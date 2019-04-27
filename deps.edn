@@ -1,0 +1,5 @@
+{:deps {org.clojure/clojurescript {:mvn/version "1.10.520"}
+        binaryage/devtools {:mvn/version "0.9.10"}
+        cljsjs/handsontable {:mvn/version "0.31.2-0"}
+        cljsjs/react {:mvn/version "16.8.3-0"}
+        reagent {:mvn/version "0.8.1"}}}
