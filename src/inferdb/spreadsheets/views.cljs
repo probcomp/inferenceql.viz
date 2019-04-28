@@ -1,6 +1,7 @@
 (ns inferdb.spreadsheets.views
   (:require [re-frame.core :as rf]
             [camel-snake-kebab.core :as csk]
+            [oz.core :as oz]
             [inferdb.spreadsheets.handsontable :as hot]))
 
 (def hooks [:after-deselect :after-selection-end])
@@ -15,16 +16,20 @@
           hooks))
 
 (def default-hot-settings
-  (-> {:settings {:data                []
+  (-> {:settings {:licenseKey          "non-commercial-and-evaluation"
+                  :data                []
                   :row-headers         true
                   :colHeaders          []
                   :filters             true
                   :bindRowsWithHeaders true
                   :columnSorting       true
-                  :selectionMode       :single}}
+                  :selectionMode       :multiple}}
       (update :settings merge (hook-hot-settings hooks))))
 
 (defn app
   []
-  (let [hot-props @(rf/subscribe [:hot-props])]
-    [hot/handsontable hot-props]))
+  (let [hot-props @(rf/subscribe [:hot-props])
+        selected-maps @(rf/subscribe [:selections])]
+    (js/console.log selected-maps)
+    [:div
+     [hot/handsontable hot-props]]))

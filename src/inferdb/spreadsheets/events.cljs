@@ -13,10 +13,10 @@
  :after-selection-end
  [interceptors/check-spec]
  (fn [db [_ row column row2 column2 selection-layer-level]]
-   (db/add-selection db row column row2 column2)))
+   (db/selection db row column row2 column2 selection-layer-level)))
 
 (rf/reg-event-db
  :after-deselect
  [interceptors/check-spec]
  (fn [db _]
-   (db/clear-selection db)))
+   (db/clear-selections db)))

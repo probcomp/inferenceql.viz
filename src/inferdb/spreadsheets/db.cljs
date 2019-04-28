@@ -13,17 +13,31 @@
                           :col ::column-index
                           :row2 ::row-index
                           :col2 ::column-index))
+(s/def ::selections (s/coll-of ::selection))
 
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::selection]))
+                    :opt [::selections]))
 
-(defn add-selection
-  [db row col row2 col2]
-  (assoc-in db [::selection] [row col row2 col2]))
+(defn selection
+  [db row col row2 col2 selection-layer-level]
+  (update-in db [::selections] (fnil #(assoc % selection-layer-level [row col row2 col2])
+                                     [])))
 
-(defn clear-selection
+(defn clear-selections
   [db]
-  (dissoc db ::selection))
+  (dissoc db ::selections))
+
+(defn table-selections
+  [db]
+  (get-in db [::selections]))
+
+(defn table-headers
+  [db]
+  (get-in db [::headers]))
+
+(defn table-rows
+  [db]
+  (get-in db [::rows]))
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."

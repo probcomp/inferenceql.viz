@@ -7,6 +7,7 @@
             [inferdb.spreadsheets.views :as views]))
 
 (enable-console-print!)
+(set! *warn-on-infer* true)
 
 (rf/dispatch-sync [:initialize-db])
 

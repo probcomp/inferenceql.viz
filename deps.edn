@@ -3,8 +3,7 @@
                                  :sha "29a73a3e5fef8329c14dd44a0b151e90b86c0854"}
         binaryage/devtools {:mvn/version "0.9.10"}
         camel-snake-kebab {:mvn/version "0.4.0"}
-        cljsjs/handsontable {:mvn/version "0.31.2-0"}
-        cljsjs/react {:mvn/version "16.8.3-0"}
         expound {:mvn/version "0.7.2"}
+        metasoarous/oz {:mvn/version "1.6.0-alpha2"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.6"}}}

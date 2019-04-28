@@ -1,6 +1,6 @@
 (ns inferdb.spreadsheets.handsontable
   "A Handsontable Reagent component."
-  (:require [cljsjs.handsontable]
+  (:require [yarn.handsontable]
             [cljsjs.react]
             [reagent.core :as reagent]
             [reagent.dom :as dom]))

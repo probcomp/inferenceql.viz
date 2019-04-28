@@ -15,8 +15,22 @@
         rows))
 
 (defn hot-props
-  [{:keys [::db/headers ::db/rows] :as db} _]
-  (-> views/default-hot-settings
-      (assoc-in [:settings :data] (cell-vector headers rows))
-      (assoc-in [:settings :colHeaders] headers)))
+  [db _]
+  (let [headers (db/table-headers db)
+        rows    (db/table-rows db)]
+    (-> views/default-hot-settings
+        (assoc-in [:settings :data] (cell-vector headers rows))
+        (assoc-in [:settings :colHeaders] headers))))
 (rf/reg-sub :hot-props hot-props)
+
+(defn selections
+  [db _]
+  (db/table-selections db))
+(rf/reg-sub :selections selections)
+
+(defn selected-maps
+  [selections _]
+  selections)
+(rf/reg-sub :selected-maps
+            (fn [_ _]
+              (rf/subscribe [:selections])))
