@@ -43,10 +43,9 @@
 (defn selected-map
   [headers rows [row col row2 col2 selection-layer-level]]
   (let [selected-headers (mapv headers (if (<= col col2)
-                                         (range col (inc col2))
-                                         (range (inc col2) (- col 2) -1)))
+                                         (range col (inc col2)  1)
+                                         (range col (dec col2) -1)))
         selected-rows    (subvec rows row (inc row2))]
-    (js/console.log col col2 selected-headers)
     (mapv (fn [row]
             (into (sorted-map-by (fn [header1 header2]
                                    (< (.indexOf selected-headers header1)
