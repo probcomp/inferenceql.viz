@@ -8,3 +8,15 @@
  [interceptors/check-spec]
  (fn [db _]
    (db/default-db)))
+
+(rf/reg-event-db
+ :after-selection-end
+ [interceptors/check-spec]
+ (fn [db [_ row column row2 column2 selection-layer-level]]
+   (db/add-selection db row column row2 column2)))
+
+(rf/reg-event-db
+ :after-deselect
+ [interceptors/check-spec]
+ (fn [db _]
+   (db/clear-selection db)))

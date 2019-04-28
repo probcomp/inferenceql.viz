@@ -5,7 +5,25 @@
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/cat :row (s/* ::row)))
 (s/def ::headers (s/cat :header (s/* ::header)))
-(s/def ::db (s/keys :req [::headers ::rows]))
+
+(s/def ::index nat-int?)
+(s/def ::row-index ::index)
+(s/def ::column-index ::index)
+(s/def ::selection (s/cat :row ::row-index
+                          :col ::column-index
+                          :row2 ::row-index
+                          :col2 ::column-index))
+
+(s/def ::db (s/keys :req [::headers ::rows]
+                    :opt [::selection]))
+
+(defn add-selection
+  [db row col row2 col2]
+  (assoc-in db [::selection] [row col row2 col2]))
+
+(defn clear-selection
+  [db]
+  (dissoc db ::selection))
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
