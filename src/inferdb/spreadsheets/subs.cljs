@@ -1,5 +1,6 @@
 (ns inferdb.spreadsheets.subs
-  (:require [re-frame.core :as rf]))
+  (:require [re-frame.core :as rf]
+            [inferdb.spreadsheets.db :as db]))
 
 (defn- cell-vector
   "Takes tabular data represented as a sequence of maps and reshapes the data as a
@@ -20,7 +21,7 @@
               :dropdownMenu true}})
 
 (defn hot-props
-  [{:keys [headers rows] :as db} _]
+  [{:keys [::db/headers ::db/rows] :as db} _]
   (-> default-hot-settings
       (assoc-in [:settings :data] (cell-vector headers rows))
       (assoc-in [:settings :colHeaders] headers)))

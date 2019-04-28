@@ -1,6 +1,9 @@
 {:deps {org.clojure/clojurescript {:mvn/version "1.10.520"}
+        org.clojure/spec-alpha2 {:git/url "https://github.com/clojure/spec-alpha2.git"
+                                 :sha "29a73a3e5fef8329c14dd44a0b151e90b86c0854"}
         binaryage/devtools {:mvn/version "0.9.10"}
         cljsjs/handsontable {:mvn/version "0.31.2-0"}
         cljsjs/react {:mvn/version "16.8.3-0"}
+        expound {:mvn/version "0.7.2"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.6"}}}
