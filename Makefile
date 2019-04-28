@@ -1,6 +1,6 @@
 compile-opts := compile-opts.edn
-main-ns := table.core
-output-dir := out
+main-ns      := inferdb.spreadsheets.core
+output-dir   := out
 
 clean:
 	rm -R $(output-dir)
