@@ -6,6 +6,8 @@
             [inferdb.spreadsheets.subs]
             [inferdb.spreadsheets.views :as views]))
 
+(enable-console-print!)
+
 (rf/dispatch-sync [:initialize-db])
 
 (defn ^:export -main
