@@ -3,6 +3,9 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
+(def hooks [:after-deselect
+            :after-selection-end])
+
 (rf/reg-event-db
  :initialize-db
  [interceptors/check-spec]

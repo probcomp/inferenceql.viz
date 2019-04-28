@@ -3,6 +3,16 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]))
 
+(defn table-headers
+  [db _]
+  (db/table-headers db))
+(rf/reg-sub :table-headers table-headers)
+
+(defn table-rows
+  [db _]
+  (db/table-rows db))
+(rf/reg-sub :table-rows table-rows)
+
 (defn- cell-vector
   "Takes tabular data represented as a sequence of maps and reshapes the data as a
   2D vector of cells and a vector of headers."
@@ -15,22 +25,41 @@
         rows))
 
 (defn hot-props
-  [db _]
-  (let [headers (db/table-headers db)
-        rows    (db/table-rows db)]
-    (-> views/default-hot-settings
-        (assoc-in [:settings :data] (cell-vector headers rows))
-        (assoc-in [:settings :colHeaders] headers))))
-(rf/reg-sub :hot-props hot-props)
+  [{:keys [::db/headers ::db/rows]} _]
+  (-> views/default-hot-settings
+      (assoc-in [:settings :data] (cell-vector headers rows))
+      (assoc-in [:settings :colHeaders] headers)))
+(rf/reg-sub :hot-props
+            (fn [_ _]
+              {::db/headers (rf/subscribe [:table-headers])
+               ::db/rows    (rf/subscribe [:table-rows])})
+            hot-props)
 
 (defn selections
   [db _]
   (db/table-selections db))
 (rf/reg-sub :selections selections)
 
+(defn selected-map
+  [headers rows [row col row2 col2 selection-layer-level]]
+  (let [selected-headers (mapv headers (if (<= col col2)
+                                         (range col (inc col2))
+                                         (range (inc col2) (- col 2) -1)))
+        selected-rows    (subvec rows row (inc row2))]
+    (js/console.log col col2 selected-headers)
+    (mapv (fn [row]
+            (into (sorted-map-by (fn [header1 header2]
+                                   (< (.indexOf selected-headers header1)
+                                      (.indexOf selected-headers header2))))
+                  (select-keys row selected-headers)))
+          selected-rows)))
+
 (defn selected-maps
-  [selections _]
-  selections)
+  [{:keys [::db/headers ::db/rows ::db/selections]} _]
+  (mapv #(selected-map headers rows %) selections))
 (rf/reg-sub :selected-maps
             (fn [_ _]
-              (rf/subscribe [:selections])))
+              {::db/headers    (rf/subscribe [:table-headers])
+               ::db/rows       (rf/subscribe [:table-rows])
+               ::db/selections (rf/subscribe [:selections])})
+            selected-maps)
