@@ -44,9 +44,9 @@
   "When the application starts, this will be the value put in `app-db`."
   []
   {::headers ["x" "y" "z"]
-   ::rows (into []
-                (repeatedly 100 (fn []
-                                  (let [x (dist/uniform 0 10)]
-                                    {"x" x
-                                     "y" (dist/gaussian 0 x)
-                                     "z" (dist/gaussian 0 1)}))))})
+   ::rows (into [] (repeatedly 10000
+                               (fn []
+                                 (let [x (dist/uniform 0 10)]
+                                   {"x" x
+                                    "y" (dist/gaussian 0 x)
+                                    "z" (dist/gaussian 0 1)}))))})
