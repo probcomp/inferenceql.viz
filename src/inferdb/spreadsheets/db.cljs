@@ -1,5 +1,6 @@
 (ns inferdb.spreadsheets.db
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [metaprob.distributions :as dist]))
 
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
@@ -42,19 +43,10 @@
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
   []
-  {::headers ["" "Ford" "Tesla" "Toyota" "Honda"]
-   ::rows    [{""       "2017"
-               "Ford"   10
-               "Tesla"  11
-               "Toyota" 12
-               "Honda"  13}
-              {""       "2018"
-               "Ford"   20
-               "Tesla"  11
-               "Toyota" 14
-               "Honda"  13}
-              {""       "2019"
-               "Ford"   30
-               "Tesla"  15
-               "Toyota" 12
-               "Honda"  13}]})
+  {::headers ["x" "y" "z"]
+   ::rows (into []
+                (repeatedly 100 (fn []
+                                  (let [x (dist/uniform 0 10)]
+                                    {"x" x
+                                     "y" (dist/gaussian 0 x)
+                                     "z" (dist/gaussian 0 1)}))))})

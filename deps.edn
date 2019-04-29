@@ -6,4 +6,6 @@
         expound {:mvn/version "0.7.2"}
         metasoarous/oz {:mvn/version "1.6.0-alpha2"}
         reagent {:mvn/version "0.8.1"}
-        re-frame {:mvn/version "0.10.6"}}}
+        re-frame {:mvn/version "0.10.6"}
+        probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
+                           :sha "7f2e086250bfdf3ebf6dce6b9529059d1bfbe6fd"}}}
