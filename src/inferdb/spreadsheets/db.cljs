@@ -1,5 +1,6 @@
 (ns inferdb.spreadsheets.db
   (:require [clojure.spec.alpha :as s]
+            [inferdb.spreadsheets.data :refer [nyt-data]]
             [metaprob.distributions :as dist]))
 
 (s/def ::header string?)
@@ -43,10 +44,6 @@
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
   []
-  {::headers ["x" "y" "z"]
-   ::rows (into [] (repeatedly 10000
-                               (fn []
-                                 (let [x (dist/uniform 0 10)]
-                                   {"x" x
-                                    "y" (dist/gaussian 0 x)
-                                    "z" (dist/gaussian 0 1)}))))})
+  {::headers ["geo_fips"  "district_name" "percap"
+              "percent_married_children" "percent_college" "percent_black"]
+   ::rows (into [] nyt-data)})

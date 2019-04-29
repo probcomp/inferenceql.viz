@@ -8,4 +8,4 @@
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.6"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
-                           :sha "7f2e086250bfdf3ebf6dce6b9529059d1bfbe6fd"}}}
+                           :sha "d805d626b03dd8a5122c6b3a5d34acea12fe3b8d"}}}
