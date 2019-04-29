@@ -62,3 +62,32 @@
                ::db/rows       (rf/subscribe [:table-rows])
                ::db/selections (rf/subscribe [:selections])})
             selected-maps)
+
+(rf/reg-sub :vega-lite-spec
+            (fn [_ _]
+              (rf/subscribe [:selected-maps]))
+            (fn [selected-maps]
+              (when-let [selection (first selected-maps)]
+                (let [keys (-> selection first keys)]
+                  (clj->js
+                   (if (= 1 (count keys))
+                     {:$schema
+                      "https://vega.github.io/schema/vega-lite/v3.json",
+                      :data {:values selection},
+                      :mark "bar",
+                      :encoding
+                      {:x {:bin true,
+                           :field (first keys),
+                           :type "quantitative"},
+                       :y {:aggregate "count", :type "quantitative"}}}
+                     {:$schema
+                      "https://vega.github.io/schema/vega-lite/v3.json"
+                      :data {:values selection}
+                      :mark "point"
+                      :encoding
+                      (reduce (fn [acc [k field]]
+                                (assoc acc k {:field field, :type "quantitative"}))
+                              {}
+                              (map vector
+                                   [:x :y]
+                                   keys))}))))))

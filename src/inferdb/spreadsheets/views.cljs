@@ -27,8 +27,11 @@
 (defn app
   []
   (let [hot-props @(rf/subscribe [:hot-props])
-        selected-maps @(rf/subscribe [:selected-maps])]
+        selected-maps @(rf/subscribe [:selected-maps])
+        vega-lite-spec @(rf/subscribe [:vega-lite-spec])]
     [:div
      [hot/handsontable hot-props]
-     [oz/vega-lite]
-     [:pre (with-out-str (cljs.pprint/pprint selected-maps))]]))
+     [oz/vega-lite vega-lite-spec]
+     #_
+     (let [vega-lite-spec ]
+       [:pre (with-out-str (cljs.pprint/pprint @(rf/subscribe [:vega-lite-spec])))])]))
