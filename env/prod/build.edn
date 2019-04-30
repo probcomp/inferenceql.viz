@@ -1,0 +1,12 @@
+{:main "inferdb.spreadsheets.core"
+ :output-dir "out"
+ :output-to "out/main.js"
+ :foreign-libs [{:file "node_modules/hot-formula-parser/dist/formula-parser.js"
+                 :file-min "node_modules/hot-formula-parser/dist/formula-parser.min.js"
+                 :provides ["yarn.formula-parser"]}
+                {:file "node_modules/handsontable/dist/handsontable.full.js"
+                 :file-min "node_modules/handsontable/dist/handsontable.min.js"
+                 :requires ["yarn.formula-parser"]
+                 :provides ["yarn.handsontable"]}]
+ :optimizations :advanced
+ :infer-externs true}
