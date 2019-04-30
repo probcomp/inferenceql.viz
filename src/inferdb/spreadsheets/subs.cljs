@@ -3,10 +3,30 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]))
 
+(rf/reg-sub :scores
+            (fn [db _]
+              (db/scores db)))
+
 (defn table-headers
   [db _]
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
+
+(rf/reg-sub :computed-headers
+            (fn [_ _]
+              (rf/subscribe [:table-headers]))
+            (fn [headers]
+              (into ["score"] headers)))
+
+(rf/reg-sub :computed-rows
+            (fn [_ _]
+              {:rows (rf/subscribe [:table-rows])
+               :scores (rf/subscribe [:scores])})
+            (fn [{:keys [rows scores]}]
+              (cond->> rows
+                scores (mapv (fn [score row]
+                               (assoc row "score" score))
+                             scores))))
 
 (defn table-rows
   [db _]
@@ -25,69 +45,54 @@
         rows))
 
 (defn hot-props
-  [{:keys [::db/headers ::db/rows]} _]
-  (-> views/default-hot-settings
-      (assoc-in [:settings :data] (cell-vector headers rows))
-      (assoc-in [:settings :colHeaders] headers)))
+  [{:keys [headers rows]} _]
+  (let [data (cell-vector headers rows)]
+    (-> views/default-hot-settings
+        (assoc-in [:settings :data] data)
+        (assoc-in [:settings :colHeaders] headers))))
 (rf/reg-sub :hot-props
             (fn [_ _]
-              {::db/headers (rf/subscribe [:table-headers])
-               ::db/rows    (rf/subscribe [:table-rows])})
+              {:headers (rf/subscribe [:computed-headers])
+               :rows    (rf/subscribe [:computed-rows])})
             hot-props)
 
 (defn selections
   [db _]
-  (db/table-selections db))
+  (db/selections db))
 (rf/reg-sub :selections selections)
 
-(defn selected-map
-  [headers rows [row col row2 col2 selection-layer-level]]
-  (let [selected-headers (mapv headers (if (<= col col2)
-                                         (range col (inc col2)  1)
-                                         (range col (dec col2) -1)))
-        selected-rows    (subvec rows row (inc row2))]
-    (mapv (fn [row]
-            (into (sorted-map-by (fn [header1 header2]
-                                   (< (.indexOf selected-headers header1)
-                                      (.indexOf selected-headers header2))))
-                  (select-keys row selected-headers)))
-          selected-rows)))
+(defn selected-columns
+  [db _]
+  (db/selected-columns db))
+(rf/reg-sub :selected-columns selected-columns)
 
-(defn selected-maps
-  [{:keys [::db/headers ::db/rows ::db/selections]} _]
-  (mapv #(selected-map headers rows %) selections))
-(rf/reg-sub :selected-maps
-            (fn [_ _]
-              {::db/headers    (rf/subscribe [:table-headers])
-               ::db/rows       (rf/subscribe [:table-rows])
-               ::db/selections (rf/subscribe [:selections])})
-            selected-maps)
-
+(defn vega-lite-spec
+  [{:keys [selections selected-columns]}]
+  (when-let [selection (first selections)]
+    (clj->js
+     (if (= 1 (count selected-columns))
+       {:$schema
+        "https://vega.github.io/schema/vega-lite/v3.json",
+        :data {:values selection},
+        :mark "bar",
+        :encoding
+        {:x {:bin true,
+             :field (first selected-columns),
+             :type "quantitative"},
+         :y {:aggregate "count", :type "quantitative"}}}
+       {:$schema
+        "https://vega.github.io/schema/vega-lite/v3.json"
+        :data {:values selection}
+        :mark "point"
+        :encoding
+        (reduce (fn [acc [k field]]
+                  (assoc acc k {:field field, :type "quantitative"}))
+                {}
+                (map vector
+                     [:x :y]
+                     (take 2 selected-columns)))}))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              (rf/subscribe [:selected-maps]))
-            (fn [selected-maps]
-              (when-let [selection (first selected-maps)]
-                (let [keys (-> selection first keys)]
-                  (clj->js
-                   (if (= 1 (count keys))
-                     {:$schema
-                      "https://vega.github.io/schema/vega-lite/v3.json",
-                      :data {:values selection},
-                      :mark "bar",
-                      :encoding
-                      {:x {:bin true,
-                           :field (first keys),
-                           :type "quantitative"},
-                       :y {:aggregate "count", :type "quantitative"}}}
-                     {:$schema
-                      "https://vega.github.io/schema/vega-lite/v3.json"
-                      :data {:values selection}
-                      :mark "point"
-                      :encoding
-                      (reduce (fn [acc [k field]]
-                                (assoc acc k {:field field, :type "quantitative"}))
-                              {}
-                              (map vector
-                                   [:x :y]
-                                   keys))}))))))
+              {:selections (rf/subscribe [:selections])
+               :selected-columns (rf/subscribe [:selected-columns])})
+            vega-lite-spec)

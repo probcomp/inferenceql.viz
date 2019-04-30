@@ -11,27 +11,36 @@
 (s/def ::index nat-int?)
 (s/def ::row-index ::index)
 (s/def ::column-index ::index)
-(s/def ::selection (s/cat :row ::row-index
-                          :col ::column-index
-                          :row2 ::row-index
-                          :col2 ::column-index))
+
+(s/def ::selection ::row)
 (s/def ::selections (s/coll-of ::selection))
+(s/def ::selected-columns (s/coll-of (s/coll-of ::header)))
+
+(s/def ::score number?)
+(s/def ::scores (s/coll-of ::score))
 
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::selections]))
+                    :opt [::scores ::selections ::selected-columns]))
 
-(defn selection
-  [db row col row2 col2 selection-layer-level]
-  (update-in db [::selections] (fnil #(assoc % selection-layer-level [row col row2 col2])
-                                     [])))
+(defn with-selections
+  [db selections]
+  (assoc db ::selections selections))
+
+(defn with-selected-columns
+  [db columns]
+  (assoc db ::selected-columns columns))
 
 (defn clear-selections
   [db]
-  (dissoc db ::selections))
+  (dissoc db ::selections ::selected-columns))
 
-(defn table-selections
+(defn selections
   [db]
   (get-in db [::selections]))
+
+(defn selected-columns
+  [db]
+  (get-in db [::selected-columns]))
 
 (defn table-headers
   [db]
@@ -40,6 +49,14 @@
 (defn table-rows
   [db]
   (get-in db [::rows]))
+
+(defn scores
+  [db]
+  (get-in db [::scores]))
+
+(defn with-scores
+  [db scores]
+  (assoc-in db [::scores] scores))
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
