@@ -66,31 +66,65 @@
   (db/selected-columns db))
 (rf/reg-sub :selected-columns selected-columns)
 
+(def ^:private topojson-feature "cb_2017_us_cd115_20m")
+
+(defn- left-pad
+  [s n c]
+  (str (apply str (repeat (max 0 (- n (count s)))
+                          c))
+       s))
+
 (defn vega-lite-spec
   [{:keys [selections selected-columns]}]
   (when-let [selection (first selections)]
     (clj->js
-     (if (= 1 (count selected-columns))
-       {:$schema
-        "https://vega.github.io/schema/vega-lite/v3.json",
-        :data {:values selection},
-        :mark "bar",
-        :encoding
-        {:x {:bin true,
-             :field (first selected-columns),
-             :type "quantitative"},
-         :y {:aggregate "count", :type "quantitative"}}}
-       {:$schema
-        "https://vega.github.io/schema/vega-lite/v3.json"
-        :data {:values selection}
-        :mark "point"
-        :encoding
-        (reduce (fn [acc [k field]]
-                  (assoc acc k {:field field, :type "quantitative"}))
-                {}
-                (map vector
-                     [:x :y]
-                     (take 2 selected-columns)))}))))
+     (cond (= 1 (count selected-columns))
+           {:$schema
+            "https://vega.github.io/schema/vega-lite/v3.json",
+            :data {:values selection},
+            :mark "bar",
+            :encoding
+            {:x {:bin true,
+                 :field (first selected-columns),
+                 :type "quantitative"},
+             :y {:aggregate "count", :type "quantitative"}}}
+
+           (some #{"geo_fips"} selected-columns)
+           (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
+                 transformed-selection (mapv (fn [row]
+                                               (update row "geo_fips" #(left-pad (str %) 4 \0)))
+                                             selection)
+                 name {:field "NAME"
+                       :type "nominal"}
+                 color {:field map-column
+                        :type "quantitative"}]
+             {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+              :width 500
+              :height 300
+              :data {:values js/topojson
+                     :format {:type "topojson"
+                              :feature topojson-feature}}
+              :transform [{:lookup "properties.GEOID"
+                           :from {:data {:values transformed-selection}
+                                  :key "geo_fips"
+                                  "fields" [(:field name) (:field color)]}}]
+              :projection {:type "albersUsa"}
+              :mark "geoshape"
+              :encoding {:tooltip [name color]
+                         :color color}})
+
+           :else
+           {:$schema
+            "https://vega.github.io/schema/vega-lite/v3.json"
+            :data {:values selection}
+            :mark "point"
+            :encoding
+            (reduce (fn [acc [k field]]
+                      (assoc acc k {:field field, :type "quantitative"}))
+                    {}
+                    (map vector
+                         [:x :y]
+                         (take 2 selected-columns)))}))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:selections (rf/subscribe [:selections])

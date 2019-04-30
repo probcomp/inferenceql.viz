@@ -31,7 +31,6 @@
          (let [dom-node (dom/dom-node this)
                hot (js/Handsontable. dom-node (clj->js (:settings props)))]
            (doseq [key hooks]
-             (js/console.log )
              (let [camel-key (csk/->camelCase (clj->js key))]
                (js/Handsontable.hooks.add camel-key
                                           (fn [& args]

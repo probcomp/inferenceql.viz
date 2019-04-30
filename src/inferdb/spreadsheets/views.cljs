@@ -55,5 +55,3 @@
      [:div {:style {:display "flex"
                     :justify-content "center"}}
       [oz/vega-lite vega-lite-spec]]]))
-
-#_[:pre (with-out-str (cljs.pprint/pprint @(rf/subscribe [:vega-lite-spec])))]

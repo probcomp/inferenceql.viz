@@ -19,8 +19,10 @@
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
+(s/def ::topojson any?)
+
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::scores ::selections ::selected-columns]))
+                    :opt [::scores ::selections ::selected-columns ::topojson]))
 
 (defn with-selections
   [db selections]
