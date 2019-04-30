@@ -16,6 +16,13 @@ DISTFILE = $(DISTDIR).tar.gz
 COPTS      := env/dev/build.edn
 HOTDISTDIR  = $(NODEMODULESDIR)/handsontable/dist/
 
+MAINOPTS = -co $(COPTS) -d $(OUTDIR) -c $(MAINNS)
+CLJFLAGS = -m cljs.main $(MAINOPTS)
+
+JSOUT  := main.js
+CSSOUT := styles.css
+SYMLINK = $(CURDIR)/$(DISTDIR)/$(JSOUT)
+
 test:
 	echo "$(HOTDISTDIR)"
 
@@ -26,7 +33,6 @@ prod-env:
 COPTS    = env/prod/build.edn
 CSSFILE  = $(HOTDISTDIR)/handsontable.full.min.css
 
-
 dev-env:
 COPTS   = env/dev/build.edn
 CSSFILE = $(HOTDISTDIR)/handsontable.full.css
@@ -35,13 +41,6 @@ watch-env:
 CLJFLAGS += -watch $(SRCDIR)
 
 watch: dev-env watch-env build $(SYMLINK)
-
-MAINOPTS = -co $(COPTS) -d $(OUTDIR) -c $(MAINNS)
-CLJFLAGS = -m cljs.main $(MAINOPTS)
-
-JSOUT  := main.js
-CSSOUT := styles.css
-SYMLINK = $(CURDIR)/$(DISTDIR)/$(JSOUT)
 
 all: dist
 
