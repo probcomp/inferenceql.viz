@@ -1,3 +1,5 @@
+export
+
 MAINNS         := inferdb.spreadsheets.core
 NODEMODULESDIR := node_modules
 SRCDIR         := src
@@ -17,17 +19,22 @@ HOTDISTDIR  = $(NODEMODULESDIR)/handsontable/dist/
 test:
 	echo "$(HOTDISTDIR)"
 
-prod: COPTS   ?= env/prod/build.edn
-prod: CSSFILE  = $(HOTDISTDIR)/handsontable.full.min.css
-prod: build
+prod: prod-env $(DISTDIR) build
 	cp $(JSFILE) $(DISTDIR)
 
-dev: COPTS   ?= env/dev/build.edn
-dev: CSSFILE  = $(HOTDISTDIR)/handsontable.full.css
-dev: $(SYMLINK)
+prod-env:
+COPTS    = env/prod/build.edn
+CSSFILE  = $(HOTDISTDIR)/handsontable.full.min.css
 
-watch: CLJFLAGS += -watch $(SRCDIR)
-watch: build
+
+dev-env:
+COPTS   = env/dev/build.edn
+CSSFILE = $(HOTDISTDIR)/handsontable.full.css
+
+watch-env:
+CLJFLAGS += -watch $(SRCDIR)
+
+watch: dev-env watch-env build $(SYMLINK)
 
 MAINOPTS = -co $(COPTS) -d $(OUTDIR) -c $(MAINNS)
 CLJFLAGS = -m cljs.main $(MAINOPTS)
@@ -39,6 +46,8 @@ SYMLINK = $(CURDIR)/$(DISTDIR)/$(JSOUT)
 all: dist
 
 build: $(JSFILE)
+
+prod-dist: prod dist
 
 dist: build $(DISTDIR) $(HTMLFILE) $(CSSFILE)
 	cp $(HTMLFILE) $(DISTDIR)
