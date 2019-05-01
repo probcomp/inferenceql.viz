@@ -15,11 +15,3 @@
    (fix-table data/nyt-data)
    example
    emphasis))
-
-(defn search-by-example-old [example context n]
-  (sbe/search
-   model/census-cgpm
-   (fix-table data/nyt-data)
-   example
-   context
-   n))
