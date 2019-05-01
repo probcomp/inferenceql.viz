@@ -4,12 +4,22 @@
             [metaprob.examples.search-by-example :as sbe]
             [clojure.walk]))
 
-(defn search-by-example [example context n]
+(defn fix-table [t]
+  (map
+   #(dissoc % :geo_fips :district_name)
+   (clojure.walk/keywordize-keys t)))
+
+(defn search-by-example [example emphasis _]
   (sbe/search
    model/census-cgpm
-   (map
-    #(dissoc % :geo_fips :district_name)
-    (clojure.walk/keywordize-keys data/nyt-data))
+   (fix-table data/nyt-data)
+   example
+   emphasis))
+
+(defn search-by-example-old [example context n]
+  (sbe/search
+   model/census-cgpm
+   (fix-table data/nyt-data)
    example
    context
    n))

@@ -57,7 +57,7 @@
    (let [row (edn/read-string text)]
      (let [result #_(mapv (fn [i] [i 0])
                           (range 435))
-           (search/search-by-example row #{:cluster-for-percap} 1)]
+           (search/search-by-example row :cluster-for-percap 1)]
        (rf/dispatch [:search-result result])))
    db))
 
