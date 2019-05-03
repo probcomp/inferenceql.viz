@@ -22,8 +22,7 @@
    :hooks events/hooks})
 
 (def ^:private default-search-string
-  (pr-str {:percent_married_children 0.90
-           :percent_black            0.10}))
+  (pr-str {"percent_black" 0.40}))
 
 (defn search-form
   [name]
