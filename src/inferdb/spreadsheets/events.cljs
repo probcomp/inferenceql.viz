@@ -5,7 +5,7 @@
             [inferdb.spreadsheets.events.interceptors :as interceptors]
             [inferdb.spreadsheets.search :as search]))
 
-(def hooks [#_:after-deselect :after-selection])
+(def hooks [:after-deselect :after-selection-end])
 
 #_
 (defn selected-map
@@ -26,7 +26,7 @@
    (db/default-db)))
 
 (rf/reg-event-db
- :after-selection
+ :after-selection-end
  (fn [db [_ hot row col row2 col2 prevent-scrolling selection-layer-level]]
    (let [headers (map #(.getColHeader hot %)
                       (range (min col col2) (inc (max col col2))))
@@ -50,15 +50,14 @@
  :after-deselect
  [interceptors/check-spec]
  (fn [db _]
+   (js/console.log "DESELECT")
    (db/clear-selections db)))
 
 (rf/reg-event-db
  :search
  (fn [db [_ text]]
    (let [row (edn/read-string text)]
-     (let [result #_(mapv (fn [i] [i 0])
-                          (range 435))
-           (search/search-by-example row :cluster-for-percap 1)]
+     (let [result (search/search-by-example row :cluster-for-percap 1)]
        (rf/dispatch [:search-result result])))
    db))
 

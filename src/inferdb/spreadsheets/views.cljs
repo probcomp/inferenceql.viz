@@ -37,11 +37,6 @@
                  :style {:float "right"}}
         "Search"]])))
 
-(defn debug
-  [data]
-  (when data
-    [:pre (with-out-str (cljs.pprint/pprint data))]))
-
 (defn app
   []
   (let [hot-props @(rf/subscribe [:hot-props])
@@ -55,4 +50,5 @@
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
-      [oz/vega-lite vega-lite-spec]]]))
+      (when vega-lite-spec
+        [oz/vega-lite vega-lite-spec])]]))

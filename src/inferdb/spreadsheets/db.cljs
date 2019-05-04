@@ -34,6 +34,10 @@
   [db row-index]
   (assoc db ::selected-row row-index))
 
+(defn selected-row-index
+  [db]
+  (get db ::selected-row))
+
 (defn selected-row
   [db]
   (when-let [row-index (get db ::selected-row)]
@@ -50,7 +54,10 @@
 
 (defn clear-selections
   [db]
-  (dissoc db ::selections ::selected-columns))
+  (dissoc db
+          ::selections
+          ::selected-row
+          ::selected-columns))
 
 (defn selections
   [db]

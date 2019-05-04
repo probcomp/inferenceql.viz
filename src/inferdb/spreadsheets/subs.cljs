@@ -15,9 +15,19 @@
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
 
-(rf/reg-sub :selected-row
+(rf/reg-sub :selected-row-index
             (fn [db _]
-              (db/selected-row db)))
+              (db/selected-row-index db)))
+
+(rf/reg-sub :selected-row
+            (fn [_ _]
+              {:computed-rows (rf/subscribe [:computed-rows])
+               :selected-row-index (rf/subscribe [:selected-row-index])})
+            (fn [{:keys [selected-row-index computed-rows]} _]
+              (js/console.log "computed-rows" (take 10 computed-rows))
+              (js/console.log "reloading selected row")
+              (when selected-row-index
+                (nth computed-rows selected-row-index))))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -30,6 +40,7 @@
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])})
             (fn [{:keys [rows scores]}]
+              (js/console.log "reloading computed rows")
               (cond->> rows
                 scores (mapv (fn [score row]
                                (assoc row "score" score))
@@ -83,10 +94,13 @@
 
 (defn vega-lite-spec
   [{:keys [selected-row selections selected-columns]}]
+  (js/console.log "reloading vega-lite")
   (when-let [selection (first selections)]
     (clj->js
      (cond (and (= 1 (count selected-columns))
-                (= 1 (count (first selections))))
+                (= 1 (count (first selections)))
+                (not (contains? #{"geo_fips" "district_name" "score"}
+                                (first selected-columns))))
            (let [selected-row-kw (walk/keywordize-keys selected-row)
                  selected-column-kw (keyword (first selected-columns))
                  values (cgpm/cgpm-simulate nyt/census-cgpm
@@ -94,7 +108,8 @@
                                             (dissoc selected-row-kw
                                                     selected-column-kw
                                                     :district_name
-                                                    :geo_fips)
+                                                    :geo_fips
+                                                    :score)
                                             {}
                                             100)]
              {:$schema
@@ -106,7 +121,7 @@
                                       :type "quantitative"}
                                   :y {:aggregate "count"
                                       :type "quantitative"
-                                      :axis {:title "Distribution of probable values"}}}}
+                                      :axis {:title "distribution of probable values"}}}}
                       {:data {:values [{selected-column-kw (-> selected-row (get (first selected-columns)))
                                         :label "Selected row"}]}
                        :mark {:type "rule"
@@ -163,8 +178,8 @@
                          (take 2 selected-columns)))}))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:selected-row (rf/subscribe [:selected-row])
-               :selections (rf/subscribe [:selections])
+              {:selected-row     (rf/subscribe [:selected-row])
+               :selections       (rf/subscribe [:selections])
                :selected-columns (rf/subscribe [:selected-columns])})
             vega-lite-spec)
 

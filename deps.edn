@@ -7,7 +7,7 @@
         metasoarous/oz {:mvn/version "1.6.0-alpha2"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.6"}
-        {:git/url "https://github.com/probcomp/metaprob.git"
-         :sha "f7be25995f7e4bc015b34eff0edaef6e604b8139"}
+        probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
+                           :sha "9611baaeaae54bb84100f43251808caa788d4682"}
         ;; probcomp/metaprob {:local/root "/home/joshua/projects/metaprob"}
         }}

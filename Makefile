@@ -21,5 +21,5 @@ publish:
 	cp node_modules/handsontable/dist/handsontable.full.css publish/node_modules/handsontable/dist/
 	cp index.html publish
 	cp cb_2017_us_cd115_20m-topo.js publish
-	cd publish ; surge --domain inferdb-spreadsheet.surge.sh
+	cd publish ; surge
 .PHONY: publish
