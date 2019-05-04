@@ -83,7 +83,6 @@
 
 (defn vega-lite-spec
   [{:keys [selected-row selections selected-columns]}]
-  (js/console.log selections)
   (when-let [selection (first selections)]
     (clj->js
      (cond (and (= 1 (count selected-columns))
@@ -96,18 +95,24 @@
                                                     selected-column-kw
                                                     :district_name
                                                     :geo_fips)
-                                            {} ; no arguments
-                                            50)]
+                                            {}
+                                            100)]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
               :data {:values values}
-              :mark "bar"
-              :encoding {:x {:bin true
-                             :field selected-column-kw
-                             :type "quantitative"}
-                         :y {:aggregate "count"
-                             :type "quantitative"
-                             :axis {:title "Distribution of probable values"}}}})
+              :layer [{:mark "bar"
+                       :encoding {:x {:bin true
+                                      :field selected-column-kw
+                                      :type "quantitative"}
+                                  :y {:aggregate "count"
+                                      :type "quantitative"
+                                      :axis {:title "Distribution of probable values"}}}}
+                      {:data {:values [{selected-column-kw (-> selected-row (get (first selected-columns)))
+                                        :label "Selected row"}]}
+                       :mark {:type "rule"
+                              :color "red"}
+                       :encoding {:x {:field selected-column-kw
+                                      :type "quantitative"}}}]})
 
            (= 1 (count selected-columns))
            {:$schema
@@ -148,7 +153,7 @@
            {:$schema
             "https://vega.github.io/schema/vega-lite/v3.json"
             :data {:values selection}
-            :mark "point"
+            :mark "circle"
             :encoding
             (reduce (fn [acc [k field]]
                       (assoc acc k {:field field, :type "quantitative"}))
