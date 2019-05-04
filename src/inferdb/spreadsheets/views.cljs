@@ -47,10 +47,14 @@
   (let [hot-props @(rf/subscribe [:hot-props])
         selected-maps @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
-        scores @(rf/subscribe [:scores])]
+        scores @(rf/subscribe [:scores])
+        db @(rf/subscribe [:whole-db])
+        selected-row @(rf/subscribe [:selected-row])]
     [:div
      [hot/handsontable {:style {:overflow "hidden"}} hot-props]
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
-      [oz/vega-lite vega-lite-spec]]]))
+      [oz/vega-lite vega-lite-spec]]
+     [:pre (with-out-str
+             (pr-str selected-row))]]))

@@ -1,7 +1,10 @@
 (ns inferdb.spreadsheets.subs
-  (:require [re-frame.core :as rf]
+  (:require [clojure.walk :as walk]
+            [re-frame.core :as rf]
             [inferdb.spreadsheets.db :as db]
-            [inferdb.spreadsheets.views :as views]))
+            [inferdb.spreadsheets.views :as views]
+            [metaprob.examples.cgpm :as cgpm]
+            [metaprob.examples.nyt :as nyt]))
 
 (rf/reg-sub :scores
             (fn [db _]
@@ -11,6 +14,10 @@
   [db _]
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
+
+(rf/reg-sub :selected-row
+            (fn [db _]
+              (db/selected-row db)))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -75,10 +82,33 @@
        s))
 
 (defn vega-lite-spec
-  [{:keys [selections selected-columns]}]
+  [{:keys [selected-row selections selected-columns]}]
   (when-let [selection (first selections)]
     (clj->js
-     (cond (= 1 (count selected-columns))
+     (cond (and (= 1 (count selected-columns))
+                (= 1 (count (keys (first selection)))))
+           (let [selected-row-kw (walk/keywordize-keys selected-row)
+                 selected-column-kw (keyword (first selected-columns))
+                 values (cgpm/cgpm-simulate nyt/census-cgpm
+                                            [selected-column-kw]
+                                            (dissoc selected-row-kw
+                                                    selected-column-kw
+                                                    :district_name
+                                                    :geo_fips)
+                                            {} ; no arguments
+                                            200)]
+             {:$schema
+              "https://vega.github.io/schema/vega-lite/v3.json"
+              :data {:values values}
+              :mark "bar"
+              :encoding {:x {:bin true
+                             :field selected-column-kw
+                             :type "quantitative"}
+                         :y {:aggregate "count"
+                             :type "quantitative"
+                             :axis {:title "Distribution of probable values"}}}})
+
+           (= 1 (count selected-columns))
            {:$schema
             "https://vega.github.io/schema/vega-lite/v3.json",
             :data {:values selection},
@@ -127,6 +157,11 @@
                          (take 2 selected-columns)))}))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:selections (rf/subscribe [:selections])
+              {:selected-row (rf/subscribe [:selected-row])
+               :selections (rf/subscribe [:selections])
                :selected-columns (rf/subscribe [:selected-columns])})
             vega-lite-spec)
+
+(rf/reg-sub :whole-db
+            (fn [db]
+              db))

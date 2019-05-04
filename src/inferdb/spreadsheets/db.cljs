@@ -21,8 +21,25 @@
 
 (s/def ::topojson any?)
 
+(s/def ::selected-row ::row-index)
+
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::scores ::selections ::selected-columns ::topojson]))
+                    :opt [::selected-row
+                          ::scores
+                          ::selections
+                          ::selected-columns
+                          ::topojson]))
+
+(defn with-selected-row-index
+  [db row-index]
+  (assoc db ::selected-row row-index))
+
+(defn selected-row
+  [db]
+  (when-let [row-index (get db ::selected-row)]
+    (js/console.log "row-index" row-index)
+    (nth (get db ::rows)
+         row-index)))
 
 (defn with-selections
   [db selections]
