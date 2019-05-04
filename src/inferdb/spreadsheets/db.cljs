@@ -81,4 +81,13 @@
   []
   {::headers ["geo_fips"  "district_name" "percap"
               "percent_married_children" "percent_college" "percent_black"]
-   ::rows (into [] nyt-data)})
+   ::rows (into [] (map (fn [row]
+                          (reduce (fn [acc key]
+                                    (cond-> acc
+                                      (and (not (contains? #{"geo_fips" "district_name"}
+                                                           key))
+                                           (dist/flip 0.2))
+                                      (dissoc acc key)))
+                                  row
+                                  (keys row)))
+                        nyt-data))})
