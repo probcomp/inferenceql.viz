@@ -37,7 +37,6 @@
 (defn selected-row
   [db]
   (when-let [row-index (get db ::selected-row)]
-    (js/console.log "row-index" row-index)
     (nth (get db ::rows)
          row-index)))
 

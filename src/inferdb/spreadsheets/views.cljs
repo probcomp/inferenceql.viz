@@ -55,6 +55,4 @@
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
-      [oz/vega-lite vega-lite-spec]]
-     [:pre (with-out-str
-             (pr-str selected-row))]]))
+      [oz/vega-lite vega-lite-spec]]]))

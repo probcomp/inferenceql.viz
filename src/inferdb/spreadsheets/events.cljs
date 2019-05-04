@@ -28,11 +28,6 @@
 (rf/reg-event-db
  :after-selection
  (fn [db [_ hot row col row2 col2 prevent-scrolling selection-layer-level]]
-   (js/console.log "row" row
-                   "col" col
-                   "row2" row2
-                   "col2" col2
-                   "sll" selection-layer-level)
    (let [headers (map #(.getColHeader hot %)
                       (range (min col col2) (inc (max col col2))))
          selected-maps (into []
