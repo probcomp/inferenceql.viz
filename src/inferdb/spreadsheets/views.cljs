@@ -14,7 +14,7 @@
               :filters             true
               :bindRowsWithHeaders true
               :selectionMode       :multiple
-              :readOnly            true
+              :readOnly            false
               :height              "30vh"
               :width               "100vw"
               :stretchH            "all"

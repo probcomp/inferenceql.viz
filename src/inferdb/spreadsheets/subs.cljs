@@ -83,10 +83,11 @@
 
 (defn vega-lite-spec
   [{:keys [selected-row selections selected-columns]}]
+  (js/console.log selections)
   (when-let [selection (first selections)]
     (clj->js
      (cond (and (= 1 (count selected-columns))
-                (= 1 (count (keys (first selection)))))
+                (= 1 (count (first selections))))
            (let [selected-row-kw (walk/keywordize-keys selected-row)
                  selected-column-kw (keyword (first selected-columns))
                  values (cgpm/cgpm-simulate nyt/census-cgpm
@@ -96,7 +97,7 @@
                                                     :district_name
                                                     :geo_fips)
                                             {} ; no arguments
-                                            200)]
+                                            50)]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
               :data {:values values}
