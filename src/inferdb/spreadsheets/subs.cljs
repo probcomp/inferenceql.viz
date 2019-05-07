@@ -3,8 +3,8 @@
             [re-frame.core :as rf]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]
-            [metaprob.examples.cgpm :as cgpm]
-            [metaprob.examples.nyt :as nyt]))
+            [inferdb.cgpm.main :as cgpm]
+            [inferdb.spreadsheets.model :as model]))
 
 (rf/reg-sub :scores
             (fn [db _]
@@ -103,7 +103,7 @@
                                 (first selected-columns))))
            (let [selected-row-kw (walk/keywordize-keys selected-row)
                  selected-column-kw (keyword (first selected-columns))
-                 values (cgpm/cgpm-simulate nyt/census-cgpm
+                 values (cgpm/cgpm-simulate model/census-cgpm
                                             [selected-column-kw]
                                             (dissoc selected-row-kw
                                                     selected-column-kw
