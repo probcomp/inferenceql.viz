@@ -20,14 +20,14 @@
     (if (contains? collection item)
       (get collection item)
       (assert false (str "no such key " item
-                         "in set " (keys collection)))))
+                         " in set " (keys collection)))))
 
 ; Assert that value is valid for given statistical type.
 (defn validate-cell
   [stattype value]
     (assert ((get stattype :valid?) value)
             (str "invalid value " value
-                 "for stattype " (get stattype :name))))
+                 " for stattype " (get stattype :name))))
 
 ; Assert that row of values are valid for given statistical types.
 ; addrs-types is a dictionary from keys to statistical types.
@@ -44,7 +44,7 @@
     (if check-all-exist?
         (assert (= (set (keys addrs-types)) (set (keys addrs-vals)))
                 (str "row " addrs-vals
-                        "must have values for " addrs-types))
+                        " must have values for " addrs-types))
         nil)))
 
 ; Assert that set-a and set-b have the same number of items.
