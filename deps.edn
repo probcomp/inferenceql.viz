@@ -7,7 +7,22 @@
         metasoarous/oz {:mvn/version "1.6.0-alpha2"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.6"}
-        probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
-                           :sha "9611baaeaae54bb84100f43251808caa788d4682"}
-        ;; probcomp/metaprob {:local/root "/home/joshua/projects/metaprob"}
-        }}
+        ;;probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
+                           ;;:sha "9611baaeaae54bb84100f43251808caa788d4682"}
+        probcomp/metaprob {:local/root "/home/joshua/projects/metaprob"}
+        }
+
+ :aliases {:test {:extra-paths ["test"]
+                  :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                                                          :sha "028a6d41ac9ac5d5c405dfc38e4da6b4cc1255d5"}}
+                  ;; Default stack size is 1MB or less, increase to 50. For more
+                  ;; information on `java` options:
+                  ;; https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html
+                  :jvm-opts ["-Xss50M"]
+                  :main-opts ["-m" "cognitect.test-runner"]}
+
+           :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.339"}}}
+           :cljstest {:extra-paths ["test"]
+                      :main-opts ["-m"  "cljs.main"
+                                  "-re" "node"
+                                  "-m"  "metaprob.test-runner"]}}}

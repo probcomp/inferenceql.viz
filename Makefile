@@ -2,6 +2,14 @@ compile-opts := build.edn
 main-ns      := inferdb.spreadsheets.core
 output-dir   := out
 
+test: cljtest
+.PHONY: test
+
+cljtest:
+	clojure -Atest
+.PHONY: cljtest
+
+
 clean:
 	rm -R $(output-dir)
 .PHONY: clean
