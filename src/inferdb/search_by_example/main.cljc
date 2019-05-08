@@ -1,7 +1,7 @@
 (ns inferdb.search-by-example.main
-  (:require [inferdb.cgpm.main :refer [cgpm-logpdf]]
-            [inferdb.multimixture.dsl :as mmix]
-
+  (:require [inferdb.multimixture.dsl :as mmix]
+            [inferdb.search-by-example.pfcas :as pfcas]
+            [metaprob.prelude :as prelude]
             [metaprob.trace :as trace]))
 
 (defn- kli [p-in q-in]
@@ -22,8 +22,8 @@
      (kl qs ps)))
 
 (defn constrain-by-row
-  "Constrains the given trace such that the values chosen for each column are the
-  ones in the provided row."
+  "Constrains the given trace such that the values chosen for each
+  column are the ones in the provided row."
   [trace row]
   (reduce (fn [trace [column value]]
             (trace/trace-set-value trace column value))
@@ -31,12 +31,14 @@
           row))
 
 (defn constrain-by-view
-  "Constrains the given trace with such that the view chosen is the one provided."
+  "Constrains the given trace with such that the view chosen is the
+  one provided."
   [trace cluster view]
   (trace/trace-set-value trace (mmix/view-cluster-address view) cluster))
 
 (defn constrain-by-cluster
-  "Constrains the given trace such that the cluster chosen is the one provided."
+  "Constrains the given trace such that the cluster chosen is the one
+  provided."
   [trace cluster columns]
   (reduce (fn [trace column]
             (trace/trace-set-value trace
@@ -54,8 +56,8 @@
 
 (defn probability-distribution-on-cluster
   [model clusters row view]
-  (let [columns (-> model/clusters second keys)
-        cluster-addresses (range (model/cluster-count clusters))]
+  (let [columns (-> clusters second keys)
+        cluster-addresses (range (mmix/cluster-count clusters))]
     (->> cluster-addresses
          (map (fn [cluster-address]
                 (let [trace (-> {}
@@ -67,10 +69,10 @@
                   (prelude/exp score))))
          (normalize))))
 
-(defnp rowwise-similarity [cgpm clusters view example-pfca row emphasis]
+(defn rowwise-similarity [cgpm clusters view example-pfca row emphasis]
   (kl example-pfca (probability-distribution-on-cluster cgpm clusters row view)))
 
-(defnp search
+(defn search
   [cgpm clusters rows example emphasis]
   (let [view (mmix/view-for-column emphasis)
         example-pfca (probability-distribution-on-cluster
@@ -81,7 +83,7 @@
                                 (:proc cgpm) clusters view example-pfca row emphasis)]))
          (sort-by second))))
 
-(defnp cached-search
+(defn cached-search
   [cgpm clusters example emphasis]
   (let [view (mmix/view-for-column emphasis)
         example-pfca (probability-distribution-on-cluster (:proc cgpm) clusters example emphasis)]
