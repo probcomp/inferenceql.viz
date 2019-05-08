@@ -79,8 +79,6 @@
 
     (apply clusters cluster-data))))
 
-(def cluster-count (/ (count cluster-data) 2))
-
 (defn make-identity-output-addr-map
   [output-addrs-types]
   (let [output-addrs (keys output-addrs-types)

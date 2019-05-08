@@ -6,6 +6,6 @@
 
 (defn search-by-example [example emphasis _]
   (sbe/cached-search model/census-cgpm
-                     model/cluster-count
+                     model/cluster-data
                      example
                      emphasis))
