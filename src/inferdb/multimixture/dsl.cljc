@@ -16,11 +16,14 @@
 ;;       by Alex or maybe Feras.
 (defn view-cluster-address
   [v]
-  (str "view-cluster-for-" v))
+  ;; (str "view-cluster-for-" v)
+  (str "cluster-for-" v)
+  )
 
 (defn column-cluster-address
   [column]
-  (str "column-cluster-for-" column))
+  ;; (str "column-cluster-for-" column)
+  (str "cluster-for-" column))
 
 (defn view-for-column
   [column]
@@ -89,6 +92,9 @@
              (comp (map-xform (fn [view] (p :view (at '() view))))
                    cat)
              views))))
+
+(defn cluster-count [clusters]
+  (/ (count clusters) 2))
 
 ;; ------------------------
 ;; DOMAIN SPECIFIC LANGUAGE
