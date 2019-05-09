@@ -56,8 +56,8 @@
 
 (defn probability-distribution-on-cluster
   [model clusters row view]
-  (let [columns (-> clusters second keys)
-        cluster-addresses (range (mmix/cluster-count clusters))]
+  (let [columns            (-> clusters second keys)
+        cluster-addresses  (range (mmix/cluster-count clusters))]
     (->> cluster-addresses
          (map (fn [cluster-address]
                 (let [trace (-> {}
