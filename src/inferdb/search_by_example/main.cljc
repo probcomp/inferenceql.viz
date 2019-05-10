@@ -1,6 +1,5 @@
 (ns inferdb.search-by-example.main
   (:require [inferdb.multimixture.dsl :as mmix]
-            [inferdb.search-by-example.pfcas :as pfcas]
             [metaprob.prelude :as prelude]
             [metaprob.trace :as trace]))
 
@@ -84,10 +83,10 @@
          (sort-by second))))
 
 (defn cached-search
-  [cgpm clusters example emphasis]
+  [cgpm clusters pfcas example emphasis]
   (let [view (mmix/view-for-column emphasis)
         example-pfca (probability-distribution-on-cluster (:proc cgpm) clusters example emphasis)]
-    (->> pfcas/pfcas
+    (->> pfcas
          (map-indexed (fn [index pfca]
                         [index (symmetrized-kl example-pfca pfca)]))
          (sort-by second))))
@@ -98,6 +97,6 @@
                            rows)
 
                 sexp (with-out-str
-                       (pr '(ns ~ns))
+                       (pr `(~'ns ~ns))
                        (pr `(~'def ~'pfcas ~data)))]
             (spit filename sexp))))

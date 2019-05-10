@@ -17,8 +17,9 @@ clean:
 node_modules: yarn.lock
 	yarn install
 
-pfca_cache:
+pfca-cache:
 	clj -m inferdb.spreadsheets.build-pfcas
+	mv pfcas.cljc src/inferdb/spreadsheets/pfcas.cljc
 .PHONY: pfca_cache
 
 watch: node_modules
