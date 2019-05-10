@@ -1,8 +1,16 @@
-# inferdb.spreadsheets
+# inferdb
 
-In-browser inferdb demo.
+## inferdb.spreadsheets notes
 
-## publishing
+### building PFCA cache
+
+The spreadsheet product requires a prebuilt
+probability-for-cluster-assignment cache in order to run. If the data
+in `inferdb.spreadsheets.data` changes, the cache must be
+rebuilt. `make pfca-cache` will rebuild the cache and write it to the
+appropriate location.
+
+### publishing spreadsheet
 
 `make publish` will deploy the spreadsheet to
 https://inferdb-spreadsheet.surge.sh/ . For this to work, you'll need
