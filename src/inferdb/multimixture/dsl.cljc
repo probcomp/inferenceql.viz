@@ -5,8 +5,7 @@
             #?(:clj [metaprob.generative-functions :refer [gen]])
             [metaprob.prelude :refer [map apply infer-and-score map-xform]]
             [metaprob.distributions :refer [categorical log-categorical exactly]]
-            [metaprob.inference :refer [with-custom-proposal-attached]]
-            [taoensso.tufte :as tufte :refer [defnp p profiled profile]]))
+            [metaprob.inference :refer [with-custom-proposal-attached]]))
 
 ;; -------------------
 ;; MULTI-MIXTURE MODEL
@@ -38,7 +37,6 @@
 
         ;; Generative model
         sampler   (gen []
-                    (p :sampler
                        (let [cluster-idx (at cluster-addr categorical cluster-probs)
                              params      (nth cluster-params cluster-idx)]
 
@@ -50,13 +48,12 @@
                                  (apply-at v
                                            (get vars-and-dists v)
                                            (get params v)))
-                               var-names))))]
+                               var-names)))]
 
     (with-custom-proposal-attached
       sampler
       (fn [observations]
         (gen []
-          (p :scorer
              (let [score-cluster
                    (fn [idx]
                      (let [new-obs (trace-set-value observations cluster-addr idx)
@@ -79,7 +76,7 @@
                (at '() infer-and-score
                    :procedure sampler
                    :observation-trace
-                   (trace-set-value observations cluster-addr chosen-cluster))))))
+                   (trace-set-value observations cluster-addr chosen-cluster)))))
 
       ;; Only use the custom proposal when we don't already know the cluster ID
       (fn [tr] (not (trace-has-value? tr cluster-addr))))))
@@ -87,11 +84,10 @@
 (defn make-multi-mixture
   [views]
   (gen []
-    (p :multi-mixture
        (into []
-             (comp (map-xform (fn [view] (p :view (at '() view))))
+             (comp (map-xform (fn [view] (at '() view)))
                    cat)
-             views))))
+             views)))
 
 (defn cluster-count [clusters]
   (/ (count clusters) 2))

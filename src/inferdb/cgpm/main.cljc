@@ -4,8 +4,7 @@
     [metaprob.prelude :as prelude :refer [map]]
     [metaprob.distributions]
     [inferdb.cgpm.utils :as utils]
-    [metaprob.inference]
-    [taoensso.tufte :as tufte :refer (defnp p profiled profile)]))
+    [metaprob.inference]))
 
 ;; ----------------------
 ;; STATISTICAL DATA TYPES
@@ -110,22 +109,20 @@
                     input-addrs-vals)
 
         ;; Run infer to obtain probabilities.
-        [retval trace log-weight-numer] (p :i-a-s
-                                           (prelude/infer-and-score
-                                            :procedure (:proc cgpm)
-                                            :inputs input-args
-                                            :observation-trace
-                                            target-constraint-addrs-vals))
+        [retval trace log-weight-numer] (prelude/infer-and-score
+                                         :procedure (:proc cgpm)
+                                         :inputs input-args
+                                         :observation-trace
+                                         target-constraint-addrs-vals)
 
         log-weight-denom (if (empty? constraint-addrs-vals')
                            ;; There are no constraints: log weight is zero.
                            0
                            ;; There are constraints: find marginal probability of constraints.
-                           (let [[retval trace weight] (p :i-a-s
-                                                          (prelude/infer-and-score
-                                                           :procedure (:proc cgpm)
-                                                           :inputs input-args
-                                                           :observation-trace constraint-addrs-vals'))]
+                           (let [[retval trace weight] (prelude/infer-and-score
+                                                        :procedure (:proc cgpm)
+                                                        :inputs input-args
+                                                        :observation-trace constraint-addrs-vals')]
                              weight))]
     (- log-weight-numer log-weight-denom)))
 
