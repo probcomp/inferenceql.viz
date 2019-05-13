@@ -7,10 +7,8 @@
         metasoarous/oz {:mvn/version "1.6.0-alpha2"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.6"}
-        ;;probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
-                           ;;:sha "9611baaeaae54bb84100f43251808caa788d4682"}
-        probcomp/metaprob {:local/root "/home/joshua/projects/metaprob"}
-        }
+        probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
+                           :sha "7d40086d486ed452829bce6d8125fbeee691a9a6"}}
 
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
