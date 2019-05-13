@@ -1,3 +1,12 @@
 /node_modules
 /out
 /publish
+
+# Ignore vim swap files.
+*.swp
+
+# Ignore clojure cache directory.
+.cpcache/
+
+# Ingore the port number that was saved to disk for the nREPL.
+.nrepl-port
