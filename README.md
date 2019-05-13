@@ -1,5 +1,7 @@
 # inferdb
 
+[![CircleCI](https://circleci.com/gh/probcomp/inferenceql.svg?style=svg&circle-token=9068882ad6a95c5a982984cc124815fd2499a86d)](https://circleci.com/gh/joshuathayer/inferdb.spreadsheets)
+
 ## inferdb.spreadsheets notes
 
 ### building PFCA cache
