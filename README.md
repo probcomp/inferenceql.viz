@@ -1,6 +1,6 @@
 # inferdb
 
-[![CircleCI](https://circleci.com/gh/probcomp/inferenceql.svg?style=svg&circle-token=9068882ad6a95c5a982984cc124815fd2499a86d)](https://circleci.com/gh/joshuathayer/inferdb.spreadsheets)
+[![CircleCI](https://circleci.com/gh/probcomp/inferenceql.svg?style=svg&circle-token=a7fdbf0f271ddb2a6a9798c3a99bdb21c68080c2)](https://circleci.com/gh/probcomp/inferenceql)
 
 ## inferdb.spreadsheets notes
 
