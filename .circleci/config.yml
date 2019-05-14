@@ -3,7 +3,7 @@ jobs: # basic units of work in a run
   build: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/cci-inferenceql # directory where steps will run
     docker: # run the steps with Docker
-      - image: circleci/clojure:tools-deps
+      - image: circleci/clojure:tools-deps-node
     environment: # environment variables for primary container
       JVM_OPTS: -Xmx3200m # limit the maximum heap size to prevent out of memory errors
     steps: # commands that comprise the `build` job
@@ -14,4 +14,14 @@ jobs: # basic units of work in a run
           paths:
             - ~/.m2
           key: cci-inferenceql-{{ checksum "deps.edn" }}
-      - run: clojure -Atest
+      - run:
+          name: Install build tools
+          command: sudo apt-get update && sudo apt-get install -y make
+      - run:
+          name: Generate charts
+          command: make charts
+      - run:
+          name: Run tests
+          command: make test
+      - store_artifacts:
+          path: out/charts

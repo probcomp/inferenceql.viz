@@ -1,6 +1,10 @@
-compile-opts := build.edn
-main-ns      := inferdb.spreadsheets.core
-output-dir   := out
+yarn-install-opts := --no-progress --frozen-lockfile
+compile-opts      := build.edn
+main-ns           := inferdb.spreadsheets.core
+output-dir        := out
+chart-namespaces  := select-simulate
+
+chart-dir =  $(output-dir)/charts
 
 test: cljtest
 .PHONY: test
@@ -9,16 +13,29 @@ cljtest:
 	clojure -Atest
 .PHONY: cljtest
 
-
 clean:
-	rm -R $(output-dir)
+	rm -Rf $(output-dir)
+	rm -Rf *.png
 .PHONY: clean
 
 node_modules: yarn.lock
-	yarn install
+	yarn install $(yarn-install-opts)
+
+charts: $(chart-namespaces:%=%.png)
+	mkdir -p $(chart-dir)
+	cp $< $(chart-dir)
+
+%.vl.json:
+	clojure -Ctest -m inferdb.charts.$(basename $(basename $@)) > $@
+
+%.vg.json: %.vl.json node_modules
+	yarn run vl2vg $< $@
+
+%.png: %.vg.json node_modules
+	yarn run vg2png $< $@
 
 pfca-cache:
-	clj -m inferdb.spreadsheets.build-pfcas
+	clojure -m inferdb.spreadsheets.build-pfcas
 	mv pfcas.cljc src/inferdb/spreadsheets/pfcas.cljc
 .PHONY: pfca_cache
 
