@@ -1,6 +1,7 @@
 # inferdb
 
 [![CircleCI](https://circleci.com/gh/probcomp/inferenceql.svg?style=svg&circle-token=a7fdbf0f271ddb2a6a9798c3a99bdb21c68080c2)](https://circleci.com/gh/probcomp/inferenceql)
+[![Dependencies status](https://versions.deps.co/probcomp/metaprob/status.svg)](https://versions.deps.co/probcomp/metaprob)
 
 ## Testing
 
