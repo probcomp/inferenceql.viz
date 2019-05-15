@@ -16,7 +16,6 @@
 
 (def threshold 0.1)
 
-
 (defn p-gaussian [x mu sigma]
   (Math/exp (score-gaussian x [mu sigma])))
 
@@ -26,17 +25,24 @@
       (is (almost-equal (p-gaussian 0 0 1) true-probability threshold)))))
 
 
-(defn p-gmm-1d [x parameters]
+
+(defn p-gaussian [x parameter]
+  (Math/exp (score-gaussian x [(:mu parameter) (:sigma parameter)])))
+
+
+;; XXX: this only works with a scalar x right now (that get's interpreted as [x x])
+;; need to do some enumerate shit here...
+(defn p-gmm [x parameters]
   (reduce + (map
-              (fn [parameter] (* (:p parameter)
-                                 (p-gaussian x
-                                             (:mu parameter)
-                                             (:sigma parameter))))
+              (fn [parameter] (* (first parameter)
+                                 (reduce * (map (fn [param] (p-gaussian x param))
+                                                 (rest parameter)))))
               parameters)))
 
-(def gmm-1d-parameters
-  [{:p 0.1 :mu -10 :sigma 1}
-   {:p 0.8 :mu   0 :sigma 1}
-   {:p 0.1 :mu  10 :sigma 1}])
+(def gmm-parameters
+  [[0.1 {:mu -10 :sigma 1}]
+   [0.8 {:mu   0 :sigma 1}]
+   [0.1 {:mu  10 :sigma 1}]])
 
-(p-gmm-1d 10 gmm-1d-parameters)
+;; Test the above.
+;; (p-gmm 10 gmm-parameters)
