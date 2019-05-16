@@ -57,7 +57,8 @@
 
 (deftest check-gmm-scorer
   (testing "whether the the joint GMM scorer works"
-    (let [isotropic-biv-normal-params [[1 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]]
+    (let [isotropic-biv-normal-params [[0.5 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]
+                                       [0.5 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]]
           true-probability 0.15915494309189535] ;; Computed with scipy stats.
       (is (utils/almost-equal (p-gmm 0 isotropic-biv-normal-params)
                               true-probability
