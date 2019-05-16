@@ -32,16 +32,14 @@
                                                    (rest parameter)))))
                  parameters)))
 
+
+;; Define some global test parameters.
 (def threshold 0.0001)
-
-
 
 (def gmm-parameters
   [[0.1 {:mu -10 :sigma 1} {:mu -10 :sigma 1}]
    [0.8 {:mu   0 :sigma 1} {:mu   0 :sigma 1}]
    [0.1 {:mu  10 :sigma 1} {:mu  10 :sigma 1}]])
-;; Test the above using a REPL.
-;; (p-gmm 10 gmm-parameters)
 
 (deftest fixed-rand-seed
   (testing "whether we can fix the rand seed."
