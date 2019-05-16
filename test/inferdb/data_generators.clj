@@ -55,5 +55,13 @@
                               true-probability
                               metrics/relerr threshold)))))
 
+(deftest check-gmm-scorer
+  (testing "whether the the joint GMM scorer works"
+    (let [isotropic-biv-normal-params [[1 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]]
+          true-probability 0.15915494309189535] ;; Computed with scipy stats.
+      (is (utils/almost-equal (p-gmm 0 isotropic-biv-normal-params)
+                              true-probability
+                              metrics/relerr threshold)))))
+
 ;; TODO: add tests for test harness, test against itself, and test against
 ;; fixed, analytical vaule
