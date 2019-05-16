@@ -65,4 +65,4 @@
                               metrics/relerr threshold)))))
 
 ;; TODO: add tests for test harness, test against itself, and test against
-;; fixed, analytical vaule
+;; fixed, analytical value.
