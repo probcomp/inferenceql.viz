@@ -1,6 +1,12 @@
 (ns inferdb.utils)
 
-(defn abs [n] (max n (- n)))
-(defn relerr [a b] (abs (- a b)))
-(defn almost-equal [a b threshold]
-  (< (relerr a b) threshold))
+
+(defn abs
+  [n]
+  (max n (- n)))
+
+(defn almost-equal
+  "Returns true if `a` and `b` are approximately equal. Takes a difference
+  metric (presumably from `inferdb.metrics`) as its second argument."
+  [a b difference-metric threshold]
+  (< (difference-metric a b) threshold))
