@@ -12,8 +12,9 @@
             [inferdb.metrics :as metrics]
             [inferdb.utils :as utils]))
 
-(def random-seed 42)
 
+;; XXX: this code should probably not live here.
+(def random-seed 42)
 (defn fix-random-seed
   [run-test]
   (binding [metaprob.prelude/*rng* (java.util.Random. random-seed)]
@@ -24,12 +25,17 @@
 (defn p-gaussian [x parameter]
   (Math/exp (dist/score-gaussian x [(:mu parameter) (:sigma parameter)])))
 
-;; XXX: this only works with a scalar x right now (that get's interpreted as [x x])
-;; need to do some enumerate shit here...
-(defn p-gmm [x parameters]
-  (reduce + (map (fn [parameter] (* (first parameter)
-                                    (reduce * (map (fn [param] (p-gaussian x param))
-                                                   (rest parameter)))))
+(defn p-gmm [observed parameters]
+  (reduce +
+          (map (fn [parameter]
+                   (* (first parameter)
+                      (reduce *
+                              (map (fn [x-and-dim-param] (let
+                                                           ;; XXX: line break :(
+                                                           [x (first x-and-dim-param)
+                                                            param (second x-and-dim-param)]
+                                                           (p-gaussian x param)))
+                                   (zipmap observed (rest parameter))))))
                  parameters)))
 
 
@@ -59,8 +65,9 @@
   (testing "whether the the joint GMM scorer works"
     (let [isotropic-biv-normal-params [[0.5 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]
                                        [0.5 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]]
-          true-probability 0.15915494309189535] ;; Computed with scipy stats.
-      (is (utils/almost-equal (p-gmm 0 isotropic-biv-normal-params)
+          computed-probability (p-gmm [0 1] isotropic-biv-normal-params)
+          true-probability  0.09653235263005393] ;; Computed with scipy stats.
+      (is (utils/almost-equal computed-probability
                               true-probability
                               metrics/relerr threshold)))))
 
