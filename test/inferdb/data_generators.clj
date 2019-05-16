@@ -22,7 +22,7 @@
 (use-fixtures :once fix-random-seed)
 
 (defn p-gaussian [x parameter]
-  (Math/exp (score-gaussian x [(:mu parameter) (:sigma parameter)])))
+  (Math/exp (dist/score-gaussian x [(:mu parameter) (:sigma parameter)])))
 
 ;; XXX: this only works with a scalar x right now (that get's interpreted as [x x])
 ;; need to do some enumerate shit here...
