@@ -5,7 +5,7 @@
   We also want to test certain properties of the function that are supposed to
   compute ground truth values. "
   (:refer-clojure :exclude [apply replicate])
-  (:require [clojure.test :refer [deftest]]
+  (:require [clojure.test :refer [deftest testing is]]
             [clojure.string :refer [index-of]]
             [metaprob.distributions :as dist]
             [metaprob.prelude]
