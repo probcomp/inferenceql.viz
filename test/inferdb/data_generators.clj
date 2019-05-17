@@ -24,7 +24,9 @@
 
 (defn p-gaussian [x parameter]
   "Compute Gaussian likelihood score."
-  (Math/exp (dist/score-gaussian x [(:mu parameter) (:sigma parameter)])))
+  (if (nil? x)
+    1.
+    (Math/exp (dist/score-gaussian x [(:mu parameter) (:sigma parameter)]))))
 
 (defn p-gmm [observed parameters]
   "Compute an unconditional likelihood score for a Gaussian mixture model."
@@ -66,6 +68,18 @@
         unnormalized_p_given_y (map get-weights gmm)
         ]
   (utils/normalize unnormalized_p_given_y)))
+
+(defn update-gmm-weights [gmm weights]
+  (let [replace-weights (fn [i] i (assoc (nth gmm i) 0 (nth weights i)))]
+    (map replace-weights (range (count weights)))))
+
+
+;; XXX: (again) this currently only works with univariate constraints.
+(defn p-gmm-conditional [observed parameters constraints]
+  "Compute an conditional likelihood score for a Gaussian mixture model."
+  (let [new-cluster-weights (re-weight-cluster-assignments parameters constraints)
+        new-gmm-representation (update-gmm-weights parameters new-cluster-weights)]
+    (p-gmm observed new-gmm-representation)))
 
 ;; Define some global test parameters.
 (def threshold 0.0001)
@@ -109,5 +123,25 @@
           expected
           computed
           metrics/relerr threshold)))))
-;; TODO: add tests for test harness, test against itself, and test against
-;; fixed, analytical value.
+
+(deftest replace-weights
+  (testing "whether we correctly replace cluster weights/mixing coefficients in a GMM."
+    (let [expected-reweighted-gmm [
+                                   [0.2 {:mu -10 :sigma 1} {:mu -10 :sigma 1}]
+                                   [0.3 {:mu   0 :sigma 1} {:mu   0 :sigma 1}]
+                                   [0.5 {:mu  10 :sigma 1} {:mu  10 :sigma 1}]]
+          computed-reweighted-gmm (update-gmm-weights gmm-parameters [0.2 0.3 0.5])]
+    (is (= expected-reweighted-gmm computed-reweighted-gmm)))))
+
+(deftest conditional-gmm
+  (testing "whether if we conditioning on one column val"
+     ;; by putting a lot of probability pressure on cluster one, we now the
+     ;; problem reduces to scoring a single Gaussian.
+    (let [observed [-10 nil]
+          expected-probability (p-gaussian (first observed) {:mu -10 :sigma 1})
+          computed-probability (p-gmm-conditional observed
+                                                  gmm-parameters
+                                                  {1 -10})]
+      (is (utils/almost-equal computed-probability
+                              expected-probability
+                              metrics/relerr threshold)))))
