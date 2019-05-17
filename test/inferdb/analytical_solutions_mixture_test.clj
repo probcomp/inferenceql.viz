@@ -112,6 +112,13 @@
                               true-probability
                               metrics/relerr threshold)))))
 
+(deftest check-categorical-scorer
+  (testing "whether the categorical scorer works"
+    (let [true-probability 0.2] ;; Computed with scipy stats.
+      (is (utils/almost-equal (p-categorical 1 {:p [0.8 0.2]})
+                              true-probability
+                              metrics/relerr threshold)))))
+
 (deftest check-gmm-scorer
   (testing "whether the the joint GMM scorer works"
     (let [isotropic-biv-normal-params [[0.5 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]
