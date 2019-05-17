@@ -23,9 +23,11 @@
 (use-fixtures :once fix-random-seed)
 
 (defn p-gaussian [x parameter]
+  "Compute Gaussian likelihood score."
   (Math/exp (dist/score-gaussian x [(:mu parameter) (:sigma parameter)])))
 
 (defn p-gmm [observed parameters]
+  "Compute an unconditional likelihood score for a Gaussian mixture model."
   (reduce +
           (map (fn [parameter]
                    (* (first parameter)
