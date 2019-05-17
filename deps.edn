@@ -23,4 +23,4 @@
            :cljstest {:extra-paths ["test"]
                       :main-opts ["-m"  "cljs.main"
                                   "-re" "node"
-                                  "-m"  "metaprob.test-runner"]}}}
+                                  "-m"  "inferdb.test-runner"]}}}
