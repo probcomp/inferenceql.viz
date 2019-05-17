@@ -1,5 +1,10 @@
 (ns inferdb.utils)
 
+;; taken from metaprob/test/distributions test. Felt wrong to import from a
+;; metaprob test...
+(defn normalize [weights]
+  (let [total (apply + weights)]
+    (map (fn [x] (/ x total)) weights)))
 
 (defn abs [n]
   (max n (- n)))
