@@ -1,4 +1,4 @@
-(ns inferdb.data-generators
+(ns inferdb.analytical-solutions-mixture-test
   "The purpose of this file is to provide ground truth solutions; for both
   synthetic data and the corresponding quantitities like logPDF, MI, KL, etc.
 
