@@ -28,7 +28,18 @@
     1.
     (Math/exp (dist/score-gaussian x [(:mu parameter) (:sigma parameter)]))))
 
-(defn p-gmm [observed parameters]
+(defn p-categorical [x parameter]
+  "Compute categorical likelihood score."
+  (if (nil? x)
+    1.
+    (nth (:p parameter) x)))
+
+(defn choose-p-scorer [parameter]
+ (if (contains? parameter :mu)
+   p-gaussian
+   p-categorical))
+
+(defn p-mixture-model [observed parameters]
   "Compute an unconditional likelihood score for a Gaussian mixture model."
   (reduce +
           (map (fn [parameter]
@@ -37,8 +48,9 @@
                               (map (fn [x-and-dim-param] (let
                                                            ;; XXX: line break :(
                                                            [x (first x-and-dim-param)
-                                                            param (second x-and-dim-param)]
-                                                           (p-gaussian x param)))
+                                                            param (second x-and-dim-param)
+                                                            p-scorer (choose-p-scorer param)]
+                                                           (p-scorer x param)))
                                    (zipmap observed (rest parameter))))))
                  parameters)))
 
@@ -55,13 +67,14 @@
   (let [params (nth (rest cluster) (first (keys constraints)))
         y (first (vals constraints))
         p_k (first cluster)
-        p_y_given_k (p-gaussian y params)
+        p-scorer (choose-p-scorer params)
+        p_y_given_k (p-scorer y params)
         ]
   (* p_k p_y_given_k)))
 
 (defn re-weight-cluster-assignments
   [gmm  constraints]
-  "Take a gmm and return a new, updated gmm to compute p-gmm"
+  "Take a gmm and return a new, updated gmm to compute p-mixture-model"
   (let [
         get-weights (fn [cluster]
                       (re-weight-cluster-assignment cluster constraints))
@@ -75,11 +88,11 @@
 
 
 ;; XXX: (again) this currently only works with univariate constraints.
-(defn p-gmm-conditional [observed parameters constraints]
+(defn p-mixture-model-conditional [observed parameters constraints]
   "Compute an conditional likelihood score for a Gaussian mixture model."
   (let [new-cluster-weights (re-weight-cluster-assignments parameters constraints)
         new-gmm-representation (update-gmm-weights parameters new-cluster-weights)]
-    (p-gmm observed new-gmm-representation)))
+    (p-mixture-model observed new-gmm-representation)))
 
 ;; Define some global test parameters.
 (def threshold 0.0001)
@@ -103,7 +116,7 @@
   (testing "whether the the joint GMM scorer works"
     (let [isotropic-biv-normal-params [[0.5 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]
                                        [0.5 {:mu 0 :sigma 1} {:mu 0 :sigma 1}]]
-          computed-probability (p-gmm [0 1] isotropic-biv-normal-params)
+          computed-probability (p-mixture-model [0 1] isotropic-biv-normal-params)
           true-probability  0.09653235263005393] ;; Computed with scipy stats.
       (is (utils/almost-equal computed-probability
                               true-probability
@@ -139,7 +152,7 @@
      ;; problem reduces to scoring a single Gaussian.
     (let [observed [-10 nil]
           expected-probability (p-gaussian (first observed) {:mu -10 :sigma 1})
-          computed-probability (p-gmm-conditional observed
+          computed-probability (p-mixture-model-conditional observed
                                                   gmm-parameters
                                                   {1 -10})]
       (is (utils/almost-equal computed-probability
