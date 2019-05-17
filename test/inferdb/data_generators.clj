@@ -41,13 +41,35 @@
                  parameters)))
 
 
+;; Compute P(X | Y) = P(X | C) * P(C | Y); where C is the cluster assignemnt.
+;; We thus need  to compute P(C | Y) and then use that quantity to update the
+;; cluster to get P(X | Y).
+;; P(C | Y) \approx P(Y | C) * P(C).
+;; To turn the \approx into `=` we simply need to normalize to 1.
+(defn re-weight-cluster-assignment
+  [cluster constraints]
+  "Re-weight an individual component in a mixture model."
+  ;; XXX: this currently only works with univariate constraints.
+  (let [params (nth (rest cluster) (first (keys constraints)))
+        y (first (vals constraints))
+        p_k (first cluster)
+        p_y_given_k (p-gaussian y params)
+        ]
+  (* p_k p_y_given_k)))
+
+(defn re-weight-cluster-assignments
+  [gmm  constraints]
+  "Take a gmm and return a new, updated gmm to compute p-gmm"
+  (let [
+        get-weights (fn [cluster]
+                      (re-weight-cluster-assignment cluster constraints))
+        unnormalized_p_given_y (map get-weights gmm)
+        ]
+  (utils/normalize unnormalized_p_given_y)))
+
 ;; Define some global test parameters.
 (def threshold 0.0001)
 
-(def gmm-parameters
-  [[0.1 {:mu -10 :sigma 1} {:mu -10 :sigma 1}]
-   [0.8 {:mu   0 :sigma 1} {:mu   0 :sigma 1}]
-   [0.1 {:mu  10 :sigma 1} {:mu  10 :sigma 1}]])
 
 (deftest fixed-rand-seed
   (testing "whether we can fix the rand seed."
@@ -73,5 +95,19 @@
                               true-probability
                               metrics/relerr threshold)))))
 
+;; Define a GMM for testing.
+(def gmm-parameters
+  [[0.1 {:mu -10 :sigma 1} {:mu -10 :sigma 1}]
+   [0.8 {:mu   0 :sigma 1} {:mu   0 :sigma 1}]
+   [0.1 {:mu  10 :sigma 1} {:mu  10 :sigma 1}]])
+
+(deftest re-weighted-clusters
+  (testing "whether we correctly re-weight cluster probabilities."
+    (let [expected [1. 0. 0.]
+          computed (re-weight-cluster-assignments gmm-parameters {1 -10})]
+    (is (utils/almost-equal-vectors
+          expected
+          computed
+          metrics/relerr threshold)))))
 ;; TODO: add tests for test harness, test against itself, and test against
 ;; fixed, analytical value.
