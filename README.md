@@ -6,9 +6,21 @@
 
 ### Running the tests
 
+Tests can be run either [from the command-line](https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/4-running-kaocha-cli)
+
 ```bash
-make test
+bin/kaocha
 ```
+
+or [from the REPL](https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/5-running-kaocha-from-the-repl).
+
+```clojure
+(require '[kaocha.repl :as kaocha])
+(kaocha/run)
+```
+
+Kaocha provides a variety of options for running the test suite. For full
+details refer to its [documentation](https://cljdoc.org/d/lambdaisland/kaocha/).
 
 ### Generating charts
 

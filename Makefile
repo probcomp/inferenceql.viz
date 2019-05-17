@@ -6,13 +6,6 @@ chart-namespaces  := select-simulate
 
 chart-dir =  $(output-dir)/charts
 
-test: cljtest
-.PHONY: test
-
-cljtest:
-	clojure -Atest
-.PHONY: cljtest
-
 clean:
 	rm -Rf $(output-dir)
 	rm -Rf *.png

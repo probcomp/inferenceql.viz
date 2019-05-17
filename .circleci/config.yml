@@ -22,6 +22,6 @@ jobs: # basic units of work in a run
           command: make charts
       - run:
           name: Run tests
-          command: make test
+          command: bin/kaocha
       - store_artifacts:
           path: out/charts
