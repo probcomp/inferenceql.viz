@@ -1,7 +1,7 @@
 yarn-install-opts := --no-progress --frozen-lockfile
 compile-opts      := build.edn
 main-ns           := inferdb.spreadsheets.core
-output-dir        := out
+output-dir        := spreadsheets/out
 chart-namespaces  := select-simulate
 
 chart-dir =  $(output-dir)/charts
@@ -33,7 +33,7 @@ pfca-cache:
 .PHONY: pfca_cache
 
 watch: node_modules
-	clojure -m cljs.main --watch src -co $(compile-opts) -d $(output-dir) -c $(main-ns)
+	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) -d $(output-dir) -c $(main-ns)
 .PHONY: watch
 
 publish:
