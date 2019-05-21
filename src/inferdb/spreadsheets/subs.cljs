@@ -191,17 +191,44 @@
                          :color color}})
 
            :else
-           {:$schema
-            "https://vega.github.io/schema/vega-lite/v3.json"
-            :data {:values selection}
-            :mark "circle"
-            :encoding
-            (reduce (fn [acc [k field]]
-                      (assoc acc k {:field field, :type "quantitative"}))
-                    {}
-                    (map vector
-                         [:x :y]
-                         (take 2 selected-columns)))}))))
+           (let [types (into #{}
+                             (map model/stattypes)
+                             (take 2 selected-columns))]
+             (condp = types
+               #{dist/gaussian} {:$schema
+                                 "https://vega.github.io/schema/vega-lite/v3.json"
+                                 :data {:values selection}
+                                 :mark "circle"
+                                 :encoding {:x {:field (first selected-columns)
+                                                :type "quantitative"}
+                                            :y {:field (second selected-columns)
+                                                :type "quantitative"}}}
+               #{dist/categorical} {:$schema
+                                    "https://vega.github.io/schema/vega-lite/v3.json"
+                                    :data {:values selection}
+                                    :mark "rect"
+                                    :encoding {:x {:field (first selected-columns)
+                                                   :type "nominal"}
+                                               :y {:field (second selected-columns)
+                                                   :type "nominal"}
+                                               :color {:aggregate "count"
+                                                       :type "quantitative"}}}
+               #{dist/gaussian
+                 dist/categorical} {:$schema
+                                    "https://vega.github.io/schema/vega-lite/v3.json"
+                                    :data {:values selection}
+                                    :mark {:type "boxplot"
+                                           :extent "min-max"}
+                                    :encoding {:x {:field (first selected-columns)
+                                                   :type (condp = (model/stattypes (first selected-columns))
+                                                           dist/gaussian "quantitative"
+                                                           dist/categorical "nominal")}
+                                               :y {:field (second selected-columns)
+                                                   :type (condp = (model/stattypes (second selected-columns))
+                                                           dist/gaussian "quantitative"
+                                                           dist/categorical "nominal")}
+                                               :color {:aggregate "count"
+                                                       :type "quantitative"}}}))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:selected-row     (rf/subscribe [:selected-row])
