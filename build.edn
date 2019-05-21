@@ -1,5 +1,6 @@
 {:preloads [devtools.preload]
  :main "inferdb.spreadsheets.core"
+ :asset-path
  ;; :output-dir "out"
  ;; :output-to "out/main.js"
  :foreign-libs [{:file "node_modules/handsontable/dist/handsontable.full.js"

@@ -1,7 +1,7 @@
 yarn-install-opts := --no-progress --frozen-lockfile
 compile-opts      := build.edn
 main-ns           := inferdb.spreadsheets.core
-output-dir        := out
+output-dir        := spreadsheets/out
 output-to         := out/main.js
 chart-namespaces  := select-simulate
 
