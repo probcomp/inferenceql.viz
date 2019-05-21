@@ -102,14 +102,19 @@
                 (not (contains? #{"geo_fips" "district_name" "score"}
                                 (first selected-columns))))
            (let [selected-row-kw (walk/keywordize-keys selected-row)
+                 _ (cljs.pprint/pprint selected-row-kw)
                  selected-column-kw (keyword (first selected-columns))
                  values (cgpm/cgpm-simulate model/census-cgpm
                                             [selected-column-kw]
-                                            (dissoc selected-row-kw
-                                                    selected-column-kw
-                                                    :district_name
-                                                    :geo_fips
-                                                    :score)
+                                            (reduce-kv (fn [acc k v]
+                                                         (cond-> acc
+                                                           v (assoc k v)))
+                                                       {}
+                                                       (dissoc selected-row-kw
+                                                               selected-column-kw
+                                                               :score
+                                                               :NAME
+                                                               :geo_fips))
                                             {}
                                             100)]
              {:$schema
