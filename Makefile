@@ -2,7 +2,8 @@ yarn-install-opts := --no-progress --frozen-lockfile
 compile-opts      := build.edn
 main-ns           := inferdb.spreadsheets.core
 output-dir        := spreadsheets/out
-output-to         := out/main.js
+output-to         := spreadsheets/out/main.js
+output-resource-dir := spreadsheets/resources
 chart-namespaces  := select-simulate
 
 chart-dir =  $(output-dir)/charts
@@ -34,8 +35,21 @@ pfca-cache:
 .PHONY: pfca_cache
 
 watch: node_modules
-	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) -d $(output-dir) --output-to $(output-to) -c $(main-ns)
+	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) \
+		-d $(output-dir) --output-to $(output-to) -c $(main-ns)
 .PHONY: watch
+
+$(output-resource-dir):
+	mkdir -p $(output-resource-dir)
+
+$(output-resource-dir)/handsontable.full.css: $(output-resource-dir)
+	cp node_modules/handsontable/dist/handsontable.full.css $(output-resource-dir)/
+
+spreadsheet: node_modules $(output-dir)/main.js $(output-resource-dir)/handsontable.full.css
+
+$(output-dir)/main.js:
+	clojure -m cljs.main -co $(compile-opts) -d $(output-dir) \
+		--output-to $(output-to) -c $(main-ns)
 
 publish:
 	rm -rf publish/out
