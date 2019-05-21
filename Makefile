@@ -7,7 +7,9 @@ output-to         := $(output-to)/main.js
 output-resource-dir := $(spreadsheet-dir)/resources
 chart-namespaces  := select-simulate
 publish-dir       := .publish
-chart-dir =  $(output-dir)/charts
+surge-domain      := inferdb-spreadsheet.surge.sh
+
+chart-dir         =  $(output-dir)/charts
 
 clean:
 	rm -Rf $(output-dir)
@@ -60,6 +62,6 @@ publish:
 	cp $(spreadsheet-dir)/index.html $(publish-dir)
 	cp -r $(spreadsheet-dir)/out $(publish-dir)
 	cp -r $(spreadsheet-dir)/resources $(publish-dir)
-	cd $(publish-dir) ; surge
+	cd $(publish-dir) ; surge # --domain $(surge-domain)
 	rm -rf .publish
 .PHONY: publish
