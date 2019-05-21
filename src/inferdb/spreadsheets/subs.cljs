@@ -4,7 +4,8 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]
             [inferdb.cgpm.main :as cgpm]
-            [inferdb.spreadsheets.model :as model]))
+            [inferdb.spreadsheets.model :as model]
+            [metaprob.distributions :as dist]))
 
 (rf/reg-sub :scores
             (fn [db _]
@@ -134,15 +135,26 @@
                                       :type "quantitative"}}}]})
 
            (= 1 (count selected-columns))
-           {:$schema
-            "https://vega.github.io/schema/vega-lite/v3.json",
-            :data {:values selection},
-            :mark "bar",
-            :encoding
-            {:x {:bin true,
-                 :field (first selected-columns),
-                 :type "quantitative"},
-             :y {:aggregate "count", :type "quantitative"}}}
+           (let [selected-column (first selected-columns)]
+             {:$schema
+              "https://vega.github.io/schema/vega-lite/v3.json",
+              :data {:values selection},
+              :mark "bar",
+              :encoding
+              (condp = (get model/stattypes selected-column)
+                dist/gaussian
+                {:x {:bin true,
+                     :field selected-column
+                     :type "quantitative"}
+                 :y {:aggregate "count"
+                     :type "quantitative"}}
+
+                dist/categorical
+                {:x {:field selected-column
+                     :type "ordinal"}
+                 :y {:aggregate "count"
+                     :type "quantitative"}
+                 :color {:field selected-column}})})
 
            (some #{"geo_fips"} selected-columns)
            (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))

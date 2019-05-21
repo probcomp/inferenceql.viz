@@ -225,21 +225,22 @@
                      "percent_single_parent" [0.15071550921377747, 0.019850000000000007]
                      "percent_owned" [0.2047415292742671, 0.0555]}])
 
+(def stattypes
+  {"percent_white"         dist/gaussian
+   "percent_lths"          dist/gaussian
+   "percent_children"      dist/gaussian
+   "percent_married"       dist/gaussian
+   "percent_poor"          dist/gaussian
+   "percent_manufacturing" dist/gaussian
+   "alex_type"             dist/categorical
+   "cluster_name"          dist/categorical
+   "nyt_rating"            dist/categorical
+   "percent_single_parent" dist/gaussian
+   "percent_owned"         dist/gaussian})
+
 (def generate-census-row
   (multi-mixture
-   (view
-    {"percent_white"         dist/gaussian
-     "percent_lths"          dist/gaussian
-     "percent_children"      dist/gaussian
-     "percent_married"       dist/gaussian
-     "percent_poor"          dist/gaussian
-     "percent_manufacturing" dist/gaussian
-     "alex_type"             dist/categorical
-     "cluster_name"          dist/categorical
-     "nyt_rating"            dist/categorical
-     "percent_single_parent" dist/gaussian
-     "percent_owned"         dist/gaussian}
-    (apply clusters cluster-data))))
+   (view stattypes (apply clusters cluster-data))))
 
 (defn make-identity-output-addr-map
   [output-addrs-types]
