@@ -102,7 +102,6 @@
                 (not (contains? #{"geo_fips" "district_name" "score"}
                                 (first selected-columns))))
            (let [selected-row-kw (walk/keywordize-keys selected-row)
-                 _ (cljs.pprint/pprint selected-row-kw)
                  selected-column-kw (keyword (first selected-columns))
                  values (cgpm/cgpm-simulate model/census-cgpm
                                             [selected-column-kw]
