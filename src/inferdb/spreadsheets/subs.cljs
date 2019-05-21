@@ -121,18 +121,26 @@
               "https://vega.github.io/schema/vega-lite/v3.json"
               :data {:values values}
               :layer [{:mark "bar"
-                       :encoding {:x {:bin true
-                                      :field selected-column-kw
-                                      :type "quantitative"}
-                                  :y {:aggregate "count"
-                                      :type "quantitative"
-                                      :axis {:title "distribution of probable values"}}}}
+                       :encoding (condp = (get model/stattypes (first selected-columns))
+                                   dist/gaussian {:x {:bin true
+                                                      :field selected-column-kw
+                                                      :type "quantitative"}
+                                                  :y {:aggregate "count"
+                                                      :type "quantitative"
+                                                      :axis {:title "distribution of probable values"}}}
+                                   dist/categorical {:x {:field selected-column-kw
+                                                         :type "nominal"}
+                                                     :y {:aggregate "count"
+                                                         :type "quantitative"
+                                                         :axis {:title "distribution of probable values"}}})}
                       {:data {:values [{selected-column-kw (-> selected-row (get (first selected-columns)))
                                         :label "Selected row"}]}
                        :mark {:type "rule"
                               :color "red"}
                        :encoding {:x {:field selected-column-kw
-                                      :type "quantitative"}}}]})
+                                      :type (condp = (get model/stattypes (first selected-columns))
+                                              dist/gaussian "quantitative"
+                                              dist/categorical "nominal")}}}]})
 
            (= 1 (count selected-columns))
            (let [selected-column (first selected-columns)]
@@ -142,19 +150,21 @@
               :mark "bar",
               :encoding
               (condp = (get model/stattypes selected-column)
-                dist/gaussian
-                {:x {:bin true,
-                     :field selected-column
-                     :type "quantitative"}
-                 :y {:aggregate "count"
-                     :type "quantitative"}}
+                dist/gaussian {:x {:bin true,
+                                   :field selected-column
+                                   :type "quantitative"}
+                               :y {:aggregate "count"
+                                   :type "quantitative"}}
 
-                dist/categorical
-                {:x {:field selected-column
-                     :type "ordinal"}
-                 :y {:aggregate "count"
-                     :type "quantitative"}
-                 :color {:field selected-column}})})
+                dist/categorical {:x {:field selected-column
+                                      :type "nominal"}
+                                  :y {:aggregate "count"
+                                      :type "quantitative"}
+                                  :color {:field selected-column
+                                          :type "nominal"}}
+
+                nil
+                {})})
 
            (some #{"geo_fips"} selected-columns)
            (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
@@ -198,7 +208,3 @@
                :selections       (rf/subscribe [:selections])
                :selected-columns (rf/subscribe [:selected-columns])})
             vega-lite-spec)
-
-(rf/reg-sub :whole-db
-            (fn [db]
-              db))
