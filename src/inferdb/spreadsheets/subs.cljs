@@ -159,9 +159,7 @@
                 dist/categorical {:x {:field selected-column
                                       :type "nominal"}
                                   :y {:aggregate "count"
-                                      :type "quantitative"}
-                                  :color {:field selected-column
-                                          :type "nominal"}}
+                                      :type "quantitative"}}
 
                 nil
                 {})})
