@@ -1,15 +1,17 @@
 yarn-install-opts := --no-progress --frozen-lockfile
 compile-opts      := build.edn
 main-ns           := inferdb.spreadsheets.core
-output-dir        := spreadsheets/out
-output-to         := spreadsheets/out/main.js
-output-resource-dir := spreadsheets/resources
+spreadsheet-dir   := spreadsheets
+output-dir        := $(spreadsheet-dir)/out
+output-to         := $(output-to)/main.js
+output-resource-dir := $(spreadsheet-dir)/resources
 chart-namespaces  := select-simulate
-
+publish-dir       := .publish
 chart-dir =  $(output-dir)/charts
 
 clean:
 	rm -Rf $(output-dir)
+	rm -f $(output-resource-dir)/handsontable.full.css
 	rm -Rf *.png
 .PHONY: clean
 
@@ -52,12 +54,12 @@ $(output-dir)/main.js:
 		--output-to $(output-to) -c $(main-ns)
 
 publish:
-	rm -rf publish/out
-	rm -rf publish/node_modules
-	mkdir -p publish/node_modules/handsontable/dist/
-	cp -r out publish
-	cp node_modules/handsontable/dist/handsontable.full.css publish/node_modules/handsontable/dist/
-	cp index.html publish
-	cp cb_2017_us_cd115_20m-topo.js publish
-	cd publish ; surge
+	rm -rf $(publish-dir)
+	mkdir $(publish-dir)
+	echo "!node_modules" > $(publish-dir)/.surgeignore
+	cp $(spreadsheet-dir)/index.html $(publish-dir)
+	cp -r $(spreadsheet-dir)/out $(publish-dir)
+	cp -r $(spreadsheet-dir)/resources $(publish-dir)
+	cd $(publish-dir) ; surge
+	rm -rf .publish
 .PHONY: publish
