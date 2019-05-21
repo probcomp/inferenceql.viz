@@ -3,7 +3,7 @@ compile-opts      := build.edn
 main-ns           := inferdb.spreadsheets.core
 spreadsheet-dir   := spreadsheets
 output-dir        := $(spreadsheet-dir)/out
-output-to         := $(output-to)/main.js
+output-to         := $(output-dir)/main.js
 output-resource-dir := $(spreadsheet-dir)/resources
 chart-namespaces  := select-simulate
 publish-dir       := .publish
@@ -38,11 +38,6 @@ pfca-cache:
 	mv pfcas.cljc src/inferdb/spreadsheets/pfcas.cljc
 .PHONY: pfca_cache
 
-watch: node_modules
-	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) \
-		-d $(output-dir) --output-to $(output-to) -c $(main-ns)
-.PHONY: watch
-
 $(output-resource-dir):
 	mkdir -p $(output-resource-dir)
 
@@ -55,7 +50,12 @@ $(output-dir)/main.js:
 	clojure -m cljs.main -co $(compile-opts) -d $(output-dir) \
 		--output-to $(output-to) -c $(main-ns)
 
-publish:
+watch: node_modules $(output-resource-dir)/handsontable.full.css
+	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) \
+		-d $(output-dir) --output-to $(output-to) -c $(main-ns)
+.PHONY: watch
+
+publish: spreadsheet
 	rm -rf $(publish-dir)
 	mkdir $(publish-dir)
 	echo "!node_modules" > $(publish-dir)/.surgeignore
