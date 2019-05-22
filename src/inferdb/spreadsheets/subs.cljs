@@ -120,34 +120,35 @@
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
               :data {:values values}
-              :layer [{:mark "bar"
-                       :encoding (condp = (get model/stattypes (first selected-columns))
-                                   dist/gaussian {:x {:bin true
-                                                      :field selected-column-kw
-                                                      :type "quantitative"}
-                                                  :y {:aggregate "count"
-                                                      :type "quantitative"
-                                                      :axis {:title "distribution of probable values"}}}
-                                   dist/categorical {:x {:field selected-column-kw
-                                                         :type "nominal"}
-                                                     :y {:aggregate "count"
-                                                         :type "quantitative"
-                                                         :axis {:title "distribution of probable values"}}})}
-                      {:data {:values [{selected-column-kw (-> selected-row (get (first selected-columns)))
-                                        :label "Selected row"}]}
-                       :mark {:type "rule"
-                              :color "red"}
-                       :encoding {:x {:field selected-column-kw
-                                      :type (condp = (get model/stattypes (first selected-columns))
-                                              dist/gaussian "quantitative"
-                                              dist/categorical "nominal")}}}]})
+              :layer (cond-> [{:mark "bar"
+                               :encoding (condp = (get model/stattypes (first selected-columns))
+                                           dist/gaussian {:x {:bin true
+                                                              :field selected-column-kw
+                                                              :type "quantitative"}
+                                                          :y {:aggregate "count"
+                                                              :type "quantitative"
+                                                              :axis {:title "distribution of probable values"}}}
+                                           dist/categorical {:x {:field selected-column-kw
+                                                                 :type "nominal"}
+                                                             :y {:aggregate "count"
+                                                                 :type "quantitative"
+                                                                 :axis {:title "distribution of probable values"}}})}]
+                       (get selected-row (first selected-columns))
+                       (conj {:data {:values [{selected-column-kw (-> selected-row (get (first selected-columns)))
+                                               :label "Selected row"}]}
+                              :mark {:type "rule"
+                                     :color "red"}
+                              :encoding {:x {:field selected-column-kw
+                                             :type (condp = (get model/stattypes (first selected-columns))
+                                                     dist/gaussian "quantitative"
+                                                     dist/categorical "nominal")}}}))})
 
            (= 1 (count selected-columns))
            (let [selected-column (first selected-columns)]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json",
               :data {:values selection},
-              :mark "bar",
+              :mark "bar"
               :encoding
               (condp = (get model/stattypes selected-column)
                 dist/gaussian {:x {:bin true,
