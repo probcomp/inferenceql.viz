@@ -6,6 +6,10 @@ chart-namespaces  := select-simulate
 
 chart-dir =  $(output-dir)/charts
 
+watch: node_modules
+	clojure -m cljs.main --watch src -co $(compile-opts) -d $(output-dir) -c $(main-ns)
+.PHONY: watch
+
 clean:
 	rm -Rf $(output-dir)
 	rm -Rf *.png
@@ -31,10 +35,6 @@ pfca-cache:
 	clojure -m inferdb.spreadsheets.build-pfcas
 	mv pfcas.cljc src/inferdb/spreadsheets/pfcas.cljc
 .PHONY: pfca_cache
-
-watch: node_modules
-	clojure -m cljs.main --watch src -co $(compile-opts) -d $(output-dir) -c $(main-ns)
-.PHONY: watch
 
 publish:
 	rm -rf publish/out
