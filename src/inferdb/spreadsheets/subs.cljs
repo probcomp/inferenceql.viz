@@ -97,8 +97,9 @@
     (clj->js
      (cond (and (= 1 (count selected-columns))
                 (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "district_name" "score"}
+                (not (contains? #{"geo_fips" "NAME" "score"}
                                 (first selected-columns))))
+           ;; Simulate plot
            (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
                  selected-column-kw (keyword (first selected-columns))
                  y-axis {:title "distribution of probable values"
@@ -136,6 +137,7 @@
                                                      dist/categorical "nominal")}}}))})
 
            (= 1 (count selected-columns))
+           ;; Histogram
            (let [selected-column (first selected-columns)]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json",
@@ -158,6 +160,7 @@
                 {})})
 
            (some #{"geo_fips"} selected-columns)
+           ;; Choropleth
            (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
                  transformed-selection (mapv (fn [row]
                                                (update row "geo_fips" #(left-pad (str %) 4 \0)))
@@ -165,7 +168,9 @@
                  name {:field "NAME"
                        :type "nominal"}
                  color {:field map-column
-                        :type "quantitative"}]
+                        :type (condp = (stattype map-column)
+                                dist/gaussian "quantitative"
+                                dist/categorical "nominal")}]
              {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
               :width 500
               :height 300
@@ -182,10 +187,12 @@
                          :color color}})
 
            :else
+           ;; Comparison plot
            (let [types (into #{}
                              (map stattype)
                              (take 2 selected-columns))]
              (condp = types
+               ;; Scatterplot
                #{dist/gaussian} {:$schema
                                  "https://vega.github.io/schema/vega-lite/v3.json"
                                  :data {:values selection}
@@ -194,6 +201,7 @@
                                                 :type "quantitative"}
                                             :y {:field (second selected-columns)
                                                 :type "quantitative"}}}
+               ;; Heatmap
                #{dist/categorical} {:$schema
                                     "https://vega.github.io/schema/vega-lite/v3.json"
                                     :data {:values selection}
@@ -204,6 +212,7 @@
                                                    :type "nominal"}
                                                :color {:aggregate "count"
                                                        :type "quantitative"}}}
+               ;; Bot-and-line
                #{dist/gaussian
                  dist/categorical} {:$schema
                                     "https://vega.github.io/schema/vega-lite/v3.json"
