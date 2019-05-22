@@ -24,14 +24,6 @@
             (fn [db _]
               (db/selected-row-index db)))
 
-(rf/reg-sub :selected-row
-            (fn [_ _]
-              {:computed-rows (rf/subscribe [:computed-rows])
-               :selected-row-index (rf/subscribe [:selected-row-index])})
-            (fn [{:keys [selected-row-index computed-rows]} _]
-              (when selected-row-index
-                (nth computed-rows selected-row-index))))
-
 (rf/reg-sub :computed-headers
             (fn [_ _]
               (rf/subscribe [:table-headers]))
@@ -47,7 +39,6 @@
                 scores (mapv (fn [score row]
                                (assoc row "score" score))
                              scores))))
-
 (defn table-rows
   [db _]
   (db/table-rows db))
@@ -101,14 +92,14 @@
     (get model/stattypes column)))
 
 (defn vega-lite-spec
-  [{:keys [selected-row selections selected-columns]}]
+  [{:keys [selections selected-columns row-at-selection-start]}]
   (when-let [selection (first selections)]
     (clj->js
      (cond (and (= 1 (count selected-columns))
                 (= 1 (count (first selections)))
                 (not (contains? #{"geo_fips" "district_name" "score"}
                                 (first selected-columns))))
-           (let [selected-row-kw (walk/keywordize-keys selected-row)
+           (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
                  selected-column-kw (keyword (first selected-columns))
                  y-axis {:title "distribution of probable values"
                          :grid false
@@ -131,8 +122,8 @@
                                                              :y {:aggregate "count"
                                                                  :type "quantitative"
                                                                  :axis y-axis}})}]
-                       (get selected-row (first selected-columns))
-                       (conj {:data {:values [{selected-column-kw (-> selected-row (get (first selected-columns)))
+                       (get row-at-selection-start (first selected-columns))
+                       (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
                                                :label "Selected row"}]}
                               :mark {:type "rule"
                                      :color "red"}
@@ -229,9 +220,9 @@
                {}))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:selected-row     (rf/subscribe [:selected-row])
-               :selections       (rf/subscribe [:selections])
-               :selected-columns (rf/subscribe [:selected-columns])})
+              {:selections             (rf/subscribe [:selections])
+               :selected-columns       (rf/subscribe [:selected-columns])
+               :row-at-selection-start (rf/subscribe [:row-at-selection-start])})
             vega-lite-spec)
 
 (rf/reg-sub :one-cell-selected

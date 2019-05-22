@@ -88,7 +88,6 @@
         selected-maps  @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
         scores         @(rf/subscribe [:scores])
-        selected-row   @(rf/subscribe [:selected-row])
         generator      @(rf/subscribe [:generator])]
     [:div
      [hot/handsontable {:style {:overflow "hidden"}} hot-props]
