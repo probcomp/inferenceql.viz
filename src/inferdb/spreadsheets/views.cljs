@@ -41,7 +41,7 @@
 (defn vega-lite
   [spec generator]
   (let [stop (atom nil)
-        embed (fn [this spec]
+        embed (fn [this spec generator]
                 (when spec
                   (let [spec (clj->js spec)
                         opts #js {:renderer "canvas"
@@ -53,14 +53,12 @@
                                          (when-let [stop @stop]
                                            (async/close! stop))
                                          (reset! stop (async/chan))
-                                         (go (js/console.log "start")
-                                             (while (async/alt! @stop false (async/timeout 0) true)
+                                         (go (while (async/alt! @stop false (async/timeout 0) true :priority true)
                                                (let [datum (generator)
                                                      changeset (.. js/vega
                                                                    (changeset)
                                                                    (insert (clj->js datum)))]
-                                                 (.run (.change (.-view res) "data" changeset))))
-                                             (js/console.log "stop"))))
+                                                 (.run (.change (.-view res) "data" changeset)))))))
                       true (.catch (fn [err]
                                      (js/console.error err)))))))]
     (r/create-class
@@ -68,12 +66,11 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec))
+        (embed this spec generator))
 
       :component-will-update
-      (fn [this [_ new-spec]]
-        (js/console.log "will-update")
-        (embed this new-spec))
+      (fn [this [_ new-spec new-generator]]
+        (embed this new-spec new-generator))
 
       :component-will-unmount
       (fn [this]
