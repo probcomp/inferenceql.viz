@@ -94,6 +94,12 @@
                           c))
        s))
 
+(defn stattype
+  [column]
+  (if (= "score" column)
+    dist/gaussian
+    (get model/stattypes column)))
+
 (defn vega-lite-spec
   [{:keys [selected-row selections selected-columns]}]
   (when-let [selection (first selections)]
@@ -113,7 +119,7 @@
               :data {:name "data"}
               :autosize {:resize true}
               :layer (cond-> [{:mark "bar"
-                               :encoding (condp = (get model/stattypes (first selected-columns))
+                               :encoding (condp = (stattype (first selected-columns))
                                            dist/gaussian {:x {:bin true
                                                               :field selected-column-kw
                                                               :type "quantitative"}
@@ -131,7 +137,7 @@
                               :mark {:type "rule"
                                      :color "red"}
                               :encoding {:x {:field selected-column-kw
-                                             :type (condp = (get model/stattypes (first selected-columns))
+                                             :type (condp = (stattype (first selected-columns))
                                                      dist/gaussian "quantitative"
                                                      dist/categorical "nominal")}}}))})
 
@@ -142,7 +148,7 @@
               :data {:values selection},
               :mark "bar"
               :encoding
-              (condp = (get model/stattypes selected-column)
+              (condp = (stattype selected-column)
                 dist/gaussian {:x {:bin true,
                                    :field selected-column
                                    :type "quantitative"}
@@ -183,7 +189,7 @@
 
            :else
            (let [types (into #{}
-                             (map model/stattypes)
+                             (map stattype)
                              (take 2 selected-columns))]
              (condp = types
                #{dist/gaussian} {:$schema
@@ -211,11 +217,11 @@
                                     :mark {:type "boxplot"
                                            :extent "min-max"}
                                     :encoding {:x {:field (first selected-columns)
-                                                   :type (condp = (model/stattypes (first selected-columns))
+                                                   :type (condp = (stattype (first selected-columns))
                                                            dist/gaussian "quantitative"
                                                            dist/categorical "nominal")}
                                                :y {:field (second selected-columns)
-                                                   :type (condp = (model/stattypes (second selected-columns))
+                                                   :type (condp = (stattype (second selected-columns))
                                                            dist/gaussian "quantitative"
                                                            dist/categorical "nominal")}
                                                :color {:aggregate "count"
