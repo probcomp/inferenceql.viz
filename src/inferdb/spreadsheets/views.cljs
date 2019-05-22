@@ -1,6 +1,5 @@
 (ns inferdb.spreadsheets.views
-  (:require [clojure.core.async :as async :refer [go]]
-            [reagent.core :as r]
+  (:require [reagent.core :as r]
             [re-frame.core :as rf]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
@@ -40,7 +39,7 @@
 
 (defn vega-lite
   [spec opt generator]
-  (let [stop (atom nil)
+  (let [run (atom 0)
         embed (fn [this spec opt generator]
                 (when spec
                   (let [spec (clj->js spec)
@@ -51,15 +50,16 @@
                                           spec
                                           opt)
                       generator (.then (fn [res]
-                                         (when-let [stop @stop]
-                                           (async/close! stop))
-                                         (reset! stop (async/chan))
-                                         (go (while (async/alt! @stop false (async/timeout 0) true :priority true)
-                                               (let [datum (generator)
-                                                     changeset (.. js/vega
-                                                                   (changeset)
-                                                                   (insert (clj->js datum)))]
-                                                 (.run (.change (.-view res) "data" changeset)))))))
+                                         (let [current-run (swap! run inc)]
+                                           (js/requestAnimationFrame
+                                            (fn send []
+                                              (when (= current-run @run)
+                                                (let [datum (generator)
+                                                      changeset (.. js/vega
+                                                                    (changeset)
+                                                                    (insert (clj->js datum)))]
+                                                  (.run (.change (.-view res) "data" changeset)))
+                                                (js/requestAnimationFrame send)))))))
                       true (.catch (fn [err]
                                      (js/console.error err)))))))]
     (r/create-class
@@ -75,8 +75,7 @@
 
       :component-will-unmount
       (fn [this]
-        (when-let [stop @stop]
-          (async/close! stop)))
+        (swap! run inc))
 
       :reagent-render
       (fn [spec]

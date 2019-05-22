@@ -1,7 +1,6 @@
 (ns inferdb.spreadsheets.events
   (:require [clojure.edn :as edn]
             [clojure.walk :as walk]
-            [clojure.core.async :as async :refer [go]]
             [re-frame.core :as rf]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.spreadsheets.db :as db]
