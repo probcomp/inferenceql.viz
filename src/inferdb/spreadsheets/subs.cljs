@@ -104,7 +104,8 @@
                  y-axis {:title "distribution of probable values"
                          :grid false
                          :labels false
-                         :ticks false}]
+                         :ticks false}
+                 y-scale {:nice false}]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
               :data {:name "data"}
@@ -116,12 +117,14 @@
                                                               :type "quantitative"}
                                                           :y {:aggregate "count"
                                                               :type "quantitative"
-                                                              :axis y-axis}}
+                                                              :axis y-axis
+                                                              :scale y-scale}}
                                            dist/categorical {:x {:field selected-column-kw
                                                                  :type "nominal"}
                                                              :y {:aggregate "count"
                                                                  :type "quantitative"
-                                                                 :axis y-axis}})}]
+                                                                 :axis y-axis
+                                                                 :scale y-scale}})}]
                        (get row-at-selection-start (first selected-columns))
                        (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
                                                :label "Selected row"}]}
