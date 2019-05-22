@@ -39,16 +39,17 @@
         "Search"]])))
 
 (defn vega-lite
-  [spec generator]
+  [spec opt generator]
   (let [stop (atom nil)
-        embed (fn [this spec generator]
+        embed (fn [this spec opt generator]
                 (when spec
                   (let [spec (clj->js spec)
-                        opts #js {:renderer "canvas"
-                                  :mode "vega-lite"}]
+                        opt (clj->js (merge {:renderer "canvas"
+                                             :mode "vega-lite"}
+                                            opt))]
                     (cond-> (js/vegaEmbed (r/dom-node this)
                                           spec
-                                          opts)
+                                          opt)
                       generator (.then (fn [res]
                                          (when-let [stop @stop]
                                            (async/close! stop))
@@ -66,11 +67,11 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec generator))
+        (embed this spec opt generator))
 
       :component-will-update
-      (fn [this [_ new-spec new-generator]]
-        (embed this new-spec new-generator))
+      (fn [this [_ new-spec new-opt new-generator]]
+        (embed this new-spec new-opt new-generator))
 
       :component-will-unmount
       (fn [this]
@@ -95,4 +96,4 @@
      [:div {:style {:display "flex"
                     :justify-content "center"}}
       (when vega-lite-spec
-        [vega-lite vega-lite-spec generator])]]))
+        [vega-lite vega-lite-spec {:actions false} generator])]]))
