@@ -25,8 +25,6 @@
               {:computed-rows (rf/subscribe [:computed-rows])
                :selected-row-index (rf/subscribe [:selected-row-index])})
             (fn [{:keys [selected-row-index computed-rows]} _]
-              (js/console.log "computed-rows" (take 10 computed-rows))
-              (js/console.log "reloading selected row")
               (when selected-row-index
                 (nth computed-rows selected-row-index))))
 
@@ -41,7 +39,6 @@
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])})
             (fn [{:keys [rows scores]}]
-              (js/console.log "reloading computed rows")
               (cond->> rows
                 scores (mapv (fn [score row]
                                (assoc row "score" score))
@@ -93,9 +90,12 @@
                           c))
        s))
 
+(rf/reg-sub :simulated-rows
+            (fn [db _]
+              (db/simulated-rows db)))
+
 (defn vega-lite-spec
-  [{:keys [selected-row selections selected-columns]}]
-  (js/console.log "reloading vega-lite")
+  [{:keys [selected-row selections selected-columns simulated-rows]}]
   (when-let [selection (first selections)]
     (clj->js
      (cond (and (= 1 (count selected-columns))
@@ -103,23 +103,10 @@
                 (not (contains? #{"geo_fips" "district_name" "score"}
                                 (first selected-columns))))
            (let [selected-row-kw (walk/keywordize-keys selected-row)
-                 selected-column-kw (keyword (first selected-columns))
-                 values (cgpm/cgpm-simulate model/census-cgpm
-                                            [selected-column-kw]
-                                            (reduce-kv (fn [acc k v]
-                                                         (cond-> acc
-                                                           v (assoc k v)))
-                                                       {}
-                                                       (dissoc selected-row-kw
-                                                               selected-column-kw
-                                                               :score
-                                                               :NAME
-                                                               :geo_fips))
-                                            {}
-                                            100)]
+                 selected-column-kw (keyword (first selected-columns))]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
-              :data {:values values}
+              :data {:values (or simulated-rows [])}
               :layer (cond-> [{:mark "bar"
                                :encoding (condp = (get model/stattypes (first selected-columns))
                                            dist/gaussian {:x {:bin true
@@ -232,5 +219,6 @@
             (fn [_ _]
               {:selected-row     (rf/subscribe [:selected-row])
                :selections       (rf/subscribe [:selections])
-               :selected-columns (rf/subscribe [:selected-columns])})
+               :selected-columns (rf/subscribe [:selected-columns])
+               :simulated-rows   (rf/subscribe [:simulated-rows])})
             vega-lite-spec)

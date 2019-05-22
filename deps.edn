@@ -1,4 +1,5 @@
 {:deps {org.clojure/clojurescript {:mvn/version "1.10.520"}
+        org.clojure/core.async {:mvn/version "0.4.490"}
         org.clojure/spec-alpha2 {:git/url "https://github.com/clojure/spec-alpha2.git"
                                  :sha "29a73a3e5fef8329c14dd44a0b151e90b86c0854"}
         binaryage/devtools {:mvn/version "0.9.10"}
