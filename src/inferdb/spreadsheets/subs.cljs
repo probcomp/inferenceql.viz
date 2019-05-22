@@ -228,22 +228,33 @@
                :selected-columns (rf/subscribe [:selected-columns])})
             vega-lite-spec)
 
+(rf/reg-sub :one-cell-selected
+            (fn [_ _]
+              {:selections (rf/subscribe [:selections])})
+            (fn [{:keys [selections]}]
+              (= 1
+                 (count selections)
+                 (count (first selections))
+                 (count (keys (first selections))))))
+
 (rf/reg-sub :generator
             (fn [_ _]
               {:row (rf/subscribe [:row-at-selection-start])
-               :columns (rf/subscribe [:selected-columns])})
-            (fn [{:keys [row columns]}]
-              (let [sampled-column (first columns) ; columns that will be sampled
-                    constraints (reduce-kv (fn [acc k v]
-                                             (cond-> acc
-                                               v (assoc k v)))
-                                           {}
-                                           (-> row
-                                               (select-keys (keys model/stattypes))
-                                               (dissoc sampled-column)
-                                               (walk/keywordize-keys)))]
-                #(cgpm/cgpm-simulate model/census-cgpm
-                                     [(keyword sampled-column)]
-                                     constraints
-                                     {}
-                                     1))))
+               :columns (rf/subscribe [:selected-columns])
+               :one-cell-selected (rf/subscribe [:one-cell-selected])})
+            (fn [{:keys [row columns one-cell-selected]}]
+              (when one-cell-selected
+                (let [sampled-column (first columns) ; columns that will be sampled
+                      constraints (reduce-kv (fn [acc k v]
+                                               (cond-> acc
+                                                 v (assoc k v)))
+                                             {}
+                                             (-> row
+                                                 (select-keys (keys model/stattypes))
+                                                 (dissoc sampled-column)
+                                                 (walk/keywordize-keys)))]
+                  #(cgpm/cgpm-simulate model/census-cgpm
+                                       [(keyword sampled-column)]
+                                       constraints
+                                       {}
+                                       1)))))
