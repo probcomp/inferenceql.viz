@@ -16,6 +16,10 @@
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
 
+(rf/reg-sub :row-at-selection-start
+            (fn [db _]
+              (db/row-at-selection-start db)))
+
 (rf/reg-sub :selected-row-index
             (fn [db _]
               (db/selected-row-index db)))
@@ -90,12 +94,8 @@
                           c))
        s))
 
-(rf/reg-sub :simulated-rows
-            (fn [db _]
-              (db/simulated-rows db)))
-
 (defn vega-lite-spec
-  [{:keys [selected-row selections selected-columns simulated-rows]}]
+  [{:keys [selected-row selections selected-columns]}]
   (when-let [selection (first selections)]
     (clj->js
      (cond (and (= 1 (count selected-columns))
@@ -103,10 +103,15 @@
                 (not (contains? #{"geo_fips" "district_name" "score"}
                                 (first selected-columns))))
            (let [selected-row-kw (walk/keywordize-keys selected-row)
-                 selected-column-kw (keyword (first selected-columns))]
+                 selected-column-kw (keyword (first selected-columns))
+                 y-axis {:title "distribution of probable values"
+                         :grid false
+                         :labels false
+                         :ticks false}]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
-              :data {:values (or simulated-rows [])}
+              :data {:name "data"}
+              :autosize {:resize true}
               :layer (cond-> [{:mark "bar"
                                :encoding (condp = (get model/stattypes (first selected-columns))
                                            dist/gaussian {:x {:bin true
@@ -114,12 +119,12 @@
                                                               :type "quantitative"}
                                                           :y {:aggregate "count"
                                                               :type "quantitative"
-                                                              :axis {:title "distribution of probable values"}}}
+                                                              :axis y-axis}}
                                            dist/categorical {:x {:field selected-column-kw
                                                                  :type "nominal"}
                                                              :y {:aggregate "count"
                                                                  :type "quantitative"
-                                                                 :axis {:title "distribution of probable values"}}})}]
+                                                                 :axis y-axis}})}]
                        (get selected-row (first selected-columns))
                        (conj {:data {:values [{selected-column-kw (-> selected-row (get (first selected-columns)))
                                                :label "Selected row"}]}
@@ -214,11 +219,31 @@
                                                            dist/gaussian "quantitative"
                                                            dist/categorical "nominal")}
                                                :color {:aggregate "count"
-                                                       :type "quantitative"}}}))))))
+                                                       :type "quantitative"}}}
+               {}))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:selected-row     (rf/subscribe [:selected-row])
                :selections       (rf/subscribe [:selections])
-               :selected-columns (rf/subscribe [:selected-columns])
-               :simulated-rows   (rf/subscribe [:simulated-rows])})
+               :selected-columns (rf/subscribe [:selected-columns])})
             vega-lite-spec)
+
+(rf/reg-sub :generator
+            (fn [_ _]
+              {:row (rf/subscribe [:row-at-selection-start])
+               :columns (rf/subscribe [:selected-columns])})
+            (fn [{:keys [row columns]}]
+              (let [sampled-column (first columns) ; columns that will be sampled
+                    constraints (reduce-kv (fn [acc k v]
+                                             (cond-> acc
+                                               v (assoc k v)))
+                                           {}
+                                           (-> row
+                                               (select-keys (keys model/stattypes))
+                                               (dissoc sampled-column)
+                                               (walk/keywordize-keys)))]
+                #(cgpm/cgpm-simulate model/census-cgpm
+                                     [(keyword sampled-column)]
+                                     constraints
+                                     {}
+                                     1))))

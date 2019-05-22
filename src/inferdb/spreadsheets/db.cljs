@@ -28,45 +28,15 @@
 
 (s/def ::row-at-selection-start ::row)
 
-(s/def ::simulated-row ::row)
-(s/def ::simulated-rows (s/coll-of ::simulated-row))
-
-(s/def ::simulator fn?)
-
 (s/def ::db (s/keys :req [::headers ::rows]
                     :opt [::simulator
                           ::simulated-rows
                           ::selected-row-index
                           ::row-at-selection-start
                           ::scores
-                          ::selections
                           ::selected-columns
                           ::topojson
                           ::sampled-rows]))
-
-(defn with-simulator
-  [db stop]
-  (assoc db ::simulator stop))
-
-(defn simulator
-  [db]
-  (get db ::simulator))
-
-(defn clear-simulator
-  [db]
-  (dissoc db ::simulator))
-
-(defn with-simulated-rows
-  [db rows]
-  (update db ::simulated-rows (fnil into []) rows))
-
-(defn simulated-rows
-  [db]
-  (get db ::simulated-rows))
-
-(defn clear-simulated-rows
-  [db]
-  (dissoc db ::simulated-rows))
 
 (defn with-row-at-selection-start
   [db row]
@@ -138,4 +108,5 @@
 (defn one-cell-selected?
   [db]
   (and (= 1 (count (selected-columns db)))
-       (= 1 (count (selections db)))))
+       (= 1 (count (selections db)))
+       (= 1 (count (first (selections db))))))
