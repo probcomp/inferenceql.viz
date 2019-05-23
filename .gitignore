@@ -1,3 +1,10 @@
 /node_modules
 /out
 /publish
+
+# Clojure caching
+.cpcache/
+# Fireplace NREPL connection
+.nrepl-port
+# Vim swap files.
+*.swp
