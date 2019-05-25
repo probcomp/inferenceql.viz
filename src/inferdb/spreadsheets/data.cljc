@@ -1,438 +1,3918 @@
 (ns inferdb.spreadsheets.data)
 
 (def nyt-data
-  [{ "district_name" "CD 1, Alabama", "geo_fips" 101, "percap" 25695.0, "percent_college" 0.2404, "percent_black" 0.2724, "percent_married_children" 0.1699}
-   { "district_name" "CD 2, Alabama", "geo_fips" 102, "percap" 24161.0, "percent_college" 0.2179, "percent_black" 0.3206, "percent_married_children" 0.1738}
-   { "district_name" "CD 3, Alabama", "geo_fips" 103, "percap" 24132.0, "percent_college" 0.2277, "percent_black" 0.2596, "percent_married_children" 0.1998}
-   { "district_name" "CD 4, Alabama", "geo_fips" 104, "percap" 22320.0, "percent_college" 0.1703, "percent_black" 0.0692, "percent_married_children" 0.2034}
-   { "district_name" "CD 5, Alabama", "geo_fips" 105, "percap" 29758.0, "percent_college" 0.3027, "percent_black" 0.1777, "percent_married_children" 0.1824}
-   { "district_name" "CD 6, Alabama", "geo_fips" 106, "percap" 33383.0, "percent_college" 0.3674, "percent_black" 0.1485, "percent_married_children" 0.2219}
-   { "district_name" "CD 7, Alabama", "geo_fips" 107, "percap" 20732.0, "percent_college" 0.1935, "percent_black" 0.6329, "percent_married_children" 0.1138}
-   { "district_name" "CD (at Large}, Alaska", "geo_fips" 200, "percap" 34187.0, "percent_college" 0.2956, "percent_black" 0.0293, "percent_married_children" 0.2305}
-   { "district_name" "CD 1, Arizona", "geo_fips" 401, "percap" 22491.0, "percent_college" 0.2453, "percent_black" 0.0209, "percent_married_children" 0.1753}
-   { "district_name" "CD 2, Arizona", "geo_fips" 402, "percap" 28577.0, "percent_college" 0.3396, "percent_black" 0.0368, "percent_married_children" 0.1414}
-   { "district_name" "CD 3, Arizona", "geo_fips" 403, "percap" 19232.0, "percent_college" 0.1646, "percent_black" 0.0427, "percent_married_children" 0.234}
-   { "district_name" "CD 4, Arizona", "geo_fips" 404, "percap" 26523.0, "percent_college" 0.1917, "percent_black" 0.0158, "percent_married_children" 0.1486}
-   { "district_name" "CD 5, Arizona", "geo_fips" 405, "percap" 32918.0, "percent_college" 0.3602, "percent_black" 0.0332, "percent_married_children" 0.2735}
-   { "district_name" "CD 6, Arizona", "geo_fips" 406, "percap" 42779.0, "percent_college" 0.454, "percent_black" 0.0207, "percent_married_children" 0.1835}
-   { "district_name" "CD 7, Arizona", "geo_fips" 407, "percap" 16959.0, "percent_college" 0.1402, "percent_black" 0.0948, "percent_married_children" 0.2173}
-   { "district_name" "CD 8, Arizona", "geo_fips" 408, "percap" 30432.0, "percent_college" 0.2935, "percent_black" 0.0378, "percent_married_children" 0.2129}
-   { "district_name" "CD 9, Arizona", "geo_fips" 409, "percap" 32415.0, "percent_college" 0.3755, "percent_black" 0.0622, "percent_married_children" 0.1541}
-   { "district_name" "CD 1, Arkansas", "geo_fips" 501, "percap" 21907.0, "percent_college" 0.1646, "percent_black" 0.1771, "percent_married_children" 0.1688}
-   { "district_name" "CD 2, Arkansas", "geo_fips" 502, "percap" 27592.0, "percent_college" 0.2997, "percent_black" 0.2224, "percent_married_children" 0.1877}
-   { "district_name" "CD 3, Arkansas", "geo_fips" 503, "percap" 25991.0, "percent_college" 0.2688, "percent_black" 0.0301, "percent_married_children" 0.2427}
-   { "district_name" "CD 4, Arkansas", "geo_fips" 504, "percap" 21182.0, "percent_college" 0.1581, "percent_black" 0.1988, "percent_married_children" 0.1749}
-   { "district_name" "CD 1, California", "geo_fips" 601, "percap" 26949.0, "percent_college" 0.2366, "percent_black" 0.0129, "percent_married_children" 0.1495}
-   { "district_name" "CD 2, California", "geo_fips" 602, "percap" 44818.0, "percent_college" 0.4076, "percent_black" 0.0128, "percent_married_children" 0.1789}
-   { "district_name" "CD 3, California", "geo_fips" 603, "percap" 29224.0, "percent_college" 0.2508, "percent_black" 0.0603, "percent_married_children" 0.2304}
-   { "district_name" "CD 4, California", "geo_fips" 604, "percap" 38757.0, "percent_college" 0.3328, "percent_black" 0.0126, "percent_married_children" 0.2153}
-   { "district_name" "CD 5, California", "geo_fips" 605, "percap" 35209.0, "percent_college" 0.3121, "percent_black" 0.059, "percent_married_children" 0.1964}
-   { "district_name" "CD 6, California", "geo_fips" 606, "percap" 26642.0, "percent_college" 0.2752, "percent_black" 0.1249, "percent_married_children" 0.1958}
-   { "district_name" "CD 7, California", "geo_fips" 607, "percap" 34031.0, "percent_college" 0.3291, "percent_black" 0.0676, "percent_married_children" 0.2319}
-   { "district_name" "CD 8, California", "geo_fips" 608, "percap" 21809.0, "percent_college" 0.1709, "percent_black" 0.0866, "percent_married_children" 0.2423}
-   { "district_name" "CD 9, California", "geo_fips" 609, "percap" 26494.0, "percent_college" 0.1914, "percent_black" 0.0895, "percent_married_children" 0.2567}
-   { "district_name" "CD 10, California", "geo_fips" 610, "percap" 25293.0, "percent_college" 0.1656, "percent_black" 0.0306, "percent_married_children" 0.2877}
-   { "district_name" "CD 11, California", "geo_fips" 611, "percap" 44515.0, "percent_college" 0.436, "percent_black" 0.0745, "percent_married_children" 0.2419}
-   { "district_name" "CD 12, California", "geo_fips" 612, "percap" 64839.0, "percent_college" 0.5948, "percent_black" 0.0495, "percent_married_children" 0.1324}
-   { "district_name" "CD 13, California", "geo_fips" 613, "percap" 41397.0, "percent_college" 0.4715, "percent_black" 0.1683, "percent_married_children" 0.1766}
-   { "district_name" "CD 14, California", "geo_fips" 614, "percap" 50487.0, "percent_college" 0.4753, "percent_black" 0.025, "percent_married_children" 0.2447}
-   { "district_name" "CD 15, California", "geo_fips" 615, "percap" 44491.0, "percent_college" 0.4499, "percent_black" 0.049, "percent_married_children" 0.3153}
-   { "district_name" "CD 16, California", "geo_fips" 616, "percap" 18362.0, "percent_college" 0.1216, "percent_black" 0.0604, "percent_married_children" 0.2339}
-   { "district_name" "CD 17, California", "geo_fips" 617, "percap" 49171.0, "percent_college" 0.5702, "percent_black" 0.027, "percent_married_children" 0.339}
-   { "district_name" "CD 18, California", "geo_fips" 618, "percap" 66772.0, "percent_college" 0.6153, "percent_black" 0.019, "percent_married_children" 0.2697}
-   { "district_name" "CD 19, California", "geo_fips" 619, "percap" 36864.0, "percent_college" 0.3553, "percent_black" 0.0256, "percent_married_children" 0.2856}
-   { "district_name" "CD 20, California", "geo_fips" 620, "percap" 29672.0, "percent_college" 0.2786, "percent_black" 0.0178, "percent_married_children" 0.2387}
-   { "district_name" "CD 21, California", "geo_fips" 621, "percap" 15153.0, "percent_college" 0.0786, "percent_black" 0.0358, "percent_married_children" 0.3503}
-   { "district_name" "CD 22, California", "geo_fips" 622, "percap" 25763.0, "percent_college" 0.2411, "percent_black" 0.022, "percent_married_children" 0.2601}
-   { "district_name" "CD 23, California", "geo_fips" 623, "percap" 25392.0, "percent_college" 0.2083, "percent_black" 0.0606, "percent_married_children" 0.2309}
-   { "district_name" "CD 24, California", "geo_fips" 624, "percap" 32445.0, "percent_college" 0.3403, "percent_black" 0.0174, "percent_married_children" 0.2072}
-   { "district_name" "CD 25, California", "geo_fips" 625, "percap" 31565.0, "percent_college" 0.2779, "percent_black" 0.0685, "percent_married_children" 0.2711}
-   { "district_name" "CD 26, California", "geo_fips" 626, "percap" 34606.0, "percent_college" 0.3412, "percent_black" 0.0163, "percent_married_children" 0.2414}
-   { "district_name" "CD 27, California", "geo_fips" 627, "percap" 35241.0, "percent_college" 0.4052, "percent_black" 0.0474, "percent_married_children" 0.2208}
-   { "district_name" "CD 28, California", "geo_fips" 628, "percap" 41930.0, "percent_college" 0.4622, "percent_black" 0.0304, "percent_married_children" 0.1428}
-   { "district_name" "CD 29, California", "geo_fips" 629, "percap" 21309.0, "percent_college" 0.1924, "percent_black" 0.0303, "percent_married_children" 0.2481}
-   { "district_name" "CD 30, California", "geo_fips" 630, "percap" 41473.0, "percent_college" 0.4245, "percent_black" 0.0566, "percent_married_children" 0.1989}
-   { "district_name" "CD 31, California", "geo_fips" 631, "percap" 23514.0, "percent_college" 0.2266, "percent_black" 0.097, "percent_married_children" 0.2482}
-   { "district_name" "CD 32, California", "geo_fips" 632, "percap" 23237.0, "percent_college" 0.2136, "percent_black" 0.0293, "percent_married_children" 0.259}
-   { "district_name" "CD 33, California", "geo_fips" 633, "percap" 69375.0, "percent_college" 0.6538, "percent_black" 0.0308, "percent_married_children" 0.1776}
-   { "district_name" "CD 34, California", "geo_fips" 634, "percap" 21540.0, "percent_college" 0.254, "percent_black" 0.0429, "percent_married_children" 0.1589}
-   { "district_name" "CD 35, California", "geo_fips" 635, "percap" 19394.0, "percent_college" 0.1606, "percent_black" 0.0588, "percent_married_children" 0.305}
-   { "district_name" "CD 36, California", "geo_fips" 636, "percap" 25180.0, "percent_college" 0.2062, "percent_black" 0.0429, "percent_married_children" 0.177}
-   { "district_name" "CD 37, California", "geo_fips" 637, "percap" 33653.0, "percent_college" 0.3689, "percent_black" 0.2135, "percent_married_children" 0.1471}
-   { "district_name" "CD 38, California", "geo_fips" 638, "percap" 25489.0, "percent_college" 0.2349, "percent_black" 0.0437, "percent_married_children" 0.265}
-   { "district_name" "CD 39, California", "geo_fips" 639, "percap" 35092.0, "percent_college" 0.4162, "percent_black" 0.0228, "percent_married_children" 0.2833}
-   { "district_name" "CD 40, California", "geo_fips" 640, "percap" 15885.0, "percent_college" 0.0981, "percent_black" 0.0409, "percent_married_children" 0.289}
-   { "district_name" "CD 41, California", "geo_fips" 641, "percap" 21233.0, "percent_college" 0.1827, "percent_black" 0.091, "percent_married_children" 0.2965}
-   { "district_name" "CD 42, California", "geo_fips" 642, "percap" 29264.0, "percent_college" 0.2505, "percent_black" 0.0474, "percent_married_children" 0.3072}
-   { "district_name" "CD 43, California", "geo_fips" 643, "percap" 26562.0, "percent_college" 0.2654, "percent_black" 0.2125, "percent_married_children" 0.2044}
-   { "district_name" "CD 44, California", "geo_fips" 644, "percap" 19009.0, "percent_college" 0.1234, "percent_black" 0.1475, "percent_married_children" 0.2633}
-   { "district_name" "CD 45, California", "geo_fips" 645, "percap" 48000.0, "percent_college" 0.5595, "percent_black" 0.0143, "percent_married_children" 0.2687}
-   { "district_name" "CD 46, California", "geo_fips" 646, "percap" 21018.0, "percent_college" 0.1869, "percent_black" 0.0156, "percent_married_children" 0.3013}
-   { "district_name" "CD 47, California", "geo_fips" 647, "percap" 30348.0, "percent_college" 0.32, "percent_black" 0.0734, "percent_married_children" 0.2174}
-   { "district_name" "CD 48, California", "geo_fips" 648, "percap" 47277.0, "percent_college" 0.4456, "percent_black" 0.0128, "percent_married_children" 0.2144}
-   { "district_name" "CD 49, California", "geo_fips" 649, "percap" 42826.0, "percent_college" 0.4402, "percent_black" 0.0214, "percent_married_children" 0.2621}
-   { "district_name" "CD 50, California", "geo_fips" 650, "percap" 30315.0, "percent_college" 0.2816, "percent_black" 0.0328, "percent_married_children" 0.2695}
-   { "district_name" "CD 51, California", "geo_fips" 651, "percap" 18206.0, "percent_college" 0.1412, "percent_black" 0.0646, "percent_married_children" 0.2532}
-   { "district_name" "CD 52, California", "geo_fips" 652, "percap" 46537.0, "percent_college" 0.5741, "percent_black" 0.0264, "percent_married_children" 0.2192}
-   { "district_name" "CD 53, California", "geo_fips" 653, "percap" 33570.0, "percent_college" 0.3784, "percent_black" 0.0761, "percent_married_children" 0.2051}
-   { "district_name" "CD 1, Colorado", "geo_fips" 801, "percap" 39756.0, "percent_college" 0.4764, "percent_black" 0.0811, "percent_married_children" 0.1711}
-   { "district_name" "CD 2, Colorado", "geo_fips" 802, "percap" 39981.0, "percent_college" 0.5425, "percent_black" 0.0088, "percent_married_children" 0.2054}
-   { "district_name" "CD 3, Colorado", "geo_fips" 803, "percap" 27411.0, "percent_college" 0.2924, "percent_black" 0.008, "percent_married_children" 0.1854}
-   { "district_name" "CD 4, Colorado", "geo_fips" 804, "percap" 33787.0, "percent_college" 0.3494, "percent_black" 0.0131, "percent_married_children" 0.2833}
-   { "district_name" "CD 5, Colorado", "geo_fips" 805, "percap" 30613.0, "percent_college" 0.37, "percent_black" 0.0562, "percent_married_children" 0.2256}
-   { "district_name" "CD 6, Colorado", "geo_fips" 806, "percap" 37219.0, "percent_college" 0.4183, "percent_black" 0.0915, "percent_married_children" 0.2717}
-   { "district_name" "CD 7, Colorado", "geo_fips" 807, "percap" 32226.0, "percent_college" 0.3247, "percent_black" 0.0161, "percent_married_children" 0.2023}
-   { "district_name" "CD 1, Connecticut", "geo_fips" 901, "percap" 36544.0, "percent_college" 0.3678, "percent_black" 0.1475, "percent_married_children" 0.194}
-   { "district_name" "CD 2, Connecticut", "geo_fips" 902, "percap" 37675.0, "percent_college" 0.3512, "percent_black" 0.0373, "percent_married_children" 0.176}
-   { "district_name" "CD 3, Connecticut", "geo_fips" 903, "percap" 36056.0, "percent_college" 0.3615, "percent_black" 0.1319, "percent_married_children" 0.16}
-   { "district_name" "CD 4, Connecticut", "geo_fips" 904, "percap" 56020.0, "percent_college" 0.4885, "percent_black" 0.1154, "percent_married_children" 0.2508}
-   { "district_name" "CD 5, Connecticut", "geo_fips" 905, "percap" 38709.0, "percent_college" 0.363, "percent_black" 0.059, "percent_married_children" 0.1742}
-   { "district_name" "CD (at Large}, Delaware", "geo_fips" 1000, "percap" 31712.0, "percent_college" 0.3095, "percent_black" 0.2135, "percent_married_children" 0.1691}
-   { "district_name" "CD 1, Florida", "geo_fips" 1201, "percap" 28149.0, "percent_college" 0.2789, "percent_black" 0.1362, "percent_married_children" 0.1782}
-   { "district_name" "CD 2, Florida", "geo_fips" 1202, "percap" 25110.0, "percent_college" 0.2339, "percent_black" 0.1263, "percent_married_children" 0.1649}
-   { "district_name" "CD 3, Florida", "geo_fips" 1203, "percap" 24072.0, "percent_college" 0.2586, "percent_black" 0.1493, "percent_married_children" 0.1652}
-   { "district_name" "CD 4, Florida", "geo_fips" 1204, "percap" 36749.0, "percent_college" 0.3922, "percent_black" 0.0862, "percent_married_children" 0.1997}
-   { "district_name" "CD 5, Florida", "geo_fips" 1205, "percap" 20606.0, "percent_college" 0.2141, "percent_black" 0.4718, "percent_married_children" 0.1449}
-   { "district_name" "CD 6, Florida", "geo_fips" 1206, "percap" 26083.0, "percent_college" 0.2389, "percent_black" 0.0974, "percent_married_children" 0.1384}
-   { "district_name" "CD 7, Florida", "geo_fips" 1207, "percap" 30651.0, "percent_college" 0.3775, "percent_black" 0.0921, "percent_married_children" 0.186}
-   { "district_name" "CD 8, Florida", "geo_fips" 1208, "percap" 29605.0, "percent_college" 0.2898, "percent_black" 0.0911, "percent_married_children" 0.1381}
-   { "district_name" "CD 9, Florida", "geo_fips" 1209, "percap" 22124.0, "percent_college" 0.2465, "percent_black" 0.1236, "percent_married_children" 0.2179}
-   { "district_name" "CD 10, Florida", "geo_fips" 1210, "percap" 27055.0, "percent_college" 0.3033, "percent_black" 0.2723, "percent_married_children" 0.1866}
-   { "district_name" "CD 11, Florida", "geo_fips" 1211, "percap" 25513.0, "percent_college" 0.2056, "percent_black" 0.0783, "percent_married_children" 0.0971}
-   { "district_name" "CD 12, Florida", "geo_fips" 1212, "percap" 29214.0, "percent_college" 0.2689, "percent_black" 0.0452, "percent_married_children" 0.1614}
-   { "district_name" "CD 13, Florida", "geo_fips" 1213, "percap" 30900.0, "percent_college" 0.2779, "percent_black" 0.1199, "percent_married_children" 0.1163}
-   { "district_name" "CD 14, Florida", "geo_fips" 1214, "percap" 31648.0, "percent_college" 0.3526, "percent_black" 0.1826, "percent_married_children" 0.1636}
-   { "district_name" "CD 15, Florida", "geo_fips" 1215, "percap" 25401.0, "percent_college" 0.2575, "percent_black" 0.1307, "percent_married_children" 0.2019}
-   { "district_name" "CD 16, Florida", "geo_fips" 1216, "percap" 31916.0, "percent_college" 0.3072, "percent_black" 0.0746, "percent_married_children" 0.1457}
-   { "district_name" "CD 17, Florida", "geo_fips" 1217, "percap" 26354.0, "percent_college" 0.2126, "percent_black" 0.0723, "percent_married_children" 0.1289}
-   { "district_name" "CD 18, Florida", "geo_fips" 1218, "percap" 34411.0, "percent_college" 0.3049, "percent_black" 0.1212, "percent_married_children" 0.1502}
-   { "district_name" "CD 19, Florida", "geo_fips" 1219, "percap" 35227.0, "percent_college" 0.3232, "percent_black" 0.0782, "percent_married_children" 0.1201}
-   { "district_name" "CD 20, Florida", "geo_fips" 1220, "percap" 20374.0, "percent_college" 0.197, "percent_black" 0.52, "percent_married_children" 0.1766}
-   { "district_name" "CD 21, Florida", "geo_fips" 1221, "percap" 34037.0, "percent_college" 0.3427, "percent_black" 0.1581, "percent_married_children" 0.1604}
-   { "district_name" "CD 22, Florida", "geo_fips" 1222, "percap" 40187.0, "percent_college" 0.3787, "percent_black" 0.1547, "percent_married_children" 0.1533}
-   { "district_name" "CD 23, Florida", "geo_fips" 1223, "percap" 34835.0, "percent_college" 0.3858, "percent_black" 0.1239, "percent_married_children" 0.2008}
-   { "district_name" "CD 24, Florida", "geo_fips" 1224, "percap" 19669.0, "percent_college" 0.1936, "percent_black" 0.4684, "percent_married_children" 0.1447}
-   { "district_name" "CD 25, Florida", "geo_fips" 1225, "percap" 22975.0, "percent_college" 0.2274, "percent_black" 0.0337, "percent_married_children" 0.2115}
-   { "district_name" "CD 26, Florida", "geo_fips" 1226, "percap" 22747.0, "percent_college" 0.2722, "percent_black" 0.1024, "percent_married_children" 0.2311}
-   { "district_name" "CD 27, Florida", "geo_fips" 1227, "percap" 37681.0, "percent_college" 0.3747, "percent_black" 0.0376, "percent_married_children" 0.1681}
-   { "district_name" "CD 1, Georgia", "geo_fips" 1301, "percap" 26644.0, "percent_college" 0.25, "percent_black" 0.2931, "percent_married_children" 0.1926}
-   { "district_name" "CD 2, Georgia", "geo_fips" 1302, "percap" 19804.0, "percent_college" 0.1763, "percent_black" 0.5157, "percent_married_children" 0.1508}
-   { "district_name" "CD 3, Georgia", "geo_fips" 1303, "percap" 28475.0, "percent_college" 0.2647, "percent_black" 0.244, "percent_married_children" 0.2211}
-   { "district_name" "CD 4, Georgia", "geo_fips" 1304, "percap" 25426.0, "percent_college" 0.2985, "percent_black" 0.5853, "percent_married_children" 0.184}
-   { "district_name" "CD 5, Georgia", "geo_fips" 1305, "percap" 33008.0, "percent_college" 0.4202, "percent_black" 0.5718, "percent_married_children" 0.1}
-   { "district_name" "CD 6, Georgia", "geo_fips" 1306, "percap" 46304.0, "percent_college" 0.6059, "percent_black" 0.1468, "percent_married_children" 0.2694}
-   { "district_name" "CD 7, Georgia", "geo_fips" 1307, "percap" 31614.0, "percent_college" 0.3964, "percent_black" 0.202, "percent_married_children" 0.3222}
-   { "district_name" "CD 8, Georgia", "geo_fips" 1308, "percap" 22991.0, "percent_college" 0.2178, "percent_black" 0.3067, "percent_married_children" 0.1984}
-   { "district_name" "CD 9, Georgia", "geo_fips" 1309, "percap" 23963.0, "percent_college" 0.2158, "percent_black" 0.0717, "percent_married_children" 0.215}
-   { "district_name" "CD 10, Georgia", "geo_fips" 1310, "percap" 25544.0, "percent_college" 0.2666, "percent_black" 0.2484, "percent_married_children" 0.2133}
-   { "district_name" "CD 11, Georgia", "geo_fips" 1311, "percap" 36404.0, "percent_college" 0.4098, "percent_black" 0.1602, "percent_married_children" 0.2464}
-   { "district_name" "CD 12, Georgia", "geo_fips" 1312, "percap" 22374.0, "percent_college" 0.2088, "percent_black" 0.3517, "percent_married_children" 0.1927}
-   { "district_name" "CD 13, Georgia", "geo_fips" 1313, "percap" 25950.0, "percent_college" 0.2962, "percent_black" 0.5812, "percent_married_children" 0.2074}
-   { "district_name" "CD 14, Georgia", "geo_fips" 1314, "percap" 23855.0, "percent_college" 0.1811, "percent_black" 0.0888, "percent_married_children" 0.2394}
-   { "district_name" "CD 1, Hawaii", "geo_fips" 1501, "percap" 34669.0, "percent_college" 0.3602, "percent_black" 0.02, "percent_married_children" 0.2251}
-   { "district_name" "CD 2, Hawaii", "geo_fips" 1502, "percap" 30643.0, "percent_college" 0.278, "percent_black" 0.0142, "percent_married_children" 0.2201}
-   { "district_name" "CD 1, Idaho", "geo_fips" 1601, "percap" 25361.0, "percent_college" 0.2542, "percent_black" 0.0034, "percent_married_children" 0.2056}
-   { "district_name" "CD 2, Idaho", "geo_fips" 1602, "percap" 26014.0, "percent_college" 0.3008, "percent_black" 0.0088, "percent_married_children" 0.2379}
-   { "district_name" "CD 1, Illinois", "geo_fips" 1701, "percap" 28130.0, "percent_college" 0.2892, "percent_black" 0.4983, "percent_married_children" 0.1512}
-   { "district_name" "CD 2, Illinois", "geo_fips" 1702, "percap" 24297.0, "percent_college" 0.2334, "percent_black" 0.5662, "percent_married_children" 0.1319}
-   { "district_name" "CD 3, Illinois", "geo_fips" 1703, "percap" 29713.0, "percent_college" 0.2693, "percent_black" 0.0516, "percent_married_children" 0.2475}
-   { "district_name" "CD 4, Illinois", "geo_fips" 1704, "percap" 23939.0, "percent_college" 0.245, "percent_black" 0.0328, "percent_married_children" 0.2273}
-   { "district_name" "CD 5, Illinois", "geo_fips" 1705, "percap" 48869.0, "percent_college" 0.5469, "percent_black" 0.0236, "percent_married_children" 0.1878}
-   { "district_name" "CD 6, Illinois", "geo_fips" 1706, "percap" 46654.0, "percent_college" 0.5219, "percent_black" 0.0252, "percent_married_children" 0.2697}
-   { "district_name" "CD 7, Illinois", "geo_fips" 1707, "percap" 37667.0, "percent_college" 0.4068, "percent_black" 0.4683, "percent_married_children" 0.1015}
-   { "district_name" "CD 8, Illinois", "geo_fips" 1708, "percap" 30276.0, "percent_college" 0.3258, "percent_black" 0.0449, "percent_married_children" 0.2375}
-   { "district_name" "CD 9, Illinois", "geo_fips" 1709, "percap" 41955.0, "percent_college" 0.5317, "percent_black" 0.0989, "percent_married_children" 0.1963}
-   { "district_name" "CD 10, Illinois", "geo_fips" 1710, "percap" 40667.0, "percent_college" 0.4406, "percent_black" 0.0665, "percent_married_children" 0.2736}
-   { "district_name" "CD 11, Illinois", "geo_fips" 1711, "percap" 32678.0, "percent_college" 0.3601, "percent_black" 0.104, "percent_married_children" 0.2591}
-   { "district_name" "CD 12, Illinois", "geo_fips" 1712, "percap" 26882.0, "percent_college" 0.2395, "percent_black" 0.1694, "percent_married_children" 0.1654}
-   { "district_name" "CD 13, Illinois", "geo_fips" 1713, "percap" 27673.0, "percent_college" 0.3024, "percent_black" 0.1098, "percent_married_children" 0.1568}
-   { "district_name" "CD 14, Illinois", "geo_fips" 1714, "percap" 37982.0, "percent_college" 0.421, "percent_black" 0.0343, "percent_married_children" 0.3157}
-   { "district_name" "CD 15, Illinois", "geo_fips" 1715, "percap" 25860.0, "percent_college" 0.202, "percent_black" 0.0443, "percent_married_children" 0.1948}
-   { "district_name" "CD 16, Illinois", "geo_fips" 1716, "percap" 28866.0, "percent_college" 0.2218, "percent_black" 0.0333, "percent_married_children" 0.1958}
-   { "district_name" "CD 17, Illinois", "geo_fips" 1717, "percap" 24700.0, "percent_college" 0.1868, "percent_black" 0.113, "percent_married_children" 0.1523}
-   { "district_name" "CD 18, Illinois", "geo_fips" 1718, "percap" 32668.0, "percent_college" 0.3168, "percent_black" 0.0402, "percent_married_children" 0.2072}
-   { "district_name" "CD 1, Indiana", "geo_fips" 1801, "percap" 28232.0, "percent_college" 0.2261, "percent_black" 0.1853, "percent_married_children" 0.1851}
-   { "district_name" "CD 2, Indiana", "geo_fips" 1802, "percap" 24293.0, "percent_college" 0.2077, "percent_black" 0.0689, "percent_married_children" 0.2059}
-   { "district_name" "CD 3, Indiana", "geo_fips" 1803, "percap" 25709.0, "percent_college" 0.2288, "percent_black" 0.0624, "percent_married_children" 0.2002}
-   { "district_name" "CD 4, Indiana", "geo_fips" 1804, "percap" 27319.0, "percent_college" 0.2598, "percent_black" 0.0418, "percent_married_children" 0.2146}
-   { "district_name" "CD 5, Indiana", "geo_fips" 1805, "percap" 38140.0, "percent_college" 0.4496, "percent_black" 0.0726, "percent_married_children" 0.2271}
-   { "district_name" "CD 6, Indiana", "geo_fips" 1806, "percap" 25803.0, "percent_college" 0.2072, "percent_black" 0.0261, "percent_married_children" 0.1953}
-   { "district_name" "CD 7, Indiana", "geo_fips" 1807, "percap" 23208.0, "percent_college" 0.2346, "percent_black" 0.3033, "percent_married_children" 0.1488}
-   { "district_name" "CD 8, Indiana", "geo_fips" 1808, "percap" 25987.0, "percent_college" 0.2128, "percent_black" 0.0385, "percent_married_children" 0.1903}
-   { "district_name" "CD 9, Indiana", "geo_fips" 1809, "percap" 28010.0, "percent_college" 0.2635, "percent_black" 0.0256, "percent_married_children" 0.2018}
-   { "district_name" "CD 1, Iowa", "geo_fips" 1901, "percap" 30633.0, "percent_college" 0.2708, "percent_black" 0.0379, "percent_married_children" 0.2068}
-   { "district_name" "CD 2, Iowa", "geo_fips" 1902, "percap" 27917.0, "percent_college" 0.2846, "percent_black" 0.0441, "percent_married_children" 0.1899}
-   { "district_name" "CD 3, Iowa", "geo_fips" 1903, "percap" 33074.0, "percent_college" 0.331, "percent_black" 0.0412, "percent_married_children" 0.2257}
-   { "district_name" "CD 4, Iowa", "geo_fips" 1904, "percap" 28357.0, "percent_college" 0.2465, "percent_black" 0.0144, "percent_married_children" 0.1944}
-   { "district_name" "CD 1, Kansas", "geo_fips" 2001, "percap" 24350.0, "percent_college" 0.2389, "percent_black" 0.0282, "percent_married_children" 0.2015}
-   { "district_name" "CD 2, Kansas", "geo_fips" 2002, "percap" 26783.0, "percent_college" 0.2921, "percent_black" 0.0483, "percent_married_children" 0.1907}
-   { "district_name" "CD 3, Kansas", "geo_fips" 2003, "percap" 37433.0, "percent_college" 0.4736, "percent_black" 0.0806, "percent_married_children" 0.2399}
-   { "district_name" "CD 4, Kansas", "geo_fips" 2004, "percap" 26686.0, "percent_college" 0.2947, "percent_black" 0.0625, "percent_married_children" 0.2007}
-   { "district_name" "CD 1, Kentucky", "geo_fips" 2101, "percap" 22856.0, "percent_college" 0.1568, "percent_black" 0.0759, "percent_married_children" 0.1861}
-   { "district_name" "CD 2, Kentucky", "geo_fips" 2102, "percap" 25750.0, "percent_college" 0.2088, "percent_black" 0.0563, "percent_married_children" 0.2057}
-   { "district_name" "CD 3, Kentucky", "geo_fips" 2103, "percap" 30288.0, "percent_college" 0.309, "percent_black" 0.2169, "percent_married_children" 0.1509}
-   { "district_name" "CD 4, Kentucky", "geo_fips" 2104, "percap" 30526.0, "percent_college" 0.2829, "percent_black" 0.034, "percent_married_children" 0.2269}
-   { "district_name" "CD 5, Kentucky", "geo_fips" 2105, "percap" 18575.0, "percent_college" 0.1243, "percent_black" 0.0147, "percent_married_children" 0.1873}
-   { "district_name" "CD 6, Kentucky", "geo_fips" 2106, "percap" 27670.0, "percent_college" 0.3166, "percent_black" 0.0872, "percent_married_children" 0.1866}
-   { "district_name" "CD 1, Louisiana", "geo_fips" 2201, "percap" 31238.0, "percent_college" 0.3033, "percent_black" 0.1385, "percent_married_children" 0.2039}
-   { "district_name" "CD 2, Louisiana", "geo_fips" 2202, "percap" 23818.0, "percent_college" 0.2344, "percent_black" 0.6114, "percent_married_children" 0.1286}
-   { "district_name" "CD 3, Louisiana", "geo_fips" 2203, "percap" 24365.0, "percent_college" 0.2101, "percent_black" 0.2505, "percent_married_children" 0.1815}
-   { "district_name" "CD 4, Louisiana", "geo_fips" 2204, "percap" 22832.0, "percent_college" 0.1988, "percent_black" 0.347, "percent_married_children" 0.1711}
-   { "district_name" "CD 5, Louisiana", "geo_fips" 2205, "percap" 20613.0, "percent_college" 0.1677, "percent_black" 0.344, "percent_married_children" 0.1636}
-   { "district_name" "CD 6, Louisiana", "geo_fips" 2206, "percap" 30571.0, "percent_college" 0.2793, "percent_black" 0.2398, "percent_married_children" 0.2032}
-   { "district_name" "CD 1, Maine", "geo_fips" 2301, "percap" 33540.0, "percent_college" 0.3694, "percent_black" 0.0177, "percent_married_children" 0.167}
-   { "district_name" "CD 2, Maine", "geo_fips" 2302, "percap" 25544.0, "percent_college" 0.2302, "percent_black" 0.0092, "percent_married_children" 0.147}
-   { "district_name" "CD 1, Maryland", "geo_fips" 2401, "percap" 34345.0, "percent_college" 0.3056, "percent_black" 0.1191, "percent_married_children" 0.2085}
-   { "district_name" "CD 2, Maryland", "geo_fips" 2402, "percap" 32194.0, "percent_college" 0.3338, "percent_black" 0.3362, "percent_married_children" 0.1974}
-   { "district_name" "CD 3, Maryland", "geo_fips" 2403, "percap" 43726.0, "percent_college" 0.4716, "percent_black" 0.2175, "percent_married_children" 0.1894}
-   { "district_name" "CD 4, Maryland", "geo_fips" 2404, "percap" 35970.0, "percent_college" 0.34, "percent_black" 0.5151, "percent_married_children" 0.1893}
-   { "district_name" "CD 5, Maryland", "geo_fips" 2405, "percap" 38916.0, "percent_college" 0.337, "percent_black" 0.3816, "percent_married_children" 0.234}
-   { "district_name" "CD 6, Maryland", "geo_fips" 2406, "percap" 37910.0, "percent_college" 0.4148, "percent_black" 0.1386, "percent_married_children" 0.2375}
-   { "district_name" "CD 7, Maryland", "geo_fips" 2407, "percap" 35078.0, "percent_college" 0.3782, "percent_black" 0.5252, "percent_married_children" 0.1468}
-   { "district_name" "CD 8, Maryland", "geo_fips" 2408, "percap" 50881.0, "percent_college" 0.556, "percent_black" 0.1208, "percent_married_children" 0.253}
-   { "district_name" "CD 1, Massachusetts", "geo_fips" 2501, "percap" 29632.0, "percent_college" 0.2973, "percent_black" 0.0561, "percent_married_children" 0.1494}
-   { "district_name" "CD 2, Massachusetts", "geo_fips" 2502, "percap" 33892.0, "percent_college" 0.3839, "percent_black" 0.0482, "percent_married_children" 0.1927}
-   { "district_name" "CD 3, Massachusetts", "geo_fips" 2503, "percap" 37598.0, "percent_college" 0.3742, "percent_black" 0.0284, "percent_married_children" 0.2186}
-   { "district_name" "CD 4, Massachusetts", "geo_fips" 2504, "percap" 49383.0, "percent_college" 0.5102, "percent_black" 0.0324, "percent_married_children" 0.2603}
-   { "district_name" "CD 5, Massachusetts", "geo_fips" 2505, "percap" 48695.0, "percent_college" 0.5736, "percent_black" 0.047, "percent_married_children" 0.2245}
-   { "district_name" "CD 6, Massachusetts", "geo_fips" 2506, "percap" 42372.0, "percent_college" 0.4398, "percent_black" 0.034, "percent_married_children" 0.2243}
-   { "district_name" "CD 7, Massachusetts", "geo_fips" 2507, "percap" 35107.0, "percent_college" 0.4291, "percent_black" 0.2348, "percent_married_children" 0.1199}
-   { "district_name" "CD 8, Massachusetts", "geo_fips" 2508, "percap" 43213.0, "percent_college" 0.4683, "percent_black" 0.0925, "percent_married_children" 0.1914}
-   { "district_name" "CD 9, Massachusetts", "geo_fips" 2509, "percap" 37633.0, "percent_college" 0.3588, "percent_black" 0.0234, "percent_married_children" 0.1629}
-   { "district_name" "CD 1, Michigan", "geo_fips" 2601, "percap" 25936.0, "percent_college" 0.2459, "percent_black" 0.0134, "percent_married_children" 0.1425}
-   { "district_name" "CD 2, Michigan", "geo_fips" 2602, "percap" 25522.0, "percent_college" 0.2383, "percent_black" 0.062, "percent_married_children" 0.2071}
-   { "district_name" "CD 3, Michigan", "geo_fips" 2603, "percap" 29188.0, "percent_college" 0.3141, "percent_black" 0.0779, "percent_married_children" 0.2178}
-   { "district_name" "CD 4, Michigan", "geo_fips" 2604, "percap" 25919.0, "percent_college" 0.2185, "percent_black" 0.0162, "percent_married_children" 0.1755}
-   { "district_name" "CD 5, Michigan", "geo_fips" 2605, "percap" 24002.0, "percent_college" 0.1896, "percent_black" 0.1714, "percent_married_children" 0.1584}
-   { "district_name" "CD 6, Michigan", "geo_fips" 2606, "percap" 27912.0, "percent_college" 0.2795, "percent_black" 0.0787, "percent_married_children" 0.194}
-   { "district_name" "CD 7, Michigan", "geo_fips" 2607, "percap" 29282.0, "percent_college" 0.2465, "percent_black" 0.043, "percent_married_children" 0.1937}
-   { "district_name" "CD 8, Michigan", "geo_fips" 2608, "percap" 34603.0, "percent_college" 0.4061, "percent_black" 0.0545, "percent_married_children" 0.2094}
-   { "district_name" "CD 9, Michigan", "geo_fips" 2609, "percap" 33233.0, "percent_college" 0.3032, "percent_black" 0.1404, "percent_married_children" 0.1597}
-   { "district_name" "CD 10, Michigan", "geo_fips" 2610, "percap" 31019.0, "percent_college" 0.23, "percent_black" 0.0244, "percent_married_children" 0.1978}
-   { "district_name" "CD 11, Michigan", "geo_fips" 2611, "percap" 41789.0, "percent_college" 0.4665, "percent_black" 0.0501, "percent_married_children" 0.2363}
-   { "district_name" "CD 12, Michigan", "geo_fips" 2612, "percap" 30640.0, "percent_college" 0.3396, "percent_black" 0.1078, "percent_married_children" 0.1733}
-   { "district_name" "CD 13, Michigan", "geo_fips" 2613, "percap" 19190.0, "percent_college" 0.1473, "percent_black" 0.5442, "percent_married_children" 0.1133}
-   { "district_name" "CD 14, Michigan", "geo_fips" 2614, "percap" 28051.0, "percent_college" 0.3083, "percent_black" 0.5585, "percent_married_children" 0.13}
-   { "district_name" "CD 1, Minnesota", "geo_fips" 2701, "percap" 30641.0, "percent_college" 0.2795, "percent_black" 0.0302, "percent_married_children" 0.2095}
-   { "district_name" "CD 2, Minnesota", "geo_fips" 2702, "percap" 37188.0, "percent_college" 0.3845, "percent_black" 0.0441, "percent_married_children" 0.2636}
-   { "district_name" "CD 3, Minnesota", "geo_fips" 2703, "percap" 46703.0, "percent_college" 0.4901, "percent_black" 0.0821, "percent_married_children" 0.2381}
-   { "district_name" "CD 4, Minnesota", "geo_fips" 2704, "percap" 34911.0, "percent_college" 0.4223, "percent_black" 0.0958, "percent_married_children" 0.1986}
-   { "district_name" "CD 5, Minnesota", "geo_fips" 2705, "percap" 35517.0, "percent_college" 0.4448, "percent_black" 0.162, "percent_married_children" 0.1535}
-   { "district_name" "CD 6, Minnesota", "geo_fips" 2706, "percap" 33682.0, "percent_college" 0.2945, "percent_black" 0.0289, "percent_married_children" 0.2693}
-   { "district_name" "CD 7, Minnesota", "geo_fips" 2707, "percap" 27908.0, "percent_college" 0.2183, "percent_black" 0.0105, "percent_married_children" 0.1852}
-   { "district_name" "CD 8, Minnesota", "geo_fips" 2708, "percap" 28609.0, "percent_college" 0.2299, "percent_black" 0.0101, "percent_married_children" 0.165}
-   { "district_name" "CD 1, Mississippi", "geo_fips" 2801, "percap" 22852.0, "percent_college" 0.2073, "percent_black" 0.2797, "percent_married_children" 0.1993}
-   { "district_name" "CD 2, Mississippi", "geo_fips" 2802, "percap" 19401.0, "percent_college" 0.1927, "percent_black" 0.664, "percent_married_children" 0.1421}
-   { "district_name" "CD 3, Mississippi", "geo_fips" 2803, "percap" 24646.0, "percent_college" 0.2589, "percent_black" 0.3574, "percent_married_children" 0.194}
-   { "district_name" "CD 4, Mississippi", "geo_fips" 2804, "percap" 23654.0, "percent_college" 0.2109, "percent_black" 0.2352, "percent_married_children" 0.183}
-   { "district_name" "CD 1, Missouri", "geo_fips" 2901, "percap" 28507.0, "percent_college" 0.3179, "percent_black" 0.4891, "percent_married_children" 0.1141}
-   { "district_name" "CD 2, Missouri", "geo_fips" 2902, "percap" 43011.0, "percent_college" 0.4919, "percent_black" 0.0409, "percent_married_children" 0.2344}
-   { "district_name" "CD 3, Missouri", "geo_fips" 2903, "percap" 28940.0, "percent_college" 0.264, "percent_black" 0.0336, "percent_married_children" 0.2439}
-   { "district_name" "CD 4, Missouri", "geo_fips" 2904, "percap" 24131.0, "percent_college" 0.2393, "percent_black" 0.0465, "percent_married_children" 0.2086}
-   { "district_name" "CD 5, Missouri", "geo_fips" 2905, "percap" 28028.0, "percent_college" 0.2821, "percent_black" 0.2202, "percent_married_children" 0.1504}
-   { "district_name" "CD 6, Missouri", "geo_fips" 2906, "percap" 28593.0, "percent_college" 0.2865, "percent_black" 0.0382, "percent_married_children" 0.2172}
-   { "district_name" "CD 7, Missouri", "geo_fips" 2907, "percap" 24057.0, "percent_college" 0.2316, "percent_black" 0.0185, "percent_married_children" 0.1914}
-   { "district_name" "CD 8, Missouri", "geo_fips" 2908, "percap" 21846.0, "percent_college" 0.1504, "percent_black" 0.0463, "percent_married_children" 0.1872}
-   { "district_name" "CD (at Large}, Montana", "geo_fips" 3000, "percap" 28933.0, "percent_college" 0.3096, "percent_black" 0.0033, "percent_married_children" 0.1906}
-   { "district_name" "CD 1, Nebraska", "geo_fips" 3101, "percap" 29693.0, "percent_college" 0.3247, "percent_black" 0.0279, "percent_married_children" 0.2173}
-   { "district_name" "CD 2, Nebraska", "geo_fips" 3102, "percap" 32626.0, "percent_college" 0.3917, "percent_black" 0.0951, "percent_married_children" 0.2251}
-   { "district_name" "CD 3, Nebraska", "geo_fips" 3103, "percap" 27180.0, "percent_college" 0.222, "percent_black" 0.0105, "percent_married_children" 0.2004}
-   { "district_name" "CD 1, Nevada", "geo_fips" 3201, "percap" 20869.0, "percent_college" 0.1523, "percent_black" 0.1092, "percent_married_children" 0.1507}
-   { "district_name" "CD 2, Nevada", "geo_fips" 3202, "percap" 31102.0, "percent_college" 0.2547, "percent_black" 0.0163, "percent_married_children" 0.184}
-   { "district_name" "CD 3, Nevada", "geo_fips" 3203, "percap" 34371.0, "percent_college" 0.3148, "percent_black" 0.0647, "percent_married_children" 0.1965}
-   { "district_name" "CD 4, Nevada", "geo_fips" 3204, "percap" 25669.0, "percent_college" 0.2043, "percent_black" 0.15, "percent_married_children" 0.1995}
-   { "district_name" "CD 1, New Hampshire", "geo_fips" 3301, "percap" 36520.0, "percent_college" 0.3724, "percent_black" 0.0121, "percent_married_children" 0.1864}
-   { "district_name" "CD 2, New Hampshire", "geo_fips" 3302, "percap" 36118.0, "percent_college" 0.3593, "percent_black" 0.0116, "percent_married_children" 0.1925}
-   { "district_name" "CD 1, New Jersey", "geo_fips" 3401, "percap" 33460.0, "percent_college" 0.3043, "percent_black" 0.1629, "percent_married_children" 0.203}
-   { "district_name" "CD 2, New Jersey", "geo_fips" 3402, "percap" 30426.0, "percent_college" 0.258, "percent_black" 0.1162, "percent_married_children" 0.168}
-   { "district_name" "CD 3, New Jersey", "geo_fips" 3403, "percap" 37886.0, "percent_college" 0.3385, "percent_black" 0.1039, "percent_married_children" 0.1932}
-   { "district_name" "CD 4, New Jersey", "geo_fips" 3404, "percap" 40874.0, "percent_college" 0.3956, "percent_black" 0.0647, "percent_married_children" 0.2349}
-   { "district_name" "CD 5, New Jersey", "geo_fips" 3405, "percap" 47162.0, "percent_college" 0.4775, "percent_black" 0.0485, "percent_married_children" 0.2792}
-   { "district_name" "CD 6, New Jersey", "geo_fips" 3406, "percap" 34454.0, "percent_college" 0.3887, "percent_black" 0.094, "percent_married_children" 0.2495}
-   { "district_name" "CD 7, New Jersey", "geo_fips" 3407, "percap" 55442.0, "percent_college" 0.5132, "percent_black" 0.048, "percent_married_children" 0.2886}
-   { "district_name" "CD 8, New Jersey", "geo_fips" 3408, "percap" 33034.0, "percent_college" 0.3311, "percent_black" 0.0903, "percent_married_children" 0.186}
-   { "district_name" "CD 9, New Jersey", "geo_fips" 3409, "percap" 33248.0, "percent_college" 0.3363, "percent_black" 0.0903, "percent_married_children" 0.2199}
-   { "district_name" "CD 10, New Jersey", "geo_fips" 3410, "percap" 27692.0, "percent_college" 0.2828, "percent_black" 0.4978, "percent_married_children" 0.1792}
-   { "district_name" "CD 11, New Jersey", "geo_fips" 3411, "percap" 52661.0, "percent_college" 0.544, "percent_black" 0.0303, "percent_married_children" 0.27}
-   { "district_name" "CD 12, New Jersey", "geo_fips" 3412, "percap" 41372.0, "percent_college" 0.4548, "percent_black" 0.1613, "percent_married_children" 0.2425}
-   { "district_name" "CD 1, New Mexico", "geo_fips" 3501, "percap" 28106.0, "percent_college" 0.329, "percent_black" 0.0245, "percent_married_children" 0.158}
-   { "district_name" "CD 2, New Mexico", "geo_fips" 3502, "percap" 21727.0, "percent_college" 0.2099, "percent_black" 0.0179, "percent_married_children" 0.1932}
-   { "district_name" "CD 3, New Mexico", "geo_fips" 3503, "percap" 25561.0, "percent_college" 0.272, "percent_black" 0.0119, "percent_married_children" 0.1731}
-   { "district_name" "CD 1, New York", "geo_fips" 3601, "percap" 40163.0, "percent_college" 0.3414, "percent_black" 0.053, "percent_married_children" 0.2479}
-   { "district_name" "CD 2, New York", "geo_fips" 3602, "percap" 36835.0, "percent_college" 0.3121, "percent_black" 0.0947, "percent_married_children" 0.2608}
-   { "district_name" "CD 3, New York", "geo_fips" 3603, "percap" 53684.0, "percent_college" 0.5165, "percent_black" 0.0262, "percent_married_children" 0.2678}
-   { "district_name" "CD 4, New York", "geo_fips" 3604, "percap" 42094.0, "percent_college" 0.4249, "percent_black" 0.1408, "percent_married_children" 0.267}
-   { "district_name" "CD 5, New York", "geo_fips" 3605, "percap" 26356.0, "percent_college" 0.2554, "percent_black" 0.4697, "percent_married_children" 0.2074}
-   { "district_name" "CD 6, New York", "geo_fips" 3606, "percap" 30194.0, "percent_college" 0.3586, "percent_black" 0.0357, "percent_married_children" 0.2098}
-   { "district_name" "CD 7, New York", "geo_fips" 3607, "percap" 30310.0, "percent_college" 0.3369, "percent_black" 0.085, "percent_married_children" 0.1996}
-   { "district_name" "CD 8, New York", "geo_fips" 3608, "percap" 29320.0, "percent_college" 0.337, "percent_black" 0.5054, "percent_married_children" 0.1346}
-   { "district_name" "CD 9, New York", "geo_fips" 3609, "percap" 30897.0, "percent_college" 0.375, "percent_black" 0.4681, "percent_married_children" 0.1685}
-   { "district_name" "CD 10, New York", "geo_fips" 3610, "percap" 69523.0, "percent_college" 0.6026, "percent_black" 0.0309, "percent_married_children" 0.1767}
-   { "district_name" "CD 11, New York", "geo_fips" 3611, "percap" 32625.0, "percent_college" 0.3445, "percent_black" 0.0676, "percent_married_children" 0.2633}
-   { "district_name" "CD 12, New York", "geo_fips" 3612, "percap" 83122.0, "percent_college" 0.7217, "percent_black" 0.0419, "percent_married_children" 0.1144}
-   { "district_name" "CD 13, New York", "geo_fips" 3613, "percap" 24876.0, "percent_college" 0.3098, "percent_black" 0.2431, "percent_married_children" 0.1172}
-   { "district_name" "CD 14, New York", "geo_fips" 3614, "percap" 25661.0, "percent_college" 0.256, "percent_black" 0.0937, "percent_married_children" 0.1886}
-   { "district_name" "CD 15, New York", "geo_fips" 3615, "percap" 14846.0, "percent_college" 0.1243, "percent_black" 0.2665, "percent_married_children" 0.1399}
-   { "district_name" "CD 16, New York", "geo_fips" 3616, "percap" 41543.0, "percent_college" 0.4063, "percent_black" 0.3186, "percent_married_children" 0.1885}
-   { "district_name" "CD 17, New York", "geo_fips" 3617, "percap" 44547.0, "percent_college" 0.4446, "percent_black" 0.102, "percent_married_children" 0.2604}
-   { "district_name" "CD 18, New York", "geo_fips" 3618, "percap" 38305.0, "percent_college" 0.3572, "percent_black" 0.0855, "percent_married_children" 0.2454}
-   { "district_name" "CD 19, New York", "geo_fips" 3619, "percap" 31677.0, "percent_college" 0.2917, "percent_black" 0.0411, "percent_married_children" 0.1663}
-   { "district_name" "CD 20, New York", "geo_fips" 3620, "percap" 34756.0, "percent_college" 0.3874, "percent_black" 0.0848, "percent_married_children" 0.1609}
-   { "district_name" "CD 21, New York", "geo_fips" 3621, "percap" 27243.0, "percent_college" 0.2321, "percent_black" 0.0275, "percent_married_children" 0.1732}
-   { "district_name" "CD 22, New York", "geo_fips" 3622, "percap" 27133.0, "percent_college" 0.2604, "percent_black" 0.0371, "percent_married_children" 0.1659}
-   { "district_name" "CD 23, New York", "geo_fips" 3623, "percap" 25547.0, "percent_college" 0.2609, "percent_black" 0.0285, "percent_married_children" 0.1651}
-   { "district_name" "CD 24, New York", "geo_fips" 3624, "percap" 29784.0, "percent_college" 0.3028, "percent_black" 0.0801, "percent_married_children" 0.1675}
-   { "district_name" "CD 25, New York", "geo_fips" 3625, "percap" 30921.0, "percent_college" 0.373, "percent_black" 0.1504, "percent_married_children" 0.1546}
-   { "district_name" "CD 26, New York", "geo_fips" 3626, "percap" 28141.0, "percent_college" 0.3082, "percent_black" 0.173, "percent_married_children" 0.1341}
-   { "district_name" "CD 27, New York", "geo_fips" 3627, "percap" 33051.0, "percent_college" 0.3069, "percent_black" 0.0239, "percent_married_children" 0.1881}
-   { "district_name" "CD 1, North Carolina", "geo_fips" 3701, "percap" 24035.0, "percent_college" 0.2775, "percent_black" 0.4461, "percent_married_children" 0.1436}
-   { "district_name" "CD 2, North Carolina", "geo_fips" 3702, "percap" 31315.0, "percent_college" 0.3623, "percent_black" 0.1971, "percent_married_children" 0.2857}
-   { "district_name" "CD 3, North Carolina", "geo_fips" 3703, "percap" 24808.0, "percent_college" 0.228, "percent_black" 0.1908, "percent_married_children" 0.2017}
-   { "district_name" "CD 4, North Carolina", "geo_fips" 3704, "percap" 37872.0, "percent_college" 0.5445, "percent_black" 0.2152, "percent_married_children" 0.2186}
-   { "district_name" "CD 5, North Carolina", "geo_fips" 3705, "percap" 26338.0, "percent_college" 0.2633, "percent_black" 0.1438, "percent_married_children" 0.1852}
-   { "district_name" "CD 6, North Carolina", "geo_fips" 3706, "percap" 26311.0, "percent_college" 0.2463, "percent_black" 0.1984, "percent_married_children" 0.184}
-   { "district_name" "CD 7, North Carolina", "geo_fips" 3707, "percap" 26259.0, "percent_college" 0.2488, "percent_black" 0.188, "percent_married_children" 0.1636}
-   { "district_name" "CD 8, North Carolina", "geo_fips" 3708, "percap" 25695.0, "percent_college" 0.2651, "percent_black" 0.2283, "percent_married_children" 0.2083}
-   { "district_name" "CD 9, North Carolina", "geo_fips" 3709, "percap" 32597.0, "percent_college" 0.3383, "percent_black" 0.1915, "percent_married_children" 0.2486}
-   { "district_name" "CD 10, North Carolina", "geo_fips" 3710, "percap" 25925.0, "percent_college" 0.2462, "percent_black" 0.1158, "percent_married_children" 0.1756}
-   { "district_name" "CD 11, North Carolina", "geo_fips" 3711, "percap" 25237.0, "percent_college" 0.2398, "percent_black" 0.0339, "percent_married_children" 0.1586}
-   { "district_name" "CD 12, North Carolina", "geo_fips" 3712, "percap" 30913.0, "percent_college" 0.3978, "percent_black" 0.3674, "percent_married_children" 0.1924}
-   { "district_name" "CD 13, North Carolina", "geo_fips" 3713, "percap" 26904.0, "percent_college" 0.2695, "percent_black" 0.2139, "percent_married_children" 0.1796}
-   { "district_name" "CD (at Large}, North Dakota", "geo_fips" 3800, "percap" 33339.0, "percent_college" 0.2956, "percent_black" 0.0248, "percent_married_children" 0.1955}
-   { "district_name" "CD 1, Ohio", "geo_fips" 3901, "percap" 31423.0, "percent_college" 0.3383, "percent_black" 0.2175, "percent_married_children" 0.1982}
-   { "district_name" "CD 2, Ohio", "geo_fips" 3902, "percap" 32935.0, "percent_college" 0.3234, "percent_black" 0.0837, "percent_married_children" 0.1921}
-   { "district_name" "CD 3, Ohio", "geo_fips" 3903, "percap" 24115.0, "percent_college" 0.278, "percent_black" 0.3281, "percent_married_children" 0.1513}
-   { "district_name" "CD 4, Ohio", "geo_fips" 3904, "percap" 26004.0, "percent_college" 0.1787, "percent_black" 0.0526, "percent_married_children" 0.1738}
-   { "district_name" "CD 5, Ohio", "geo_fips" 3905, "percap" 30424.0, "percent_college" 0.2616, "percent_black" 0.0258, "percent_married_children" 0.1895}
-   { "district_name" "CD 6, Ohio", "geo_fips" 3906, "percap" 24818.0, "percent_college" 0.1593, "percent_black" 0.0252, "percent_married_children" 0.1734}
-   { "district_name" "CD 7, Ohio", "geo_fips" 3907, "percap" 26745.0, "percent_college" 0.2085, "percent_black" 0.0389, "percent_married_children" 0.2142}
-   { "district_name" "CD 8, Ohio", "geo_fips" 3908, "percap" 28539.0, "percent_college" 0.2385, "percent_black" 0.0592, "percent_married_children" 0.199}
-   { "district_name" "CD 9, Ohio", "geo_fips" 3909, "percap" 25452.0, "percent_college" 0.2164, "percent_black" 0.164, "percent_married_children" 0.1283}
-   { "district_name" "CD 10, Ohio", "geo_fips" 3910, "percap" 28999.0, "percent_college" 0.2794, "percent_black" 0.1681, "percent_married_children" 0.1634}
-   { "district_name" "CD 11, Ohio", "geo_fips" 3911, "percap" 26140.0, "percent_college" 0.2683, "percent_black" 0.5227, "percent_married_children" 0.0988}
-   { "district_name" "CD 12, Ohio", "geo_fips" 3912, "percap" 36847.0, "percent_college" 0.41, "percent_black" 0.0473, "percent_married_children" 0.2323}
-   { "district_name" "CD 13, Ohio", "geo_fips" 3913, "percap" 24583.0, "percent_college" 0.2373, "percent_black" 0.1152, "percent_married_children" 0.1383}
-   { "district_name" "CD 14, Ohio", "geo_fips" 3914, "percap" 35365.0, "percent_college" 0.3408, "percent_black" 0.0433, "percent_married_children" 0.2033}
-   { "district_name" "CD 15, Ohio", "geo_fips" 3915, "percap" 30410.0, "percent_college" 0.3144, "percent_black" 0.0429, "percent_married_children" 0.2054}
-   { "district_name" "CD 16, Ohio", "geo_fips" 3916, "percap" 33452.0, "percent_college" 0.3327, "percent_black" 0.0237, "percent_married_children" 0.2042}
-   { "district_name" "CD 1, Oklahoma", "geo_fips" 4001, "percap" 29587.0, "percent_college" 0.3015, "percent_black" 0.0842, "percent_married_children" 0.2005}
-   { "district_name" "CD 2, Oklahoma", "geo_fips" 4002, "percap" 20913.0, "percent_college" 0.17, "percent_black" 0.0333, "percent_married_children" 0.1978}
-   { "district_name" "CD 3, Oklahoma", "geo_fips" 4003, "percap" 24016.0, "percent_college" 0.2288, "percent_black" 0.0351, "percent_married_children" 0.216}
-   { "district_name" "CD 4, Oklahoma", "geo_fips" 4004, "percap" 26796.0, "percent_college" 0.2551, "percent_black" 0.0679, "percent_married_children" 0.2187}
-   { "district_name" "CD 5, Oklahoma", "geo_fips" 4005, "percap" 27725.0, "percent_college" 0.301, "percent_black" 0.1341, "percent_married_children" 0.1893}
-   { "district_name" "CD 1, Oregon", "geo_fips" 4101, "percap" 36229.0, "percent_college" 0.4106, "percent_black" 0.0142, "percent_married_children" 0.2335}
-   { "district_name" "CD 2, Oregon", "geo_fips" 4102, "percap" 26409.0, "percent_college" 0.2382, "percent_black" 0.0073, "percent_married_children" 0.1748}
-   { "district_name" "CD 3, Oregon", "geo_fips" 4103, "percap" 33839.0, "percent_college" 0.4119, "percent_black" 0.0521, "percent_married_children" 0.1874}
-   { "district_name" "CD 4, Oregon", "geo_fips" 4104, "percap" 26405.0, "percent_college" 0.2674, "percent_black" 0.0073, "percent_married_children" 0.1497}
-   { "district_name" "CD 5, Oregon", "geo_fips" 4105, "percap" 30917.0, "percent_college" 0.2997, "percent_black" 0.0103, "percent_married_children" 0.2}
-   { "district_name" "CD 1, Rhode Island", "geo_fips" 4401, "percap" 32302.0, "percent_college" 0.342, "percent_black" 0.0791, "percent_married_children" 0.1673}
-   { "district_name" "CD 2, Rhode Island", "geo_fips" 4402, "percap" 33739.0, "percent_college" 0.3399, "percent_black" 0.0309, "percent_married_children" 0.1566}
-   { "district_name" "CD 1, South Carolina", "geo_fips" 4501, "percap" 35549.0, "percent_college" 0.3986, "percent_black" 0.179, "percent_married_children" 0.192}
-   { "district_name" "CD 2, South Carolina", "geo_fips" 4502, "percap" 29799.0, "percent_college" 0.3346, "percent_black" 0.2328, "percent_married_children" 0.2116}
-   { "district_name" "CD 3, South Carolina", "geo_fips" 4503, "percap" 24185.0, "percent_college" 0.2199, "percent_black" 0.1777, "percent_married_children" 0.1723}
-   { "district_name" "CD 4, South Carolina", "geo_fips" 4504, "percap" 28564.0, "percent_college" 0.3068, "percent_black" 0.1879, "percent_married_children" 0.1822}
-   { "district_name" "CD 5, South Carolina", "geo_fips" 4505, "percap" 25936.0, "percent_college" 0.2304, "percent_black" 0.2645, "percent_married_children" 0.1795}
-   { "district_name" "CD 6, South Carolina", "geo_fips" 4506, "percap" 20001.0, "percent_college" 0.196, "percent_black" 0.568, "percent_married_children" 0.1243}
-   { "district_name" "CD 7, South Carolina", "geo_fips" 4507, "percap" 24069.0, "percent_college" 0.2015, "percent_black" 0.28, "percent_married_children" 0.1557}
-   { "district_name" "CD (at Large}, South Dakota", "geo_fips" 4600, "percap" 28585.0, "percent_college" 0.2885, "percent_black" 0.0166, "percent_married_children" 0.2004}
-   { "district_name" "CD 1, Tennessee", "geo_fips" 4701, "percap" 23487.0, "percent_college" 0.1942, "percent_black" 0.0185, "percent_married_children" 0.1718}
-   { "district_name" "CD 2, Tennessee", "geo_fips" 4702, "percap" 28119.0, "percent_college" 0.3097, "percent_black" 0.0625, "percent_married_children" 0.1875}
-   { "district_name" "CD 3, Tennessee", "geo_fips" 4703, "percap" 26075.0, "percent_college" 0.2274, "percent_black" 0.1068, "percent_married_children" 0.1596}
-   { "district_name" "CD 4, Tennessee", "geo_fips" 4704, "percap" 25460.0, "percent_college" 0.2255, "percent_black" 0.0917, "percent_married_children" 0.219}
-   { "district_name" "CD 5, Tennessee", "geo_fips" 4705, "percap" 32051.0, "percent_college" 0.375, "percent_black" 0.2483, "percent_married_children" 0.1533}
-   { "district_name" "CD 6, Tennessee", "geo_fips" 4706, "percap" 26712.0, "percent_college" 0.2192, "percent_black" 0.0446, "percent_married_children" 0.2177}
-   { "district_name" "CD 7, Tennessee", "geo_fips" 4707, "percap" 29219.0, "percent_college" 0.2807, "percent_black" 0.095, "percent_married_children" 0.2592}
-   { "district_name" "CD 8, Tennessee", "geo_fips" 4708, "percap" 30049.0, "percent_college" 0.2757, "percent_black" 0.194, "percent_married_children" 0.2149}
-   { "district_name" "CD 9, Tennessee", "geo_fips" 4709, "percap" 22217.0, "percent_college" 0.2411, "percent_black" 0.6603, "percent_married_children" 0.1077}
-   { "district_name" "CD 1, Texas", "geo_fips" 4801, "percap" 22948.0, "percent_college" 0.2087, "percent_black" 0.178, "percent_married_children" 0.2092}
-   { "district_name" "CD 2, Texas", "geo_fips" 4802, "percap" 39593.0, "percent_college" 0.4081, "percent_black" 0.1238, "percent_married_children" 0.2283}
-   { "district_name" "CD 3, Texas", "geo_fips" 4803, "percap" 41962.0, "percent_college" 0.5352, "percent_black" 0.0963, "percent_married_children" 0.3178}
-   { "district_name" "CD 4, Texas", "geo_fips" 4804, "percap" 26686.0, "percent_college" 0.2213, "percent_black" 0.1041, "percent_married_children" 0.2334}
-   { "district_name" "CD 5, Texas", "geo_fips" 4805, "percap" 24307.0, "percent_college" 0.2105, "percent_black" 0.1477, "percent_married_children" 0.241}
-   { "district_name" "CD 6, Texas", "geo_fips" 4806, "percap" 29087.0, "percent_college" 0.2875, "percent_black" 0.2007, "percent_married_children" 0.2524}
-   { "district_name" "CD 7, Texas", "geo_fips" 4807, "percap" 45900.0, "percent_college" 0.5068, "percent_black" 0.1246, "percent_married_children" 0.2463}
-   { "district_name" "CD 8, Texas", "geo_fips" 4808, "percap" 32984.0, "percent_college" 0.3015, "percent_black" 0.0861, "percent_married_children" 0.265}
-   { "district_name" "CD 9, Texas", "geo_fips" 4809, "percap" 20788.0, "percent_college" 0.2382, "percent_black" 0.3652, "percent_married_children" 0.2015}
-   { "district_name" "CD 10, Texas", "geo_fips" 4810, "percap" 36517.0, "percent_college" 0.3871, "percent_black" 0.1062, "percent_married_children" 0.266}
-   { "district_name" "CD 11, Texas", "geo_fips" 4811, "percap" 27915.0, "percent_college" 0.2035, "percent_black" 0.037, "percent_married_children" 0.2037}
-   { "district_name" "CD 12, Texas", "geo_fips" 4812, "percap" 31952.0, "percent_college" 0.2994, "percent_black" 0.0844, "percent_married_children" 0.2332}
-   { "district_name" "CD 13, Texas", "geo_fips" 4813, "percap" 25315.0, "percent_college" 0.2036, "percent_black" 0.049, "percent_married_children" 0.2305}
-   { "district_name" "CD 14, Texas", "geo_fips" 4814, "percap" 29325.0, "percent_college" 0.2272, "percent_black" 0.1976, "percent_married_children" 0.2081}
-   { "district_name" "CD 15, Texas", "geo_fips" 4815, "percap" 18423.0, "percent_college" 0.1975, "percent_black" 0.0145, "percent_married_children" 0.2972}
-   { "district_name" "CD 16, Texas", "geo_fips" 4816, "percap" 20563.0, "percent_college" 0.239, "percent_black" 0.0357, "percent_married_children" 0.2345}
-   { "district_name" "CD 17, Texas", "geo_fips" 4817, "percap" 26713.0, "percent_college" 0.2938, "percent_black" 0.1294, "percent_married_children" 0.2055}
-   { "district_name" "CD 18, Texas", "geo_fips" 4818, "percap" 24132.0, "percent_college" 0.2242, "percent_black" 0.3544, "percent_married_children" 0.1889}
-   { "district_name" "CD 19, Texas", "geo_fips" 4819, "percap" 23579.0, "percent_college" 0.2242, "percent_black" 0.0586, "percent_married_children" 0.212}
-   { "district_name" "CD 20, Texas", "geo_fips" 4820, "percap" 22507.0, "percent_college" 0.2472, "percent_black" 0.0497, "percent_married_children" 0.2166}
-   { "district_name" "CD 21, Texas", "geo_fips" 4821, "percap" 38034.0, "percent_college" 0.4506, "percent_black" 0.0341, "percent_married_children" 0.1888}
-   { "district_name" "CD 22, Texas", "geo_fips" 4822, "percap" 38041.0, "percent_college" 0.4507, "percent_black" 0.132, "percent_married_children" 0.358}
-   { "district_name" "CD 23, Texas", "geo_fips" 4823, "percap" 23280.0, "percent_college" 0.2166, "percent_black" 0.0355, "percent_married_children" 0.2714}
-   { "district_name" "CD 24, Texas", "geo_fips" 4824, "percap" 40379.0, "percent_college" 0.4475, "percent_black" 0.1145, "percent_married_children" 0.2234}
-   { "district_name" "CD 25, Texas", "geo_fips" 4825, "percap" 36139.0, "percent_college" 0.3715, "percent_black" 0.0684, "percent_married_children" 0.2538}
-   { "district_name" "CD 26, Texas", "geo_fips" 4826, "percap" 38097.0, "percent_college" 0.4425, "percent_black" 0.0692, "percent_married_children" 0.3229}
-   { "district_name" "CD 27, Texas", "geo_fips" 4827, "percap" 26761.0, "percent_college" 0.2025, "percent_black" 0.0529, "percent_married_children" 0.2096}
-   { "district_name" "CD 28, Texas", "geo_fips" 4828, "percap" 18843.0, "percent_college" 0.1769, "percent_black" 0.0355, "percent_married_children" 0.2845}
-   { "district_name" "CD 29, Texas", "geo_fips" 4829, "percap" 17512.0, "percent_college" 0.1036, "percent_black" 0.1031, "percent_married_children" 0.2731}
-   { "district_name" "CD 30, Texas", "geo_fips" 4830, "percap" 21974.0, "percent_college" 0.2053, "percent_black" 0.4304, "percent_married_children" 0.166}
-   { "district_name" "CD 31, Texas", "geo_fips" 4831, "percap" 31588.0, "percent_college" 0.3432, "percent_black" 0.1048, "percent_married_children" 0.2681}
-   { "district_name" "CD 32, Texas", "geo_fips" 4832, "percap" 42307.0, "percent_college" 0.4339, "percent_black" 0.1418, "percent_married_children" 0.2256}
-   { "district_name" "CD 33, Texas", "geo_fips" 4833, "percap" 15556.0, "percent_college" 0.0932, "percent_black" 0.1528, "percent_married_children" 0.2513}
-   { "district_name" "CD 34, Texas", "geo_fips" 4834, "percap" 16944.0, "percent_college" 0.1509, "percent_black" 0.0121, "percent_married_children" 0.265}
-   { "district_name" "CD 35, Texas", "geo_fips" 4835, "percap" 21480.0, "percent_college" 0.2036, "percent_black" 0.0974, "percent_married_children" 0.2081}
-   { "district_name" "CD 36, Texas", "geo_fips" 4836, "percap" 28675.0, "percent_college" 0.1944, "percent_black" 0.0889, "percent_married_children" 0.2308}
-   { "district_name" "CD 1, Utah", "geo_fips" 4901, "percap" 26194.0, "percent_college" 0.289, "percent_black" 0.0099, "percent_married_children" 0.3426}
-   { "district_name" "CD 2, Utah", "geo_fips" 4902, "percap" 26807.0, "percent_college" 0.3251, "percent_black" 0.0136, "percent_married_children" 0.2633}
-   { "district_name" "CD 3, Utah", "geo_fips" 4903, "percap" 28770.0, "percent_college" 0.4161, "percent_black" 0.0046, "percent_married_children" 0.3458}
-   { "district_name" "CD 4, Utah", "geo_fips" 4904, "percap" 26246.0, "percent_college" 0.282, "percent_black" 0.0123, "percent_married_children" 0.3397}
-   { "district_name" "CD (at Large}, Vermont", "geo_fips" 5000, "percap" 31836.0, "percent_college" 0.3637, "percent_black" 0.0117, "percent_married_children" 0.1644}
-   { "district_name" "CD 1, Virginia", "geo_fips" 5101, "percap" 37264.0, "percent_college" 0.3749, "percent_black" 0.1537, "percent_married_children" 0.2617}
-   { "district_name" "CD 2, Virginia", "geo_fips" 5102, "percap" 33688.0, "percent_college" 0.3444, "percent_black" 0.1972, "percent_married_children" 0.2035}
-   { "district_name" "CD 3, Virginia", "geo_fips" 5103, "percap" 27901.0, "percent_college" 0.2618, "percent_black" 0.4495, "percent_married_children" 0.1411}
-   { "district_name" "CD 4, Virginia", "geo_fips" 5104, "percap" 29971.0, "percent_college" 0.3013, "percent_black" 0.408, "percent_married_children" 0.1592}
-   { "district_name" "CD 5, Virginia", "geo_fips" 5105, "percap" 28754.0, "percent_college" 0.2794, "percent_black" 0.1966, "percent_married_children" 0.1745}
-   { "district_name" "CD 6, Virginia", "geo_fips" 5106, "percap" 27250.0, "percent_college" 0.2664, "percent_black" 0.1111, "percent_married_children" 0.1688}
-   { "district_name" "CD 7, Virginia", "geo_fips" 5107, "percap" 35846.0, "percent_college" 0.3896, "percent_black" 0.1693, "percent_married_children" 0.2436}
-   { "district_name" "CD 8, Virginia", "geo_fips" 5108, "percap" 54612.0, "percent_college" 0.6176, "percent_black" 0.1375, "percent_married_children" 0.2126}
-   { "district_name" "CD 9, Virginia", "geo_fips" 5109, "percap" 24290.0, "percent_college" 0.2036, "percent_black" 0.0536, "percent_married_children" 0.1685}
-   { "district_name" "CD 10, Virginia", "geo_fips" 5110, "percap" 49981.0, "percent_college" 0.5433, "percent_black" 0.0655, "percent_married_children" 0.3503}
-   { "district_name" "CD 11, Virginia", "geo_fips" 5111, "percap" 45038.0, "percent_college" 0.5548, "percent_black" 0.1313, "percent_married_children" 0.2842}
-   { "district_name" "CD 1, Washington", "geo_fips" 5301, "percap" 42593.0, "percent_college" 0.4335, "percent_black" 0.0127, "percent_married_children" 0.2663}
-   { "district_name" "CD 2, Washington", "geo_fips" 5302, "percap" 32802.0, "percent_college" 0.3029, "percent_black" 0.0328, "percent_married_children" 0.1933}
-   { "district_name" "CD 3, Washington", "geo_fips" 5303, "percap" 29968.0, "percent_college" 0.2543, "percent_black" 0.0121, "percent_married_children" 0.2157}
-   { "district_name" "CD 4, Washington", "geo_fips" 5304, "percap" 23991.0, "percent_college" 0.2012, "percent_black" 0.0096, "percent_married_children" 0.2388}
-   { "district_name" "CD 5, Washington", "geo_fips" 5305, "percap" 27495.0, "percent_college" 0.3037, "percent_black" 0.0152, "percent_married_children" 0.1879}
-   { "district_name" "CD 6, Washington", "geo_fips" 5306, "percap" 32637.0, "percent_college" 0.2972, "percent_black" 0.0363, "percent_married_children" 0.1744}
-   { "district_name" "CD 7, Washington", "geo_fips" 5307, "percap" 54859.0, "percent_college" 0.6101, "percent_black" 0.0393, "percent_married_children" 0.1593}
-   { "district_name" "CD 8, Washington", "geo_fips" 5308, "percap" 36598.0, "percent_college" 0.3452, "percent_black" 0.0272, "percent_married_children" 0.2691}
-   { "district_name" "CD 9, Washington", "geo_fips" 5309, "percap" 40171.0, "percent_college" 0.4177, "percent_black" 0.1056, "percent_married_children" 0.2099}
-   { "district_name" "CD 10, Washington", "geo_fips" 5310, "percap" 29976.0, "percent_college" 0.2866, "percent_black" 0.0566, "percent_married_children" 0.2187}
-   { "district_name" "CD 1, West Virginia", "geo_fips" 5401, "percap" 26172.0, "percent_college" 0.2346, "percent_black" 0.028, "percent_married_children" 0.1641}
-   { "district_name" "CD 2, West Virginia", "geo_fips" 5402, "percap" 26713.0, "percent_college" 0.2146, "percent_black" 0.0486, "percent_married_children" 0.182}
-   { "district_name" "CD 3, West Virginia", "geo_fips" 5403, "percap" 21256.0, "percent_college" 0.174, "percent_black" 0.0359, "percent_married_children" 0.171}
-   { "district_name" "CD 1, Wisconsin", "geo_fips" 5501, "percap" 32083.0, "percent_college" 0.2819, "percent_black" 0.0525, "percent_married_children" 0.2064}
-   { "district_name" "CD 2, Wisconsin", "geo_fips" 5502, "percap" 34919.0, "percent_college" 0.4261, "percent_black" 0.042, "percent_married_children" 0.1944}
-   { "district_name" "CD 3, Wisconsin", "geo_fips" 5503, "percap" 27175.0, "percent_college" 0.2543, "percent_black" 0.0119, "percent_married_children" 0.1793}
-   { "district_name" "CD 4, Wisconsin", "geo_fips" 5504, "percap" 24156.0, "percent_college" 0.2741, "percent_black" 0.3331, "percent_married_children" 0.1292}
-   { "district_name" "CD 5, Wisconsin", "geo_fips" 5505, "percap" 37330.0, "percent_college" 0.3688, "percent_black" 0.0193, "percent_married_children" 0.2099}
-   { "district_name" "CD 6, Wisconsin", "geo_fips" 5506, "percap" 31307.0, "percent_college" 0.2639, "percent_black" 0.0159, "percent_married_children" 0.1921}
-   { "district_name" "CD 7, Wisconsin", "geo_fips" 5507, "percap" 29417.0, "percent_college" 0.231, "percent_black" 0.0072, "percent_married_children" 0.1727}
-   { "district_name" "CD 8, Wisconsin", "geo_fips" 5508, "percap" 30536.0, "percent_college" 0.2543, "percent_black" 0.0133, "percent_married_children" 0.1973}
-   { "district_name" "CD (at Large}, Wyoming", "geo_fips" 5600, "percap" 30042.0, "percent_college" 0.271, "percent_black" 0.0092, "percent_married_children" 0.1975}
-   { "district_name" "CD 1, Pennsylvania", "geo_fips" 4201, "percap" 38726.5950469, "percent_college" 0.389, "percent_black" 0.0391, "percent_married_children" 0.2403}
-   { "district_name" "CD 2, Pennsylvania", "geo_fips" 4202, "percap" 18689.9445908, "percent_college" 0.1905, "percent_black" 0.2609, "percent_married_children" 0.145}
-   { "district_name" "CD 3, Pennsylvania", "geo_fips" 4203, "percap" 25533.7195473, "percent_college" 0.3494, "percent_black" 0.5711, "percent_married_children" 0.0798}
-   { "district_name" "CD 4, Pennsylvania", "geo_fips" 4204, "percap" 41976.8517614, "percent_college" 0.4636, "percent_black" 0.0869, "percent_married_children" 0.24}
-   { "district_name" "CD 5, Pennsylvania", "geo_fips" 4205, "percap" 33561.3035031, "percent_college" 0.3593, "percent_black" 0.2356, "percent_married_children" 0.1975}
-   { "district_name" "CD 6, Pennsylvania", "geo_fips" 4206, "percap" 37818.5437747, "percent_college" 0.4272, "percent_black" 0.0563, "percent_married_children" 0.2432}
-   { "district_name" "CD 7, Pennsylvania", "geo_fips" 4207, "percap" 29041.0201897, "percent_college" 0.2831, "percent_black" 0.054, "percent_married_children" 0.2039}
-   { "district_name" "CD 8, Pennsylvania", "geo_fips" 4208, "percap" 24963.4558286, "percent_college" 0.2339, "percent_black" 0.0507, "percent_married_children" 0.1669}
-   { "district_name" "CD 9, Pennsylvania", "geo_fips" 4209, "percap" 26334.3703736, "percent_college" 0.1999, "percent_black" 0.023, "percent_married_children" 0.1891}
-   { "district_name" "CD 10, Pennsylvania", "geo_fips" 4210, "percap" 29923.4689981, "percent_college" 0.2974, "percent_black" 0.1024, "percent_married_children" 0.189}
-   { "district_name" "CD 11, Pennsylvania", "geo_fips" 4211, "percap" 28031.3244511, "percent_college" 0.2456, "percent_black" 0.0318, "percent_married_children" 0.2235}
-   { "district_name" "CD 12, Pennsylvania", "geo_fips" 4212, "percap" 24275.6896192, "percent_college" 0.2139, "percent_black" 0.0228, "percent_married_children" 0.181}
-   { "district_name" "CD 13, Pennsylvania", "geo_fips" 4213, "percap" 25089.7085724, "percent_college" 0.1913, "percent_black" 0.0252, "percent_married_children" 0.1872}
-   { "district_name" "CD 14, Pennsylvania", "geo_fips" 4214, "percap" 28392.8720931, "percent_college" 0.2487, "percent_black" 0.0302, "percent_married_children" 0.175}
-   { "district_name" "CD 15, Pennsylvania", "geo_fips" 4215, "percap" 23668.332722, "percent_college" 0.1862, "percent_black" 0.0194, "percent_married_children" 0.1758}
-   { "district_name" "CD 16, Pennsylvania", "geo_fips" 4216, "percap" 26376.716264, "percent_college" 0.2618, "percent_black" 0.0441, "percent_married_children" 0.1816}
-   { "district_name" "CD 17, Pennsylvania", "geo_fips" 4217, "percap" 36053.01941, "percent_college" 0.3936, "percent_black" 0.0568, "percent_married_children" 0.1966}
-   { "district_name" "CD 18, Pennsylvania", "geo_fips" 4218, "percap" 29340.6200601, "percent_college" 0.3568, "percent_black" 0.1822, "percent_married_children" 0.1371}])
+  [{"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1197,
+    "geo_fips" "101",
+    "percent_children" 0.2286,
+    "percent_white" 0.6546,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1764,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1106}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1426,
+    "geo_fips" "102",
+    "percent_children" 0.226,
+    "percent_white" 0.6126,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1931,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1234}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1696,
+    "geo_fips" "103",
+    "percent_children" 0.2227,
+    "percent_white" 0.6779,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1648,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0986}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2034,
+    "geo_fips" "104",
+    "percent_children" 0.2265,
+    "percent_white" 0.8331,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1781,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0997}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1433,
+    "geo_fips" "105",
+    "percent_children" 0.2206,
+    "percent_white" 0.7264,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1482,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1028}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.086,
+    "geo_fips" "106",
+    "percent_children" 0.2359,
+    "percent_white" 0.7615,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0988,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0906}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1331,
+    "geo_fips" "107",
+    "percent_children" 0.2221,
+    "percent_white" 0.3197,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2438,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1662}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.043,
+    "geo_fips" "200",
+    "percent_children" 0.2525,
+    "percent_white" 0.6103,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0989,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1107}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.0648,
+    "geo_fips" "401",
+    "percent_children" 0.2443,
+    "percent_white" 0.4944,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.209,
+    "nyt_classification_1" "western_ag",
+    "percent_single_parent" 0.128}
+   {"nyt_political_prediction" "5) Lean D",
+    "percent_manufacturing" 0.0595,
+    "geo_fips" "402",
+    "percent_children" 0.2035,
+    "percent_white" 0.612,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.1728,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.1013}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.06,
+    "geo_fips" "403",
+    "percent_children" 0.2647,
+    "percent_white" 0.2716,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2073,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1605}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0595,
+    "geo_fips" "404",
+    "percent_children" 0.1888,
+    "percent_white" 0.7387,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1374,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0665}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0955,
+    "geo_fips" "405",
+    "percent_children" 0.2625,
+    "percent_white" 0.7062,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0896,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0862}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0631,
+    "geo_fips" "406",
+    "percent_children" 0.2052,
+    "percent_white" 0.7242,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1188,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0762}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0841,
+    "geo_fips" "407",
+    "percent_children" 0.3069,
+    "percent_white" 0.1987,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2842,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.2227}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0586,
+    "geo_fips" "408",
+    "percent_children" 0.2248,
+    "percent_white" 0.699,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0849,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0818}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0768,
+    "geo_fips" "409",
+    "percent_children" 0.2109,
+    "percent_white" 0.5535,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1666,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1188}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1509,
+    "geo_fips" "501",
+    "percent_children" 0.2317,
+    "percent_white" 0.7595,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1889,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1285}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0772,
+    "geo_fips" "502",
+    "percent_children" 0.2353,
+    "percent_white" 0.6806,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.1618,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.1177}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1526,
+    "geo_fips" "503",
+    "percent_children" 0.25,
+    "percent_white" 0.7544,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1468,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0964}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1609,
+    "geo_fips" "504",
+    "percent_children" 0.2286,
+    "percent_white" 0.7166,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1953,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1107}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0649,
+    "geo_fips" "601",
+    "percent_children" 0.1965,
+    "percent_white" 0.7698,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1726,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0853}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0621,
+    "geo_fips" "602",
+    "percent_children" 0.1991,
+    "percent_white" 0.7058,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1267,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0861}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0775,
+    "geo_fips" "603",
+    "percent_children" 0.2349,
+    "percent_white" 0.48,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1515,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1179}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0614,
+    "geo_fips" "604",
+    "percent_children" 0.2157,
+    "percent_white" 0.7533,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0915,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0794}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1028,
+    "geo_fips" "605",
+    "percent_children" 0.2051,
+    "percent_white" 0.4932,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1023,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1041}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0547,
+    "geo_fips" "606",
+    "percent_children" 0.2416,
+    "percent_white" 0.3701,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2147,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1338}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.0552,
+    "geo_fips" "607",
+    "percent_children" 0.2388,
+    "percent_white" 0.5254,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1158,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1099}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0632,
+    "geo_fips" "608",
+    "percent_children" 0.2735,
+    "percent_white" 0.4377,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2042,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1527}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0813,
+    "geo_fips" "609",
+    "percent_children" 0.2685,
+    "percent_white" 0.3356,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1416,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1392}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.119,
+    "geo_fips" "610",
+    "percent_children" 0.2707,
+    "percent_white" 0.4277,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.1267,
+    "nyt_classification_1" "western_ag",
+    "percent_single_parent" 0.1428}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0551,
+    "geo_fips" "611",
+    "percent_children" 0.2272,
+    "percent_white" 0.4572,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.094,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1055}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0509,
+    "geo_fips" "612",
+    "percent_children" 0.1304,
+    "percent_white" 0.4317,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1027,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0408}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0659,
+    "geo_fips" "613",
+    "percent_children" 0.1884,
+    "percent_white" 0.3476,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1551,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0949}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0721,
+    "geo_fips" "614",
+    "percent_children" 0.2008,
+    "percent_white" 0.3418,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0671,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0737}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1141,
+    "geo_fips" "615",
+    "percent_children" 0.2312,
+    "percent_white" 0.3325,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0719,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0809}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.092,
+    "geo_fips" "616",
+    "percent_children" 0.3016,
+    "percent_white" 0.2246,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2811,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.2086}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1843,
+    "geo_fips" "617",
+    "percent_children" 0.2156,
+    "percent_white" 0.2315,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0648,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0516}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1274,
+    "geo_fips" "618",
+    "percent_children" 0.2164,
+    "percent_white" 0.5291,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0815,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0656}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.145,
+    "geo_fips" "619",
+    "percent_children" 0.2419,
+    "percent_white" 0.2566,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1127,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1208}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0671,
+    "geo_fips" "620",
+    "percent_children" 0.2451,
+    "percent_white" 0.369,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1322,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1226}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0681,
+    "geo_fips" "621",
+    "percent_children" 0.3177,
+    "percent_white" 0.1659,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.2724,
+    "nyt_classification_1" "western_ag",
+    "percent_single_parent" 0.1771}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.074,
+    "geo_fips" "622",
+    "percent_children" 0.2836,
+    "percent_white" 0.386,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1945,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1441}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.065,
+    "geo_fips" "623",
+    "percent_children" 0.2681,
+    "percent_white" 0.4588,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1983,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1357}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0723,
+    "geo_fips" "624",
+    "percent_children" 0.207,
+    "percent_white" 0.5437,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1266,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.093}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1051,
+    "geo_fips" "625",
+    "percent_children" 0.258,
+    "percent_white" 0.4246,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.1267,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.1194}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.099,
+    "geo_fips" "626",
+    "percent_children" 0.2401,
+    "percent_white" 0.4358,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.102,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1107}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0724,
+    "geo_fips" "627",
+    "percent_children" 0.1895,
+    "percent_white" 0.2529,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1327,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0774}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0512,
+    "geo_fips" "628",
+    "percent_children" 0.1532,
+    "percent_white" 0.5543,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.14,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0597}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0995,
+    "geo_fips" "629",
+    "percent_children" 0.2367,
+    "percent_white" 0.1932,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1887,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1306}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.071,
+    "geo_fips" "630",
+    "percent_children" 0.1978,
+    "percent_white" 0.5078,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1195,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0938}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0878,
+    "geo_fips" "631",
+    "percent_children" 0.2678,
+    "percent_white" 0.2618,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1882,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1597}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1098,
+    "geo_fips" "632",
+    "percent_children" 0.2261,
+    "percent_white" 0.1489,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1229,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.139}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.077,
+    "geo_fips" "633",
+    "percent_children" 0.1764,
+    "percent_white" 0.6478,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0867,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0518}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0972,
+    "geo_fips" "634",
+    "percent_children" 0.2127,
+    "percent_white" 0.1063,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2459,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1381}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1115,
+    "geo_fips" "635",
+    "percent_children" 0.2633,
+    "percent_white" 0.1422,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1598,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1594}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.055,
+    "geo_fips" "636",
+    "percent_children" 0.231,
+    "percent_white" 0.4002,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2006,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1018}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0502,
+    "geo_fips" "637",
+    "percent_children" 0.1901,
+    "percent_white" 0.2511,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1894,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0982}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1279,
+    "geo_fips" "638",
+    "percent_children" 0.2343,
+    "percent_white" 0.1674,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1185,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1325}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1206,
+    "geo_fips" "639",
+    "percent_children" 0.2155,
+    "percent_white" 0.2835,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.096,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.082}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1649,
+    "geo_fips" "640",
+    "percent_children" 0.2896,
+    "percent_white" 0.0439,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.224,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.2224}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1096,
+    "geo_fips" "641",
+    "percent_children" 0.2735,
+    "percent_white" 0.2421,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1629,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1614}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0923,
+    "geo_fips" "642",
+    "percent_children" 0.263,
+    "percent_white" 0.4175,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1076,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0999}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0999,
+    "geo_fips" "643",
+    "percent_children" 0.2342,
+    "percent_white" 0.1504,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1793,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.141}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1467,
+    "geo_fips" "644",
+    "percent_children" 0.2792,
+    "percent_white" 0.0679,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.209,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.196}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.1168,
+    "geo_fips" "645",
+    "percent_children" 0.2147,
+    "percent_white" 0.5076,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.0878,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0639}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.145,
+    "geo_fips" "646",
+    "percent_children" 0.2622,
+    "percent_white" 0.1744,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1602,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1547}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1171,
+    "geo_fips" "647",
+    "percent_children" 0.225,
+    "percent_white" 0.3036,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1546,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1192}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1053,
+    "geo_fips" "648",
+    "percent_children" 0.197,
+    "percent_white" 0.5631,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0932,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0699}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1144,
+    "geo_fips" "649",
+    "percent_children" 0.2367,
+    "percent_white" 0.607,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0928,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.0806}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0876,
+    "geo_fips" "650",
+    "percent_children" 0.2429,
+    "percent_white" 0.5468,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1252,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1053}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0695,
+    "geo_fips" "651",
+    "percent_children" 0.2516,
+    "percent_white" 0.1311,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2065,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1701}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1107,
+    "geo_fips" "652",
+    "percent_children" 0.1957,
+    "percent_white" 0.5906,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0945,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0646}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0682,
+    "geo_fips" "653",
+    "percent_children" 0.1991,
+    "percent_white" 0.3977,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.113,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0895}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0496,
+    "geo_fips" "801",
+    "percent_children" 0.204,
+    "percent_white" 0.5791,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1299,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0846}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0821,
+    "geo_fips" "802",
+    "percent_children" 0.1938,
+    "percent_white" 0.8271,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1019,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0622}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0501,
+    "geo_fips" "803",
+    "percent_children" 0.2191,
+    "percent_white" 0.7085,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1555,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.084}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0863,
+    "geo_fips" "804",
+    "percent_children" 0.2538,
+    "percent_white" 0.7241,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0957,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0839}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0606,
+    "geo_fips" "805",
+    "percent_children" 0.2357,
+    "percent_white" 0.7155,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.116,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0879}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0599,
+    "geo_fips" "806",
+    "percent_children" 0.2553,
+    "percent_white" 0.616,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.0802,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.1031}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0795,
+    "geo_fips" "807",
+    "percent_children" 0.2306,
+    "percent_white" 0.6306,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0978,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1061}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1011,
+    "geo_fips" "901",
+    "percent_children" 0.2187,
+    "percent_white" 0.6086,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1068,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1072}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1186,
+    "geo_fips" "902",
+    "percent_children" 0.1916,
+    "percent_white" 0.8172,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0835,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0868}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1064,
+    "geo_fips" "903",
+    "percent_children" 0.1974,
+    "percent_white" 0.6391,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1112,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1066}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.071,
+    "geo_fips" "904",
+    "percent_children" 0.235,
+    "percent_white" 0.6104,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.087,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0915}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1227,
+    "geo_fips" "905",
+    "percent_children" 0.208,
+    "percent_white" 0.7,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0999,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0957}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0788,
+    "geo_fips" "1000",
+    "percent_children" 0.2145,
+    "percent_white" 0.6274,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1167,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1065}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0557,
+    "geo_fips" "1201",
+    "percent_children" 0.2142,
+    "percent_white" 0.7328,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1196,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0892}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0559,
+    "geo_fips" "1202",
+    "percent_children" 0.1965,
+    "percent_white" 0.763,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1485,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0942}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0544,
+    "geo_fips" "1203",
+    "percent_children" 0.2073,
+    "percent_white" 0.6858,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1866,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1035}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0474,
+    "geo_fips" "1204",
+    "percent_children" 0.2085,
+    "percent_white" 0.7557,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0862,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0773}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0419,
+    "geo_fips" "1205",
+    "percent_children" 0.2335,
+    "percent_white" 0.3958,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2227,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1577}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0521,
+    "geo_fips" "1206",
+    "percent_children" 0.1803,
+    "percent_white" 0.7365,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1365,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0853}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.0571,
+    "geo_fips" "1207",
+    "percent_children" 0.1998,
+    "percent_white" 0.5811,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.149,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0945}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0894,
+    "geo_fips" "1208",
+    "percent_children" 0.1814,
+    "percent_white" 0.7513,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1431,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0771}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0416,
+    "geo_fips" "1209",
+    "percent_children" 0.2432,
+    "percent_white" 0.4282,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1605,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.127}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.043,
+    "geo_fips" "1210",
+    "percent_children" 0.2319,
+    "percent_white" 0.374,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1604,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1512}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0459,
+    "geo_fips" "1211",
+    "percent_children" 0.1537,
+    "percent_white" 0.7882,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1418,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0698}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0529,
+    "geo_fips" "1212",
+    "percent_children" 0.1901,
+    "percent_white" 0.7806,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1188,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0838}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0735,
+    "geo_fips" "1213",
+    "percent_children" 0.1719,
+    "percent_white" 0.716,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1441,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0882}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0484,
+    "geo_fips" "1214",
+    "percent_children" 0.2188,
+    "percent_white" 0.4492,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1732,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.115}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0581,
+    "geo_fips" "1215",
+    "percent_children" 0.2289,
+    "percent_white" 0.5828,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1338,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1145}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0585,
+    "geo_fips" "1216",
+    "percent_children" 0.1917,
+    "percent_white" 0.7078,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1157,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0906}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0465,
+    "geo_fips" "1217",
+    "percent_children" 0.1729,
+    "percent_white" 0.7449,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1441,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0703}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0496,
+    "geo_fips" "1218",
+    "percent_children" 0.1897,
+    "percent_white" 0.6768,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1311,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0805}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0314,
+    "geo_fips" "1219",
+    "percent_children" 0.1752,
+    "percent_white" 0.6993,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1243,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0764}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0533,
+    "geo_fips" "1220",
+    "percent_children" 0.2395,
+    "percent_white" 0.1848,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1985,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1835}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.038,
+    "geo_fips" "1221",
+    "percent_children" 0.1918,
+    "percent_white" 0.5662,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.111,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0758}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0522,
+    "geo_fips" "1222",
+    "percent_children" 0.1862,
+    "percent_white" 0.5833,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1092,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0912}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0414,
+    "geo_fips" "1223",
+    "percent_children" 0.2025,
+    "percent_white" 0.4328,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1075,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.101}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0356,
+    "geo_fips" "1224",
+    "percent_children" 0.2168,
+    "percent_white" 0.1123,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2362,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1668}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0631,
+    "geo_fips" "1225",
+    "percent_children" 0.1973,
+    "percent_white" 0.1888,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1621,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1297}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0334,
+    "geo_fips" "1226",
+    "percent_children" 0.2212,
+    "percent_white" 0.1711,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.1694,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.1576}
+   {"nyt_political_prediction" "5) Lean D",
+    "percent_manufacturing" 0.0355,
+    "geo_fips" "1227",
+    "percent_children" 0.1777,
+    "percent_white" 0.2113,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.1493,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.0942}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0929,
+    "geo_fips" "1301",
+    "percent_children" 0.2381,
+    "percent_white" 0.5911,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1672,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1263}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1213,
+    "geo_fips" "1302",
+    "percent_children" 0.2434,
+    "percent_white" 0.4011,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2656,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1602}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1416,
+    "geo_fips" "1303",
+    "percent_children" 0.2379,
+    "percent_white" 0.65,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1302,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1245}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0767,
+    "geo_fips" "1304",
+    "percent_children" 0.2598,
+    "percent_white" 0.2455,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1778,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1628}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0552,
+    "geo_fips" "1305",
+    "percent_children" 0.2056,
+    "percent_white" 0.2872,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2197,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1306}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.0625,
+    "geo_fips" "1306",
+    "percent_children" 0.2394,
+    "percent_white" 0.589,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.0849,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0793}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0934,
+    "geo_fips" "1307",
+    "percent_children" 0.272,
+    "percent_white" 0.4407,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0988,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.107}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1048,
+    "geo_fips" "1308",
+    "percent_children" 0.2411,
+    "percent_white" 0.5972,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2084,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1297}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1765,
+    "geo_fips" "1309",
+    "percent_children" 0.2301,
+    "percent_white" 0.7741,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1414,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0889}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1117,
+    "geo_fips" "1310",
+    "percent_children" 0.2364,
+    "percent_white" 0.6515,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1666,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1207}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0915,
+    "geo_fips" "1311",
+    "percent_children" 0.2445,
+    "percent_white" 0.6597,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1036,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1054}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1069,
+    "geo_fips" "1312",
+    "percent_children" 0.2368,
+    "percent_white" 0.5486,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2124,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1466}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0621,
+    "geo_fips" "1313",
+    "percent_children" 0.2735,
+    "percent_white" 0.2602,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1391,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1755}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2171,
+    "geo_fips" "1314",
+    "percent_children" 0.2481,
+    "percent_white" 0.7657,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1488,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.125}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0305,
+    "geo_fips" "1501",
+    "percent_children" 0.2056,
+    "percent_white" 0.1543,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.084,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0797}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0262,
+    "geo_fips" "1502",
+    "percent_children" 0.2251,
+    "percent_white" 0.2856,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1023,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1112}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.104,
+    "geo_fips" "1601",
+    "percent_children" 0.2481,
+    "percent_white" 0.844,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.137,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0924}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0956,
+    "geo_fips" "1602",
+    "percent_children" 0.2711,
+    "percent_white" 0.8016,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1507,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0902}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0776,
+    "geo_fips" "1701",
+    "percent_children" 0.2173,
+    "percent_white" 0.3619,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1741,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1361}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0958,
+    "geo_fips" "1702",
+    "percent_children" 0.2433,
+    "percent_white" 0.2691,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1913,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1718}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1073,
+    "geo_fips" "1703",
+    "percent_children" 0.2425,
+    "percent_white" 0.5668,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.103,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0941}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1442,
+    "geo_fips" "1704",
+    "percent_children" 0.2548,
+    "percent_white" 0.2153,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1654,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1424}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0766,
+    "geo_fips" "1705",
+    "percent_children" 0.1845,
+    "percent_white" 0.6914,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0825,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0415}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1178,
+    "geo_fips" "1706",
+    "percent_children" 0.232,
+    "percent_white" 0.7708,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0474,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0554}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.076,
+    "geo_fips" "1707",
+    "percent_children" 0.2015,
+    "percent_white" 0.2735,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2247,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1337}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1548,
+    "geo_fips" "1708",
+    "percent_children" 0.2418,
+    "percent_white" 0.5154,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1136,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1064}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0761,
+    "geo_fips" "1709",
+    "percent_children" 0.2149,
+    "percent_white" 0.6333,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1222,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0665}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1471,
+    "geo_fips" "1710",
+    "percent_children" 0.2447,
+    "percent_white" 0.5722,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0897,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.093}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1217,
+    "geo_fips" "1711",
+    "percent_children" 0.2561,
+    "percent_white" 0.5156,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.092,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1156}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1125,
+    "geo_fips" "1712",
+    "percent_children" 0.2249,
+    "percent_white" 0.7588,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1642,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1192}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0993,
+    "geo_fips" "1713",
+    "percent_children" 0.1954,
+    "percent_white" 0.7876,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1693,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1029}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.1484,
+    "geo_fips" "1714",
+    "percent_children" 0.2622,
+    "percent_white" 0.7757,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0667,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0869}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1543,
+    "geo_fips" "1715",
+    "percent_children" 0.2267,
+    "percent_white" 0.9074,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1416,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0966}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1703,
+    "geo_fips" "1716",
+    "percent_children" 0.2194,
+    "percent_white" 0.8388,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1238,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1107}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1688,
+    "geo_fips" "1717",
+    "percent_children" 0.2234,
+    "percent_white" 0.7544,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1815,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1242}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1232,
+    "geo_fips" "1718",
+    "percent_children" 0.223,
+    "percent_white" 0.8868,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0956,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0883}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1698,
+    "geo_fips" "1801",
+    "percent_children" 0.2328,
+    "percent_white" 0.6249,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1428,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1217}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.2773,
+    "geo_fips" "1802",
+    "percent_children" 0.2488,
+    "percent_white" 0.7989,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1445,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1047}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2675,
+    "geo_fips" "1803",
+    "percent_children" 0.2579,
+    "percent_white" 0.8275,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1346,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1116}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1914,
+    "geo_fips" "1804",
+    "percent_children" 0.2288,
+    "percent_white" 0.8529,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.128,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0899}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1297,
+    "geo_fips" "1805",
+    "percent_children" 0.2424,
+    "percent_white" 0.816,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0984,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0984}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.217,
+    "geo_fips" "1806",
+    "percent_children" 0.2213,
+    "percent_white" 0.9163,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1468,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1023}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.105,
+    "geo_fips" "1807",
+    "percent_children" 0.2607,
+    "percent_white" 0.525,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2083,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1437}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2005,
+    "geo_fips" "1808",
+    "percent_children" 0.2275,
+    "percent_white" 0.9023,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1385,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1056}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1515,
+    "geo_fips" "1809",
+    "percent_children" 0.2195,
+    "percent_white" 0.893,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1266,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0939}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1755,
+    "geo_fips" "1901",
+    "percent_children" 0.228,
+    "percent_white" 0.8868,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1117,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.0797}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.167,
+    "geo_fips" "1902",
+    "percent_children" 0.2267,
+    "percent_white" 0.8592,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1393,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0815,
+    "geo_fips" "1903",
+    "percent_children" 0.2489,
+    "percent_white" 0.835,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.094,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.1026}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.151,
+    "geo_fips" "1904",
+    "percent_children" 0.2228,
+    "percent_white" 0.8774,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1272,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0892}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1338,
+    "geo_fips" "2001",
+    "percent_children" 0.2422,
+    "percent_white" 0.7673,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1295,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.087}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.1231,
+    "geo_fips" "2002",
+    "percent_children" 0.2269,
+    "percent_white" 0.8263,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1342,
+    "nyt_classification_1" "rural",
+    "percent_single_parent" 0.0917}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0875,
+    "geo_fips" "2003",
+    "percent_children" 0.2572,
+    "percent_white" 0.7213,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0854,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1046}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1701,
+    "geo_fips" "2004",
+    "percent_children" 0.2565,
+    "percent_white" 0.7374,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1387,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1014}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1851,
+    "geo_fips" "2101",
+    "percent_children" 0.226,
+    "percent_white" 0.8749,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2004,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1031}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1829,
+    "geo_fips" "2102",
+    "percent_children" 0.2328,
+    "percent_white" 0.8715,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1614,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1054}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1214,
+    "geo_fips" "2103",
+    "percent_children" 0.2211,
+    "percent_white" 0.6781,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1468,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1255}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1438,
+    "geo_fips" "2104",
+    "percent_children" 0.2438,
+    "percent_white" 0.8971,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1292,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1173}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1197,
+    "geo_fips" "2105",
+    "percent_children" 0.2225,
+    "percent_white" 0.9586,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2931,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1241}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1406,
+    "geo_fips" "2106",
+    "percent_children" 0.2224,
+    "percent_white" 0.8183,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.1863,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.1154}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0591,
+    "geo_fips" "2201",
+    "percent_children" 0.2338,
+    "percent_white" 0.7184,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1376,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1139}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0668,
+    "geo_fips" "2202",
+    "percent_children" 0.2276,
+    "percent_white" 0.2776,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2493,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.156}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0791,
+    "geo_fips" "2203",
+    "percent_children" 0.2503,
+    "percent_white" 0.6768,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.205,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1429}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0762,
+    "geo_fips" "2204",
+    "percent_children" 0.2459,
+    "percent_white" 0.5803,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2341,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1267}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0739,
+    "geo_fips" "2205",
+    "percent_children" 0.2373,
+    "percent_white" 0.6083,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2485,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1554}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0908,
+    "geo_fips" "2206",
+    "percent_children" 0.2374,
+    "percent_white" 0.6679,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1457,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1182}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0877,
+    "geo_fips" "2301",
+    "percent_children" 0.1901,
+    "percent_white" 0.9285,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1019,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0761}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.0817,
+    "geo_fips" "2302",
+    "percent_children" 0.1929,
+    "percent_white" 0.9396,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1485,
+    "nyt_classification_1" "rural",
+    "percent_single_parent" 0.0951}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0657,
+    "geo_fips" "2401",
+    "percent_children" 0.2128,
+    "percent_white" 0.7931,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1017,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0915}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0538,
+    "geo_fips" "2402",
+    "percent_children" 0.2367,
+    "percent_white" 0.5025,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1032,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1443}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0432,
+    "geo_fips" "2403",
+    "percent_children" 0.2072,
+    "percent_white" 0.5825,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0877,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0971}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0317,
+    "geo_fips" "2404",
+    "percent_children" 0.2397,
+    "percent_white" 0.26,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0889,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1443}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0299,
+    "geo_fips" "2405",
+    "percent_children" 0.2231,
+    "percent_white" 0.4546,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0744,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1097}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0546,
+    "geo_fips" "2406",
+    "percent_children" 0.2305,
+    "percent_white" 0.589,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.096,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1025}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0424,
+    "geo_fips" "2407",
+    "percent_children" 0.2143,
+    "percent_white" 0.3292,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1637,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1363}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0291,
+    "geo_fips" "2408",
+    "percent_children" 0.2249,
+    "percent_white" 0.5996,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0617,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0748}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1114,
+    "geo_fips" "2501",
+    "percent_children" 0.2039,
+    "percent_white" 0.7269,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1397,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1285}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1047,
+    "geo_fips" "2502",
+    "percent_children" 0.205,
+    "percent_white" 0.77,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1053,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.091}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1362,
+    "geo_fips" "2503",
+    "percent_children" 0.2243,
+    "percent_white" 0.6812,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.11,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1247}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0973,
+    "geo_fips" "2504",
+    "percent_children" 0.2252,
+    "percent_white" 0.8297,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0623,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0746}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0749,
+    "geo_fips" "2505",
+    "percent_children" 0.1962,
+    "percent_white" 0.7141,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0777,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.063}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0958,
+    "geo_fips" "2506",
+    "percent_children" 0.2112,
+    "percent_white" 0.8124,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0721,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.078}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0482,
+    "geo_fips" "2507",
+    "percent_children" 0.1702,
+    "percent_white" 0.4057,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.204,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1317}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0541,
+    "geo_fips" "2508",
+    "percent_children" 0.1942,
+    "percent_white" 0.7215,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0914,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0865}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0671,
+    "geo_fips" "2509",
+    "percent_children" 0.1927,
+    "percent_white" 0.8634,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0803,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0955}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.1136,
+    "geo_fips" "2601",
+    "percent_children" 0.188,
+    "percent_white" 0.9095,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1473,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0762}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2304,
+    "geo_fips" "2602",
+    "percent_children" 0.24,
+    "percent_white" 0.7825,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1329,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1047}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1912,
+    "geo_fips" "2603",
+    "percent_children" 0.2398,
+    "percent_white" 0.8016,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1288,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1036}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1712,
+    "geo_fips" "2604",
+    "percent_children" 0.2073,
+    "percent_white" 0.9164,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1497,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0946}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1681,
+    "geo_fips" "2605",
+    "percent_children" 0.2224,
+    "percent_white" 0.7366,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1972,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1275}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.2176,
+    "geo_fips" "2606",
+    "percent_children" 0.2264,
+    "percent_white" 0.807,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1496,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0952}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.2059,
+    "geo_fips" "2607",
+    "percent_children" 0.2204,
+    "percent_white" 0.8764,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1179,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.094}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1644,
+    "geo_fips" "2608",
+    "percent_children" 0.2189,
+    "percent_white" 0.8155,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.1152,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0801}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1904,
+    "geo_fips" "2609",
+    "percent_children" 0.201,
+    "percent_white" 0.7535,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1219,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0958}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2229,
+    "geo_fips" "2610",
+    "percent_children" 0.2126,
+    "percent_white" 0.9083,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0965,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.081}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.2007,
+    "geo_fips" "2611",
+    "percent_children" 0.2202,
+    "percent_white" 0.7993,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.0632,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0589}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.161,
+    "geo_fips" "2612",
+    "percent_children" 0.2124,
+    "percent_white" 0.7451,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1681,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0949}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1556,
+    "geo_fips" "2613",
+    "percent_children" 0.2443,
+    "percent_white" 0.3368,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2955,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1705}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1604,
+    "geo_fips" "2614",
+    "percent_children" 0.2363,
+    "percent_white" 0.314,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2295,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1538}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1587,
+    "geo_fips" "2701",
+    "percent_children" 0.2302,
+    "percent_white" 0.8597,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1059,
+    "nyt_classification_1" "rural",
+    "percent_single_parent" 0.0889}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1204,
+    "geo_fips" "2702",
+    "percent_children" 0.2509,
+    "percent_white" 0.8149,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.0585,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0879}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1379,
+    "geo_fips" "2703",
+    "percent_children" 0.2435,
+    "percent_white" 0.7719,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0562,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.086}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1305,
+    "geo_fips" "2704",
+    "percent_children" 0.2374,
+    "percent_white" 0.6695,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1172,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.096}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1074,
+    "geo_fips" "2705",
+    "percent_children" 0.2039,
+    "percent_white" 0.6388,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1531,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0882}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1622,
+    "geo_fips" "2706",
+    "percent_children" 0.2525,
+    "percent_white" 0.8942,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.067,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0838}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.158,
+    "geo_fips" "2707",
+    "percent_children" 0.2362,
+    "percent_white" 0.8884,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1109,
+    "nyt_classification_1" "rural",
+    "percent_single_parent" 0.096}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1095,
+    "geo_fips" "2708",
+    "percent_children" 0.2122,
+    "percent_white" 0.9188,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1253,
+    "nyt_classification_1" "rural",
+    "percent_single_parent" 0.09}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1855,
+    "geo_fips" "2801",
+    "percent_children" 0.2385,
+    "percent_white" 0.6695,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1765,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1257}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1281,
+    "geo_fips" "2802",
+    "percent_children" 0.2506,
+    "percent_white" 0.3037,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2729,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1824}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.102,
+    "geo_fips" "2803",
+    "percent_children" 0.2396,
+    "percent_white" 0.5907,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1929,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1351}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1183,
+    "geo_fips" "2804",
+    "percent_children" 0.2398,
+    "percent_white" 0.6887,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1968,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1237}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0963,
+    "geo_fips" "2901",
+    "percent_children" 0.2178,
+    "percent_white" 0.4086,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1847,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1477}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.1085,
+    "geo_fips" "2902",
+    "percent_children" 0.2185,
+    "percent_white" 0.8705,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0495,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.066}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1257,
+    "geo_fips" "2903",
+    "percent_children" 0.2381,
+    "percent_white" 0.908,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0968,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0963}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1207,
+    "geo_fips" "2904",
+    "percent_children" 0.2247,
+    "percent_white" 0.8652,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1515,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0993}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1015,
+    "geo_fips" "2905",
+    "percent_children" 0.233,
+    "percent_white" 0.6356,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.163,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1174}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1337,
+    "geo_fips" "2906",
+    "percent_children" 0.2362,
+    "percent_white" 0.879,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1179,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0949}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1152,
+    "geo_fips" "2907",
+    "percent_children" 0.2299,
+    "percent_white" 0.8824,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1624,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0985}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1386,
+    "geo_fips" "2908",
+    "percent_children" 0.2261,
+    "percent_white" 0.9055,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1989,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1064}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.043,
+    "geo_fips" "3000",
+    "percent_children" 0.2193,
+    "percent_white" 0.8641,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1332,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0748}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1105,
+    "geo_fips" "3101",
+    "percent_children" 0.2397,
+    "percent_white" 0.8249,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1159,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0891}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.0846,
+    "geo_fips" "3102",
+    "percent_children" 0.2629,
+    "percent_white" 0.7289,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.1092,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.1057}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1225,
+    "geo_fips" "3103",
+    "percent_children" 0.2423,
+    "percent_white" 0.8417,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.118,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0941}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0326,
+    "geo_fips" "3201",
+    "percent_children" 0.2292,
+    "percent_white" 0.2902,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2102,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1381}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0747,
+    "geo_fips" "3202",
+    "percent_children" 0.2201,
+    "percent_white" 0.6663,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1227,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0954}
+   {"nyt_political_prediction" "5) Lean D",
+    "percent_manufacturing" 0.029,
+    "geo_fips" "3203",
+    "percent_children" 0.2254,
+    "percent_white" 0.5673,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.0899,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.1052}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.0347,
+    "geo_fips" "3204",
+    "percent_children" 0.2473,
+    "percent_white" 0.464,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1327,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.132}
+   {"nyt_political_prediction" "5) Lean D",
+    "percent_manufacturing" 0.1261,
+    "geo_fips" "3301",
+    "percent_children" 0.1923,
+    "percent_white" 0.9056,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.074,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.0807}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.118,
+    "geo_fips" "3302",
+    "percent_children" 0.1971,
+    "percent_white" 0.9091,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0719,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0902}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0716,
+    "geo_fips" "3401",
+    "percent_children" 0.2236,
+    "percent_white" 0.6247,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1065,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1197}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0726,
+    "geo_fips" "3402",
+    "percent_children" 0.2162,
+    "percent_white" 0.655,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1345,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1235}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.0667,
+    "geo_fips" "3403",
+    "percent_children" 0.2058,
+    "percent_white" 0.7482,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.0704,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0886}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.064,
+    "geo_fips" "3404",
+    "percent_children" 0.2421,
+    "percent_white" 0.7821,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0928,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0674}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.0866,
+    "geo_fips" "3405",
+    "percent_children" 0.2251,
+    "percent_white" 0.6822,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0553,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0668}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0882,
+    "geo_fips" "3406",
+    "percent_children" 0.2129,
+    "percent_white" 0.4739,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.093,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0925}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1061,
+    "geo_fips" "3407",
+    "percent_children" 0.2232,
+    "percent_white" 0.7055,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0491,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.056}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0789,
+    "geo_fips" "3408",
+    "percent_children" 0.2139,
+    "percent_white" 0.2608,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1705,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1435}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1092,
+    "geo_fips" "3409",
+    "percent_children" 0.2219,
+    "percent_white" 0.3883,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.151,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1176}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0625,
+    "geo_fips" "3410",
+    "percent_children" 0.2404,
+    "percent_white" 0.1873,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1797,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1665}
+   {"nyt_political_prediction" "5) Lean D",
+    "percent_manufacturing" 0.0968,
+    "geo_fips" "3411",
+    "percent_children" 0.2109,
+    "percent_white" 0.7305,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0489,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0496}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0884,
+    "geo_fips" "3412",
+    "percent_children" 0.2263,
+    "percent_white" 0.4651,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0948,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0942}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0431,
+    "geo_fips" "3501",
+    "percent_children" 0.2201,
+    "percent_white" 0.394,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1733,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1234}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.0329,
+    "geo_fips" "3502",
+    "percent_children" 0.2448,
+    "percent_white" 0.3667,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.2278,
+    "nyt_classification_1" "western_ag",
+    "percent_single_parent" 0.123}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0371,
+    "geo_fips" "3503",
+    "percent_children" 0.241,
+    "percent_white" 0.3739,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1947,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1149}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0509,
+    "geo_fips" "3601",
+    "percent_children" 0.2117,
+    "percent_white" 0.7458,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0725,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0724}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0816,
+    "geo_fips" "3602",
+    "percent_children" 0.2185,
+    "percent_white" 0.6098,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0711,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0869}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0552,
+    "geo_fips" "3603",
+    "percent_children" 0.2097,
+    "percent_white" 0.6843,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.052,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0475}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.042,
+    "geo_fips" "3604",
+    "percent_children" 0.2252,
+    "percent_white" 0.5623,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0684,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0825}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0303,
+    "geo_fips" "3605",
+    "percent_children" 0.2245,
+    "percent_white" 0.0975,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.124,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1671}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.039,
+    "geo_fips" "3606",
+    "percent_children" 0.1924,
+    "percent_white" 0.348,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1417,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0686}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.051,
+    "geo_fips" "3607",
+    "percent_children" 0.2322,
+    "percent_white" 0.3069,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2359,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1194}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0307,
+    "geo_fips" "3608",
+    "percent_children" 0.2066,
+    "percent_white" 0.2404,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2079,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1507}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.022,
+    "geo_fips" "3609",
+    "percent_children" 0.234,
+    "percent_white" 0.3128,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1769,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1312}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0366,
+    "geo_fips" "3610",
+    "percent_children" 0.1922,
+    "percent_white" 0.6323,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1636,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0371}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0271,
+    "geo_fips" "3611",
+    "percent_children" 0.22,
+    "percent_white" 0.5972,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.1408,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0796}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0331,
+    "geo_fips" "3612",
+    "percent_children" 0.1202,
+    "percent_white" 0.6507,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0987,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0336}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0294,
+    "geo_fips" "3613",
+    "percent_children" 0.2054,
+    "percent_white" 0.1454,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2735,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1778}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0378,
+    "geo_fips" "3614",
+    "percent_children" 0.2056,
+    "percent_white" 0.224,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1517,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1216}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0352,
+    "geo_fips" "3615",
+    "percent_children" 0.2822,
+    "percent_white" 0.0268,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.3595,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.2667}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0316,
+    "geo_fips" "3616",
+    "percent_children" 0.2181,
+    "percent_white" 0.3604,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1324,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1268}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0516,
+    "geo_fips" "3617",
+    "percent_children" 0.2471,
+    "percent_white" 0.5963,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.111,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0793}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0603,
+    "geo_fips" "3618",
+    "percent_children" 0.2329,
+    "percent_white" 0.6866,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1009,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0815}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0701,
+    "geo_fips" "3619",
+    "percent_children" 0.1878,
+    "percent_white" 0.8378,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1351,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0885}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0681,
+    "geo_fips" "3620",
+    "percent_children" 0.1974,
+    "percent_white" 0.7588,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1102,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1041}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0903,
+    "geo_fips" "3621",
+    "percent_children" 0.2028,
+    "percent_white" 0.9005,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1367,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1074}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1085,
+    "geo_fips" "3622",
+    "percent_children" 0.2061,
+    "percent_white" 0.8729,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1516,
+    "nyt_classification_1" "rural",
+    "percent_single_parent" 0.0977}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1327,
+    "geo_fips" "3623",
+    "percent_children" 0.2029,
+    "percent_white" 0.8825,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1617,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1032}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.096,
+    "geo_fips" "3624",
+    "percent_children" 0.2119,
+    "percent_white" 0.8172,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1432,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.1118}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1127,
+    "geo_fips" "3625",
+    "percent_children" 0.2112,
+    "percent_white" 0.6984,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1536,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1191}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0963,
+    "geo_fips" "3626",
+    "percent_children" 0.2041,
+    "percent_white" 0.6917,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1785,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1198}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1295,
+    "geo_fips" "3627",
+    "percent_children" 0.2023,
+    "percent_white" 0.9139,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.085,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0812}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1239,
+    "geo_fips" "3701",
+    "percent_children" 0.2139,
+    "percent_white" 0.4164,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2113,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1475}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.114,
+    "geo_fips" "3702",
+    "percent_children" 0.2646,
+    "percent_white" 0.6622,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1048,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1034}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0913,
+    "geo_fips" "3703",
+    "percent_children" 0.2232,
+    "percent_white" 0.676,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1482,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0989}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0762,
+    "geo_fips" "3704",
+    "percent_children" 0.2208,
+    "percent_white" 0.5633,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1109,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.097}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1431,
+    "geo_fips" "3705",
+    "percent_children" 0.2142,
+    "percent_white" 0.7274,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1768,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1071}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1681,
+    "geo_fips" "3706",
+    "percent_children" 0.2256,
+    "percent_white" 0.656,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1599,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1175}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1046,
+    "geo_fips" "3707",
+    "percent_children" 0.2063,
+    "percent_white" 0.6812,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.186,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1117}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.1118,
+    "geo_fips" "3708",
+    "percent_children" 0.2422,
+    "percent_white" 0.6088,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1527,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.119}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1232,
+    "geo_fips" "3709",
+    "percent_children" 0.2565,
+    "percent_white" 0.6046,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.1508,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1074}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1591,
+    "geo_fips" "3710",
+    "percent_children" 0.2114,
+    "percent_white" 0.7775,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1465,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1057}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1514,
+    "geo_fips" "3711",
+    "percent_children" 0.1932,
+    "percent_white" 0.8667,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1633,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0958}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.077,
+    "geo_fips" "3712",
+    "percent_children" 0.2415,
+    "percent_white" 0.3968,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1373,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1227}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.1705,
+    "geo_fips" "3713",
+    "percent_children" 0.224,
+    "percent_white" 0.6475,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.165,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1224}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0661,
+    "geo_fips" "3800",
+    "percent_children" 0.2304,
+    "percent_white" 0.8506,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1072,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.077}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.1262,
+    "geo_fips" "3901",
+    "percent_children" 0.2452,
+    "percent_white" 0.6888,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.1477,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1155}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1313,
+    "geo_fips" "3902",
+    "percent_children" 0.224,
+    "percent_white" 0.8556,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1426,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1004}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0732,
+    "geo_fips" "3903",
+    "percent_children" 0.2515,
+    "percent_white" 0.5232,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2222,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1604}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2499,
+    "geo_fips" "3904",
+    "percent_children" 0.2257,
+    "percent_white" 0.8751,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1239,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1132}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2302,
+    "geo_fips" "3905",
+    "percent_children" 0.2231,
+    "percent_white" 0.8931,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1012,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0879}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1409,
+    "geo_fips" "3906",
+    "percent_children" 0.2106,
+    "percent_white" 0.9448,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1595,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0995}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2019,
+    "geo_fips" "3907",
+    "percent_children" 0.2373,
+    "percent_white" 0.9132,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1131,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.093}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2069,
+    "geo_fips" "3908",
+    "percent_children" 0.2357,
+    "percent_white" 0.8607,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1228,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.11}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.152,
+    "geo_fips" "3909",
+    "percent_children" 0.2254,
+    "percent_white" 0.6716,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2074,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1524}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1328,
+    "geo_fips" "3910",
+    "percent_children" 0.2193,
+    "percent_white" 0.7484,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1709,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1228}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.123,
+    "geo_fips" "3911",
+    "percent_children" 0.2171,
+    "percent_white" 0.3681,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2643,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1646}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1108,
+    "geo_fips" "3912",
+    "percent_children" 0.2326,
+    "percent_white" 0.8532,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.0983,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0866}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1608,
+    "geo_fips" "3913",
+    "percent_children" 0.1965,
+    "percent_white" 0.8078,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1808,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1083}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.1811,
+    "geo_fips" "3914",
+    "percent_children" 0.2143,
+    "percent_white" 0.8891,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0872,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0765}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.1069,
+    "geo_fips" "3915",
+    "percent_children" 0.2191,
+    "percent_white" 0.8914,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1264,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1008}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1621,
+    "geo_fips" "3916",
+    "percent_children" 0.2121,
+    "percent_white" 0.9174,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0688,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0769}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.117,
+    "geo_fips" "4001",
+    "percent_children" 0.2527,
+    "percent_white" 0.6462,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1535,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1163}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1206,
+    "geo_fips" "4002",
+    "percent_children" 0.2357,
+    "percent_white" 0.6389,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1894,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1181}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.087,
+    "geo_fips" "4003",
+    "percent_children" 0.2433,
+    "percent_white" 0.7433,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1637,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.097}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0818,
+    "geo_fips" "4004",
+    "percent_children" 0.2361,
+    "percent_white" 0.7076,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1351,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1081}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0733,
+    "geo_fips" "4005",
+    "percent_children" 0.2571,
+    "percent_white" 0.5749,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1732,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1156}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1637,
+    "geo_fips" "4101",
+    "percent_children" 0.2249,
+    "percent_white" 0.714,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0928,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0805}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0948,
+    "geo_fips" "4102",
+    "percent_children" 0.2176,
+    "percent_white" 0.7986,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1419,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1031}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0942,
+    "geo_fips" "4103",
+    "percent_children" 0.2009,
+    "percent_white" 0.71,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1439,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.088}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1013,
+    "geo_fips" "4104",
+    "percent_children" 0.1888,
+    "percent_white" 0.8392,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1741,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0897}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.102,
+    "geo_fips" "4105",
+    "percent_children" 0.2278,
+    "percent_white" 0.7529,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1167,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0921}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1154,
+    "geo_fips" "4401",
+    "percent_children" 0.208,
+    "percent_white" 0.6759,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1376,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1127}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1002,
+    "geo_fips" "4402",
+    "percent_children" 0.1867,
+    "percent_white" 0.7813,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1179,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1056}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0852,
+    "geo_fips" "4501",
+    "percent_children" 0.217,
+    "percent_white" 0.711,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0969,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0854}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1008,
+    "geo_fips" "4502",
+    "percent_children" 0.2255,
+    "percent_white" 0.6635,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1272,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1168}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2062,
+    "geo_fips" "4503",
+    "percent_children" 0.2211,
+    "percent_white" 0.7407,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1614,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1217}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1799,
+    "geo_fips" "4504",
+    "percent_children" 0.2296,
+    "percent_white" 0.6844,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.127,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1156}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1717,
+    "geo_fips" "4505",
+    "percent_children" 0.2302,
+    "percent_white" 0.6558,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.155,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.108}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1083,
+    "geo_fips" "4506",
+    "percent_children" 0.2195,
+    "percent_white" 0.3505,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2439,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1509}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1171,
+    "geo_fips" "4507",
+    "percent_children" 0.2094,
+    "percent_white" 0.6411,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1693,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1062}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1076,
+    "geo_fips" "4600",
+    "percent_children" 0.2472,
+    "percent_white" 0.8242,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1325,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0953}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1482,
+    "geo_fips" "4701",
+    "percent_children" 0.203,
+    "percent_white" 0.9147,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1788,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1015}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1008,
+    "geo_fips" "4702",
+    "percent_children" 0.2079,
+    "percent_white" 0.8603,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1446,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0819}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.151,
+    "geo_fips" "4703",
+    "percent_children" 0.2103,
+    "percent_white" 0.8226,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1485,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0896}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1826,
+    "geo_fips" "4704",
+    "percent_children" 0.2317,
+    "percent_white" 0.8026,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1351,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1134}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0763,
+    "geo_fips" "4705",
+    "percent_children" 0.2159,
+    "percent_white" 0.5986,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1468,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1115}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1455,
+    "geo_fips" "4706",
+    "percent_children" 0.2287,
+    "percent_white" 0.8838,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1231,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0972}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1309,
+    "geo_fips" "4707",
+    "percent_children" 0.2511,
+    "percent_white" 0.8044,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1425,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1035}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1357,
+    "geo_fips" "4708",
+    "percent_children" 0.2317,
+    "percent_white" 0.731,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1479,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1062}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0839,
+    "geo_fips" "4709",
+    "percent_children" 0.2537,
+    "percent_white" 0.2302,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2599,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1909}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0959,
+    "geo_fips" "4801",
+    "percent_children" 0.2445,
+    "percent_white" 0.6208,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1841,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.119}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1013,
+    "geo_fips" "4802",
+    "percent_children" 0.2485,
+    "percent_white" 0.475,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1065,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1062}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0825,
+    "geo_fips" "4803",
+    "percent_children" 0.2626,
+    "percent_white" 0.5707,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0654,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0934}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1246,
+    "geo_fips" "4804",
+    "percent_children" 0.2437,
+    "percent_white" 0.7247,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1312,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0982}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0937,
+    "geo_fips" "4805",
+    "percent_children" 0.2628,
+    "percent_white" 0.5228,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1526,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1272}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1125,
+    "geo_fips" "4806",
+    "percent_children" 0.2581,
+    "percent_white" 0.4959,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1116,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1294}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0789,
+    "geo_fips" "4807",
+    "percent_children" 0.2541,
+    "percent_white" 0.429,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.1148,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.0891}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0838,
+    "geo_fips" "4808",
+    "percent_children" 0.2471,
+    "percent_white" 0.6528,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.12,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0934}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0667,
+    "geo_fips" "4809",
+    "percent_children" 0.2658,
+    "percent_white" 0.1092,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1965,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1834}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0913,
+    "geo_fips" "4810",
+    "percent_children" 0.2523,
+    "percent_white" 0.5553,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1031,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0952}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0665,
+    "geo_fips" "4811",
+    "percent_children" 0.2554,
+    "percent_white" 0.5564,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1281,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1045}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0952,
+    "geo_fips" "4812",
+    "percent_children" 0.2485,
+    "percent_white" 0.6298,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1125,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1148}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1035,
+    "geo_fips" "4813",
+    "percent_children" 0.2468,
+    "percent_white" 0.6342,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1585,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1116}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1152,
+    "geo_fips" "4814",
+    "percent_children" 0.2473,
+    "percent_white" 0.5067,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.152,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1251}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0578,
+    "geo_fips" "4815",
+    "percent_children" 0.3178,
+    "percent_white" 0.1487,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2795,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1676}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0611,
+    "geo_fips" "4816",
+    "percent_children" 0.2742,
+    "percent_white" 0.1358,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2163,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1575}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0914,
+    "geo_fips" "4817",
+    "percent_children" 0.233,
+    "percent_white" 0.5487,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1803,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1193}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0947,
+    "geo_fips" "4818",
+    "percent_children" 0.2714,
+    "percent_white" 0.1702,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2364,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1777}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0561,
+    "geo_fips" "4819",
+    "percent_children" 0.2495,
+    "percent_white" 0.5327,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1812,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1174}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0511,
+    "geo_fips" "4820",
+    "percent_children" 0.2547,
+    "percent_white" 0.2114,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1839,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1508}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0554,
+    "geo_fips" "4821",
+    "percent_children" 0.2027,
+    "percent_white" 0.6038,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.111,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0786}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0927,
+    "geo_fips" "4822",
+    "percent_children" 0.2749,
+    "percent_white" 0.4019,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0873,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0954}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0565,
+    "geo_fips" "4823",
+    "percent_children" 0.2796,
+    "percent_white" 0.25,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.179,
+    "nyt_classification_1" "western_ag",
+    "percent_single_parent" 0.1345}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0783,
+    "geo_fips" "4824",
+    "percent_children" 0.2322,
+    "percent_white" 0.4648,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0837,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0968}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0826,
+    "geo_fips" "4825",
+    "percent_children" 0.2374,
+    "percent_white" 0.6798,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0984,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0895}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0812,
+    "geo_fips" "4826",
+    "percent_children" 0.2731,
+    "percent_white" 0.6497,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0836,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0936}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.082,
+    "geo_fips" "4827",
+    "percent_children" 0.2513,
+    "percent_white" 0.3918,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1441,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1335}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0438,
+    "geo_fips" "4828",
+    "percent_children" 0.3114,
+    "percent_white" 0.1601,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2602,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1647}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1096,
+    "geo_fips" "4829",
+    "percent_children" 0.3062,
+    "percent_white" 0.0969,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2364,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.183}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0748,
+    "geo_fips" "4830",
+    "percent_children" 0.2727,
+    "percent_white" 0.1571,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2112,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1834}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.0859,
+    "geo_fips" "4831",
+    "percent_children" 0.2654,
+    "percent_white" 0.5651,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0836,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1097}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0847,
+    "geo_fips" "4832",
+    "percent_children" 0.2474,
+    "percent_white" 0.4833,
+    "nyt_classification_2" "Emerging resistance",
+    "percent_poor" 0.1136,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.1046}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1139,
+    "geo_fips" "4833",
+    "percent_children" 0.3169,
+    "percent_white" 0.1415,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.25,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.2037}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0504,
+    "geo_fips" "4834",
+    "percent_children" 0.2946,
+    "percent_white" 0.1385,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2808,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1684}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0616,
+    "geo_fips" "4835",
+    "percent_children" 0.2641,
+    "percent_white" 0.2568,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2042,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1597}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1306,
+    "geo_fips" "4836",
+    "percent_children" 0.2537,
+    "percent_white" 0.6037,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.144,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1267}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1329,
+    "geo_fips" "4901",
+    "percent_children" 0.3144,
+    "percent_white" 0.8088,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0996,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0901}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0901,
+    "geo_fips" "4902",
+    "percent_children" 0.2729,
+    "percent_white" 0.7728,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1192,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0917}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0848,
+    "geo_fips" "4903",
+    "percent_children" 0.3046,
+    "percent_white" 0.8235,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1115,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0659}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0987,
+    "geo_fips" "4904",
+    "percent_children" 0.3157,
+    "percent_white" 0.7448,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0799,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1065}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1089,
+    "geo_fips" "5000",
+    "percent_children" 0.19,
+    "percent_white" 0.9296,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1189,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0895}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0509,
+    "geo_fips" "5101",
+    "percent_children" 0.2361,
+    "percent_white" 0.672,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0686,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0777}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.0713,
+    "geo_fips" "5102",
+    "percent_children" 0.2193,
+    "percent_white" 0.6237,
+    "nyt_classification_2" "Diverse, educated suburbs",
+    "percent_poor" 0.0962,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.1234}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1041,
+    "geo_fips" "5103",
+    "percent_children" 0.2231,
+    "percent_white" 0.419,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1556,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1411}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.073,
+    "geo_fips" "5104",
+    "percent_children" 0.2117,
+    "percent_white" 0.4884,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.159,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1315}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.1081,
+    "geo_fips" "5105",
+    "percent_children" 0.1987,
+    "percent_white" 0.7252,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.138,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0982}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1208,
+    "geo_fips" "5106",
+    "percent_children" 0.2036,
+    "percent_white" 0.7945,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1443,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1066}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0619,
+    "geo_fips" "5107",
+    "percent_children" 0.2358,
+    "percent_white" 0.6713,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0774,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0944}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0197,
+    "geo_fips" "5108",
+    "percent_children" 0.2099,
+    "percent_white" 0.5202,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0894,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0743}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1293,
+    "geo_fips" "5109",
+    "percent_children" 0.1836,
+    "percent_white" 0.8953,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1882,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0782}
+   {"nyt_political_prediction" "5) Lean D",
+    "percent_manufacturing" 0.0524,
+    "geo_fips" "5110",
+    "percent_children" 0.2685,
+    "percent_white" 0.6104,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0492,
+    "nyt_classification_1" "diverse",
+    "percent_single_parent" 0.0854}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0217,
+    "geo_fips" "5111",
+    "percent_children" 0.2429,
+    "percent_white" 0.4566,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0663,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0842}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1408,
+    "geo_fips" "5301",
+    "percent_children" 0.2352,
+    "percent_white" 0.7376,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0654,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0716}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1433,
+    "geo_fips" "5302",
+    "percent_children" 0.2051,
+    "percent_white" 0.7132,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1157,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0855}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1069,
+    "geo_fips" "5303",
+    "percent_children" 0.2355,
+    "percent_white" 0.8081,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1106,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0839}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0891,
+    "geo_fips" "5304",
+    "percent_children" 0.2883,
+    "percent_white" 0.5395,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1571,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.128}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0771,
+    "geo_fips" "5305",
+    "percent_children" 0.215,
+    "percent_white" 0.8391,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.1402,
+    "nyt_classification_1" "bipolar",
+    "percent_single_parent" 0.0868}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0874,
+    "geo_fips" "5306",
+    "percent_children" 0.2005,
+    "percent_white" 0.7597,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1221,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0877}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0762,
+    "geo_fips" "5307",
+    "percent_children" 0.1575,
+    "percent_white" 0.6929,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.092,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0461}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.1191,
+    "geo_fips" "5308",
+    "percent_children" 0.2518,
+    "percent_white" 0.7149,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.0836,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.0899}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0995,
+    "geo_fips" "5309",
+    "percent_children" 0.2157,
+    "percent_white" 0.4651,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1197,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1007}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.083,
+    "geo_fips" "5310",
+    "percent_children" 0.2336,
+    "percent_white" 0.6717,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1243,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.106}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0923,
+    "geo_fips" "5401",
+    "percent_children" 0.1952,
+    "percent_white" 0.9311,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1738,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0898}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.0902,
+    "geo_fips" "5402",
+    "percent_children" 0.2158,
+    "percent_white" 0.9015,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1552,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1038}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.0647,
+    "geo_fips" "5403",
+    "percent_children" 0.2064,
+    "percent_white" 0.9284,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.2104,
+    "nyt_classification_1" "rural",
+    "percent_single_parent" 0.109}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.1838,
+    "geo_fips" "5501",
+    "percent_children" 0.232,
+    "percent_white" 0.8052,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1044,
+    "nyt_classification_1" "center_right",
+    "percent_single_parent" 0.1054}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1213,
+    "geo_fips" "5502",
+    "percent_children" 0.2153,
+    "percent_white" 0.8201,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1132,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0775}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.156,
+    "geo_fips" "5503",
+    "percent_children" 0.2101,
+    "percent_white" 0.9201,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1265,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.079}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1413,
+    "geo_fips" "5504",
+    "percent_children" 0.254,
+    "percent_white" 0.4253,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2388,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1781}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1909,
+    "geo_fips" "5505",
+    "percent_children" 0.2127,
+    "percent_white" 0.8763,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0695,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0693}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.2589,
+    "geo_fips" "5506",
+    "percent_children" 0.2127,
+    "percent_white" 0.8946,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.091,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0786}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1835,
+    "geo_fips" "5507",
+    "percent_children" 0.2155,
+    "percent_white" 0.9173,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1069,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0825}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.2205,
+    "geo_fips" "5508",
+    "percent_children" 0.2272,
+    "percent_white" 0.8704,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0914,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0798}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0396,
+    "geo_fips" "5600",
+    "percent_children" 0.2406,
+    "percent_white" 0.8439,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1132,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0905}
+   {"nyt_political_prediction" "3) Lean R",
+    "percent_manufacturing" 0.1242,
+    "geo_fips" "4201",
+    "percent_children" 0.2154,
+    "percent_white" 0.8378,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.059,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0694}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.0855,
+    "geo_fips" "4202",
+    "percent_children" 0.2524,
+    "percent_white" 0.4026,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2581,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1799}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0487,
+    "geo_fips" "4203",
+    "percent_children" 0.1874,
+    "percent_white" 0.2986,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.2597,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1338}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.1164,
+    "geo_fips" "4204",
+    "percent_children" 0.2198,
+    "percent_white" 0.7836,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0661,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0738}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0723,
+    "geo_fips" "4205",
+    "percent_children" 0.2241,
+    "percent_white" 0.6355,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1319,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1177}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.1365,
+    "geo_fips" "4206",
+    "percent_children" 0.2403,
+    "percent_white" 0.7471,
+    "nyt_classification_2" "Romney Republicans",
+    "percent_poor" 0.1097,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0949}
+   {"nyt_political_prediction" "5) Lean D",
+    "percent_manufacturing" 0.1431,
+    "geo_fips" "4207",
+    "percent_children" 0.2178,
+    "percent_white" 0.7243,
+    "nyt_classification_2" "White moderates",
+    "percent_poor" 0.1164,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1067}
+   {"nyt_political_prediction" "6) Likely D",
+    "percent_manufacturing" 0.1072,
+    "geo_fips" "4208",
+    "percent_children" 0.2002,
+    "percent_white" 0.8222,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.145,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1035}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1665,
+    "geo_fips" "4209",
+    "percent_children" 0.2029,
+    "percent_white" 0.8994,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1098,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0897}
+   {"nyt_political_prediction" "2) Likely R",
+    "percent_manufacturing" 0.1063,
+    "geo_fips" "4210",
+    "percent_children" 0.2198,
+    "percent_white" 0.7672,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1164,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.1069}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1679,
+    "geo_fips" "4211",
+    "percent_children" 0.2355,
+    "percent_white" 0.8569,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.0993,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0839}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1412,
+    "geo_fips" "4212",
+    "percent_children" 0.198,
+    "percent_white" 0.9241,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1422,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0835}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1425,
+    "geo_fips" "4213",
+    "percent_children" 0.2061,
+    "percent_white" 0.9226,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1293,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0865}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.123,
+    "geo_fips" "4214",
+    "percent_children" 0.194,
+    "percent_white" 0.9321,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.12,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0819}
+   {"nyt_political_prediction" "1) Solid R",
+    "percent_manufacturing" 0.1508,
+    "geo_fips" "4215",
+    "percent_children" 0.1912,
+    "percent_white" 0.9478,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1381,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0803}
+   {"nyt_political_prediction" nil,
+    "percent_manufacturing" 0.1628,
+    "geo_fips" "4216",
+    "percent_children" 0.2118,
+    "percent_white" 0.9014,
+    "nyt_classification_2" "Rural populists",
+    "percent_poor" 0.1401,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0988}
+   {"nyt_political_prediction" "4) Toss Up",
+    "percent_manufacturing" 0.0976,
+    "geo_fips" "4217",
+    "percent_children" 0.2052,
+    "percent_white" 0.8815,
+    "nyt_classification_2" "Loyal GOP suburbs",
+    "percent_poor" 0.0836,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0719}
+   {"nyt_political_prediction" "7) Solid D",
+    "percent_manufacturing" 0.0691,
+    "geo_fips" "4218",
+    "percent_children" 0.1826,
+    "percent_white" 0.7321,
+    "nyt_classification_2" nil,
+    "percent_poor" 0.1635,
+    "nyt_classification_1" nil,
+    "percent_single_parent" 0.0946}])
