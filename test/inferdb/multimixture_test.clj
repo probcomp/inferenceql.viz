@@ -4,6 +4,8 @@
             [clojure.repl :refer [doc source]]
             [clojure.test :refer :all]
             [clojure.string :refer [index-of]]
+            [cheshire.core :as cheshire]
+            [clojure.java.io :as io]
             [metaprob.generative-functions :refer :all]
             [metaprob.code-handlers :refer :all]
             [metaprob.expander :refer :all]
@@ -91,9 +93,32 @@
                output-addr-map
                input-addr-map)))
 
+(defn save-json [file-name file-str]
+  (make-parents file-name)
+  (spit file-name file-str))
+
+(defn scatter-plot-json
+  [columns  values domain]
+    (cheshire/generate-string
+     {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+      :background "white"
+      :data {:values values}
+      :width 1000
+      :height 1000
+      :mark "circle"
+      :encoding {
+         :x {
+           :field (first columns)
+           :type "quantitative"
+           :scale {:domain domain}},
+         :y {
+           :field (second columns)
+           :type "quantitative"
+           :scale {:domain domain}}}}))
+
 (deftest crosscat-conditional-simulate-smoke
   (testing "(smoke) simulate one col conditioned on another"
-    (let [num-samples 10
+    (let [num-samples 1000
           samples
           (cgpm-simulate
            crosscat-cgpm
@@ -101,5 +126,7 @@
            {}
            {}
            num-samples)]
+      (save-json "out/json-results/simulations.json"
+                 (scatter-plot-json ["x" "y"] samples [-2 19]))
       (is (= (count samples)
-             10)))))
+             1000)))))

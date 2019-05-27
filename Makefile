@@ -2,12 +2,11 @@ yarn-install-opts := --no-progress --frozen-lockfile
 compile-opts      := build.edn
 main-ns           := inferdb.spreadsheets.core
 output-dir        := out
-chart-namespaces  := select-simulate
+chart-namespaces  := simulations
 
 chart-dir =  $(output-dir)/charts
 
 clean:
-	rm -Rf $(output-dir)
 	rm -Rf *.png
 .PHONY: clean
 
