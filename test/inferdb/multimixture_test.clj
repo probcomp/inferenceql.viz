@@ -116,8 +116,51 @@
            :type "quantitative"
            :scale {:domain domain}}}}))
 
-(deftest crosscat-conditional-simulate-smoke
-  (testing "(smoke) simulate one col conditioned on another"
+(defn get-counts [item] {
+                         "category" (first (vals (first item)))
+                         ;; XXX: the 1000 below should be supplied as param.
+                         "probability" (float (/ (second item) 1000))})
+(defn bar-plot
+  [samples]
+    (cheshire/generate-string
+     {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+      :background "white"
+      :data {:values (map get-counts (frequencies samples))}
+      :width 1000
+      :height 1000
+      :mark "bar"
+      :encoding {
+         :y {
+           :field "category"
+           :type "ordinal"}
+         :x {
+           :field "probability"
+           :type "quantitative"}}}))
+
+
+;;(map get-counts (frequencies (cgpm-simulate crosscat-cgpm [:a] {} {} 100)))
+
+
+(deftest crosscatsimulate-categorical-smoke
+  (testing "(smoke) simulate a single categorical column"
+    (let [num-samples 1000
+          samples
+          (cgpm-simulate
+           crosscat-cgpm
+           [:a]
+           {}
+           {}
+           num-samples)]
+      (save-json "out/json-results/simulations-a.json"
+                 (bar-plot samples))
+      (is (= (count samples)
+             1000)))))
+
+
+
+
+(deftest crosscat-simulate-numerical-columns-smoke
+  (testing "(smoke) simulate two numerical columns"
     (let [num-samples 1000
           samples
           (cgpm-simulate
@@ -126,7 +169,9 @@
            {}
            {}
            num-samples)]
-      (save-json "out/json-results/simulations.json"
+      (save-json "out/json-results/simulations-x-y.json"
                  (scatter-plot-json ["x" "y"] samples [-2 19]))
       (is (= (count samples)
              1000)))))
+
+(clojure.test/run-tests)
