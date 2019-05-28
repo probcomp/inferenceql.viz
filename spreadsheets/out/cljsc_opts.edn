@@ -1,0 +1,1 @@
+{:preloads [devtools.preload], :main inferdb.spreadsheets.core, :asset-path "out", :foreign-libs [{:file "node_modules/handsontable/dist/handsontable.full.js", :file-min "node_modules/handsontable/dist/handsontable.min.js", :provides ["yarn.handsontable"]}], :optimizations :none, :output-dir "spreadsheets/out", :output-to "spreadsheets/out/main.js", :aot-cache true}
