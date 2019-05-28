@@ -94,7 +94,7 @@
                input-addr-map)))
 
 (defn save-json [file-name file-str]
-  (make-parents file-name)
+  (io/make-parents file-name)
   (spit file-name file-str))
 
 (defn scatter-plot-json
@@ -173,5 +173,3 @@
                  (scatter-plot-json ["x" "y"] samples [-2 19]))
       (is (= (count samples)
              1000)))))
-
-(clojure.test/run-tests)
