@@ -98,27 +98,53 @@
   (spit file-name file-str))
 
 
+(def test-points [{:tx 10 :ty 5 :test-point "A"}])
+
+
 (defn scatter-plot-json
   [columns values domain title]
     (cheshire/generate-string
      {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
       :background "white"
-      :data {:values values}
-      :width 700
-      :height 700
-      :mark "point"
+      :data {:values (concat values test-points)}
       :title title
-      :encoding {
-         :x {:field (first columns)
-             :type "quantitative"
-             :scale {:domain domain}},
-         :y {:field (second columns)
-             :type "quantitative"
-             :scale {:domain domain}}
-         :color {:field "a"
-                 :type "nominal"}
-         :shape {:field "b"
-                 :type "nominal"}}}))
+      :layer [{:width 700
+               :height 700
+               :mark {:type "point" :filled true}
+               :encoding {
+                  :x {:field (first columns)
+                      :title (name (first columns))
+                      :type "quantitative"
+                      :scale {:domain domain}},
+                  :y {:field (second columns)
+                      :title (name (second columns))
+                      :type "quantitative"
+                      :scale {:domain domain}}
+                  :color {:field "a"
+                          :type "nominal"}
+                  :shape {:field "b"
+                          :type "nominal"}}}
+              {:width 700
+               :height 700
+               :mark {:type "text" :dx 15}
+               :encoding {
+                  :text {:field "test-point"
+                      :type "nominal"}
+                  :x {:field "tx"
+                      :type "quantitative"}
+                  :y {:field "ty"
+                      :type "quantitative"}}}
+              {:width 700
+               :height 700
+               :mark {:type "square"
+                      :filled false
+                      :color "#030303"
+                      :size 100}
+               :encoding {
+                  :x {:field "tx"
+                      :type "quantitative"}
+                  :y {:field "ty"
+                      :type "quantitative"}}}]}))
 
 (def num-rows-from-generator 1000)
 (defn get-counts [item] {
