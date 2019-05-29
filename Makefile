@@ -2,13 +2,18 @@ yarn-install-opts := --no-progress --frozen-lockfile
 compile-opts      := build.edn
 main-ns           := inferdb.spreadsheets.core
 output-dir        := out
-chart-namespaces  := simulations-x-y simulations-a
+chart-namespaces  := simulations-x-y simulations-a simulations-b simulations-c
 
 chart-dir =  $(output-dir)/charts
 
 clean:
 	rm -Rf *.png
+	rm -f $(output-dir)/charts/*.png
 .PHONY: clean
+
+clean-json:
+	rm  out/json-results/*.json
+.PHONY: clean-json
 
 node_modules: yarn.lock
 	yarn install $(yarn-install-opts)
@@ -16,6 +21,7 @@ node_modules: yarn.lock
 charts: $(chart-namespaces:%=%.png)
 	mkdir -p $(chart-dir)
 	cp $< $(chart-dir)
+	mv *.png $(output-dir)/charts
 
 %.vl.json:
 	clojure -Ctest -m inferdb.charts.$(basename $(basename $@)) > $@

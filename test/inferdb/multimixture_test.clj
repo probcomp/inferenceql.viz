@@ -97,38 +97,44 @@
   (io/make-parents file-name)
   (spit file-name file-str))
 
+
 (defn scatter-plot-json
-  [columns  values domain]
+  [columns values domain title]
     (cheshire/generate-string
      {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
       :background "white"
       :data {:values values}
-      :width 1000
-      :height 1000
-      :mark "circle"
+      :width 700
+      :height 700
+      :mark "point"
+      :title title
       :encoding {
-         :x {
-           :field (first columns)
-           :type "quantitative"
-           :scale {:domain domain}},
-         :y {
-           :field (second columns)
-           :type "quantitative"
-           :scale {:domain domain}}}}))
+         :x {:field (first columns)
+             :type "quantitative"
+             :scale {:domain domain}},
+         :y {:field (second columns)
+             :type "quantitative"
+             :scale {:domain domain}}
+         :color {:field "a"
+                 :type "nominal"}
+         :shape {:field "b"
+                 :type "nominal"}}}))
 
+(def num-rows-from-generator 1000)
 (defn get-counts [item] {
                          "category" (first (vals (first item)))
                          ;; XXX: the 1000 below should be supplied as param.
-                         "probability" (float (/ (second item) 1000))})
+                         "probability" (float (/ (second item) num-rows-from-generator))})
 (defn bar-plot
-  [samples]
+  [samples title]
     (cheshire/generate-string
      {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
       :background "white"
       :data {:values (map get-counts (frequencies samples))}
-      :width 1000
-      :height 1000
+      :width 200
+      :height 300
       :mark "bar"
+      :title title
       :encoding {
          :y {
            :field "category"
@@ -137,39 +143,32 @@
            :field "probability"
            :type "quantitative"}}}))
 
+(defn column-subset [data columns]
+  (let [row-subset (fn [row] (select-keys row columns))]
+    (map row-subset data)))
+
 
 ;;(map get-counts (frequencies (cgpm-simulate crosscat-cgpm [:a] {} {} 100)))
 
-
-(deftest crosscatsimulate-categorical-smoke
-  (testing "(smoke) simulate a single categorical column"
-    (let [num-samples 1000
-          samples
-          (cgpm-simulate
-           crosscat-cgpm
-           [:a]
-           {}
-           {}
-           num-samples)]
-      (save-json "out/json-results/simulations-a.json"
-                 (bar-plot samples))
-      (is (= (count samples)
-             1000)))))
-
-
-
-
-(deftest crosscat-simulate-numerical-columns-smoke
-  (testing "(smoke) simulate two numerical columns"
-    (let [num-samples 1000
-          samples
-          (cgpm-simulate
-           crosscat-cgpm
-           [:x :y]
-           {}
-           {}
-           num-samples)]
+(deftest crosscatsimulate-simulate-joint
+  (testing "(smoke) simulate n complete rows"
+    (let [num-samples num-rows-from-generator
+          samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:x :y :z :a :b :c]
+                    {}
+                    {}
+                    num-samples)]
       (save-json "out/json-results/simulations-x-y.json"
-                 (scatter-plot-json ["x" "y"] samples [-2 19]))
+                 (scatter-plot-json ["x" "y"]
+                                    samples
+                                    [-2 19]
+                                    "Dim X and Y"))
+      (save-json "out/json-results/simulations-a.json"
+                 (bar-plot (column-subset samples [:a]) "Dim A"))
+      (save-json "out/json-results/simulations-b.json"
+                 (bar-plot (column-subset samples [:b]) "Dim B"))
+      (save-json "out/json-results/simulations-c.json"
+                 (bar-plot (column-subset samples [:c]) "Dim C"))
       (is (= (count samples)
-             1000)))))
+             num-rows-from-generator)))))
