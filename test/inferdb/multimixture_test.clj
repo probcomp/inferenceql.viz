@@ -1,21 +1,9 @@
 (ns inferdb.multimixture-test
-  (:refer-clojure :exclude [map apply replicate])
-  (:require [clojure.pprint :refer [pprint]]
-            [clojure.repl :refer [doc source]]
-            [clojure.test :refer :all]
-            [clojure.string :refer [index-of]]
-            [cheshire.core :as cheshire]
+  (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
-            [metaprob.generative-functions :refer :all]
-            [metaprob.code-handlers :refer :all]
-            [metaprob.expander :refer :all]
-            [metaprob.trace :refer :all]
-            [metaprob.autotrace :refer :all]
-            [metaprob.prelude :refer :all]
-            [metaprob.inference :refer :all]
             [metaprob.distributions :refer :all]
             [inferdb.cgpm.main :refer :all]
-            [inferdb.charts.select-simulate :refer :all]
+            [inferdb.plotting.generate-vljson :refer :all]
             [inferdb.multimixture.dsl :refer :all]))
 
 (defn make-identity-output-addr-map
@@ -98,116 +86,20 @@
   (spit file-name file-str))
 
 
-(def test-points [{:tx 10 :ty 5 :test-point "A"}])
+(def test-points [{:tx 10 :ty 5 :test-point "P 1"}
+                  {:tx 10 :ty 6 :test-point "P 2"}])
 
 
-(defn scatter-plot-json
-  [columns values domain title]
-    (cheshire/generate-string
-     {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-      :background "white"
-      :data {:values (concat values test-points)}
-      :title title
-      :layer [{:width 700
-               :height 700
-               :mark {:type "point" :filled true}
-               :encoding {
-                  :x {:field (first columns)
-                      :title (name (first columns))
-                      :type "quantitative"
-                      :scale {:domain domain}},
-                  :y {:field (second columns)
-                      :title (name (second columns))
-                      :type "quantitative"
-                      :scale {:domain domain}}
-                  :color {:field "a"
-                          :type "nominal"}
-                  :shape {:field "b"
-                          :type "nominal"}}}
-              {:width 700
-               :height 700
-               :mark {:type "text" :dx 15}
-               :encoding {
-                  :text {:field "test-point"
-                      :type "nominal"}
-                  :x {:field "tx"
-                      :type "quantitative"}
-                  :y {:field "ty"
-                      :type "quantitative"}}}
-              {:width 700
-               :height 700
-               :mark {:type "square"
-                      :filled false
-                      :color "#030303"
-                      :size 100}
-               :encoding {
-                  :x {:field "tx"
-                      :type "quantitative"}
-                  :y {:field "ty"
-                      :type "quantitative"}}}]}))
-
-(def num-rows-from-generator 1000)
-(defn get-counts [item] {
-                         "category" (first (vals (first item)))
-                         ;; XXX: the 1000 below should be supplied as param.
-                         "probability" (float (/ (second item) num-rows-from-generator))})
-
-(defn bar-plot
-  [samples title]
-    (cheshire/generate-string
-     {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-      :background "white"
-      :data {:values (map get-counts (frequencies samples))}
-      :width 200
-      :height 300
-      :mark "bar"
-      :title title
-      :encoding {
-         :y {
-           :field "category"
-           :type "ordinal"}
-         :x {
-           :field "probability"
-           :type "quantitative"}}}))
-
-(defn hist-plot
-  [samples columns title]
-    (let
-      [xlabel (str (first columns) " (binned) ")]
-      (cheshire/generate-string
-       {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-        :background "white"
-        :data {:values  samples}
-        :width 200
-        :height 300
-        :mark "bar"
-        :title title
-        :transform [
-           {
-             :bin {:binned true :step 1},
-             :field (first columns)
-             :as xlabel
-           }
-         ]
-        :encoding {
-           :x {:field xlabel
-               :title (name (first columns))
-               :bin {:binned true :step 1}
-               :type "quantitative"}
-           :x2 {:field (str xlabel "_end")}
-           :y {:aggregate "count"
-               :type "quantitative"
-               }
-           :color {:field (second columns)
-                   :type "nominal"}}})))
 
 (defn column-subset [data columns]
   (let [row-subset (fn [row] (select-keys row columns))]
     (map row-subset data)))
 
+(def n 1000)
+
 (deftest crosscatsimulate-simulate-joint
   (testing "(smoke) simulate n complete rows"
-    (let [num-samples num-rows-from-generator
+    (let [num-samples n
           samples (cgpm-simulate
                     crosscat-cgpm
                     [:x :y :z :a :b :c]
@@ -217,15 +109,17 @@
       (save-json "out/json-results/simulations-x-y.json"
                  (scatter-plot-json ["x" "y"]
                                     samples
+                                    test-points
                                     [-2 19]
                                     "View 1: X, Y, A, B"))
       (save-json "out/json-results/simulations-z.json"
                  (hist-plot (column-subset samples [:z :c]) [:z :c]"Dim Z"))
       (save-json "out/json-results/simulations-a.json"
-                 (bar-plot (column-subset samples [:a]) "Dim A"))
+                 (bar-plot (column-subset samples [:a]) "Dim A" n))
       (save-json "out/json-results/simulations-b.json"
-                 (bar-plot (column-subset samples [:b]) "Dim B"))
+                 (bar-plot (column-subset samples [:b]) "Dim B" n))
       (save-json "out/json-results/simulations-c.json"
-                 (bar-plot (column-subset samples [:c]) "Dim C"))
+                 (bar-plot (column-subset samples [:c]) "Dim C" n))
       (is (= (count samples)
-             num-rows-from-generator)))))
+             n)))))
+(clojure.test/run-tests)
