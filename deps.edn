@@ -6,7 +6,9 @@
         re-frame {:mvn/version "0.10.6"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "7d40086d486ed452829bce6d8125fbeee691a9a6"}}
- :paths ["src" "cgpm/src" "multimixture/src" "search-by-example/src" "spreadsheets/src"]
+ :paths ["src" "cgpm/src" "multimixture/src"
+         "search-by-example/src" "spreadsheets/src"
+         "aide/src"]
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-418"}
                                cheshire {:mvn/version "5.8.1"}}}
