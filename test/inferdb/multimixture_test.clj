@@ -61,13 +61,13 @@
        "c" categorical}
       (clusters
        0.25 {"z" [0 1]
-             "c" [[1 0 0 0 0]]}
-       0.25 {"z" [0 1]
-             "c" [[1 0 0 0 0]]}
-       0.25 {"z" [0 1]
-             "c" [[1 0 0 0 0]]}
-       0.25 {"z" [0 1]
-             "c" [[1 0 0 0 0]]}))))
+             "c" [[1 0 0 0]]}
+       0.25 {"z" [10 1]
+             "c" [[0 1 0 0]]}
+       0.25 {"z" [20 1]
+             "c" [[0 0 1 0]]}
+       0.25 {"z" [30 1]
+             "c" [[0 0 0 1]]}))))
 
 (def crosscat-cgpm
   (let [outputs-addrs-types {;; Variables in the table.
@@ -125,6 +125,7 @@
                          "category" (first (vals (first item)))
                          ;; XXX: the 1000 below should be supplied as param.
                          "probability" (float (/ (second item) num-rows-from-generator))})
+
 (defn bar-plot
   [samples title]
     (cheshire/generate-string
@@ -143,12 +144,40 @@
            :field "probability"
            :type "quantitative"}}}))
 
+(defn hist-plot
+  [samples columns title]
+    (let
+      [xlabel (str (first columns) " (binned) ")]
+      (cheshire/generate-string
+       {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+        :background "white"
+        :data {:values  samples}
+        :width 200
+        :height 300
+        :mark "bar"
+        :title title
+        :transform [
+           {
+             :bin {:binned true :step 1},
+             :field (first columns)
+             :as xlabel
+           }
+         ]
+        :encoding {
+           :x {:field xlabel
+               :title (name (first columns))
+               :bin {:binned true :step 1}
+               :type "quantitative"}
+           :x2 {:field (str xlabel "_end")}
+           :y {:aggregate "count"
+               :type "quantitative"
+               }
+           :color {:field (second columns)
+                   :type "nominal"}}})))
+
 (defn column-subset [data columns]
   (let [row-subset (fn [row] (select-keys row columns))]
     (map row-subset data)))
-
-
-;;(map get-counts (frequencies (cgpm-simulate crosscat-cgpm [:a] {} {} 100)))
 
 (deftest crosscatsimulate-simulate-joint
   (testing "(smoke) simulate n complete rows"
@@ -164,6 +193,8 @@
                                     samples
                                     [-2 19]
                                     "Dim X and Y"))
+      (save-json "out/json-results/simulations-z.json"
+                 (hist-plot (column-subset samples [:z :c]) [:z :c]"Dim Z"))
       (save-json "out/json-results/simulations-a.json"
                  (bar-plot (column-subset samples [:a]) "Dim A"))
       (save-json "out/json-results/simulations-b.json"

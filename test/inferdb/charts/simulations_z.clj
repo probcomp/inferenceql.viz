@@ -6,4 +6,5 @@
             [clojure.test :refer :all]
             [clojure.string :refer [index-of]]))
 
-(defn -main [] (println (slurp "temp.txt")))
+(defn -main [] (println (slurp "out/json-results/simulations-z.json")))
+
