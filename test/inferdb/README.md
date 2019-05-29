@@ -11,7 +11,8 @@ a given point. We will be testing:
 
 ## 1. Invariants and qualitatively known behavior for a set of points in 2-d (x and y; both numerical).
 
-We'll use the following row generator structure to test: ```
+We'll use the following row generator structure to test: 
+```
 (def generate-crosscat-row
   (multi-mixture
     (view
@@ -56,7 +57,6 @@ We'll use the following row generator structure to test: ```
              "c" [[0 0 1 0]]}
        0.25 {"z" [30 1]
              "c" [[0 0 0 1]]}))))
-
 ```
 Column `a` is a categorical that also serves as a deterministic indicator of the
 Gaussian components in `x` and `y`. `b` is a noisy copy of `a`. 
