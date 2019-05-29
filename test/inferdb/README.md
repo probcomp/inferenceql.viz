@@ -71,7 +71,7 @@ We 'll test the following points `P 1` to `P 6`:
                   {:tx 9  :ty 16 :test-point "P 6"}])
 ```
 We can plot simulations from `generate-crosscat-row` and `test-points`:
-![Data]("./simulations-x-y.png")
+![Data]("https://github.com/probcomp/inferenceql/blob/20190523-schaechtle-simpler-test-cases/test/inferdb/simulations-x-y.png")
 
 
 All but `P 1` and `P 4` of the test points map to a single component. For all
