@@ -1,7 +1,6 @@
 {:preloads [devtools.preload]
  :main "inferdb.spreadsheets.core"
- :output-dir "out"
- :output-to "out/main.js"
+ :asset-path "out"
  :foreign-libs [{:file "node_modules/vega/build/vega.js"
                  :file-min "node_modules/vega/build/vega.min.js"
                  :provides ["yarn.vega"]}
