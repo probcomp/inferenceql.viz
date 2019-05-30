@@ -128,6 +128,7 @@
 (def threshold 0.1)
 (defn is-almost-equal [a b] (almost-equal a b relerr threshold))
 (defn is-almost-equal-vectors [a b] (almost-equal-vectors a b relerr threshold))
+(defn is-almost-equal-p [a b] (almost-equal a b relerr 0.01))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testin P 2 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -141,8 +142,7 @@
                     [:x :y]
                     {:cluster-for-x 2}
                     {}
-                    numper-simulations-for-test
-                    )
+                    numper-simulations-for-test)
           x-samples (get-col :x  samples)
           y-samples (get-col :y  samples)]
       (is (and (is-almost-equal (average x-samples) (:tx p2))
@@ -155,8 +155,7 @@
                     [:x :y]
                     {:cluster-for-x 2}
                     {}
-                    numper-simulations-for-test
-                    )
+                    numper-simulations-for-test)
           x-samples (get-col :x  samples)
           y-samples (get-col :y  samples)
           factor 2]
@@ -170,8 +169,7 @@
                     [:a :b]
                     {:cluster-for-x 2}
                     {}
-                    numper-simulations-for-test
-                    )
+                    numper-simulations-for-test)
           a-samples (column-subset samples [:a])
           b-samples (column-subset samples [:b])
           true-p-a [0 0 1 0 0 0]
@@ -181,3 +179,27 @@
           b-p-fraction (probability-vector b-samples possible-values)]
       (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
                (is-almost-equal-vectors b-p-fraction true-p-b))))))
+
+(deftest crosscat-logpdf-point-conditioned-on-cluster-p2
+  (testing "Categorical simulations conditioned on cluster-ID = 2"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:x (:tx p2) :y (:ty p2)}
+                    {:cluster-for-x 2}
+                    {})
+          analytical-logpdf (+
+                             (score-gaussian (:tx p2) [8  0.5])
+                             (score-gaussian (:ty p2) [10 1]))]
+      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+
+;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
+;; on :a taking any different value than 2 this will crash. Sigh.
+(deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p2
+  (testing "Categorical simulations conditioned on cluster-ID = 2"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:a 2  :b 2}
+                    {:cluster-for-x 2}
+                    {})
+          analytical-logpdf (Math/log 0.95)]
+      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
