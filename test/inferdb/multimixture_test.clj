@@ -133,7 +133,7 @@
 ;;;;;;;;;;;;;;;; Testin P 2 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def p2 (test-point-coordinates "P 2"))
-;; Testing invatri conditioning on the cluster ID = 2 which corresponds to the component
+;; Testing invariants conditioning on the cluster ID = 2 which corresponds to the component
 ;; that of which p2 is a cluster center.
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
   (testing "Mean of simulations conditioned on cluster-ID = 2"
@@ -203,3 +203,29 @@
                     {})
           analytical-logpdf (Math/log 0.95)]
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+
+;; Testing invariants conditioning on the p2
+(deftest crosscat-simulate-cluster-id-conditoned-on-p2
+  (testing "Mean of simulations conditioned on cluster-ID = 2"
+    (let [samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:cluster-for-x, :cluster-for-y]
+                    {:x (:tx p2) :y (:ty p2)}
+                    {}
+                    numper-simulations-for-test)
+          id-samples-x (column-subset samples [:cluster-for-x])
+          id-samples-y (column-subset samples [:cluster-for-y])
+          cluster-p-fraction (probability-vector id-samples-x (range 6))
+          true-p-cluster [0 0 1 0 0 0]]
+      (is (equal-sample-values id-samples-x id-samples-y))
+      (is (is-almost-equal-vectors cluster-p-fraction true-p-cluster)))))
+
+;; Testing invariants conditioning on the p2
+(deftest crosscat-logpdf-cluster-id-conditoned-on-p2
+  (testing "Mean of simulations conditioned on cluster-ID = 2"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:cluster-for-x 2}
+                    {:x (:tx p2) :y (:ty p2)}
+                    {})]
+      (is (is-almost-equal-p  logpdf 0)))))
