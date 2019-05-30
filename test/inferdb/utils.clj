@@ -68,3 +68,6 @@
   (let [probability-map (get-probability-for-categories samples)]
     (map (fn [i] (if (contains? probability-map i) (get probability-map i) 0 ))
          possible-values)))
+
+(defn equal-sample-values [samples-1 samples-2]
+  (= (map vals samples-1) (map vals samples-1)))
