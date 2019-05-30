@@ -1,15 +1,20 @@
-yarn-install-opts := --no-progress --frozen-lockfile
-compile-opts      := build.edn
-main-ns           := inferdb.spreadsheets.core
-spreadsheet-dir   := spreadsheets
-output-dir        := $(spreadsheet-dir)/out
-output-to         := $(output-dir)/main.js
+compile-opts = build.edn
+main-ns      = inferdb.spreadsheets.core
+
+yarn-install-opts = --no-progress --frozen-lockfile
+chart-namespaces  = select-simulate
+surge-domain      = inferdb-spreadsheet.surge.sh
+
+spreadsheet-dir := spreadsheets
+output-dir      := $(spreadsheet-dir)/out
+chart-dir       := $(output-dir)/charts
+cache-dir       := $(spreadsheet-dir)/src/inferdb/spreadsheets
+
+data-file  := $(cache-dir)/data.cljc
+cache-file := $(cache-dir)/pfcas.cljc
+
+output-to           := $(output-dir)/main.js
 output-resource-dir := $(spreadsheet-dir)/resources
-chart-namespaces  := select-simulate
-surge-domain      := inferdb-spreadsheet.surge.sh
-
-
-chart-dir =  $(output-dir)/charts
 
 $(output-resource-dir):
 	mkdir -p $(output-resource-dir)
@@ -23,16 +28,17 @@ $(output-dir)/main.js:
 	clojure -m cljs.main -co $(compile-opts) -d $(output-dir) \
 	--output-to $(output-to) -c $(main-ns)
 
-watch: node_modules $(output-resource-dir)/handsontable.full.css
+.PHONY: watch
+watch:
 	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) \
 	-d $(output-dir) --output-to $(output-to) -c $(main-ns)
-.PHONY: watch
 
+.PHONY: clean
 clean:
 	rm -Rf $(output-dir)
+	rm -f $(cache-file)
 	rm -Rf *.png
 	rm -f $(output-resource-dir)/handsontable.full.css
-.PHONY: clean
 
 node_modules: yarn.lock
 	yarn install $(yarn-install-opts)
@@ -50,11 +56,11 @@ charts: $(chart-namespaces:%=%.png)
 %.png: %.vg.json node_modules
 	yarn run vg2png $< $@
 
-pfca-cache:
-	clojure -m inferdb.spreadsheets.build-pfcas
-	mv pfcas.cljc src/inferdb/spreadsheets/pfcas.cljc
-.PHONY: pfca_cache
+$(cache-file): $(data-file)
+	bin/build-cache
 
+cache: $(cache-file)
+
+.PHONY: publish
 publish: spreadsheet
 	bin/publish $(spreadsheet-dir) $(surge-domain)
-.PHONY: publish

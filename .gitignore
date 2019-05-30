@@ -1,5 +1,6 @@
-/node_modules
-/out
-/publish
-spreadsheets/out/
-.cpcache/
+/.cpcache/
+/node_modules/
+/publish/
+/spreadsheets/out/
+
+spreadsheets/src/inferdb/spreadsheets/pfcas.cljc
