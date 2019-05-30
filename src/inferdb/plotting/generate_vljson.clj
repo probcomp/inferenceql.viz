@@ -37,9 +37,9 @@
               {:width 700
                :height 700
                :mark {:type "square"
-                      :filled false
+                      :filled true
                       :color "#030303"
-                      :size 100}
+                      :size 50}
                :encoding {
                   :x {:field "tx"
                       :type "quantitative"}
