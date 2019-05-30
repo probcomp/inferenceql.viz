@@ -258,3 +258,133 @@
                     {})
           analytical-logpdf (Math/log 0.95)]
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Testin P 3 ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(def p3 (test-point-coordinates "P 3"))
+;; Testing invariants conditioning on the cluster ID = 3 which corresponds to the component
+;; that of which p3 is a cluster center.
+(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
+  (testing "Mean of simulations conditioned on cluster-ID = 3"
+    (let [samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:x :y]
+                    {:cluster-for-x 3}
+                    {}
+                    numper-simulations-for-test)
+          x-samples (get-col :x  samples)
+          y-samples (get-col :y  samples)]
+      (is (and (is-almost-equal (average x-samples) (:tx p3))
+               (is-almost-equal (average y-samples) (:ty p3)))))))
+
+(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
+  (testing "Standard deviaton of simulations conditioned on cluster-ID = 3"
+    (let [samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:x :y]
+                    {:cluster-for-x 3}
+                    {}
+                    numper-simulations-for-test)
+          x-samples (get-col :x  samples)
+          y-samples (get-col :y  samples)
+          factor 2]
+      (is (and (within-factor (std x-samples) 0.5 factor)
+               (within-factor (std y-samples) 0.5 factor))))))
+
+(deftest crosscat-simulate-categoricals-conditioned-on-cluster-p3
+  (testing "Categorical simulations conditioned on cluster-ID = 3"
+    (let [samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:a :b]
+                    {:cluster-for-x 3}
+                    {}
+                    numper-simulations-for-test)
+          a-samples (column-subset samples [:a])
+          b-samples (column-subset samples [:b])
+          true-p-a [0 0 0 1 0 0]
+          true-p-b [0.01 0.01 0.01 0.95 0.01 0.01]
+          possible-values (range 6)
+          a-p-fraction (probability-vector a-samples possible-values)
+          b-p-fraction (probability-vector b-samples possible-values)]
+      (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
+               (is-almost-equal-vectors b-p-fraction true-p-b))))))
+
+(deftest crosscat-logpdf-point-conditioned-on-cluster-p3
+  (testing "Categorical simulations conditioned on cluster-ID = 3"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:x (:tx p3) :y (:ty p3)}
+                    {:cluster-for-x 3}
+                    {})
+          analytical-logpdf (+
+                             (score-gaussian (:tx p3) [14 0.5])
+                             (score-gaussian (:ty p3) [ 7 0.5]))]
+      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+
+;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
+;; on :a taking any different value than 3 this will crash. Sigh.
+(deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p3
+  (testing "Categorical simulations conditioned on cluster-ID = 3"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:a 3  :b 3}
+                    {:cluster-for-x 3}
+                    {})
+          analytical-logpdf (Math/log 0.95)]
+      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+
+;; Testing invariants conditioning on the p3
+(deftest crosscat-simulate-cluster-id-conditoned-on-p3
+  (testing "Mean of simulations conditioned on cluster-ID = 3"
+    (let [samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:cluster-for-x, :cluster-for-y]
+                    {:x (:tx p3) :y (:ty p3)}
+                    {}
+                    numper-simulations-for-test)
+          id-samples-x (column-subset samples [:cluster-for-x])
+          id-samples-y (column-subset samples [:cluster-for-y])
+          cluster-p-fraction (probability-vector id-samples-x (range 6))
+          true-p-cluster [0 0 0 1 0 0]]
+      (is (equal-sample-values id-samples-x id-samples-y))
+      (is (is-almost-equal-vectors cluster-p-fraction true-p-cluster)))))
+
+;; Testing invariants conditioning on the p3
+(deftest crosscat-logpdf-cluster-id-conditoned-on-p3
+  (testing "Mean of simulations conditioned on cluster-ID = 3"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:cluster-for-x 3}
+                    {:x (:tx p3) :y (:ty p3)}
+                    {})]
+      (is (is-almost-equal-p  logpdf 0)))))
+
+
+(deftest crosscat-simulate-categoricals-conditioned-on-p3
+  (testing "Categorical simulations conditioned on cluster-ID = 3"
+    (let [samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:a :b]
+                    {:x (:tx p3) :y (:ty p3)}
+                    {}
+                    numper-simulations-for-test)
+          a-samples (column-subset samples [:a])
+          b-samples (column-subset samples [:b])
+          true-p-a [0 0 0 1 0 0]
+          true-p-b [0.01 0.01 0.01 0.95 0.01 0.01]
+          possible-values (range 6)
+          a-p-fraction (probability-vector a-samples possible-values)
+          b-p-fraction (probability-vector b-samples possible-values)]
+      (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
+               (is-almost-equal-vectors b-p-fraction true-p-b))))))
+
+(deftest crosscat-logpdf-categoricals-conditioned-on-p3
+  (testing "Categorical simulations conditioned on cluster-ID = 3"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:a 3  :b 3}
+                    {:x (:tx p3) :y (:ty p3)}
+                    {})
+          analytical-logpdf (Math/log 0.95)]
+      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
