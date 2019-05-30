@@ -26,10 +26,10 @@
                           :type "nominal"}}}
               {:width 700
                :height 700
-               :mark {:type "text" :dx 15 :dy -10}
+               :mark {:type "text" :dx 25 :dy -10 :fontSize 23}
                :encoding {
                   :text {:field "test-point"
-                      :type "nominal"}
+                         :type "nominal"}
                   :x {:field "tx"
                       :type "quantitative"}
                   :y {:field "ty"
