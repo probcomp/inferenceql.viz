@@ -1,13 +1,6 @@
 # Test suite.
 
 (All of the below is work-in-progress.)
-## Outline
-The test suite is organized around data points and related invariants; meaning
-we will define a set of points and "know" the system should do for
-a given point. We will be testing:
-1. Invariants and qualitatively known behavior for a set of points in 2-d (x and y; both numerical).
-2. Invariants and qualitatively known behavior for a set of points in 1-d.
-3. Invariants and qualitatively know behavior for MI.
 
 ## 1. Invariants and qualitatively known behavior for a set of points in 2-d (x and y; both numerical).
 
@@ -70,24 +63,37 @@ We 'll test the following points `P 1` to `P 6`:
                   {:tx 16 :ty 9  :test-point "P 5"}
                   {:tx 9  :ty 16 :test-point "P 6"}])
 ```
-We can plot simulations from `generate-crosscat-row` and `test-points`:
-![Data]("https://raw.githubusercontent.com/probcomp/inferenceql/20190523-schaechtle-simpler-test-cases/test/inferdb/simulations-x-y.png?token=ACJJY3G74DE5OL2IQLQGG7C47BKJ6")
-https://github.com/probcomp/inferenceql/tree/20190523-schaechtle-simpler-test-cases/test/inferdb
+We can plot simulations for the first view from `generate-crosscat-row` and `test-points`:
+![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-x-y.png)
+
+## Testing logPDF and simulate
 
 All but `P 1` and `P 4` of the test points map to a single component. For all
 the other test points, we know about the following:
+
 1. If we conditioning on the cluster ID that corresponds to the component of which the point marks a cluster center, then we know that
+
     a. Simulations of `x` and `y` should be close to the point.
+    
     b. Simulations for `a`, `b` are determined by the cluster ID.
+    
     c. LogPDF of the point will be equivalent to the product of the univariate gaussian probabilities of each dim of the point and determined by the component.
+    
     d. LogPDF for `a`, `b` is determined by the cluster ID.
+    
 2. Conditioning the point
+
     a. If we simulate the cluster-ID given the point, only a single ID should come up.
+    
     b. The probability of the correct cluster-ID should be one.
+    
     c. Simulations for `a`, `b` are determined by the point which in turn determines the cluster ID.
+    
     d. LogPDF for `a`, `b` and be should are determined by the point which in turn determines the cluster ID.
-3.  We can compute the KL of the probability vector on cluster-IDs given the point and a point that implies
-    a. a similar probability vector on cluster-IDs
-    b. a dissimilar probability vector on cluster-IDs
+    
+
 
 For `P 1` and `P 4` the above also holds, only that we need to take into account two clusters, not one.
+
+## View 2
+![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-z.png)
