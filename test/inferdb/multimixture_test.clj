@@ -229,3 +229,32 @@
                     {:x (:tx p2) :y (:ty p2)}
                     {})]
       (is (is-almost-equal-p  logpdf 0)))))
+
+
+(deftest crosscat-simulate-categoricals-conditioned-on-p2
+  (testing "Categorical simulations conditioned on cluster-ID = 2"
+    (let [samples (cgpm-simulate
+                    crosscat-cgpm
+                    [:a :b]
+                    {:x (:tx p2) :y (:ty p2)}
+                    {}
+                    numper-simulations-for-test)
+          a-samples (column-subset samples [:a])
+          b-samples (column-subset samples [:b])
+          true-p-a [0 0 1 0 0 0]
+          true-p-b [0.01 0.01 0.95 0.01 0.01 0.01]
+          possible-values (range 6)
+          a-p-fraction (probability-vector a-samples possible-values)
+          b-p-fraction (probability-vector b-samples possible-values)]
+      (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
+               (is-almost-equal-vectors b-p-fraction true-p-b))))))
+
+(deftest crosscat-logpdf-categoricals-conditioned-on-p2
+  (testing "Categorical simulations conditioned on cluster-ID = 2"
+    (let [logpdf (cgpm-logpdf
+                    crosscat-cgpm
+                    {:a 2  :b 2}
+                    {:x (:tx p2) :y (:ty p2)}
+                    {})
+          analytical-logpdf (Math/log 0.95)]
+      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
