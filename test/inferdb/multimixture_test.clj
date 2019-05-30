@@ -15,7 +15,6 @@
             [inferdb.cgpm.main :refer :all]
             [inferdb.multimixture.dsl :refer :all]))
 
-
 ;; util
 
 (def abs (fn [n] (max n (- n))))
@@ -27,7 +26,6 @@
   (let [output-addrs (keys output-addrs-types)
         trace-addrs  (map clojure.core/name output-addrs)]
     (clojure.core/zipmap output-addrs trace-addrs)))
-
 
 (def generate-crosscat-row
   (multi-mixture
@@ -101,7 +99,6 @@
                output-addr-map
                input-addr-map)))
 
-
 ;; TODO: Provide coverage for the following cases:
 ;; 1. A MultiMixture CGPM with more than one view.
 
@@ -170,7 +167,6 @@
       (is (< (relerr lp-x-given-z (- lp-zx lp-z)) 1E-4))
       (is (< (relerr lp-z-given-x (- lp-zx lp-x)) 1E-4)))))
 
-
 (deftest crosscat-row-mi-nonzero
   (testing "crosscat-row-mi-nonzero"
     (let [mi (cgpm-mutual-information
@@ -179,7 +175,6 @@
               [:sepal_width]
               {} {} {} 50 1)]
       (is (> mi 0.05)))))
-
 
 (deftest crosscat-row-mi-conditional-indep-fixed-z
   (testing "crosscat-row-mi-conditional-indep-fixed-z"
@@ -241,7 +236,6 @@
             :sepal_length 200
             :petal_length  200})
 
-
 ;; row wise-similarity. For seach-by-example, make row-1 a hypothetical row and
 ;; then loop over each row the data table (and make each row-2).
 (deftest row-wise-similarity
@@ -263,7 +257,6 @@
                            {}
                            10))]
     (is (> symmetrized-kl 0)))))
-
 
 ;; Create a 2 d gaussian mixture with two components
 (def gaussian-mixture-2d
@@ -290,7 +283,6 @@
              inputs-addrs-types
              output-addr-map
              input-addr-map)))
-
 
 (deftest gaussian-mixture-2d-cgpm-simulate-smoke
   (testing "gaussian-mixture-2d-cgpm-simulate"
@@ -334,24 +326,9 @@
   [items]
     (/ (reduce + 0 items) (count items)))
 
-
 (defn get-col
   [col-key table]
   (map (fn [row] (get row col-key)) table))
-
-
-(deftest gaussian-mixture-2d-cgpm-simulate-conditional-on-cluster
-  (testing "gaussian-mixture-2d-cgpm-simulate"
-    (let [num-samples 100
-          samples     (cgpm-simulate
-                       gmm-cgpm
-                       [:x]
-                       {:cluster-for-y 0}
-                       {}
-                       num-samples)]
-      (is (< (relerr (compute-avg2 (get-col  :x samples)) -5)
-             0.1)))))
-
 
 (deftest gaussian-mixture-2d-cgpm-logpdf-conditional-on-cluster-smoke
   (testing "gaussian-mixture-2d-cgpm-simulate (smoke)"
@@ -373,14 +350,12 @@
       (is (< (relerr logp expected-logp)
              0.0000001)))))
 
-
 ;; Create a bivariate Gaussian distribution (linearly related mean).
 (def generate-biv-gaussian-row
   (gen []
        (let [x  (at "x" gaussian 0 10)
              y  (at "y" gaussian (* 2 x) 1)]
          [x y])))
-
 
 (def biv-gaussian-cgpm
     (let [inputs-addrs-types  {}
@@ -393,10 +368,14 @@
                  output-addr-map
                  input-addr-map)))
 
+(defn square
+  "Returns the algebraic square of `x`."
+  [x]
+  (* x x))
 
-(defn square [x] (* x x))
 (def rho 0.9987)
 (def expected-mi (* -0.5 (log (- 1 (square rho)))))
+
 (deftest biv-gaussian-cgpm-simulate-smoke
   (testing "bivariate gaussian simulate"
     (let [num-samples 10
@@ -408,7 +387,6 @@
                        num-samples)]
       (is (= (count samples)
              10)))))
-
 
 (deftest biv-gaussian-logpdf
   (testing "biv-gaussian-cgpm-logpdf"
