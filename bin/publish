@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ $# -eq 0 ]; then
+    echo "Usage: ${0} spreadsheet-dir surge-domain"
+    exit 1
+fi
+
+rm -rf .publish
+mkdir .publish
+echo "!node_modules" > .publish/.surgeignore
+cp $1/index.html .publish
+cp -r $1/out .publish
+cp -r $1/resources .publish
+cd .publish ; surge --domain $2
+rm -rf .publish

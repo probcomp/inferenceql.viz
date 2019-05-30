@@ -6,7 +6,6 @@ output-dir        := $(spreadsheet-dir)/out
 output-to         := $(output-dir)/main.js
 output-resource-dir := $(spreadsheet-dir)/resources
 chart-namespaces  := select-simulate
-publish-dir       := .publish
 surge-domain      := inferdb-spreadsheet.surge.sh
 
 
@@ -57,12 +56,5 @@ pfca-cache:
 .PHONY: pfca_cache
 
 publish: spreadsheet
-	rm -rf $(publish-dir)
-	mkdir $(publish-dir)
-	echo "!node_modules" > $(publish-dir)/.surgeignore
-	cp $(spreadsheet-dir)/index.html $(publish-dir)
-	cp -r $(spreadsheet-dir)/out $(publish-dir)
-	cp -r $(spreadsheet-dir)/resources $(publish-dir)
-	cd $(publish-dir) ; surge --domain $(surge-domain)
-	rm -rf .publish
+	bin/publish $(spreadsheet-dir) $(surge-domain)
 .PHONY: publish
