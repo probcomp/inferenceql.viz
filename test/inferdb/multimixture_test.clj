@@ -51,11 +51,11 @@
       (clusters
        0.25 {"z" [0 1]
              "c" [[1 0 0 0]]}
-       0.25 {"z" [10 1]
+       0.25 {"z" [15 1]
              "c" [[0 1 0 0]]}
-       0.25 {"z" [20 1]
-             "c" [[0 0 1 0]]}
        0.25 {"z" [30 1]
+             "c" [[0 0 1 0]]}
+       0.25 {"z" [15 8]
              "c" [[0 0 0 1]]}))))
 
 (def crosscat-cgpm
@@ -113,7 +113,7 @@
                                     [0 18]
                                     "View 1: X, Y, A, B"))
       (save-json "out/json-results/simulations-z.json"
-                 (hist-plot (column-subset samples [:z :c]) [:z :c]"Dim Z"))
+                 (hist-plot (column-subset samples [:z :c]) [:z :c]"Dim Z and C"))
       (save-json "out/json-results/simulations-a.json"
                  (bar-plot (column-subset samples [:a]) "Dim A" n))
       (save-json "out/json-results/simulations-b.json"
