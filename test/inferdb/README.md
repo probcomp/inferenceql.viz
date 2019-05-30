@@ -2,7 +2,28 @@
 
 (All of the below is work-in-progress.)
 
-## 1. Invariants and qualitatively known behavior for a set of points in 2-d (x and y; both numerical).
+
+## Outline
+
+1. Design
+2. View 1
+3. View 2
+4. For which datapoints  do we "know something" about LogPDF and Simulate
+5. For which datapoints  do we "know something" about KL 
+6. For which datapoints  do we "know something" about MI
+
+## 1. Design
+
+
+The idea behind the test suite is that we start from "things we know". There are
+different "things" we can now for testing different aspects inferenceQL, depending
+on whether we are testing:
+
+1. Logpdf and simluate 
+2. KL/distance functions
+3. MI and entropy
+
+## 2. View 1
 
 We'll use the following row generator structure to test: 
 ```
@@ -66,7 +87,11 @@ We 'll test the following points `P 1` to `P 6`:
 We can plot simulations for the first view from `generate-crosscat-row` and `test-points`:
 ![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-x-y.png)
 
-## Testing logPDF and simulate
+## View 2
+![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-z.png)
+
+
+## 4. For which datapoints  do we "know something" about LogPDF and Simulate
 
 All but `P 1` and `P 4` of the test points map to a single component. For all
 the other test points, we know about the following:
@@ -95,5 +120,10 @@ the other test points, we know about the following:
 
 For `P 1` and `P 4` the above also holds, only that we need to take into account two clusters, not one.
 
-## View 2
-![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-z.png)
+## 5. For which datapoints  do we "know something" about KL 
+
+TODO.
+
+## 6. For which datapoints  do we "know something" about MI
+
+TODO.
