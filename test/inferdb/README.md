@@ -75,7 +75,7 @@ We'll use the following row generator structure to test:
 Column `a` is a categorical that also serves as a deterministic indicator of the
 Gaussian components in `x` and `y`. `b` is a noisy copy of `a`. 
 
-We 'll test the following points `P 1` to `P 6`:
+Below, we explain how we test the following points `P 1` to `P 6`:
 ```
 (def test-points [{:tx 3  :ty 4  :test-point "P 1"}
                   {:tx 8  :ty 10 :test-point "P 2"}
