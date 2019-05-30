@@ -82,7 +82,7 @@
         :title title
         :transform [
            {
-             :bin {:binned true :step 1},
+             :bin {:binned true :step 2},
              :field (first columns)
              :as xlabel
            }
@@ -90,7 +90,7 @@
         :encoding {
            :x {:field xlabel
                :title (name (first columns))
-               :bin {:binned true :step 1}
+               :bin {:binned true :step 2}
                :type "quantitative"}
            :x2 {:field (str xlabel "_end")}
            :y {:aggregate "count"
