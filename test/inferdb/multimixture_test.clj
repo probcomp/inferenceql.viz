@@ -7,12 +7,23 @@
             [inferdb.plotting.generate-vljson :refer :all]
             [inferdb.multimixture.dsl :refer :all]))
 
+; XXX: why is this still here?
 (defn make-identity-output-addr-map
   [output-addrs-types]
   (let [output-addrs (keys output-addrs-types)
         trace-addrs  (map clojure.core/name output-addrs)]
     (clojure.core/zipmap output-addrs trace-addrs)))
 
+;; The following data generator has some interesting properties:
+;; - clusters 0 and 1 in view 0 share the samme mu parameter.
+;; - a is a determinstic indicator of the cluster.
+;; - b is a noisy copy of a.
+;; - in both views, clusters are equally weighted.
+;; - in view 1, the third Gaussian components (cluster 0) "spans" the domain of
+;; all the other components and share a center with cluster 1.
+;;
+;; I'd encourage everyone who works with the file to run the tests in this file
+;; and then run make charts to see how the components relate.
 (def generate-crosscat-row
   (multi-mixture
     (view
@@ -82,8 +93,8 @@
                output-addr-map
                input-addr-map)))
 
-
-
+; XXX this is not all that elegant: for plotting, I need all the test points in
+; that format.
 (def test-points [{:tx 3  :ty 4  :test-point "P 1"}
                   {:tx 8  :ty 10 :test-point "P 2"}
                   {:tx 14 :ty 7  :test-point "P 3"}
@@ -92,13 +103,16 @@
                   {:tx 9  :ty 16 :test-point "P 6"}])
 
 (defn test-point-coordinates [name]
+  "A function to extract a relevant point from the array above."
   (let [predicate (fn [point] (= (:test-point point) name))]
     (dissoc (first (filter predicate test-points)) :test-point)))
 
+; How many points do we want to create for our plot?
 (def n 1000)
-
 (deftest crosscatsimulate-simulate-joint
-  (testing "(smoke) simulate n complete rows"
+  "This tests saves plots for all simulated data in out/json results/"
+  ;; Charts can be generated with make charts.
+  (testing "(smoke) simulate n complete rows and save them as vl-json"
     (let [num-samples n
           samples (cgpm-simulate
                     crosscat-cgpm
@@ -113,30 +127,39 @@
                                     [0 18]
                                     "View 1: X, Y, A, B"))
       (save-json "out/json-results/simulations-z.json"
-                 (hist-plot (column-subset samples [:z :c]) [:z :c]"Dim Z and C"))
+                 (hist-plot
+                   (column-subset samples [:z :c])
+                   [:z :c]
+                   "Dim Z and C"))
       (save-json "out/json-results/simulations-a.json"
                  (bar-plot (column-subset samples [:a]) "Dim A" n))
       (save-json "out/json-results/simulations-b.json"
                  (bar-plot (column-subset samples [:b]) "Dim B" n))
       (save-json "out/json-results/simulations-c.json"
                  (bar-plot (column-subset samples [:c]) "Dim C" n))
-      (is (= (count samples)
-             n)))))
+      (is (= (count samples) n)))))
 
-
+; Let's define a few helper constants and functions that we'll use below.
 (def numper-simulations-for-test 100)
 (def threshold 0.1)
 (defn is-almost-equal [a b] (almost-equal a b relerr threshold))
 (defn is-almost-equal-vectors [a b] (almost-equal-vectors a b relerr threshold))
 (defn is-almost-equal-p [a b] (almost-equal a b relerr 0.01))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testin P 2 ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Testing P 1 ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TODO. This case is marginally more complicated because P 1 happens to be the
+;; center of two clusters.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def p2 (test-point-coordinates "P 2"))
 ;; Testing invariants conditioning on the cluster ID = 2 which corresponds to the component
 ;; that of which p2 is a cluster center.
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
-  (testing "Mean of simulations conditioned on cluster-ID = 2"
+  (testing "mean of simulations conditioned on cluster-ID = 2"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:x :y]
@@ -149,7 +172,7 @@
                (is-almost-equal (average y-samples) (:ty p2)))))))
 
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
-  (testing "Standard deviaton of simulations conditioned on cluster-ID = 2"
+  (testing "standard deviaton of simulations conditioned on cluster-ID = 2"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:x :y]
@@ -163,7 +186,7 @@
                (within-factor (std y-samples) 1 factor))))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-cluster-p2
-  (testing "Categorical simulations conditioned on cluster-ID = 2"
+  (testing "categorical simulations conditioned on cluster-ID = 2"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:a :b]
@@ -181,7 +204,7 @@
                (is-almost-equal-vectors b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-point-conditioned-on-cluster-p2
-  (testing "Categorical simulations conditioned on cluster-ID = 2"
+  (testing "categorical logPDF of P2 conditioned on cluster-ID = 2"
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:x (:tx p2) :y (:ty p2)}
@@ -193,9 +216,10 @@
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
 
 ;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
-;; on :a taking any different value than 2 this will crash. Sigh.
+;; on :a taking any different value than 2 this will crash.
 (deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p2
-  (testing "Categorical simulations conditioned on cluster-ID = 2"
+  (testing "logPDF of categoricals implying cluster ID 2 conditioned on cluster-ID = 2"
+    ;; XXX, not sure how to deal wth line breaks for this....
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:a 2  :b 2}
@@ -204,9 +228,8 @@
           analytical-logpdf (Math/log 0.95)]
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
 
-;; Testing invariants conditioning on the p2
 (deftest crosscat-simulate-cluster-id-conditoned-on-p2
-  (testing "Mean of simulations conditioned on cluster-ID = 2"
+  (testing "simulations of cluster-IDs conditioned on P2"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:cluster-for-x, :cluster-for-y]
@@ -220,9 +243,8 @@
       (is (equal-sample-values id-samples-x id-samples-y))
       (is (is-almost-equal-vectors cluster-p-fraction true-p-cluster)))))
 
-;; Testing invariants conditioning on the p2
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p2
-  (testing "Mean of simulations conditioned on cluster-ID = 2"
+  (testing "logPDF of the correct cluster-IDs for P2 conditioned on P2"
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:cluster-for-x 2}
@@ -230,9 +252,8 @@
                     {})]
       (is (is-almost-equal-p  logpdf 0)))))
 
-
 (deftest crosscat-simulate-categoricals-conditioned-on-p2
-  (testing "Categorical simulations conditioned on cluster-ID = 2"
+  (testing "categorical simulations conditioned on P2"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:a :b]
@@ -250,7 +271,7 @@
                (is-almost-equal-vectors b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p2
-  (testing "Categorical simulations conditioned on cluster-ID = 2"
+  (testing "logPDF of categoricals conditioned on P2"
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:a 2  :b 2}
@@ -266,7 +287,7 @@
 ;; Testing invariants conditioning on the cluster ID = 3 which corresponds to the component
 ;; that of which p3 is a cluster center.
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
-  (testing "Mean of simulations conditioned on cluster-ID = 3"
+  (testing "mean of simulations conditioned on cluster-ID = 3"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:x :y]
@@ -279,7 +300,7 @@
                (is-almost-equal (average y-samples) (:ty p3)))))))
 
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
-  (testing "Standard deviaton of simulations conditioned on cluster-ID = 3"
+  (testing "standard deviaton of simulations conditioned on cluster-ID = 3"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:x :y]
@@ -311,7 +332,7 @@
                (is-almost-equal-vectors b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-point-conditioned-on-cluster-p3
-  (testing "Categorical simulations conditioned on cluster-ID = 3"
+  (testing "categorical logPDF of P3 conditioned on cluster-ID = 3"
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:x (:tx p3) :y (:ty p3)}
@@ -322,10 +343,11 @@
                              (score-gaussian (:ty p3) [ 7 0.5]))]
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
 
-;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
-;; on :a taking any different value than 3 this will crash. Sigh.
+;; TODO: Same as above. Add a smoke test. Categories for :a are deteriministic.
+;; If we condition on :a taking any different value than 3 this will crash.
 (deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p3
-  (testing "Categorical simulations conditioned on cluster-ID = 3"
+  (testing "logPDF of categoricals implying cluster ID 3 conditioned on cluster-ID = 3"
+    ;; XXX, not sure how to deal wth line breaks for this....
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:a 3  :b 3}
@@ -334,9 +356,8 @@
           analytical-logpdf (Math/log 0.95)]
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
 
-;; Testing invariants conditioning on the p3
 (deftest crosscat-simulate-cluster-id-conditoned-on-p3
-  (testing "Mean of simulations conditioned on cluster-ID = 3"
+  (testing "simulations of cluster-IDs conditioned on P3"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:cluster-for-x, :cluster-for-y]
@@ -350,9 +371,8 @@
       (is (equal-sample-values id-samples-x id-samples-y))
       (is (is-almost-equal-vectors cluster-p-fraction true-p-cluster)))))
 
-;; Testing invariants conditioning on the p3
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p3
-  (testing "Mean of simulations conditioned on cluster-ID = 3"
+  (testing "logPDF of the correct cluster-IDs for P3 conditioned on P3"
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:cluster-for-x 3}
@@ -360,9 +380,8 @@
                     {})]
       (is (is-almost-equal-p  logpdf 0)))))
 
-
 (deftest crosscat-simulate-categoricals-conditioned-on-p3
-  (testing "Categorical simulations conditioned on cluster-ID = 3"
+  (testing "categorical simulations conditioned on P3"
     (let [samples (cgpm-simulate
                     crosscat-cgpm
                     [:a :b]
@@ -380,7 +399,7 @@
                (is-almost-equal-vectors b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p3
-  (testing "Categorical simulations conditioned on cluster-ID = 3"
+  (testing "logPDF of categoricals conditioned on P3"
     (let [logpdf (cgpm-logpdf
                     crosscat-cgpm
                     {:a 3  :b 3}
@@ -388,3 +407,17 @@
                     {})
           analytical-logpdf (Math/log 0.95)]
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; TODO
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Testing P 5 ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; TODO
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Testing P 6 ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; TODO
