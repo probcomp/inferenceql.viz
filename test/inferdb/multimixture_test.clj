@@ -281,7 +281,7 @@
       (is (is-almost-equal-p  logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testin P 3 ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Testing P 3 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def p3 (test-point-coordinates "P 3"))
 ;; Testing invariants conditioning on the cluster ID = 3 which corresponds to the component
