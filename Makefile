@@ -1,15 +1,44 @@
-yarn-install-opts := --no-progress --frozen-lockfile
-compile-opts      := build.edn
-main-ns           := inferdb.spreadsheets.core
-output-dir        := out
-chart-namespaces  := simulations-x-y simulations-a simulations-b simulations-c simulations-z
+compile-opts = build.edn
+main-ns      = inferdb.spreadsheets.core
 
-chart-dir =  $(output-dir)/charts
+yarn-install-opts = --no-progress --frozen-lockfile
+chart-namespaces  = select-simulate simulations-x-y simulations-a simulations-b simulations-c simulations-z
+surge-domain      = inferdb-spreadsheet.surge.sh
 
-clean:
-	rm -Rf *.png
-	rm -f $(output-dir)/charts/*.png
+spreadsheet-dir := spreadsheets
+output-dir      := $(spreadsheet-dir)/out
+chart-dir       := $(output-dir)/charts
+cache-dir       := $(spreadsheet-dir)/src/inferdb/spreadsheets
+
+data-file  := $(cache-dir)/data.cljc
+cache-file := $(cache-dir)/pfcas.cljc
+
+output-to           := $(output-dir)/main.js
+output-resource-dir := $(spreadsheet-dir)/resources
+
+$(output-resource-dir):
+	mkdir -p $(output-resource-dir)
+
+$(output-resource-dir)/handsontable.full.css: $(output-resource-dir)
+	cp node_modules/handsontable/dist/handsontable.full.css $(output-resource-dir)/
+
+spreadsheet: node_modules $(output-dir)/main.js $(output-resource-dir)/handsontable.full.css
+
+$(output-dir)/main.js:
+	clojure -m cljs.main -co $(compile-opts) -d $(output-dir) \
+	--output-to $(output-to) -c $(main-ns)
+
+.PHONY: watch
+watch:
+	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) \
+	-d $(output-dir) --output-to $(output-to) -c $(main-ns)
+
 .PHONY: clean
+clean:
+	rm -Rf $(output-dir)
+	rm -f $(cache-file)
+	rm -Rf *.png
+	rm -f $(output-resource-dir)/handsontable.full.css
 
 clean-json:
 	rm  out/json-results/*.json
@@ -24,7 +53,7 @@ charts: $(chart-namespaces:%=%.png)
 	mv *.png $(output-dir)/charts
 
 %.vl.json:
-	clojure -Ctest -m inferdb.charts.$(basename $(basename $@)) > $@
+	clojure -Ctest -Rtest -m inferdb.charts.$(basename $(basename $@)) > $@
 
 %.vg.json: %.vl.json node_modules
 	yarn run vl2vg $< $@
@@ -32,22 +61,11 @@ charts: $(chart-namespaces:%=%.png)
 %.png: %.vg.json node_modules
 	yarn run vg2png $< $@
 
-pfca-cache:
-	clojure -m inferdb.spreadsheets.build-pfcas
-	mv pfcas.cljc src/inferdb/spreadsheets/pfcas.cljc
-.PHONY: pfca_cache
+$(cache-file): $(data-file)
+	bin/build-cache
 
-watch: node_modules
-	clojure -m cljs.main --watch src -co $(compile-opts) -d $(output-dir) -c $(main-ns)
-.PHONY: watch
+cache: $(cache-file)
 
-publish:
-	rm -rf publish/out
-	rm -rf publish/node_modules
-	mkdir -p publish/node_modules/handsontable/dist/
-	cp -r out publish
-	cp node_modules/handsontable/dist/handsontable.full.css publish/node_modules/handsontable/dist/
-	cp index.html publish
-	cp cb_2017_us_cd115_20m-topo.js publish
-	cd publish ; surge
 .PHONY: publish
+publish: spreadsheet
+	bin/publish $(spreadsheet-dir) $(surge-domain)

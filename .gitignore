@@ -1,10 +1,6 @@
-/node_modules
-/out
-/publish
+/.cpcache/ # Clojure cache
+/node_modules/
+/publish/
+/spreadsheets/out/
 
-# Clojure caching
-.cpcache/
-# Fireplace NREPL connection
-.nrepl-port
-# Vim swap files.
-*.swp
+/spreadsheets/src/inferdb/spreadsheets/pfcas.cljc

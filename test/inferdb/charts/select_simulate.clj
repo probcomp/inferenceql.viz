@@ -7,15 +7,15 @@
 
 (defn -main
   []
-  (let [columns ["percent_black" "percent_college"]
-        select-values (mapv #(assoc % :origin "select")
+  (let [columns ["percent_single_parent" "percent_poor"]
+        select-values (mapv #(assoc % "origin" "select")
                             data/nyt-data)
         simulate-values (->> (cgpm/cgpm-simulate model/census-cgpm
                                                  (mapv keyword columns)
                                                  {}
                                                  {}
                                                  (count data/nyt-data))
-                             (map #(assoc % :origin "simulate"))
+                             (map #(assoc % "origin" "simulate"))
                              (walk/stringify-keys))
         values (into select-values simulate-values)]
     (println
