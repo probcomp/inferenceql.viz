@@ -142,9 +142,9 @@
 ; Let's define a few helper constants and functions that we'll use below.
 (def numper-simulations-for-test 100)
 (def threshold 0.1)
-(defn is-almost-equal [a b] (almost-equal a b relerr threshold))
-(defn is-almost-equal-vectors [a b] (almost-equal-vectors a b relerr threshold))
-(defn is-almost-equal-p [a b] (almost-equal a b relerr 0.01))
+(defn is-almost-equal? [a b] (almost-equal? a b relerr threshold))
+(defn is-almost-equal-vectors? [a b] (almost-equal-vectors? a b relerr threshold))
+(defn is-almost-equal-p? [a b] (almost-equal? a b relerr 0.01))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 1 ;;;;;;;;;;;;;;;;;;;;;
@@ -166,10 +166,10 @@
                     {:cluster-for-x 2}
                     {}
                     numper-simulations-for-test)
-          x-samples (get-col :x  samples)
-          y-samples (get-col :y  samples)]
-      (is (and (is-almost-equal (average x-samples) (:tx p2))
-               (is-almost-equal (average y-samples) (:ty p2)))))))
+          x-samples (col :x  samples)
+          y-samples (col :y  samples)]
+      (is (and (is-almost-equal? (average x-samples) (:tx p2))
+               (is-almost-equal? (average y-samples) (:ty p2)))))))
 
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
   (testing "standard deviaton of simulations conditioned on cluster-ID = 2"
@@ -179,8 +179,8 @@
                     {:cluster-for-x 2}
                     {}
                     numper-simulations-for-test)
-          x-samples (get-col :x  samples)
-          y-samples (get-col :y  samples)
+          x-samples (col :x  samples)
+          y-samples (col :y  samples)
           factor 2]
       (is (and (within-factor? (std x-samples) 0.5 factor)
                (within-factor? (std y-samples) 1 factor))))))
@@ -200,8 +200,8 @@
           possible-values (range 6)
           a-p-fraction (probability-vector a-samples possible-values)
           b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
-               (is-almost-equal-vectors b-p-fraction true-p-b))))))
+      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
+               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-point-conditioned-on-cluster-p2
   (testing "categorical logPDF of P2 conditioned on cluster-ID = 2"
@@ -213,7 +213,7 @@
           analytical-logpdf (+
                              (score-gaussian (:tx p2) [8  0.5])
                              (score-gaussian (:ty p2) [10 1]))]
-      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
 ;; on :a taking any different value than 2 this will crash.
@@ -226,7 +226,7 @@
                     {:cluster-for-x 2}
                     {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 (deftest crosscat-simulate-cluster-id-conditoned-on-p2
   (testing "simulations of cluster-IDs conditioned on P2"
@@ -241,7 +241,7 @@
           cluster-p-fraction (probability-vector id-samples-x (range 6))
           true-p-cluster [0 0 1 0 0 0]]
       (is (equal-sample-values id-samples-x id-samples-y))
-      (is (is-almost-equal-vectors cluster-p-fraction true-p-cluster)))))
+      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p2
   (testing "logPDF of the correct cluster-IDs for P2 conditioned on P2"
@@ -250,7 +250,7 @@
                     {:cluster-for-x 2}
                     {:x (:tx p2) :y (:ty p2)}
                     {})]
-      (is (is-almost-equal-p  logpdf 0)))))
+      (is (is-almost-equal-p?  logpdf 0)))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-p2
   (testing "categorical simulations conditioned on P2"
@@ -267,8 +267,8 @@
           possible-values (range 6)
           a-p-fraction (probability-vector a-samples possible-values)
           b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
-               (is-almost-equal-vectors b-p-fraction true-p-b))))))
+      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
+               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p2
   (testing "logPDF of categoricals conditioned on P2"
@@ -278,7 +278,7 @@
                     {:x (:tx p2) :y (:ty p2)}
                     {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 3 ;;;;;;;;;;;;;;;;;;;;;
@@ -294,10 +294,10 @@
                     {:cluster-for-x 3}
                     {}
                     numper-simulations-for-test)
-          x-samples (get-col :x  samples)
-          y-samples (get-col :y  samples)]
-      (is (and (is-almost-equal (average x-samples) (:tx p3))
-               (is-almost-equal (average y-samples) (:ty p3)))))))
+          x-samples (col :x  samples)
+          y-samples (col :y  samples)]
+      (is (and (is-almost-equal? (average x-samples) (:tx p3))
+               (is-almost-equal? (average y-samples) (:ty p3)))))))
 
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
   (testing "standard deviaton of simulations conditioned on cluster-ID = 3"
@@ -307,8 +307,8 @@
                     {:cluster-for-x 3}
                     {}
                     numper-simulations-for-test)
-          x-samples (get-col :x  samples)
-          y-samples (get-col :y  samples)
+          x-samples (col :x  samples)
+          y-samples (col :y  samples)
           factor 2]
       (is (and (within-factor? (std x-samples) 0.5 factor)
                (within-factor? (std y-samples) 0.5 factor))))))
@@ -328,8 +328,8 @@
           possible-values (range 6)
           a-p-fraction (probability-vector a-samples possible-values)
           b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
-               (is-almost-equal-vectors b-p-fraction true-p-b))))))
+      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
+               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-point-conditioned-on-cluster-p3
   (testing "categorical logPDF of P3 conditioned on cluster-ID = 3"
@@ -341,7 +341,7 @@
           analytical-logpdf (+
                              (score-gaussian (:tx p3) [14 0.5])
                              (score-gaussian (:ty p3) [ 7 0.5]))]
-      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;; TODO: Same as above. Add a smoke test. Categories for :a are deteriministic.
 ;; If we condition on :a taking any different value than 3 this will crash.
@@ -354,7 +354,7 @@
                     {:cluster-for-x 3}
                     {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 (deftest crosscat-simulate-cluster-id-conditoned-on-p3
   (testing "simulations of cluster-IDs conditioned on P3"
@@ -369,7 +369,7 @@
           cluster-p-fraction (probability-vector id-samples-x (range 6))
           true-p-cluster [0 0 0 1 0 0]]
       (is (equal-sample-values id-samples-x id-samples-y))
-      (is (is-almost-equal-vectors cluster-p-fraction true-p-cluster)))))
+      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p3
   (testing "logPDF of the correct cluster-IDs for P3 conditioned on P3"
@@ -378,7 +378,7 @@
                     {:cluster-for-x 3}
                     {:x (:tx p3) :y (:ty p3)}
                     {})]
-      (is (is-almost-equal-p  logpdf 0)))))
+      (is (is-almost-equal-p?  logpdf 0)))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-p3
   (testing "categorical simulations conditioned on P3"
@@ -395,8 +395,8 @@
           possible-values (range 6)
           a-p-fraction (probability-vector a-samples possible-values)
           b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors a-p-fraction true-p-a)
-               (is-almost-equal-vectors b-p-fraction true-p-b))))))
+      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
+               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p3
   (testing "logPDF of categoricals conditioned on P3"
@@ -406,7 +406,7 @@
                     {:x (:tx p3) :y (:ty p3)}
                     {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p  logpdf analytical-logpdf)))))
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;

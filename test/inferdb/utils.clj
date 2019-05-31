@@ -16,7 +16,7 @@
 (defn relerr [a b]
   (abs (- a b)))
 
-(defn get-col
+(defn col
   [col-key table]
   (map (fn [row] (get row col-key)) table))
 
@@ -41,33 +41,33 @@
   (let [row-subset (fn [row] (select-keys row columns))]
     (map row-subset data)))
 
-(defn almost-equal
+(defn almost-equal?
   "Returns true if scalars `a` and `b` are approximately equal. Takes a difference
   metric (presumably from `inferdb.metrics`) as its second argument."
   [a b difference-metric threshold]
   (< (difference-metric a b) threshold))
 
-(defn almost-equal-vectors
+(defn almost-equal-vectors?
   "Returns true if vectors `a` and `b` are approximately equal. Takes a difference
   metric (presumably from `inferdb.metrics`) as its second argument."
   [a b difference-metric threshold]
   (assert (count a) (count b))
   (let [call-almost-equal
-        (fn [i] (almost-equal  (nth a i) (nth b i) difference-metric threshold))]
+        (fn [i] (almost-equal?  (nth a i) (nth b i) difference-metric threshold))]
   (all? (map call-almost-equal (range (count a))))))
 
 (defn within-factor? [a b factor]
   (< (/ b factor) a (* b factor)))
 
-(defn get-probability-for-categories [sample-vector]
-  (let [get-fraction (fn [item] {(first (vals (first item)))
+(defn probability-for-categories [sample-vector]
+  (let [fraction (fn [item] {(first (vals (first item)))
                                  (float (/ (second item)
                                            (count sample-vector)))})
         occurences (frequencies sample-vector)]
-    (apply merge (mapv get-fraction occurences))))
+    (apply merge (mapv fraction occurences))))
 
 (defn probability-vector [samples possible-values]
-  (let [probability-map (get-probability-for-categories samples)]
+  (let [probability-map (probability-for-categories samples)]
     (map (fn [i] (if (contains? probability-map i) (get probability-map i) 0 ))
          possible-values)))
 
