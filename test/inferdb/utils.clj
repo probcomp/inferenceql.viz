@@ -68,8 +68,9 @@
 
 (defn probability-vector [samples possible-values]
   (let [probability-map (probability-for-categories samples)]
-    (map (fn [i] (if (contains? probability-map i) (get probability-map i) 0 ))
+    (map #(get probability-map % 0)
          possible-values)))
 
 (defn equal-sample-values [samples-1 samples-2]
-  (= (map vals samples-1) (map vals samples-1)))
+  (= (map (comp set vals) samples-1)
+     (map (comp set vals) samples-2)))
