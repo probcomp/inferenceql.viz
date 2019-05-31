@@ -1,0 +1,18 @@
+#!/usr/bin/env clojure
+
+(require '[inferdb.search-by-example.main :as sbe])
+(require '[inferdb.spreadsheets.data :as data])
+(require '[inferdb.spreadsheets.model :as model])
+
+(let [fix-table (fn fix-table [t]
+                  (map
+                   #(as-> % r
+                      (dissoc r "geo_fips" "district_name")
+                      (remove (comp nil? second) r))
+                   t))]
+  (sbe/save-pfcas "spreadsheets/src/inferdb/spreadsheets/pfcas.cljc"
+                  'inferdb.spreadsheets.pfcas
+                  (:proc model/census-cgpm)
+                  model/cluster-data
+                  (fix-table data/nyt-data)
+                  "percent_white"))

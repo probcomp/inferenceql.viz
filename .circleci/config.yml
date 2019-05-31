@@ -18,10 +18,13 @@ jobs: # basic units of work in a run
           name: Install build tools
           command: sudo apt-get update && sudo apt-get install -y make
       - run:
-          name: Generate charts
-          command: make charts
+          name: Build spreadseets
+          command: make spreadsheet
       - run:
           name: Run tests
           command: bin/kaocha
+      - run:
+          name: Generate charts
+          command: make charts
       - store_artifacts:
-          path: out/charts
+          path: spreadsheets/out/charts
