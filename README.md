@@ -24,6 +24,8 @@ details refer to its [documentation](https://cljdoc.org/d/lambdaisland/kaocha/).
 
 ### Generating charts
 
+Once you have run the tests you can generate `.png` charts:
+
 ```bash
 make charts
 ```
