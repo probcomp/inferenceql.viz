@@ -120,22 +120,22 @@
                     {}
                     {}
                     num-samples)]
-      (save-json "out/json-results/simulations-x-y.json"
+      (save-json "simulations-x-y"
                  (scatter-plot-json ["x" "y"]
                                     samples
                                     test-points
                                     [0 18]
                                     "View 1: X, Y, A, B"))
-      (save-json "out/json-results/simulations-z.json"
+      (save-json "simulations-z"
                  (hist-plot
                    (column-subset samples [:z :c])
                    [:z :c]
                    "Dim Z and C"))
-      (save-json "out/json-results/simulations-a.json"
+      (save-json "simulations-a"
                  (bar-plot (column-subset samples [:a]) "Dim A" n))
-      (save-json "out/json-results/simulations-b.json"
+      (save-json "simulations-b"
                  (bar-plot (column-subset samples [:b]) "Dim B" n))
-      (save-json "out/json-results/simulations-c.json"
+      (save-json "simulations-c"
                  (bar-plot (column-subset samples [:c]) "Dim C" n))
       (is (= (count samples) n)))))
 

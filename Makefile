@@ -1,59 +1,62 @@
-compile-opts = build.edn
-main-ns      = inferdb.spreadsheets.core
+compile-opts := build.edn
+main-ns      := inferdb.spreadsheets.core
 
 yarn-install-opts = --no-progress --frozen-lockfile
-chart-namespaces  = select-simulate simulations-x-y simulations-a simulations-b simulations-c simulations-z
 surge-domain      = inferdb-spreadsheet.surge.sh
 
 spreadsheet-dir := spreadsheets
 output-dir      := $(spreadsheet-dir)/out
-chart-dir       := $(output-dir)/charts
+resource-dir    := $(spreadsheet-dir)/resources
 cache-dir       := $(spreadsheet-dir)/src/inferdb/spreadsheets
+chart-dir       := $(output-dir)/charts
 
-data-file  := $(cache-dir)/data.cljc
-cache-file := $(cache-dir)/pfcas.cljc
+output-to        := $(output-dir)/main.js
+data-file        := $(cache-dir)/data.cljc
+cache-file       := $(cache-dir)/pfcas.cljc
+vl-json          := $(wildcard $(chart-dir)/*.vl.json)
+pngs             := $(vl-json:.vl.json=.png)
+hot-css-file     := node_modules/handsontable/dist/handsontable.full.css
+hot-css-resource := $(resource-dir)/handsontable.full.css
 
-output-to           := $(output-dir)/main.js
-output-resource-dir := $(spreadsheet-dir)/resources
+generated-dirs  := $(output-dir) $(chart-dir)
+generated-files := $(output-to) $(cache-file) $(hot-css-resource)
+generated       := $(generated-dirs) $(generated-files)
 
-$(output-resource-dir):
-	mkdir -p $(output-resource-dir)
-
-$(output-resource-dir)/handsontable.full.css: $(output-resource-dir)
-	cp node_modules/handsontable/dist/handsontable.full.css $(output-resource-dir)/
-
-spreadsheet: node_modules $(output-dir)/main.js $(output-resource-dir)/handsontable.full.css
-
-$(output-dir)/main.js:
-	clojure -m cljs.main -co $(compile-opts) -d $(output-dir) \
-	--output-to $(output-to) -c $(main-ns)
+cljs-main-opts := \
+		-co $(compile-opts) \
+		-d $(output-dir) \
+		-o $(output-to) \
+		-c $(main-ns)
 
 .PHONY: watch
-watch:
-	clojure -m cljs.main --watch spreadsheets/src -co $(compile-opts) \
-	-d $(output-dir) --output-to $(output-to) -c $(main-ns)
+watch: node_modules $(cache-file)
+	clojure -m cljs.main -w $(spreadsheets-dir)/src $(cljs-main-opts)
 
 .PHONY: clean
 clean:
-	rm -Rf $(output-dir)
-	rm -f $(cache-file)
-	rm -Rf *.png
-	rm -f $(output-resource-dir)/handsontable.full.css
+	rm -Rf $(generated)
 
-clean-json:
-	rm  out/json-results/*.json
-.PHONY: clean-json
+.PHONY: publish
+publish: spreadsheet
+	bin/publish $(spreadsheet-dir) $(surge-domain)
 
 node_modules: yarn.lock
 	yarn install $(yarn-install-opts)
 
-charts: $(chart-namespaces:%=%.png)
-	mkdir -p $(chart-dir)
-	cp $< $(chart-dir)
-	mv *.png $(output-dir)/charts
+spreadsheet: node_modules $(hot-css-resource) $(cache-file) $(output-to)
 
-%.vl.json:
-	clojure -Ctest -Rtest -m inferdb.charts.$(basename $(basename $@)) > $@
+charts: $(chart-dir) $(pngs)
+
+cache: $(cache-file)
+
+$(generated-dir):
+	mkdir -p $(@D)
+
+$(hot-css-resource): $(hot-css-file)
+	cp $(hot-css-file) $(resource-dir)
+
+$(output-to):
+	clojure -m cljs.main $(cljs-main-opts)
 
 %.vg.json: %.vl.json node_modules
 	yarn run vl2vg $< $@
@@ -63,9 +66,3 @@ charts: $(chart-namespaces:%=%.png)
 
 $(cache-file): $(data-file)
 	bin/build-cache
-
-cache: $(cache-file)
-
-.PHONY: publish
-publish: spreadsheet
-	bin/publish $(spreadsheet-dir) $(surge-domain)

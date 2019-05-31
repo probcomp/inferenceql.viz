@@ -29,10 +29,13 @@
                     (reduce + (map square (map - a (repeat (average a)))))
                     (- (count a) 1 ))))
 
-
-(defn save-json [file-name file-str]
-  (io/make-parents file-name)
-  (spit file-name file-str))
+(defn save-json
+  "Writes the provided Vega-Lite JSON to a file in the charts directory with the
+  provided prefix."
+  [file-prefix vl-json]
+  (let [file-path (str "spreadsheets/out/charts/" file-prefix ".vl.json")]
+    (io/make-parents file-path)
+    (spit file-path vl-json)))
 
 (defn column-subset [data columns]
   (let [row-subset (fn [row] (select-keys row columns))]
