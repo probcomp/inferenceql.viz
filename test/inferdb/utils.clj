@@ -5,15 +5,16 @@
 ;; metaprob test...
 (defn normalize [weights]
   (let [total (apply + weights)]
-    (map (fn [x] (/ x total)) weights)))
+    (map #(/ % total) weights)))
 
 (defn abs [n]
   (max n (- n)))
 
 (defn all? [l]
-  (every? (fn [x] x) l))
+  (every? identity l))
 
-(def relerr (fn [a b] (abs (- a b))))
+(defn relerr [a b]
+  (abs (- a b)))
 
 (defn get-col
   [col-key table]
@@ -25,9 +26,8 @@
 (defn square [x] (* x x))
 
 (defn std [a]
-      (Math/sqrt (/
-                    (reduce + (map square (map - a (repeat (average a)))))
-                    (- (count a) 1 ))))
+  (Math/sqrt (/ (reduce + (map square (map - a (repeat (average a)))))
+                (- (count a) 1 ))))
 
 (defn save-json
   "Writes the provided Vega-Lite JSON to a file in the charts directory with the
@@ -56,9 +56,8 @@
         (fn [i] (almost-equal  (nth a i) (nth b i) difference-metric threshold))]
   (all? (map call-almost-equal (range (count a))))))
 
-(defn within-factor [a b factor]
-  (and (< a (* b factor))
-       (> a (/ b factor))))
+(defn within-factor? [a b factor]
+  (< (/ b factor) a (* b factor)))
 
 (defn get-probability-for-categories [sample-vector]
   (let [get-fraction (fn [item] {(first (vals (first item)))

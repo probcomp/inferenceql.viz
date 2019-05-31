@@ -104,8 +104,8 @@
 
 (defn test-point-coordinates [name]
   "A function to extract a relevant point from the array above."
-  (let [predicate (fn [point] (= (:test-point point) name))]
-    (dissoc (first (filter predicate test-points)) :test-point)))
+  (dissoc (first (filter #(= (:test-point %) name) test-points)) 
+          :test-point))
 
 ; How many points do we want to create for our plot?
 (def n 1000)
@@ -182,8 +182,8 @@
           x-samples (get-col :x  samples)
           y-samples (get-col :y  samples)
           factor 2]
-      (is (and (within-factor (std x-samples) 0.5 factor)
-               (within-factor (std y-samples) 1 factor))))))
+      (is (and (within-factor? (std x-samples) 0.5 factor)
+               (within-factor? (std y-samples) 1 factor))))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-cluster-p2
   (testing "categorical simulations conditioned on cluster-ID = 2"
@@ -310,8 +310,8 @@
           x-samples (get-col :x  samples)
           y-samples (get-col :y  samples)
           factor 2]
-      (is (and (within-factor (std x-samples) 0.5 factor)
-               (within-factor (std y-samples) 0.5 factor))))))
+      (is (and (within-factor? (std x-samples) 0.5 factor)
+               (within-factor? (std y-samples) 0.5 factor))))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-cluster-p3
   (testing "Categorical simulations conditioned on cluster-ID = 3"
