@@ -30,7 +30,7 @@ cljs-main-opts := \
 
 .PHONY: watch
 watch: node_modules $(hot-css-resource) $(cache-file)
-	clojure -m cljs.main -w $(spreadsheets-dir)/src $(cljs-main-opts)
+	clojure -m cljs.main -w $(spreadsheet-dir)/src $(cljs-main-opts)
 
 .PHONY: clean
 clean:
