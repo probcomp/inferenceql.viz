@@ -12,31 +12,47 @@
 (s/def ::row-index ::index)
 (s/def ::column-index ::index)
 
-(s/def ::selection ::row)
+(s/def ::selection (s/coll-of ::row))
 (s/def ::selections (s/coll-of ::selection))
-(s/def ::selected-columns (s/coll-of (s/coll-of ::header)))
+(s/def ::selected-columns (s/coll-of ::header))
 
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
 (s/def ::topojson any?)
 
-(s/def ::selected-row ::row-index)
+(s/def ::selected-row-index ::row-index)
+
+(s/def ::sampled-row ::row)
+(s/def ::sampled-rows (s/coll-of ::sampled-row))
+
+(s/def ::row-at-selection-start ::row)
 
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::selected-row
+                    :opt [::simulator
+                          ::simulated-rows
+                          ::selected-row-index
+                          ::row-at-selection-start
                           ::scores
-                          ::selections
                           ::selected-columns
-                          ::topojson]))
+                          ::topojson
+                          ::sampled-rows]))
+
+(defn with-row-at-selection-start
+  [db row]
+  (assoc db ::row-at-selection-start row))
+
+(defn row-at-selection-start
+  [db]
+  (get db ::row-at-selection-start))
 
 (defn with-selected-row-index
   [db row-index]
-  (assoc db ::selected-row row-index))
+  (assoc db ::selected-row-index row-index))
 
 (defn selected-row-index
   [db]
-  (get db ::selected-row))
+  (get db ::selected-row-index))
 
 (defn selected-row
   [db]
@@ -86,15 +102,11 @@
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
   []
-  {::headers ["geo_fips"  "district_name" "percap"
-              "percent_married_children" "percent_college" "percent_black"]
-   ::rows (into [] (map (fn [row]
-                          (reduce (fn [acc key]
-                                    (cond-> acc
-                                      (and (not (contains? #{"geo_fips" "district_name"}
-                                                           key))
-                                           (dist/flip 0.2))
-                                      (dissoc acc key)))
-                                  row
-                                  (keys row)))
-                        nyt-data))})
+  {::headers (into [] (keys (first nyt-data)))
+   ::rows nyt-data})
+
+(defn one-cell-selected?
+  [db]
+  (and (= 1 (count (selected-columns db)))
+       (= 1 (count (selections db)))
+       (= 1 (count (first (selections db))))))

@@ -24,18 +24,19 @@ details refer to its [documentation](https://cljdoc.org/d/lambdaisland/kaocha/).
 
 ### Generating charts
 
+Once you have run the tests you can generate `.png` charts:
+
 ```bash
 make charts
 ```
 
 ## inferdb.spreadsheets
 
-### Building PFCA cache
+### Building the cache
 
-The spreadsheet product requires a prebuilt probability-for-cluster-assignment
-cache in order to run. If the data in `inferdb.spreadsheets.data` changes, the
-cache must be rebuilt. `make pfca-cache` will rebuild the cache and write it to
-the appropriate location.
+The spreadsheet product requires a pre-built cache cache in order to run. If the
+data in `inferdb.spreadsheets.data` changes, the cache must be rebuilt. `make
+cache` will rebuild the cache and write it to the appropriate location.
 
 ### Publishing
 
