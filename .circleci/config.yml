@@ -22,7 +22,15 @@ jobs: # basic units of work in a run
           command: make spreadsheet
       - run:
           name: Run tests
-          command: bin/kaocha
+          command: |
+            mkdir -p /tmp/test-results/all
+            bin/kaocha \
+              --reporter kaocha.report/documentation \
+              --plugin kaocha.plugin/profiling \
+              --plugin kaocha.plugin/junit-xml \
+              --junit-xml-file /tmp/test-results/all/results.xml
+      - store_test_results:
+          path: /tmp/test-results
       - run:
           name: Generate charts
           command: make charts

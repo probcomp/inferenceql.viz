@@ -11,6 +11,7 @@
          "aide/src"]
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-418"}
+                               lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
                                cheshire {:mvn/version "5.8.1"}}}
 
            :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.339"}}}
