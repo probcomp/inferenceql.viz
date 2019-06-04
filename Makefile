@@ -13,13 +13,14 @@ chart-dir       := $(output-dir)/charts
 output-to        := $(output-dir)/main.js
 data-file        := $(cache-dir)/data.cljc
 cache-file       := $(cache-dir)/pfcas.cljc
+model-file       := $(cache-dir)/model.cljc
 vl-json          := $(wildcard $(chart-dir)/*.vl.json)
 pngs             := $(vl-json:.vl.json=.png)
 hot-css-file     := node_modules/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/handsontable.full.css
 
 generated-dirs  := $(output-dir) $(chart-dir)
-generated-files := $(output-to) $(cache-file) $(hot-css-resource)
+generated-files := $(output-to) $(data-file) $(model-file) $(cache-file) $(hot-css-resource)
 generated       := $(generated-dirs) $(generated-files)
 
 cljs-main-opts := \
@@ -29,7 +30,7 @@ cljs-main-opts := \
 		-c $(main-ns)
 
 .PHONY: watch
-watch: node_modules $(hot-css-resource) $(cache-file)
+watch: node_modules $(hot-css-resource) $(model-file) $(data-file) $(cache-file)
 	clojure -m cljs.main -w $(spreadsheet-dir)/src $(cljs-main-opts)
 
 .PHONY: clean
@@ -43,14 +44,14 @@ publish: spreadsheet
 node_modules: yarn.lock
 	yarn install $(yarn-install-opts)
 
-spreadsheet: node_modules $(hot-css-resource) $(cache-file) $(output-to)
+spreadsheet: node_modules $(hot-css-resource) $(data-file) $(model-file) $(cache-file) $(output-to)
 
 charts: $(chart-dir) $(pngs)
 
-cache: $(cache-file)
+cache: model data $(cache-file)
 
-$(generated-dir):
-	mkdir -p $(@D)
+$(generated-dirs):
+	mkdir -p $($@)
 
 $(hot-css-resource): $(hot-css-file)
 	cp $(hot-css-file) $(resource-dir)
@@ -63,6 +64,16 @@ $(output-to):
 
 %.png: %.vg.json node_modules
 	yarn run vg2png $< $@
+
+$(model-file):
+	bin/build-model $(model-file) model.json
+
+model: model.json $(model-file)
+
+$(data-file):
+	bin/build-data $(data-file) data.csv
+
+data: data.csv $(data-file)
 
 $(cache-file): $(data-file)
 	bin/build-cache

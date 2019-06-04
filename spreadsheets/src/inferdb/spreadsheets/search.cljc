@@ -5,7 +5,7 @@
             [inferdb.spreadsheets.pfcas :as pfcas]))
 
 (defn search-by-example [example emphasis _]
-  (sbe/cached-search model/census-cgpm
+  (sbe/cached-search model/model-cgpm
                      model/cluster-data
                      pfcas/pfcas
                      example
