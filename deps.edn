@@ -2,6 +2,8 @@
         binaryage/devtools {:mvn/version "0.9.10"}
         camel-snake-kebab {:mvn/version "0.4.0"}
         expound {:mvn/version "0.7.2"}
+        org.clojure/data.csv {:mvn/version "0.1.4"}
+        semantic-csv {:mvn/version "0.2.1-alpha1"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.6"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
