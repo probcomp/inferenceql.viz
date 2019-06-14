@@ -5,7 +5,10 @@
             #?(:clj [metaprob.generative-functions :refer [gen make-generative-function make-constrained-generator]])
             [metaprob.prelude :refer [map apply infer-and-score map-xform]]
             [metaprob.trace :as trace]
-            [metaprob.distributions :refer [categorical log-categorical exactly]]
+            [metaprob.distributions :refer [categorical
+                                            log-categorical
+                                            exactly
+                                            logsumexp]]
             [metaprob.inference :refer [with-custom-proposal-attached]]))
 
 ;; -------------------
@@ -39,12 +42,10 @@
   (let [view-name (str "view" (gensym))
         var-names (keys vars-and-dists)
         cluster-addr (view-cluster-address view-name)
-
         ;; Generative model
-        sampler   (gen []
+        sampler (gen []
                        (let [cluster-idx (at cluster-addr categorical cluster-probs)
                              params      (nth cluster-params cluster-idx)]
-
                          (doseq [v var-names]
                            (at (column-cluster-address v)
                                exactly cluster-idx))
@@ -53,76 +54,34 @@
                                  (apply-at v
                                            (get vars-and-dists v)
                                            (get params v)))
-                               var-names)))
-        with-custom-proposal-attached2 (fn
-          [orig-generative-function
-           make-custom-proposer
-           condition-for-use]
+                               var-names)))]
           (make-generative-function
-           ;; To run in Clojure, use the same method as before:
-           orig-generative-function
-
-           ;; To create a constrained generator, first check if
-           ;; the condition for using the custom proposal holds.
-           ;; If so, use it and score it.
-           ;; Otherwise, use the original make-constrained-generator
-           ;; implementation.
-           (fn [observations]
-             (if (condition-for-use observations)
-               (gen [& args]
-                 (let [custom-proposal
-                       (make-custom-proposer observations)
-
-                       ;; TODO: allow/require custom-proposal to specify which addresses it is proposing vs. sampling otherwise?
-                       [_ tr _]
-                       (at '() infer-and-score
-                           :procedure custom-proposal
-                           :inputs args)
-
-                       proposed-trace
-                       (trace/trace-merge observations tr)
-
-                       [v tr2 p-score]
-                       (infer-and-score :procedure orig-generative-function
-                                            :inputs args
-                                            :observation-trace proposed-trace)
-
-                       [_ _ q-score]
-                       (infer-and-score :procedure custom-proposal
-                                            :inputs args
-                                            :observation-trace proposed-trace)]
-                   [v proposed-trace (- p-score q-score)]))
-               (make-constrained-generator orig-generative-function observations)))))]
-    (with-custom-proposal-attached2
-      sampler
-      (fn [observations]
-        (gen []
-             (let [score-cluster
-                   (fn [idx]
-                     (let [new-obs (trace-set-value observations cluster-addr idx)
-                           ;; Score should not depend on any of the stochastic
-                           ;; choices made by infer-and-score, so we leave this
-                           ;; untraced.
-                           [_ _ s]
-                           (infer-and-score
-                            :procedure sampler
-                            :observation-trace new-obs)]
-                       s))
-
-                   cluster-scores
-                   (map score-cluster (range (count cluster-probs)))
-
-                   chosen-cluster
-                   (at cluster-addr log-categorical cluster-scores)]
-
-               ;; Fill in the rest of the choices
-               (at '() infer-and-score
-                   :procedure sampler
-                   :observation-trace
-                   (trace-set-value observations cluster-addr chosen-cluster)))))
-
-      ;; Only use the custom proposal when we don't already know the cluster ID
-      (fn [tr] (not (trace-has-value? tr cluster-addr))))))
+            ;; To run in Clojure, use the same method as before:
+            sampler
+            (gen [observations]
+                      (let [score-cluster
+                                (fn [idx]
+                                  (let [new-obs (trace-set-value observations cluster-addr idx)
+                                        ;; Score should not depend on any of the stochastic
+                                        ;; choices made by infer-and-score, so we leave this
+                                        ;; untraced.
+                                        [_ t s]
+                                        (infer-and-score
+                                         :procedure sampler
+                                         :observation-trace new-obs)]
+                                    s))
+                            cluster-scores
+                              (map score-cluster (range (count cluster-probs)))
+                            chosen-cluster
+                              (at cluster-addr log-categorical cluster-scores)]
+                      (gen [& args]
+                        (let [[v t s] (infer-and-score
+                                        :procedure sampler
+                                        :inputs args
+                                        :observation-trace (trace-set-value observations
+                                                                            cluster-addr
+                                                                            chosen-cluster))]
+                          [v t (logsumexp cluster-scores)])))))))
 
 (defn make-multi-mixture
   [views]
