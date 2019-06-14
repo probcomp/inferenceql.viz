@@ -1,9 +1,10 @@
 (ns inferdb.multimixture.dsl
   (:refer-clojure :exclude [map replicate apply])
-  #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen]]))
+  #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen make-generative-function make-constrained-generator]]))
   (:require [metaprob.trace :refer [trace-set-value trace-has-value?]]
-            #?(:clj [metaprob.generative-functions :refer [gen]])
+            #?(:clj [metaprob.generative-functions :refer [gen make-generative-function make-constrained-generator]])
             [metaprob.prelude :refer [map apply infer-and-score map-xform]]
+            [metaprob.trace :as trace]
             [metaprob.distributions :refer [categorical log-categorical exactly]]
             [metaprob.inference :refer [with-custom-proposal-attached]]))
 
@@ -29,6 +30,10 @@
   ;; TODO: Implement this for real.
   0)
 
+
+
+
+
 (defn make-view
   [[vars-and-dists [cluster-probs cluster-params]]]
   (let [view-name (str "view" (gensym))
@@ -48,9 +53,47 @@
                                  (apply-at v
                                            (get vars-and-dists v)
                                            (get params v)))
-                               var-names)))]
+                               var-names)))
+        with-custom-proposal-attached2 (fn
+          [orig-generative-function
+           make-custom-proposer
+           condition-for-use]
+          (make-generative-function
+           ;; To run in Clojure, use the same method as before:
+           orig-generative-function
 
-    (with-custom-proposal-attached
+           ;; To create a constrained generator, first check if
+           ;; the condition for using the custom proposal holds.
+           ;; If so, use it and score it.
+           ;; Otherwise, use the original make-constrained-generator
+           ;; implementation.
+           (fn [observations]
+             (if (condition-for-use observations)
+               (gen [& args]
+                 (let [custom-proposal
+                       (make-custom-proposer observations)
+
+                       ;; TODO: allow/require custom-proposal to specify which addresses it is proposing vs. sampling otherwise?
+                       [_ tr _]
+                       (at '() infer-and-score
+                           :procedure custom-proposal
+                           :inputs args)
+
+                       proposed-trace
+                       (trace/trace-merge observations tr)
+
+                       [v tr2 p-score]
+                       (infer-and-score :procedure orig-generative-function
+                                            :inputs args
+                                            :observation-trace proposed-trace)
+
+                       [_ _ q-score]
+                       (infer-and-score :procedure custom-proposal
+                                            :inputs args
+                                            :observation-trace proposed-trace)]
+                   [v proposed-trace (- p-score q-score)]))
+               (make-constrained-generator orig-generative-function observations)))))]
+    (with-custom-proposal-attached2
       sampler
       (fn [observations]
         (gen []
