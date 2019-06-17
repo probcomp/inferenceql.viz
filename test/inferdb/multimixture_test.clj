@@ -15,7 +15,7 @@
 
 ;; The following data generator has some interesting properties:
 ;; - clusters 0 and 1 in view 0 share the samme mu parameter.
-;; - a is a determinstic indicator of the cluster.
+;; - a is a deterministic indicator of the cluster.
 ;; - b is a noisy copy of a.
 ;; - in both views, clusters are equally weighted.
 ;; - in view 1, the third Gaussian components (cluster 0) "spans" the domain of
