@@ -1,5 +1,5 @@
 (ns inferdb.multimixture-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is testing]]
             [inferdb.cgpm.main :refer :all]
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :refer :all]
