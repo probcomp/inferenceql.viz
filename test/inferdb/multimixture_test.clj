@@ -4,7 +4,7 @@
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :refer :all]
             [inferdb.multimixture.dsl :refer :all]
-            [metaprob.distributions :refer :all]))
+            [metaprob.distributions :as dist]))
 
 ;; XXX: why is this still here?
 (defn make-identity-output-addr-map
@@ -26,10 +26,10 @@
 (def generate-crosscat-row
   (multi-mixture
    (view
-    {"x" gaussian
-     "y" gaussian
-     "a" categorical
-     "b" categorical}
+    {"x" dist/gaussian
+     "y" dist/gaussian
+     "a" dist/categorical
+     "b" dist/categorical}
     (clusters
      0.166666666 {"x" [3 1]
                   "y" [4 0.1]
@@ -56,8 +56,8 @@
                   "a" [[0 0 0 0 0 1]]
                   "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}))
    (view
-    {"z" gaussian
-     "c" categorical}
+    {"z" dist/gaussian
+     "c" dist/categorical}
     (clusters
      0.25 {"z" [0 1]
            "c" [[1 0 0 0]]}
@@ -210,8 +210,8 @@
                   {:cluster-for-x 2}
                   {})
           analytical-logpdf (+
-                             (score-gaussian (:tx p2) [8  0.5])
-                             (score-gaussian (:ty p2) [10 1]))]
+                             (dist/score-gaussian (:tx p2) [8  0.5])
+                             (dist/score-gaussian (:ty p2) [10 1]))]
       (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
@@ -338,8 +338,8 @@
                   {:cluster-for-x 3}
                   {})
           analytical-logpdf (+
-                             (score-gaussian (:tx p3) [14 0.5])
-                             (score-gaussian (:ty p3) [ 7 0.5]))]
+                             (dist/score-gaussian (:tx p3) [14 0.5])
+                             (dist/score-gaussian (:ty p3) [ 7 0.5]))]
       (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;; TODO: Same as above. Add a smoke test. Categories for :a are deteriministic.
