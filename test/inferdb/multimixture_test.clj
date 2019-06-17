@@ -1,10 +1,10 @@
 (ns inferdb.multimixture-test
   (:require [clojure.test :refer :all]
-            [metaprob.distributions :refer :all]
             [inferdb.cgpm.main :refer :all]
             [inferdb.utils :refer :all]
             [inferdb.plotting.generate-vljson :refer :all]
-            [inferdb.multimixture.dsl :refer :all]))
+            [inferdb.multimixture.dsl :refer :all]
+            [metaprob.distributions :refer :all]))
 
 ; XXX: why is this still here?
 (defn make-identity-output-addr-map
