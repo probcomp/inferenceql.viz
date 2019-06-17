@@ -103,7 +103,7 @@
 
 (defn test-point-coordinates [name]
   "A function to extract a relevant point from the array above."
-  (dissoc (first (filter #(= (:test-point %) name) test-points)) 
+  (dissoc (first (filter #(= (:test-point %) name) test-points))
           :test-point))
 
 ; How many points do we want to create for our plot?
