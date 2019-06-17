@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [deftest is testing]]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
-            [inferdb.plotting.generate-vljson :refer :all]
+            [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture.dsl :as dsl]
             [metaprob.distributions :as dist]))
 
@@ -120,22 +120,22 @@
                    {}
                    num-samples)]
       (utils/save-json "simulations-x-y"
-                       (scatter-plot-json ["x" "y"]
-                                          samples
-                                          test-points
-                                          [0 18]
-                                          "View 1: X, Y, A, B"))
+                       (plot/scatter-plot-json ["x" "y"]
+                                                 samples
+                                                 test-points
+                                                 [0 18]
+                                                 "View 1: X, Y, A, B"))
       (utils/save-json "simulations-z"
-                       (hist-plot
+                       (plot/hist-plot
                         (utils/column-subset samples [:z :c])
                         [:z :c]
                         "Dim Z and C"))
       (utils/save-json "simulations-a"
-                       (bar-plot (utils/column-subset samples [:a]) "Dim A" n))
+                       (plot/bar-plot (utils/column-subset samples [:a]) "Dim A" n))
       (utils/save-json "simulations-b"
-                       (bar-plot (utils/column-subset samples [:b]) "Dim B" n))
+                       (plot/bar-plot (utils/column-subset samples [:b]) "Dim B" n))
       (utils/save-json "simulations-c"
-                       (bar-plot (utils/column-subset samples [:c]) "Dim C" n))
+                       (plot/bar-plot (utils/column-subset samples [:c]) "Dim C" n))
       (is (= (count samples) n)))))
 
                                         ; Let's define a few helper constants and functions that we'll use below.
