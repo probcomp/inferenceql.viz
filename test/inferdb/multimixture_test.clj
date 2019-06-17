@@ -94,12 +94,13 @@
 
 ;; XXX this is not all that elegant: for plotting, I need all the test points in
 ;; that format.
-(def test-points [{:tx 3  :ty 4  :test-point "P 1"}
-                  {:tx 8  :ty 10 :test-point "P 2"}
-                  {:tx 14 :ty 7  :test-point "P 3"}
-                  {:tx 15 :ty 8  :test-point "P 4"}
-                  {:tx 16 :ty 9  :test-point "P 5"}
-                  {:tx 9  :ty 16 :test-point "P 6"}])
+(def test-points
+  [{:tx 3  :ty 4  :test-point "P 1"}
+   {:tx 8  :ty 10 :test-point "P 2"}
+   {:tx 14 :ty 7  :test-point "P 3"}
+   {:tx 15 :ty 8  :test-point "P 4"}
+   {:tx 16 :ty 9  :test-point "P 5"}
+   {:tx 9  :ty 16 :test-point "P 6"}])
 
 (defn test-point-coordinates [name]
   "A function to extract a relevant point from the array above."
@@ -121,10 +122,10 @@
                    num-samples)]
       (utils/save-json "simulations-x-y"
                        (plot/scatter-plot-json ["x" "y"]
-                                                 samples
-                                                 test-points
-                                                 [0 18]
-                                                 "View 1: X, Y, A, B"))
+                                               samples
+                                               test-points
+                                               [0 18]
+                                               "View 1: X, Y, A, B"))
       (utils/save-json "simulations-z"
                        (plot/hist-plot
                         (utils/column-subset samples [:z :c])
