@@ -299,7 +299,7 @@
       (is (and (is-almost-equal? (utils/average x-samples) (:tx p3))
                (is-almost-equal? (utils/average y-samples) (:ty p3)))))))
 
-(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
+(deftest crosscat-simulate-simulate-stddev-conditioned-on-cluster-p3
   (testing "standard deviaton of simulations conditioned on cluster-ID = 3"
     (let [samples (cgpm/cgpm-simulate
                    crosscat-cgpm
