@@ -3,7 +3,7 @@
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :refer :all]
-            [inferdb.multimixture.dsl :refer :all]
+            [inferdb.multimixture.dsl :as dsl]
             [metaprob.distributions :as dist]))
 
 ;; XXX: why is this still here?
@@ -24,13 +24,13 @@
 ;; I'd encourage everyone who works with the file to run the tests in this file
 ;; and then run make charts to see how the components relate.
 (def generate-crosscat-row
-  (multi-mixture
-   (view
+  (dsl/multi-mixture
+   (dsl/view
     {"x" dist/gaussian
      "y" dist/gaussian
      "a" dist/categorical
      "b" dist/categorical}
-    (clusters
+    (dsl/clusters
      0.166666666 {"x" [3 1]
                   "y" [4 0.1]
                   "a" [[1 0 0 0 0 0]]
@@ -55,10 +55,10 @@
                   "y" [16 0.1]
                   "a" [[0 0 0 0 0 1]]
                   "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}))
-   (view
+   (dsl/view
     {"z" dist/gaussian
      "c" dist/categorical}
-    (clusters
+    (dsl/clusters
      0.25 {"z" [0 1]
            "c" [[1 0 0 0]]}
      0.25 {"z" [15 1]
