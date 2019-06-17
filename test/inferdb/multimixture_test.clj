@@ -1,6 +1,5 @@
 (ns inferdb.multimixture-test
   (:require [clojure.test :refer :all]
-            [clojure.java.io :as io]
             [metaprob.distributions :refer :all]
             [inferdb.cgpm.main :refer :all]
             [inferdb.utils :refer :all]
