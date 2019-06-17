@@ -10,8 +10,8 @@
 (defn make-identity-output-addr-map
   [output-addrs-types]
   (let [output-addrs (keys output-addrs-types)
-        trace-addrs  (map clojure.core/name output-addrs)]
-    (clojure.core/zipmap output-addrs trace-addrs)))
+        trace-addrs  (map name output-addrs)]
+    (zipmap output-addrs trace-addrs)))
 
 ;; The following data generator has some interesting properties:
 ;; - clusters 0 and 1 in view 0 share the samme mu parameter.
