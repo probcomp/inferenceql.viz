@@ -140,7 +140,7 @@
       (is (= (count samples) n)))))
 
                                         ; Let's define a few helper constants and functions that we'll use below.
-(def numper-simulations-for-test 100)
+(def number-simulations-for-test 100)
 (def threshold 0.1)
 (defn is-almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 (defn is-almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
@@ -165,7 +165,7 @@
                    [:x :y]
                    {:cluster-for-x 2}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           x-samples (utils/col :x  samples)
           y-samples (utils/col :y  samples)]
       (is (and (is-almost-equal? (utils/average x-samples) (:tx p2))
@@ -178,7 +178,7 @@
                    [:x :y]
                    {:cluster-for-x 2}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           x-samples (utils/col :x  samples)
           y-samples (utils/col :y  samples)
           factor 2]
@@ -192,7 +192,7 @@
                    [:a :b]
                    {:cluster-for-x 2}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           a-samples (utils/column-subset samples [:a])
           b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 1 0 0 0]
@@ -235,7 +235,7 @@
                    [:cluster-for-x, :cluster-for-y]
                    {:x (:tx p2) :y (:ty p2)}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           id-samples-x (utils/column-subset samples [:cluster-for-x])
           id-samples-y (utils/column-subset samples [:cluster-for-y])
           cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
@@ -259,7 +259,7 @@
                    [:a :b]
                    {:x (:tx p2) :y (:ty p2)}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           a-samples (utils/column-subset samples [:a])
           b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 1 0 0 0]
@@ -293,7 +293,7 @@
                    [:x :y]
                    {:cluster-for-x 3}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           x-samples (utils/col :x  samples)
           y-samples (utils/col :y  samples)]
       (is (and (is-almost-equal? (utils/average x-samples) (:tx p3))
@@ -306,7 +306,7 @@
                    [:x :y]
                    {:cluster-for-x 3}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           x-samples (utils/col :x  samples)
           y-samples (utils/col :y  samples)
           factor 2]
@@ -320,7 +320,7 @@
                    [:a :b]
                    {:cluster-for-x 3}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           a-samples (utils/column-subset samples [:a])
           b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 0 1 0 0]
@@ -363,7 +363,7 @@
                    [:cluster-for-x, :cluster-for-y]
                    {:x (:tx p3) :y (:ty p3)}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           id-samples-x (utils/column-subset samples [:cluster-for-x])
           id-samples-y (utils/column-subset samples [:cluster-for-y])
           cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
@@ -387,7 +387,7 @@
                    [:a :b]
                    {:x (:tx p3) :y (:ty p3)}
                    {}
-                   numper-simulations-for-test)
+                   number-simulations-for-test)
           a-samples (utils/column-subset samples [:a])
           b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 0 1 0 0]
