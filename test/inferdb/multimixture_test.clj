@@ -1,12 +1,12 @@
 (ns inferdb.multimixture-test
   (:require [clojure.test :refer :all]
             [inferdb.cgpm.main :refer :all]
-            [inferdb.utils :refer :all]
+            [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :refer :all]
             [inferdb.multimixture.dsl :refer :all]
             [metaprob.distributions :refer :all]))
 
-; XXX: why is this still here?
+;; XXX: why is this still here?
 (defn make-identity-output-addr-map
   [output-addrs-types]
   (let [output-addrs (keys output-addrs-types)
@@ -119,31 +119,31 @@
                     {}
                     {}
                     num-samples)]
-      (save-json "simulations-x-y"
+      (utils/save-json "simulations-x-y"
                  (scatter-plot-json ["x" "y"]
                                     samples
                                     test-points
                                     [0 18]
                                     "View 1: X, Y, A, B"))
-      (save-json "simulations-z"
+      (utils/save-json "simulations-z"
                  (hist-plot
-                   (column-subset samples [:z :c])
+                   (utils/column-subset samples [:z :c])
                    [:z :c]
                    "Dim Z and C"))
-      (save-json "simulations-a"
-                 (bar-plot (column-subset samples [:a]) "Dim A" n))
-      (save-json "simulations-b"
-                 (bar-plot (column-subset samples [:b]) "Dim B" n))
-      (save-json "simulations-c"
-                 (bar-plot (column-subset samples [:c]) "Dim C" n))
+      (utils/save-json "simulations-a"
+                 (bar-plot (utils/column-subset samples [:a]) "Dim A" n))
+      (utils/save-json "simulations-b"
+                 (bar-plot (utils/column-subset samples [:b]) "Dim B" n))
+      (utils/save-json "simulations-c"
+                 (bar-plot (utils/column-subset samples [:c]) "Dim C" n))
       (is (= (count samples) n)))))
 
 ; Let's define a few helper constants and functions that we'll use below.
 (def numper-simulations-for-test 100)
 (def threshold 0.1)
-(defn is-almost-equal? [a b] (almost-equal? a b relerr threshold))
-(defn is-almost-equal-vectors? [a b] (almost-equal-vectors? a b relerr threshold))
-(defn is-almost-equal-p? [a b] (almost-equal? a b relerr 0.01))
+(defn is-almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+(defn is-almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
+(defn is-almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 1 ;;;;;;;;;;;;;;;;;;;;;
@@ -165,10 +165,10 @@
                     {:cluster-for-x 2}
                     {}
                     numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)]
-      (is (and (is-almost-equal? (average x-samples) (:tx p2))
-               (is-almost-equal? (average y-samples) (:ty p2)))))))
+          x-samples (utils/col :x  samples)
+          y-samples (utils/col :y  samples)]
+      (is (and (is-almost-equal? (utils/average x-samples) (:tx p2))
+               (is-almost-equal? (utils/average y-samples) (:ty p2)))))))
 
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
   (testing "standard deviaton of simulations conditioned on cluster-ID = 2"
@@ -178,11 +178,11 @@
                     {:cluster-for-x 2}
                     {}
                     numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)
+          x-samples (utils/col :x  samples)
+          y-samples (utils/col :y  samples)
           factor 2]
-      (is (and (within-factor? (std x-samples) 0.5 factor)
-               (within-factor? (std y-samples) 1 factor))))))
+      (is (and (utils/within-factor? (utils/std x-samples) 0.5 factor)
+               (utils/within-factor? (utils/std y-samples) 1 factor))))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-cluster-p2
   (testing "categorical simulations conditioned on cluster-ID = 2"
@@ -192,13 +192,13 @@
                     {:cluster-for-x 2}
                     {}
                     numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
+          a-samples (utils/column-subset samples [:a])
+          b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 1 0 0 0]
           true-p-b [0.01 0.01 0.95 0.01 0.01 0.01]
           possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
+          a-p-fraction (utils/probability-vector a-samples possible-values)
+          b-p-fraction (utils/probability-vector b-samples possible-values)]
       (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
                (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
@@ -235,11 +235,11 @@
                     {:x (:tx p2) :y (:ty p2)}
                     {}
                     numper-simulations-for-test)
-          id-samples-x (column-subset samples [:cluster-for-x])
-          id-samples-y (column-subset samples [:cluster-for-y])
-          cluster-p-fraction (probability-vector id-samples-x (range 6))
+          id-samples-x (utils/column-subset samples [:cluster-for-x])
+          id-samples-y (utils/column-subset samples [:cluster-for-y])
+          cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
           true-p-cluster [0 0 1 0 0 0]]
-      (is (equal-sample-values id-samples-x id-samples-y))
+      (is (utils/equal-sample-values id-samples-x id-samples-y))
       (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p2
@@ -259,13 +259,13 @@
                     {:x (:tx p2) :y (:ty p2)}
                     {}
                     numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
+          a-samples (utils/column-subset samples [:a])
+          b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 1 0 0 0]
           true-p-b [0.01 0.01 0.95 0.01 0.01 0.01]
           possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
+          a-p-fraction (utils/probability-vector a-samples possible-values)
+          b-p-fraction (utils/probability-vector b-samples possible-values)]
       (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
                (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
@@ -293,10 +293,10 @@
                     {:cluster-for-x 3}
                     {}
                     numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)]
-      (is (and (is-almost-equal? (average x-samples) (:tx p3))
-               (is-almost-equal? (average y-samples) (:ty p3)))))))
+          x-samples (utils/col :x  samples)
+          y-samples (utils/col :y  samples)]
+      (is (and (is-almost-equal? (utils/average x-samples) (:tx p3))
+               (is-almost-equal? (utils/average y-samples) (:ty p3)))))))
 
 (deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
   (testing "standard deviaton of simulations conditioned on cluster-ID = 3"
@@ -306,11 +306,11 @@
                     {:cluster-for-x 3}
                     {}
                     numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)
+          x-samples (utils/col :x  samples)
+          y-samples (utils/col :y  samples)
           factor 2]
-      (is (and (within-factor? (std x-samples) 0.5 factor)
-               (within-factor? (std y-samples) 0.5 factor))))))
+      (is (and (utils/within-factor? (utils/std x-samples) 0.5 factor)
+               (utils/within-factor? (utils/std y-samples) 0.5 factor))))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-cluster-p3
   (testing "Categorical simulations conditioned on cluster-ID = 3"
@@ -320,13 +320,13 @@
                     {:cluster-for-x 3}
                     {}
                     numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
+          a-samples (utils/column-subset samples [:a])
+          b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 0 1 0 0]
           true-p-b [0.01 0.01 0.01 0.95 0.01 0.01]
           possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
+          a-p-fraction (utils/probability-vector a-samples possible-values)
+          b-p-fraction (utils/probability-vector b-samples possible-values)]
       (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
                (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
@@ -363,11 +363,11 @@
                     {:x (:tx p3) :y (:ty p3)}
                     {}
                     numper-simulations-for-test)
-          id-samples-x (column-subset samples [:cluster-for-x])
-          id-samples-y (column-subset samples [:cluster-for-y])
-          cluster-p-fraction (probability-vector id-samples-x (range 6))
+          id-samples-x (utils/column-subset samples [:cluster-for-x])
+          id-samples-y (utils/column-subset samples [:cluster-for-y])
+          cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
           true-p-cluster [0 0 0 1 0 0]]
-      (is (equal-sample-values id-samples-x id-samples-y))
+      (is (utils/equal-sample-values id-samples-x id-samples-y))
       (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p3
@@ -387,13 +387,13 @@
                     {:x (:tx p3) :y (:ty p3)}
                     {}
                     numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
+          a-samples (utils/column-subset samples [:a])
+          b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 0 1 0 0]
           true-p-b [0.01 0.01 0.01 0.95 0.01 0.01]
           possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
+          a-p-fraction (utils/probability-vector a-samples possible-values)
+          b-p-fraction (utils/probability-vector b-samples possible-values)]
       (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
                (is-almost-equal-vectors? b-p-fraction true-p-b))))))
 
@@ -410,13 +410,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; TODO
+;; TODO
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 5 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TODO
 
-; TODO
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 6 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; TODO
+;; TODO
