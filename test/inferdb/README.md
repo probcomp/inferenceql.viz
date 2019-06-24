@@ -124,6 +124,51 @@ For `P 1` and `P 4` the above also holds, only that we need to take into account
 
 TODO.
 
-## 6. For which datapoints  do we "know something" about MI
+## 6. For which columns  do we "know something" about MI
 
-TODO.
+Assuming the following model; we can test three things:
+```
+(def generate-crosscat-row
+  (multi-mixture
+    (view
+      {"x" gaussian
+       "y" gaussian
+       "a" categorical}
+      (clusters
+       0.25 {"x" [1 0.1]
+             "y" [1 0.1]
+             "a" [[1 0 0 0]]}
+       0.25 {"x" [2 0.1]
+             "y" [2 0.1]
+             "a" [[0 1 0 0]]}
+       0.25 {"x" [3 0.1]
+             "y" [3 0.1]
+             "a" [[0 0 1 0]]}
+       0.25 {"x" [4 0.1]
+             "y" [4 0.1]
+             "a" [[0 0 0 1]]}))
+    (view
+      {"v" gaussian
+       "w" categorical}
+      (clusters
+       1.00 {"v" [1 1]
+             "w" [1 1] }))))
+```
+See plots below.
+
+#### Invariants
+
+We know three invariants about MI:
+
+1. MI of x and y >  0
+
+2. CMI of x and y | a = 0.
+
+3. MI of w and v = 0.
+
+In addition, if we had a multivariate normal CGPM, we can analyltically compute
+the mutual information between two dimenstions. We don't have this CGPM yet.
+Once we have it, we'll add it and test against an analytically computed result.
+
+
+
