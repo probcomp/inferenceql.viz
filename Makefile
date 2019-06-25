@@ -29,6 +29,11 @@ cljs-main-opts := \
 		-o $(output-to) \
 		-c $(main-ns)
 
+all: out/main.js
+
+out/main.js:
+	clojure -m cljs.main -co api.edn -d out -o out/main.js -c inferdb.search-by-example.api
+
 .PHONY: watch
 watch: node_modules $(hot-css-resource) $(model-file) $(data-file) $(cache-file)
 	clojure -m cljs.main -w $(spreadsheet-dir)/src $(cljs-main-opts)

@@ -1,6 +1,7 @@
 /.cpcache/ # Clojure cache
 /node_modules/
 /publish/
+/out/
 /spreadsheets/out/
 
 
