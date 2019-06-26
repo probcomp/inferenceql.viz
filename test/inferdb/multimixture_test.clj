@@ -533,7 +533,60 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO
+(def p4 (test-point-coordinates "P 4"))
+;; The point lies exactly between two cluster centers. We know fewer invariants
+;; about this point.
+(deftest crosscat-simulate-cluster-id-conditoned-on-p4
+  (testing "simulations of cluster-IDs conditioned on P4"
+    (let [samples (cgpm/cgpm-simulate
+                   crosscat-cgpm
+                   [:cluster-for-x, :cluster-for-y]
+                   {:x (:tx p4) :y (:ty p4)}
+                   {}
+                   number-simulations-for-test)
+          id-samples-x (utils/column-subset samples [:cluster-for-x])
+          id-samples-y (utils/column-subset samples [:cluster-for-y])
+          cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
+          true-p-cluster [0 0 0 0.5 0.5 0]]
+      (is (utils/equal-sample-values id-samples-x id-samples-y))
+      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
+
+(deftest crosscat-logpdf-cluster-id-conditoned-on-p4
+  (testing "logPDF of the correct cluster-IDs for P1 conditioned on P2"
+    (let [logpdf (cgpm/cgpm-logpdf
+                  crosscat-cgpm
+                  {:cluster-for-x 3}
+                  {:x (:tx p4) :y (:ty p4)}
+                  {})]
+      (is (is-almost-equal-p?  logpdf (Math/log 0.5))))))
+
+(deftest crosscat-simulate-categoricals-conditioned-on-p4
+  (testing "categorical simulations conditioned on P4"
+    (let [samples (cgpm/cgpm-simulate
+                   crosscat-cgpm
+                   [:a :b]
+                   {:x (:tx p4) :y (:ty p4)}
+                   {}
+                   number-simulations-for-test)
+          a-samples (utils/column-subset samples [:a])
+          b-samples (utils/column-subset samples [:b])
+          true-p-a [0 0 0 0.5 0.5 0]
+          true-p-b [ 0.01 0.01 0.01 (/ 0.95 2) (/ 0.95 2) 0.01]
+          possible-values (range 6)
+          a-p-fraction (utils/probability-vector a-samples possible-values)
+          b-p-fraction (utils/probability-vector b-samples possible-values)]
+      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
+               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+
+(deftest crosscat-logpdf-categoricals-conditioned-on-p4
+  (testing "logPDF of categoricals conditioned on P4"
+    (let [logpdf (cgpm/cgpm-logpdf
+                  crosscat-cgpm
+                  {:a 3  :b 3}
+                  {:x (:tx p4) :y (:ty p4)}
+                  {})
+          analytical-logpdf (Math/log (/ 0.95 2))]
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 5 ;;;;;;;;;;;;;;;;;;;;;
