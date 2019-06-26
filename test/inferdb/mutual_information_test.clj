@@ -77,14 +77,14 @@
       (utils/save-json "simulations-for-mi-x-y"
                        (plot/scatter-plot-json ["x" "y"]
                                                samples
-                                               test-points
+                                               []
                                                [0 5]
                                                "View 1: X, Y, A"))
       (utils/save-json "simulations-for-mi-v-w"
                        (plot/scatter-plot-json ["v" "w"]
                                                (utils/column-subset samples
                                                                     [:v :w])
-                                               test-points
+                                               []
                                                [-4 6]
                                                "View 2: V W"))
       (is (= (count samples) n)))))
