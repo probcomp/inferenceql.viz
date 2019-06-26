@@ -122,18 +122,18 @@
           :test-point))
 
 ;; How many points do we want to create for our plot?
-(def n 1000)
+(def plot-point-count 1000)
+
 (deftest crosscatsimulate-simulate-joint
   "This tests saves plots for all simulated data in out/json results/"
   ;; Charts can be generated with make charts.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
-    (let [num-samples n
-          samples (cgpm/cgpm-simulate
-                   crosscat-cgpm
-                   [:x :y :z :a :b :c]
-                   {}
-                   {}
-                   num-samples)]
+    (let [sample-count plot-point-count
+          samples (cgpm/cgpm-simulate crosscat-cgpm
+                                      [:x :y :z :a :b :c]
+                                      {}
+                                      {}
+                                      sample-count)]
       (utils/save-json "simulations-x-y"
                        (plot/scatter-plot-json ["x" "y"]
                                                samples
@@ -146,12 +146,12 @@
                         [:z :c]
                         "Dim Z and C"))
       (utils/save-json "simulations-a"
-                       (plot/bar-plot (utils/column-subset samples [:a]) "Dim A" n))
+                       (plot/bar-plot (utils/column-subset samples [:a]) "Dim A" plot-point-count))
       (utils/save-json "simulations-b"
-                       (plot/bar-plot (utils/column-subset samples [:b]) "Dim B" n))
+                       (plot/bar-plot (utils/column-subset samples [:b]) "Dim B" plot-point-count))
       (utils/save-json "simulations-c"
-                       (plot/bar-plot (utils/column-subset samples [:c]) "Dim C" n))
-      (is (= (count samples) n)))))
+                       (plot/bar-plot (utils/column-subset samples [:c]) "Dim C" plot-point-count))
+      (is (= (count samples) plot-point-count)))))
 
 (def simulation-count 100)
 (def threshold 0.2)
