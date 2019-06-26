@@ -57,7 +57,7 @@
   (all? (map call-almost-equal (range (count a))))))
 
 (defn within-factor? [a b factor]
-  (< (/ b factor) a (* b factor)))
+  (<= (/ b factor) a (* b factor)))
 
 (defn probability-for-categories [sample-vector]
   (let [fraction (fn [item] {(first (vals (first item)))
