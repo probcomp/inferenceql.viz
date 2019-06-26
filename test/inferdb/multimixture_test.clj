@@ -141,7 +141,7 @@
 
                                         ; Let's define a few helper constants and functions that we'll use below.
 (def number-simulations-for-test 100)
-(def threshold 0.1)
+(def threshold 0.5)
 (defn is-almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 (defn is-almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
 (defn is-almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
@@ -158,7 +158,7 @@
 (def p2 (test-point-coordinates "P 2"))
 ;; Testing invariants conditioning on the cluster ID = 2 which corresponds to the component
 ;; that of which p2 is a cluster center.
-(deftest ^:kaocha/pending crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
+(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
   (testing "mean of simulations conditioned on cluster-ID = 2"
     (let [samples (cgpm/cgpm-simulate
                    crosscat-cgpm
@@ -286,7 +286,7 @@
 (def p3 (test-point-coordinates "P 3"))
 ;; Testing invariants conditioning on the cluster ID = 3 which corresponds to the component
 ;; that of which p3 is a cluster center.
-(deftest ^:kaocha/pending crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
+(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
   (testing "mean of simulations conditioned on cluster-ID = 3"
     (let [samples (cgpm/cgpm-simulate
                    crosscat-cgpm
