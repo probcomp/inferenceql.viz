@@ -1,5 +1,5 @@
 (ns inferdb.multimixture-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [clojure.test :as test :refer [deftest is testing]]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :as plot]
@@ -13,6 +13,56 @@
         trace-addrs  (map name output-addrs)]
     (zipmap output-addrs trace-addrs)))
 
+(def multi-mixture
+  [{:vars {"x" dist/gaussian
+           "y" dist/gaussian
+           "a" dist/categorical
+           "b" dist/categorical}
+    :clusters [{:probability 0.166666666
+                :args {"x" [3 1]
+                       "y" [4 0.1]
+                       "a" [[1 0 0 0 0 0]]
+                       "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}}
+               {:probability 0.166666666
+                :args {"x" [3 0.1]
+                       "y" [4 1]
+                       "a" [[0 1 0 0 0 0]]
+                       "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}}
+               {:probability 0.166666667
+                :args {"x" [8 0.5]
+                       "y" [10 1]
+                       "a" [[0 0 1 0 0 0]]
+                       "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}}
+               {:probability 0.166666666
+                :args {"x" [14 0.5]
+                       "y" [7 0.5]
+                       "a" [[0 0 0 1 0 0]]
+                       "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}}
+               {:probability 0.166666666
+                :args {"x" [16 0.5]
+                       "y" [9 0.5]
+                       "a" [[0 0 0 0 1 0]]
+                       "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}}
+               {:probability 0.166666666
+                :args {"x" [9  2.5]
+                       "y" [16 0.1]
+                       "a" [[0 0 0 0 0 1]]
+                       "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}}]}
+   {:vars {"z" dist/gaussian
+           "c" dist/categorical}
+    :clusters [{:probability 0.25
+                :args {"z" [0 1]
+                       "c" [[1 0 0 0]]}}
+               {:probability 0.25
+                :args {"z" [15 1]
+                       "c" [[0 1 0 0]]}}
+               {:probability 0.25
+                :args {"z" [30 1]
+                       "c" [[0 0 1 0]]}}
+               {:probability 0.25
+                :args {"z" [15 8]
+                       "c" [[0 0 0 1]]}}]}])
+
 ;; The following data generator has some interesting properties:
 ;; - clusters 0 and 1 in view 0 share the samme mu parameter.
 ;; - a is a deterministic indicator of the cluster.
@@ -24,49 +74,13 @@
 ;; I'd encourage everyone who works with the file to run the tests in this file
 ;; and then run make charts to see how the components relate.
 (def generate-crosscat-row
-  (dsl/multi-mixture
-   (dsl/view
-    {"x" dist/gaussian
-     "y" dist/gaussian
-     "a" dist/categorical
-     "b" dist/categorical}
-    (dsl/clusters
-     0.166666666 {"x" [3 1]
-                  "y" [4 0.1]
-                  "a" [[1 0 0 0 0 0]]
-                  "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}
-     0.166666666 {"x" [3 0.1]
-                  "y" [4 1]
-                  "a" [[0 1 0 0 0 0]]
-                  "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}
-     0.166666667 {"x" [8 0.5]
-                  "y" [10 1]
-                  "a" [[0 0 1 0 0 0]]
-                  "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}
-     0.166666666 {"x" [14 0.5]
-                  "y" [7 0.5]
-                  "a" [[0 0 0 1 0 0]]
-                  "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}
-     0.166666666 {"x" [16 0.5]
-                  "y" [9 0.5]
-                  "a" [[0 0 0 0 1 0]]
-                  "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}
-     0.166666666 {"x" [9  2.5]
-                  "y" [16 0.1]
-                  "a" [[0 0 0 0 0 1]]
-                  "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}))
-   (dsl/view
-    {"z" dist/gaussian
-     "c" dist/categorical}
-    (dsl/clusters
-     0.25 {"z" [0 1]
-           "c" [[1 0 0 0]]}
-     0.25 {"z" [15 1]
-           "c" [[0 1 0 0]]}
-     0.25 {"z" [30 1]
-           "c" [[0 0 1 0]]}
-     0.25 {"z" [15 8]
-           "c" [[0 0 0 1]]}))))
+  (apply dsl/multi-mixture
+         (map (fn [{:keys [vars clusters]}]
+                (dsl/view vars (apply dsl/clusters
+                                      (mapcat (fn [{:keys [probability args]}]
+                                                [probability args])
+                                              clusters))))
+              multi-mixture)))
 
 (def crosscat-cgpm
   (let [outputs-addrs-types {;; Variables in the table.
@@ -142,9 +156,22 @@
                                         ; Let's define a few helper constants and functions that we'll use below.
 (def number-simulations-for-test 100)
 (def threshold 0.1)
-(defn is-almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
-(defn is-almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
-(defn is-almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
+(defn almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+(defn almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
+(defn almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
+
+#_
+(defmethod test/assert-expr 'almost-equal? [msg [_ a b :as form]]
+  `(let [result# (almost-equal? ~a ~b)]
+     (if result#
+       (test/do-report {:type :pass
+                        :message ~msg
+                        :expected '~form
+                        :actual result#})
+       (test/do-report {:type :fail
+                        :message ~msg
+                        :expected '~form
+                        :actual '(~'not (almost-equal? ~a ~b))}))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 1 ;;;;;;;;;;;;;;;;;;;;;
@@ -158,7 +185,8 @@
 (def p2 (test-point-coordinates "P 2"))
 ;; Testing invariants conditioning on the cluster ID = 2 which corresponds to the component
 ;; that of which p2 is a cluster center.
-(deftest ^:kaocha/pending crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
+;; ^:kaocha/pending
+(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
   (testing "mean of simulations conditioned on cluster-ID = 2"
     (let [samples (cgpm/cgpm-simulate
                    crosscat-cgpm
@@ -168,8 +196,8 @@
                    number-simulations-for-test)
           x-samples (utils/col :x  samples)
           y-samples (utils/col :y  samples)]
-      (is (and (is-almost-equal? (utils/average x-samples) (:tx p2))
-               (is-almost-equal? (utils/average y-samples) (:ty p2)))))))
+      (is (almost-equal? (utils/average x-samples) (:tx p2)))
+      (is (almost-equal? (utils/average y-samples) (:ty p2))))))
 
 (deftest crosscat-simulate-simulate-stddev-conditioned-on-cluster-p2
   (testing "standard deviaton of simulations conditioned on cluster-ID = 2"
@@ -200,8 +228,8 @@
           possible-values (range 6)
           a-p-fraction (utils/probability-vector a-samples possible-values)
           b-p-fraction (utils/probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+      (is (and (almost-equal-vectors? a-p-fraction true-p-a)
+               (almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-point-conditioned-on-cluster-p2
   (testing "categorical logPDF of P2 conditioned on cluster-ID = 2"
@@ -213,7 +241,7 @@
           analytical-logpdf (+
                              (dist/score-gaussian (:tx p2) [8  0.5])
                              (dist/score-gaussian (:ty p2) [10 1]))]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
 ;; on :a taking any different value than 2 this will crash.
@@ -226,7 +254,7 @@
                   {:cluster-for-x 2}
                   {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  logpdf analytical-logpdf)))))
 
 (deftest crosscat-simulate-cluster-id-conditoned-on-p2
   (testing "simulations of cluster-IDs conditioned on P2"
@@ -241,7 +269,7 @@
           cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
           true-p-cluster [0 0 1 0 0 0]]
       (is (utils/equal-sample-values id-samples-x id-samples-y))
-      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
+      (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p2
   (testing "logPDF of the correct cluster-IDs for P2 conditioned on P2"
@@ -250,7 +278,7 @@
                   {:cluster-for-x 2}
                   {:x (:tx p2) :y (:ty p2)}
                   {})]
-      (is (is-almost-equal-p?  logpdf 0)))))
+      (is (almost-equal-p?  logpdf 0)))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-p2
   (testing "categorical simulations conditioned on P2"
@@ -267,8 +295,8 @@
           possible-values (range 6)
           a-p-fraction (utils/probability-vector a-samples possible-values)
           b-p-fraction (utils/probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+      (is (and (almost-equal-vectors? a-p-fraction true-p-a)
+               (almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p2
   (testing "logPDF of categoricals conditioned on P2"
@@ -278,7 +306,7 @@
                   {:x (:tx p2) :y (:ty p2)}
                   {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 3 ;;;;;;;;;;;;;;;;;;;;;
@@ -296,8 +324,8 @@
                    number-simulations-for-test)
           x-samples (utils/col :x  samples)
           y-samples (utils/col :y  samples)]
-      (is (and (is-almost-equal? (utils/average x-samples) (:tx p3))
-               (is-almost-equal? (utils/average y-samples) (:ty p3)))))))
+      (is (and (almost-equal? (utils/average x-samples) (:tx p3))
+               (almost-equal? (utils/average y-samples) (:ty p3)))))))
 
 (deftest crosscat-simulate-simulate-stddev-conditioned-on-cluster-p3
   (testing "standard deviaton of simulations conditioned on cluster-ID = 3"
@@ -328,8 +356,8 @@
           possible-values (range 6)
           a-p-fraction (utils/probability-vector a-samples possible-values)
           b-p-fraction (utils/probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+      (is (and (almost-equal-vectors? a-p-fraction true-p-a)
+               (almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-point-conditioned-on-cluster-p3
   (testing "categorical logPDF of P3 conditioned on cluster-ID = 3"
@@ -341,7 +369,7 @@
           analytical-logpdf (+
                              (dist/score-gaussian (:tx p3) [14 0.5])
                              (dist/score-gaussian (:ty p3) [ 7 0.5]))]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;; TODO: Same as above. Add a smoke test. Categories for :a are deteriministic.
 ;; If we condition on :a taking any different value than 3 this will crash.
@@ -354,7 +382,7 @@
                   {:cluster-for-x 3}
                   {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  logpdf analytical-logpdf)))))
 
 (deftest crosscat-simulate-cluster-id-conditoned-on-p3
   (testing "simulations of cluster-IDs conditioned on P3"
@@ -369,7 +397,7 @@
           cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
           true-p-cluster [0 0 0 1 0 0]]
       (is (utils/equal-sample-values id-samples-x id-samples-y))
-      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
+      (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p3
   (testing "logPDF of the correct cluster-IDs for P3 conditioned on P3"
@@ -378,7 +406,7 @@
                   {:cluster-for-x 3}
                   {:x (:tx p3) :y (:ty p3)}
                   {})]
-      (is (is-almost-equal-p?  logpdf 0)))))
+      (is (almost-equal-p?  logpdf 0)))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-p3
   (testing "categorical simulations conditioned on P3"
@@ -395,8 +423,8 @@
           possible-values (range 6)
           a-p-fraction (utils/probability-vector a-samples possible-values)
           b-p-fraction (utils/probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+      (is (and (almost-equal-vectors? a-p-fraction true-p-a)
+               (almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p3
   (testing "logPDF of categoricals conditioned on P3"
@@ -406,7 +434,7 @@
                   {:x (:tx p3) :y (:ty p3)}
                   {})
           analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;
