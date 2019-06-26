@@ -149,8 +149,130 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 1 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO. This case is marginally more complicated because P 1 happens to be the
-;; center of two clusters.
+(def p1 (test-point-coordinates "P 1"))
+;; Testing invariants conditioning on the cluster ID = 2 which corresponds to the component
+;; that of which p2 is a cluster center.
+(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p1
+  (testing "mean of simulations conditioned on cluster-ID = 1"
+    (let [samples (cgpm/cgpm-simulate
+                   crosscat-cgpm
+                   [:x :y]
+                   {:cluster-for-x 0}
+                   {}
+                   number-simulations-for-test)
+          x-samples (utils/col :x  samples)
+          y-samples (utils/col :y  samples)]
+      (is (and (is-almost-equal? (utils/average x-samples) (:tx p1))
+               (is-almost-equal? (utils/average y-samples) (:ty p1)))))))
+
+(deftest crosscat-simulate-simulate-stddev-conditioned-on-cluster-p1
+  (testing "standard deviaton of simulations conditioned on cluster-ID = 1"
+    (let [samples (cgpm/cgpm-simulate
+                   crosscat-cgpm
+                   [:x :y]
+                   {:cluster-for-x 0}
+                   {}
+                   number-simulations-for-test)
+          x-samples (utils/col :x  samples)
+          y-samples (utils/col :y  samples)
+          factor 2]
+      (is (and (utils/within-factor? (utils/std x-samples) 1 factor)
+               (utils/within-factor? (utils/std y-samples) 0.1 factor))))))
+
+(deftest crosscat-simulate-categoricals-conditioned-on-cluster-p1
+  (testing "categorical simulations conditioned on cluster-ID = 1"
+    (let [samples (cgpm/cgpm-simulate
+                   crosscat-cgpm
+                   [:a :b]
+                   {:cluster-for-x 0}
+                   {}
+                   number-simulations-for-test)
+          a-samples (utils/column-subset samples [:a])
+          b-samples (utils/column-subset samples [:b])
+          true-p-a [1 0 0 0 0 0]
+          true-p-b [0.95 0.01 0.01 0.01 0.01 0.01]
+          possible-values (range 6)
+          a-p-fraction (utils/probability-vector a-samples possible-values)
+          b-p-fraction (utils/probability-vector b-samples possible-values)]
+      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
+               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+
+(deftest crosscat-logpdf-point-conditioned-on-cluster-p1
+  (testing "categorical logPDF of P1 conditioned on cluster-ID = 1"
+    (let [logpdf (cgpm/cgpm-logpdf
+                  crosscat-cgpm
+                  {:x (:tx p1) :y (:ty p1)}
+                  {:cluster-for-x 1}
+                  {})
+          analytical-logpdf (+
+                               (dist/score-gaussian (:tx p1) [3  1])
+                               (dist/score-gaussian (:ty p1) [4 0.1]))]
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+
+;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
+;; on :a taking any different value than 2 this will crash.
+(deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p1
+  (testing "logPDF of categoricals implying cluster ID 1 conditioned on cluster-ID = 1"
+    ;; XXX, not sure how to deal wth line breaks for this....
+    (let [logpdf (cgpm/cgpm-logpdf
+                  crosscat-cgpm
+                  {:a 0  :b 0}
+                  {:cluster-for-x 0}
+                  {})
+          analytical-logpdf (Math/log 0.95)]
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+
+(deftest crosscat-simulate-cluster-id-conditoned-on-p1
+  (testing "simulations of cluster-IDs conditioned on P1"
+    (let [samples (cgpm/cgpm-simulate
+                   crosscat-cgpm
+                   [:cluster-for-x, :cluster-for-y]
+                   {:x (:tx p1) :y (:ty p1)}
+                   {}
+                   number-simulations-for-test)
+          id-samples-x (utils/column-subset samples [:cluster-for-x])
+          id-samples-y (utils/column-subset samples [:cluster-for-y])
+          cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
+          true-p-cluster [0.5 0.5 0 0 0 0]]
+      (is (utils/equal-sample-values id-samples-x id-samples-y))
+      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
+
+(deftest crosscat-logpdf-cluster-id-conditoned-on-p1
+  (testing "logPDF of the correct cluster-IDs for P1 conditioned on P2"
+    (let [logpdf (cgpm/cgpm-logpdf
+                  crosscat-cgpm
+                  {:cluster-for-x 0}
+                  {:x (:tx p1) :y (:ty p1)}
+                  {})]
+      (is (is-almost-equal-p?  logpdf (Math/log 0.5))))))
+
+(deftest crosscat-simulate-categoricals-conditioned-on-p1
+  (testing "categorical simulations conditioned on P1"
+    (let [samples (cgpm/cgpm-simulate
+                   crosscat-cgpm
+                   [:a :b]
+                   {:x (:tx p1) :y (:ty p1)}
+                   {}
+                   number-simulations-for-test)
+          a-samples (utils/column-subset samples [:a])
+          b-samples (utils/column-subset samples [:b])
+          true-p-a [0.5 0.5 0 0 0 0]
+          true-p-b [(/ 0.95 2) (/ 0.95 2) 0.01 0.01 0.01 0.01]
+          possible-values (range 6)
+          a-p-fraction (utils/probability-vector a-samples possible-values)
+          b-p-fraction (utils/probability-vector b-samples possible-values)]
+      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
+               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+
+(deftest crosscat-logpdf-categoricals-conditioned-on-p1
+  (testing "logPDF of categoricals conditioned on P1"
+    (let [logpdf (cgpm/cgpm-logpdf
+                  crosscat-cgpm
+                  {:a 0  :b 0}
+                  {:x (:tx p1) :y (:ty p1)}
+                  {})
+          analytical-logpdf (Math/log (/ 0.95 2))]
+      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
