@@ -193,8 +193,6 @@
   [view cluster variable]
   (get-in multi-mixture [view :clusters cluster :args (name variable)]))
 
-(get-in multi-mixture [0 :clusters 0 :args :x])
-
 (defn mixture-mu
   [view cluster variable]
   (first (variable-parameters view cluster variable)))
