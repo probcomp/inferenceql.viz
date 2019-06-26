@@ -154,21 +154,35 @@ Assuming the following model; we can test three things:
        1.00 {"v" [1 1]
              "w" [1 1] }))))
 ```
-See plots below.
+See samples from the first view here:
+
+![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-for-mi-x-y.png)
+
+
+
+and samples from the second view here:
+
+![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-for-mi-v-w.png)
 
 #### Invariants
 
-We know three invariants about MI:
+For the Multimix model we specified to test MI, we know that three invariants about 
+MI hold given this model:
 
-1. MI of x and y >  0
+1. MI of `x` and `y is larger than  0` because `x` carries information about `y`.
 
-2. CMI of x and y | a = 0.
+2. CMI of `x` and `y | a = 0`. Column `a` is a deterministic indicator of the
+   cluster ID. Conditioning on `a = 0` simplifies the distribution of `x` and `y`
+   to a simple bivariate Gaussian with a diagonal covariance matrix. This implies
+   that `x` and `y` are statistically independent and there is no information
+   flowing between them.
 
-3. MI of w and v = 0.
+3. MI of `v` and `w` is equal to 0. Again, the joint is equal to a bivariate
+   Gaussian distribution with a diagonal covariance matrix and no information is
+   flowing between `v` and `w`.
 
-In addition, if we had a multivariate normal CGPM, we can analyltically compute
-the mutual information between two dimenstions. We don't have this CGPM yet.
+#### Multivariate Gaussian
+
+In addition, if we had a multivariate normal CGPM, we could analytically compute
+the mutual information between two dimensions. We don't have this CGPM yet.
 Once we have it, we'll add it and test against an analytically computed result.
-
-
-
