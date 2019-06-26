@@ -64,12 +64,12 @@
                        "c" [[0 0 0 1]]}}]}])
 
 ;; The following data generator has some interesting properties:
-;; - clusters 0 and 1 in view 0 share the samme mixture-mu parameter.
+;; - clusters 0 and 1 in view 0 share the samme mu parameter.
 ;; - a is a deterministic indicator of the cluster.
 ;; - b is a noisy copy of a.
 ;; - in both views, clusters are equally weighted.
-;; - in view 1, the third Gaussian components (point 0) "spans" the domain of
-;; all the other components and share a center with point 1.
+;; - in view 1, the third Gaussian components (cluster 0) "spans" the domain of
+;; all the other components and share a center with cluster 1.
 ;;
 ;; I'd encourage everyone who works with the file to run the tests in this file
 ;; and then run make charts to see how the components relate.
