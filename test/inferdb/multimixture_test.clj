@@ -153,8 +153,7 @@
                        (plot/bar-plot (utils/column-subset samples [:c]) "Dim C" n))
       (is (= (count samples) n)))))
 
-;; Let's define a few helper constants and functions that we'll use below.
-(def num-simulations 100)
+(def simulation-count 100)
 (def threshold 0.2)
 
 (defn almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
@@ -174,7 +173,7 @@
                                         nominal-variables
                                         {:cluster-for-x point-id}
                                         {}
-                                        num-simulations)]
+                                        simulation-count)]
         (doseq [variable nominal-variables]
           (testing (str "of nominal variable " variable)
             (let [samples (utils/col variable samples)]
@@ -189,6 +188,7 @@
                   (is (utils/within-factor? (utils/std samples)
                                             actual-std
                                             2)))))))))))
+
 (defn variable-parameters
   [view cluster variable]
   (get-in multi-mixture [view :clusters cluster :args (name variable)]))
@@ -239,7 +239,7 @@
                                              {})]
       (is (almost-equal-p? simulated-logpdf analytical-logpdf)))))
 
-(deftest categorical-simulations
+(deftest simulated-categorical-probabilities
   (doseq [point #{2 3}]
     (testing (str "For categorical point " point)
       (testing "simulations"
@@ -247,7 +247,7 @@
                                               categorical-variables
                                               {:cluster-for-x point}
                                               {}
-                                              num-simulations)]
+                                              simulation-count)]
           (doseq [variable categorical-variables]
             (testing (str "of categorical variable" variable)
               (let [samples (utils/column-subset all-samples [variable])
@@ -269,7 +269,7 @@
 ;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
 ;; on :a taking any different value than 2 this will crash.
 (deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p2
-  (testing "logPDF of categoricals implying point ID 2 conditioned on cluster-ID = 2"
+  (testing "logPDF of categoricals implying cluster ID 2 conditioned on cluster-ID = 2"
     ;; XXX, not sure how to deal wth line breaks for this....
     (let [simulated-logpdf (cgpm/cgpm-logpdf
                             crosscat-cgpm
@@ -286,7 +286,7 @@
                    [:cluster-for-x, :cluster-for-y]
                    {:x (:x p2) :y (:y p2)}
                    {}
-                   num-simulations)
+                   simulation-count)
           id-samples-x (utils/column-subset samples [:cluster-for-x])
           id-samples-y (utils/column-subset samples [:cluster-for-y])
           cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
@@ -310,7 +310,7 @@
                    [:a :b]
                    {:x (:x p2) :y (:y p2)}
                    {}
-                   num-simulations)
+                   simulation-count)
           a-samples (utils/column-subset samples [:a])
           b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 1 0 0 0]
@@ -358,7 +358,7 @@
                    [:cluster-for-x, :cluster-for-y]
                    {:x (:x p3) :y (:y p3)}
                    {}
-                   num-simulations)
+                   simulation-count)
           id-samples-x (utils/column-subset samples [:cluster-for-x])
           id-samples-y (utils/column-subset samples [:cluster-for-y])
           cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
@@ -382,7 +382,7 @@
                    [:a :b]
                    {:x (:x p3) :y (:y p3)}
                    {}
-                   num-simulations)
+                   simulation-count)
           a-samples (utils/column-subset samples [:a])
           b-samples (utils/column-subset samples [:b])
           true-p-a [0 0 0 1 0 0]
