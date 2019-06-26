@@ -158,7 +158,7 @@
 (def p2 (test-point-coordinates "P 2"))
 ;; Testing invariants conditioning on the cluster ID = 2 which corresponds to the component
 ;; that of which p2 is a cluster center.
-(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
+(deftest ^:kaocha/pending crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
   (testing "mean of simulations conditioned on cluster-ID = 2"
     (let [samples (cgpm/cgpm-simulate
                    crosscat-cgpm
@@ -286,7 +286,7 @@
 (def p3 (test-point-coordinates "P 3"))
 ;; Testing invariants conditioning on the cluster ID = 3 which corresponds to the component
 ;; that of which p3 is a cluster center.
-(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
+(deftest ^:kaocha/pending crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
   (testing "mean of simulations conditioned on cluster-ID = 3"
     (let [samples (cgpm/cgpm-simulate
                    crosscat-cgpm
