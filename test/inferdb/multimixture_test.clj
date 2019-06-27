@@ -228,11 +228,11 @@
                                                 (dist/score-gaussian mu [mu sigma]))))
                                        +
                                        nominal-variables)
-          simulated-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
-                                             point
-                                             {:cluster-for-x cluster}
-                                             {})]
-      (is (almost-equal-p? analytical-logpdf simulated-logpdf)))))
+          queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                           point
+                                           {:cluster-for-x cluster}
+                                           {})]
+      (is (almost-equal-p? analytical-logpdf queried-logpdf)))))
 
 (deftest simulated-categorical-probabilities
   (doseq [cluster (keys cluster-point-mapping)]
@@ -281,12 +281,12 @@
                                            (assoc m (keyword variable) (max-index probabilities)))
                                          {}
                                          categorical-args)
-                  simulated-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
-                                                     constraints
-                                                     {:cluster-for-x cluster}
-                                                     {})
+                  queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                   constraints
+                                                   {:cluster-for-x cluster}
+                                                   {})
                   analytical-logpdf (Math/log (apply max (get-in multi-mixture [0 :clusters cluster :args "b" 0])))]
-              (is (almost-equal-p? analytical-logpdf simulated-logpdf)))))))))
+              (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))))
 
 (deftest simulations-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
@@ -311,11 +311,11 @@
     (when-not (= 1 point-id)
       (testing (str "P" point-id)
         (let [point (test-point point-id)
-              simulated-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
-                                                 {:cluster-for-x cluster}
-                                                 point
-                                                 {})]
-          (is (almost-equal-p? 0 simulated-logpdf)))))))
+              queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                               {:cluster-for-x cluster}
+                                               point
+                                               {})]
+          (is (almost-equal-p? 0 queried-logpdf)))))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
@@ -345,13 +345,13 @@
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p2
   (testing "logPDF of categoricals conditioned on P2"
-    (let [simulated-logpdf (cgpm/cgpm-logpdf
-                            crosscat-cgpm
-                            {:a 2  :b 2}
-                            {:x (:x p2) :y (:y p2)}
-                            {})
+    (let [queried-logpdf (cgpm/cgpm-logpdf
+                          crosscat-cgpm
+                          {:a 2  :b 2}
+                          {:x (:x p2) :y (:y p2)}
+                          {})
           analytical-logpdf (Math/log 0.95)]
-      (is (almost-equal-p?  simulated-logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  queried-logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 3 ;;;;;;;;;;;;;;;;;;;;;
@@ -364,13 +364,13 @@
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p3
   (testing "logPDF of categoricals conditioned on P3"
-    (let [simulated-logpdf (cgpm/cgpm-logpdf
-                            crosscat-cgpm
-                            {:a 3  :b 3}
-                            {:x (:x p3) :y (:y p3)}
-                            {})
+    (let [queried-logpdf (cgpm/cgpm-logpdf
+                          crosscat-cgpm
+                          {:a 3  :b 3}
+                          {:x (:x p3) :y (:y p3)}
+                          {})
           analytical-logpdf (Math/log 0.95)]
-      (is (almost-equal-p?  simulated-logpdf analytical-logpdf)))))
+      (is (almost-equal-p?  queried-logpdf analytical-logpdf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;
