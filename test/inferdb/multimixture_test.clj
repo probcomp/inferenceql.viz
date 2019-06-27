@@ -225,7 +225,6 @@
           analytical-logpdf (transduce (map (fn [variable]
                                               (let [mu (data/mu multi-mixture variable cluster)
                                                     sigma (data/sigma multi-mixture variable cluster)]
-                                                (println mu sigma)
                                                 (dist/score-gaussian mu [mu sigma]))))
                                        +
                                        nominal-variables)
