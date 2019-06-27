@@ -154,7 +154,7 @@
       (is (= (count samples) plot-point-count)))))
 
 (def simulation-count 100)
-(def threshold 0.2)
+(def threshold 0.25)
 
 (defn almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 (defn almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
@@ -164,29 +164,43 @@
 (def nominal-variables #{:x :y})
 (def categorical-variables #{:a :b})
 
+;; Maps each cluster index to the ID of the point that is at the cluster's
+;; center. Note that not all points have a cluster around them.
+(def cluster-point-mapping
+  {0 1
+   1 1
+   2 2
+   3 3
+   ;; P4 between clusters 4 and 5
+   4 5
+   5 6})
+
+(defn test-point
+  [point-id]
+  (select-keys (nth test-points (dec point-id))
+               (into nominal-variables categorical-variables)))
+
 (deftest nominal-simulations
-  ;; TODO: Test point 1. This case is marginally more complicated because P 1
-  ;;       happens to be the center of two clusters.
-  (doseq [point-id #{2 3}]
-    (testing (str "Simulations for P " point-id)
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (testing (str "Simulations conditioned on P" point-id)
       (let [samples (cgpm/cgpm-simulate crosscat-cgpm
                                         nominal-variables
-                                        {:cluster-for-x point-id}
+                                        {:cluster-for-x cluster}
                                         {}
                                         simulation-count)]
         (doseq [variable nominal-variables]
-          (testing (str "of nominal variable " variable)
+          (testing (str "of " variable)
             (let [samples (utils/col variable samples)]
               (testing "mean"
-                (is (almost-equal? (utils/average samples)
-                                   (get-in test-points [(dec point-id) variable]))))
+                (is (almost-equal? (get (test-point point-id) variable)
+                                   (utils/average samples))))
               (testing "standard deviation"
                 (let [actual-std (get-in multi-mixture [0
-                                                        :clusters point-id
+                                                        :clusters cluster
                                                         :args (name variable)
                                                         1])]
-                  (is (utils/within-factor? (utils/std samples)
-                                            actual-std
+                  (is (utils/within-factor? actual-std
+                                            (utils/std samples)
                                             2)))))))))))
 
 (defn variable-parameters
@@ -201,16 +215,6 @@
   [view cluster variable]
   (second (variable-parameters view cluster variable)))
 
-;; Maps each cluster index to the ID of the point that is at the cluster's
-;; center. Note that not all clusters have a point at their center.
-(def cluster-point-mapping
-  {0 1
-   1 1
-   2 2
-   3 3
-   4 5
-   5 6})
-
 (deftest test-cluster-point-mapping
   ;; Clusters that have a point at their center should have that point's
   ;; variables as the mu for each gaussian that makes up the cluster gaussian
@@ -218,14 +222,14 @@
   (doseq [[cluster point-id] cluster-point-mapping]
     (doseq [variable #{:x :y}]
       (let [view 0
-            point-value (get-in test-points [(dec point-id) variable])
+            point-value (get (test-point point-id) variable)
             mu (mixture-mu view cluster variable)]
         (is (= point-value mu))))))
 
 (deftest nominal-logpdf-point
   (doseq [[cluster point-id] cluster-point-mapping]
     (let [view 0
-          point (select-keys (nth test-points (dec point-id))
+          point (select-keys (test-point point-id)
                              nominal-variables)
           analytical-logpdf (transduce (map (fn [variable]
                                               (let [mu (mixture-mu view cluster variable)
@@ -237,31 +241,26 @@
                                              point
                                              {:cluster-for-x cluster}
                                              {})]
-      (is (almost-equal-p? simulated-logpdf analytical-logpdf)))))
+      (is (almost-equal-p? analytical-logpdf simulated-logpdf)))))
 
 (deftest simulated-categorical-probabilities
-  (doseq [point #{2 3}]
-    (testing (str "For categorical point " point "simulations")
+  (doseq [cluster (keys cluster-point-mapping)]
+    (testing (str "For categorical cluster " cluster "simulations")
       (let [all-samples (cgpm/cgpm-simulate crosscat-cgpm
                                             categorical-variables
-                                            {:cluster-for-x point}
+                                            {:cluster-for-x cluster}
                                             {}
                                             simulation-count)]
         (doseq [variable categorical-variables]
           (testing (str "of categorical variable" variable)
             (let [samples (utils/column-subset all-samples [variable])
                   actual-probabilities (get-in multi-mixture [0
-                                                              :clusters point
+                                                              :clusters cluster
                                                               :args (name variable)
                                                               0])
                   possible-values (range 6)
                   probabilities (utils/probability-vector samples possible-values)]
               (is (almost-equal-vectors? probabilities actual-probabilities)))))))))
-
-(defn test-point
-  [point-id]
-  (select-keys (nth test-points (dec point-id))
-               (into nominal-variables categorical-variables)))
 
 (defn max-index
   "Returns the index of the maximum value in the provided vector."
@@ -271,12 +270,10 @@
 (deftest categorical-variables-determined-by-cluster
   (let [clusters (get-in multi-mixture [0 :clusters])]
     (testing "Across all clusters most likely categorical indexes are distinct"
-      (is (= (count clusters)
-             (count (mapcat (fn [cluster]
-                              (distinct
+      (is (distinct? (mapcat (fn [cluster]
                                (map (comp max-index first)
-                                    (vals (select-keys (:args cluster) (map name categorical-variables))))))
-                            clusters)))))
+                                    (vals (select-keys (:args cluster) (map name categorical-variables)))))
+                             clusters))))
     (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
       (testing (str "For cluster " cluster)
         (let [categorical-args (select-keys args (map name categorical-variables))]
@@ -309,12 +306,11 @@
 
 (deftest crosscat-simulate-cluster-id-conditoned-on-p2
   (testing "simulations of cluster-IDs conditioned on P2"
-    (let [samples (cgpm/cgpm-simulate
-                   crosscat-cgpm
-                   [:cluster-for-x, :cluster-for-y]
-                   {:x (:x p2) :y (:y p2)}
-                   {}
-                   simulation-count)
+    (let [samples (cgpm/cgpm-simulate crosscat-cgpm
+                                      [:cluster-for-x, :cluster-for-y]
+                                      {:x (:x p2) :y (:y p2)}
+                                      {}
+                                      simulation-count)
           id-samples-x (utils/column-subset samples [:cluster-for-x])
           id-samples-y (utils/column-subset samples [:cluster-for-y])
           cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
