@@ -267,7 +267,7 @@
   [xs]
   (first (apply max-key second (map-indexed vector xs))))
 
-(deftest categorical-variables-determined-by-cluster
+(deftest logpdf-categoricals-conditioned-on-cluster
   (let [clusters (get-in multi-mixture [0 :clusters])]
     (testing "Across all clusters most likely categorical indexes are distinct"
       (is (distinct? (mapcat (fn [cluster]
@@ -275,7 +275,7 @@
                                     (vals (select-keys (:args cluster) (map name categorical-variables)))))
                              clusters))))
     (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
-      (testing (str "For cluster " cluster)
+      (testing (str "Conditioned on cluster " cluster)
         (let [categorical-args (select-keys args (map name categorical-variables))]
           (testing "maximum indexes agree"
             (is (= 1 (->> (vals categorical-args)
@@ -283,7 +283,7 @@
                           (map max-index)
                           (distinct)
                           (count)))))
-          (testing "simulated probabilities"
+          (testing "logpdf"
             (let [;; Constrain all categorical variables to their most likely values
                   ;; for the cluster.
                   constraints (reduce-kv (fn [m variable [probabilities]]
@@ -294,8 +294,8 @@
                                                      constraints
                                                      {:cluster-for-x cluster}
                                                      {})
-                  analytical-logpdf (Math/log 0.95)]
-              (is (almost-equal-p? simulated-logpdf analytical-logpdf)))))))))
+                  analytical-logpdf (Math/log (apply max (get-in multi-mixture [0 :clusters cluster :args "b" 0])))]
+              (is (almost-equal-p? analytical-logpdf simulated-logpdf)))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
