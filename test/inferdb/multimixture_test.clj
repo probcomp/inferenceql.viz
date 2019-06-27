@@ -241,23 +241,64 @@
 
 (deftest simulated-categorical-probabilities
   (doseq [point #{2 3}]
-    (testing (str "For categorical point " point)
-      (testing "simulations"
-        (let [all-samples (cgpm/cgpm-simulate crosscat-cgpm
-                                              categorical-variables
-                                              {:cluster-for-x point}
-                                              {}
-                                              simulation-count)]
-          (doseq [variable categorical-variables]
-            (testing (str "of categorical variable" variable)
-              (let [samples (utils/column-subset all-samples [variable])
-                    actual-probabilities (get-in multi-mixture [0
-                                                                :clusters point
-                                                                :args (name variable)
-                                                                0])
-                    possible-values (range 6)
-                    probabilities (utils/probability-vector samples possible-values)]
-                (is (almost-equal-vectors? probabilities actual-probabilities))))))))))
+    (testing (str "For categorical point " point "simulations")
+      (let [all-samples (cgpm/cgpm-simulate crosscat-cgpm
+                                            categorical-variables
+                                            {:cluster-for-x point}
+                                            {}
+                                            simulation-count)]
+        (doseq [variable categorical-variables]
+          (testing (str "of categorical variable" variable)
+            (let [samples (utils/column-subset all-samples [variable])
+                  actual-probabilities (get-in multi-mixture [0
+                                                              :clusters point
+                                                              :args (name variable)
+                                                              0])
+                  possible-values (range 6)
+                  probabilities (utils/probability-vector samples possible-values)]
+              (is (almost-equal-vectors? probabilities actual-probabilities)))))))))
+
+(defn test-point
+  [point-id]
+  (select-keys (nth test-points (dec point-id))
+               (into nominal-variables categorical-variables)))
+
+(defn max-index
+  "Returns the index of the maximum value in the provided vector."
+  [xs]
+  (first (apply max-key second (map-indexed vector xs))))
+
+(deftest categorical-variables-determined-by-cluster
+  (let [clusters (get-in multi-mixture [0 :clusters])]
+    (testing "Across all clusters most likely categorical indexes are distinct"
+      (is (= (count clusters)
+             (count (mapcat (fn [cluster]
+                              (distinct
+                               (map (comp max-index first)
+                                    (vals (select-keys (:args cluster) (map name categorical-variables))))))
+                            clusters)))))
+    (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
+      (testing (str "For cluster " cluster)
+        (let [categorical-args (select-keys args (map name categorical-variables))]
+          (testing "maximum indexes agree"
+            (is (= 1 (->> (vals categorical-args)
+                          (map first)
+                          (map max-index)
+                          (distinct)
+                          (count)))))
+          (testing "simulated probabilities"
+            (let [;; Constrain all categorical variables to their most likely values
+                  ;; for the cluster.
+                  constraints (reduce-kv (fn [m variable [probabilities]]
+                                           (assoc m (keyword variable) (max-index probabilities)))
+                                         {}
+                                         categorical-args)
+                  simulated-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                     constraints
+                                                     {:cluster-for-x cluster}
+                                                     {})
+                  analytical-logpdf (Math/log 0.95)]
+              (is (almost-equal-p? simulated-logpdf analytical-logpdf)))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
