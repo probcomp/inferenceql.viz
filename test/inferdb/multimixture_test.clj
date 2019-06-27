@@ -335,54 +335,20 @@
                     p-fraction (utils/probability-vector variable-samples possible-values)]
                 (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def p2 (test-point-coordinates "P 2"))
-
-;; Testing invariants conditioning on the point ID = 2 which corresponds to
-;; the component that of which p2 is a point center.
-
-(deftest crosscat-logpdf-categoricals-conditioned-on-p2
-  (testing "logPDF of categoricals conditioned on P2"
-    (let [queried-logpdf (cgpm/cgpm-logpdf
-                          crosscat-cgpm
-                          {:a 2  :b 2}
-                          {:x (:x p2) :y (:y p2)}
-                          {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (almost-equal-p?  queried-logpdf analytical-logpdf)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 3 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(def p3 (test-point-coordinates "P 3"))
-
-;; Testing invariants conditioning on the point ID = 3 which corresponds to the component
-;; that of which p3 is a point center.
-
-(deftest crosscat-logpdf-categoricals-conditioned-on-p3
-  (testing "logPDF of categoricals conditioned on P3"
-    (let [queried-logpdf (cgpm/cgpm-logpdf
-                          crosscat-cgpm
-                          {:a 3  :b 3}
-                          {:x (:x p3) :y (:y p3)}
-                          {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (almost-equal-p?  queried-logpdf analytical-logpdf)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 5 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 6 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO
+(deftest crosscat-logpdf-categoricals-conditioned-on-points
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (when-not (= 1 point-id)
+      (testing (str "P" point-id)
+        (let [point (test-point point-id)
+              most-likely-category (fn [variable]
+                                     (max-index
+                                      (data/categorical-probabilities multi-mixture
+                                                                      variable
+                                                                      cluster)))
+              target (zipmap categorical-variables
+                             (map most-likely-category categorical-variables))
+              samples (cgpm/cgpm-logpdf crosscat-cgpm
+                                        target
+                                        point
+                                        {})]
+          (is (some? samples)))))))
