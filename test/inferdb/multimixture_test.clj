@@ -2,8 +2,8 @@
   (:require [clojure.test :as test :refer [deftest is testing]]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
+            [inferdb.multimixture.data :as data]
             [inferdb.plotting.generate-vljson :as plot]
-            [inferdb.multimixture.dsl :as dsl]
             [metaprob.distributions :as dist]))
 
 ;; XXX: why is this still here?
@@ -73,17 +73,10 @@
 ;;
 ;; I'd encourage everyone who works with the file to run the tests in this file
 ;; and then run make charts to see how the components relate.
-(def generate-crosscat-row
-  (apply dsl/multi-mixture
-         (map (fn [{:keys [vars clusters]}]
-                (dsl/view vars (apply dsl/clusters
-                                      (mapcat (fn [{:keys [probability args]}]
-                                                [probability args])
-                                              clusters))))
-              multi-mixture)))
 
 (def crosscat-cgpm
-  (let [outputs-addrs-types {;; Variables in the table.
+  (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
+        outputs-addrs-types {;; Variables in the table.
                              :x cgpm/real-type
                              :y cgpm/real-type
                              :z cgpm/real-type
@@ -116,8 +109,9 @@
    {:x 16 :y 9  :test-point "P 5"}
    {:x 9  :y 16 :test-point "P 6"}])
 
-(defn test-point-coordinates [name]
+(defn test-point-coordinates
   "A function to extract a relevant point from the array above."
+  [name]
   (dissoc (first (filter #(= (:test-point %) name) test-points))
           :test-point))
 
@@ -156,13 +150,21 @@
 (def simulation-count 100)
 (def threshold 0.5)
 
-(defn almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
-(defn almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
-(defn almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
+(defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+(defn- almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
+(defn- almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
 
-;; TODO: Compute these
-(def nominal-variables #{:x :y})
-(def categorical-variables #{:a :b})
+(def variables (data/view-variables (first multi-mixture)))
+
+(def nominal-variables
+  (into #{}
+        (filter #(data/nominal? multi-mixture %))
+        variables))
+
+(def categorical-variables
+  (into #{}
+        (filter #(data/categorical? multi-mixture %))
+        variables))
 
 ;; Maps each cluster index to the ID of the point that is at the cluster's
 ;; center. Note that not all points have a cluster around them.
@@ -178,13 +180,13 @@
 (defn test-point
   [point-id]
   (select-keys (nth test-points (dec point-id))
-               (into nominal-variables categorical-variables)))
+               variables))
 
 (deftest nominal-simulations
   (doseq [[cluster point-id] cluster-point-mapping]
     (testing (str "Simulations conditioned on P" point-id)
       (let [samples (cgpm/cgpm-simulate crosscat-cgpm
-                                        nominal-variables
+                                        variables
                                         {:cluster-for-x cluster}
                                         {}
                                         simulation-count)]
@@ -203,22 +205,6 @@
                                             (utils/std samples)
                                             2)))))))))))
 
-(defn variable-parameters
-  [view cluster variable]
-  (get-in multi-mixture [view :clusters cluster :args (name variable)]))
-
-(defn mixture-mu
-  [view cluster variable]
-  (first (variable-parameters view cluster variable)))
-
-(defn mixture-sigma
-  [view cluster variable]
-  (second (variable-parameters view cluster variable)))
-
-(defn mixture-categorical-probabilities
-  [view cluster variable]
-  (first (variable-parameters view cluster variable)))
-
 (deftest test-cluster-point-mapping
   ;; Clusters that have a point at their center should have that point's
   ;; variables as the mu for each gaussian that makes up the cluster gaussian
@@ -227,17 +213,17 @@
     (doseq [variable #{:x :y}]
       (let [view 0
             point-value (get (test-point point-id) variable)
-            mu (mixture-mu view cluster variable)]
+            mu (data/mu multi-mixture variable cluster)]
         (is (= point-value mu))))))
 
 (deftest nominal-logpdf-point
   (doseq [[cluster point-id] cluster-point-mapping]
-    (let [view 0
-          point (select-keys (test-point point-id)
+    (let [point (select-keys (test-point point-id)
                              nominal-variables)
           analytical-logpdf (transduce (map (fn [variable]
-                                              (let [mu (mixture-mu view cluster variable)
-                                                    sigma (mixture-sigma view cluster variable)]
+                                              (let [mu (data/mu multi-mixture variable cluster)
+                                                    sigma (data/sigma multi-mixture variable cluster)]
+                                                (println mu sigma)
                                                 (dist/score-gaussian mu [mu sigma]))))
                                        +
                                        nominal-variables)
@@ -256,7 +242,7 @@
                                             {}
                                             simulation-count)]
         (doseq [variable categorical-variables]
-          (testing (str "of categorical variable" variable)
+          (testing (str "of categorical variable " variable)
             (let [samples (utils/column-subset all-samples [variable])
                   actual-probabilities (get-in multi-mixture [0
                                                               :clusters cluster
@@ -301,7 +287,7 @@
                   analytical-logpdf (Math/log (apply max (get-in multi-mixture [0 :clusters cluster :args "b" 0])))]
               (is (almost-equal-p? analytical-logpdf simulated-logpdf)))))))))
 
-(deftest crosscat-simulate-cluster-id-conditioned-on-points
+(deftest simulations-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id) ; TODO: Handle this later
       (testing (str "Conditioned on point " point-id)
@@ -310,13 +296,14 @@
                                           [:cluster-for-x :cluster-for-y]
                                           point
                                           {}
-                                          simulation-count)
-              id-samples-x (utils/column-subset samples [:cluster-for-x])
-              id-samples-y (utils/column-subset samples [:cluster-for-y])
-              cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
-              true-p-cluster (mixture-categorical-probabilities 0 cluster :a)]
-          (is (utils/equal-sample-values id-samples-x id-samples-y))
-          (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))))
+                                          simulation-count)]
+          (testing "simulate clusters"
+            (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
+                  id-samples-y (utils/column-subset samples [:cluster-for-y])
+                  cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
+                  true-p-cluster (data/categorical-probabilities multi-mixture :a cluster)]
+              (is (utils/equal-sample-values id-samples-x id-samples-y))
+              (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
