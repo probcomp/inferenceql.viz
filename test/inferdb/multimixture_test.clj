@@ -215,6 +215,10 @@
   [view cluster variable]
   (second (variable-parameters view cluster variable)))
 
+(defn mixture-categorical-probabilities
+  [view cluster variable]
+  (first (variable-parameters view cluster variable)))
+
 (deftest test-cluster-point-mapping
   ;; Clusters that have a point at their center should have that point's
   ;; variables as the mu for each gaussian that makes up the cluster gaussian
@@ -297,26 +301,30 @@
                   analytical-logpdf (Math/log (apply max (get-in multi-mixture [0 :clusters cluster :args "b" 0])))]
               (is (almost-equal-p? analytical-logpdf simulated-logpdf)))))))))
 
+(deftest crosscat-simulate-cluster-id-conditioned-on-points
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (when-not (= 1 point-id) ; TODO: Handle this later
+      (testing (str "Conditioned on point " point-id)
+        (let [point (test-point point-id)
+              samples (cgpm/cgpm-simulate crosscat-cgpm
+                                          [:cluster-for-x :cluster-for-y]
+                                          point
+                                          {}
+                                          simulation-count)
+              id-samples-x (utils/column-subset samples [:cluster-for-x])
+              id-samples-y (utils/column-subset samples [:cluster-for-y])
+              cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
+              true-p-cluster (mixture-categorical-probabilities 0 cluster :a)]
+          (is (utils/equal-sample-values id-samples-x id-samples-y))
+          (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def p2 (test-point-coordinates "P 2"))
+
 ;; Testing invariants conditioning on the point ID = 2 which corresponds to
 ;; the component that of which p2 is a point center.
-
-(deftest crosscat-simulate-cluster-id-conditoned-on-p2
-  (testing "simulations of cluster-IDs conditioned on P2"
-    (let [samples (cgpm/cgpm-simulate crosscat-cgpm
-                                      [:cluster-for-x, :cluster-for-y]
-                                      {:x (:x p2) :y (:y p2)}
-                                      {}
-                                      simulation-count)
-          id-samples-x (utils/column-subset samples [:cluster-for-x])
-          id-samples-y (utils/column-subset samples [:cluster-for-y])
-          cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
-          true-p-cluster [0 0 1 0 0 0]]
-      (is (utils/equal-sample-values id-samples-x id-samples-y))
-      (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p2
   (testing "logPDF of the correct cluster-IDs for P2 conditioned on P2"
@@ -358,24 +366,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 3 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (def p3 (test-point-coordinates "P 3"))
+
 ;; Testing invariants conditioning on the point ID = 3 which corresponds to the component
 ;; that of which p3 is a point center.
-
-(deftest crosscat-simulate-cluster-id-conditoned-on-p3
-  (testing "simulations of cluster-IDs conditioned on P3"
-    (let [samples (cgpm/cgpm-simulate
-                   crosscat-cgpm
-                   [:cluster-for-x, :cluster-for-y]
-                   {:x (:x p3) :y (:y p3)}
-                   {}
-                   simulation-count)
-          id-samples-x (utils/column-subset samples [:cluster-for-x])
-          id-samples-y (utils/column-subset samples [:cluster-for-y])
-          cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
-          true-p-cluster [0 0 0 1 0 0]]
-      (is (utils/equal-sample-values id-samples-x id-samples-y))
-      (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
 
 (deftest crosscat-logpdf-cluster-id-conditoned-on-p3
   (testing "logPDF of the correct cluster-IDs for P3 conditioned on P3"
