@@ -43,13 +43,13 @@
   (let [view (view-for-variable mmix variable)]
     (get-in view [:vars (name variable)])))
 
-(defn categorical?
-  "Returns true if `variable` is a categorical variable in `mmix`."
+(defn nominal?
+  "Returns true if `variable` is a nominal variable in `mmix`."
   [mmix variable]
   (= dist/categorical (stattype mmix variable)))
 
-(defn nominal?
-  "Returns true if `variable` is a nominal variable in `multimixture`."
+(defn numerical?
+  "Returns true if `variable` is a numerical variable in `multimixture`."
   [mmix variable]
   (= dist/gaussian (stattype mmix variable)))
 

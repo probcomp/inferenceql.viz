@@ -30,15 +30,15 @@
 
 (deftest statistical-types-test
   (let [variables (data/variables mmix)]
-    (testing "nominal?"
+    (testing "numerical?"
       (is (= #{:x :a}
              (into #{}
-                   (filter #(data/nominal? mmix %))
+                   (filter #(data/numerical? mmix %))
                    variables))))
-    (testing "categorical?"
+    (testing "nominal?"
       (is (= #{:y :b}
              (into #{}
-                   (filter #(data/categorical? mmix %))
+                   (filter #(data/nominal? mmix %))
                    variables))))))
 
 (deftest parameters-test

@@ -113,12 +113,12 @@
 
 (def nominal-variables
   (into #{}
-        (filter #(data/nominal? multi-mixture %))
+        (filter #(data/numerical? multi-mixture %))
         variables))
 
 (def categorical-variables
   (into #{}
-        (filter #(data/categorical? multi-mixture %))
+        (filter #(data/nominal? multi-mixture %))
         variables))
 
 (defn- test-point
