@@ -277,12 +277,12 @@
           (testing "logpdf"
             (let [;; Constrain all categorical variables to their most likely values
                   ;; for the cluster.
-                  constraints (reduce-kv (fn [m variable [probabilities]]
-                                           (assoc m (keyword variable) (max-index probabilities)))
-                                         {}
-                                         categorical-args)
+                  target (reduce-kv (fn [m variable [probabilities]]
+                                      (assoc m (keyword variable) (max-index probabilities)))
+                                    {}
+                                    categorical-args)
                   queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
-                                                   constraints
+                                                   target
                                                    {:cluster-for-x cluster}
                                                    {})
                   analytical-logpdf (Math/log (apply max (get-in multi-mixture [0 :clusters cluster :args "b" 0])))]
