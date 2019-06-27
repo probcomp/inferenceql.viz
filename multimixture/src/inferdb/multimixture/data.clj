@@ -3,6 +3,8 @@
             [inferdb.multimixture.dsl :as dsl]))
 
 (defn crosscat-row-generator
+  "Creates a crosscat row generator from the provided data representation of a
+  crosscat model. For an example of such a data representation see the tests."
   [mmix]
   (apply dsl/multi-mixture
          (map (fn [{:keys [vars clusters]}]
@@ -13,18 +15,21 @@
               mmix)))
 
 (defn view-variables
+  "Returns the variables assigned to given view."
   [view]
   (into #{}
         (map keyword)
         (keys (:vars view))))
 
 (defn variables
+  "Returns the variables in a multi-mixture."
   [mmix]
   (into #{}
         (mapcat view-variables)
         mmix))
 
 (defn- view-for-variable
+  "Returns the view a given variable was assigned to."
   [mmix variable]
   (some (fn [view]
           (when (contains? (:vars view) (name variable))
@@ -32,6 +37,8 @@
         mmix))
 
 (defn stattype
+  "Returns the statistical type (distribution from `metaprob.distributions`) of a
+  variable."
   [mmix variable]
   (let [view (view-for-variable mmix variable)]
     (get-in view [:vars (name variable)])))
@@ -47,18 +54,22 @@
   (= dist/gaussian (stattype mmix variable)))
 
 (defn parameters
-  [mmix variable cluster]
+  "Returns the parameters of a variable for a cluster."
+  [mmix variable cluster-idx]
   (let [view (view-for-variable mmix variable)]
-    (get-in view [:clusters cluster :args (name variable)])))
+    (get-in view [:clusters cluster-idx :args (name variable)])))
 
 (defn mu
-  [mmix variable cluster]
-  (first (parameters mmix variable cluster)))
+  "Returns the mu for the given variable."
+  [mmix variable cluster-idx]
+  (first (parameters mmix variable cluster-idx)))
 
 (defn sigma
-  [mmix variable cluster]
-  (second (parameters mmix variable cluster)))
+  "Returns the sigma for the given variable."
+  [mmix variable cluster-idx]
+  (second (parameters mmix variable cluster-idx)))
 
 (defn categorical-probabilities
-  [mmix variable cluster]
-  (first (parameters mmix variable cluster)))
+  "Returns the probabilities for the given categorical variable"
+  [mmix variable cluster-idx]
+  (first (parameters mmix variable cluster-idx)))

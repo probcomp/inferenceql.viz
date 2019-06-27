@@ -13,6 +13,17 @@
         trace-addrs  (map name output-addrs)]
     (zipmap output-addrs trace-addrs)))
 
+;; The following data generator has some interesting properties:
+;; - clusters 0 and 1 in view 0 share the samme mu parameter.
+;; - a is a deterministic indicator of the cluster.
+;; - b is a noisy copy of a.
+;; - in both views, clusters are equally weighted.
+;; - in view 1, the third Gaussian components (cluster 0) "spans" the domain of
+;; all the other components and share a center with cluster 1.
+;;
+;; I'd encourage everyone who works with the file to run the tests in this file
+;; and then run make charts to see how the components relate.
+
 (def multi-mixture
   [{:vars {"x" dist/gaussian
            "y" dist/gaussian
@@ -63,17 +74,6 @@
                 :args {"z" [15 8]
                        "c" [[0 0 0 1]]}}]}])
 
-;; The following data generator has some interesting properties:
-;; - clusters 0 and 1 in view 0 share the samme mu parameter.
-;; - a is a deterministic indicator of the cluster.
-;; - b is a noisy copy of a.
-;; - in both views, clusters are equally weighted.
-;; - in view 1, the third Gaussian components (cluster 0) "spans" the domain of
-;; all the other components and share a center with cluster 1.
-;;
-;; I'd encourage everyone who works with the file to run the tests in this file
-;; and then run make charts to see how the components relate.
-
 (def crosscat-cgpm
   (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
         outputs-addrs-types {;; Variables in the table.
@@ -108,6 +108,47 @@
    {:x 15 :y 8  :test-point "P 4"}
    {:x 16 :y 9  :test-point "P 5"}
    {:x 9  :y 16 :test-point "P 6"}])
+
+(def variables (data/view-variables (first multi-mixture)))
+
+(def nominal-variables
+  (into #{}
+        (filter #(data/nominal? multi-mixture %))
+        variables))
+
+(def categorical-variables
+  (into #{}
+        (filter #(data/categorical? multi-mixture %))
+        variables))
+
+(defn- test-point
+  "Retrieves a given point given its ID. Note that point IDs are different from
+  their indexes in `test-points`: Point IDs are 1-indexed."
+  [point-id]
+  (select-keys (nth test-points (dec point-id))
+               variables))
+
+(def cluster-point-mapping
+  ;; Maps each cluster index to the ID of the point that is at the cluster's
+  ;; center. Note that not all points have a cluster around them.
+  {0 1
+   1 1
+   2 2
+   3 3
+   ;; P4 between clusters 4 and 5
+   4 5
+   5 6})
+
+(deftest test-cluster-point-mapping
+  ;; This test verifies that we've constructed our multi-mixture correctly such
+  ;; that the subsequent tests can succeed. Clusters that have a point at their
+  ;; center should have that point's variables as the mu for each gaussian that
+  ;; makes up the cluster gaussian that makes up the cluster.
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (doseq [variable #{:x :y}]
+      (let [point-value (get (test-point point-id) variable)
+            mu (data/mu multi-mixture variable cluster)]
+        (is (= point-value mu))))))
 
 (defn test-point-coordinates
   "A function to extract a relevant point from the array above."
@@ -154,34 +195,6 @@
 (defn- almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
 (defn- almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
 
-(def variables (data/view-variables (first multi-mixture)))
-
-(def nominal-variables
-  (into #{}
-        (filter #(data/nominal? multi-mixture %))
-        variables))
-
-(def categorical-variables
-  (into #{}
-        (filter #(data/categorical? multi-mixture %))
-        variables))
-
-;; Maps each cluster index to the ID of the point that is at the cluster's
-;; center. Note that not all points have a cluster around them.
-(def cluster-point-mapping
-  {0 1
-   1 1
-   2 2
-   3 3
-   ;; P4 between clusters 4 and 5
-   4 5
-   5 6})
-
-(defn test-point
-  [point-id]
-  (select-keys (nth test-points (dec point-id))
-               variables))
-
 (deftest nominal-simulations
   (doseq [[cluster point-id] cluster-point-mapping]
     (testing (str "Simulations conditioned on P" point-id)
@@ -204,17 +217,6 @@
                   (is (utils/within-factor? actual-std
                                             (utils/std samples)
                                             2)))))))))))
-
-(deftest test-cluster-point-mapping
-  ;; Clusters that have a point at their center should have that point's
-  ;; variables as the mu for each gaussian that makes up the cluster gaussian
-  ;; that makes up the cluster.
-  (doseq [[cluster point-id] cluster-point-mapping]
-    (doseq [variable #{:x :y}]
-      (let [view 0
-            point-value (get (test-point point-id) variable)
-            mu (data/mu multi-mixture variable cluster)]
-        (is (= point-value mu))))))
 
 (deftest nominal-logpdf-point
   (doseq [[cluster point-id] cluster-point-mapping]
@@ -305,6 +307,17 @@
               (is (utils/equal-sample-values id-samples-x id-samples-y))
               (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))))))
 
+(deftest crosscat-logpdf-cluster-id-conditioned-on-point
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (when-not (= 1 point-id)
+      (testing (str "P" point-id)
+        (let [point (test-point point-id)
+              simulated-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                 {:cluster-for-x cluster}
+                                                 point
+                                                 {})]
+          (is (almost-equal-p? 0 simulated-logpdf)))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -312,15 +325,6 @@
 
 ;; Testing invariants conditioning on the point ID = 2 which corresponds to
 ;; the component that of which p2 is a point center.
-
-(deftest crosscat-logpdf-cluster-id-conditoned-on-p2
-  (testing "logPDF of the correct cluster-IDs for P2 conditioned on P2"
-    (let [simulated-logpdf (cgpm/cgpm-logpdf
-                            crosscat-cgpm
-                            {:cluster-for-x 2}
-                            {:x (:x p2) :y (:y p2)}
-                            {})]
-      (is (almost-equal-p?  simulated-logpdf 0)))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-p2
   (testing "categorical simulations conditioned on P2"
@@ -358,15 +362,6 @@
 
 ;; Testing invariants conditioning on the point ID = 3 which corresponds to the component
 ;; that of which p3 is a point center.
-
-(deftest crosscat-logpdf-cluster-id-conditoned-on-p3
-  (testing "logPDF of the correct cluster-IDs for P3 conditioned on P3"
-    (let [simulated-logpdf (cgpm/cgpm-logpdf
-                            crosscat-cgpm
-                            {:cluster-for-x 3}
-                            {:x (:x p3) :y (:y p3)}
-                            {})]
-      (is (almost-equal-p?  simulated-logpdf 0)))))
 
 (deftest crosscat-simulate-categoricals-conditioned-on-p3
   (testing "categorical simulations conditioned on P3"
