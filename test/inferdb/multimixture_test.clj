@@ -307,19 +307,6 @@
 ;; Testing invariants conditioning on the point ID = 2 which corresponds to
 ;; the component that of which p2 is a point center.
 
-;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
-;; on :a taking any different value than 2 this will crash.
-(deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p2
-  (testing "logPDF of categoricals implying cluster ID 2 conditioned on cluster-ID = 2"
-    ;; XXX, not sure how to deal wth line breaks for this....
-    (let [simulated-logpdf (cgpm/cgpm-logpdf
-                            crosscat-cgpm
-                            {:a 2  :b 2}
-                            {:cluster-for-x 2}
-                            {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (almost-equal-p?  simulated-logpdf analytical-logpdf)))))
-
 (deftest crosscat-simulate-cluster-id-conditoned-on-p2
   (testing "simulations of cluster-IDs conditioned on P2"
     (let [samples (cgpm/cgpm-simulate
@@ -378,19 +365,6 @@
 (def p3 (test-point-coordinates "P 3"))
 ;; Testing invariants conditioning on the point ID = 3 which corresponds to the component
 ;; that of which p3 is a point center.
-
-;; TODO: Same as above. Add a smoke test. Categories for :a are deteriministic.
-;; If we condition on :a taking any different value than 3 this will crash.
-(deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p3
-  (testing "logPDF of categoricals implying point ID 3 conditioned on cluster-ID = 3"
-    ;; XXX, not sure how to deal wth line breaks for this....
-    (let [simulated-logpdf (cgpm/cgpm-logpdf
-                            crosscat-cgpm
-                            {:a 3  :b 3}
-                            {:cluster-for-x 3}
-                            {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (almost-equal-p?  simulated-logpdf analytical-logpdf)))))
 
 (deftest crosscat-simulate-cluster-id-conditoned-on-p3
   (testing "simulations of cluster-IDs conditioned on P3"
