@@ -307,7 +307,7 @@
               (is (utils/equal-sample-values id-samples-x id-samples-y))
               (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))))))
 
-(deftest crosscat-logpdf-cluster-id-conditioned-on-point
+(deftest crosscat-logpdf-cluster-id-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
       (testing (str "P" point-id)
@@ -318,6 +318,24 @@
                                                  {})]
           (is (almost-equal-p? 0 simulated-logpdf)))))))
 
+(deftest crosscat-simulate-categoricals-conditioned-on-points
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (when-not (= 1 point-id)
+      (testing (str "When conditioned on point P" point-id)
+        (let [point (test-point point-id)
+              samples (cgpm/cgpm-simulate crosscat-cgpm
+                                          [:a :b]
+                                          point
+                                          {}
+                                          simulation-count)]
+          (doseq [variable #{:a :b}]
+            (testing (str "check probabilities for variable " variable " in cluster " cluster)
+              (let [variable-samples (utils/column-subset samples [variable])
+                    possible-values (range 6)
+                    true-probabilities (data/categorical-probabilities multi-mixture variable cluster)
+                    p-fraction (utils/probability-vector variable-samples possible-values)]
+                (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -325,24 +343,6 @@
 
 ;; Testing invariants conditioning on the point ID = 2 which corresponds to
 ;; the component that of which p2 is a point center.
-
-(deftest crosscat-simulate-categoricals-conditioned-on-p2
-  (testing "categorical simulations conditioned on P2"
-    (let [samples (cgpm/cgpm-simulate
-                   crosscat-cgpm
-                   [:a :b]
-                   {:x (:x p2) :y (:y p2)}
-                   {}
-                   simulation-count)
-          a-samples (utils/column-subset samples [:a])
-          b-samples (utils/column-subset samples [:b])
-          true-p-a [0 0 1 0 0 0]
-          true-p-b [0.01 0.01 0.95 0.01 0.01 0.01]
-          possible-values (range 6)
-          a-p-fraction (utils/probability-vector a-samples possible-values)
-          b-p-fraction (utils/probability-vector b-samples possible-values)]
-      (is (and (almost-equal-vectors? a-p-fraction true-p-a)
-               (almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p2
   (testing "logPDF of categoricals conditioned on P2"
@@ -362,24 +362,6 @@
 
 ;; Testing invariants conditioning on the point ID = 3 which corresponds to the component
 ;; that of which p3 is a point center.
-
-(deftest crosscat-simulate-categoricals-conditioned-on-p3
-  (testing "categorical simulations conditioned on P3"
-    (let [samples (cgpm/cgpm-simulate
-                   crosscat-cgpm
-                   [:a :b]
-                   {:x (:x p3) :y (:y p3)}
-                   {}
-                   simulation-count)
-          a-samples (utils/column-subset samples [:a])
-          b-samples (utils/column-subset samples [:b])
-          true-p-a [0 0 0 1 0 0]
-          true-p-b [0.01 0.01 0.01 0.95 0.01 0.01]
-          possible-values (range 6)
-          a-p-fraction (utils/probability-vector a-samples possible-values)
-          b-p-fraction (utils/probability-vector b-samples possible-values)]
-      (is (and (almost-equal-vectors? a-p-fraction true-p-a)
-               (almost-equal-vectors? b-p-fraction true-p-b))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-p3
   (testing "logPDF of categoricals conditioned on P3"
