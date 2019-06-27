@@ -154,7 +154,7 @@
       (is (= (count samples) plot-point-count)))))
 
 (def simulation-count 100)
-(def threshold 0.25)
+(def threshold 0.5)
 
 (defn almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 (defn almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
