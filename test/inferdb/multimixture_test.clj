@@ -233,7 +233,7 @@
                                           point
                                           {}
                                           simulation-count)]
-          (testing "validate cluster assignments of samples"
+          (testing "validate cluster assignments"
             (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
                   id-samples-y (utils/column-subset samples [:cluster-for-y])
                   cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
