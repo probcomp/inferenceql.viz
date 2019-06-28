@@ -279,20 +279,28 @@
 (deftest simulations-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id) ; TODO: Handle this later
-      (testing (str "Conditioned on point " point-id)
+      (testing (str "Conditioned on point P" point-id)
         (let [point (test-point point-id)
               samples (cgpm/cgpm-simulate crosscat-cgpm
-                                          [:cluster-for-x :cluster-for-y]
+                                          [:a :b :cluster-for-x :cluster-for-y]
                                           point
                                           {}
                                           simulation-count)]
-          (testing "simulate clusters"
+          (testing "validate cluster assignments of samples"
             (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
                   id-samples-y (utils/column-subset samples [:cluster-for-y])
                   cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
                   true-p-cluster (data/categorical-probabilities multi-mixture :a cluster)]
               (is (utils/equal-sample-values id-samples-x id-samples-y))
-              (is (almost-equal-vectors? cluster-p-fraction true-p-cluster)))))))))
+              (is (almost-equal-vectors? cluster-p-fraction true-p-cluster))))
+          (testing "validate distribution of categorical"
+            (doseq [variable categorical-variables]
+              (testing (str "variable " variable " in cluster " cluster)
+                (let [variable-samples (utils/column-subset samples [variable])
+                      possible-values (range 6)
+                      true-probabilities (data/categorical-probabilities multi-mixture variable cluster)
+                      p-fraction (utils/probability-vector variable-samples possible-values)]
+                  (is (almost-equal-vectors? true-probabilities p-fraction)))))))))))
 
 (deftest crosscat-logpdf-cluster-id-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
@@ -304,24 +312,6 @@
                                                point
                                                {})]
           (is (almost-equal-p? 0 queried-logpdf)))))))
-
-(deftest crosscat-simulate-categoricals-conditioned-on-points
-  (doseq [[cluster point-id] cluster-point-mapping]
-    (when-not (= 1 point-id)
-      (testing (str "When conditioned on point P" point-id)
-        (let [point (test-point point-id)
-              samples (cgpm/cgpm-simulate crosscat-cgpm
-                                          [:a :b]
-                                          point
-                                          {}
-                                          simulation-count)]
-          (doseq [variable #{:a :b}]
-            (testing (str "check probabilities for variable " variable " in cluster " cluster)
-              (let [variable-samples (utils/column-subset samples [variable])
-                    possible-values (range 6)
-                    true-probabilities (data/categorical-probabilities multi-mixture variable cluster)
-                    p-fraction (utils/probability-vector variable-samples possible-values)]
-                (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
 
 (deftest crosscat-logpdf-categoricals-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
