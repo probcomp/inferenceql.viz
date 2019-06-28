@@ -196,27 +196,29 @@
                                         {:cluster-for-x cluster}
                                         {}
                                         simulation-count)]
-        (doseq [variable numerical-variables]
-          (testing (str "numerical variable " variable)
-            (let [samples (utils/col variable samples)]
-              (testing "mean"
-                (is (almost-equal? (get (test-point point-id) variable)
-                                   (utils/average samples))))
-              (testing "standard deviation"
-                (let [analytical-std (data/sigma multi-mixture variable cluster)]
-                  (is (utils/within-factor? analytical-std
-                                            (utils/std samples)
-                                            2)))))))
-        (doseq [variable categorical-variables]
-          (testing (str "simulated probabilities of categorical variable " variable)
-            (let [variable-samples (utils/column-subset samples [variable])
-                  actual-probabilities (get-in multi-mixture [0
-                                                              :clusters cluster
-                                                              :args (name variable)
-                                                              0])
-                  possible-values (range 6)
-                  probabilities (utils/probability-vector variable-samples possible-values)]
-              (is (almost-equal-vectors? probabilities actual-probabilities)))))))))
+        (doseq [variable variables]
+          (testing (str "variable " variable)
+            (cond (data/numerical? multi-mixture variable)
+                  (let [samples (utils/col variable samples)]
+                    (testing "mean"
+                      (is (almost-equal? (get (test-point point-id) variable)
+                                         (utils/average samples))))
+                    (testing "standard deviation"
+                      (let [analytical-std (data/sigma multi-mixture variable cluster)]
+                        (is (utils/within-factor? analytical-std
+                                                  (utils/std samples)
+                                                  2)))))
+
+                  (data/nominal? multi-mixture variable)
+                  (testing "simulated categorical probabilities"
+                    (let [variable-samples (utils/column-subset samples [variable])
+                          actual-probabilities (get-in multi-mixture [0
+                                                                      :clusters cluster
+                                                                      :args (name variable)
+                                                                      0])
+                          possible-values (range 6)
+                          probabilities (utils/probability-vector variable-samples possible-values)]
+                      (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
 
 (deftest simulations-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
