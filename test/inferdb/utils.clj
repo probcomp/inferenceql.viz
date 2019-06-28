@@ -74,3 +74,8 @@
 (defn equal-sample-values [samples-1 samples-2]
   (= (map (comp set vals) samples-1)
      (map (comp set vals) samples-2)))
+
+(defn max-index
+  "Returns the index of the maximum value in the provided vector."
+  [xs]
+  (first (apply max-key second (map-indexed vector xs))))

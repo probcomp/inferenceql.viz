@@ -247,16 +247,11 @@
                   probabilities (utils/probability-vector samples possible-values)]
               (is (almost-equal-vectors? probabilities actual-probabilities)))))))))
 
-(defn max-index
-  "Returns the index of the maximum value in the provided vector."
-  [xs]
-  (first (apply max-key second (map-indexed vector xs))))
-
 (deftest logpdf-categoricals-conditioned-on-cluster
   (let [clusters (get-in multi-mixture [0 :clusters])]
     (testing "Across all clusters most likely categorical indexes are distinct"
       (is (distinct? (mapcat (fn [cluster]
-                               (map (comp max-index first)
+                               (map (comp utils/max-index first)
                                     (vals (select-keys (:args cluster) (map name categorical-variables)))))
                              clusters))))
     (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
@@ -265,14 +260,14 @@
           (testing "maximum indexes agree"
             (is (= 1 (->> (vals categorical-args)
                           (map first)
-                          (map max-index)
+                          (map utils/max-index)
                           (distinct)
                           (count)))))
           (testing "logpdf"
             (let [;; Constrain all categorical variables to their most likely values
                   ;; for the cluster.
                   target (reduce-kv (fn [m variable [probabilities]]
-                                      (assoc m (keyword variable) (max-index probabilities)))
+                                      (assoc m (keyword variable) (utils/max-index probabilities)))
                                     {}
                                     categorical-args)
                   queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
@@ -335,7 +330,7 @@
       (testing (str "Query logPDF for point P" point-id)
         (let [point (test-point point-id)
               most-likely-category (fn [variable]
-                                     (max-index
+                                     (utils/max-index
                                       (data/categorical-probabilities multi-mixture
                                                                       variable
                                                                       cluster)))
