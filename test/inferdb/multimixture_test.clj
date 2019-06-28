@@ -293,7 +293,7 @@
                   analytical-logpdf (Math/log (apply max (data/categorical-probabilities multi-mixture :b cluster)))]
               (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))))
 
-(deftest crosscat-logpdf-cluster-id-conditioned-on-points
+(deftest crosscat-logpdf-cluster-given-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
       (testing (str "Validate queried logPDF matches analytical logPDF for point P" point-id
