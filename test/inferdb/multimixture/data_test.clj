@@ -7,16 +7,16 @@
   [{:vars {"x" dist/gaussian
            "y" dist/categorical}
     :clusters [{:probability 1
-                :args {"x" [2 3]
-                       "y" [0.1 0.2 0.3 0.4]}}]}
+                :args {"x" [[2 3]]
+                       "y" [[0.1 0.2 0.3 0.4]]}}]}
    {:vars {"a" dist/gaussian
            "b" dist/categorical}
     :clusters [{:probability 0.4
-                :args {"a" [4 5]
-                       "b" [0.9 0.01 0.02 0.03 0.04]}}
+                :args {"a" [[4 5]]
+                       "b" [[0.9 0.01 0.02 0.03 0.04]]}}
                {:probability 0.6
-                :args {"a" [6 7]
-                       "b" [0.99 0.001 0.002 0.003 0.004]}}]}])
+                :args {"a" [[6 7]]
+                       "b" [[0.99 0.001 0.002 0.003 0.004]]}}]}])
 
 (deftest view-variables-test
   (is (= #{:x :y} (data/view-variables (first mmix))))
@@ -42,4 +42,8 @@
                    variables))))))
 
 (deftest parameters-test
-  (is (= [2 3] (data/parameters mmix :x 0))))
+  (is (= [[2 3]] (data/parameters mmix :x 0))))
+
+(deftest categorical-probabilities-test
+  (is (= [2 3] (data/categorical-probabilities mmix :x 0)))
+  (is (= [10/22 12/22] (data/categorical-probabilities mmix :a 0 1))))

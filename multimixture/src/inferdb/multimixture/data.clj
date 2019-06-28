@@ -1,6 +1,7 @@
 (ns inferdb.multimixture.data
   (:require [metaprob.distributions :as dist]
-            [inferdb.multimixture.dsl :as dsl]))
+            [inferdb.multimixture.dsl :as dsl]
+            [inferdb.utils :as utils]))
 
 (defn crosscat-row-generator
   "Creates a crosscat row generator from the provided data representation of a
@@ -70,6 +71,14 @@
   (second (parameters mmix variable cluster-idx)))
 
 (defn categorical-probabilities
-  "Returns the probabilities for the given categorical variable"
-  [mmix variable cluster-idx]
-  (first (parameters mmix variable cluster-idx)))
+  "Returns the probabilities for the given categorical variable. If multiple
+  clusters are provided their probability vectors will be summed and normalized
+  to 1."
+  ([mmix variable cluster-idx]
+   (first (parameters mmix variable cluster-idx)))
+  ([mmix variable cluster-idx-1 cluster-idx-2 & more]
+   (let [clusters (into more [cluster-idx-1 cluster-idx-2])]
+     (->> (map #(categorical-probabilities mmix variable %)
+               clusters)
+          (apply map +)
+          (utils/normalize)))))

@@ -93,6 +93,14 @@
    4 5
    5 6})
 
+(defn invert-map
+  "Reverse the keys/values of a map"
+  [m]
+  (reduce-kv (fn [m k v]
+               (update m v (fnil conj #{}) k))
+             {}
+             m))
+
 (def crosscat-cgpm
   (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
         outputs-addrs-types {;; Variables in the table.
@@ -193,7 +201,8 @@
     (testing (str "Conditioned on cluster " cluster)
       ;; We simulate all variables together in a single test like this because
       ;; there's currently a performance benefit to doing so.
-      (let [samples (cgpm/cgpm-simulate crosscat-cgpm
+      (let [point (test-point point-id)
+            samples (cgpm/cgpm-simulate crosscat-cgpm
                                         variables
                                         {:cluster-for-x cluster}
                                         {}
@@ -203,7 +212,7 @@
             (cond (data/numerical? multi-mixture variable)
                   (let [samples (utils/col variable samples)]
                     (testing "mean"
-                      (is (almost-equal? (get (test-point point-id) variable)
+                      (is (almost-equal? (get point variable)
                                          (utils/average samples))))
                     (testing "standard deviation"
                       (let [analytical-std (data/sigma multi-mixture variable cluster)]
@@ -223,31 +232,30 @@
                       (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
 
 (deftest simulations-conditioned-on-points
-  (doseq [[cluster point-id] cluster-point-mapping]
-    (when-not (= 1 point-id) ; TODO: Handle this later
-      (testing (str "Conditioned on point P" point-id)
-        (let [point (test-point point-id)
-              samples (cgpm/cgpm-simulate crosscat-cgpm
-                                          (into categorical-variables
-                                                [:cluster-for-x :cluster-for-y])
-                                          point
-                                          {}
-                                          simulation-count)]
-          (testing "validate cluster assignments"
-            (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
-                  id-samples-y (utils/column-subset samples [:cluster-for-y])
-                  cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
-                  true-p-cluster (data/categorical-probabilities multi-mixture :a cluster)]
-              (is (utils/equal-sample-values id-samples-x id-samples-y))
-              (is (almost-equal-vectors? cluster-p-fraction true-p-cluster))))
-          (testing "validate distribution of categorical variable"
-            (doseq [variable categorical-variables]
-              (testing variable
-                (let [variable-samples (utils/column-subset samples [variable])
-                      possible-values (range 6)
-                      true-probabilities (data/categorical-probabilities multi-mixture variable cluster)
-                      p-fraction (utils/probability-vector variable-samples possible-values)]
-                  (is (almost-equal-vectors? true-probabilities p-fraction)))))))))))
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Conditioned on point P" point-id)
+      (let [point (test-point point-id)
+            samples (cgpm/cgpm-simulate crosscat-cgpm
+                                        (into categorical-variables
+                                              [:cluster-for-x :cluster-for-y])
+                                        point
+                                        {}
+                                        simulation-count)]
+        (testing "validate cluster assignments"
+          (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
+                id-samples-y (utils/column-subset samples [:cluster-for-y])
+                cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
+                true-p-cluster (apply data/categorical-probabilities multi-mixture :a clusters)]
+            (is (utils/equal-sample-values id-samples-x id-samples-y))
+            (is (almost-equal-vectors? true-p-cluster cluster-p-fraction))))
+        (testing "validate distribution of categorical variable"
+          (doseq [variable categorical-variables]
+            (testing variable
+              (let [variable-samples (utils/column-subset samples [variable])
+                    possible-values (range 6)
+                    true-probabilities (apply data/categorical-probabilities multi-mixture variable clusters)
+                    p-fraction (utils/probability-vector variable-samples possible-values)]
+                (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
 
 (deftest logpdf-numerical-given-cluster
   (doseq [[cluster point-id] cluster-point-mapping]
