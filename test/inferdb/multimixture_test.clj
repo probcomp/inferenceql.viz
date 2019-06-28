@@ -336,7 +336,7 @@
                              (map most-likely-category categorical-variables))
               analytical-logpdf (Math/log highest-probability)
               queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
-                                       target
-                                       point
-                                       {})]
+                                               target
+                                               point
+                                               {})]
           (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))
