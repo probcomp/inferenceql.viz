@@ -244,8 +244,10 @@
               (is (almost-equal-vectors? probabilities actual-probabilities)))))))))
 
 (deftest logpdf-categoricals-conditioned-on-cluster
-  (let [clusters (get-in multi-mixture [0 :clusters])]
-    (testing "Across all clusters most likely categorical indexes are distinct"
+  (let [;; This test takes advantage of some special properties of this view.
+        view 0
+        clusters (get-in multi-mixture [view :clusters])]
+    (testing (str "Across all clusters in view " view " most likely categorical indexes are distinct")
       (is (distinct? (mapcat (fn [cluster]
                                (map (comp utils/max-index first)
                                     (vals (select-keys (:args cluster) (map name categorical-variables)))))
