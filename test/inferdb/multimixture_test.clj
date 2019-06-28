@@ -300,8 +300,7 @@
 (deftest crosscat-logpdf-cluster-given-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
-      (testing (str "Validate queried logPDF matches analytical logPDF for point P" point-id
-                    " given cluster assignment " cluster)
+      (testing (str "Validate queried cluster logPDF given point P" point-id)
         (let [point (test-point point-id)
               queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
                                                {:cluster-for-x cluster}
@@ -312,8 +311,7 @@
 (deftest crosscat-logpdf-categoricals-given-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
-      (testing (str "Validate queried logPDF matches analytical logpdf for point P" point-id
-                    " given cluster assignment " cluster)
+      (testing (str "Validate queried categorical probabilities logPDF logPDF givenpoint P" point-id)
         (let [point (test-point point-id)
               ;; Returns the most likely categorical for a given categorical
               ;; variable. For example, for a categorical variable with
