@@ -1,0 +1,8 @@
+#kaocha/v1
+{:tests [{:id :all
+          :source-paths ["aide/src"
+                         "cgpm/src"
+                         "multimixture/src"
+                         "search-by-example/src"
+                         "spreadsheets/src"]
+          :test-paths ["test"]}]}
