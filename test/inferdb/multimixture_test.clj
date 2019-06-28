@@ -306,7 +306,7 @@
 (deftest crosscat-logpdf-cluster-id-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
-      (testing (str "P" point-id)
+      (testing (str "Query logPDF for point P" point-id)
         (let [point (test-point point-id)
               queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
                                                {:cluster-for-x cluster}
@@ -319,6 +319,9 @@
     (when-not (= 1 point-id)
       (testing (str "Query logPDF for point P" point-id)
         (let [point (test-point point-id)
+              ;; Returns the most likely categorical for a given categorical
+              ;; variable. For example, for a categorical variable with
+              ;; probabilities [0.01 0.97 0.01 0.01] it will return 1.
               most-likely-category (fn [variable]
                                      (utils/max-index
                                       (data/categorical-probabilities multi-mixture
