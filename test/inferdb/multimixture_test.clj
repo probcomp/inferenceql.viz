@@ -251,9 +251,9 @@
                                     (vals (select-keys (:args cluster) (map name categorical-variables)))))
                              clusters))))
     (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
-      (testing (str "Conditioned on cluster " cluster)
-        (let [categorical-args (select-keys args (map name categorical-variables))]
-          (testing "maximum indexes agree"
+      (let [categorical-args (select-keys args (map name categorical-variables))]
+        (testing (str "For cluster " cluster)
+          (testing "most likely categories share the same index"
             (is (= 1 (->> (vals categorical-args)
                           (map first)
                           (map utils/max-index)
@@ -291,9 +291,9 @@
                   true-p-cluster (data/categorical-probabilities multi-mixture :a cluster)]
               (is (utils/equal-sample-values id-samples-x id-samples-y))
               (is (almost-equal-vectors? cluster-p-fraction true-p-cluster))))
-          (testing "validate distribution of categorical"
+          (testing "validate distribution of categorical variable"
             (doseq [variable categorical-variables]
-              (testing (str "variable " variable " in cluster " cluster)
+              (testing variable
                 (let [variable-samples (utils/column-subset samples [variable])
                       possible-values (range 6)
                       true-probabilities (data/categorical-probabilities multi-mixture variable cluster)
