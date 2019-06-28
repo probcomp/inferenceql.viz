@@ -273,7 +273,7 @@
                                                    target
                                                    {:cluster-for-x cluster}
                                                    {})
-                  analytical-logpdf (Math/log (apply max (get-in multi-mixture [0 :clusters cluster :args "b" 0])))]
+                  analytical-logpdf (Math/log (apply max (data/categorical-probabilities multi-mixture :b cluster)))]
               (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))))
 
 (deftest simulations-conditioned-on-points
