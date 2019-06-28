@@ -199,7 +199,7 @@
                                         {}
                                         simulation-count)]
         (doseq [variable variables]
-          (testing (str "variable " variable)
+          (testing (str "validate variable " variable)
             (cond (data/numerical? multi-mixture variable)
                   (let [samples (utils/col variable samples)]
                     (testing "mean"
@@ -212,7 +212,7 @@
                                                   2)))))
 
                   (data/nominal? multi-mixture variable)
-                  (testing "simulated categorical probabilities"
+                  (testing "validate simulated categorical probabilities"
                     (let [variable-samples (utils/column-subset samples [variable])
                           actual-probabilities (get-in multi-mixture [0
                                                                       :clusters cluster
@@ -277,13 +277,13 @@
     (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
       (let [categorical-args (select-keys args (map name categorical-variables))]
         (testing (str "In cluster " cluster)
-          (testing "most likely categories share the same index"
+          (testing "most likely categories should share the same index"
             (is (= 1 (->> (vals categorical-args)
                           (map first)
                           (map utils/max-index)
                           (distinct)
                           (count)))))
-          (testing "logpdf"
+          (testing "validate logpdf"
             (let [;; Constrain all categorical variables to their most likely values
                   ;; for the cluster.
                   target (reduce-kv (fn [m variable [probabilities]]
@@ -311,7 +311,7 @@
 (deftest crosscat-logpdf-categoricals-given-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
-      (testing (str "Validate queried categorical probabilities logPDF logPDF givenpoint P" point-id)
+      (testing (str "Validate queried categorical probabilities logPDF logPDF given point P" point-id)
         (let [point (test-point point-id)
               ;; Returns the most likely categorical for a given categorical
               ;; variable. For example, for a categorical variable with
