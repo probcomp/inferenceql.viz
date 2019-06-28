@@ -191,6 +191,8 @@
 (deftest simulations-conditioned-on-clusters
   (doseq [[cluster point-id] cluster-point-mapping]
     (testing (str "Conditioned on cluster " cluster)
+      ;; We simulate all variables together in a single test like this because
+      ;; there's currently a performance benefit to doing so.
       (let [samples (cgpm/cgpm-simulate crosscat-cgpm
                                         variables
                                         {:cluster-for-x cluster}
