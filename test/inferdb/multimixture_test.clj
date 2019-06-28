@@ -338,8 +338,8 @@
               target (zipmap categorical-variables
                              (map most-likely-category categorical-variables))
               analytical-logpdf (Math/log highest-probability)
-              logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+              queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
                                        target
                                        point
                                        {})]
-          (is (almost-equal-p? analytical-logpdf logpdf)))))))
+          (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))
