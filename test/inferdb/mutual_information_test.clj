@@ -127,3 +127,47 @@
               2
               2)]
       (is (number? mi)))))
+
+;; MI of x and y is larger than 0 because x carries information about y.
+(deftest positive-mi
+  (testing "Test the first invariant descrited in test/inferdb/README.md"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              []
+              []
+              {}
+              {}
+              100
+              1)]
+      (is (> mi 0)))))
+
+
+(def threshold 0.01)
+(defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+
+(deftest zero-mi
+  (testing "Test the third invariant descrited in test/inferdb/README.md"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:v :w]
+              []
+              []
+              {}
+              {}
+              100
+              1)]
+      (is (almost-equal? mi 0)))))
+
+(deftest zero-cmi
+  (testing "Test the second invariant descrited in test/inferdb/README.md"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              []
+              []
+              {:a 0}
+              {}
+              100
+              1)]
+      (is (almost-equal? mi 0)))))
