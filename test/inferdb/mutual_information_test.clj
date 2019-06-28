@@ -88,4 +88,42 @@
                                                [-4 6]
                                                "View 2: V W"))
       (is (= (count samples) n)))))
-;; TODO: implemet tests according to test/inferdb/README.md
+
+(deftest mi-smoke
+  (testing "smoke testing generic, CGPM based mutual information Oapproximation"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              [:a]
+              []
+              {}
+              {}
+              2
+              2)]
+      (is (number? mi)))))
+
+(deftest cmi-smoke-estimate-condition
+  (testing "smoke testing generic, CGPM based mutual information Oapproximation"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              [:a]
+              [:v]
+              {}
+              {}
+              2
+              2)]
+      (is (number? mi)))))
+
+(deftest cmi-smoke-specify-condition
+  (testing "smoke testing generic, CGPM based mutual information Oapproximation"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              [:a]
+              []
+              {:v 0}
+              {}
+              2
+              2)]
+      (is (number? mi)))))
