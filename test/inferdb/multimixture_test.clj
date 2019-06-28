@@ -276,7 +276,7 @@
                              clusters))))
     (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
       (let [categorical-args (select-keys args (map name categorical-variables))]
-        (testing (str "For cluster " cluster)
+        (testing (str "In cluster " cluster)
           (testing "most likely categories share the same index"
             (is (= 1 (->> (vals categorical-args)
                           (map first)
