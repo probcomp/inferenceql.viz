@@ -188,26 +188,23 @@
 (defn- almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
 (defn- almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
 
-(deftest nominal-simulations
+(deftest mean-stdev-conditioned-on-cluster
   (doseq [[cluster point-id] cluster-point-mapping]
-    (testing (str "Simulations conditioned on P" point-id)
+    (testing (str "Simulations conditioned on cluster " cluster)
       (let [samples (cgpm/cgpm-simulate crosscat-cgpm
                                         variables
                                         {:cluster-for-x cluster}
                                         {}
                                         simulation-count)]
         (doseq [variable nominal-variables]
-          (testing (str "of " variable)
+          (testing (str "of variable " variable)
             (let [samples (utils/col variable samples)]
               (testing "mean"
                 (is (almost-equal? (get (test-point point-id) variable)
                                    (utils/average samples))))
               (testing "standard deviation"
-                (let [actual-std (get-in multi-mixture [0
-                                                        :clusters cluster
-                                                        :args (name variable)
-                                                        1])]
-                  (is (utils/within-factor? actual-std
+                (let [analytical-std (data/sigma multi-mixture variable cluster)]
+                  (is (utils/within-factor? analytical-std
                                             (utils/std samples)
                                             2)))))))))))
 
@@ -229,14 +226,14 @@
 
 (deftest simulated-categorical-probabilities
   (doseq [cluster (keys cluster-point-mapping)]
-    (testing (str "For categorical cluster " cluster "simulations")
+    (testing (str "Conditioned on cluster " cluster)
       (let [all-samples (cgpm/cgpm-simulate crosscat-cgpm
                                             categorical-variables
                                             {:cluster-for-x cluster}
                                             {}
                                             simulation-count)]
         (doseq [variable categorical-variables]
-          (testing (str "of categorical variable " variable)
+          (testing (str "simulations of categorical variable " variable)
             (let [samples (utils/column-subset all-samples [variable])
                   actual-probabilities (get-in multi-mixture [0
                                                               :clusters cluster
