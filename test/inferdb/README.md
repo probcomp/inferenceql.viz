@@ -124,6 +124,65 @@ For `P 1` and `P 4` the above also holds, only that we need to take into account
 
 TODO.
 
-## 6. For which datapoints  do we "know something" about MI
+## 6. For which columns  do we "know something" about MI
 
-TODO.
+Assuming the following model; we can test three things:
+```
+(def generate-crosscat-row
+  (multi-mixture
+    (view
+      {"x" gaussian
+       "y" gaussian
+       "a" categorical}
+      (clusters
+       0.25 {"x" [1 0.1]
+             "y" [1 0.1]
+             "a" [[1 0 0 0]]}
+       0.25 {"x" [2 0.1]
+             "y" [2 0.1]
+             "a" [[0 1 0 0]]}
+       0.25 {"x" [3 0.1]
+             "y" [3 0.1]
+             "a" [[0 0 1 0]]}
+       0.25 {"x" [4 0.1]
+             "y" [4 0.1]
+             "a" [[0 0 0 1]]}))
+    (view
+      {"v" gaussian
+       "w" categorical}
+      (clusters
+       1.00 {"v" [1 1]
+             "w" [1 1] }))))
+```
+See samples from the first view here:
+
+![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-for-mi-x-y.png)
+
+
+
+and samples from the second view here:
+
+![Data](https://probcomp-3.csail.mit.edu/1b2e3ccb909da5afc7a7e497785197b8/n/simulations-for-mi-v-w.png)
+
+#### Invariants
+
+For the Multimix model we specified to test MI, we know that three invariants about 
+MI hold given this model:
+
+1. MI of `x` and `y is larger than  0` because `x` carries information about `y`.
+
+2. CMI of `x` and `y | a = 0`. Column `a` is a deterministic indicator of the
+   cluster ID. Conditioning on `a = 0` simplifies the distribution of `x` and `y`
+   to a simple bivariate Gaussian with a diagonal covariance matrix. This implies
+   that `x` and `y` are statistically independent and there is no information
+   flowing between them.
+
+3. MI of `v` and `w` is equal to 0. Again, the joint is equal to a bivariate
+   Gaussian distribution with a diagonal covariance matrix and no information is
+   flowing between `v` and `w`.
+
+#### Multivariate Gaussian
+
+In addition, if we had a multivariate normal CGPM, we could analytically compute
+the mutual information between two dimensions. We don't have this CGPM yet.
+Once we have it, we'll add it and test against an analytically computed result.
