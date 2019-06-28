@@ -99,15 +99,19 @@
                     output-addr-map
                     input-addr-map)))
 
-;; XXX this is not all that elegant: for plotting, I need all the test points in
-;; that format.
 (def test-points
-  [{:x 3  :y 4  :test-point "P 1"}
-   {:x 8  :y 10 :test-point "P 2"}
-   {:x 14 :y 7  :test-point "P 3"}
-   {:x 15 :y 8  :test-point "P 4"}
-   {:x 16 :y 9  :test-point "P 5"}
-   {:x 9  :y 16 :test-point "P 6"}])
+  [{:x 3  :y 4}
+   {:x 8  :y 10}
+   {:x 14 :y 7}
+   {:x 15 :y 8}
+   {:x 16 :y 9}
+   {:x 9  :y 16}])
+
+(defn test-point
+  "Retrieves a given point given its ID. Note that point IDs are different from
+  their indexes in `test-points`: Point IDs are 1-indexed."
+  [point-id]
+  (nth test-points (dec point-id)))
 
 (def variables (data/view-variables (first multi-mixture)))
 
@@ -120,13 +124,6 @@
   (into #{}
         (filter #(data/nominal? multi-mixture %))
         variables))
-
-(defn- test-point
-  "Retrieves a given point given its ID. Note that point IDs are different from
-  their indexes in `test-points`: Point IDs are 1-indexed."
-  [point-id]
-  (select-keys (nth test-points (dec point-id))
-               variables))
 
 (def cluster-point-mapping
   ;; Maps each cluster index to the ID of the point that is at the cluster's
@@ -163,7 +160,10 @@
   "This tests saves plots for all simulated data in out/json results/"
   ;; Charts can be generated with make charts.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
-    (let [sample-count plot-point-count
+    (let [data (map-indexed (fn [index point]
+                              (assoc point :test-point (inc index)))
+                            test-points)
+          sample-count plot-point-count
           samples (cgpm/cgpm-simulate crosscat-cgpm
                                       [:x :y :z :a :b :c]
                                       {}
@@ -172,7 +172,7 @@
       (utils/save-json "simulations-x-y"
                        (plot/scatter-plot-json ["x" "y"]
                                                samples
-                                               test-points
+                                               data
                                                [0 18]
                                                "View 1: X, Y, A, B"))
       (utils/save-json "simulations-z"
