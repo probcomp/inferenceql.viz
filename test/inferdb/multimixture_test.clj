@@ -338,7 +338,7 @@
 (deftest crosscat-logpdf-categoricals-conditioned-on-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
-      (testing (str "P" point-id)
+      (testing (str "Query logPDF for point P" point-id)
         (let [point (test-point point-id)
               most-likely-category (fn [variable]
                                      (max-index
