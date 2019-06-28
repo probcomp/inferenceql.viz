@@ -327,10 +327,15 @@
                                       (data/categorical-probabilities multi-mixture
                                                                       variable
                                                                       cluster)))
+              ;; The target here takes advantage of the structure of the
+              ;; multimixture. In particular, this test assumes that all the
+              ;; categorical variables in a given cluster will have the same
+              ;; index for the most likely category.
               target (zipmap categorical-variables
                              (map most-likely-category categorical-variables))
-              samples (cgpm/cgpm-logpdf crosscat-cgpm
+              analytical-logpdf (Math/log 0.95) ; TODO: Pull this out of model data
+              logpdf (cgpm/cgpm-logpdf crosscat-cgpm
                                         target
                                         point
                                         {})]
-          (is (some? samples)))))))
+          (is (almost-equal-p? analytical-logpdf logpdf)))))))
