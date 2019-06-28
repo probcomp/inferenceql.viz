@@ -249,7 +249,7 @@
                       p-fraction (utils/probability-vector variable-samples possible-values)]
                   (is (almost-equal-vectors? true-probabilities p-fraction)))))))))))
 
-(deftest nominal-logpdf-point
+(deftest logpdf-numerical-given-cluster
   (doseq [[cluster point-id] cluster-point-mapping]
     (let [point (select-keys (test-point point-id)
                              numerical-variables)
@@ -265,7 +265,7 @@
                                            {})]
       (is (almost-equal-p? analytical-logpdf queried-logpdf)))))
 
-(deftest logpdf-categoricals-conditioned-on-cluster
+(deftest logpdf-categoricals-given-cluster
   (let [;; This test takes advantage of some special properties of this view.
         view 0
         clusters (get-in multi-mixture [view :clusters])]
