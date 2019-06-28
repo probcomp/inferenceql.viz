@@ -31,6 +31,8 @@ Once you have run the tests you can generate `.png` charts:
 make charts
 ```
 
+See `inferdb.utils/save-json` for where chart metadata and images are saved.
+
 ## inferdb.spreadsheets
 
 ### Building the cache

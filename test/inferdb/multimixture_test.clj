@@ -150,8 +150,8 @@
 (def plot-point-count 1000)
 
 (deftest crosscat-simulate-joint
-  "This test saves plots for all simulated data in out/json results/"
-  ;; Charts can be generated with make charts.
+  ;; This test saves plots for all simulated data. See `README.md` for more
+  ;; information on chart generation.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
     (let [data (map-indexed (fn [index point]
                               (assoc point :test-point (inc index)))
