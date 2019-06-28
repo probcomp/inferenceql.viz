@@ -282,7 +282,8 @@
       (testing (str "Conditioned on point P" point-id)
         (let [point (test-point point-id)
               samples (cgpm/cgpm-simulate crosscat-cgpm
-                                          [:a :b :cluster-for-x :cluster-for-y]
+                                          (into categorical-variables
+                                                [:cluster-for-x :cluster-for-y])
                                           point
                                           {}
                                           simulation-count)]
