@@ -74,6 +74,25 @@
                 :args {"z" [15 8]
                        "c" [[0 0 0 1]]}}]}])
 
+(def test-points
+  [{:x 3  :y 4}
+   {:x 8  :y 10}
+   {:x 14 :y 7}
+   {:x 15 :y 8}
+   {:x 16 :y 9}
+   {:x 9  :y 16}])
+
+(def cluster-point-mapping
+  ;; Maps each cluster index to the ID of the point that is at the cluster's
+  ;; center. Note that not all points have a cluster around them.
+  {0 1
+   1 1
+   2 2
+   3 3
+   ;; P4 between clusters 4 and 5
+   4 5
+   5 6})
+
 (def crosscat-cgpm
   (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
         outputs-addrs-types {;; Variables in the table.
@@ -99,14 +118,6 @@
                     output-addr-map
                     input-addr-map)))
 
-(def test-points
-  [{:x 3  :y 4}
-   {:x 8  :y 10}
-   {:x 14 :y 7}
-   {:x 15 :y 8}
-   {:x 16 :y 9}
-   {:x 9  :y 16}])
-
 (defn test-point
   "Retrieves a given point given its ID. Note that point IDs are different from
   their indexes in `test-points`: Point IDs are 1-indexed."
@@ -124,17 +135,6 @@
   (into #{}
         (filter #(data/nominal? multi-mixture %))
         variables))
-
-(def cluster-point-mapping
-  ;; Maps each cluster index to the ID of the point that is at the cluster's
-  ;; center. Note that not all points have a cluster around them.
-  {0 1
-   1 1
-   2 2
-   3 3
-   ;; P4 between clusters 4 and 5
-   4 5
-   5 6})
 
 (deftest test-cluster-point-mapping
   ;; This test verifies that we've constructed our multi-mixture correctly such
