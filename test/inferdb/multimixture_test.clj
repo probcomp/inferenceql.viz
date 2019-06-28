@@ -309,7 +309,7 @@
                                                {})]
           (is (almost-equal-p? 0 queried-logpdf)))))))
 
-(deftest crosscat-logpdf-categoricals-conditioned-on-points
+(deftest crosscat-logpdf-categoricals-given-points
   (doseq [[cluster point-id] cluster-point-mapping]
     (when-not (= 1 point-id)
       (testing (str "Validate queried logPDF matches analytical logpdf for point P" point-id
