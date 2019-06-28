@@ -147,7 +147,6 @@
             mu (data/mu multi-mixture variable cluster)]
         (is (= point-value mu))))))
 
-;; How many points do we want to create for our plot?
 (def plot-point-count 1000)
 
 (deftest crosscatsimulate-simulate-joint
