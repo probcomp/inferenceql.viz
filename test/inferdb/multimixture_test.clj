@@ -147,12 +147,6 @@
             mu (data/mu multi-mixture variable cluster)]
         (is (= point-value mu))))))
 
-(defn test-point-coordinates
-  "A function to extract a relevant point from the array above."
-  [name]
-  (dissoc (first (filter #(= (:test-point %) name) test-points))
-          :test-point))
-
 ;; How many points do we want to create for our plot?
 (def plot-point-count 1000)
 
