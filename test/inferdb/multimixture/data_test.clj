@@ -46,4 +46,10 @@
 
 (deftest categorical-probabilities-test
   (is (= [2 3] (data/categorical-probabilities mmix :x 0)))
-  (is (= [10/22 12/22] (data/categorical-probabilities mmix :a 0 1))))
+  (is (= [1/3 2/3]
+         (let [mmix [{:vars {"x" dist/gaussian}
+                      :clusters [{:probability 2/3
+                                  :args {"x" [[1/3 2/3]]}}
+                                 {:probability 1/3
+                                  :args {"x" [[2/3 1/3]]}}]}]]
+           (data/categorical-probabilities mmix :x 0 1)))))

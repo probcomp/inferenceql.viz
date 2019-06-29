@@ -29,6 +29,14 @@
         (mapcat view-variables)
         mmix))
 
+(defn- view-index-for-variable
+  "Returns the index of the view a given variable was assigned to."
+  [mmix variable]
+  (some (fn [[i view]]
+          (when (contains? (:vars view) (name variable))
+            i))
+        (map-indexed vector mmix)))
+
 (defn- view-for-variable
   "Returns the view a given variable was assigned to."
   [mmix variable]
@@ -70,15 +78,23 @@
   [mmix variable cluster-idx]
   (second (parameters mmix variable cluster-idx)))
 
+(defn cluster-probability
+  [mmix view-idx cluster-idx]
+  (get-in mmix [view-idx :clusters cluster-idx :probability]))
+
 (defn categorical-probabilities
   "Returns the probabilities for the given categorical variable. If multiple
-  clusters are provided their probability vectors will be summed and normalized
-  to 1."
+  clusters are provided the weighted (by cluster probability) sum is returned
+  instead."
   ([mmix variable cluster-idx]
    (first (parameters mmix variable cluster-idx)))
   ([mmix variable cluster-idx-1 cluster-idx-2 & more]
-   (let [clusters (into more [cluster-idx-1 cluster-idx-2])]
-     (->> (map #(categorical-probabilities mmix variable %)
-               clusters)
-          (apply map +)
+   (let [clusters (into more [cluster-idx-1 cluster-idx-2])
+         view-idx (view-index-for-variable mmix variable)]
+     (->> clusters
+          (map (fn [cluster]
+                 (let [cluster-probs (cluster-probability mmix view-idx cluster)]
+                   (map (partial * cluster-probs)
+                        (categorical-probabilities mmix variable cluster)))))
+          (map (partial apply +))
           (utils/normalize)))))
