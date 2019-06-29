@@ -306,40 +306,48 @@
               (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))))
 
 (deftest crosscat-logpdf-cluster-given-points
-  (doseq [[cluster point-id] cluster-point-mapping]
-    (when-not (= 1 point-id)
-      (testing (str "Validate queried cluster logPDF given point P" point-id)
-        (let [point (test-point point-id)
-              queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
-                                               {:cluster-for-x cluster}
-                                               point
-                                               {})]
-          (is (almost-equal-p? 0 queried-logpdf)))))))
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Validate queried cluster logPDF given point P" point-id)
+      (doseq [cluster clusters]
+        (testing (str "and cluster" cluster)
+          (let [point (test-point point-id)
+                queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                 {:cluster-for-x cluster}
+                                                 point
+                                                 {})]
+            ;; This is based on the fact that in the cluster-point-mapping any
+            ;; point that is associated with more than one cluster is
+            ;; equidistant from that cluster's center.
+            (is (almost-equal-p? (Math/log (/ 1 (count clusters))) queried-logpdf))))))))
 
 (deftest crosscat-logpdf-categoricals-given-points
-  (doseq [[cluster point-id] cluster-point-mapping]
-    (when-not (= 1 point-id)
-      (testing (str "Validate queried categorical probabilities logPDF logPDF given point P" point-id)
-        (let [point (test-point point-id)
-              ;; Returns the most likely categorical for a given categorical
-              ;; variable. For example, for a categorical variable with
-              ;; probabilities [0.01 0.97 0.01 0.01] it will return 1.
-              most-likely-category (fn [variable]
-                                     (utils/max-index
-                                      (data/categorical-probabilities multi-mixture
-                                                                      variable
-                                                                      cluster)))
-              highest-probability (apply min (map #(apply max (data/categorical-probabilities multi-mixture % cluster))
-                                                  categorical-variables))
-              ;; The target here takes advantage of the structure of the
-              ;; multimixture. In particular, this test assumes that all the
-              ;; categorical variables in a given cluster will have the same
-              ;; index for the most likely category.
-              target (zipmap categorical-variables
-                             (map most-likely-category categorical-variables))
-              analytical-logpdf (Math/log highest-probability)
-              queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
-                                               target
-                                               point
-                                               {})]
-          (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Validate queried categorical probabilities logPDF given point P" point-id)
+      (doseq [cluster clusters]
+        (testing (str "cluster " cluster)
+          (let [point (test-point point-id)
+                ;; Returns the most likely categorical for a given categorical
+                ;; variable. For example, for a categorical variable with
+                ;; probabilities [0.01 0.97 0.01 0.01] it will return 1.
+                most-likely-category (fn [variable]
+                                       (utils/max-index
+                                        (data/categorical-probabilities multi-mixture
+                                                                        variable
+                                                                        cluster)))
+                highest-probability (apply min (map #(apply max (data/categorical-probabilities multi-mixture % cluster))
+                                                    categorical-variables))
+                ;; The target here takes advantage of the structure of the
+                ;; multimixture. In particular, this test assumes that all the
+                ;; categorical variables in a given cluster will have the same
+                ;; index for the most likely category.
+                target (zipmap categorical-variables
+                               (map most-likely-category categorical-variables))
+                ;; This is based on the fact that in the cluster-point-mapping any
+                ;; point that is associated with more than one cluster is
+                ;; equidistant from that cluster's center.
+                analytical-logpdf (Math/log (/ highest-probability (count clusters)))
+                queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                 target
+                                                 point
+                                                 {})]
+            (is (almost-equal-p? analytical-logpdf queried-logpdf))))))))
