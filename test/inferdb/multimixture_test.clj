@@ -93,6 +93,12 @@
    4 5
    5 6})
 
+(defn test-point
+  "Retrieves a given point given its ID. Note that point IDs are different from
+  their indexes in `test-points`: Point IDs are 1-indexed."
+  [point-id]
+  (nth test-points (dec point-id)))
+
 (defn invert-map
   "Reverse the keys/values of a map"
   [m]
@@ -100,6 +106,25 @@
                (update m v (fnil conj #{}) k))
              {}
              m))
+
+(defn euclidean-distance
+  [p1 p2]
+  (Math/sqrt (->> (map - p1 p2)
+                  (map #(Math/pow % 2))
+                  (reduce +))))
+
+(deftest points-equidistant-from-cluster-centers
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Each cluster in " clusters " shoudl be an equal distance from P" point-id)
+      ;; Subsequent tests rely on this property of the test multimixture.
+      (let [{:keys [x y] :as _point} (test-point point-id)
+            cluster-center (fn [cluster]
+                             [(data/mu multi-mixture :x cluster)
+                              (data/mu multi-mixture :y cluster)])
+            distances (->> clusters
+                           (map cluster-center)
+                           (map #(euclidean-distance [x y] %)))]
+        (is (apply = distances))))))
 
 (def crosscat-cgpm
   (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
@@ -125,12 +150,6 @@
                     inputs-addrs-types
                     output-addr-map
                     input-addr-map)))
-
-(defn test-point
-  "Retrieves a given point given its ID. Note that point IDs are different from
-  their indexes in `test-points`: Point IDs are 1-indexed."
-  [point-id]
-  (nth test-points (dec point-id)))
 
 (def variables (data/view-variables (first multi-mixture)))
 
@@ -315,9 +334,10 @@
                                                  {:cluster-for-x cluster}
                                                  point
                                                  {})]
-            ;; This is based on the fact that in the cluster-point-mapping any
-            ;; point that is associated with more than one cluster is
-            ;; equidistant from that cluster's center.
+            ;; This is based on the fact that in the cluster-point-mapping
+            ;; any point that is associated with more than one cluster is
+            ;; equidistant from that cluster's center. See
+            ;; `points-equidistant-from-cluster-centers`.
             (is (almost-equal-p? (Math/log (/ 1 (count clusters))) queried-logpdf))))))))
 
 (deftest crosscat-logpdf-categoricals-given-points
@@ -342,10 +362,12 @@
                 ;; index for the most likely category.
                 target (zipmap categorical-variables
                                (map most-likely-category categorical-variables))
-                ;; This is based on the fact that in the cluster-point-mapping any
-                ;; point that is associated with more than one cluster is
-                ;; equidistant from that cluster's center.
-                analytical-logpdf (Math/log (/ highest-probability (count clusters)))
+                ;; This is based on the fact that in the cluster-point-mapping
+                ;; any point that is associated with more than one cluster is
+                ;; equidistant from that cluster's center. See
+                ;; `points-equidistant-from-cluster-centers`.
+                analytical-logpdf (Math/log (/ highest-probability
+                                               (count clusters)))
                 queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
                                                  target
                                                  point
