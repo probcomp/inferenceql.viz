@@ -123,7 +123,7 @@
       (is (number? mi)))))
 
 ;; MI of x and y is larger than 0 because x carries information about y.
-(deftest positive-mi
+(deftest ^:kaocha/pending positive-mi
   (testing "Test the first invariant descrited in test/inferdb/README.md"
     (let [mi (cgpm/cgpm-mutual-information
               crosscat-cgpm-mi
