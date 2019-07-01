@@ -10,8 +10,8 @@
   (apply dsl/multi-mixture
          (map (fn [{:keys [vars clusters]}]
                 (dsl/view vars (apply dsl/clusters
-                                      (mapcat (fn [{:keys [probability args]}]
-                                                [probability args])
+                                      (mapcat (fn [{:keys [probability parameters]}]
+                                                [probability parameters])
                                               clusters))))
               mmix)))
 
@@ -66,7 +66,7 @@
   "Returns the parameters of a variable for a cluster."
   [mmix variable cluster-idx]
   (let [view (view-for-variable mmix variable)]
-    (get-in view [:clusters cluster-idx :args (name variable)])))
+    (get-in view [:clusters cluster-idx :parameters (name variable)])))
 
 (defn mu
   "Returns the mu for the given variable."

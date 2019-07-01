@@ -31,49 +31,49 @@
            "a" dist/categorical
            "b" dist/categorical}
     :clusters [{:probability 0.166666666
-                :args {"x" [3 1]
-                       "y" [4 0.1]
-                       "a" [[1 0 0 0 0 0]]
-                       "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}}
+                :parameters {"x" [3 1]
+                             "y" [4 0.1]
+                             "a" [[1 0 0 0 0 0]]
+                             "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}}
                {:probability 0.166666666
-                :args {"x" [3 0.1]
-                       "y" [4 1]
-                       "a" [[0 1 0 0 0 0]]
-                       "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}}
+                :parameters {"x" [3 0.1]
+                             "y" [4 1]
+                             "a" [[0 1 0 0 0 0]]
+                             "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}}
                {:probability 0.166666667
-                :args {"x" [8 0.5]
-                       "y" [10 1]
-                       "a" [[0 0 1 0 0 0]]
-                       "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}}
+                :parameters {"x" [8 0.5]
+                             "y" [10 1]
+                             "a" [[0 0 1 0 0 0]]
+                             "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}}
                {:probability 0.166666666
-                :args {"x" [14 0.5]
-                       "y" [7 0.5]
-                       "a" [[0 0 0 1 0 0]]
-                       "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}}
+                :parameters {"x" [14 0.5]
+                             "y" [7 0.5]
+                             "a" [[0 0 0 1 0 0]]
+                             "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}}
                {:probability 0.166666666
-                :args {"x" [16 0.5]
-                       "y" [9 0.5]
-                       "a" [[0 0 0 0 1 0]]
-                       "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}}
+                :parameters {"x" [16 0.5]
+                             "y" [9 0.5]
+                             "a" [[0 0 0 0 1 0]]
+                             "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}}
                {:probability 0.166666666
-                :args {"x" [9  2.5]
-                       "y" [16 0.1]
-                       "a" [[0 0 0 0 0 1]]
-                       "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}}]}
+                :parameters {"x" [9  2.5]
+                             "y" [16 0.1]
+                             "a" [[0 0 0 0 0 1]]
+                             "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}}]}
    {:vars {"z" dist/gaussian
            "c" dist/categorical}
     :clusters [{:probability 0.25
-                :args {"z" [0 1]
-                       "c" [[1 0 0 0]]}}
+                :parameters {"z" [0 1]
+                             "c" [[1 0 0 0]]}}
                {:probability 0.25
-                :args {"z" [15 1]
-                       "c" [[0 1 0 0]]}}
+                :parameters {"z" [15 1]
+                             "c" [[0 1 0 0]]}}
                {:probability 0.25
-                :args {"z" [30 1]
-                       "c" [[0 0 1 0]]}}
+                :parameters {"z" [30 1]
+                             "c" [[0 0 1 0]]}}
                {:probability 0.25
-                :args {"z" [15 8]
-                       "c" [[0 0 0 1]]}}]}])
+                :parameters {"z" [15 8]
+                             "c" [[0 0 0 1]]}}]}])
 
 (def test-points
   [{:x 3  :y 4}
@@ -246,7 +246,7 @@
                     (let [variable-samples (utils/column-subset samples [variable])
                           actual-probabilities (get-in multi-mixture [0
                                                                       :clusters cluster
-                                                                      :args (name variable)
+                                                                      :parameters (name variable)
                                                                       0])
                           possible-values (range 6)
                           probabilities (utils/probability-vector variable-samples possible-values)]
@@ -301,10 +301,10 @@
     (testing (str "Across all clusters in view " view " most likely categorical indexes are distinct")
       (is (distinct? (mapcat (fn [cluster]
                                (map (comp utils/max-index first)
-                                    (vals (select-keys (:args cluster) (map name categorical-variables)))))
+                                    (vals (select-keys (:parameters cluster) (map name categorical-variables)))))
                              clusters))))
-    (doseq [[cluster {:keys [args]}] (map-indexed vector clusters)]
-      (let [categorical-args (select-keys args (map name categorical-variables))]
+    (doseq [[cluster {:keys [parameters]}] (map-indexed vector clusters)]
+      (let [categorical-args (select-keys parameters (map name categorical-variables))]
         (testing (str "In cluster " cluster)
           (testing "most likely categories should share the same index"
             (is (= 1 (->> (vals categorical-args)
