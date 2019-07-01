@@ -244,10 +244,7 @@
                   (data/nominal? multi-mixture variable)
                   (testing "validate simulated categorical probabilities"
                     (let [variable-samples (utils/column-subset samples [variable])
-                          actual-probabilities (get-in multi-mixture [0
-                                                                      :clusters cluster
-                                                                      :parameters (name variable)
-                                                                      0])
+                          actual-probabilities (data/categorical-probabilities multi-mixture variable cluster)
                           possible-values (range 6)
                           probabilities (utils/probability-vector variable-samples possible-values)]
                       (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
