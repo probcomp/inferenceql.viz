@@ -134,7 +134,7 @@
               {}
               100
               1)]
-      (is (> mi 0)))))
+      (is (< 0. mi)))))
 
 
 (def threshold 0.01)
@@ -151,7 +151,7 @@
               {}
               100
               1)]
-      (is (almost-equal? mi 0)))))
+      (is (almost-equal? 0. mi)))))
 
 (deftest zero-cmi
   (testing "Test the second invariant descrited in test/inferdb/README.md"
@@ -164,4 +164,4 @@
               {}
               100
               1)]
-      (is (almost-equal? mi 0)))))
+      (is (almost-equal? 0. mi)))))
