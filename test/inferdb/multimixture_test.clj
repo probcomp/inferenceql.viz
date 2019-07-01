@@ -182,21 +182,17 @@
   ;; Charts can be generated with make charts.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
     (let [num-samples plot-point-count
-          test-points [{:tx 3  :ty 4  :test-point "P 1"}
-                       {:tx 8  :ty 10 :test-point "P 2"}
-                       {:tx 14 :ty 7  :test-point "P 3"}
-                       {:tx 15 :ty 8  :test-point "P 4"}
-                       {:tx 16 :ty 9  :test-point "P 5"}
-                       {:tx 9 :ty 16 :test-point "P 6"}]
           point-data (map-indexed (fn [index point]
-                                    (assoc point :test-point (str "P " (inc index))))
+                                    (reduce-kv (fn [m k v]
+                                                 (assoc m (keyword (str "t" (name k))) v))
+                                               {:test-point (str "P " (inc index))}
+                                               point))
                                   test-points)
           samples (cgpm/cgpm-simulate crosscat-cgpm
                                       [:x :y :z :a :b :c]
                                       {}
                                       {}
                                       num-samples)]
-      (is (= test-points point-data))
       (utils/save-json "simulations-x-y"
                        (plot/scatter-plot-json ["x" "y"]
                                                samples
@@ -204,10 +200,9 @@
                                                [0 18]
                                                "View 1: X, Y, A, B"))
       (utils/save-json "simulations-z"
-                       (plot/hist-plot
-                        (utils/column-subset samples [:z :c])
-                        [:z :c]
-                        "Dim Z and C"))
+                       (plot/hist-plot (utils/column-subset samples [:z :c])
+                                       [:z :c]
+                                       "Dim Z and C"))
       (utils/save-json "simulations-a"
                        (plot/bar-plot (utils/column-subset samples [:a]) "Dim A" plot-point-count))
       (utils/save-json "simulations-b"
