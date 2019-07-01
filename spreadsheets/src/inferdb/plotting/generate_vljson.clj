@@ -8,7 +8,7 @@
     (cheshire/generate-string
       {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
        :background "white"
-       :data {:values (concat values test-points)}
+       :data {:values (into values test-points)}
        :title title
        :layer [{:width  700
                 :height 700
@@ -83,4 +83,3 @@
                         :type "quantitative"}
                     :color {:field (second columns)
                             :type "nominal"}}})))
-

@@ -1,5 +1,6 @@
 (ns inferdb.multimixture-test
-  (:require [clojure.test :as test :refer [deftest is testing]]
+  (:require [clojure.string :as str]
+            [clojure.test :as test :refer [deftest is testing]]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
             [inferdb.multimixture.data :as data]
@@ -176,23 +177,30 @@
 
 (def plot-point-count 1000)
 
-(deftest crosscat-simulate-joint
-  ;; This test saves plots for all simulated data. See `README.md` for more
-  ;; information on chart generation.
+(deftest visual-test
+  "This tests saves plots for all simulated data in out/json results/"
+  ;; Charts can be generated with make charts.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
-    (let [data (map-indexed (fn [index point]
-                              (assoc point :test-point (inc index)))
-                            test-points)
-          sample-count plot-point-count
+    (let [num-samples plot-point-count
+          test-points [{:tx 3  :ty 4  :test-point "P 1"}
+                       {:tx 8  :ty 10 :test-point "P 2"}
+                       {:tx 14 :ty 7  :test-point "P 3"}
+                       {:tx 15 :ty 8  :test-point "P 4"}
+                       {:tx 16 :ty 9  :test-point "P 5"}
+                       {:tx 9 :ty 16 :test-point "P 6"}]
+          point-data (map-indexed (fn [index point]
+                                    (assoc point :test-point (str "P " (inc index))))
+                                  test-points)
           samples (cgpm/cgpm-simulate crosscat-cgpm
                                       [:x :y :z :a :b :c]
                                       {}
                                       {}
-                                      sample-count)]
+                                      num-samples)]
+      (is (= test-points point-data))
       (utils/save-json "simulations-x-y"
                        (plot/scatter-plot-json ["x" "y"]
                                                samples
-                                               data
+                                               point-data
                                                [0 18]
                                                "View 1: X, Y, A, B"))
       (utils/save-json "simulations-z"
