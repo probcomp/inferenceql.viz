@@ -203,12 +203,11 @@
                        (plot/hist-plot (utils/column-subset samples [:z :c])
                                        [:z :c]
                                        "Dim Z and C"))
-      (utils/save-json "simulations-a"
-                       (plot/bar-plot (utils/column-subset samples [:a]) "Dim A" plot-point-count))
-      (utils/save-json "simulations-b"
-                       (plot/bar-plot (utils/column-subset samples [:b]) "Dim B" plot-point-count))
-      (utils/save-json "simulations-c"
-                       (plot/bar-plot (utils/column-subset samples [:c]) "Dim C" plot-point-count))
+      (doseq [variable #{:a :b :c}]
+        (utils/save-json (str "simulations-" (name variable))
+                         (plot/bar-plot (utils/column-subset samples [variable])
+                                        (str "Dim " (-> variable name str/upper-case))
+                                        plot-point-count)))
       (is (= (count samples) plot-point-count)))))
 
 (def simulation-count 100)
