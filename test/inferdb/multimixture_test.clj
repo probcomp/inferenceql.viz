@@ -282,7 +282,7 @@
           analytical-logpdf (transduce (map (fn [variable]
                                               (let [mu (data/mu multi-mixture variable cluster)
                                                     sigma (data/sigma multi-mixture variable cluster)]
-                                                (dist/score-gaussian mu [mu sigma]))))
+                                                (dist/score-gaussian (get point variable) [mu sigma]))))
                                        +
                                        numerical-variables)
           queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
