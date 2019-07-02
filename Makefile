@@ -51,7 +51,7 @@ charts: $(chart-dir) $(pngs)
 cache: model data $(cache-file)
 
 $(generated-dirs):
-	mkdir -p $($@)
+	mkdir -p $@
 
 $(hot-css-resource): $(hot-css-file)
 	cp $(hot-css-file) $(resource-dir)
