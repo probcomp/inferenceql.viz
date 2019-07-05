@@ -56,9 +56,6 @@
                     output-addr-map
                     input-addr-map)))
 
-#_((data/crosscat-row-generator multi-mixture))
-#_(crosscat-cgpm-mi)
-
 ;; How many points do we want to create for our plot?
 (def n 1000)
 
