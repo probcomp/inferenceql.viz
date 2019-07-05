@@ -1,9 +1,6 @@
 (ns inferdb.cgpm-test
   (:refer-clojure :exclude [map apply replicate])
-  (:require [clojure.pprint :refer [pprint]]
-            [clojure.repl :refer [doc source]]
-            [clojure.test :refer :all]
-            [clojure.string :refer [index-of]]
+  (:require [clojure.test :refer :all]
             [metaprob.generative-functions :refer :all]
             [metaprob.code-handlers :refer :all]
             [metaprob.expander :refer :all]

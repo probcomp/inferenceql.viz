@@ -1,6 +1,7 @@
 # inferdb
 
-[![CircleCI](https://circleci.com/gh/probcomp/inferenceql.svg?style=svg&circle-token=a7fdbf0f271ddb2a6a9798c3a99bdb21c68080c2)](https://circleci.com/gh/probcomp/inferenceql)
+[![CircleCI](https://circleci.com/gh/probcomp/inferenceql.svg?style=shield&circle-token=a7fdbf0f271ddb2a6a9798c3a99bdb21c68080c2)](https://circleci.com/gh/probcomp/inferenceql)
+![Stability: Experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
 
 ## Testing
 
@@ -29,6 +30,8 @@ Once you have run the tests you can generate `.png` charts:
 ```bash
 make charts
 ```
+
+See `inferdb.utils/save-json` for where chart metadata and images are saved.
 
 ## inferdb.spreadsheets
 

@@ -1,0 +1,14 @@
+#!/usr/bin/env clojure
+
+(require '[inferdb.spreadsheets.build-model :as build])
+(require '[clojure.data.json :as json])
+
+(when (< (count *command-line-args*) 2)
+  (do
+    (println "Usage: build-model output-filename json-model-filename")
+    (System/exit 0)))
+
+(def model
+  (json/read-str (slurp (second *command-line-args*))))
+
+(build/write-model model (first *command-line-args*))
