@@ -3,10 +3,12 @@
 
 (defn scatter-plot-json
   [columns values test-points domain title]
+    (let [color (if (contains? (first values) :a) {:field "a" :type "nominal"} {})
+          shape (if (contains? (first values) :b) {:field "b" :type "nominal"} {})]
     (cheshire/generate-string
       {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
        :background "white"
-       :data {:values (concat values test-points)}
+       :data {:values (into values test-points)}
        :title title
        :layer [{:width  700
                 :height 700
@@ -19,10 +21,8 @@
                                :title (name (second columns))
                                :type "quantitative"
                                :scale {:domain domain}}
-                           :color {:field "a"
-                                   :type "nominal"}
-                           :shape {:field "b"
-                                   :type "nominal"}}}
+                           :color color
+                           :shape shape}}
                {:width  700
                 :height 700
                 :mark {:type "text" :dx 25 :dy -10 :fontSize 23}
@@ -41,7 +41,7 @@
                 :encoding {:x {:field "tx"
                            :type "quantitative"}
                            :y {:field "ty"
-                           :type "quantitative"}}}]}))
+                           :type "quantitative"}}}]})))
 
 (defn bar-plot
   [samples title n]
@@ -83,4 +83,3 @@
                         :type "quantitative"}
                     :color {:field (second columns)
                             :type "nominal"}}})))
-

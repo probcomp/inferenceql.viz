@@ -1,22 +1,22 @@
 (ns inferdb.multimixture-test
-  (:require [clojure.test :refer :all]
-            [clojure.java.io :as io]
-            [metaprob.distributions :refer :all]
-            [inferdb.cgpm.main :refer :all]
-            [inferdb.utils :refer :all]
-            [inferdb.plotting.generate-vljson :refer :all]
-            [inferdb.multimixture.dsl :refer :all]))
+  (:require [clojure.string :as str]
+            [clojure.test :as test :refer [deftest is testing]]
+            [inferdb.cgpm.main :as cgpm]
+            [inferdb.utils :as utils]
+            [inferdb.multimixture.data :as data]
+            [inferdb.plotting.generate-vljson :as plot]
+            [metaprob.distributions :as dist]))
 
-; XXX: why is this still here?
+;; XXX: why is this still here?
 (defn make-identity-output-addr-map
   [output-addrs-types]
   (let [output-addrs (keys output-addrs-types)
-        trace-addrs  (map clojure.core/name output-addrs)]
-    (clojure.core/zipmap output-addrs trace-addrs)))
+        trace-addrs  (map name output-addrs)]
+    (zipmap output-addrs trace-addrs)))
 
 ;; The following data generator has some interesting properties:
 ;; - clusters 0 and 1 in view 0 share the samme mu parameter.
-;; - a is a determinstic indicator of the cluster.
+;; - a is a deterministic indicator of the cluster.
 ;; - b is a noisy copy of a.
 ;; - in both views, clusters are equally weighted.
 ;; - in view 1, the third Gaussian components (cluster 0) "spans" the domain of
@@ -24,400 +24,351 @@
 ;;
 ;; I'd encourage everyone who works with the file to run the tests in this file
 ;; and then run make charts to see how the components relate.
-(def generate-crosscat-row
-  (multi-mixture
-    (view
-      {"x" gaussian
-       "y" gaussian
-       "a" categorical
-       "b" categorical}
-      (clusters
-       0.166666666 {"x" [3 1]
-                    "y" [4 0.1]
-                    "a" [[1 0 0 0 0 0]]
-                    "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}
-       0.166666666 {"x" [3 0.1]
-                    "y" [4 1]
-                    "a" [[0 1 0 0 0 0]]
-                    "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}
-       0.166666667 {"x" [8 0.5]
-                    "y" [10 1]
-                    "a" [[0 0 1 0 0 0]]
-                    "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}
-       0.166666666 {"x" [14 0.5]
-                    "y" [7 0.5]
-                    "a" [[0 0 0 1 0 0]]
-                    "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}
-       0.166666666 {"x" [16 0.5]
-                    "y" [9 0.5]
-                    "a" [[0 0 0 0 1 0]]
-                    "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}
-       0.166666666 {"x" [9  2.5]
-                    "y" [16 0.1]
-                    "a" [[0 0 0 0 0 1]]
-                    "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}))
-    (view
-      {"z" gaussian
-       "c" categorical}
-      (clusters
-       0.25 {"z" [0 1]
-             "c" [[1 0 0 0]]}
-       0.25 {"z" [15 1]
-             "c" [[0 1 0 0]]}
-       0.25 {"z" [30 1]
-             "c" [[0 0 1 0]]}
-       0.25 {"z" [15 8]
-             "c" [[0 0 0 1]]}))))
+
+(def multi-mixture
+  [{:vars {"x" dist/gaussian
+           "y" dist/gaussian
+           "a" dist/categorical
+           "b" dist/categorical}
+    :clusters [{:probability 0.166666666
+                :parameters {"x" [3 1]
+                             "y" [4 0.1]
+                             "a" [[1 0 0 0 0 0]]
+                             "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}}
+               {:probability 0.166666666
+                :parameters {"x" [3 0.1]
+                             "y" [4 1]
+                             "a" [[0 1 0 0 0 0]]
+                             "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}}
+               {:probability 0.166666667
+                :parameters {"x" [8 0.5]
+                             "y" [10 1]
+                             "a" [[0 0 1 0 0 0]]
+                             "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}}
+               {:probability 0.166666666
+                :parameters {"x" [14 0.5]
+                             "y" [7 0.5]
+                             "a" [[0 0 0 1 0 0]]
+                             "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}}
+               {:probability 0.166666666
+                :parameters {"x" [16 0.5]
+                             "y" [9 0.5]
+                             "a" [[0 0 0 0 1 0]]
+                             "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}}
+               {:probability 0.166666666
+                :parameters {"x" [9  2.5]
+                             "y" [16 0.1]
+                             "a" [[0 0 0 0 0 1]]
+                             "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}}]}
+   {:vars {"z" dist/gaussian
+           "c" dist/categorical}
+    :clusters [{:probability 0.25
+                :parameters {"z" [0 1]
+                             "c" [[1 0 0 0]]}}
+               {:probability 0.25
+                :parameters {"z" [15 1]
+                             "c" [[0 1 0 0]]}}
+               {:probability 0.25
+                :parameters {"z" [30 1]
+                             "c" [[0 0 1 0]]}}
+               {:probability 0.25
+                :parameters {"z" [15 8]
+                             "c" [[0 0 0 1]]}}]}])
+
+(def test-points
+  [{:x 3  :y 4}
+   {:x 8  :y 10}
+   {:x 14 :y 7}
+   {:x 15 :y 8}
+   {:x 16 :y 9}
+   {:x 9  :y 16}])
+
+(def cluster-point-mapping
+  ;; Maps each cluster index to the ID of the point that is at the cluster's
+  ;; center. Note that not all points have a cluster around them.
+  {0 1
+   1 1
+   2 2
+   3 3
+   ;; P4 between clusters 4 and 5
+   4 5
+   5 6})
+
+(defn test-point
+  "Retrieves a given point given its ID. Note that point IDs are different from
+  their indexes in `test-points`: Point IDs are 1-indexed."
+  [point-id]
+  (nth test-points (dec point-id)))
+
+(defn invert-map
+  "Reverse the keys/values of a map"
+  [m]
+  (reduce-kv (fn [m k v]
+               (update m v (fnil conj #{}) k))
+             {}
+             m))
+
+(defn euclidean-distance
+  [p1 p2]
+  (Math/sqrt (->> (map - p1 p2)
+                  (map #(Math/pow % 2))
+                  (reduce +))))
+
+(deftest points-equidistant-from-cluster-centers
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Each cluster in " clusters " should be an equal distance from P" point-id)
+      ;; Subsequent tests rely on this property of the test multimixture.
+      (let [{:keys [x y] :as _point} (test-point point-id)
+            cluster-center (fn [cluster]
+                             [(data/mu multi-mixture :x cluster)
+                              (data/mu multi-mixture :y cluster)])
+            distances (->> clusters
+                           (map cluster-center)
+                           (map #(euclidean-distance [x y] %)))]
+        (is (apply = distances))))))
 
 (def crosscat-cgpm
-  (let [outputs-addrs-types {;; Variables in the table.
-                             :x real-type
-                             :y real-type
-                             :z real-type
-                             :a integer-type
-                             :b integer-type
-                             :c integer-type
+  (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
+        outputs-addrs-types {;; Variables in the table.
+                             :x cgpm/real-type
+                             :y cgpm/real-type
+                             :z cgpm/real-type
+                             :a cgpm/integer-type
+                             :b cgpm/integer-type
+                             :c cgpm/integer-type
                              ;; Exposed latent variables.
-                             :cluster-for-x integer-type
-                             :cluster-for-y integer-type
-                             :cluster-for-z integer-type
-                             :cluster-for-a integer-type
-                             :cluster-for-b integer-type
-                             :cluster-for-c integer-type}
+                             :cluster-for-x cgpm/integer-type
+                             :cluster-for-y cgpm/integer-type
+                             :cluster-for-z cgpm/integer-type
+                             :cluster-for-a cgpm/integer-type
+                             :cluster-for-b cgpm/integer-type
+                             :cluster-for-c cgpm/integer-type}
         output-addr-map (make-identity-output-addr-map outputs-addrs-types)
         inputs-addrs-types {}
         input-addr-map {}]
-    (make-cgpm generate-crosscat-row
-               outputs-addrs-types
-               inputs-addrs-types
-               output-addr-map
-               input-addr-map)))
+    (cgpm/make-cgpm generate-crosscat-row
+                    outputs-addrs-types
+                    inputs-addrs-types
+                    output-addr-map
+                    input-addr-map)))
 
-; XXX this is not all that elegant: for plotting, I need all the test points in
-; that format.
-(def test-points [{:tx 3  :ty 4  :test-point "P 1"}
-                  {:tx 8  :ty 10 :test-point "P 2"}
-                  {:tx 14 :ty 7  :test-point "P 3"}
-                  {:tx 15 :ty 8  :test-point "P 4"}
-                  {:tx 16 :ty 9  :test-point "P 5"}
-                  {:tx 9  :ty 16 :test-point "P 6"}])
+(def variables (data/view-variables (first multi-mixture)))
 
-(defn test-point-coordinates [name]
-  "A function to extract a relevant point from the array above."
-  (dissoc (first (filter #(= (:test-point %) name) test-points)) 
-          :test-point))
+(def numerical-variables
+  (into #{}
+        (filter #(data/numerical? multi-mixture %))
+        variables))
 
-; How many points do we want to create for our plot?
-(def n 1000)
-(deftest crosscatsimulate-simulate-joint
+(def categorical-variables
+  (into #{}
+        (filter #(data/nominal? multi-mixture %))
+        variables))
+
+(deftest test-cluster-point-mapping
+  ;; This test verifies that we've constructed our multi-mixture correctly such
+  ;; that the subsequent tests can succeed. Clusters that have a point at their
+  ;; center should have that point's variables as the mu for each gaussian that
+  ;; makes up the cluster gaussian that makes up the cluster.
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (doseq [variable #{:x :y}]
+      (let [point-value (get (test-point point-id) variable)
+            mu (data/mu multi-mixture variable cluster)]
+        (is (= point-value mu))))))
+
+(def plot-point-count 1000)
+
+(deftest visual-test
   "This tests saves plots for all simulated data in out/json results/"
   ;; Charts can be generated with make charts.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
-    (let [num-samples n
-          samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:x :y :z :a :b :c]
-                    {}
-                    {}
-                    num-samples)]
-      (save-json "simulations-x-y"
-                 (scatter-plot-json ["x" "y"]
-                                    samples
-                                    test-points
-                                    [0 18]
-                                    "View 1: X, Y, A, B"))
-      (save-json "simulations-z"
-                 (hist-plot
-                   (column-subset samples [:z :c])
-                   [:z :c]
-                   "Dim Z and C"))
-      (save-json "simulations-a"
-                 (bar-plot (column-subset samples [:a]) "Dim A" n))
-      (save-json "simulations-b"
-                 (bar-plot (column-subset samples [:b]) "Dim B" n))
-      (save-json "simulations-c"
-                 (bar-plot (column-subset samples [:c]) "Dim C" n))
-      (is (= (count samples) n)))))
+    (let [num-samples plot-point-count
+          point-data (map-indexed (fn [index point]
+                                    (reduce-kv (fn [m k v]
+                                                 (assoc m (keyword (str "t" (name k))) v))
+                                               {:test-point (str "P " (inc index))}
+                                               point))
+                                  test-points)
+          samples (cgpm/cgpm-simulate crosscat-cgpm
+                                      [:x :y :z :a :b :c]
+                                      {}
+                                      {}
+                                      num-samples)]
+      (utils/save-json "simulations-x-y"
+                       (plot/scatter-plot-json ["x" "y"]
+                                               samples
+                                               point-data
+                                               [0 18]
+                                               "View 1: X, Y, A, B"))
+      (utils/save-json "simulations-z"
+                       (plot/hist-plot (utils/column-subset samples [:z :c])
+                                       [:z :c]
+                                       "Dim Z and C"))
+      (doseq [variable #{:a :b :c}]
+        (utils/save-json (str "simulations-" (name variable))
+                         (plot/bar-plot (utils/column-subset samples [variable])
+                                        (str "Dim " (-> variable name str/upper-case))
+                                        plot-point-count)))
+      (is (= (count samples) plot-point-count)))))
 
-; Let's define a few helper constants and functions that we'll use below.
-(def numper-simulations-for-test 100)
-(def threshold 0.1)
-(defn is-almost-equal? [a b] (almost-equal? a b relerr threshold))
-(defn is-almost-equal-vectors? [a b] (almost-equal-vectors? a b relerr threshold))
-(defn is-almost-equal-p? [a b] (almost-equal? a b relerr 0.01))
+(def simulation-count 100)
+(def threshold 0.5)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 1 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO. This case is marginally more complicated because P 1 happens to be the
-;; center of two clusters.
+(defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+(defn- almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
+(defn- almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 2 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def p2 (test-point-coordinates "P 2"))
-;; Testing invariants conditioning on the cluster ID = 2 which corresponds to the component
-;; that of which p2 is a cluster center.
-(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
-  (testing "mean of simulations conditioned on cluster-ID = 2"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:x :y]
-                    {:cluster-for-x 2}
-                    {}
-                    numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)]
-      (is (and (is-almost-equal? (average x-samples) (:tx p2))
-               (is-almost-equal? (average y-samples) (:ty p2)))))))
+(deftest simulations-conditioned-on-clusters
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (testing (str "Conditioned on cluster " cluster)
+      ;; We simulate all variables together in a single test like this because
+      ;; there's currently a performance benefit to doing so.
+      (let [point (test-point point-id)
+            samples (cgpm/cgpm-simulate crosscat-cgpm
+                                        variables
+                                        {:cluster-for-x cluster}
+                                        {}
+                                        simulation-count)]
+        (doseq [variable variables]
+          (testing (str "validate variable " variable)
+            (cond (data/numerical? multi-mixture variable)
+                  (let [samples (utils/col variable samples)]
+                    (testing "mean"
+                      (is (almost-equal? (get point variable)
+                                         (utils/average samples))))
+                    (testing "standard deviation"
+                      (let [analytical-std (data/sigma multi-mixture variable cluster)]
+                        (is (utils/within-factor? analytical-std
+                                                  (utils/std samples)
+                                                  2)))))
 
-(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p2
-  (testing "standard deviaton of simulations conditioned on cluster-ID = 2"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:x :y]
-                    {:cluster-for-x 2}
-                    {}
-                    numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)
-          factor 2]
-      (is (and (within-factor? (std x-samples) 0.5 factor)
-               (within-factor? (std y-samples) 1 factor))))))
+                  (data/nominal? multi-mixture variable)
+                  (testing "validate simulated categorical probabilities"
+                    (let [variable-samples (utils/column-subset samples [variable])
+                          actual-probabilities (data/categorical-probabilities multi-mixture variable cluster)
+                          possible-values (range 6)
+                          probabilities (utils/probability-vector variable-samples possible-values)]
+                      (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
 
-(deftest crosscat-simulate-categoricals-conditioned-on-cluster-p2
-  (testing "categorical simulations conditioned on cluster-ID = 2"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:a :b]
-                    {:cluster-for-x 2}
-                    {}
-                    numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
-          true-p-a [0 0 1 0 0 0]
-          true-p-b [0.01 0.01 0.95 0.01 0.01 0.01]
-          possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
+(deftest simulations-conditioned-on-points
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Conditioned on point P" point-id)
+      (let [point (test-point point-id)
+            samples (cgpm/cgpm-simulate crosscat-cgpm
+                                        (into categorical-variables
+                                              [:cluster-for-x :cluster-for-y])
+                                        point
+                                        {}
+                                        simulation-count)]
+        (testing "validate cluster assignments"
+          (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
+                id-samples-y (utils/column-subset samples [:cluster-for-y])
+                cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
+                true-p-cluster (apply data/categorical-probabilities multi-mixture :a clusters)]
+            (is (utils/equal-sample-values id-samples-x id-samples-y))
+            (is (almost-equal-vectors? true-p-cluster cluster-p-fraction))))
+        (testing "validate distribution of categorical variable"
+          (doseq [variable categorical-variables]
+            (testing variable
+              (let [variable-samples (utils/column-subset samples [variable])
+                    possible-values (range 6)
+                    true-probabilities (apply data/categorical-probabilities multi-mixture variable clusters)
+                    p-fraction (utils/probability-vector variable-samples possible-values)]
+                (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
 
-(deftest crosscat-logpdf-point-conditioned-on-cluster-p2
-  (testing "categorical logPDF of P2 conditioned on cluster-ID = 2"
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:x (:tx p2) :y (:ty p2)}
-                    {:cluster-for-x 2}
-                    {})
-          analytical-logpdf (+
-                             (score-gaussian (:tx p2) [8  0.5])
-                             (score-gaussian (:ty p2) [10 1]))]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+(deftest logpdf-numerical-given-cluster
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (let [point (select-keys (test-point point-id)
+                             numerical-variables)
+          analytical-logpdf (transduce (map (fn [variable]
+                                              (let [mu (data/mu multi-mixture variable cluster)
+                                                    sigma (data/sigma multi-mixture variable cluster)]
+                                                (dist/score-gaussian (get point variable) [mu sigma]))))
+                                       +
+                                       numerical-variables)
+          queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                           point
+                                           {:cluster-for-x cluster}
+                                           {})]
+      (is (almost-equal-p? analytical-logpdf queried-logpdf)))))
 
-;; TODO: Add a smoke test. Categories for :a are deteriministic. If we condition
-;; on :a taking any different value than 2 this will crash.
-(deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p2
-  (testing "logPDF of categoricals implying cluster ID 2 conditioned on cluster-ID = 2"
-    ;; XXX, not sure how to deal wth line breaks for this....
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:a 2  :b 2}
-                    {:cluster-for-x 2}
-                    {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
+(deftest logpdf-categoricals-given-cluster
+  (let [;; This test takes advantage of some special properties of this view.
+        view 0
+        clusters (get-in multi-mixture [view :clusters])]
+    (testing (str "Across all clusters in view " view " most likely categorical indexes are distinct")
+      (is (distinct? (mapcat (fn [cluster]
+                               (map (comp utils/max-index first)
+                                    (vals (select-keys (:parameters cluster) (map name categorical-variables)))))
+                             clusters))))
+    (doseq [[cluster {:keys [parameters]}] (map-indexed vector clusters)]
+      (let [categorical-args (select-keys parameters (map name categorical-variables))]
+        (testing (str "In cluster " cluster)
+          (testing "most likely categories should share the same index"
+            (is (= 1 (->> (vals categorical-args)
+                          (map first)
+                          (map utils/max-index)
+                          (distinct)
+                          (count)))))
+          (testing "validate logpdf"
+            (let [;; Constrain all categorical variables to their most likely values
+                  ;; for the cluster.
+                  target (reduce-kv (fn [m variable [probabilities]]
+                                      (assoc m (keyword variable) (utils/max-index probabilities)))
+                                    {}
+                                    categorical-args)
+                  queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                   target
+                                                   {:cluster-for-x cluster}
+                                                   {})
+                  analytical-logpdf (Math/log (apply max (data/categorical-probabilities multi-mixture :b cluster)))]
+              (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))))
 
-(deftest crosscat-simulate-cluster-id-conditoned-on-p2
-  (testing "simulations of cluster-IDs conditioned on P2"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:cluster-for-x, :cluster-for-y]
-                    {:x (:tx p2) :y (:ty p2)}
-                    {}
-                    numper-simulations-for-test)
-          id-samples-x (column-subset samples [:cluster-for-x])
-          id-samples-y (column-subset samples [:cluster-for-y])
-          cluster-p-fraction (probability-vector id-samples-x (range 6))
-          true-p-cluster [0 0 1 0 0 0]]
-      (is (equal-sample-values id-samples-x id-samples-y))
-      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
+(deftest crosscat-logpdf-cluster-given-points
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Validate queried cluster logPDF given point P" point-id)
+      (doseq [cluster clusters]
+        (testing (str "and cluster" cluster)
+          (let [point (test-point point-id)
+                queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                 {:cluster-for-x cluster}
+                                                 point
+                                                 {})]
+            ;; This is based on the fact that in the cluster-point-mapping
+            ;; any point that is associated with more than one cluster is
+            ;; equidistant from that cluster's center. See
+            ;; `points-equidistant-from-cluster-centers`.
+            (is (almost-equal-p? (Math/log (/ 1 (count clusters))) queried-logpdf))))))))
 
-(deftest crosscat-logpdf-cluster-id-conditoned-on-p2
-  (testing "logPDF of the correct cluster-IDs for P2 conditioned on P2"
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:cluster-for-x 2}
-                    {:x (:tx p2) :y (:ty p2)}
-                    {})]
-      (is (is-almost-equal-p?  logpdf 0)))))
-
-(deftest crosscat-simulate-categoricals-conditioned-on-p2
-  (testing "categorical simulations conditioned on P2"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:a :b]
-                    {:x (:tx p2) :y (:ty p2)}
-                    {}
-                    numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
-          true-p-a [0 0 1 0 0 0]
-          true-p-b [0.01 0.01 0.95 0.01 0.01 0.01]
-          possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
-
-(deftest crosscat-logpdf-categoricals-conditioned-on-p2
-  (testing "logPDF of categoricals conditioned on P2"
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:a 2  :b 2}
-                    {:x (:tx p2) :y (:ty p2)}
-                    {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 3 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def p3 (test-point-coordinates "P 3"))
-;; Testing invariants conditioning on the cluster ID = 3 which corresponds to the component
-;; that of which p3 is a cluster center.
-(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
-  (testing "mean of simulations conditioned on cluster-ID = 3"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:x :y]
-                    {:cluster-for-x 3}
-                    {}
-                    numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)]
-      (is (and (is-almost-equal? (average x-samples) (:tx p3))
-               (is-almost-equal? (average y-samples) (:ty p3)))))))
-
-(deftest crosscat-simulate-simulate-mean-conditioned-on-cluster-p3
-  (testing "standard deviaton of simulations conditioned on cluster-ID = 3"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:x :y]
-                    {:cluster-for-x 3}
-                    {}
-                    numper-simulations-for-test)
-          x-samples (col :x  samples)
-          y-samples (col :y  samples)
-          factor 2]
-      (is (and (within-factor? (std x-samples) 0.5 factor)
-               (within-factor? (std y-samples) 0.5 factor))))))
-
-(deftest crosscat-simulate-categoricals-conditioned-on-cluster-p3
-  (testing "Categorical simulations conditioned on cluster-ID = 3"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:a :b]
-                    {:cluster-for-x 3}
-                    {}
-                    numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
-          true-p-a [0 0 0 1 0 0]
-          true-p-b [0.01 0.01 0.01 0.95 0.01 0.01]
-          possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
-
-(deftest crosscat-logpdf-point-conditioned-on-cluster-p3
-  (testing "categorical logPDF of P3 conditioned on cluster-ID = 3"
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:x (:tx p3) :y (:ty p3)}
-                    {:cluster-for-x 3}
-                    {})
-          analytical-logpdf (+
-                             (score-gaussian (:tx p3) [14 0.5])
-                             (score-gaussian (:ty p3) [ 7 0.5]))]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
-
-;; TODO: Same as above. Add a smoke test. Categories for :a are deteriministic.
-;; If we condition on :a taking any different value than 3 this will crash.
-(deftest crosscat-logpdf-categoricals-conditioned-on-cluster-p3
-  (testing "logPDF of categoricals implying cluster ID 3 conditioned on cluster-ID = 3"
-    ;; XXX, not sure how to deal wth line breaks for this....
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:a 3  :b 3}
-                    {:cluster-for-x 3}
-                    {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
-
-(deftest crosscat-simulate-cluster-id-conditoned-on-p3
-  (testing "simulations of cluster-IDs conditioned on P3"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:cluster-for-x, :cluster-for-y]
-                    {:x (:tx p3) :y (:ty p3)}
-                    {}
-                    numper-simulations-for-test)
-          id-samples-x (column-subset samples [:cluster-for-x])
-          id-samples-y (column-subset samples [:cluster-for-y])
-          cluster-p-fraction (probability-vector id-samples-x (range 6))
-          true-p-cluster [0 0 0 1 0 0]]
-      (is (equal-sample-values id-samples-x id-samples-y))
-      (is (is-almost-equal-vectors? cluster-p-fraction true-p-cluster)))))
-
-(deftest crosscat-logpdf-cluster-id-conditoned-on-p3
-  (testing "logPDF of the correct cluster-IDs for P3 conditioned on P3"
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:cluster-for-x 3}
-                    {:x (:tx p3) :y (:ty p3)}
-                    {})]
-      (is (is-almost-equal-p?  logpdf 0)))))
-
-(deftest crosscat-simulate-categoricals-conditioned-on-p3
-  (testing "categorical simulations conditioned on P3"
-    (let [samples (cgpm-simulate
-                    crosscat-cgpm
-                    [:a :b]
-                    {:x (:tx p3) :y (:ty p3)}
-                    {}
-                    numper-simulations-for-test)
-          a-samples (column-subset samples [:a])
-          b-samples (column-subset samples [:b])
-          true-p-a [0 0 0 1 0 0]
-          true-p-b [0.01 0.01 0.01 0.95 0.01 0.01]
-          possible-values (range 6)
-          a-p-fraction (probability-vector a-samples possible-values)
-          b-p-fraction (probability-vector b-samples possible-values)]
-      (is (and (is-almost-equal-vectors? a-p-fraction true-p-a)
-               (is-almost-equal-vectors? b-p-fraction true-p-b))))))
-
-(deftest crosscat-logpdf-categoricals-conditioned-on-p3
-  (testing "logPDF of categoricals conditioned on P3"
-    (let [logpdf (cgpm-logpdf
-                    crosscat-cgpm
-                    {:a 3  :b 3}
-                    {:x (:tx p3) :y (:ty p3)}
-                    {})
-          analytical-logpdf (Math/log 0.95)]
-      (is (is-almost-equal-p?  logpdf analytical-logpdf)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 4 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; TODO
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 5 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; TODO
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;; Testing P 6 ;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; TODO
+(deftest crosscat-logpdf-categoricals-given-points
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Validate queried categorical probabilities logPDF given point P" point-id)
+      (doseq [cluster clusters]
+        (testing (str "cluster " cluster)
+          (let [point (test-point point-id)
+                ;; Returns the most likely categorical for a given categorical
+                ;; variable. For example, for a categorical variable with
+                ;; probabilities [0.01 0.97 0.01 0.01] it will return 1.
+                most-likely-category (fn [variable]
+                                       (utils/max-index
+                                        (data/categorical-probabilities multi-mixture
+                                                                        variable
+                                                                        cluster)))
+                highest-probability (apply min (map #(apply max (data/categorical-probabilities multi-mixture % cluster))
+                                                    categorical-variables))
+                ;; The target here takes advantage of the structure of the
+                ;; multimixture. In particular, this test assumes that all the
+                ;; categorical variables in a given cluster will have the same
+                ;; index for the most likely category.
+                target (zipmap categorical-variables
+                               (map most-likely-category categorical-variables))
+                ;; This is based on the fact that in the cluster-point-mapping
+                ;; any point that is associated with more than one cluster is
+                ;; equidistant from that cluster's center. See
+                ;; `points-equidistant-from-cluster-centers`.
+                analytical-logpdf (Math/log (/ highest-probability
+                                               (count clusters)))
+                queried-logpdf (cgpm/cgpm-logpdf crosscat-cgpm
+                                                 target
+                                                 point
+                                                 {})]
+            (is (almost-equal-p? analytical-logpdf queried-logpdf))))))))

@@ -262,7 +262,7 @@
                                                  (select-keys (keys model/stattypes))
                                                  (dissoc sampled-column)
                                                  (walk/keywordize-keys)))]
-                  #(cgpm/cgpm-simulate model/census-cgpm
+                  #(cgpm/cgpm-simulate model/model-cgpm
                                        [(keyword sampled-column)]
                                        constraints
                                        {}
