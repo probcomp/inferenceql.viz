@@ -116,7 +116,7 @@
 
 (deftest points-equidistant-from-cluster-centers
   (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
-    (testing (str "Each cluster in " clusters " shoudl be an equal distance from P" point-id)
+    (testing (str "Each cluster in " clusters " should be an equal distance from P" point-id)
       ;; Subsequent tests rely on this property of the test multimixture.
       (let [{:keys [x y] :as _point} (test-point point-id)
             cluster-center (fn [cluster]

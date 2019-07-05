@@ -3,44 +3,39 @@
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :as plot]
-            [inferdb.multimixture.dsl :as dsl]
+            [inferdb.multimixture-test :as mm-test]
+            [inferdb.multimixture.data :as data]
             [metaprob.distributions :as dist]))
 
-;; XXX: why is this still here?
-(defn make-identity-output-addr-map
-  [output-addrs-types]
-  (let [output-addrs (keys output-addrs-types)
-        trace-addrs  (map name output-addrs)]
-    (zipmap output-addrs trace-addrs)))
-
-(def generate-crosscat-row-for-mi
-  (dsl/multi-mixture
-   (dsl/view
-    {"x" dist/gaussian
-     "y" dist/gaussian
-     "a" dist/categorical}
-    (dsl/clusters
-       0.25 {"x" [1 0.1]
-             "y" [1 0.1]
-             "a" [[1 0 0 0]]}
-       0.25 {"x" [2 0.1]
-             "y" [2 0.1]
-             "a" [[0 1 0 0]]}
-       0.25 {"x" [3 0.1]
-             "y" [3 0.1]
-             "a" [[0 0 1 0]]}
-       0.25 {"x" [4 0.1]
-             "y" [4 0.1]
-             "a" [[0 0 0 1]]}))
-   (dsl/view
-    {"v" dist/gaussian
-     "w" dist/gaussian}
-    (dsl/clusters
-       1.00 {"v" [1 1]
-             "w" [1 1] }))))
+(def multi-mixture
+  [{:vars {"x" dist/gaussian
+           "y" dist/gaussian
+           "a" dist/categorical}
+    :clusters [{:probability 0.25
+                :parameters {"x" [1 0.1]
+                             "y" [1 0.1]
+                             "a" [[1 0 0 0]]}}
+               {:probability 0.25
+                :parameters {"x" [2 0.1]
+                             "y" [2 0.1]
+                             "a" [[0 1 0 0]]}}
+               {:probability 0.25
+                :parameters {"x" [3 0.1]
+                             "y" [3 0.1]
+                             "a" [[0 0 1 0]]}}
+               {:probability 0.25
+                :parameters {"x" [4 0.1]
+                             "y" [4 0.1]
+                             "a" [[0 0 0 1]]}}]}
+   {:vars {"v" dist/gaussian
+           "w" dist/gaussian}
+    :clusters [{:probability 1.00
+                :parameters {"v" [1 1]
+                             "w" [1 1]}}]}])
 
 (def crosscat-cgpm-mi
-  (let [outputs-addrs-types {;; Variables in the table.
+  (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
+        outputs-addrs-types {;; Variables in the table.
                              :x cgpm/real-type
                              :y cgpm/real-type
                              :v cgpm/real-type
@@ -52,10 +47,10 @@
                              :cluster-for-v cgpm/integer-type
                              :cluster-for-w cgpm/integer-type
                              :cluster-for-a cgpm/integer-type}
-        output-addr-map (make-identity-output-addr-map outputs-addrs-types)
+        output-addr-map (mm-test/make-identity-output-addr-map outputs-addrs-types)
         inputs-addrs-types {}
         input-addr-map {}]
-    (cgpm/make-cgpm generate-crosscat-row-for-mi
+    (cgpm/make-cgpm generate-crosscat-row
                     outputs-addrs-types
                     inputs-addrs-types
                     output-addr-map
@@ -63,6 +58,7 @@
 
 ;; How many points do we want to create for our plot?
 (def n 1000)
+
 (deftest crosscatsimulate-simulate-MI-model
   "This tests saves plots for all simulated data in out/json results/"
   ;; Charts can be generated with make charts.
@@ -88,4 +84,86 @@
                                                [-4 6]
                                                "View 2: V W"))
       (is (= (count samples) n)))))
-;; TODO: implemet tests according to test/inferdb/README.md
+
+(deftest mi-smoke
+  (testing "smoke testing generic, CGPM based mutual information Oapproximation"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              [:a]
+              []
+              {}
+              {}
+              2
+              2)]
+      (is (number? mi)))))
+
+(deftest cmi-smoke-estimate-condition
+  (testing "smoke testing generic, CGPM based mutual information Oapproximation"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              [:a]
+              [:v]
+              {}
+              {}
+              2
+              2)]
+      (is (number? mi)))))
+
+(deftest cmi-smoke-specify-condition
+  (testing "smoke testing generic, CGPM based mutual information Oapproximation"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              [:a]
+              []
+              {:v 0}
+              {}
+              2
+              2)]
+      (is (number? mi)))))
+
+;; MI of x and y is larger than 0 because x carries information about y.
+(deftest ^:kaocha/pending positive-mi
+  (testing "Test the first invariant descrited in test/inferdb/README.md"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              []
+              []
+              {}
+              {}
+              100
+              1)]
+      (is (< 0. mi)))))
+
+
+(def threshold 0.01)
+(defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+
+(deftest zero-mi
+  (testing "Test the third invariant descrited in test/inferdb/README.md"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:v :w]
+              []
+              []
+              {}
+              {}
+              100
+              1)]
+      (is (almost-equal? 0. mi)))))
+
+(deftest zero-cmi
+  (testing "Test the second invariant descrited in test/inferdb/README.md"
+    (let [mi (cgpm/cgpm-mutual-information
+              crosscat-cgpm-mi
+              [:x :y]
+              []
+              []
+              {:a 0}
+              {}
+              100
+              1)]
+      (is (almost-equal? 0. mi)))))
