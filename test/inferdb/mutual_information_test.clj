@@ -125,12 +125,12 @@
       (is (number? mi)))))
 
 ;; MI of x and y is larger than 0 because x carries information about y.
-(deftest ^:kaocha/pending positive-mi
+(deftest positive-mi
   (testing "Test the first invariant descrited in test/inferdb/README.md"
     (let [mi (cgpm/cgpm-mutual-information
               crosscat-cgpm-mi
-              [:x :y]
-              []
+              [:x]
+              [:y]
               []
               {}
               {}
@@ -146,8 +146,8 @@
   (testing "Test the third invariant descrited in test/inferdb/README.md"
     (let [mi (cgpm/cgpm-mutual-information
               crosscat-cgpm-mi
-              [:v :w]
-              []
+              [:v]
+              [:w]
               []
               {}
               {}
@@ -159,8 +159,8 @@
   (testing "Test the second invariant descrited in test/inferdb/README.md"
     (let [mi (cgpm/cgpm-mutual-information
               crosscat-cgpm-mi
-              [:x :y]
-              []
+              [:x]
+              [:y]
               []
               {:a 0}
               {}
