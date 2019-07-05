@@ -1,10 +1,10 @@
 (ns inferdb.multimixture.dsl
-  (:refer-clojure :exclude [map replicate apply])
   #?(:cljs (:require-macros [metaprob.generative-functions :as gfn :refer [gen]]))
   (:require [metaprob.distributions :as dist]
-            #?(:clj [metaprob.generative-functions :as gfn :refer [gen]])
-            [metaprob.prelude :refer [map apply infer-and-score map-xform]]
-            [metaprob.trace :as trace :refer [trace-set-value trace-has-value?]]))
+            #?(:clj [metaprob.generative-functions :as gfn :refer [apply-at at gen]]
+               :cljs [metaprob.generative-functions :refer [apply-at at]])
+            [metaprob.prelude :as mp]
+            [metaprob.trace :as trace]))
 
 ;;; Multi-mixture model
 
@@ -48,24 +48,24 @@
      (gen [observations]
        (let [score-cluster
              (fn [idx]
-               (let [new-obs (trace-set-value observations cluster-addr idx)
+               (let [new-obs (trace/trace-set-value observations cluster-addr idx)
                      ;; Score should not depend on any of the stochastic
-                     ;; choices made by infer-and-score, so we leave this
+                     ;; choices made by mp/infer-and-score, so we leave this
                      ;; untraced.
                      [_ t s]
-                     (infer-and-score
+                     (mp/infer-and-score
                       :procedure sampler
                       :observation-trace new-obs)]
                  s))
              cluster-scores
-             (map score-cluster (range (count cluster-probs)))
+             (mp/map score-cluster (range (count cluster-probs)))
              chosen-cluster
              (at cluster-addr dist/log-categorical cluster-scores)]
          (gen [& args]
-           (let [[v t s] (infer-and-score
+           (let [[v t s] (mp/infer-and-score
                           :procedure sampler
                           :inputs args
-                          :observation-trace (trace-set-value observations
+                          :observation-trace (trace/trace-set-value observations
                                                               cluster-addr
                                                               chosen-cluster))]
              [v t (dist/logsumexp cluster-scores)])))))))
@@ -74,7 +74,7 @@
   [views]
   (gen []
     (into []
-          (comp (map-xform (fn [view] (at '() view)))
+          (comp (mp/map-xform (fn [view] (at '() view)))
                 cat)
           views)))
 
@@ -85,7 +85,7 @@
 
 (defn multi-mixture
   [& viewspecs]
-  (make-multi-mixture (map make-view viewspecs)))
+  (make-multi-mixture (mp/map make-view viewspecs)))
 
 (defn view
   "View specification constructor."
