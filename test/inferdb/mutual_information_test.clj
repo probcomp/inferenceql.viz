@@ -12,26 +12,27 @@
            "y" dist/gaussian
            "a" dist/categorical}
     :clusters [{:probability 0.25
-                :args {"x" [1 0.1]
-                       "y" [1 0.1]
-                       "a" [[1 0 0 0]]}}
+                :parameters {"x" [1 0.1]
+                             "y" [1 0.1]
+                             "a" [[1 0 0 0]]}}
                {:probability 0.25
-                :args {"x" [2 0.1]
-                       "y" [2 0.1]
-                       "a" [[0 1 0 0]]}}
+                :parameters {"x" [2 0.1]
+                             "y" [2 0.1]
+                             "a" [[0 1 0 0]]}}
                {:probability 0.25
-                :args {"x" [3 0.1]
-                       "y" [3 0.1]
-                       "a" [[0 0 1 0]]}}
+                :parameters {"x" [3 0.1]
+                             "y" [3 0.1]
+                             "a" [[0 0 1 0]]}}
                {:probability 0.25
-                :args {"x" [4 0.1]
-                       "y" [4 0.1]
-                       "a" [[0 0 0 1]]}}]}
+                :parameters {"x" [4 0.1]
+                             "y" [4 0.1]
+                             "a" [[0 0 0 1]]}}]}
    {:vars {"v" dist/gaussian
            "w" dist/gaussian}
     :clusters [{:probability 1.00
-                :args {"v" [1 1]
-                       "w" [1 1]}}]}])
+                :parameters {"v" [1 1]
+                             "w" [1 1]}}]}])
+
 (def crosscat-cgpm-mi
   (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
         outputs-addrs-types {;; Variables in the table.
@@ -55,8 +56,12 @@
                     output-addr-map
                     input-addr-map)))
 
+#_((data/crosscat-row-generator multi-mixture))
+#_(crosscat-cgpm-mi)
+
 ;; How many points do we want to create for our plot?
 (def n 1000)
+
 (deftest crosscatsimulate-simulate-MI-model
   "This tests saves plots for all simulated data in out/json results/"
   ;; Charts can be generated with make charts.
