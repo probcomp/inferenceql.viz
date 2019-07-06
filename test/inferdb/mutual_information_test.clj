@@ -4,7 +4,7 @@
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture-test :as mm-test]
-            [inferdb.multimixture.data :as data]
+            [inferdb.multimixture.specification :as spec]
             [metaprob.distributions :as dist]))
 
 (def multi-mixture
@@ -34,7 +34,7 @@
                              "w" [1 1]}}]}])
 
 (def crosscat-cgpm-mi
-  (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
+  (let [generate-crosscat-row (spec/crosscat-row-generator multi-mixture)
         outputs-addrs-types {;; Variables in the table.
                              :x cgpm/real-type
                              :y cgpm/real-type

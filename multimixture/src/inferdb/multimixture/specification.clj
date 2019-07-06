@@ -1,7 +1,53 @@
-(ns inferdb.multimixture.data
-  (:require [metaprob.distributions :as dist]
+(ns inferdb.multimixture.specification
+  (:require [clojure.spec.alpha :as s]
+            [metaprob.distributions :as dist]
             [inferdb.multimixture.dsl :as dsl]
             [inferdb.utils :as utils]))
+
+(s/def ::mu number?)
+
+(s/def ::sigma
+  (s/and number? pos?))
+
+(s/def ::gaussian-parameters
+  (s/cat ::mu    ::mu
+         ::sigma ::sigma))
+
+(defn normalized?
+  [xs]
+  (== 1 (apply + xs)))
+
+(s/def ::probability #(<= 0 % 1))
+
+(s/def ::probability-vector
+  (s/and (s/+ ::probability)
+         normalized?))
+
+(s/def ::categorical-parameters (s/cat ::probability-vector ::probability-vector))
+
+(s/def ::parameter-vector
+  (s/or ::gaussian-parameters    ::gaussian-parameters
+        ::categorical-parameters ::categorical-parameters))
+
+(s/def ::column string?)
+
+(s/def ::parameters (s/map-of ::column ::parameter-vector))
+
+(def distribution? #{dist/gaussian dist/categorical})
+
+(s/def ::distribution distribution?)
+
+(s/def ::vars (s/map-of ::column ::distribution))
+
+(s/def ::cluster (s/keys :req-un [::probability ::parameters]))
+
+(s/def ::clusters (s/+ ::cluster))
+
+(s/def ::view (s/keys :req-un [::vars ::clusters]))
+
+(s/def ::views (s/+ ::view))
+
+(s/def ::multi-mixture ::views)
 
 (defn crosscat-row-generator
   "Creates a crosscat row generator from the provided data representation of a

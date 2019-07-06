@@ -1,9 +1,11 @@
 (ns inferdb.multimixture-test
-  (:require [clojure.string :as str]
+  (:require [clojure.spec.alpha :as s]
+            [clojure.string :as str]
             [clojure.test :as test :refer [deftest is testing]]
+            [expound.alpha :as expound]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
-            [inferdb.multimixture.data :as data]
+            [inferdb.multimixture.specification :as spec]
             [inferdb.plotting.generate-vljson :as plot]
             [metaprob.distributions :as dist]))
 
@@ -75,6 +77,11 @@
                 :parameters {"z" [15 8]
                              "c" [[0 0 0 1]]}}]}])
 
+(deftest multi-mixture-is-valid
+  (when-not (s/valid? ::spec/multi-mixture multi-mixture)
+    (println (expound/expound-str ::spec/multi-mixture multi-mixture)))
+  (is (s/valid? ::spec/multi-mixture multi-mixture)))
+
 (def test-points
   [{:x 3  :y 4}
    {:x 8  :y 10}
@@ -120,15 +127,15 @@
       ;; Subsequent tests rely on this property of the test multimixture.
       (let [{:keys [x y] :as _point} (test-point point-id)
             cluster-center (fn [cluster]
-                             [(data/mu multi-mixture :x cluster)
-                              (data/mu multi-mixture :y cluster)])
+                             [(spec/mu multi-mixture :x cluster)
+                              (spec/mu multi-mixture :y cluster)])
             distances (->> clusters
                            (map cluster-center)
                            (map #(euclidean-distance [x y] %)))]
         (is (apply = distances))))))
 
 (def crosscat-cgpm
-  (let [generate-crosscat-row (data/crosscat-row-generator multi-mixture)
+  (let [generate-crosscat-row (spec/crosscat-row-generator multi-mixture)
         outputs-addrs-types {;; Variables in the table.
                              :x cgpm/real-type
                              :y cgpm/real-type
@@ -152,16 +159,16 @@
                     output-addr-map
                     input-addr-map)))
 
-(def variables (data/view-variables (first multi-mixture)))
+(def variables (spec/view-variables (first multi-mixture)))
 
 (def numerical-variables
   (into #{}
-        (filter #(data/numerical? multi-mixture %))
+        (filter #(spec/numerical? multi-mixture %))
         variables))
 
 (def categorical-variables
   (into #{}
-        (filter #(data/nominal? multi-mixture %))
+        (filter #(spec/nominal? multi-mixture %))
         variables))
 
 (deftest test-cluster-point-mapping
@@ -172,7 +179,7 @@
   (doseq [[cluster point-id] cluster-point-mapping]
     (doseq [variable #{:x :y}]
       (let [point-value (get (test-point point-id) variable)
-            mu (data/mu multi-mixture variable cluster)]
+            mu (spec/mu multi-mixture variable cluster)]
         (is (= point-value mu))))))
 
 (def plot-point-count 1000)
@@ -230,21 +237,21 @@
                                         simulation-count)]
         (doseq [variable variables]
           (testing (str "validate variable " variable)
-            (cond (data/numerical? multi-mixture variable)
+            (cond (spec/numerical? multi-mixture variable)
                   (let [samples (utils/col variable samples)]
                     (testing "mean"
                       (is (almost-equal? (get point variable)
                                          (utils/average samples))))
                     (testing "standard deviation"
-                      (let [analytical-std (data/sigma multi-mixture variable cluster)]
+                      (let [analytical-std (spec/sigma multi-mixture variable cluster)]
                         (is (utils/within-factor? analytical-std
                                                   (utils/std samples)
                                                   2)))))
 
-                  (data/nominal? multi-mixture variable)
+                  (spec/nominal? multi-mixture variable)
                   (testing "validate simulated categorical probabilities"
                     (let [variable-samples (utils/column-subset samples [variable])
-                          actual-probabilities (data/categorical-probabilities multi-mixture variable cluster)
+                          actual-probabilities (spec/categorical-probabilities multi-mixture variable cluster)
                           possible-values (range 6)
                           probabilities (utils/probability-vector variable-samples possible-values)]
                       (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
@@ -263,7 +270,7 @@
           (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
                 id-samples-y (utils/column-subset samples [:cluster-for-y])
                 cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
-                true-p-cluster (apply data/categorical-probabilities multi-mixture :a clusters)]
+                true-p-cluster (apply spec/categorical-probabilities multi-mixture :a clusters)]
             (is (utils/equal-sample-values id-samples-x id-samples-y))
             (is (almost-equal-vectors? true-p-cluster cluster-p-fraction))))
         (testing "validate distribution of categorical variable"
@@ -271,7 +278,7 @@
             (testing variable
               (let [variable-samples (utils/column-subset samples [variable])
                     possible-values (range 6)
-                    true-probabilities (apply data/categorical-probabilities multi-mixture variable clusters)
+                    true-probabilities (apply spec/categorical-probabilities multi-mixture variable clusters)
                     p-fraction (utils/probability-vector variable-samples possible-values)]
                 (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
 
@@ -280,8 +287,8 @@
     (let [point (select-keys (test-point point-id)
                              numerical-variables)
           analytical-logpdf (transduce (map (fn [variable]
-                                              (let [mu (data/mu multi-mixture variable cluster)
-                                                    sigma (data/sigma multi-mixture variable cluster)]
+                                              (let [mu (spec/mu multi-mixture variable cluster)
+                                                    sigma (spec/sigma multi-mixture variable cluster)]
                                                 (dist/score-gaussian (get point variable) [mu sigma]))))
                                        +
                                        numerical-variables)
@@ -320,7 +327,7 @@
                                                    target
                                                    {:cluster-for-x cluster}
                                                    {})
-                  analytical-logpdf (Math/log (apply max (data/categorical-probabilities multi-mixture :b cluster)))]
+                  analytical-logpdf (Math/log (apply max (spec/categorical-probabilities multi-mixture :b cluster)))]
               (is (almost-equal-p? analytical-logpdf queried-logpdf)))))))))
 
 (deftest crosscat-logpdf-cluster-given-points
@@ -350,10 +357,10 @@
                 ;; probabilities [0.01 0.97 0.01 0.01] it will return 1.
                 most-likely-category (fn [variable]
                                        (utils/max-index
-                                        (data/categorical-probabilities multi-mixture
+                                        (spec/categorical-probabilities multi-mixture
                                                                         variable
                                                                         cluster)))
-                highest-probability (apply min (map #(apply max (data/categorical-probabilities multi-mixture % cluster))
+                highest-probability (apply min (map #(apply max (spec/categorical-probabilities multi-mixture % cluster))
                                                     categorical-variables))
                 ;; The target here takes advantage of the structure of the
                 ;; multimixture. In particular, this test assumes that all the
