@@ -11,8 +11,11 @@
                            :sha "7d40086d486ed452829bce6d8125fbeee691a9a6"}}
  :paths ["src"
          "aide/src"
+         "aide/test"
          "cgpm/src"
+         "cgpm/test"
          "multimixture/src"
+         "multimixture/test"
          "search-by-example/src"
          "spreadsheets/src"]
  :aliases {:test {:extra-paths ["test"]
