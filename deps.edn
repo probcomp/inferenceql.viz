@@ -20,6 +20,7 @@
          "spreadsheets/src"]
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-521"}
+                               lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
                                cheshire {:mvn/version "5.8.1"}}}
 
