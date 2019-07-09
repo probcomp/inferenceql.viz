@@ -1,10 +1,12 @@
 (ns inferdb.multimixture-test
   (:require [clojure.spec.alpha :as s]
+            #?(:clj [clojure.string :as str])
             [clojure.test :as test :refer [deftest is testing]]
             [expound.alpha :as expound]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
             [inferdb.multimixture.specification :as spec]
+            #?(:clj [inferdb.plotting.generate-vljson :as plot])
             [metaprob.distributions :as dist]))
 
 ;; XXX: why is this still here?
