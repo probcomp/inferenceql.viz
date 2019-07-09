@@ -51,12 +51,12 @@
 (deftest parameters-test
   (is (= [2 3] (spec/parameters mmix :x 0))))
 
-(deftest categorical-probabilities-test
-  (is (= [0.1 0.2 0.3 0.4] (spec/categorical-probabilities mmix :y 0)))
-  (is (= [1/3 2/3]
-         (let [mmix [{:vars {"x" dist/categorical}
-                      :clusters [{:probability 2/3
-                                  :parameters {"x" [[1/3 2/3]]}}
-                                 {:probability 1/3
-                                  :parameters {"x" [[2/3 1/3]]}}]}]]
-           (spec/categorical-probabilities mmix :x 0 1)))))
+#?(:clj (deftest categorical-probabilities-test
+          (is (= [0.1 0.2 0.3 0.4] (spec/categorical-probabilities mmix :y 0)))
+          (is (= [1/3 2/3]
+                 (let [mmix [{:vars {"x" dist/categorical}
+                              :clusters [{:probability 2/3
+                                          :parameters {"x" [[1/3 2/3]]}}
+                                         {:probability 1/3
+                                          :parameters {"x" [[2/3 1/3]]}}]}]]
+                   (spec/categorical-probabilities mmix :x 0 1))))))

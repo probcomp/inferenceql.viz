@@ -1,12 +1,10 @@
 (ns inferdb.multimixture-test
   (:require [clojure.spec.alpha :as s]
-            [clojure.string :as str]
             [clojure.test :as test :refer [deftest is testing]]
             [expound.alpha :as expound]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
             [inferdb.multimixture.specification :as spec]
-            [inferdb.plotting.generate-vljson :as plot]
             [metaprob.distributions :as dist]))
 
 ;; XXX: why is this still here?
@@ -184,38 +182,38 @@
 
 (def plot-point-count 1000)
 
-(deftest visual-test
-  "This tests saves plots for all simulated data in out/json results/"
-  ;; Charts can be generated with make charts.
-  (testing "(smoke) simulate n complete rows and save them as vl-json"
-    (let [num-samples plot-point-count
-          point-data (map-indexed (fn [index point]
-                                    (reduce-kv (fn [m k v]
-                                                 (assoc m (keyword (str "t" (name k))) v))
-                                               {:test-point (str "P " (inc index))}
-                                               point))
-                                  test-points)
-          samples (cgpm/cgpm-simulate crosscat-cgpm
-                                      [:x :y :z :a :b :c]
-                                      {}
-                                      {}
-                                      num-samples)]
-      (utils/save-json "simulations-x-y"
-                       (plot/scatter-plot-json ["x" "y"]
-                                               samples
-                                               point-data
-                                               [0 18]
-                                               "View 1: X, Y, A, B"))
-      (utils/save-json "simulations-z"
-                       (plot/hist-plot (utils/column-subset samples [:z :c])
-                                       [:z :c]
-                                       "Dim Z and C"))
-      (doseq [variable #{:a :b :c}]
-        (utils/save-json (str "simulations-" (name variable))
-                         (plot/bar-plot (utils/column-subset samples [variable])
-                                        (str "Dim " (-> variable name str/upper-case))
-                                        plot-point-count)))
-      (is (= (count samples) plot-point-count)))))
+#?(:clj (deftest visual-test
+          "This tests saves plots for all simulated data in out/json results/"
+          ;; Charts can be generated with make charts.
+          (testing "(smoke) simulate n complete rows and save them as vl-json"
+            (let [num-samples plot-point-count
+                  point-data (map-indexed (fn [index point]
+                                            (reduce-kv (fn [m k v]
+                                                         (assoc m (keyword (str "t" (name k))) v))
+                                                       {:test-point (str "P " (inc index))}
+                                                       point))
+                                          test-points)
+                  samples (cgpm/cgpm-simulate crosscat-cgpm
+                                              [:x :y :z :a :b :c]
+                                              {}
+                                              {}
+                                              num-samples)]
+              (utils/save-json "simulations-x-y"
+                               (plot/scatter-plot-json ["x" "y"]
+                                                       samples
+                                                       point-data
+                                                       [0 18]
+                                                       "View 1: X, Y, A, B"))
+              (utils/save-json "simulations-z"
+                               (plot/hist-plot (utils/column-subset samples [:z :c])
+                                               [:z :c]
+                                               "Dim Z and C"))
+              (doseq [variable #{:a :b :c}]
+                (utils/save-json (str "simulations-" (name variable))
+                                 (plot/bar-plot (utils/column-subset samples [variable])
+                                                (str "Dim " (-> variable name str/upper-case))
+                                                plot-point-count)))
+              (is (= (count samples) plot-point-count))))))
 
 (def simulation-count 100)
 (def threshold 0.5)
