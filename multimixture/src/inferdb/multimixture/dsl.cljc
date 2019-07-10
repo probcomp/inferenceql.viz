@@ -8,6 +8,21 @@
 
 ;;; Multi-mixture model
 
+;; run-in-clojure (forward sampling) logic:
+;;   for each view, choose a cluster, at the place for that view
+;;   for each variable, generate a value for it, at the place for that variable
+;;     (using metaprob to generate the value)
+;;
+;; for generative function:
+;;   to constrain:
+;;      - handle the cluster assignment, if provided
+;;      - for each cluster assignment, score the observations
+;;      - normalize the scores and return as overall score
+;;      - sample a cluster assignment according to the normalized scores
+;;      - sample the rest of the trace as needed to fill it in
+;;
+;; we can test this using the synthetic mixture, by printing out the traces
+
 ;; TODO: This appears to be used for both views and columns? Get that confirmed
 ;;       by Alex or maybe Feras.
 (defn view-cluster-address
