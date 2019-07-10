@@ -184,9 +184,12 @@
 
 (def plot-point-count 1000)
 
+;; The purpose of this test is to help the reader understand the test suite. It
+;; generates Vega-Lite JSON as a side effect which can be rendered into charts.
+;; See issue #81 for why it is Clojure-only.
 #?(:clj (deftest visual-test
-          "This tests saves plots for all simulated data in out/json results/"
-          ;; Charts can be generated with make charts.
+          ;; This tests saves plots for all simulated data in out/json results/
+          ;; Charts can be generated with `make charts`.
           (testing "(smoke) simulate n complete rows and save them as vl-json"
             (let [num-samples plot-point-count
                   point-data (map-indexed (fn [index point]
