@@ -2,7 +2,7 @@
   #?(:cljs (:require-macros [metaprob.generative-functions :as gfn :refer [gen]]))
   (:require [metaprob.distributions :as dist]
             #?(:clj [metaprob.generative-functions :as gfn :refer [apply-at at gen]]
-               :cljs [metaprob.generative-functions :refer [apply-at at]])
+               :cljs [metaprob.generative-functions :as gfn :refer [apply-at at gen]])
             [metaprob.prelude :as mp]
             [metaprob.trace :as trace]))
 
