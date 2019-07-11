@@ -2,7 +2,6 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.test :as test :refer [deftest testing is are]]
             [expound.alpha :as expound]
-            [metaprob.distributions :as dist]
             [inferdb.multimixture.specification :as spec]))
 
 (def mmix
