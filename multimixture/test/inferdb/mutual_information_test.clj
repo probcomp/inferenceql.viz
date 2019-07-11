@@ -4,13 +4,12 @@
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture-test :as mm-test]
-            [inferdb.multimixture.specification :as spec]
-            [metaprob.distributions :as dist]))
+            [inferdb.multimixture.specification :as spec]))
 
 (def multi-mixture
-  [{:vars {"x" dist/gaussian
-           "y" dist/gaussian
-           "a" dist/categorical}
+  [{:vars {"x" :gaussian
+           "y" :gaussian
+           "a" :categorical}
     :clusters [{:probability 0.25
                 :parameters {"x" [1 0.1]
                              "y" [1 0.1]
@@ -27,8 +26,8 @@
                 :parameters {"x" [4 0.1]
                              "y" [4 0.1]
                              "a" [[0 0 0 1]]}}]}
-   {:vars {"v" dist/gaussian
-           "w" dist/gaussian}
+   {:vars {"v" :gaussian
+           "w" :gaussian}
     :clusters [{:probability 1.00
                 :parameters {"v" [1 1]
                              "w" [1 1]}}]}])

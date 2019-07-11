@@ -33,7 +33,7 @@
 
 (s/def ::parameters (s/map-of ::column ::parameter-vector))
 
-(def distribution? #{dist/gaussian dist/categorical})
+(def distribution? #{:gaussian :categorical})
 
 (s/def ::distribution distribution?)
 
@@ -55,10 +55,15 @@
   [mmix]
   (apply dsl/multi-mixture
          (map (fn [{:keys [vars clusters]}]
-                (dsl/view vars (apply dsl/clusters
-                                      (mapcat (fn [{:keys [probability parameters]}]
-                                                [probability parameters])
-                                              clusters))))
+                (dsl/view (reduce-kv (fn [m k v]
+                                       (assoc m k (case v
+                                                    :gaussian    dist/gaussian
+                                                    :categorical dist/categorical)))
+                                     {}
+                                     vars)
+                          (apply dsl/clusters
+                                 (mapcat (juxt :probability :parameters)
+                                         clusters))))
               mmix)))
 
 (defn view-variables
@@ -101,12 +106,12 @@
 (defn nominal?
   "Returns true if `variable` is a nominal variable in `mmix`."
   [mmix variable]
-  (= dist/categorical (stattype mmix variable)))
+  (= :categorical (stattype mmix variable)))
 
 (defn numerical?
   "Returns true if `variable` is a numerical variable in `multimixture`."
   [mmix variable]
-  (= dist/gaussian (stattype mmix variable)))
+  (= :gaussian (stattype mmix variable)))
 
 (defn parameters
   "Returns the parameters of a variable for a cluster."
