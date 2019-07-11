@@ -34,5 +34,6 @@ jobs: # basic units of work in a run
       - run:
           name: Generate charts
           command: make charts
+          when: always
       - store_artifacts:
           path: spreadsheets/out/charts
