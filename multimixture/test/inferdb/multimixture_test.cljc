@@ -28,10 +28,10 @@
 ;; and then run make charts to see how the components relate.
 
 (def multi-mixture
-  [{:vars {"x" dist/gaussian
-           "y" dist/gaussian
-           "a" dist/categorical
-           "b" dist/categorical}
+  [{:vars {"x" :gaussian
+           "y" :gaussian
+           "a" :categorical
+           "b" :categorical}
     :clusters [{:probability 0.166666666
                 :parameters {"x" [3 1]
                              "y" [4 0.1]
@@ -62,8 +62,8 @@
                              "y" [16 0.1]
                              "a" [[0 0 0 0 0 1]]
                              "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}}]}
-   {:vars {"z" dist/gaussian
-           "c" dist/categorical}
+   {:vars {"z" :gaussian
+           "c" :categorical}
     :clusters [{:probability 0.25
                 :parameters {"z" [0 1]
                              "c" [[1 0 0 0]]}}
