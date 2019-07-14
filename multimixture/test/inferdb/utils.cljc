@@ -1,5 +1,5 @@
 (ns inferdb.utils
-  (:require [clojure.java.io :as io]))
+  #?(:clj (:require [clojure.java.io :as io])))
 
 ;; taken from metaprob/test/distributions test. Felt wrong to import from a
 ;; metaprob test...
@@ -29,13 +29,13 @@
   (Math/sqrt (/ (reduce + (map square (map - a (repeat (average a)))))
                 (- (count a) 1 ))))
 
-(defn save-json
-  "Writes the provided Vega-Lite JSON to a file in the charts directory with the
-  provided prefix."
-  [file-prefix vl-json]
-  (let [file-path (str "spreadsheets/out/charts/" file-prefix ".vl.json")]
-    (io/make-parents file-path)
-    (spit file-path vl-json)))
+#?(:clj (defn save-json
+          "Writes the provided Vega-Lite JSON to a file in the charts directory with the
+          provided prefix."
+          [file-prefix vl-json]
+          (let [file-path (str "spreadsheets/out/charts/" file-prefix ".vl.json")]
+            (io/make-parents file-path)
+            (spit file-path vl-json))))
 
 (defn column-subset [data columns]
   (let [row-subset (fn [row] (select-keys row columns))]
@@ -54,15 +54,15 @@
   (assert (count a) (count b))
   (let [call-almost-equal
         (fn [i] (almost-equal?  (nth a i) (nth b i) difference-metric threshold))]
-  (all? (map call-almost-equal (range (count a))))))
+    (all? (map call-almost-equal (range (count a))))))
 
 (defn within-factor? [a b factor]
   (<= (/ b factor) a (* b factor)))
 
 (defn probability-for-categories [sample-vector]
   (let [fraction (fn [item] {(first (vals (first item)))
-                                 (float (/ (second item)
-                                           (count sample-vector)))})
+                             (float (/ (second item)
+                                       (count sample-vector)))})
         occurences (frequencies sample-vector)]
     (apply merge (mapv fraction occurences))))
 

@@ -19,7 +19,7 @@ jobs: # basic units of work in a run
           command: sudo apt-get update && sudo apt-get install -y make
       - run:
           name: Build spreadseets
-          command: make spreadsheet
+          command: make spreadsheet # Also pulls down the npm dependencies needed by Kaocha
       - run:
           name: Run tests
           command: |
@@ -34,5 +34,6 @@ jobs: # basic units of work in a run
       - run:
           name: Generate charts
           command: make charts
+          when: always
       - store_artifacts:
           path: spreadsheets/out/charts
