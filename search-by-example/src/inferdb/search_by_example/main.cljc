@@ -8,12 +8,10 @@
         q (max 1E-300 q-in)]
     (* p (Math/log (/ p q)))))
 
-(defn kl [ps qs]
+(defn kl
   "K-L divergence between two vectors of floating point numbers."
-  (apply +
-         (map (fn [p q] (kli p q))
-              ps
-              qs)))
+  [ps qs]
+  (apply + (map kli ps qs)))
 
 (defn symmetrized-kl
   [ps qs]
