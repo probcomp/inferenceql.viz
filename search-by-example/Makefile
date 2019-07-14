@@ -1,7 +1,7 @@
 current-dir  := $(shell pwd)
 output-dir   := $(current-dir)/out
 output-to    := $(output-dir)/main.js
-compile-opts := $(current-dir)/api.edn
+compile-opts := $(current-dir)/build.edn
 
 all: $(output-to)
 
