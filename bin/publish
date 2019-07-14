@@ -5,11 +5,13 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-rm -rf .publish
-mkdir .publish
-echo "!node_modules" > .publish/.surgeignore
-cp $1/index.html .publish
-cp -r $1/out .publish
-cp -r $1/resources .publish
-cd .publish ; surge --domain $2
-rm -rf .publish
+DIR=$1/.publish
+
+rm -rf $DIR
+mkdir $DIR
+echo "!node_modules" > $DIR/.surgeignore
+cp $1/index.html $DIR
+cp -r $1/out $DIR
+cp -r $1/resources $DIR
+cd $DIR ; surge --domain $2
+rm -rf $DIR

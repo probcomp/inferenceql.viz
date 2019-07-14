@@ -33,7 +33,7 @@
           "Writes the provided Vega-Lite JSON to a file in the charts directory with the
           provided prefix."
           [file-prefix vl-json]
-          (let [file-path (str "spreadsheets/out/charts/" file-prefix ".vl.json")]
+          (let [file-path (str "multimixture/out/" file-prefix ".vl.json")]
             (io/make-parents file-path)
             (spit file-path vl-json))))
 
