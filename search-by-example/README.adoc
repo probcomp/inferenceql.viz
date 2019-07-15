@@ -7,28 +7,40 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+== Building
+Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
+
 == Usage
 
-=== `data`
+=== `inferdb.search_by_example.search.data`
 The data that was used to build the model. A vector of rows. Rows are maps from column names to values.
 
 [source,javascript]
 ----
 > inferdb.search_by_example.search.data
-[]{percent_owned: 0.681, percent_married: 0.4635, NAME: "CD 1 Alabama", percent_lths: 0.1292, ...} ...]
+----
+[source,javascript]
+----
+[{percent_owned: 0.681, percent_married: 0.4635 ...} ...]
 ----
 
-=== `search`
+=== `inferdb.search_by_example.search`
 
 [source,javascript]
 ----
 > inferdb.search_by_example.search({
   "percent_white": 0.6
 }, "percent_white");
-[ [92, 5.277729959291074], [87, 5.354034441842514], [104, 5.367275425891225], ...]
+----
+[source.javascript]
+----
+[[92, 5.277729959291074],
+ [87, 5.354034441842514],
+ [104, 5.367275425891225],
+ ...]
 ----
 
-=== `isVeryAnomalous`
+=== `inferdb.search_by_example.isVeryAnomalous`
 
 [source,javascript]
 ----
@@ -37,6 +49,3 @@ true
 > inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.4})
 false
 ----
-
-=== Building
-A stand-alone `.js` file can be built with `make`.
