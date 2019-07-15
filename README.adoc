@@ -13,7 +13,7 @@ image:https://img.shields.io/badge/stability-experimental-orange.svg[]
 --
 
 == Usage
-InferenceQL is comprised of a number of separate modules, each of which can be used separately or together. See their respective `README` files for more information.
+InferenceQL is comprised of a number of separate modules, each of which can be used separately or together.
 
 |===
 | Module | Type | Description
@@ -21,8 +21,10 @@ InferenceQL is comprised of a number of separate modules, each of which can be u
 | aide              | Library     | An algorithm for measuring the accuracy of probabilistic inference algorithms.
 | multimixture      | Library     | A collection of functions for building and manipulating multimixture models.
 | search-by-example | Library     | A collection of functions for searching tabular data.
-| spreadsheets      | Application | A web application demoing InferenceQL's search capabilities.
+| spreadsheets      | Application | A web application demonstrating InferenceQL's search capabilities.
 |===
+
+See the `README` files in their respective subdirectories for more information.
 
 == Contributing
 NOTE: InferenceQL is not accepting contributors from outside the MIT Probabilistic Computing Project at this time.
