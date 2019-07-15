@@ -27,10 +27,13 @@ InferenceQL is comprised of a number of separate modules, each of which can be u
 See the `README` files in their respective subdirectories for more information.
 
 == Contributing
-NOTE: InferenceQL is not accepting contributors from outside the MIT Probabilistic Computing Project at this time.
+WARNING: InferenceQL is only accepting contributors from members of the MIT Probabilistic Computing Project at this time.
+
+=== Building
+The modules can be collectively built by running `make` at the project root.
 
 === Testing
-Tests can be run either https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/4-running-kaocha-cli[from the command-line]
+One the project has been built the tests can be run either https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/4-running-kaocha-cli[from the command-line]
 
 [source,bash]
 ----
