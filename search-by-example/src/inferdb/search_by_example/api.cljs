@@ -4,16 +4,18 @@
 
 (def ^:export data (clj->js data/nyt-data))
 
-(defn ^:export search
-  [example emphasis]
-  (clj->js
-   (search/search-by-example (js->clj example)
-                             (js->clj emphasis)
-                             1)))
-
 (defn ^:export isVeryAnomalous
   [example]
   (search/very-anomalous? (reduce-kv (fn [m k v]
                                        (assoc m (keyword k) v))
                                      {}
                                      (js->clj example))))
+
+(defn ^:export search
+  [example emphasis]
+  (if (isVeryAnomalous example)
+    (throw (js/Error. "Example is too anomalous!"))
+    (clj->js
+     (search/search-by-example (js->clj example)
+                               (js->clj emphasis)
+                               1))))
