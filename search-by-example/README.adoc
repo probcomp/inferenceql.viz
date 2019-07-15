@@ -7,11 +7,12 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 :toc:
+:!toc-title:
 :toc-placement: macro
 
 A collection of functions for searching tabular data.
 
-== toc::[]
+toc::[]
 
 == Building
 Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
