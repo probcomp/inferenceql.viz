@@ -41,6 +41,8 @@ Takes a hypothetical row and an emphasis column and returns an array of pair whe
  ...]
 ----
 
+CAUTION: Searching for a row that is too anomalous with respect to the data in ``inferdb.search_by_example.search.data` will trigger an error.
+
 === `inferdb.search_by_example.isVeryAnomalous`
 
 [source,javascript]
