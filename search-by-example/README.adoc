@@ -12,6 +12,7 @@ endif::[]
 
 A collection of functions for searching tabular data.
 
+== Table of contents
 toc::[]
 
 == Building
