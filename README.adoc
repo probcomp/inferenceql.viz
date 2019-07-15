@@ -27,7 +27,7 @@ InferenceQL is comprised of a number of separate modules, each of which can be u
 See the `README` files in their respective subdirectories for more information.
 
 == Contributing
-WARNING: InferenceQL is only accepting contributors from members of the MIT Probabilistic Computing Project at this time.
+WARNING: InferenceQL is only accepting contributors from members of the MIT Probabilistic Computing Project.
 
 === Building
 The modules can be collectively built by running `make` at the project root.
