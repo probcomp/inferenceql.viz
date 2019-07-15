@@ -6,6 +6,12 @@ ifdef::env-github[]
 :caution-caption: :warning:
 :warning-caption: :warning:
 endif::[]
+:toc:
+:toc-placement!:
+
+A collection of functions for searching tabular data.
+
+toc::[]
 
 == Building
 Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
