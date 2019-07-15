@@ -25,6 +25,7 @@ The data that was used to build the model. A vector of rows. Rows are maps from 
 ----
 
 === `inferdb.search_by_example.search`
+Takes a hypothetical row and an emphasis column and returns an array of pair where the first element is the index of the row in `inferdb.search_by_example.search.data` and the second element is the similarity score for that row.
 
 [source,javascript]
 ----
