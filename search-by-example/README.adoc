@@ -1,0 +1,21 @@
+= InferenceQL: Search by Example
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:caution-caption: :warning:
+:warning-caption: :warning:
+endif::[]
+
+== Usage
+[source,javascript]
+----
+const example = {
+  "percent_white": 0.6
+};
+const emphasis = "percent_white";
+inferdb.search-by-example.search(example, emphasis);
+----
+
+=== Building
+A stand-alone `.js` file can be built with `make`.
