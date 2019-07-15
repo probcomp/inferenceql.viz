@@ -15,18 +15,41 @@ image:https://img.shields.io/badge/stability-experimental-orange.svg[]
 == Usage
 InferenceQL is comprised of a number of separate modules, each of which can be used separately or together. See their respective `README` files for more information.
 
+.Table Modules
+|===
+|Module
+|Type
+|Description
+
+|aide
+|Library
+|An algorithm for measuring the accuracy of probabilistic inference algorithms.
+
+|multimixture
+|Library
+|A collection of functions for building and manipulating multimixture models.
+
+|search-by-example
+|Library
+|A collection of functions for searching tabular data.
+
+|spreadsheets
+|Application
+|A web application demoing InferenceQL's search capabilities.
+|===
+
 == Contributing
 NOTE: InferenceQL is not accepting contributors from outside the MIT Probabilistic Computing Project at this time.
 
 === Testing
-Tests can be run either [from the command-line](https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/4-running-kaocha-cli)
+Tests can be run either https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/4-running-kaocha-cli[from the command-line]
 
 [source,bash]
 ----
 bin/kaocha
 ----
 
-or [from the REPL](https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/5-running-kaocha-from-the-repl).
+or https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/5-running-kaocha-from-the-repl[from the REPL].
 
 [source,clojure]
 ----
