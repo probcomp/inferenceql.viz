@@ -6,6 +6,7 @@ ifdef::env-github[]
 :caution-caption: :warning:
 :warning-caption: :warning:
 endif::[]
+:toc:
 :toc-placement: macro
 
 A collection of functions for searching tabular data.
