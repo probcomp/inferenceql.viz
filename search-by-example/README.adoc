@@ -11,7 +11,7 @@ endif::[]
 
 A collection of functions for searching tabular data.
 
-toc::[]
+== toc::[]
 
 == Building
 Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
