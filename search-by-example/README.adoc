@@ -45,7 +45,18 @@ The data that was used to build the model. A vector of rows. Rows are maps from 
 [source,javascript]
 ----
 > inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.05})
+----
+
+[source,javascript]
+----
 true
+----
+
+[source,javascript]
+----
 > inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.4})
+----
+[source,javascript]
+----
 false
 ----
