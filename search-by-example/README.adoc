@@ -8,13 +8,34 @@ ifdef::env-github[]
 endif::[]
 
 == Usage
+
+=== `data`
+The data that was used to build the model. A vector of rows. Rows are maps from column names to values.
+
 [source,javascript]
 ----
-const example = {
+> inferdb.search_by_example.search.data
+[]{percent_owned: 0.681, percent_married: 0.4635, NAME: "CD 1 Alabama", percent_lths: 0.1292, ...} ...]
+----
+
+=== `search`
+
+[source,javascript]
+----
+> inferdb.search_by_example.search({
   "percent_white": 0.6
-};
-const emphasis = "percent_white";
-inferdb.search-by-example.search(example, emphasis);
+}, "percent_white");
+[ [92, 5.277729959291074], [87, 5.354034441842514], [104, 5.367275425891225], ...]
+----
+
+=== `isVeryAnomalous`
+
+[source,javascript]
+----
+> inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.05})
+true
+> inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.4})
+false
 ----
 
 === Building
