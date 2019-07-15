@@ -13,7 +13,7 @@ Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
 == Usage
 
 === `inferdb.search_by_example.search.data`
-The data that was used to build the model. A vector of rows. Rows are maps from column names to values.
+The data that was used to build the model. An array of rows. Each row is an object where the keys are column names.
 
 [source,javascript]
 ----
