@@ -7,8 +7,10 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+--
 image::https://circleci.com/gh/probcomp/inferenceql.svg?style=shield&circle-token=a7fdbf0f271ddb2a6a9798c3a99bdb21c68080c2[float="left"]
 image::https://img.shields.io/badge/stability-experimental-orange.svg[float="left"]
+--
 
 == Usage
 InferenceQL is comprised of a number of separate modules, each of which can be used separately or together. See their respective `README` files for more information.
