@@ -41,7 +41,18 @@ Takes a hypothetical row and an emphasis column and returns an array of pair whe
  ...]
 ----
 
-CAUTION: Searching for a row that is too anomalous with respect to the data in ``inferdb.search_by_example.search.data` will trigger an error.
+[CAUTION]
+====
+Searching for a row that is too anomalous with respect to the data in ``inferdb.search_by_example.search.data` will trigger an error.
+[source,javascript]
+----
+inferdb.search_by_example.api.search({percent_children: 0.9}, "percent_children")
+----
+[source,javascript]
+----
+main.js:1256 Uncaught Error: Example is too anomalous!
+----
+====
 
 === `inferdb.search_by_example.isVeryAnomalous`
 
