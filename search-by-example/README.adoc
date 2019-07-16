@@ -26,7 +26,7 @@ The data that was used to build the model. An array of rows. Each row is an obje
 
 [source,javascript]
 ----
-> inferdb.search_by_example.search.data
+> inferdb.search_by_example.api.data
 ----
 [source,javascript]
 ----
@@ -38,7 +38,7 @@ Takes a hypothetical row and returns an array of pair where the first element is
 
 [source,javascript]
 ----
-> inferdb.search_by_example.search({
+> inferdb.search_by_example.api.search({
   "percent_white": 0.6
 });
 ----
