@@ -12,6 +12,7 @@ endif::[]
 
 A collection of functions for searching tabular data.
 
+[discrete]
 == Table of contents
 toc::[]
 
