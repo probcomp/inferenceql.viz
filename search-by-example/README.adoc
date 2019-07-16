@@ -34,13 +34,13 @@ The data that was used to build the model. An array of rows. Each row is an obje
 ----
 
 === `inferdb.search_by_example.search`
-Takes a hypothetical row and an emphasis column and returns an array of pair where the first element is the index of the row in `inferdb.search_by_example.search.data` and the second element is the similarity score for that row.
+Takes a hypothetical row and returns an array of pair where the first element is the index of the row in `inferdb.search_by_example.search.data` and the second element is the similarity score for that row.
 
 [source,javascript]
 ----
 > inferdb.search_by_example.search({
   "percent_white": 0.6
-}, "percent_white");
+});
 ----
 [source.javascript]
 ----
