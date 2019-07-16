@@ -53,9 +53,8 @@
                          (count data-logpdfs))]
      (< percent-rank threshold))))
 
-(defn search-by-example [example emphasis _]
+(defn search-by-example [example]
   (sbe/cached-search model/model-cgpm
                      model/cluster-data
                      pfcas/pfcas
-                     example
-                     emphasis))
+                     example))

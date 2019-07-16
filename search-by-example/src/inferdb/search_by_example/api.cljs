@@ -12,10 +12,7 @@
                                      (js->clj example))))
 
 (defn ^:export search
-  [example emphasis]
+  [example]
   (if (isVeryAnomalous example)
     (throw (js/Error. "Example is too anomalous!"))
-    (clj->js
-     (search/search-by-example (js->clj example)
-                               (js->clj emphasis)
-                               1))))
+    (clj->js (search/search-by-example (js->clj example)))))

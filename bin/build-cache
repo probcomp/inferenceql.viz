@@ -14,5 +14,4 @@
                   'inferdb.spreadsheets.pfcas
                   (:proc model/model-cgpm)
                   model/cluster-data
-                  (fix-table data/nyt-data)
-                  "percent_white"))
+                  (fix-table data/nyt-data)))
