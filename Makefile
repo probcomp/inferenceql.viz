@@ -2,6 +2,7 @@ multimixture-dir      := multimixture
 search-by-example-dir := search-by-example
 spreadsheets-dir      := spreadsheets
 node-modules-dir      := node_modules
+out-dir               := out
 
 module-dirs := \
 	$(multimixture-dir) \
@@ -16,7 +17,7 @@ all:
 
 .PHONY: clean
 clean:
-	rm -Rf $(node-modules-dir)
+	rm -Rf $(node-modules-dir) $(out-dir)
 	for d in $(module-dirs) ; do \
 		$(MAKE) -w -C $$d clean ; \
 	done

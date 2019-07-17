@@ -10,11 +10,17 @@
           :test-paths ["multimixture/test"]}
          {:id :multimixture-cljs
           :type :kaocha.type/cljs
-          ;; The time it takes to load our this test suite exceeds the default
-          ;; threshold. We're not sure if the default threshold is unreasonably
-          ;; low, or if there is something usual about our test suite that makes
-          ;; it take so long, but at this point we don't think there would be
-          ;; much value in investigating further.
+          ;; The time it takes to load our ClojureScript test suites exceeds the
+          ;; default threshold. We're not sure if the default threshold is
+          ;; unreasonably low, or if there is something usual about our test
+          ;; suite that makes it take so long, but at this point we don't think
+          ;; there would be much value in investigating further.
           :cljs/timeout 30000
           :source-paths ["multimixture/src"]
-          :test-paths ["multimixture/test"]}]}
+          :test-paths ["multimixture/test"]}
+         {:id :search-by-example
+          :type :kaocha.type/cljs
+          ;; See note above.
+          :cljs/timeout 30000
+          :source-paths ["search-by-example/src"]
+          :test-paths ["search-by-example/test"]}]}

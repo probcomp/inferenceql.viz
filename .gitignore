@@ -1,5 +1,7 @@
 /.cpcache/ # Clojure cache
+
 /node_modules/
+/out/
 
 /multimixture/out/
 

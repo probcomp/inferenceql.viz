@@ -28,16 +28,17 @@
                                         {}))]
     (get valid-value-map column)))
 
-(defn validate
+(defn validation-errors
   "Given a example map `example`, returns a potentially empty vector of validation
   error maps."
   [example]
-  (let [{valid-keys true, invalid-keys false} (group-by #(contains? columns %) (keys example))
+  (let [columns (set (keys model/stattypes))
+        {valid-columns true, invalid-columns false} (group-by #(contains? columns %) (keys example))
         key-errors (mapv (fn [column]
                            {:type :invalid-column
                             :column column
                             :valid-columns columns})
-                         invalid-keys)
+                         invalid-columns)
         value-errors (keep (fn [column]
                              (let [v (get example column)]
                                (if (categorical? column)
@@ -52,7 +53,7 @@
                                     :column column
                                     :column-type :numeric
                                     :value v}))))
-                           valid-keys)]
+                           valid-columns)]
     (into key-errors value-errors)))
 
 (defn- error-message
@@ -67,7 +68,7 @@
                      (str "Invalid value for numerical column " (pr-str column) ": " (pr-str (:value error)) "\n"
                           "Value must be numeric.\n"))))
 
-(defn- validation-error
+(defn- js-error
   "Given a collection of validation error maps, returns a JavaScript error
   object."
   [errors]
@@ -79,8 +80,8 @@
 (defn ^:export isVeryAnomalous
   "Returns `true` if the provided example is very anomalous."
   [example]
-  (if-let [errors (seq (validate example))]
-    (throw (validation-error errors))
+  (if-let [errors (seq (validation-errors example))]
+    (throw (js-error errors))
     (search/very-anomalous? (reduce-kv (fn [m k v]
                                          (assoc m (keyword k) v))
                                        {}
