@@ -60,7 +60,7 @@ Takes a hypothetical row and returns an array of pair where the first element is
  ...]
 ----
 
-WARNING: Searching for a row that is too anomalous with respect to the data in ``inferdb.search_by_example.api.data` will trigger an error.
+WARNING: Searching for a row that is too anomalous with respect to the data in `inferdb.search_by_example.api.data` will trigger an error.
 [source,javascript]
 ----
 inferdb.search_by_example.api.search({percent_children: 0.9}, "percent_children")
