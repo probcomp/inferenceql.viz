@@ -1,5 +1,6 @@
 (ns inferdb.search-by-example.api
   (:require [clojure.string :as str]
+            [clojure.walk :as walk]
             [metaprob.distributions :as dist]
             [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.model :as model]
@@ -28,7 +29,7 @@
                                         {}))]
     (get valid-value-map column)))
 
-(defn validation-errors
+(defn- validation-errors
   "Given a example map `example`, returns a potentially empty vector of validation
   error maps."
   [example]
@@ -77,15 +78,16 @@
                      (str/join "\n"))]
     (js/Error. message)))
 
-(defn ^:export isVeryAnomalous
-  "Returns `true` if the provided example is very anomalous."
+(defn- very-anomalous?
   [example]
   (if-let [errors (seq (validation-errors example))]
     (throw (js-error errors))
-    (search/very-anomalous? (reduce-kv (fn [m k v]
-                                         (assoc m (keyword k) v))
-                                       {}
-                                       (js->clj example)))))
+    (search/very-anomalous? (walk/keywordize-keys example))))
+
+(defn ^:export isVeryAnomalous
+  "Returns `true` if the provided example is very anomalous."
+  [example]
+  (very-anomalous? (walk/stringify-keys (js->clj example))))
 
 (defn ^:export search
   "Returns a collection of [row index, similarity score] pairs, sorted by scores."
