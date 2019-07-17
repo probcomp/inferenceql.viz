@@ -21,15 +21,19 @@ Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
 
 == Usage
 
-=== `inferdb.search_by_example.search.columns`
+=== `inferdb.search_by_example.api.columns`
 The columns that can be used in a search example.
 
+[source,javascript]
+----
+> inferdb.search_by_example.api.columns
+----
 [source,javascript]
 ----
 ["percent_owned", "percent_married", "nyt_political_prediction", ...]
 ----
 
-=== `inferdb.search_by_example.search.data`
+=== `inferdb.search_by_example.api.data`
 The data that was used to build the model. An array of rows. Each row is an object where the keys are column names.
 
 [source,javascript]
@@ -41,8 +45,8 @@ The data that was used to build the model. An array of rows. Each row is an obje
 [{percent_owned: 0.681, percent_married: 0.4635 ...} ...]
 ----
 
-=== `inferdb.search_by_example.search`
-Takes a hypothetical row and returns an array of pair where the first element is the index of the row in `inferdb.search_by_example.search.data` and the second element is the similarity score for that row.
+=== `inferdb.search_by_example.api.search`
+Takes a hypothetical row and returns an array of pair where the first element is the index of the row in `inferdb.search_by_example.api.data` and the second element is the similarity score for that row.
 
 [source,javascript]
 ----
@@ -60,7 +64,7 @@ Takes a hypothetical row and returns an array of pair where the first element is
 
 [WARNING]
 ====
-Searching for a row that is too anomalous with respect to the data in ``inferdb.search_by_example.search.data` will trigger an error.
+Searching for a row that is too anomalous with respect to the data in ``inferdb.search_by_example.api.data` will trigger an error.
 ====
 [source,javascript]
 ----
@@ -71,7 +75,7 @@ inferdb.search_by_example.api.search({percent_children: 0.9}, "percent_children"
 main.js:1256 Uncaught Error: Example is too anomalous!
 ----
 
-=== `inferdb.search_by_example.isVeryAnomalous`
+=== `inferdb.search_by_example.api.isVeryAnomalous`
 
 [source,javascript]
 ----
