@@ -21,6 +21,14 @@ Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
 
 == Usage
 
+=== `inferdb.search_by_example.search.columns`
+The columns that can be used in a search example.
+
+[source,javascript]
+----
+["percent_owned", "percent_married", "nyt_political_prediction", ...]
+----
+
 === `inferdb.search_by_example.search.data`
 The data that was used to build the model. An array of rows. Each row is an object where the keys are column names.
 
