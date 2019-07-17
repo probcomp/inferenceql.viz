@@ -49,4 +49,4 @@ or https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/5-running-kaocha-from-th
 ----
 
 Kaocha provides a variety of options for running the test suite. For full
-details refer to its [documentation](https://cljdoc.org/d/lambdaisland/kaocha/).
+details refer to its https://cljdoc.org/d/lambdaisland/kaocha/[documentation].
