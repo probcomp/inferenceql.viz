@@ -1,5 +1,6 @@
 (ns inferdb.spreadsheets.search
-  (:require [inferdb.search-by-example.main :as sbe]
+  (:require [clojure.walk :as walk]
+            [inferdb.search-by-example.main :as sbe]
             [inferdb.cgpm.main :as cgpm]
             [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.model :as model]
@@ -31,26 +32,25 @@
                                           {}
                                           ;; input-address variables
                                           {})
-         data-logpdfs (->> data/nyt-data
-                           ;; Remove rows where any of the keys in the example map
-                           ;; to `nil`.
-                           (remove (fn [row]
-                                     (some (fn [key]
-                                             (and (contains? row key)
-                                                  (nil? (get row key))))
-                                           (keys example))))
-                           ;; Include from the row only the keys that are present
-                           ;; in the example.
-                           (map (fn [row]
-                                  (->> (keys example)
-                                       (map name)
-                                       (select-keys row)
-                                       (reduce-kv (fn [row k v]
-                                                    (assoc row (keyword k) v))
-                                                  {}))))
-                           (map #(cgpm/cgpm-logpdf model/model-cgpm % {} {})))
-         percent-rank (/ (rank example-logpdf data-logpdfs)
-                         (count data-logpdfs))]
+         data-logpdfs (into []
+                            (comp
+                             ;; Remove rows where any of the keys in the
+                             ;; example map to `nil`.
+                             (remove (fn [row]
+                                       (some (fn [key]
+                                               (and (contains? row key)
+                                                    (nil? (get row key))))
+                                             (map name (keys example)))))
+                             ;; Include from the row only the keys that are present
+                             ;; in the example.
+                             (map (fn [row]
+                                    (->> (keys example)
+                                         (map name)
+                                         (select-keys row)
+                                         (walk/keywordize-keys))))
+                             (map #(cgpm/cgpm-logpdf model/model-cgpm % {} {})))
+                            data/nyt-data)
+         percent-rank (/ (rank example-logpdf data-logpdfs) (count data-logpdfs))]
      (< percent-rank threshold))))
 
 (defn search-by-example [example]
