@@ -50,9 +50,7 @@ Takes a hypothetical row and returns an array of pair where the first element is
 
 [source,javascript]
 ----
-> inferdb.search_by_example.api.search({
-  "percent_white": 0.6
-});
+> inferdb.search_by_example.api.search({"percent_white": 0.6});
 ----
 [source.javascript]
 ----
