@@ -19,6 +19,9 @@ toc::[]
 == Building
 Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
 
+== About the dataset
+Each row in the dataset represents a U.S. congressional district.
+
 == Usage
 
 === `inferdb.search_by_example.api.columns`
