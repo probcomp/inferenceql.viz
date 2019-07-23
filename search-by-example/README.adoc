@@ -46,7 +46,7 @@ The data that was used to build the model. An array of rows. Each row is an obje
 ----
 
 === `inferdb.search_by_example.api.search`
-Takes a hypothetical row and returns an array of pair where the first element is the index of the row in `inferdb.search_by_example.api.data` and the second element is the similarity score for that row.
+Takes a hypothetical row and returns an array of pairs. In each returned pair the first element is the index of the row in `inferdb.search_by_example.api.data`, and the second element is the similarity score for that row. The array will be sorted by similarity to the provided row, descending. Since a lower score means a higher degree of similarity, the scores themselves will be in ascending order.
 
 [source,javascript]
 ----
