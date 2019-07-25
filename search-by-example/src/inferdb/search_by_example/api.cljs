@@ -87,7 +87,7 @@
 (defn ^:export isVeryAnomalous
   "Returns `true` if the provided example is very anomalous."
   [example]
-  (very-anomalous? (walk/stringify-keys (js->clj example))))
+  (very-anomalous? (js->clj example :keywordize-keys false)))
 
 (defn ^:export search
   "Returns a collection of [row index, similarity score] pairs, sorted by scores."
