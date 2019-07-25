@@ -1,0 +1,95 @@
+= InferenceQL: Search by Example
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:caution-caption: :warning:
+:warning-caption: :warning:
+endif::[]
+:toc:
+:!toc-title:
+:toc-placement: macro
+
+A collection of functions for searching tabular data.
+
+[discrete]
+== Table of contents
+toc::[]
+
+== Building
+Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
+
+== About the dataset
+Each row in the dataset represents a U.S. congressional district.
+
+== Usage
+
+=== `inferdb.search_by_example.api.columns`
+The columns that can be used in a search example.
+
+[source,javascript]
+----
+> inferdb.search_by_example.api.columns
+----
+[source,javascript]
+----
+["percent_owned", "percent_married", "nyt_political_prediction", ...]
+----
+
+=== `inferdb.search_by_example.api.data`
+The data that was used to build the model. An array of rows. Each row is an object where the keys are column names.
+
+[source,javascript]
+----
+> inferdb.search_by_example.api.data
+----
+[source,javascript]
+----
+[{percent_owned: 0.681, percent_married: 0.4635 ...} ...]
+----
+
+=== `inferdb.search_by_example.api.search`
+Takes a hypothetical row and returns an array of pairs. In each returned pair the first element is the index of the row in `inferdb.search_by_example.api.data`, and the second element is the similarity score for that row. The array will be sorted by similarity to the provided row, descending. Since a lower score means a higher degree of similarity, the scores themselves will be in ascending order.
+
+[source,javascript]
+----
+> inferdb.search_by_example.api.search({"percent_white": 0.6});
+----
+[source.javascript]
+----
+[[92, 5.277729959291074],
+ [87, 5.354034441842514],
+ [104, 5.367275425891225],
+ ...]
+----
+
+WARNING: Searching for a row that is too anomalous with respect to the data in `inferdb.search_by_example.api.data` will trigger an error.
+[source,javascript]
+----
+inferdb.search_by_example.api.search({percent_children: 0.9}, "percent_children")
+----
+[source,javascript]
+----
+main.js:1256 Uncaught Error: Example is too anomalous!
+----
+
+=== `inferdb.search_by_example.api.isVeryAnomalous`
+
+[source,javascript]
+----
+> inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.05})
+----
+
+[source,javascript]
+----
+true
+----
+
+[source,javascript]
+----
+> inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.4})
+----
+[source,javascript]
+----
+false
+----

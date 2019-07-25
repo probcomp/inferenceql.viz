@@ -18,10 +18,10 @@ jobs: # basic units of work in a run
           name: Install build tools
           command: sudo apt-get update && sudo apt-get install -y make
       - run:
-          name: Build spreadseets
-          command: make spreadsheet # Also pulls down the npm dependencies needed by Kaocha
+          name: Build
+          command: make
       - run:
-          name: Run tests
+          name: Test
           command: |
             mkdir -p /tmp/test-results/all
             bin/kaocha \
@@ -32,8 +32,8 @@ jobs: # basic units of work in a run
       - store_test_results:
           path: /tmp/test-results
       - run:
-          name: Generate charts
-          command: make charts
+          name: Artifacts
+          command: make -w -C multimixture
           when: always
       - store_artifacts:
           path: spreadsheets/out/charts

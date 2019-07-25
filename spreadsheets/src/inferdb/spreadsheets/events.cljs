@@ -1,11 +1,8 @@
 (ns inferdb.spreadsheets.events
   (:require [clojure.edn :as edn]
-            [clojure.walk :as walk]
             [re-frame.core :as rf]
-            [inferdb.cgpm.main :as cgpm]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]
-            [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.search :as search]))
 
 (def hooks [:after-deselect :after-selection-end])
@@ -54,9 +51,9 @@
  :search
  event-interceptors
  (fn [db [_ text]]
-   (let [row (edn/read-string text)]
-     (let [result (search/search-by-example row :cluster-for-percap 1)]
-       (rf/dispatch [:search-result result])))
+   (let [row (edn/read-string text)
+         result (search/search-by-example row)]
+     (rf/dispatch [:search-result result]))
    db))
 
 (rf/reg-event-db

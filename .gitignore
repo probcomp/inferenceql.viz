@@ -1,9 +1,14 @@
 /.cpcache/ # Clojure cache
+
 /node_modules/
-/publish/
+/out/
+
+/multimixture/out/
+
+/search-by-example/out/
+
+/spreadsheets/.publish/
 /spreadsheets/out/
-
-
 /spreadsheets/resources/handsontable.full.css
 /spreadsheets/src/inferdb/spreadsheets/pfcas.cljc
 /spreadsheets/src/inferdb/spreadsheets/model.cljc

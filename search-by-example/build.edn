@@ -1,0 +1,2 @@
+{:main "inferdb.search-by-example.api"
+ :optimizations :advanced}

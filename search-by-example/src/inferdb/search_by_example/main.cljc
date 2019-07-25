@@ -52,13 +52,13 @@
           ns)))
 
 (defn probability-distribution-on-cluster
-  [model clusters row view]
-  (let [columns            (-> clusters second keys)
-        cluster-addresses  (range (mmix/cluster-count clusters))]
+  [model clusters row]
+  ;; WARNING: Does not handle views yet. Assumes a single view.
+  (let [columns (-> clusters second keys)
+        cluster-addresses (range (mmix/cluster-count clusters))]
     (->> cluster-addresses
          (map (fn [cluster-address]
                 (let [trace (-> {}
-                                (constrain-by-view cluster-address view)
                                 (constrain-by-cluster cluster-address columns)
                                 (constrain-by-row row))
                       [_ _ score] (prelude/infer-and-score :procedure model
@@ -66,32 +66,30 @@
                   (prelude/exp score))))
          (normalize))))
 
-(defn rowwise-similarity [cgpm clusters view example-pfca row emphasis]
-  (kl example-pfca (probability-distribution-on-cluster cgpm clusters row view)))
+(defn rowwise-similarity
+  [cgpm clusters example-pfca row]
+  ;; WARNING: Does not handle views yet. Assumes a single view
+  (kl example-pfca (probability-distribution-on-cluster cgpm clusters row)))
 
 (defn search
-  [cgpm clusters rows example emphasis]
-  (let [view (mmix/view-for-column emphasis)
-        example-pfca (probability-distribution-on-cluster
-                      (:proc cgpm) clusters example emphasis)]
+  [cgpm clusters rows example]
+  (let [example-pfca (probability-distribution-on-cluster (:proc cgpm) clusters example)]
     (->> rows
          (map-indexed (fn [index row]
-                        [index (rowwise-similarity
-                                (:proc cgpm) clusters view example-pfca row emphasis)]))
+                        [index (rowwise-similarity (:proc cgpm) clusters example-pfca row)]))
          (sort-by second))))
 
 (defn cached-search
-  [cgpm clusters pfcas example emphasis]
-  (let [view (mmix/view-for-column emphasis)
-        example-pfca (probability-distribution-on-cluster (:proc cgpm) clusters example emphasis)]
+  [cgpm clusters pfcas example]
+  (let [example-pfca (probability-distribution-on-cluster (:proc cgpm) clusters example)]
     (->> pfcas
          (map-indexed (fn [index pfca]
                         [index (symmetrized-kl example-pfca pfca)]))
          (sort-by second))))
 
 #?(:clj (defn save-pfcas
-          [filename ns model clusters rows emphasis]
-          (let [data (mapv #(probability-distribution-on-cluster model clusters % emphasis)
+          [filename ns model clusters rows]
+          (let [data (mapv #(probability-distribution-on-cluster model clusters %)
                            rows)
 
                 sexp (with-out-str

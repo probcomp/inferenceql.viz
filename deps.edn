@@ -17,6 +17,7 @@
          "multimixture/src"
          "multimixture/test"
          "search-by-example/src"
+         "search-by-example/test"
          "spreadsheets/src"]
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-521"}

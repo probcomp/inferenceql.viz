@@ -1,0 +1,52 @@
+= InferenceQL
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:caution-caption: :warning:
+:warning-caption: :warning:
+endif::[]
+
+--
+image:https://circleci.com/gh/probcomp/inferenceql.svg?style=shield&circle-token=a7fdbf0f271ddb2a6a9798c3a99bdb21c68080c2[]
+image:https://img.shields.io/badge/stability-experimental-orange.svg[]
+--
+
+== Usage
+InferenceQL is comprised of a number of separate modules, each of which can be used separately or together.
+
+|===
+| Module | Type | Description
+
+| aide              | Library     | An algorithm for measuring the accuracy of probabilistic inference algorithms.
+| multimixture      | Library     | A collection of functions for building and manipulating multimixture models.
+| search-by-example | Library     | A collection of functions for searching tabular data.
+| spreadsheets      | Application | A web application demonstrating InferenceQL's search capabilities.
+|===
+
+See the `README` files in their respective subdirectories for more information.
+
+== Contributing
+WARNING: InferenceQL is only accepting contributors from members of the MIT Probabilistic Computing Project.
+
+=== Building
+The modules can be collectively built by running `make` at the project root.
+
+=== Testing
+One the project has been built the tests can be run either https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/4-running-kaocha-cli[from the command-line]
+
+[source,bash]
+----
+bin/kaocha
+----
+
+or https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/5-running-kaocha-from-the-repl[from the REPL].
+
+[source,clojure]
+----
+(require '[kaocha.repl :as kaocha])
+(kaocha/run)
+----
+
+Kaocha provides a variety of options for running the test suite. For full
+details refer to its https://cljdoc.org/d/lambdaisland/kaocha/[documentation].
