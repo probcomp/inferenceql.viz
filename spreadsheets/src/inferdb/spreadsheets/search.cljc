@@ -25,13 +25,7 @@
   ([example]
    (very-anomalous? example anomalousness-threshold))
   ([example threshold]
-   (let [example-logpdf (cgpm/cgpm-logpdf model/model-cgpm
-                                          ;; target - probability of this target
-                                          example
-                                          ;; constraint - given that we know these things
-                                          {}
-                                          ;; input-address variables
-                                          {})
+   (let [example-logpdf (cgpm/cgpm-logpdf model/model-cgpm example {} {})
          data-logpdfs (into []
                             (comp
                              ;; Remove rows where any of the keys in the
