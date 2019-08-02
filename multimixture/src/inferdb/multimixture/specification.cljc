@@ -80,7 +80,7 @@
         (mapcat view-variables)
         mmix))
 
-(defn- view-index-for-variable
+(defn view-index-for-variable
   "Returns the index of the view a given variable was assigned to."
   [mmix variable]
   (some (fn [[i view]]

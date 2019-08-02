@@ -2,6 +2,7 @@
         org.clojure/clojurescript {:mvn/version "1.10.520"}
         org.clojure/data.json {:mvn/version "0.2.6"}
         org.clojure/data.csv {:mvn/version"0.1.4"}
+        org.clojure/math.combinatorics {:mvn/version "0.1.6"}
         binaryage/devtools {:mvn/version "0.9.10"}
         camel-snake-kebab {:mvn/version "0.4.0"}
         expound {:mvn/version "0.7.2"}
