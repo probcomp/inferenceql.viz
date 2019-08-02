@@ -3,7 +3,7 @@
             [inferdb.cgpm.main :as cgpm]
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :as plot]
-            [inferdb.multimixture-test :as mm-test]
+            [inferdb.multimixture.dsl-test :as mm-test]
             [inferdb.multimixture.specification :as spec]))
 
 (def multi-mixture
