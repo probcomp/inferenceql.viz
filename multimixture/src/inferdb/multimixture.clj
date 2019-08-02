@@ -5,6 +5,8 @@
             [metaprob.prelude :as mp]
             [inferdb.multimixture.specification :as spec]))
 
+#_(require '[inferdb.multimixture.dsl-test :as dsl-test])
+
 #_(def mmix
     [{:vars {"x" :gaussian
              "y" :categorical}
@@ -29,13 +31,13 @@
 (defn row-generator
   "Returns a generative function that samples a row from the provided view
   specification."
-  [views]
-  (let [view-var-index (zipmap (range) (map view-variables views))
+  [spec]
+  (let [view-var-index (zipmap (range) (map view-variables spec))
         var-view-index (reduce-kv (fn [m view variables]
                                     (merge m (zipmap variables (repeat view))))
                                   {}
                                   view-var-index)
-        metadata {:spec views
+        metadata {:spec spec
                   :view-var-index view-var-index
                   :var-view-index var-view-index}
         f (gen []
@@ -51,7 +53,7 @@
                                                             (assoc m variable (apply-at `(:columns ~variable) primitive params))))
                                                         {}
                                                         (:parameters cluster))))
-                                         views))))]
+                                         spec))))]
     (with-meta f (merge (meta f) metadata))))
 
 #_(row-generator mmix)
@@ -242,11 +244,34 @@
          (map (comp last #(mp/infer-and-score :procedure (mmix/row-generator spec)
                                               :observation-trace %)))))
 
+(defn optimized-row-generator
+  [spec]
+  (let [row-generator (row-generator spec)]
+    (gfn/make-generative-function
+     row-generator
+     (gen [partial-trace]
+       (let [all-latents    (all-latents spec)
+             all-traces     (mapv #(merge partial-trace %)
+                                  all-latents)
+             all-logscores  (mapv #(last (mp/infer-and-score :procedure row-generator
+                                                             :observation-trace %))
+                                  all-latents)
+             log-normalizer (dist/logsumexp all-logscores)
+             score          log-normalizer]
+         #(let [i     (dist/categorical all-logscores)
+                trace (nth all-traces i)
+                v     (first (mp/infer-and-score :procedure row-generator
+                                                 :observation-trace trace))]
+            [v trace score]))))))
+
+#_(optimized-row-generator dsl-test/multi-mixture)
+#_((optimized-row-generator dsl-test/multi-mixture))
+#_(mp/infer-and-score :procedure (optimized-row-generator dsl-test/multi-mixture))
+
 (defn data-likelihood
   [data spec latent-trace]
-  ;; Probability of the merged minus the probability of latents
-  (let [row-generator (mmix/row-generator spec)
-        data-trace (mmix/with-row-values {} data)
+  (let [row-generator (row-generator spec)
+        data-trace (with-row-values {} data)
         probability-of #(last (mp/infer-and-score :procedure row-generator
                                                   :observation-trace %))]
     (- (probability-of (merge data-trace latent-trace))
