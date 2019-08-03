@@ -112,16 +112,6 @@
 
 #_(with-rows {} [{"a" 1, "b" 2}])
 
-(defn importance-resampling
-  [& {:keys [model inputs observation-trace n-particles]
-      :or {inputs [], observation-trace {}, n-particles 1}}]
-  (let [particles (mp/replicate n-particles
-                                (fn []
-                                  (mp/infer-and-score :procedure model
-                                                      :inputs inputs
-                                                      :observation-trace observation-trace)))]
-    (nth particles (dist/log-categorical (map (fn [[_ _ s]] s) particles)))))
-
 (defn- valueify
   [m]
   (reduce-kv (fn [m k v]

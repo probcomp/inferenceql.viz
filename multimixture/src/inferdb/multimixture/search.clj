@@ -66,6 +66,16 @@
     (mp/infer-and-score :procedure generate-1col-binary-extension
                         :inputs [spec (count rows) "y" {:alpha 0.001 :beta 0.001}]))
 
+(defn importance-resampling
+  [& {:keys [model inputs observation-trace n-particles]
+      :or {inputs [], observation-trace {}, n-particles 1}}]
+  (let [particles (mp/replicate n-particles
+                                (fn []
+                                  (mp/infer-and-score :procedure model
+                                                      :inputs inputs
+                                                      :observation-trace observation-trace)))]
+    (nth particles (dist/log-categorical (map (fn [[_ _ s]] s) particles)))))
+
 (defn insert-column
   "Takes a multimixture specification, views, and a set of rows that have a value
   in the new column that is being added. Returns an updated multimixture
@@ -73,10 +83,10 @@
   [spec rows column-key beta-params]
   (first
    ;; TODO: Setting n-particles to 1 causes IOB errors
-   (mmix/importance-resampling :model generate-1col-binary-extension
-                               :inputs [spec (count rows) column-key beta-params]
-                               :observation-trace (mmix/with-rows {} rows)
-                               :n-particles 10)))
+   (importance-resampling :model generate-1col-binary-extension
+                          :inputs [spec (count rows) column-key beta-params]
+                          :observation-trace (mmix/with-rows {} rows)
+                          :n-particles 10)))
 
 (defn score-rows
   [spec rows new-column-key]
