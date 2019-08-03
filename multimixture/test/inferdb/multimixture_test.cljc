@@ -31,7 +31,7 @@
   (plot! points samples))
 
 #_(let [row-generator (mmix/optimized-row-generator dsl-test/multi-mixture)
-        observations (mmix/with-row-values {} {"y" 8})
+        observations (mmix/with-row-values {} {"x" 8})
 
         samples (repeatedly 100 #(first (mp/infer-and-score :procedure row-generator
                                                             :observation-trace observations)))

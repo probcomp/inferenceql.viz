@@ -94,26 +94,15 @@
                        "a" 99
                        "y" 3})
 
+(declare optimized-row-generator)
+
+(defn- uniform-categorical-params
+  [n]
+  (repeat n (double (/ 1 n))))
+
 (def generate-1col-binary-extension
   (gen [mmix-spec row-count column-key {:keys [alpha beta]}]
-    ;; Returns:
-    ;; - view choice
-    ;; - parameters
-
-    ;; Things to trace:
-
-    ;; - view choice
-    ;; - parameters
-    ;; - value for the coin flips
-
-    ;; Steps:
-
-    ;; 1. Choose a random view to put the new column in.
-    (let [uniform-categorical-params #(repeat % (double (/ 1 %)))
-          view-idx (at :view dist/categorical (uniform-categorical-params (count mmix-spec)))
-          ;; 2. Fill out the parameters for this new view. (Generate a coin weight
-          ;;    for each of the new columns.)
-          ;; 3. Return random chosen view, return new parameters.
+    (let [view-idx (at :view dist/categorical (uniform-categorical-params (count mmix-spec)))
           new-spec (-> mmix-spec
                        (assoc-in [view-idx :vars column-key] :binary)
                        (update-in [view-idx :clusters]
@@ -124,7 +113,7 @@
                                                                         [(at `(:cluster-parameters ~i)
                                                                              dist/beta alpha beta)])))
                                                       clusters)))))
-          new-row-generator (row-generator new-spec)]
+          new-row-generator (optimized-row-generator new-spec)]
       (doseq [i (range row-count)]
         (at `(:rows ~i) new-row-generator))
       new-spec)))
@@ -136,11 +125,10 @@
                            :parameters {"x" [0 1]}}
                           {:probability 0.25
                            :parameters {"x" [5 1]}}]}]]
+    #_
+    (mp/infer-and-score :procedure (optimized-row-generator spec))
     (mp/infer-and-score :procedure generate-1col-binary-extension
-                        :inputs [spec
-                                 (count rows)
-                                 "y"]
-                        :observation-trace (with-rows {} rows)))
+                        :inputs [spec (count rows) "y" {:alpha 0.001 :beta 0.001}]))
 
 (defn with-rows
   "Given a trace for generate-1col, produces a trace with the values in rows
@@ -174,24 +162,13 @@
                           :observation-trace (with-rows {} rows)
                           :n-particles 100)))
 
-#_(let [rows [{"x" 0, "y" true}
-              {"x" 5, "y" false}]
-        spec [{:vars {"x" :gaussian}
-               :clusters [{:probability 0.75
-                           :parameters {"x" [0 1]}}
-                          {:probability 0.25
-                           :parameters {"x" [5 1]}}]}]]
-    (insert-column spec rows "y"))
-
 (defn score-rows
   [spec rows new-column-key]
   (let [new-column-view (spec/view-index-for-variable spec new-column-key)
-        row-generator (row-generator spec)]
+        row-generator (optimized-row-generator spec)]
     (mapv (fn [row]
-            (let [[_ trace _] (importance-resampling :model row-generator
-                                                     :inputs []
-                                                     :observation-trace (with-row-values {} row)
-                                                     :n-particles 100)
+            (let [[_ trace _] (mp/infer-and-score :procedure row-generator
+                                                  :observation-trace (with-row-values {} row))
                   cluster-idx (get-in trace [:cluster-assignments-for-view new-column-view :value])]
               (get-in spec [new-column-view :clusters cluster-idx :parameters new-column-key 0])))
           rows)))
@@ -210,15 +187,30 @@
 
 (defn search
   [spec new-column-key known-rows unknown-rows n-models beta-params]
-  (let [models (repeatedly n-models #(insert-column spec known-rows new-column-key beta-params))
-        scores (map (fn [model]
-                      (score-rows model unknown-rows new-column-key))
-                    models)]
+  (let [specs (repeatedly n-models #(insert-column spec known-rows new-column-key beta-params))
+        scores (map (fn [spec]
+                      (score-rows spec unknown-rows new-column-key))
+                    specs)]
     (mapv (fn [i]
             (/ (reduce + (map #(nth % i) scores))
                n-models))
           (range (count unknown-rows)))))
 
+#_(let [unknown-rows [{"x" 0}
+                      {"x" 1}
+                      {"x" 2}
+                      {"x" 3}
+                      {"x" 4}
+                      {"x" 5}]
+        known-rows [{"x" 0 "y" true}
+                    {"x" 0 "y" true}
+                    {"x" 5 "y" false}]
+        spec [{:vars {"x" :gaussian}
+               :clusters [{:probability 0.5
+                           :parameters {"x" [0 2]}}
+                          {:probability 0.5
+                           :parameters {"x" [5 2]}}]}]]
+    (time (search spec "y" known-rows unknown-rows 100 {:alpha 0.001 :beta 0.001})))
 
 (defn- valueify
   [m]
@@ -245,6 +237,15 @@
          (map (comp last #(mp/infer-and-score :procedure (mmix/row-generator spec)
                                               :observation-trace %)))))
 
+(defn score-probabilities
+  [logscores]
+  (let [scores (map mp/exp logscores)]
+    (if (every? #(== 0 %) scores)
+      (uniform-categorical-params (count scores))
+      (dist/normalize-numbers scores))))
+
+#_(score-probabilities (map #(Math/log %) [1 2 3 0]))
+
 (defn optimized-row-generator
   [spec]
   (let [row-generator (row-generator spec)]
@@ -254,101 +255,26 @@
        (let [all-latents    (all-latents spec)
              all-traces     (mapv #(merge partial-trace %)
                                   all-latents)
-             all-logscores  (mapv #(-> (mp/infer-and-score :procedure row-generator
-                                                           :observation-trace %)
-                                       (last)
-                                       (mp/exp))
+             all-logscores  (mapv #(last (mp/infer-and-score :procedure row-generator
+                                                             :observation-trace %))
                                   all-traces)
-             log-normalizer (dist/logsumexp all-logscores)
-             score          log-normalizer]
+             all-scores (map mp/exp all-logscores)
+             all-zeroes (every? #(== 0 %) all-scores)
+             log-normalizer (if all-zeroes ##-Inf (dist/logsumexp all-logscores))
+             score          log-normalizer
+             categorical-params (if all-zeroes
+                                  (uniform-categorical-params (count all-scores))
+                                  (dist/normalize-numbers all-scores))]
          (gen []
-           (let [i     (dist/categorical all-logscores)
+           (let [i     (dist/categorical categorical-params)
                  trace (nth all-traces i)
                  v     (first (mp/infer-and-score :procedure row-generator
                                                   :observation-trace trace))]
              [v trace score])))))))
 
+#_(dist/logsumexp [##-Inf])
+#_(dist/normalize-numbers [0 0 0])
+
 #_(optimized-row-generator dsl-test/multi-mixture)
 #_((optimized-row-generator dsl-test/multi-mixture))
 #_(repeatedly 100 #(mp/infer-and-score :procedure (optimized-row-generator dsl-test/multi-mixture)))
-
-#_(let [unknown-rows [{"x" 0}
-                      {"x" 1}
-                      {"x" 2}
-                      {"x" 3}
-                      {"x" 4}
-                      {"x" 5}]
-        known-rows [#_{"x" 0 "y" true}
-                    #_{"x" 5 "y" false}]
-        spec [{:vars {"x" :gaussian
-                      "y" :binary}
-               :clusters [{:probability 0.75
-                           :parameters {"x" [0 1]
-                                        "y" [0]}}
-                          {:probability 0.25
-                           :parameters {"x" [5 1]
-                                        "y" [1]}}]}]]
-    (search spec "y" known-rows unknown-rows 1000 {:alpha 0.001 :beta 0.001}))
-
-#_(require '[zane.vega.repl :as vega])
-
-#_[{:vars {"x" :gaussian
-           "y" :gaussian
-           "a" :categorical
-           "b" :categorical}
-    :clusters [{:probability 0.166666666
-                :parameters {"x" [3 1]
-                             "y" [4 0.1]
-                             "a" [[1 0 0 0 0 0]]
-                             "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}}
-               {:probability 0.166666666
-                :parameters {"x" [3 0.1]
-                             "y" [4 1]
-                             "a" [[0 1 0 0 0 0]]
-                             "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}}
-               {:probability 0.166666667
-                :parameters {"x" [8 0.5]
-                             "y" [10 1]
-                             "a" [[0 0 1 0 0 0]]
-                             "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}}
-               {:probability 0.166666666
-                :parameters {"x" [14 0.5]
-                             "y" [7 0.5]
-                             "a" [[0 0 0 1 0 0]]
-                             "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}}
-               {:probability 0.166666666
-                :parameters {"x" [16 0.5]
-                             "y" [9 0.5]
-                             "a" [[0 0 0 0 1 0]]
-                             "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}}
-               {:probability 0.166666666
-                :parameters {"x" [9  2.5]
-                             "y" [16 0.1]
-                             "a" [[0 0 0 0 0 1]]
-                             "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}}]}
-   {:vars {"z" :gaussian
-           "c" :categorical}
-    :clusters [{:probability 0.25
-                :parameters {"z" [0 1]
-                             "c" [[1 0 0 0]]}}
-               {:probability 0.25
-                :parameters {"z" [15 1]
-                             "c" [[0 1 0 0]]}}
-               {:probability 0.25
-                :parameters {"z" [30 1]
-                             "c" [[0 0 1 0]]}}
-               {:probability 0.25
-                :parameters {"z" [15 8]
-                             "c" [[0 0 0 1]]}}]}]
-
-;; Test fixing and graphing observable variables
-
-#_[{:vars {"x" :gaussian
-           "y" :gaussian
-           "a" :categorical}
-    :clusters [{:probability 0.75
-                :parameters {"x" [0 1]
-                             "y" [0]}}
-               {:probability 0.25
-                :parameters {"x" [5 1]
-                             "y" [1]}}]}]
