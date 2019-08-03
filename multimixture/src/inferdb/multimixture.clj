@@ -3,9 +3,10 @@
             [metaprob.generative-functions :as gfn :refer [apply-at at gen]]
             [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
-            [inferdb.multimixture.specification :as spec]))
-
-#_(require '[inferdb.multimixture.dsl-test :as dsl-test])
+            [metaprob.inference :as inference]
+            [inferdb.multimixture.dsl-test :as dsl-test]
+            [inferdb.multimixture.specification :as spec]
+            [zane.vega.repl :as vega]))
 
 #_(def mmix
     [{:vars {"x" :gaussian
@@ -253,37 +254,31 @@
        (let [all-latents    (all-latents spec)
              all-traces     (mapv #(merge partial-trace %)
                                   all-latents)
-             all-logscores  (mapv #(last (mp/infer-and-score :procedure row-generator
-                                                             :observation-trace %))
-                                  all-latents)
+             all-logscores  (mapv #(-> (mp/infer-and-score :procedure row-generator
+                                                           :observation-trace %)
+                                       (last)
+                                       (mp/exp))
+                                  all-traces)
              log-normalizer (dist/logsumexp all-logscores)
              score          log-normalizer]
-         #(let [i     (dist/categorical all-logscores)
-                trace (nth all-traces i)
-                v     (first (mp/infer-and-score :procedure row-generator
-                                                 :observation-trace trace))]
-            [v trace score]))))))
+         (gen []
+           (let [i     (dist/categorical all-logscores)
+                 trace (nth all-traces i)
+                 v     (first (mp/infer-and-score :procedure row-generator
+                                                  :observation-trace trace))]
+             [v trace score])))))))
 
 #_(optimized-row-generator dsl-test/multi-mixture)
 #_((optimized-row-generator dsl-test/multi-mixture))
-#_(mp/infer-and-score :procedure (optimized-row-generator dsl-test/multi-mixture))
-
-(defn data-likelihood
-  [data spec latent-trace]
-  (let [row-generator (row-generator spec)
-        data-trace (with-row-values {} data)
-        probability-of #(last (mp/infer-and-score :procedure row-generator
-                                                  :observation-trace %))]
-    (- (probability-of (merge data-trace latent-trace))
-       (probability-of latent-trace))))
+#_(repeatedly 100 #(mp/infer-and-score :procedure (optimized-row-generator dsl-test/multi-mixture)))
 
 #_(data-likelihood {"x" 3 "y" 4}
                    dsl-test/multi-mixture
-                   (mmix/with-cluster-assignment {} 0 0))
+                   (with-cluster-assignment {} 0 0))
 
 #_(data-likelihood {"x" 3 "y" 4}
                    dsl-test/multi-mixture
-                   (mmix/with-cluster-assignment {} 0 4))
+                   (with-cluster-assignment {} 0 1))
 
 (defn marginal-probability
   [data spec]

@@ -1,12 +1,12 @@
 (ns inferdb.multimixture-test
   (:require [clojure.test :refer [deftest is testing]]
-            [inferdb.multimixture :as mmix]
-            #_[metaprob.inference :as inf]
             [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
+            [inferdb.multimixture :as mmix]
+            [inferdb.multimixture.dsl-test :as dsl-test]
             [zane.vega.repl :as vega]))
 
-#_(require '[inferdb.multimixture.dsl-test :as dsl-test])
+#_(require )
 
 #_
 (let [row-generator (mmix/row-generator dsl-test/multi-mixture)
@@ -29,6 +29,17 @@
                             (assoc point "name" (str "P" i)))
                           dsl-test/test-points)]
   (plot! points samples))
+
+#_(let [row-generator (mmix/optimized-row-generator dsl-test/multi-mixture)
+        observations (mmix/with-row-values {} {"y" 8})
+
+        samples (repeatedly 100 #(first (mp/infer-and-score :procedure row-generator
+                                                            :observation-trace observations)))
+
+        points (map-indexed (fn [i point]
+                              (assoc point "name" (str "P" i)))
+                            dsl-test/test-points)]
+    (plot! points samples))
 
 (defn plot!
   [points samples]
