@@ -272,20 +272,6 @@
 #_((optimized-row-generator dsl-test/multi-mixture))
 #_(repeatedly 100 #(mp/infer-and-score :procedure (optimized-row-generator dsl-test/multi-mixture)))
 
-#_(data-likelihood {"x" 3 "y" 4}
-                   dsl-test/multi-mixture
-                   (with-cluster-assignment {} 0 0))
-
-#_(data-likelihood {"x" 3 "y" 4}
-                   dsl-test/multi-mixture
-                   (with-cluster-assignment {} 0 1))
-
-(defn marginal-probability
-  [data spec]
-  (->> (all-latents spec)
-       (map #(data-likelihood data spec %))
-       (dist/logsumexp)))
-
 #_(let [unknown-rows [{"x" 0}
                       {"x" 1}
                       {"x" 2}
