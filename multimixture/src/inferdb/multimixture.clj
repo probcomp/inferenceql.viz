@@ -1,8 +1,7 @@
 (ns inferdb.multimixture
   (:require [clojure.math.combinatorics :as combo]
             [metaprob.generative-functions :as gfn :refer [apply-at at gen]]
-            [metaprob.distributions :as dist]
-            [metaprob.prelude :as mp]))
+            [metaprob.distributions :as dist]))
 
 #_(def mmix
     [{:vars {"x" :gaussian
