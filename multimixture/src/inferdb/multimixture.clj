@@ -146,12 +146,3 @@
     (->> (all-latents spec)
          (map (comp last #(mp/infer-and-score :procedure (mmix/row-generator spec)
                                               :observation-trace %)))))
-
-(defn score-probabilities
-  [logscores]
-  (let [scores (map mp/exp logscores)]
-    (if (every? #(== 0 %) scores)
-      (uniform-categorical-params (count scores))
-      (dist/normalize-numbers scores))))
-
-#_(score-probabilities (map #(Math/log %) [1 2 3 0]))
