@@ -1,6 +1,6 @@
 (ns inferdb.multimixture
   (:require [clojure.math.combinatorics :as combo]
-            [metaprob.generative-functions :as gfn :refer [apply-at at gen]]
+            [metaprob.generative-functions :refer [apply-at at gen]]
             [metaprob.distributions :as dist]))
 
 #_(def mmix
