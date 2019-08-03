@@ -232,7 +232,7 @@
   [spec]
   (->> spec
        (map (comp range count :clusters))
-       (reduce combo/cartesian-product)
+       (apply combo/cartesian-product)
        (map (fn [cluster-assignments]
               {:cluster-assignments-for-view
                (->> cluster-assignments
