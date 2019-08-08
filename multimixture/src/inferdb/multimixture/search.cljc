@@ -48,6 +48,14 @@
                :colunn-key ::spec/column
                :beta-parameters ::spec/beta-parameters))
 
+;; TODO: Implement for real
+#?(:cljs (def stubbed-beta
+           (mp/make-primitive
+            (fn [_ _]
+              1)
+            (fn [_ [_ _]]
+              (mp/log 1)))))
+
 (def generate-1col-binary-extension
   (gen [spec row-count column-key {:keys [alpha beta]}]
     (let [view-idx (at :view dist/categorical (mmix/uniform-categorical-params (count (:views spec))))
@@ -59,7 +67,10 @@
                                                         (update cluster :parameters
                                                                 #(assoc % column-key
                                                                         (at `(:cluster-parameters ~i)
-                                                                            dist/beta alpha beta))))
+                                                                            #?(:clj dist/beta
+                                                                               :cljs stubbed-beta)
+                                                                            alpha
+                                                                            beta))))
                                                       clusters)))))
           new-row-generator (optimized-row-generator new-spec)]
       (doseq [i (range row-count)]

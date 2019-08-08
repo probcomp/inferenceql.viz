@@ -1,7 +1,9 @@
 (ns inferdb.multimixture
+  #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen]]))
   (:require [clojure.math.combinatorics :as combo]
             [clojure.spec.alpha :as s]
-            [metaprob.generative-functions :refer [apply-at at gen]]
+            #?(:clj [metaprob.generative-functions :refer [apply-at at gen]]
+               :cljs [metaprob.generative-functions :refer [apply-at at]])
             [metaprob.distributions :as dist]
             [inferdb.multimixture.specification :as spec]))
 
@@ -28,7 +30,6 @@
 (defn view-variables
   "Returns the variables assigned to given view."
   [view]
-  ()
   (set (keys (get-in view [0 :parameters]))))
 
 (defn row-generator

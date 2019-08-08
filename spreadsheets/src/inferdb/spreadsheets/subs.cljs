@@ -1,11 +1,13 @@
 (ns inferdb.spreadsheets.subs
   (:require [clojure.walk :as walk]
             [re-frame.core :as rf]
+            [metaprob.distributions :as dist]
+            [metaprob.prelude :as mp]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]
-            [inferdb.cgpm.main :as cgpm]
-            [inferdb.spreadsheets.model :as model]
-            [metaprob.distributions :as dist]))
+            [inferdb.multimixture :as mmix]
+            [inferdb.multimixture.search :as search]
+            [inferdb.spreadsheets.model :as model]))
 
 (rf/reg-sub :scores
             (fn [db _]
@@ -257,16 +259,8 @@
             (fn [{:keys [row columns one-cell-selected]}]
               (when one-cell-selected
                 (let [sampled-column (first columns) ; columns that will be sampled
-                      constraints (reduce-kv (fn [acc k v]
-                                               (cond-> acc
-                                                 v (assoc k v)))
-                                             {}
-                                             (-> row
-                                                 (select-keys (keys model/stattypes))
-                                                 (dissoc sampled-column)
-                                                 (walk/keywordize-keys)))]
-                  #(cgpm/cgpm-simulate model/model-cgpm
-                                       [(keyword sampled-column)]
-                                       constraints
-                                       {}
-                                       1)))))
+                      constraints (mmix/with-row-values {} (-> row
+                                                               (select-keys (keys (:vars model/spec)))
+                                                               (dissoc sampled-column)))]
+                  #(mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                       :observation-trace constraints)))))
