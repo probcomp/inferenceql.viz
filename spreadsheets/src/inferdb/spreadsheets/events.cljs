@@ -60,7 +60,6 @@
    (let [row (merge (edn/read-string text)
                     {search-column true})
          result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
-     ;; TODO: Re-implement search to use `inferdb.multimixture.search`
      (rf/dispatch [:search-result result]))
    db))
 

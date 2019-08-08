@@ -100,8 +100,6 @@
                        "a" 99
                        "y" 3})
 
-(declare optimized-row-generator)
-
 (defn uniform-categorical-params
   [n]
   (repeat n (double (/ 1 n))))

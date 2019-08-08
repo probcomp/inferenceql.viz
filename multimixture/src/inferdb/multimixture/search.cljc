@@ -12,22 +12,20 @@
 
 #_(clojure.spec.test.alpha/instrument)
 
+#?(:cljs (enable-console-print!))
+
 (defn optimized-row-generator
   [spec]
   (let [row-generator (mmix/row-generator spec)]
     (g/make-generative-function
      row-generator
      (gen [partial-trace]
-       #?(:cljs (js/console.log "spec" spec))
-       #?(:cljs (js/console.log "partial-trace" partial-trace))
        (let [all-latents    (mmix/all-latents spec)
              all-traces     (mapv #(merge partial-trace %)
                                   all-latents)
              all-logscores  (mapv #(last (mp/infer-and-score :procedure row-generator
                                                              :observation-trace %))
                                   all-traces)
-             _ #?(:clj (prn "all logscores" all-logscores )
-                  :cljs (js/console.log "all logscores" all-logscores))
              all-scores (map mp/exp all-logscores)
              all-zeroes (every? #(== 0 %) all-scores)
              log-normalizer (if all-zeroes ##-Inf (dist/logsumexp all-logscores))
@@ -36,7 +34,6 @@
                                   (mmix/uniform-categorical-params (count all-scores))
                                   (dist/normalize-numbers all-scores))]
          (gen []
-           #?(:cljs (js/console.log categorical-params))
            (let [i     (dist/categorical categorical-params)
                  trace (nth all-traces i)
                  v     (first (mp/infer-and-score :procedure row-generator
@@ -95,9 +92,11 @@
 (def cljs-beta
   (mp/make-primitive
    (fn [alpha beta]
-     (kixi/sample 1 (kixi/beta {:alpha alpha :beta beta})))
+     (= 1 (first (kixi/sample 1 (kixi/beta {:alpha alpha :beta beta})))))
    (fn [v [alpha beta]]
-     (beta-pdf v [alpha beta]))))
+     (beta-pdf (if v 1 0) [alpha beta]))))
+
+#_(mp/infer-and-score :procedure cljs-beta :inputs [0.001 0.001])
 
 (def generate-1col-binary-extension
   (gen [spec row-count column-key {:keys [alpha beta]}]
@@ -201,7 +200,8 @@
           (range (count unknown-rows)))))
 
 #_
-(let [unknown-rows [{"x" 0}]
+(let [unknown-rows [{"x" 0}
+                    {"x" 5}]
       known-rows [{"x" 0 "y" true}
                   {"x" 5 "y" false}]
       spec {:vars {"x" :gaussian
@@ -216,7 +216,9 @@
                       :parameters {"z" {:mu 5 :sigma 2}}}]]}]
   (search spec "y" known-rows unknown-rows 10 {:alpha 0.001 :beta 0.001}))
 
-(comment
-  (require '[clojure.spec.test.alpha :refer [instrument]])
-  (instrument)
-  )
+#_(require 'inferdb.spreadsheets.model)
+#_(require 'cljs.pprint)
+#_(cljs.pprint/pprint (insert-column inferdb.spreadsheets.model/spec [] "z" {:alpha 0.001 :beta 0.001}))
+
+
+#_(cljs.pprint/pprint [{:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 1}, 2 {:value 1}}}])
