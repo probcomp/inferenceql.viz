@@ -1,6 +1,7 @@
 (ns inferdb.spreadsheets.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
+            [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
             [yarn.vega-embed]))
@@ -22,7 +23,7 @@
    :hooks events/hooks})
 
 (def ^:private default-search-string
-  (pr-str {"percent_white" 0.40}))
+  (pr-str (select-keys (rand-nth data/nyt-data) [(rand-nth (keys (first data/nyt-data)))])))
 
 (defn search-form
   [name]

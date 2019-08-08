@@ -1,6 +1,9 @@
 (ns inferdb.spreadsheets.events
   (:require [clojure.edn :as edn]
             [re-frame.core :as rf]
+            [inferdb.spreadsheets.data :as data]
+            [inferdb.multimixture.search :as search]
+            [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
@@ -12,13 +15,13 @@
 (rf/reg-event-db
  :initialize-db
  event-interceptors
- (fn [db _]
+ (fn [_ _]
    (db/default-db)))
 
 (rf/reg-event-db
  :after-selection-end
  event-interceptors
- (fn [db [_ hot row-index col row2 col2 prevent-scrolling selection-layer-level]]
+ (fn [db [_ hot row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
    (let [selected-headers (map #(.getColHeader hot %)
                                (range (min col col2) (inc (max col col2))))
          row (js->clj (zipmap (.getColHeader hot)
@@ -46,21 +49,23 @@
  (fn [db _]
    (db/clear-selections db)))
 
+(def ^:private search-column "new property")
+(def ^:private n-models 1)
+(def ^:private beta-params {:alpha 0.001, :beta 0.001})
+
 (rf/reg-event-db
  :search
  event-interceptors
  (fn [db [_ text]]
-   (let [row (edn/read-string text)
-         #_result #_(search/search-by-example row)]
+   (let [row (merge (edn/read-string text)
+                    {search-column true})
+         result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
      ;; TODO: Re-implement search to use `inferdb.multimixture.search`
-     (js/console.error "Search not implemented!")
-     #_(rf/dispatch [:search-result result]))
+     (rf/dispatch [:search-result result]))
    db))
 
 (rf/reg-event-db
  :search-result
  event-interceptors
  (fn [db [_ result]]
-   (db/with-scores db (->> result
-                           (sort-by first)
-                           (mapv second)))))
+   (db/with-scores db result))) ; TODO: This is not resilient to sorting the table

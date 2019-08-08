@@ -262,5 +262,5 @@
                       constraints (mmix/with-row-values {} (-> row
                                                                (select-keys (keys (:vars model/spec)))
                                                                (dissoc sampled-column)))]
-                  #(mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                       :observation-trace constraints)))))
+                  #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                              :observation-trace constraints))))))

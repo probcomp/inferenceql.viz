@@ -1,5 +1,6 @@
 (ns inferdb.multimixture.search
   (:require [clojure.spec.alpha :as s]
+            [kixi.stats.distribution :as kixi]
             [metaprob.distributions :as dist]
             [metaprob.generative-functions :as g :refer [at gen]]
             [metaprob.prelude :as mp]
@@ -17,12 +18,16 @@
     (g/make-generative-function
      row-generator
      (gen [partial-trace]
+       #?(:cljs (js/console.log "spec" spec))
+       #?(:cljs (js/console.log "partial-trace" partial-trace))
        (let [all-latents    (mmix/all-latents spec)
              all-traces     (mapv #(merge partial-trace %)
                                   all-latents)
              all-logscores  (mapv #(last (mp/infer-and-score :procedure row-generator
                                                              :observation-trace %))
                                   all-traces)
+             _ #?(:clj (prn "all logscores" all-logscores )
+                  :cljs (js/console.log "all logscores" all-logscores))
              all-scores (map mp/exp all-logscores)
              all-zeroes (every? #(== 0 %) all-scores)
              log-normalizer (if all-zeroes ##-Inf (dist/logsumexp all-logscores))
@@ -31,6 +36,7 @@
                                   (mmix/uniform-categorical-params (count all-scores))
                                   (dist/normalize-numbers all-scores))]
          (gen []
+           #?(:cljs (js/console.log categorical-params))
            (let [i     (dist/categorical categorical-params)
                  trace (nth all-traces i)
                  v     (first (mp/infer-and-score :procedure row-generator
@@ -40,7 +46,8 @@
 #_(require '[inferdb.multimixture.specification-test :as spec-test])
 #_(optimized-row-generator spec-test/mmix)
 #_((optimized-row-generator spec-test/mmix))
-#_(repeatedly 100 #(mp/infer-and-score :procedure (optimized-row-generator dsl-test/multi-mixture)))
+#_(second (mp/infer-and-score :procedure (optimized-row-generator spec-test/mmix)))
+#_(repeatedly 1 #(mp/infer-and-score :procedure (optimized-row-generator spec-test/mmix)))
 
 (s/fdef generate-1col-binary-extension
   :args (s/cat :spec ::spec/multi-mixture
@@ -56,6 +63,42 @@
             (fn [_ [_ _]]
               (mp/log 1)))))
 
+;; https://rosettacode.org/wiki/Gamma_function#Clojure
+(defn gamma
+  "Returns Gamma(z + 1 = number) using Lanczos approximation."
+  [number]
+  (if (< number 0.5)
+    (/ Math/PI (* (Math/sin (* Math/PI number))
+                  (gamma (- 1 number))))
+    (let [n (dec number)
+          c [0.99999999999980993 676.5203681218851 -1259.1392167224028
+             771.32342877765313 -176.61502916214059 12.507343278686905
+             -0.13857109526572012 9.9843695780195716e-6 1.5056327351493116e-7]]
+      (* (Math/sqrt (* 2 Math/PI))
+         (Math/pow (+ n 7 0.5) (+ n 0.5))
+         (Math/exp (- (+ n 7 0.5)))
+         (+ (first c)
+            (apply + (map-indexed #(/ %2 (+ n %1 1)) (next c))))))))
+
+(defn beta-pdf
+  [v [alpha beta]]
+  (let [b (fn [alpha beta]
+            (/ (* (gamma alpha)
+                  (gamma beta))
+               (gamma (+ alpha beta))))]
+    (/ (* (mp/expt v
+                   (- alpha 1))
+          (mp/expt (- 1 v)
+                   (- beta 1)))
+       (b alpha beta))))
+
+(def cljs-beta
+  (mp/make-primitive
+   (fn [alpha beta]
+     (kixi/sample 1 (kixi/beta {:alpha alpha :beta beta})))
+   (fn [v [alpha beta]]
+     (beta-pdf v [alpha beta]))))
+
 (def generate-1col-binary-extension
   (gen [spec row-count column-key {:keys [alpha beta]}]
     (let [view-idx (at :view dist/categorical (mmix/uniform-categorical-params (count (:views spec))))
@@ -68,7 +111,7 @@
                                                                 #(assoc % column-key
                                                                         (at `(:cluster-parameters ~i)
                                                                             #?(:clj dist/beta
-                                                                               :cljs stubbed-beta)
+                                                                               :cljs cljs-beta)
                                                                             alpha
                                                                             beta))))
                                                       clusters)))))
@@ -97,10 +140,9 @@
   [& {:keys [model inputs observation-trace n-particles]
       :or {inputs [], observation-trace {}, n-particles 1}}]
   (let [particles (mp/replicate n-particles
-                                (fn []
-                                  (mp/infer-and-score :procedure model
-                                                      :inputs inputs
-                                                      :observation-trace observation-trace)))]
+                                #(mp/infer-and-score :procedure model
+                                                     :inputs inputs
+                                                     :observation-trace observation-trace))]
     (nth particles (dist/log-categorical (map (fn [[_ _ s]] s) particles)))))
 
 (s/fdef insert-column
@@ -120,6 +162,8 @@
                           :inputs [spec (count rows) column-key beta-params]
                           :observation-trace (mmix/with-rows {} rows)
                           :n-particles 100)))
+
+#_(insert-column spec-test/mmix [{"z" true}] "z" {:alpha 0.001 :beta 0.001})
 
 (defn score-rows
   [spec rows new-column-key]
