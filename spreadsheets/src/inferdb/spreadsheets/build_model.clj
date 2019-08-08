@@ -28,9 +28,7 @@
     (reduce-kv (fn [a k v]
                  (assoc a k (stat-type-map v)))
                {}
-               (select-keys
-                (get model "columns")
-                (vars-in-first-cluster model)))))
+               (get model "columns"))))
 
 (defn table-vars [model]
   (let [categories (get model "categories")]
@@ -46,10 +44,10 @@
                                   (get categories)
                                   vals
                                   set)))))
-     {}
-     (select-keys
-      (get model "columns")
-      (vars-in-first-cluster model)))))
+               {}
+               (select-keys
+                (get model "columns")
+                (vars-in-first-cluster model)))))
 
 (defn latent-vars [model]
   (reduce-kv (fn [a k v]
@@ -71,7 +69,7 @@
    `(def ~'stattypes ~(stat-types model))
 
    '(def generate-census-row (multi-mixture (view stattypes
-                                           (apply clusters cluster-data))))
+                                                  (apply clusters cluster-data))))
 
    '(defn make-identity-output-addr-map
       [output-addrs-types]

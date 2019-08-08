@@ -4,7 +4,7 @@
             [metaprob.prelude :as mp]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.dsl-test :as dsl-test]
-            [zane.vega.repl :as vega]))
+            #_[zane.vega.repl :as vega]))
 
 #_(require )
 
@@ -41,6 +41,7 @@
                             dsl-test/test-points)]
     (plot! points samples))
 
+#_
 (defn plot!
   [points samples]
   (vega/vega-lite
