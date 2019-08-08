@@ -2,8 +2,13 @@
 
   (:require [clojure.spec.alpha :as s]
             [metaprob.distributions :as dist]
-            [inferdb.multimixture.dsl :as dsl]
-            [inferdb.utils :as utils]))
+            [inferdb.multimixture.dsl :as dsl]))
+
+(s/def ::alpha pos?)
+
+(s/def ::beta pos?)
+
+(s/def ::beta-parameters (s/keys :req-un [::alpha ::beta]))
 
 (s/def ::mu number?)
 
@@ -23,18 +28,27 @@
   (s/and (s/+ ::probability)
          normalized?))
 
+(s/def ::binary-paramters
+  (s/and number?
+         #(<= 0 % 1)))
+
 (s/def ::categorical-parameters
   (s/map-of string? float?))
 
-(s/def ::parameter-map
-  (s/or ::gaussian-parameters    ::gaussian-parameters
-        ::categorical-parameters ::categorical-parameters))
+(s/def ::distribution-paremeters
+  (s/or ::binary-parameters      ::binary-paramters
+        ::categorical-parameters ::categorical-parameters
+        ::gaussian-parameters    ::gaussian-parameters))
 
 (s/def ::column string?)
 
-(s/def ::parameters (s/map-of ::column ::parameter-map))
+(s/def ::row (s/map-of ::column any?))
 
-(def distribution? #{:gaussian :categorical})
+(s/def ::rows (s/coll-of ::row))
+
+(s/def ::parameters (s/map-of ::column ::distribution-paremeters))
+
+(def distribution? #{:binary :gaussian :categorical})
 
 (s/def ::distribution distribution?)
 

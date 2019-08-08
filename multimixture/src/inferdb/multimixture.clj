@@ -1,7 +1,9 @@
 (ns inferdb.multimixture
   (:require [clojure.math.combinatorics :as combo]
+            [clojure.spec.alpha :as s]
             [metaprob.generative-functions :refer [apply-at at gen]]
-            [metaprob.distributions :as dist]))
+            [metaprob.distributions :as dist]
+            [inferdb.multimixture.specification :as spec]))
 
 #_(def mmix
     [{:vars {"x" :gaussian
@@ -26,13 +28,13 @@
 (defn view-variables
   "Returns the variables assigned to given view."
   [view]
-  (into #{}
-        (keys (:vars view))))
+  ()
+  (set (keys (get-in view [0 :parameters]))))
 
 (defn row-generator
   "Returns a generative function that samples a row from the provided view
   specification."
-  [spec]
+  [{:keys [vars views] :as spec}]
   (let [view-var-index (zipmap (range) (map view-variables spec))
         var-view-index (reduce-kv (fn [m view variables]
                                     (merge m (zipmap variables (repeat view))))
@@ -42,19 +44,22 @@
                   :view-var-index view-var-index
                   :var-view-index var-view-index}
         f (gen []
-            (into {} (doall (map-indexed (fn [i view]
-                                           (let [{:keys [vars clusters]} view
-                                                 cluster-idx (at `(:cluster-assignments-for-view ~i) dist/categorical (map :probability clusters))
+            (into {} (doall (map-indexed (fn [i clusters]
+                                           (let [cluster-idx (at `(:cluster-assignments-for-view ~i) dist/categorical (map :probability clusters))
                                                  cluster (nth clusters cluster-idx)]
                                              (reduce-kv (fn [m variable params]
                                                           (let [primitive (case (get vars variable)
                                                                             :binary dist/flip
                                                                             :gaussian dist/gaussian
-                                                                            :categorical dist/categorical)]
+                                                                            :categorical dist/categorical)
+                                                                params (case (get vars variable)
+                                                                         :binary [params]
+                                                                         :gaussian [(:mu params) (:sigma params)]
+                                                                         :categorical [params])]
                                                             (assoc m variable (apply-at `(:columns ~variable) primitive params))))
                                                         {}
                                                         (:parameters cluster))))
-                                         spec))))]
+                                         views))))]
     (with-meta f (merge (meta f) metadata))))
 
 #_(row-generator mmix)
@@ -118,11 +123,14 @@
              {}
              m))
 
+(s/fdef all-latents
+  :args (s/cat :spec ::spec/multi-mixture))
+
 (defn all-latents
   "Returns a lazy sequence of all the possible traces of latents."
   [spec]
-  (->> spec
-       (map (comp range count :clusters))
+  (->> (:views spec)
+       (map (comp range count))
        (apply combo/cartesian-product)
        (map (fn [assignments]
               {:cluster-assignments-for-view
@@ -131,7 +139,11 @@
                                    {view-i {:value cluster-i}}))
                     (into {}))}))))
 
-#_(let [spec dsl-test/multi-mixture]
+#_(require '[metaprob.prelude :as mp])
+#_(require '[inferdb.multimixture.specification-test :as spec-test])
+
+#_(let [spec spec-test/mmix]
     (->> (all-latents spec)
-         (map (comp last #(mp/infer-and-score :procedure (mmix/row-generator spec)
+         #_
+         (map (comp last #(mp/infer-and-score :procedure (row-generator spec)
                                               :observation-trace %)))))

@@ -2,8 +2,7 @@
   (:require [clojure.edn :as edn]
             [re-frame.core :as rf]
             [inferdb.spreadsheets.db :as db]
-            [inferdb.spreadsheets.events.interceptors :as interceptors]
-            [inferdb.spreadsheets.search :as search]))
+            [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
 (def hooks [:after-deselect :after-selection-end])
 
@@ -52,8 +51,10 @@
  event-interceptors
  (fn [db [_ text]]
    (let [row (edn/read-string text)
-         result (search/search-by-example row)]
-     (rf/dispatch [:search-result result]))
+         #_result #_(search/search-by-example row)]
+     ;; TODO: Re-implement search to use `inferdb.multimixture.search`
+     (js/console.error "Search not implemented!")
+     #_(rf/dispatch [:search-result result]))
    db))
 
 (rf/reg-event-db

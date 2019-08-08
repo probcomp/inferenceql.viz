@@ -8,7 +8,5 @@
     (println "Usage: build-model output-filename json-model-filename")
     (System/exit 0)))
 
-(def model
-  (json/read-str (slurp (second *command-line-args*))))
-
-(build/write-model model (first *command-line-args*))
+(let [model (json/read-str (slurp (second *command-line-args*)))]
+  (build/write-model model (first *command-line-args*)))

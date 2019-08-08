@@ -1,983 +1,534 @@
 {
     "columns": {
-        "percent_white": "gaussian",
-        "percent_lths": "gaussian",
-        "percent_children": "gaussian",
-        "percent_married": "gaussian",
-        "percent_poor": "gaussian",
-        "percent_manufacturing": "gaussian",
-        "percent_single_parent": "gaussian",
-        "nyt_political_prediction": "categorical",
-        "nyt_classification_1": "categorical",
-        "nyt_classification_2": "categorical",
-        "percent_owned": "gaussian"
+        "visual_studio": "categorical",
+        "sqlite": "categorical",
+        "git": "categorical",
+        "back-end_developer": "categorical",
+        "mobile_developer": "categorical",
+        "c#": "categorical",
+        "linux": "categorical",
+        "age": "categorical",
+        "bash_shell": "categorical",
+        "ios": "categorical",
+        "c": "categorical",
+        "c++": "categorical",
+        "vim": "categorical",
+        "subversion": "categorical",
+        "firebase": "categorical",
+        "yearscoding": "categorical",
+        "java": "categorical",
+        "android": "categorical",
+        "notepad++": "categorical",
+        "windows_desktop_or_server": "categorical"
     },
     "categories": {
-        "nyt_classification_1": {
-            "0.0": "western_ag",
-            "1.0": "diverse",
-            "2.0": "bipolar",
-            "3.0": "center_right",
-            "4.0": "rural"
+        "visual_studio": {
+            "0.0": "False",
+            "1.0": "True"
         },
-        "nyt_classification_2": {
-            "0.0": "Emerging resistance",
-            "1.0": "Loyal GOP suburbs",
-            "2.0": "Diverse, educated suburbs",
-            "3.0": "Romney Republicans",
-            "4.0": "White moderates",
-            "5.0": "Rural populists"
+        "yearscoding": {
+            "0.0": "6-8 years",
+            "1.0": "12-14 years",
+            "2.0": "9-11 years",
+            "3.0": "3-5 years",
+            "4.0": "18-20 years",
+            "5.0": "15-17 years",
+            "6.0": "24-26 years",
+            "7.0": "0-2 years",
+            "8.0": "21-23 years",
+            "9.0": "30 or more years",
+            "10.0": "27-29 years"
         },
-        "nyt_political_prediction": {
-            "0.0": "1) Solid R",
-            "1.0": "7) Solid D",
-            "2.0": "6) Likely D",
-            "3.0": "5) Lean D",
-            "4.0": "2) Likely R",
-           "5.0": "4) Toss Up",
-            "6.0": "3) Lean R"
+        "sqlite": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "git": {
+            "0.0": "True",
+            "1.0": "False"
+        },
+        "back-end_developer": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "mobile_developer": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "c#": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "age": {
+            "0.0": "25 - 34 years old",
+            "1.0": "35 - 44 years old",
+            "2.0": "18 - 24 years old",
+            "3.0": "45 - 54 years old",
+            "4.0": "55 - 64 years old",
+            "5.0": "Under 18 years old"
+        },
+        "bash_shell": {
+            "0.0": "True",
+            "1.0": "False"
+        },
+        "ios": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "c": {
+            "0.0": "True",
+            "1.0": "False"
+        },
+        "c++": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "vim": {
+            "0.0": "True",
+            "1.0": "False"
+        },
+        "subversion": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "firebase": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "linux": {
+            "0.0": "True",
+            "1.0": "False"
+        },
+        "java": {
+            "0.0": "True",
+            "1.0": "False"
+        },
+        "android": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "notepad++": {
+            "0.0": "False",
+            "1.0": "True"
+        },
+        "windows_desktop_or_server": {
+            "0.0": "False",
+            "1.0": "True"
         }
     },
     "views": [
         [
             {
-                "p": 0.29655172413793096,
-                "percent_white": [
-                    0.8366130786500527,
-                    0.07068988790759735
-                ],
-                "percent_children": [
-                    0.21827696347658487,
-                    0.0198316836638368
-                ],
-                "percent_married": [
-                    0.5122359841852,
-                    0.021414205402424967
-                ],
-                "percent_poor": [
-                    0.12632146950738188,
-                    0.02692248428073017
-                ],
-                "percent_manufacturing": [
-                    0.1335790490288156,
-                    0.05204879401211422
-                ],
-                "percent_single_parent": [
-                    0.09182979124504345,
-                    0.011635331169949954
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.02608695652173913,
-                    "4) Toss Up": 0.06956521739130435,
-                    "1) Solid R": 0.6521739130434783,
-                    "2) Likely R": 0.09565217391304348,
-                    "3) Lean R": 0.06086956521739131,
-                    "7) Solid D": 0.0782608695652174,
-                    "6) Likely D": 0.017391304347826087
+                "p": 0.13469387755102041,
+                "visual_studio": {
+                    "True": 0.19117647058823528,
+                    "False": 0.80882352941176472
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.3,
-                    "bipolar": 0.25,
-                    "western_ag": 0.05,
-                    "diverse": 0.05,
-                    "rural": 0.35
+                "git": {
+                    "False": 0.014705882352941176,
+                    "True": 0.98529411764705888
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.32,
-                    "Romney Republicans": 0.04,
-                    "White moderates": 0.32,
-                    "Diverse, educated suburbs": 0.04,
-                    "Loyal GOP suburbs": 0.24,
-                    "Emerging resistance": 0.04
+                "back-end_developer": {
+                    "True": 0.67358757117197898,
+                    "False": 0.32641242882802096
                 },
-                "percent_owned": [
-                    0.7113674988579285,
-                    0.03639860638763965
-                ]
+                "c#": {
+                    "True": 0.044117647058823532,
+                    "False": 0.95588235294117652
+                },
+                "linux": {
+                    "False": 0.029411764705882353,
+                    "True": 0.97058823529411764
+                },
+                "c": {
+                    "False": 0.088235294117647065,
+                    "True": 0.91176470588235292
+                },
+                "c++": {
+                    "True": 0.5,
+                    "False": 0.5
+                },
+                "vim": {
+                    "False": 0.22058823529411764,
+                    "True": 0.77941176470588236
+                },
+                "bash_shell": {
+                    "False": 0.10294117647058823,
+                    "True": 0.8970588235294118
+                },
+                "java": {
+                    "False": 0.12031590712345228,
+                    "True": 0.8796840928765477
+                },
+                "notepad++": {
+                    "True": 0.16700542484018185,
+                    "False": 0.83299457515981823
+                },
+                "windows_desktop_or_server": {
+                    "True": 0.22058823529411764,
+                    "False": 0.77941176470588236
+                }
             },
             {
-                "p": 0.04367816091954022,
-                "percent_white": [
-                    0.37841035938701906,
-                    0.11247251975852157
-                ],
-                "percent_children": [
-                    0.23436996419420014,
-                    0.014433252618984913
-                ],
-                "percent_married": [
-                    0.35524480811153053,
-                    0.02892215456930462
-                ],
-                "percent_poor": [
-                    0.2398173601784906,
-                    0.028355467211379593
-                ],
-                "percent_manufacturing": [
-                    0.10826795128155423,
-                    0.03207865161126128
-                ],
-                "percent_single_parent": [
-                    0.16171741037076276,
-                    0.012880144267184677
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.041666666666666664,
-                    "4) Toss Up": 0.041666666666666664,
-                    "1) Solid R": 0.08333333333333333,
-                    "2) Likely R": 0.041666666666666664,
-                    "3) Lean R": 0.041666666666666664,
-                    "7) Solid D": 0.7083333333333334,
-                    "6) Likely D": 0.041666666666666664
+                "p": 0.24285714285714288,
+                "visual_studio": {
+                    "True": 0.016528925619834711,
+                    "False": 0.98347107438016534
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.2,
-                    "bipolar": 0.2,
-                    "western_ag": 0.2,
-                    "diverse": 0.2,
-                    "rural": 0.2
+                "git": {
+                    "False": 0.95867768595041325,
+                    "True": 0.041322314049586778
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.16666666666666666,
-                    "Romney Republicans": 0.16666666666666666,
-                    "White moderates": 0.16666666666666666,
-                    "Diverse, educated suburbs": 0.16666666666666666,
-                    "Loyal GOP suburbs": 0.16666666666666666,
-                    "Emerging resistance": 0.16666666666666666
+                "back-end_developer": {
+                    "True": 0.37945375136166093,
+                    "False": 0.62054624863833918
                 },
-                "percent_owned": [
-                    0.5274021988266426,
-                    0.05373744471026623
-                ]
+                "c#": {
+                    "True": 0.0082644628099173556,
+                    "False": 0.99173553719008267
+                },
+                "linux": {
+                    "False": 0.99173553719008267,
+                    "True": 0.0082644628099173556
+                },
+                "c": {
+                    "False": 0.97520661157024791,
+                    "True": 0.024793388429752067
+                },
+                "c++": {
+                    "True": 0.0082644628099173556,
+                    "False": 0.99173553719008267
+                },
+                "vim": {
+                    "False": 0.99173553719008267,
+                    "True": 0.0082644628099173556
+                },
+                "bash_shell": {
+                    "False": 0.99173553719008267,
+                    "True": 0.0082644628099173556
+                },
+                "java": {
+                    "False": 0.96510486637122261,
+                    "True": 0.034895133628777358
+                },
+                "notepad++": {
+                    "True": 0.028959543811487937,
+                    "False": 0.97104045618851209
+                },
+                "windows_desktop_or_server": {
+                    "True": 0.016528925619834711,
+                    "False": 0.98347107438016534
+                }
             },
             {
-                "p": 0.07586206896551723,
-                "percent_white": [
-                    0.37345272679137015,
-                    0.0892579477160812
-                ],
-                "percent_children": [
-                    0.24215982606983133,
-                    0.020540621582275112
-                ],
-                "percent_married": [
-                    0.44395175939087694,
-                    0.03528723798161288
-                ],
-                "percent_poor": [
-                    0.15902417805777108,
-                    0.03382317900518118
-                ],
-                "percent_manufacturing": [
-                    0.06603287926532558,
-                    0.027718782936059477
-                ],
-                "percent_single_parent": [
-                    0.12954183935474628,
-                    0.011585379152233653
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.03125,
-                    "4) Toss Up": 0.09375,
-                    "1) Solid R": 0.0625,
-                    "2) Likely R": 0.0625,
-                    "3) Lean R": 0.0625,
-                    "7) Solid D": 0.59375,
-                    "6) Likely D": 0.09375
+                "p": 0.22040816326530613,
+                "visual_studio": {
+                    "True": 0.91818181818181821,
+                    "False": 0.081818181818181818
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.1111111111111111,
-                    "bipolar": 0.1111111111111111,
-                    "western_ag": 0.5555555555555556,
-                    "diverse": 0.1111111111111111,
-                    "rural": 0.1111111111111111
+                "git": {
+                    "False": 0.2818181818181818,
+                    "True": 0.71818181818181814
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.1,
-                    "Romney Republicans": 0.1,
-                    "White moderates": 0.1,
-                    "Diverse, educated suburbs": 0.1,
-                    "Loyal GOP suburbs": 0.1,
-                    "Emerging resistance": 0.5
+                "back-end_developer": {
+                    "True": 0.49254690776918131,
+                    "False": 0.50745309223081869
                 },
-                "percent_owned": [
-                    0.5841028356293197,
-                    0.06589887109898934
-                ]
+                "c#": {
+                    "True": 0.73636363636363633,
+                    "False": 0.26363636363636361
+                },
+                "linux": {
+                    "False": 0.80909090909090908,
+                    "True": 0.19090909090909092
+                },
+                "c": {
+                    "False": 0.0090909090909090905,
+                    "True": 0.99090909090909096
+                },
+                "c++": {
+                    "True": 0.18181818181818182,
+                    "False": 0.81818181818181823
+                },
+                "vim": {
+                    "False": 0.91818181818181821,
+                    "True": 0.081818181818181818
+                },
+                "bash_shell": {
+                    "False": 0.8545454545454545,
+                    "True": 0.14545454545454545
+                },
+                "java": {
+                    "False": 0.18319478899806799,
+                    "True": 0.81680521100193204
+                },
+                "notepad++": {
+                    "True": 0.54501657742183773,
+                    "False": 0.45498342257816232
+                },
+                "windows_desktop_or_server": {
+                    "True": 0.59090909090909094,
+                    "False": 0.40909090909090912
+                }
             },
             {
-                "p": 0.11264367816091951,
-                "percent_white": [
-                    0.6490025048698238,
-                    0.07461520636734277
-                ],
-                "percent_children": [
-                    0.2340409450349926,
-                    0.01447380606673573
-                ],
-                "percent_married": [
-                    0.47461107188785273,
-                    0.021814196837689658
-                ],
-                "percent_poor": [
-                    0.16551457263391287,
-                    0.026352670775013676
-                ],
-                "percent_manufacturing": [
-                    0.11959218401481284,
-                    0.0382296365995756
-                ],
-                "percent_single_parent": [
-                    0.12046249236064697,
-                    0.009037134275773894
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.02040816326530612,
-                    "4) Toss Up": 0.061224489795918366,
-                    "1) Solid R": 0.7142857142857143,
-                    "2) Likely R": 0.04081632653061224,
-                    "3) Lean R": 0.061224489795918366,
-                    "7) Solid D": 0.08163265306122448,
-                    "6) Likely D": 0.02040816326530612
+                "p": 0.24285714285714288,
+                "visual_studio": {
+                    "True": 0.39669421487603307,
+                    "False": 0.60330578512396693
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.45454545454545453,
-                    "bipolar": 0.2727272727272727,
-                    "western_ag": 0.09090909090909091,
-                    "diverse": 0.09090909090909091,
-                    "rural": 0.09090909090909091
+                "git": {
+                    "False": 0.0082644628099173556,
+                    "True": 0.99173553719008267
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.15384615384615385,
-                    "Romney Republicans": 0.07692307692307693,
-                    "White moderates": 0.15384615384615385,
-                    "Diverse, educated suburbs": 0.23076923076923078,
-                    "Loyal GOP suburbs": 0.3076923076923077,
-                    "Emerging resistance": 0.07692307692307693
+                "back-end_developer": {
+                    "True": 0.57232774918300344,
+                    "False": 0.42767225081699656
                 },
-                "percent_owned": [
-                    0.6687052506519325,
-                    0.039366408723387
-                ]
+                "c#": {
+                    "True": 0.024793388429752067,
+                    "False": 0.97520661157024791
+                },
+                "linux": {
+                    "False": 0.64462809917355368,
+                    "True": 0.35537190082644626
+                },
+                "c": {
+                    "False": 0.34710743801652894,
+                    "True": 0.65289256198347112
+                },
+                "c++": {
+                    "True": 0.016528925619834711,
+                    "False": 0.98347107438016534
+                },
+                "vim": {
+                    "False": 0.76859504132231404,
+                    "True": 0.23140495867768596
+                },
+                "bash_shell": {
+                    "False": 0.58677685950413228,
+                    "True": 0.41322314049586778
+                },
+                "java": {
+                    "False": 0.17483819076702134,
+                    "True": 0.82516180923297866
+                },
+                "notepad++": {
+                    "True": 0.16822367868461324,
+                    "False": 0.83177632131538681
+                },
+                "windows_desktop_or_server": {
+                    "True": 0.0743801652892562,
+                    "False": 0.92561983471074383
+                }
             },
             {
-                "p": 0.07586206896551723,
-                "percent_white": [
-                    0.7004202676141043,
-                    0.0784577457591355
-                ],
-                "percent_children": [
-                    0.2047224962701087,
-                    0.011965948012829157
-                ],
-                "percent_married": [
-                    0.44322389219260827,
-                    0.024163560358926153
-                ],
-                "percent_poor": [
-                    0.14632875630997444,
-                    0.024457152052137582
-                ],
-                "percent_manufacturing": [
-                    0.0923896132241886,
-                    0.027231098869458063
-                ],
-                "percent_single_parent": [
-                    0.10252498035434848,
-                    0.01206869304020971
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.05263157894736842,
-                    "4) Toss Up": 0.02631578947368421,
-                    "1) Solid R": 0.10526315789473684,
-                    "2) Likely R": 0.07894736842105263,
-                    "3) Lean R": 0.02631578947368421,
-                    "7) Solid D": 0.631578947368421,
-                    "6) Likely D": 0.07894736842105263
+                "p": 0.057142857142857141,
+                "visual_studio": {
+                    "True": 0.90000000000000002,
+                    "False": 0.10000000000000001
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.25,
-                    "bipolar": 0.25,
-                    "western_ag": 0.125,
-                    "diverse": 0.25,
-                    "rural": 0.125
+                "git": {
+                    "False": 0.033333333333333333,
+                    "True": 0.96666666666666667
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.2,
-                    "Romney Republicans": 0.1,
-                    "White moderates": 0.3,
-                    "Diverse, educated suburbs": 0.1,
-                    "Loyal GOP suburbs": 0.1,
-                    "Emerging resistance": 0.2
+                "back-end_developer": {
+                    "True": 0.57383820521082884,
+                    "False": 0.4261617947891711
                 },
-                "percent_owned": [
-                    0.6232968431216583,
-                    0.05444238595460114
-                ]
+                "c#": {
+                    "True": 0.8666666666666667,
+                    "False": 0.13333333333333333
+                },
+                "linux": {
+                    "False": 0.26666666666666666,
+                    "True": 0.73333333333333328
+                },
+                "c": {
+                    "False": 0.033333333333333333,
+                    "True": 0.96666666666666667
+                },
+                "c++": {
+                    "True": 0.73333333333333328,
+                    "False": 0.26666666666666666
+                },
+                "vim": {
+                    "False": 0.6333333333333333,
+                    "True": 0.36666666666666664
+                },
+                "bash_shell": {
+                    "False": 0.26666666666666666,
+                    "True": 0.73333333333333328
+                },
+                "java": {
+                    "False": 0.30313656436712239,
+                    "True": 0.69686343563287756
+                },
+                "notepad++": {
+                    "True": 0.62874074632865562,
+                    "False": 0.37125925367134438
+                },
+                "windows_desktop_or_server": {
+                    "True": 0.66666666666666663,
+                    "False": 0.33333333333333331
+                }
             },
             {
-                "p": 0.07356321839080458,
-                "percent_white": [
-                    0.7255854439670023,
-                    0.09734589403738352
-                ],
-                "percent_children": [
-                    0.25490363411052974,
-                    0.028531331462096188
-                ],
-                "percent_married": [
-                    0.5768545674950454,
-                    0.02025971892543182
-                ],
-                "percent_poor": [
-                    0.07091127671854636,
-                    0.01725026720807536
-                ],
-                "percent_manufacturing": [
-                    0.10194396509008377,
-                    0.03532008989229784
-                ],
-                "percent_single_parent": [
-                    0.07904610745463206,
-                    0.015406230666823569
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.08823529411764706,
-                    "4) Toss Up": 0.23529411764705882,
-                    "1) Solid R": 0.29411764705882354,
-                    "2) Likely R": 0.14705882352941177,
-                    "3) Lean R": 0.058823529411764705,
-                    "7) Solid D": 0.11764705882352941,
-                    "6) Likely D": 0.058823529411764705
+                "p": 0.10204081632653061,
+                "visual_studio": {
+                    "True": 0.25,
+                    "False": 0.75
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.7058823529411765,
-                    "bipolar": 0.058823529411764705,
-                    "western_ag": 0.058823529411764705,
-                    "diverse": 0.11764705882352941,
-                    "rural": 0.058823529411764705
+                "git": {
+                    "False": 0.48076923076923078,
+                    "True": 0.51923076923076927
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.05263157894736842,
-                    "Romney Republicans": 0.5789473684210527,
-                    "White moderates": 0.05263157894736842,
-                    "Diverse, educated suburbs": 0.05263157894736842,
-                    "Loyal GOP suburbs": 0.21052631578947367,
-                    "Emerging resistance": 0.05263157894736842
+                "back-end_developer": {
+                    "True": 0.55251239124578289,
+                    "False": 0.44748760875421711
                 },
-                "percent_owned": [
-                    0.7248401510467484,
-                    0.03865245585664642
-                ]
-            },
-            {
-                "p": 0.016091954022988506,
-                "percent_white": [
-                    0.6430510843112773,
-                    0.0860533033672047
-                ],
-                "percent_children": [
-                    0.16087111092567838,
-                    0.025111920902801753
-                ],
-                "percent_married": [
-                    0.4449958269678367,
-                    0.033453964714246366
-                ],
-                "percent_poor": [
-                    0.10478842108790984,
-                    0.028221109482232682
-                ],
-                "percent_manufacturing": [
-                    0.06075150002195906,
-                    0.017768568901752515
-                ],
-                "percent_single_parent": [
-                    0.04411693260009422,
-                    0.008306918680183626
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.07692307692307693,
-                    "4) Toss Up": 0.07692307692307693,
-                    "1) Solid R": 0.07692307692307693,
-                    "2) Likely R": 0.07692307692307693,
-                    "3) Lean R": 0.07692307692307693,
-                    "7) Solid D": 0.5384615384615384,
-                    "6) Likely D": 0.07692307692307693
+                "c#": {
+                    "True": 0.21153846153846154,
+                    "False": 0.78846153846153844
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.2,
-                    "bipolar": 0.2,
-                    "western_ag": 0.2,
-                    "diverse": 0.2,
-                    "rural": 0.2
+                "linux": {
+                    "False": 0.86538461538461542,
+                    "True": 0.13461538461538461
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.16666666666666666,
-                    "Romney Republicans": 0.16666666666666666,
-                    "White moderates": 0.16666666666666666,
-                    "Diverse, educated suburbs": 0.16666666666666666,
-                    "Loyal GOP suburbs": 0.16666666666666666,
-                    "Emerging resistance": 0.16666666666666666
+                "c": {
+                    "False": 0.019230769230769232,
+                    "True": 0.98076923076923073
                 },
-                "percent_owned": [
-                    0.4074058731737442,
-                    0.10288160820147813
-                ]
-            },
-            {
-                "p": 0.011494252873563216,
-                "percent_white": [
-                    0.14200685004156133,
-                    0.024453907663193625
-                ],
-                "percent_children": [
-                    0.2826642220148612,
-                    0.008632867426295864
-                ],
-                "percent_married": [
-                    0.46766850270943394,
-                    0.012816770263993981
-                ],
-                "percent_poor": [
-                    0.2638009245906493,
-                    0.01644355192773143
-                ],
-                "percent_manufacturing": [
-                    0.07099428834135338,
-                    0.023275704070983547
-                ],
-                "percent_single_parent": [
-                    0.1713406592816673,
-                    0.006818973529791707
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.08333333333333333,
-                    "4) Toss Up": 0.08333333333333333,
-                    "1) Solid R": 0.08333333333333333,
-                    "2) Likely R": 0.16666666666666666,
-                    "3) Lean R": 0.08333333333333333,
-                    "7) Solid D": 0.4166666666666667,
-                    "6) Likely D": 0.08333333333333333
+                "c++": {
+                    "True": 0.51923076923076927,
+                    "False": 0.48076923076923078
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.16666666666666666,
-                    "bipolar": 0.16666666666666666,
-                    "western_ag": 0.3333333333333333,
-                    "diverse": 0.16666666666666666,
-                    "rural": 0.16666666666666666
+                "vim": {
+                    "False": 0.94230769230769229,
+                    "True": 0.057692307692307696
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.14285714285714285,
-                    "Romney Republicans": 0.14285714285714285,
-                    "White moderates": 0.14285714285714285,
-                    "Diverse, educated suburbs": 0.14285714285714285,
-                    "Loyal GOP suburbs": 0.14285714285714285,
-                    "Emerging resistance": 0.2857142857142857
+                "bash_shell": {
+                    "False": 0.73076923076923073,
+                    "True": 0.26923076923076922
                 },
-                "percent_owned": [
-                    0.6282827846791779,
-                    0.08422523612314779
-                ]
-            },
-            {
-                "p": 0.045977011494252866,
-                "percent_white": [
-                    0.18319732629419339,
-                    0.052520952009650394
-                ],
-                "percent_children": [
-                    0.2541363136567578,
-                    0.016237099494675767
-                ],
-                "percent_married": [
-                    0.40588626839421355,
-                    0.023371572475980294
-                ],
-                "percent_poor": [
-                    0.17493827966118064,
-                    0.023781641553938197
-                ],
-                "percent_manufacturing": [
-                    0.07848552090318771,
-                    0.030993371872063222
-                ],
-                "percent_single_parent": [
-                    0.15937651615581255,
-                    0.01362837481139993
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.038461538461538464,
-                    "4) Toss Up": 0.07692307692307693,
-                    "1) Solid R": 0.038461538461538464,
-                    "2) Likely R": 0.038461538461538464,
-                    "3) Lean R": 0.038461538461538464,
-                    "7) Solid D": 0.7307692307692307,
-                    "6) Likely D": 0.038461538461538464
+                "java": {
+                    "False": 0.099832163830966575,
+                    "True": 0.9001678361690334
                 },
-                "nyt_classification_1": {
-                    "center_right": 0.16666666666666666,
-                    "bipolar": 0.16666666666666666,
-                    "western_ag": 0.16666666666666666,
-                    "diverse": 0.3333333333333333,
-                    "rural": 0.16666666666666666
+                "notepad++": {
+                    "True": 0.236198440757318,
+                    "False": 0.76380155924268212
                 },
-                "nyt_classification_2": {
-                    "Rural populists": 0.14285714285714285,
-                    "Romney Republicans": 0.14285714285714285,
-                    "White moderates": 0.14285714285714285,
-                    "Diverse, educated suburbs": 0.14285714285714285,
-                    "Loyal GOP suburbs": 0.14285714285714285,
-                    "Emerging resistance": 0.2857142857142857
-                },
-                "percent_owned": [
-                    0.5061642802345088,
-                    0.07624476031177486
-                ]
-            },
-            {
-                "p": 0.01379310344827586,
-                "percent_white": [
-                    0.11634775520299387,
-                    0.06575592917921716
-                ],
-                "percent_children": [
-                    0.2891889781598722,
-                    0.015797221978000514
-                ],
-                "percent_married": [
-                    0.4103913916691433,
-                    0.019320232630299475
-                ],
-                "percent_poor": [
-                    0.24850101246055517,
-                    0.02780825716701187
-                ],
-                "percent_manufacturing": [
-                    0.10540525161032009,
-                    0.029959403087066558
-                ],
-                "percent_single_parent": [
-                    0.20795500878373246,
-                    0.015581978550734676
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.08333333333333333,
-                    "4) Toss Up": 0.08333333333333333,
-                    "1) Solid R": 0.08333333333333333,
-                    "2) Likely R": 0.08333333333333333,
-                    "3) Lean R": 0.08333333333333333,
-                    "7) Solid D": 0.5,
-                    "6) Likely D": 0.08333333333333333
-                },
-                "nyt_classification_1": {
-                    "center_right": 0.2,
-                    "bipolar": 0.2,
-                    "western_ag": 0.2,
-                    "diverse": 0.2,
-                    "rural": 0.2
-                },
-                "nyt_classification_2": {
-                    "Rural populists": 0.16666666666666666,
-                    "Romney Republicans": 0.16666666666666666,
-                    "White moderates": 0.16666666666666666,
-                    "Diverse, educated suburbs": 0.16666666666666666,
-                    "Loyal GOP suburbs": 0.16666666666666666,
-                    "Emerging resistance": 0.16666666666666666
-                },
-                "percent_owned": [
-                    0.4165584018551043,
-                    0.05166320418505484
-                ]
-            },
-            {
-                "p": 0.03218390804597701,
-                "percent_white": [
-                    0.266541827327448,
-                    0.0796239721363831
-                ],
-                "percent_children": [
-                    0.21546534296607156,
-                    0.017074363166777858
-                ],
-                "percent_married": [
-                    0.34023072867387494,
-                    0.048868148823009
-                ],
-                "percent_poor": [
-                    0.22451162578936562,
-                    0.033450505624438805
-                ],
-                "percent_manufacturing": [
-                    0.0547855373259348,
-                    0.02071723254901088
-                ],
-                "percent_single_parent": [
-                    0.1383166341658812,
-                    0.01882373122265767
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.047619047619047616,
-                    "4) Toss Up": 0.047619047619047616,
-                    "1) Solid R": 0.047619047619047616,
-                    "2) Likely R": 0.047619047619047616,
-                    "3) Lean R": 0.047619047619047616,
-                    "7) Solid D": 0.7142857142857143,
-                    "6) Likely D": 0.047619047619047616
-                },
-                "nyt_classification_1": {
-                    "center_right": 0.2,
-                    "bipolar": 0.2,
-                    "western_ag": 0.2,
-                    "diverse": 0.2,
-                    "rural": 0.2
-                },
-                "nyt_classification_2": {
-                    "Rural populists": 0.16666666666666666,
-                    "Romney Republicans": 0.16666666666666666,
-                    "White moderates": 0.16666666666666666,
-                    "Diverse, educated suburbs": 0.16666666666666666,
-                    "Loyal GOP suburbs": 0.16666666666666666,
-                    "Emerging resistance": 0.16666666666666666
-                },
-                "percent_owned": [
-                    0.2889688721441883,
-                    0.1013018385815381
-                ]
-            },
-            {
-                "p": 0.002298850574712643,
-                "percent_white": [
-                    0.06481800824590987,
-                    0.0001
-                ],
-                "percent_children": [
-                    0.2584688356076461,
-                    0.0001
-                ],
-                "percent_married": [
-                    0.32519904317061754,
-                    0.0001
-                ],
-                "percent_poor": [
-                    0.3439956592671287,
-                    0.0001
-                ],
-                "percent_manufacturing": [
-                    0.036394140419521326,
-                    0.0001
-                ],
-                "percent_single_parent": [
-                    0.26833484904734456,
-                    0.0001
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.14285714285714285,
-                    "4) Toss Up": 0.14285714285714285,
-                    "1) Solid R": 0.14285714285714285,
-                    "2) Likely R": 0.14285714285714285,
-                    "3) Lean R": 0.14285714285714285,
-                    "7) Solid D": 0.14285714285714285,
-                    "6) Likely D": 0.14285714285714285
-                },
-                "nyt_classification_1": {
-                    "center_right": 0.2,
-                    "bipolar": 0.2,
-                    "western_ag": 0.2,
-                    "diverse": 0.2,
-                    "rural": 0.2
-                },
-                "nyt_classification_2": {
-                    "Rural populists": 0.16666666666666666,
-                    "Romney Republicans": 0.16666666666666666,
-                    "White moderates": 0.16666666666666666,
-                    "Diverse, educated suburbs": 0.16666666666666666,
-                    "Loyal GOP suburbs": 0.16666666666666666,
-                    "Emerging resistance": 0.16666666666666666
-                },
-                "percent_owned": [
-                    0.21899594403785685,
-                    0.0001
-                ]
-            },
-            {
-                "p": 0.17931034482758618,
-                "percent_white": [
-                    0.5808022556670032,
-                    0.11288071392812447
-                ],
-                "percent_children": [
-                    0.22599095662060412,
-                    0.021335576959188605
-                ],
-                "percent_married": [
-                    0.5013611883085025,
-                    0.02580125134573742
-                ],
-                "percent_poor": [
-                    0.10242178573970971,
-                    0.017359611964202024
-                ],
-                "percent_manufacturing": [
-                    0.08127213199763755,
-                    0.032575737170515394
-                ],
-                "percent_single_parent": [
-                    0.09338722316648404,
-                    0.01472641948901597
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.02531645569620253,
-                    "4) Toss Up": 0.08860759493670886,
-                    "1) Solid R": 0.1518987341772152,
-                    "2) Likely R": 0.12658227848101267,
-                    "3) Lean R": 0.06329113924050633,
-                    "7) Solid D": 0.5063291139240507,
-                    "6) Likely D": 0.0379746835443038
-                },
-                "nyt_classification_1": {
-                    "center_right": 0.23529411764705882,
-                    "bipolar": 0.17647058823529413,
-                    "western_ag": 0.058823529411764705,
-                    "diverse": 0.47058823529411764,
-                    "rural": 0.058823529411764705
-                },
-                "nyt_classification_2": {
-                    "Rural populists": 0.05,
-                    "Romney Republicans": 0.25,
-                    "White moderates": 0.05,
-                    "Diverse, educated suburbs": 0.35,
-                    "Loyal GOP suburbs": 0.05,
-                    "Emerging resistance": 0.25
-                },
-                "percent_owned": [
-                    0.6355215107669074,
-                    0.058613557860131726
-                ]
-            },
-            {
-                "p": 0.016091954022988506,
-                "percent_white": [
-                    0.27555004252195303,
-                    0.08160361386555358
-                ],
-                "percent_children": [
-                    0.18255826780448492,
-                    0.011537728705142513
-                ],
-                "percent_married": [
-                    0.48050223450678475,
-                    0.05696732683328761
-                ],
-                "percent_poor": [
-                    0.12831682809083722,
-                    0.031880734378144364
-                ],
-                "percent_manufacturing": [
-                    0.0654726741039284,
-                    0.04898541223920543
-                ],
-                "percent_single_parent": [
-                    0.07739183983436751,
-                    0.01441660040879745
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.16666666666666666,
-                    "4) Toss Up": 0.08333333333333333,
-                    "1) Solid R": 0.08333333333333333,
-                    "2) Likely R": 0.08333333333333333,
-                    "3) Lean R": 0.08333333333333333,
-                    "7) Solid D": 0.4166666666666667,
-                    "6) Likely D": 0.08333333333333333
-                },
-                "nyt_classification_1": {
-                    "center_right": 0.16666666666666666,
-                    "bipolar": 0.16666666666666666,
-                    "western_ag": 0.16666666666666666,
-                    "diverse": 0.3333333333333333,
-                    "rural": 0.16666666666666666
-                },
-                "nyt_classification_2": {
-                    "Rural populists": 0.14285714285714285,
-                    "Romney Republicans": 0.14285714285714285,
-                    "White moderates": 0.14285714285714285,
-                    "Diverse, educated suburbs": 0.14285714285714285,
-                    "Loyal GOP suburbs": 0.14285714285714285,
-                    "Emerging resistance": 0.2857142857142857
-                },
-                "percent_owned": [
-                    0.4584977047197453,
-                    0.03749132144474863
-                ]
-            },
-            {
-                "p": 0.004597701149425286,
-                "percent_white": [
-                    0.9258315536813309,
-                    0.015100000000000002
-                ],
-                "percent_children": [
-                    0.18200589611523216,
-                    0.008050000000000002
-                ],
-                "percent_married": [
-                    0.5270631514593547,
-                    0.0045499999999999985
-                ],
-                "percent_poor": [
-                    0.27491311831699183,
-                    0.04135000000000001
-                ],
-                "percent_manufacturing": [
-                    0.08020251767120866,
-                    0.027500000000000004
-                ],
-                "percent_single_parent": [
-                    0.1181243480950551,
-                    0.007550000000000001
-                ],
-                "nyt_political_prediction": {
-                    "5) Lean D": 0.1111111111111111,
-                    "4) Toss Up": 0.1111111111111111,
-                    "1) Solid R": 0.2222222222222222,
-                    "2) Likely R": 0.1111111111111111,
-                    "3) Lean R": 0.2222222222222222,
-                    "7) Solid D": 0.1111111111111111,
-                    "6) Likely D": 0.1111111111111111
-                },
-                "nyt_classification_1": {
-                    "center_right": 0.16666666666666666,
-                    "bipolar": 0.16666666666666666,
-                    "western_ag": 0.16666666666666666,
-                    "diverse": 0.16666666666666666,
-                    "rural": 0.3333333333333333
-                },
-                "nyt_classification_2": {
-                    "Rural populists": 0.2857142857142857,
-                    "Romney Republicans": 0.14285714285714285,
-                    "White moderates": 0.14285714285714285,
-                    "Diverse, educated suburbs": 0.14285714285714285,
-                    "Loyal GOP suburbs": 0.14285714285714285,
-                    "Emerging resistance": 0.14285714285714285
-                },
-                "percent_owned": [
-                    0.725018805792641,
-                    0.00020000000000003348
-                ]
+                "windows_desktop_or_server": {
+                    "True": 0.096153846153846159,
+                    "False": 0.90384615384615385
+                }
             }
         ],
         [
             {
-                "p": 0.0022988505747126436,
-                "percent_lths": [
-                    0.09712643048387162,
-                    0.023934037464373132
-                ]
+                "p": 0.81400000000000006,
+                "sqlite": {
+                    "True": 0.064079124165364904,
+                    "False": 0.93592087583463512
+                },
+                "mobile_developer": {
+                    "True": 0.050077029313027897,
+                    "False": 0.94992297068697207
+                },
+                "ios": {
+                    "True": 0.017114914425427872,
+                    "False": 0.9828850855745721
+                },
+                "firebase": {
+                    "True": 0.036674816625916873,
+                    "False": 0.96332518337408313
+                },
+                "android": {
+                    "True": 0.056752722890833211,
+                    "False": 0.94324727710916678
+                }
             },
             {
-                "p": 0.01839080459770115,
-                "percent_lths": [
-                    0.30915190559843797,
-                    0.023022760477405837
-                ]
+                "p": 0.18600000000000003,
+                "sqlite": {
+                    "True": 0.36907976160710199,
+                    "False": 0.63092023839289801
+                },
+                "mobile_developer": {
+                    "True": 0.70297658546891151,
+                    "False": 0.29702341453108849
+                },
+                "ios": {
+                    "True": 0.47368421052631576,
+                    "False": 0.52631578947368418
+                },
+                "firebase": {
+                    "True": 0.32631578947368423,
+                    "False": 0.67368421052631577
+                },
+                "android": {
+                    "True": 0.6728147146786253,
+                    "False": 0.32718528532137464
+                }
+            }
+        ],
+        [
+            {
+                "p": 0.84569138276553102,
+                "age": {
+                    "25 - 34 years old": 0.6145038167938931,
+                    "Under 18 years old": 0.045801526717557252,
+                    "45 - 54 years old": 0.0076335877862595417,
+                    "35 - 44 years old": 0.061068702290076333,
+                    "18 - 24 years old": 0.26717557251908397,
+                    "55 - 64 years old": 0.0038167938931297708
+                },
+                "subversion": {
+                    "True": 0.10477115953724256,
+                    "False": 0.89522884046275741
+                },
+                "yearscoding": {
+                    "3-5 years": 0.29104477611940299,
+                    "30 or more years": 0.0024875621890547263,
+                    "6-8 years": 0.2462686567164179,
+                    "27-29 years": 0.0024875621890547263,
+                    "21-23 years": 0.0024875621890547263,
+                    "15-17 years": 0.04975124378109453,
+                    "18-20 years": 0.014925373134328358,
+                    "9-11 years": 0.15671641791044777,
+                    "12-14 years": 0.094527363184079602,
+                    "24-26 years": 0.012437810945273632,
+                    "0-2 years": 0.12686567164179105
+                }
             },
             {
-                "p": 0.004597701149425287,
-                "percent_lths": [
-                    0.23643237247460988,
-                    0.007550000000000001
-                ]
-            },
-            {
-                "p": 0.016091954022988506,
-                "percent_lths": [
-                    0.3867860339308286,
-                    0.03873712557688275
-                ]
-            },
-            {
-                "p": 0.6666666666666666,
-                "percent_lths": [
-                    0.20732584679251356,
-                    0.0001
-                ]
-            },
-            {
-                "p": 0.011494252873563218,
-                "percent_lths": [
-                    0.1266382118757566,
-                    0.019704557848376093
-                ]
-            },
-            {
-                "p": 0.10344827586206896,
-                "percent_lths": [
-                    0.14876093937393217,
-                    0.024827457520124375
-                ]
-            },
-            {
-                "p": 0.006896551724137931,
-                "percent_lths": [
-                    0.1267358840496254,
-                    0.029235176680765168
-                ]
-            },
-            {
-                "p": 0.0022988505747126436,
-                "percent_lths": [
-                    0.28930429637664185,
-                    0.0001
-                ]
-            },
-            {
-                "p": 0.009195402298850575,
-                "percent_lths": [
-                    0.21492843930606703,
-                    0.023484941984173602
-                ]
-            },
-            {
-                "p": 0.0022988505747126436,
-                "percent_lths": [
-                    0.28247828466609193,
-                    0.0001
-                ]
-            },
-            {
-                "p": 0.004597701149425287,
-                "percent_lths": [
-                    0.27636391821242734,
-                    0.019799999999999984
-                ]
-            },
-            {
-                "p": 0.06666666666666667,
-                "percent_lths": [
-                    0.20052747019152461,
-                    0.02709133887597191
-                ]
-            },
-            {
-                "p": 0.06896551724137931,
-                "percent_lths": [
-                    0.15607016187253597,
-                    0.025247510108259524
-                ]
-            },
-            {
-                "p": 0.006896551724137931,
-                "percent_lths": [
-                    0.1883000879646906,
-                    0.028772710836639792
-                ]
-            },
-            {
-                "p": 0.009195402298850575,
-                "percent_lths": [
-                    0.18228296320117537,
-                    0.007198958257970389
-                ]
+                "p": 0.15430861723446893,
+                "age": {
+                    "25 - 34 years old": 0.098360655737704916,
+                    "Under 18 years old": 0.016393442622950821,
+                    "45 - 54 years old": 0.27868852459016391,
+                    "35 - 44 years old": 0.50819672131147542,
+                    "18 - 24 years old": 0.016393442622950821,
+                    "55 - 64 years old": 0.081967213114754092
+                },
+                "subversion": {
+                    "True": 0.31890889449384069,
+                    "False": 0.68109110550615937
+                },
+                "yearscoding": {
+                    "3-5 years": 0.012500000000000001,
+                    "30 or more years": 0.16250000000000001,
+                    "6-8 years": 0.037499999999999999,
+                    "27-29 years": 0.087499999999999994,
+                    "21-23 years": 0.16250000000000001,
+                    "15-17 years": 0.13750000000000001,
+                    "18-20 years": 0.21249999999999999,
+                    "9-11 years": 0.025000000000000001,
+                    "12-14 years": 0.025000000000000001,
+                    "24-26 years": 0.125,
+                    "0-2 years": 0.012500000000000001
+                }
             }
         ]
     ]

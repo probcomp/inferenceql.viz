@@ -87,9 +87,12 @@
 
 (defn stattype
   [column]
-  (if (= "score" column)
-    dist/gaussian
-    (get model/stattypes column)))
+  (let [stattype-kw (if (= "score" column)
+                      :gaussian
+                      (get-in model/spec [:vars column]))]
+    (case stattype-kw
+      :gaussian dist/gaussian
+      :categorical dist/categorical)))
 
 (defn vega-lite-spec
   [{:keys [selections selected-columns row-at-selection-start]}]
