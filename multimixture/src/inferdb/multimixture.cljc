@@ -46,7 +46,7 @@
                   :var-view-index var-view-index}
         f (gen []
             (into {} (doall (map-indexed (fn [i clusters]
-                                           (let [cluster-idx (at `(:cluster-assignments-for-view ~i) dist/categorical (map :probability clusters))
+                                           (let [cluster-idx (at `(:cluster-assignments-for-view ~i) dist/categorical (mapv :probability clusters))
                                                  cluster (nth clusters cluster-idx)]
                                              (reduce-kv (fn [m variable params]
                                                           (let [primitive (case (get vars variable)
