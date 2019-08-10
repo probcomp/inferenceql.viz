@@ -19,6 +19,9 @@
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
+(s/def ::example-status bool?)
+(s/def ::example-statuses (s/coll-of ::example-status))
+
 (s/def ::topojson any?)
 
 (s/def ::selected-row-index ::row-index)
@@ -34,6 +37,7 @@
                           ::selected-row-index
                           ::row-at-selection-start
                           ::scores
+                          ::example-statuses
                           ::selected-columns
                           ::topojson
                           ::sampled-rows]))
@@ -98,6 +102,10 @@
 (defn with-scores
   [db scores]
   (assoc-in db [::scores] scores))
+
+(defn example-statuses
+  [db]
+  (get-in db [::example-statuses]))
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."

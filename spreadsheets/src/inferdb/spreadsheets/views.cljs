@@ -36,7 +36,13 @@
                 :value @input-text}]
        [:button {:on-click #(rf/dispatch [:search @input-text])
                  :style {:float "right"}}
-        "Search"]])))
+        "Search"]
+       [:button {:on-click #(rf/dispatch [:search @input-text])
+                 :style {:float "right"}}
+        "Search by flagged"]
+       [:button {:on-click #(rf/dispatch [:search @input-text])
+                 :style {:float "right"}}
+        "Simulate"]])))
 
 (defn vega-lite
   [spec opt generator]
@@ -94,5 +100,6 @@
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
-      (when vega-lite-spec
+      ;(when vega-lite-spec)
+      (when nil
         [vega-lite vega-lite-spec {:actions false} generator])]]))

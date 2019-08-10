@@ -13,6 +13,10 @@
             (fn [db _]
               (db/scores db)))
 
+(rf/reg-sub :example-statuses
+            (fn [db _]
+              (db/example-statuses db)))
+
 (defn table-headers
   [db _]
   (db/table-headers db))
@@ -30,17 +34,22 @@
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into ["score"] headers)))
+              (into ["example-status" "score"] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
-               :scores (rf/subscribe [:scores])})
-            (fn [{:keys [rows scores]}]
+               :scores (rf/subscribe [:scores])
+               :example-statuses (rf/subscribe [:example-statuses])})
+            (fn [{:keys [rows scores ex-stats]}]
               (cond->> rows
                 scores (mapv (fn [score row]
                                (assoc row "score" score))
-                             scores))))
+                             scores)
+                ex-stats (mapv (fn [ex row]
+                                 (assoc row "example-status" ex))
+                               ex-stats))))
+
 (defn table-rows
   [db _]
   (db/table-rows db))
@@ -89,7 +98,7 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (if (= "score" column)
+  (let [stattype-kw (if (or (= "score" column) (= "example-status" column))
                       :gaussian
                       (get-in model/spec [:vars column]))]
     (case stattype-kw
