@@ -19,8 +19,8 @@
 
 (defn handsontable
   ([props]
-   (handsontable {} props))
-  ([attributes {:keys [settings hooks] :as props}]
+   (handsontable {} 0 props))
+  ([attributes x-pos {:keys [settings hooks] :as props}]
    (let [js-settings (clj->js settings)
          hot-instance (reagent/atom nil)]
      (reagent/create-class
@@ -38,16 +38,14 @@
                                           hot)))
            (reset! hot-instance hot)))
 
-       :should-component-update
-       (fn [this [_ _ old-props] [_ _ {new-settings :settings :as new-props}]]
-         (update-hot! @hot-instance (clj->js new-settings))
-         false)
-
        :component-did-update
        (fn [this old-argv]
-         (let [new-argv (rest (reagent/argv this))]
-           ;; do something
-           ))
+         (let [[_ old-attributes old-x-pos {:keys [old-settings old-hooks] :as old-props}] old-argv
+               [_ new-attributes new-x-pos {:keys [new-settings new-hooks] :as new-props}] (reagent/argv this)]
+           (if (not= old-settings new-settings)
+             (update-hot! @hot-instance (clj->js new-settings)))
+           (if (not= old-x-pos new-x-pos)
+             (+ 1 1))))
 
        :component-will-unmount
        (fn [this]

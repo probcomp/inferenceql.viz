@@ -96,10 +96,10 @@
         scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]
     [:div
-     [hot/handsontable {:style {:overflow "hidden"}} hot-props]
+     [hot/handsontable {:style {:overflow "hidden"}} 0 hot-props]
+     [hot/handsontable {:style {:overflow "hidden"}} 0 hot-props]
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
-      ;(when vega-lite-spec)
-      (when nil
+      (when vega-lite-spec
         [vega-lite vega-lite-spec {:actions false} generator])]]))
