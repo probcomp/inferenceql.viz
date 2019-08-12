@@ -99,9 +99,24 @@
   [db]
   (get-in db [::scores]))
 
+(defn left-scroll-pos
+  [db]
+  (get-in db [::left-scroll-pos]))
+
+(defn pos-emmitter
+  [db]
+  (get-in db [::pos-emmitter]))
+
 (defn with-scores
   [db scores]
   (assoc-in db [::scores] scores))
+
+(defn with-left-scroll-pos
+  [db pos-emmitter left-scroll-pos]
+  ;(.log js/console left-scroll-pos)
+  ;(.log js/console pos-emmitter)
+  (let [first-assoc (assoc-in db [::left-scroll-pos] left-scroll-pos)]
+    (assoc-in first-assoc [::pos-emmitter] pos-emmitter)))
 
 (defn example-statuses
   [db]

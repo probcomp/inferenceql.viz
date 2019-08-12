@@ -13,6 +13,14 @@
             (fn [db _]
               (db/scores db)))
 
+(rf/reg-sub :left-scroll-pos
+            (fn [db _]
+              (db/left-scroll-pos db)))
+
+(rf/reg-sub :pos-emmitter
+            (fn [db _]
+              (db/pos-emmitter db)))
+
 (rf/reg-sub :example-statuses
             (fn [db _]
               (db/example-statuses db)))

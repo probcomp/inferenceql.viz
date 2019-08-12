@@ -19,6 +19,15 @@
    (db/default-db)))
 
 (rf/reg-event-db
+ :table-scroll
+ []
+ (fn [db [event-name emmitter-obj left-scroll-pos]]
+   (.log js/console "table-scroll")
+   (.log js/console emmitter-obj)
+   (.log js/console left-scroll-pos)
+   (db/with-left-scroll-pos db emmitter-obj left-scroll-pos)))
+
+(rf/reg-event-db
  :after-selection-end
  event-interceptors
  (fn [db [_ hot row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
