@@ -63,7 +63,7 @@
                (if (not (.is new-emmitter nested-jq-obj))
                  (do
                    (.off nested-jq-obj "scroll")
-                   (.scrollLeft nested-jq-obj new-x-pos)
+                   ;(.scrollLeft nested-jq-obj new-x-pos)
                    (.on nested-jq-obj "scroll" fn-for-scroll-event)))))))
 
        :component-will-unmount
