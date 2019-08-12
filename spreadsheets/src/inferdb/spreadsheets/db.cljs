@@ -116,8 +116,13 @@
   (assoc-in db [::scores] scores))
 
 (defn with-virtual-rows
-  [db virtual-rows]
-  (assoc-in db [::virtual-rows] virtual-rows))
+  [db new-v-rows]
+  (let [cur-v-rows (virtual-rows db)]
+    (assoc-in db [::virtual-rows] (concat new-v-rows cur-v-rows))))
+
+(defn clear-simulations
+  [db]
+  (assoc-in db [::virtual-rows] []))
 
 (defn with-left-scroll-pos
   [db pos-emmitter left-scroll-pos]
@@ -134,7 +139,8 @@
   "When the application starts, this will be the value put in `app-db`."
   []
   {::headers (into [] (keys (first nyt-data)))
-   ::rows nyt-data})
+   ::rows nyt-data
+   ::virtual-rows []})
 
 (defn one-cell-selected?
   [db]

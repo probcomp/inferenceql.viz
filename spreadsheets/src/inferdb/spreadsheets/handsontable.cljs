@@ -15,7 +15,6 @@
 
 (defn- update-hot!
   [hot-instance new-settings]
-  (.log js/console "in-new-settings")
   (.updateSettings hot-instance new-settings false))
 
 (defn handsontable
@@ -58,9 +57,7 @@
                {old-settings :settings, old-hooks :hooks} old-props
                {new-settings :settings, new-hooks :hooks} new-props]
            (if (not= old-settings new-settings)
-             (do
-               (.log js/console "settings change")
-               (update-hot! @hot-instance (clj->js new-settings))))
+             (update-hot! @hot-instance (clj->js new-settings)))
            (if (not= old-x-pos new-x-pos)
              (let [dom-node (dom/dom-node this)
                    jq-obj (js/$. dom-node)

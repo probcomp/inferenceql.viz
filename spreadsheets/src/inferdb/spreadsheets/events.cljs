@@ -33,8 +33,14 @@
  [rf/debug]
  (fn [db [event-name]]
    (let [gen #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)))
-         new-rows (repeatedly 2 gen)]
+         new-rows (repeatedly 1 gen)]
      (db/with-virtual-rows db new-rows))))
+
+(rf/reg-event-db
+ :clear-simulations
+ [rf/debug]
+ (fn [db [event-name]]
+   (db/clear-simulations db)))
 
 (rf/reg-event-db
  :after-selection-end
