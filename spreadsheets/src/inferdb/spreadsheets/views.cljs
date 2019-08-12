@@ -88,6 +88,19 @@
       (fn [spec]
         [:div#vis])})))
 
+(def x-pos (r/atom 0))
+
+(defn x-pos-form []
+  (let [input-text (r/atom @x-pos)]
+    (fn []
+      [:div {:style {:display "flex"}}
+       [:input {:type "search"
+                :style {:width "100%"}
+                :on-change #(reset! input-text (-> % .-target .-value))
+                :value @input-text}]
+       [:button {:on-click #(reset! x-pos (js/parseFloat @input-text))
+                 :style {:float "right"}}
+        "scroll!"]])))
 (defn app
   []
   (let [hot-props      @(rf/subscribe [:hot-props])
@@ -96,9 +109,10 @@
         scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]
     [:div
-     [hot/handsontable {:style {:overflow "hidden"}} 0 hot-props]
-     [hot/handsontable {:style {:overflow "hidden"}} 0 hot-props]
+     [hot/handsontable {:style {:overflow "hidden"}} @x-pos hot-props]
+     [hot/handsontable {:style {:overflow "hidden"}} @x-pos hot-props]
      [search-form "Zane"]
+     [x-pos-form]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
       (when vega-lite-spec

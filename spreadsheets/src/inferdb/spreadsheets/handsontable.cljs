@@ -45,7 +45,14 @@
            (if (not= old-settings new-settings)
              (update-hot! @hot-instance (clj->js new-settings)))
            (if (not= old-x-pos new-x-pos)
-             (+ 1 1))))
+             (let [dom-node (dom/dom-node this)
+                   jq-obj (js/$. dom-node)
+                   nested-jq-obj (.find jq-obj ".ht_master > .wtHolder")
+                   left-pos (.scrollLeft nested-jq-obj)]
+               (.log js/console "old pos:")
+               (.log js/console left-pos)
+               (.scrollLeft nested-jq-obj new-x-pos)))))
+
 
        :component-will-unmount
        (fn [this]
