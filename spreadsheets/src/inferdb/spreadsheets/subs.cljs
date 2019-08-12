@@ -58,6 +58,10 @@
                                  (assoc row "example-status" ex))
                                ex-stats))))
 
+(rf/reg-sub :virtual-rows
+            (fn [db _]
+              (db/virtual-rows db)))
+
 (defn table-rows
   [db _]
   (db/table-rows db))
@@ -85,6 +89,20 @@
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:computed-rows])})
             hot-props)
+
+(defn virtual-hot-props
+  [{:keys [headers rows]} _]
+  (let [data (cell-vector headers rows)]
+    ;(.log js/console rows)
+    (.log js/console data)
+    (-> views/default-hot-settings
+        (assoc-in [:settings :data] data)
+        (assoc-in [:settings :colHeaders] headers))))
+(rf/reg-sub :virtual-hot-props
+            (fn [_ _]
+              {:headers (rf/subscribe [:computed-headers])
+               :rows    (rf/subscribe [:virtual-rows])})
+            virtual-hot-props)
 
 (defn selections
   [db _]
@@ -279,5 +297,9 @@
                       constraints (mmix/with-row-values {} (-> row
                                                                (select-keys (keys (:vars model/spec)))
                                                                (dissoc sampled-column)))]
+                  (.log js/console sampled-column)
+                  (.log js/console constraints)
+                  (.log js/console row)
+                  (.log js/console model/spec)
                   #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                               :observation-trace constraints))))))

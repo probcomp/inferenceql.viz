@@ -15,6 +15,7 @@
 
 (defn- update-hot!
   [hot-instance new-settings]
+  (.log js/console "in-new-settings")
   (.updateSettings hot-instance new-settings false))
 
 (defn handsontable
@@ -52,10 +53,14 @@
 
        :component-did-update
        (fn [this old-argv]
-         (let [[_ old-attributes [old-emmitter old-x-pos] {:keys [old-settings old-hooks] :as old-props}] old-argv
-               [_ new-attributes [new-emmitter new-x-pos] {:keys [new-settings new-hooks] :as new-props}] (reagent/argv this)]
+         (let [[_ old-attributes [old-emmitter old-x-pos] old-props] old-argv
+               [_ new-attributes [new-emmitter new-x-pos] new-props] (reagent/argv this)
+               {old-settings :settings, old-hooks :hooks} old-props
+               {new-settings :settings, new-hooks :hooks} new-props]
            (if (not= old-settings new-settings)
-             (update-hot! @hot-instance (clj->js new-settings)))
+             (do
+               (.log js/console "settings change")
+               (update-hot! @hot-instance (clj->js new-settings))))
            (if (not= old-x-pos new-x-pos)
              (let [dom-node (dom/dom-node this)
                    jq-obj (js/$. dom-node)

@@ -36,13 +36,16 @@
                 :value @input-text}]
        [:button {:on-click #(rf/dispatch [:search @input-text])
                  :style {:float "right"}}
-        "Search"]
+        "Search by example"]
        [:button {:on-click #(rf/dispatch [:search @input-text])
                  :style {:float "right"}}
         "Search by flagged"]
-       [:button {:on-click #(rf/dispatch [:search @input-text])
+       [:button {:on-click #(rf/dispatch [:simulate])
                  :style {:float "right"}}
-        "Simulate"]])))
+        "Simulate"]
+       [:button {:on-click #(rf/dispatch [:clear-simulations])
+                 :style {:float "right"}}
+        "Clear simulations"]])))
 
 (defn vega-lite
   [spec opt generator]
@@ -91,6 +94,7 @@
 (defn app
   []
   (let [hot-props      @(rf/subscribe [:hot-props])
+        virtual-hot-props @(rf/subscribe [:virtual-hot-props])
         selected-maps  @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
         scores         @(rf/subscribe [:scores])
@@ -99,7 +103,7 @@
         pos-emmiter @(rf/subscribe [:pos-emmitter])]
     [:div
      [hot/handsontable {:style {:overflow "hidden"}} [pos-emmiter left-scroll-pos] hot-props]
-     [hot/handsontable {:style {:overflow "hidden"}} [pos-emmiter left-scroll-pos] hot-props]
+     [hot/handsontable {:style {:overflow "hidden"}} [pos-emmiter left-scroll-pos] virtual-hot-props]
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}

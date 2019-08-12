@@ -1,6 +1,7 @@
 (ns inferdb.spreadsheets.events
   (:require [clojure.edn :as edn]
             [re-frame.core :as rf]
+            [metaprob.prelude :as mp]
             [inferdb.spreadsheets.data :as data]
             [inferdb.multimixture.search :as search]
             [inferdb.spreadsheets.model :as model]
@@ -26,6 +27,14 @@
    ;(.log js/console emmitter-obj)
    ;(.log js/console left-scroll-pos)
    (db/with-left-scroll-pos db emmitter-obj left-scroll-pos)))
+
+(rf/reg-event-db
+ :simulate
+ [rf/debug]
+ (fn [db [event-name]]
+   (let [gen #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)))
+         new-rows (repeatedly 2 gen)]
+     (db/with-virtual-rows db new-rows))))
 
 (rf/reg-event-db
  :after-selection-end
