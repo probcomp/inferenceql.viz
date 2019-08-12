@@ -103,7 +103,7 @@
         pos-emmiter @(rf/subscribe [:pos-emmitter])]
     [:div
      [hot/handsontable {:style {:overflow "hidden"}} [pos-emmiter left-scroll-pos] hot-props]
-     [hot/handsontable {:style {:overflow "hidden"}} [pos-emmiter left-scroll-pos] virtual-hot-props]
+     [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} [pos-emmiter left-scroll-pos] virtual-hot-props]
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
