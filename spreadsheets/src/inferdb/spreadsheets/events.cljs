@@ -93,20 +93,35 @@
 (def ^:private n-models 30)
 (def ^:private beta-params {:alpha 0.001, :beta 0.001})
 
+
+(defn anomaly-search?
+  [text]
+    (clojure.string/includes? (clojure.string/lower-case text) "probability"))
+
 (rf/reg-event-db
  :search
  event-interceptors
  (fn [db [_ text]]
-   (let [row (merge (edn/read-string text)
-                    {search-column true})
-
+   (let [
          _ (.log js/console "rows")
          _ (.log js/console [row])
          _ (.log js/console 1)
          _ (.log js/console "rows-not-flagged")
          _ (.log js/console data/nyt-data)
          _ (.log js/console (count data/nyt-data))
-         result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
+         ;;result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
+        result (if (anomaly-search? text)
+                 (search/anomaly-search model/spec
+                                        "foo"
+                                        []
+                                        data/nyt-data)
+                 (let [row (merge (edn/read-string text) {search-column true})]
+                   (search/search model/spec
+                                 search-column
+                                 [row]
+                                 data/nyt-data
+                                 n-models
+                                 beta-params)))]
      (rf/dispatch [:search-result result]))
    db))
 

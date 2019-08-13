@@ -118,7 +118,7 @@
    (importance-resampling :model generate-1col-binary-extension
                           :inputs [spec (count rows) column-key beta-params]
                           :observation-trace (mmix/with-rows {} rows)
-                          :n-particles 500)))
+                          :n-particles 200)))
 
 #_(insert-column spec-test/mmix [{"z" true}] "z" {:alpha 0.001 :beta 0.001})
 
@@ -148,6 +148,16 @@
 (defn transpose
   [coll]
   (apply map vector coll))
+
+
+(defn anomaly-search
+  [spec target-col condition-cols data]
+  (map (fn [_] 999) data))
+
+#_(require '[inferdb.spreadsheets.model :as model])
+#_(require '[inferdb.spreadsheets.data :as data])
+#_(anomaly-search model/spec "java" [] data/nyt-data)
+#_(clojure.string/includes? "clojure" (clojure.string/lower-case "CL"))
 
 (defn search
   [spec new-column-key known-rows unknown-rows n-models beta-params]
