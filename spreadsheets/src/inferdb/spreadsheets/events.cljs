@@ -31,7 +31,7 @@
 
 (rf/reg-event-db
  :simulate
- [rf/debug]
+ event-interceptors
  (fn [db [event-name]]
    (let [gen #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)))
          new-rows (repeatedly 1 gen)]
@@ -39,13 +39,13 @@
 
 (rf/reg-event-db
  :clear-simulations
- [rf/debug]
+ event-interceptors
  (fn [db [event-name]]
    (db/clear-simulations db)))
 
 (rf/reg-event-db
  :after-change
- [rf/debug]
+ event-interceptors
  (fn [db [_ hot changes]]
 
    ; may end up using this later on

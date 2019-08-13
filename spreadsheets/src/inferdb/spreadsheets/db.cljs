@@ -19,9 +19,8 @@
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
-;(s/def ::example-flag any?)
-;(s/def ::example-flags (s/coll-of ::example-flag))
-(s/def ::example-flags any?)
+(s/def ::example-flag #(or (string? %) (nil? %)))
+(s/def ::example-flags (s/coll-of ::example-flag))
 
 (s/def ::topojson any?)
 
