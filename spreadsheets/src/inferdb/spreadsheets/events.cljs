@@ -8,7 +8,8 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
-(def hooks [:after-deselect :after-selection-end])
+(def hooks [:after-deselect :after-selection-end :after-change])
+(def virtual-hot-hooks [:after-deselect :after-selection-end])
 
 (def event-interceptors
   [rf/debug interceptors/check-spec])
@@ -41,6 +42,23 @@
  [rf/debug]
  (fn [db [event-name]]
    (db/clear-simulations db)))
+
+(rf/reg-event-db
+ :after-change
+ [rf/debug]
+ (fn [db [_ hot changes]]
+
+   ; may end up using this later on
+   #_(doseq [change changes])
+     (let [[row prop oldVal newVal] change]
+       ; do something
+       (+ 1 1))
+
+   ; TODO make this more robust, as row 0 might move
+   (let [example-flags (.getDataAtCol hot 0)]
+     (.log js/console "bar--------")
+     (.log js/console example-flags)
+     (db/with-example-flags db (js->clj example-flags)))))
 
 (rf/reg-event-db
  :after-selection-end

@@ -21,9 +21,9 @@
             (fn [db _]
               (db/pos-emmitter db)))
 
-(rf/reg-sub :example-statuses
+(rf/reg-sub :example-flags
             (fn [db _]
-              (db/example-statuses db)))
+              (db/example-flags db)))
 
 (defn table-headers
   [db _]
@@ -42,21 +42,28 @@
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into ["example-status" "score"] headers)))
+              (into ["example-flag" "score"] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
-               :example-statuses (rf/subscribe [:example-statuses])})
-            (fn [{:keys [rows scores ex-stats]}]
-              (cond->> rows
-                scores (mapv (fn [score row]
-                               (assoc row "score" score))
-                             scores)
-                ex-stats (mapv (fn [ex row]
-                                 (assoc row "example-status" ex))
-                               ex-stats))))
+               :example-flags (rf/subscribe [:example-flags])})
+            (fn [{:keys [rows scores example-flags]}]
+              (.log js/console "foo---------")
+              (.log js/console rows)
+              (.log js/console scores)
+              (.log js/console example-flags)
+              (let [foo (cond->> rows
+                            scores (mapv (fn [score row]
+                                           (assoc row "score" score))
+                                         scores)
+                            example-flags (mapv (fn [ex-flag row]
+                                                 (assoc row "example-flag" ex-flag))
+                                           example-flags))]
+                (.log js/console "foo value ------")
+                (.log js/console foo)
+                foo)))
 
 (rf/reg-sub :virtual-rows
             (fn [db _]
@@ -97,11 +104,20 @@
                :rows    (rf/subscribe [:computed-rows])})
             hot-props)
 
+(defn virtual-hot-props
+  [{:keys [headers rows]} _]
+  (let [data (cell-vector headers rows)
+        num-columns (count headers)
+        column-settings (repeat num-columns {})]
+    (-> views/virtual-hot-settings
+        (assoc-in [:settings :data] data)
+        (assoc-in [:settings :colHeaders] headers)
+        (assoc-in [:settings :columns] column-settings))))
 (rf/reg-sub :virtual-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:virtual-rows])})
-            hot-props)
+            virtual-hot-props)
 
 (defn selections
   [db _]
@@ -123,7 +139,7 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (if (or (= "score" column) (= "example-status" column))
+  (let [stattype-kw (if (or (= "score" column) (= "example-flag" column))
                       :gaussian
                       (get-in model/spec [:vars column]))]
     (case stattype-kw
@@ -136,7 +152,7 @@
     (clj->js
      (cond (and (= 1 (count selected-columns))
                 (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "NAME" "score" "example-status"}
+                (not (contains? #{"geo_fips" "NAME" "score" "example-flag"}
                                 (first selected-columns))))
            ;; Simulate plot
            (do
@@ -301,7 +317,7 @@
             (fn [{:keys [row columns one-cell-selected]}]
               (when (and one-cell-selected
                          ;; TODO clean up this check
-                         (not (contains? #{"geo_fips" "NAME" "score" "example-status"} (first columns))))
+                         (not (contains? #{"geo_fips" "NAME" "score" "example-flag"} (first columns))))
                 (let [sampled-column (first columns) ; columns that will be sampled
                       constraints (mmix/with-row-values {} (-> row
                                                                (select-keys (keys (:vars model/spec)))

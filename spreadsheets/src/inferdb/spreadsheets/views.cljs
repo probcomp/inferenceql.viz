@@ -23,6 +23,8 @@
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks events/hooks})
 
+(def virtual-hot-settings (assoc default-hot-settings :hooks events/virtual-hot-hooks))
+
 (def ^:private default-search-string
   (pr-str (select-keys (rand-nth data/nyt-data) [(rand-nth (keys (first data/nyt-data)))])))
 

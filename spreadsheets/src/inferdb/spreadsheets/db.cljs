@@ -19,8 +19,9 @@
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
-(s/def ::example-status bool?)
-(s/def ::example-statuses (s/coll-of ::example-status))
+;(s/def ::example-flag any?)
+;(s/def ::example-flags (s/coll-of ::example-flag))
+(s/def ::example-flags any?)
 
 (s/def ::topojson any?)
 
@@ -37,7 +38,7 @@
                           ::selected-row-index
                           ::row-at-selection-start
                           ::scores
-                          ::example-statuses
+                          ::example-flags
                           ::selected-columns
                           ::topojson
                           ::sampled-rows]))
@@ -128,12 +129,17 @@
   [db pos-emmitter left-scroll-pos]
   ;(.log js/console left-scroll-pos)
   ;(.log js/console pos-emmitter)
+  ; TODO make this less ugly
   (let [first-assoc (assoc-in db [::left-scroll-pos] left-scroll-pos)]
     (assoc-in first-assoc [::pos-emmitter] pos-emmitter)))
 
-(defn example-statuses
+(defn example-flags
   [db]
-  (get-in db [::example-statuses]))
+  (get-in db [::example-flags]))
+
+(defn with-example-flags
+  [db example-flags]
+  (assoc-in db [::example-flags] example-flags))
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
