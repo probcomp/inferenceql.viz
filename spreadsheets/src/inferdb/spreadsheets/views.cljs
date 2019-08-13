@@ -9,6 +9,7 @@
 (def default-hot-settings
   {:settings {:data                []
               :colHeaders          []
+              :columns             []
               :rowHeaders          true
               :columnSorting       true
               :manualColumnMove    true

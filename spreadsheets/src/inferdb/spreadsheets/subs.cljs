@@ -80,10 +80,17 @@
 
 (defn hot-props
   [{:keys [headers rows]} _]
-  (let [data (cell-vector headers rows)]
+  (let [data (cell-vector headers rows)
+        num-columns (count headers)
+
+        initial-column-setting {:readOnly false}
+        rem-column-settings (repeat (dec num-columns) {})
+        all-column-settings (cons initial-column-setting rem-column-settings)]
+
     (-> views/default-hot-settings
         (assoc-in [:settings :data] data)
-        (assoc-in [:settings :colHeaders] headers))))
+        (assoc-in [:settings :colHeaders] headers)
+        (assoc-in [:settings :columns] all-column-settings))))
 (rf/reg-sub :hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
