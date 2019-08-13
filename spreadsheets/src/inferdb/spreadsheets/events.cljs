@@ -99,13 +99,6 @@
  (fn [db [_ text]]
    (let [row (merge (edn/read-string text)
                     {search-column true})
-
-         _ (.log js/console "rows")
-         _ (.log js/console [row])
-         _ (.log js/console 1)
-         _ (.log js/console "rows-not-flagged")
-         _ (.log js/console data/nyt-data)
-         _ (.log js/console (count data/nyt-data))
          result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
      (rf/dispatch [:search-result result]))
    db))
@@ -130,29 +123,20 @@
          _ (.log js/console (count rows))
          _ (.log js/console "rows-ids")
          _ (.log js/console rows-ids)
-         _ (.log js/console (count rows-ids))
          _ (.log js/console "rows-not-flagged")
          _ (.log js/console rows-not-flagged)
          _ (.log js/console (count rows-not-flagged))
          _ (.log js/console "rows-not-flagged-ids")
          _ (.log js/console rows-not-flagged-ids)
-         _ (.log js/console (count rows-not-flagged-ids))
-         calculated-result (search/search model/spec search-column rows rows-not-flagged n-models beta-params)
 
-         calculated-result-map (zipmap rows-not-flagged-ids calculated-result)
-         pos-result-map (zipmap rows-ids (repeat 1))
+         calced-scores (search/search model/spec search-column rows rows-not-flagged n-models beta-params)
 
-         full-result-map (merge calculated-result-map pos-result-map)
-         sorted-pairs (sort-by key full-result-map)
-         scores (map second sorted-pairs)
+         calced-scores-ids-map (zipmap rows-not-flagged-ids calced-scores)
+         pos-scores-ids-map (zipmap rows-ids (repeat 1))
 
-         _ (.log js/console "result-map")
-         _ (.log js/console calculated-result-map)
-         _ (.log js/console pos-result-map)
-         _ (.log js/console full-result-map)
-         _ (.log js/console sorted-pairs)]
-
-
+         scores-ids-map (merge calced-scores-ids-map pos-scores-ids-map)
+         sorted-scores-ids (sort-by key scores-ids-map)
+         scores (map second sorted-scores-ids)]
      (rf/dispatch [:search-result scores]))
    db))
 
