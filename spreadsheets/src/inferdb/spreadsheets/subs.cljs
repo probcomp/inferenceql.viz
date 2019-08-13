@@ -1,5 +1,6 @@
 (ns inferdb.spreadsheets.subs
   (:require [clojure.walk :as walk]
+            [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
@@ -121,6 +122,37 @@
   [db _]
   (db/selected-columns db))
 (rf/reg-sub :selected-columns selected-columns)
+
+(defn rows-flagged-pos
+  [{:keys [flags rows]} _]
+  (let [clean-flag (fnil str/trim "")
+        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "1"))
+        pos-rows (map (fn [flag row] (if (pos-flag? flag) row)) flags rows)
+        pos-rows (remove nil? pos-rows)]
+    pos-rows))
+(rf/reg-sub :rows-flagged-pos
+            (fn [_ _]
+              {:flags (rf/subscribe [:example-flags])
+               :rows (rf/subscribe [:table-rows])})
+            rows-flagged-pos)
+
+(defn rows-not-flagged
+  [{:keys [flags rows]} _]
+  (let [clean-flag (fnil str/trim "")
+        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "1"))
+        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "0"))
+        unflaggged-rows (map (fn [flag row]
+                               (if (and (not (pos-flag? flag))
+                                        (not (neg-flag? flag)))
+                                   row))
+                             flags rows)
+        unflaggged-rows (remove nil? unflaggged-rows)]
+    unflaggged-rows))
+(rf/reg-sub :rows-not-flagged
+            (fn [_ _]
+              {:flags (rf/subscribe [:example-flags])
+               :rows (rf/subscribe [:table-rows])})
+            rows-not-flagged)
 
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 

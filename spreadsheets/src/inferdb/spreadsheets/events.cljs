@@ -104,6 +104,21 @@
    db))
 
 (rf/reg-event-db
+ :search-by-flagged
+ event-interceptors
+ (fn [db [_]]
+   (let [rows @(rf/subscribe [:rows-flagged-pos])
+         rows (map #(merge % {search-column true}) rows)
+         rows-not-flagged @(rf/subscribe [:rows-not-flagged])]
+         ;result (search/search model/spec search-column rows rows-not-flagged n-models beta-params)]
+     (.log js/console rows)
+     (.log js/console (count rows))
+     (.log js/console rows-not-flagged)
+     (.log js/console (count rows-not-flagged)))
+     ;(rf/dispatch [:search-result result]))
+   db))
+
+(rf/reg-event-db
  :search-result
  event-interceptors
  (fn [db [_ result]]
