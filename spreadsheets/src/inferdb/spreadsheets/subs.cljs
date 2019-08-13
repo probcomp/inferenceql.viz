@@ -139,6 +139,22 @@
                :rows (rf/subscribe [:table-rows])})
             rows-flagged-pos)
 
+(defn rows-flagged-neg
+  [{:keys [flags rows]} _]
+  (let [clean-flag (fnil str/trim "")
+        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "0"))
+        rows-with-ids (map vector (range) rows)
+        neg-rows (map (fn [flag row]
+                        (if (neg-flag? flag) row))
+                      flags rows-with-ids)
+        neg-rows (remove nil? neg-rows)]
+    neg-rows))
+(rf/reg-sub :rows-flagged-neg
+            (fn [_ _]
+              {:flags (rf/subscribe [:example-flags])
+               :rows (rf/subscribe [:table-rows])})
+            rows-flagged-neg)
+
 (defn rows-not-flagged
   [{:keys [flags rows]} _]
   (let [clean-flag (fnil str/trim "")

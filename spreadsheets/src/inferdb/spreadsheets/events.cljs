@@ -108,33 +108,32 @@
  event-interceptors
  (fn [db [_]]
    (let [remove-nils #(into {} (remove (comp nil? second) %))
-         rows-pairs @(rf/subscribe [:rows-flagged-pos])
-         rows-ids (map first rows-pairs)
-         rows (->> (map second rows-pairs)
+
+         pos-rows-pairs @(rf/subscribe [:rows-flagged-pos])
+         pos-rows-ids (map first pos-rows-pairs)
+         pos-rows (->> (map second pos-rows-pairs)
                    (map #(merge % {search-column true}))
                    (map remove-nils))
+
+         neg-rows-pairs @(rf/subscribe [:rows-flagged-neg])
+         neg-rows-ids (map first neg-rows-pairs)
+         neg-rows (->> (map second neg-rows-pairs)
+                   (map #(merge % {search-column false}))
+                   (map remove-nils))
+
+         example-rows (concat pos-rows neg-rows)
 
          rows-not-flagged-pairs @(rf/subscribe [:rows-not-flagged])
          rows-not-flagged-ids (map first rows-not-flagged-pairs)
          rows-not-flagged (map second rows-not-flagged-pairs)
 
-         _ (.log js/console "rows")
-         _ (.log js/console rows)
-         _ (.log js/console (count rows))
-         _ (.log js/console "rows-ids")
-         _ (.log js/console rows-ids)
-         _ (.log js/console "rows-not-flagged")
-         _ (.log js/console rows-not-flagged)
-         _ (.log js/console (count rows-not-flagged))
-         _ (.log js/console "rows-not-flagged-ids")
-         _ (.log js/console rows-not-flagged-ids)
-
-         calced-scores (search/search model/spec search-column rows rows-not-flagged n-models beta-params)
+         calced-scores (search/search model/spec search-column example-rows rows-not-flagged n-models beta-params)
 
          calced-scores-ids-map (zipmap rows-not-flagged-ids calced-scores)
-         pos-scores-ids-map (zipmap rows-ids (repeat 1))
+         pos-scores-ids-map (zipmap pos-rows-ids (repeat 1))
+         neg-scores-ids-map (zipmap neg-rows-ids (repeat 0))
 
-         scores-ids-map (merge calced-scores-ids-map pos-scores-ids-map)
+         scores-ids-map (merge calced-scores-ids-map pos-scores-ids-map neg-scores-ids-map)
          sorted-scores-ids (sort-by key scores-ids-map)
          scores (map second sorted-scores-ids)]
      (rf/dispatch [:search-result scores]))
