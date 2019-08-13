@@ -1,501 +1,99 @@
-age,yearscoding,subversion,mobile_developer,sqlite,android,ios,firebase,back-end_developer,java,c++,c,git,windows_desktop_or_server,notepad++,c#,visual_studio,linux,bash_shell,vim
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,True,True,True
-25 - 34 years old,12-14 years,True,True,False,True,False,True,False,False,False,False,False,True,True,False,False,False,False,False
-35 - 44 years old,9-11 years,False,False,False,False,False,False,False,True,False,False,True,False,True,False,False,True,True,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,True,False,False,False,True,True,False
-,6-8 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,True,False,True,True,False,False,True,False,False,False,False,False,False,False
-,9-11 years,False,True,False,True,False,False,False,True,False,True,False,True,False,True,True,True,True,False
-35 - 44 years old,18-20 years,False,False,False,False,False,False,True,False,False,False,True,False,False,False,True,True,True,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,False,True,True,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,12-14 years,False,True,True,True,True,True,True,True,False,True,True,False,True,True,True,True,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,True,True,True,True,False,False,False,False,True,True,True
-,12-14 years,False,False,False,False,False,False,False,True,False,True,True,False,False,True,True,False,True,False
-35 - 44 years old,9-11 years,False,False,False,False,False,False,True,True,False,True,True,False,False,True,True,True,False,True
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,False,False,False,True,False,False,False,False,False,False,False
-18 - 24 years old,9-11 years,False,False,False,False,False,False,False,True,True,True,True,False,False,True,False,True,True,True
-25 - 34 years old,15-17 years,True,True,False,True,True,True,False,True,False,True,True,False,False,True,True,False,True,True
-35 - 44 years old,24-26 years,True,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,True,False,False,False,False,True,True,False,False,True,False,False,False,False,True,True,True
-,0-2 years,False,True,False,False,False,False,False,True,False,True,False,False,False,False,False,False,False,False
-,9-11 years,False,False,False,True,False,False,False,True,False,True,True,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,True,True,True,True,False,True,True,True,True,True,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,True,False,True,True,True,False,False
-35 - 44 years old,24-26 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,False,False,True,True
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,True,False
-,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,False,False,False
-45 - 54 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,True,False,False,False,False,False
-25 - 34 years old,12-14 years,False,True,False,False,True,False,True,True,False,True,True,False,False,False,True,False,False,False
-25 - 34 years old,12-14 years,False,False,True,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-18 - 24 years old,6-8 years,False,True,False,True,True,True,True,True,False,True,True,False,False,False,False,True,True,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,True,False,True,False,True,False
-18 - 24 years old,12-14 years,False,True,False,False,True,False,False,False,False,True,True,False,False,False,False,False,False,False
-,21-23 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,0-2 years,False,False,False,True,False,False,False,True,False,True,False,False,False,True,True,False,False,False
-25 - 34 years old,9-11 years,False,True,False,False,False,False,True,True,True,True,True,True,False,True,True,True,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,False,True,True,True,False,False,False,False,True,True,False
-18 - 24 years old,6-8 years,False,False,False,False,False,False,True,True,True,True,True,False,True,False,False,True,True,True
-25 - 34 years old,6-8 years,False,False,False,False,False,True,False,True,False,True,True,False,False,False,True,True,True,False
-35 - 44 years old,9-11 years,False,False,False,False,False,False,True,False,False,True,True,False,False,False,False,True,True,True
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,21-23 years,True,False,False,False,False,False,True,True,False,True,True,False,True,False,True,False,True,False
-25 - 34 years old,6-8 years,True,False,False,False,False,False,True,True,False,True,True,True,False,False,False,True,False,False
-25 - 34 years old,18-20 years,False,False,False,True,False,False,True,True,True,True,True,True,False,True,True,True,True,True
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,True,False,False
-25 - 34 years old,6-8 years,False,True,False,True,False,True,False,True,False,True,True,False,True,True,False,False,False,False
-,6-8 years,False,True,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,6-8 years,False,False,False,False,False,False,False,True,True,True,True,True,True,True,True,True,True,False
-25 - 34 years old,18-20 years,False,True,False,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,True,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,False,True,False,True,True,False,False,True,True,False,False,False
-,9-11 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,True,False,False,False,True,False,False,False,True,False,False,False,True,True,False,False
-,0-2 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-45 - 54 years old,24-26 years,False,False,False,False,False,False,False,True,False,True,True,True,True,True,True,False,False,False
-25 - 34 years old,9-11 years,False,True,False,False,False,False,True,True,True,True,False,True,True,True,True,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,False,True,True,True,True,False,False,False
-18 - 24 years old,3-5 years,False,False,False,True,False,True,False,True,False,True,True,False,False,False,True,True,True,False
-25 - 34 years old,9-11 years,False,False,False,True,False,False,True,True,True,True,True,False,False,False,False,True,True,True
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,12-14 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,0-2 years,False,True,False,False,False,False,True,True,False,True,False,True,False,True,True,False,False,False
-,3-5 years,False,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,True,False,False,False,True,False
-45 - 54 years old,30 or more years,True,True,False,False,False,False,True,True,True,True,True,True,True,True,True,True,False,True
-55 - 64 years old,30 or more years,False,False,False,False,False,False,True,True,False,True,True,True,False,False,False,False,False,False
-25 - 34 years old,15-17 years,False,False,True,False,False,False,False,True,False,True,True,False,True,False,False,True,True,True
-25 - 34 years old,9-11 years,True,False,False,False,False,False,False,False,True,True,True,False,True,True,True,False,True,True
-45 - 54 years old,27-29 years,True,True,False,True,True,False,False,False,False,True,True,True,True,True,True,False,True,True
-18 - 24 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,False,True,True,True,False,True
-25 - 34 years old,3-5 years,True,False,False,False,False,False,False,True,False,True,True,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,False,False,False,False,True,True,False,False,True,True,True
-45 - 54 years old,15-17 years,True,False,False,False,False,False,False,False,True,True,True,False,False,False,False,True,False,True
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,12-14 years,False,False,True,False,True,False,True,True,False,True,True,True,False,True,True,True,False,False
-,15-17 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,False,True,False,True
-25 - 34 years old,12-14 years,False,False,False,False,False,True,False,True,False,True,True,False,False,False,True,True,True,False
-45 - 54 years old,30 or more years,True,False,False,False,False,False,True,True,False,True,False,False,False,False,True,True,True,False
-,6-8 years,False,True,True,True,False,False,True,True,False,True,True,False,False,True,True,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,False,True,False,True,True,True,True,True,True,False,False,False
-Under 18 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,False,True,False,True,True,False,False,False
-25 - 34 years old,18-20 years,False,True,True,False,True,False,False,True,False,True,True,False,False,True,True,True,True,False
-,15-17 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,True,False,False,False,False,False,False,True,False,True,True,True,True,False,False,False,False,False
-,12-14 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,True,False,False,False,True,False,True
-35 - 44 years old,21-23 years,False,False,False,False,False,True,False,True,False,True,True,False,False,False,True,False,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,True,False,True,False,True,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,False,False,False,True,True,False,False,False,False,True,True,True
-25 - 34 years old,6-8 years,False,False,False,True,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,False,True,False,True,True,False,True,False,True,True,False,True,True,True,True,False,False
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,False
-25 - 34 years old,12-14 years,False,False,False,True,True,False,False,False,True,True,True,False,False,True,True,False,False,False
-25 - 34 years old,18-20 years,False,False,False,True,True,False,False,True,False,True,True,False,True,True,False,True,False,True
-18 - 24 years old,3-5 years,False,True,False,True,True,False,True,True,False,False,True,False,False,False,False,False,False,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,False,True,False
-,0-2 years,False,False,False,False,False,False,True,False,True,True,True,False,True,True,True,True,True,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,True,False,False,True,True,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,True,False,False,False,True,False,True,False,False,False,True,True
-35 - 44 years old,21-23 years,True,False,False,True,False,False,True,True,True,True,True,False,True,False,False,True,True,True
-18 - 24 years old,0-2 years,False,False,False,False,False,False,True,True,False,False,True,True,False,False,True,True,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,False,True,True,True,True,False,False,False
-35 - 44 years old,0-2 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,True,True,True,True,False,False,True,True,True,True
-18 - 24 years old,6-8 years,False,True,True,True,False,False,True,True,True,True,True,False,False,False,False,True,True,True
-25 - 34 years old,9-11 years,True,True,False,True,True,True,True,True,True,True,True,False,True,False,True,True,True,False
-55 - 64 years old,30 or more years,False,False,False,False,False,False,True,True,False,True,False,True,False,True,True,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,True,False,False,True,True,True,False,True,True,False,False,False
-,6-8 years,True,False,False,False,False,False,True,True,False,True,True,True,False,True,True,False,False,False
-25 - 34 years old,3-5 years,False,True,False,False,False,False,False,True,True,True,True,False,False,False,True,True,False,False
-25 - 34 years old,3-5 years,True,False,False,False,False,False,True,False,True,True,False,True,True,False,True,False,False,False
-25 - 34 years old,6-8 years,False,True,False,True,False,True,True,True,False,False,True,False,False,False,False,True,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,True,False,False,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-45 - 54 years old,21-23 years,True,False,True,True,True,False,False,False,True,True,False,False,False,False,False,False,False,False
-,0-2 years,False,False,False,False,False,True,True,True,True,True,True,False,False,False,False,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-Under 18 years old,3-5 years,False,False,False,False,False,False,False,True,False,False,True,False,True,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,False,True,True,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-,21-23 years,True,False,False,False,False,False,True,True,False,False,True,False,False,False,False,True,False,False
-,0-2 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,9-11 years,False,False,False,False,False,False,True,True,False,True,True,True,True,False,False,False,False,False
-25 - 34 years old,3-5 years,False,True,True,True,False,False,False,True,False,True,True,True,False,False,False,True,True,False
-,0-2 years,False,True,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-45 - 54 years old,27-29 years,True,False,False,False,False,False,False,True,False,True,True,False,True,False,False,False,False,False
-18 - 24 years old,,False,False,False,False,False,False,False,False,False,False,False,False,True,False,True,False,False,False
-35 - 44 years old,24-26 years,False,True,False,True,True,False,True,False,False,True,True,True,False,True,True,False,False,False
-25 - 34 years old,0-2 years,False,False,True,False,False,False,False,True,False,True,True,False,False,False,False,False,True,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,True,True,False,True,True,False,False,True,True,False,False,False
-25 - 34 years old,0-2 years,False,False,False,False,False,True,False,True,False,True,True,False,False,False,True,False,False,False
-,0-2 years,False,False,False,False,False,False,True,True,True,True,False,False,False,False,False,True,False,False
-35 - 44 years old,18-20 years,True,False,False,True,True,False,False,True,False,True,True,False,False,False,False,True,True,True
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,18-20 years,False,False,False,False,True,False,True,True,False,True,True,False,False,False,False,False,True,True
-Under 18 years old,0-2 years,False,False,False,False,False,False,True,True,False,True,True,True,False,False,False,False,False,False
-,18-20 years,False,False,False,False,False,False,True,True,False,True,False,False,False,False,False,False,True,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,False,False,True,True,False,True,False,False,False,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,True,False
-35 - 44 years old,24-26 years,False,False,False,False,False,False,False,False,False,False,False,True,False,False,False,False,False,False
-25 - 34 years old,0-2 years,False,False,False,False,False,False,True,False,False,False,True,True,False,False,False,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,21-23 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,True,False,False,False,False,False,True,True,False,True,False,False,False,True,False,True,True,True
-,0-2 years,False,True,False,False,False,True,False,True,False,True,True,False,False,True,True,False,False,False
-25 - 34 years old,3-5 years,False,False,True,False,False,False,True,True,False,True,True,True,False,True,True,False,True,False
-25 - 34 years old,0-2 years,False,False,True,True,False,True,True,True,False,True,True,False,False,False,True,True,True,True
-18 - 24 years old,0-2 years,False,True,True,True,False,False,False,True,True,True,True,False,False,False,True,False,False,False
-25 - 34 years old,9-11 years,False,True,True,True,True,True,False,True,False,True,True,False,True,False,False,False,False,False
-25 - 34 years old,3-5 years,True,True,True,True,True,False,True,True,False,True,True,True,True,True,True,False,True,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,False,False,True,True
-25 - 34 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,True,False
-,0-2 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,False,False,False,True,True,True,False,True,True,True,True,False
-,6-8 years,False,False,True,False,False,False,True,True,False,True,False,False,False,True,False,False,False,False
-35 - 44 years old,18-20 years,True,True,False,True,False,False,True,True,False,True,True,False,True,False,False,True,True,True
-18 - 24 years old,9-11 years,True,False,False,False,False,False,True,False,True,True,True,True,True,True,True,True,True,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,False,True,False
-,15-17 years,False,False,False,False,False,False,False,False,False,False,True,False,False,False,False,False,False,False
-45 - 54 years old,12-14 years,False,False,False,False,False,False,True,True,False,True,True,True,False,False,True,False,False,False
-18 - 24 years old,9-11 years,False,False,False,False,False,False,True,False,True,True,True,True,True,True,True,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,True,True,False,True,False,True,False
-,9-11 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,12-14 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,True,False,False,True,True,False,True,True,True,True,True,True,False,False,False
-,0-2 years,False,False,False,False,False,False,True,False,False,False,True,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,False,False,True,False,False,False,True,True,False,False,False
-,3-5 years,False,False,False,True,False,False,False,True,True,True,False,False,False,True,False,False,False,False
-25 - 34 years old,24-26 years,True,False,False,False,False,False,False,True,True,True,True,False,False,False,False,True,True,False
-35 - 44 years old,21-23 years,False,False,False,False,False,False,True,True,False,True,False,True,False,True,True,True,False,False
-,9-11 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-Under 18 years old,0-2 years,False,False,False,False,False,False,False,True,False,False,True,True,False,False,True,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,False,True,True,True,True,False,True
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,True,True,True,True,False,True,False,True,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,21-23 years,False,True,True,True,False,False,False,True,False,True,True,False,True,True,True,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,True,True
-,6-8 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,False,True,True,False,False,True,False,True,False,True,True,False,False,False,False,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,False,False,False,False,True,False,False,False,False,True,True,True
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,True,True,True,True,False,False,False,True,True,True,True
-35 - 44 years old,18-20 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,True,True,True
-18 - 24 years old,15-17 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,False,True,True
-,3-5 years,False,False,False,False,False,False,True,True,True,True,True,True,True,False,False,True,True,True
-25 - 34 years old,6-8 years,False,False,False,True,True,True,False,True,False,True,True,False,False,False,True,False,False,True
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,True,False
-,9-11 years,False,False,False,True,False,False,True,True,False,False,True,False,False,False,False,False,False,True
-,15-17 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,True,True,False,False,True,False,False,True,False,True,True,True,True,True,True,False,False,False
-25 - 34 years old,3-5 years,True,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,True,True
-25 - 34 years old,6-8 years,False,False,True,False,False,True,True,True,False,False,True,False,False,False,True,True,True,True
-25 - 34 years old,6-8 years,False,True,False,False,True,False,False,True,False,True,False,True,False,True,True,False,False,False
-,0-2 years,False,True,False,True,False,False,True,True,False,True,False,False,True,False,True,False,False,False
-25 - 34 years old,6-8 years,False,True,False,True,True,False,False,False,True,True,True,True,False,True,False,False,True,False
-35 - 44 years old,21-23 years,False,False,False,True,False,True,False,True,True,True,True,True,False,True,True,False,False,False
-18 - 24 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,True,False,False,True,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,True,True,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,True,True,True,False,False,False,True,False,True,True,False,False,False,True,False,True,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,True,True,True,False,False,True,True,True,False,False
-25 - 34 years old,12-14 years,False,True,True,False,False,False,True,True,True,True,True,False,False,False,False,True,True,True
-18 - 24 years old,9-11 years,False,False,False,False,False,False,True,False,False,True,True,True,True,True,True,False,False,False
-,3-5 years,False,False,False,True,False,False,False,True,True,True,True,True,True,True,True,False,False,False
-35 - 44 years old,15-17 years,True,False,False,False,False,False,True,False,False,True,True,False,False,False,False,False,True,False
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,True,True,False,True,True,False,False
-,3-5 years,True,False,False,True,False,False,True,True,True,True,True,False,False,False,True,True,False,True
-,3-5 years,False,False,False,False,True,False,False,True,False,True,True,True,False,False,True,False,False,False
-,6-8 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-,3-5 years,True,False,False,False,False,False,True,True,True,True,False,True,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-Under 18 years old,0-2 years,False,False,False,True,False,True,False,True,True,True,True,False,False,False,True,False,False,False
-45 - 54 years old,27-29 years,True,False,False,False,False,False,True,True,True,True,True,False,False,False,True,True,True,True
-,3-5 years,True,False,False,False,False,False,True,True,False,False,True,False,False,False,False,True,False,True
-25 - 34 years old,0-2 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,True,False,False,False,False,True,True,True,True,True,False,False,False,False,False,False,False
-45 - 54 years old,30 or more years,True,False,False,False,False,False,True,True,False,False,True,False,False,False,False,False,False,False
-18 - 24 years old,0-2 years,False,True,False,True,False,True,False,True,True,True,True,False,False,False,False,False,False,False
-,18-20 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,15-17 years,False,False,False,False,False,False,False,False,False,False,True,False,False,False,True,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,False,True,False,True,False,True,True,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,6-8 years,False,True,True,False,False,False,True,True,False,True,True,False,True,True,True,False,True,False
-,0-2 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,18-20 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,True,True,True
-35 - 44 years old,15-17 years,False,True,False,True,False,False,False,False,True,True,True,False,False,False,False,True,True,True
-45 - 54 years old,24-26 years,True,False,False,False,False,False,True,False,False,True,False,False,True,True,True,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,False,True,False,True,False,True,True,False
-,24-26 years,True,False,False,True,True,False,False,True,True,True,True,True,True,True,True,True,True,False
-,15-17 years,False,False,True,False,False,False,True,True,False,True,True,False,False,False,True,False,True,False
-25 - 34 years old,6-8 years,True,False,True,False,False,False,False,True,False,True,True,False,True,False,False,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,0-2 years,False,False,False,False,False,False,False,True,True,True,True,False,True,False,True,True,False,False
-35 - 44 years old,18-20 years,False,False,False,False,False,False,False,True,False,False,True,False,False,False,True,True,False,True
-,3-5 years,False,False,True,False,False,False,True,False,False,True,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,False,False,True,True,False,False,False,False,False,True,False
-,15-17 years,False,True,False,False,False,False,True,True,True,True,False,False,False,True,False,False,False,False
-35 - 44 years old,12-14 years,False,False,False,False,False,False,False,True,False,True,True,True,False,True,True,False,False,False
-25 - 34 years old,0-2 years,True,False,False,False,False,False,True,True,False,True,True,True,False,True,True,True,False,False
-35 - 44 years old,21-23 years,False,True,False,True,False,False,True,True,True,True,True,True,False,True,True,False,False,False
-Under 18 years old,3-5 years,False,True,True,False,False,False,True,False,False,True,True,True,False,True,True,True,True,True
-18 - 24 years old,3-5 years,False,True,False,True,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-35 - 44 years old,24-26 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,True,True,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,6-8 years,False,True,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,24-26 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,True,True,False,False,True,False,True,False,True,False,False,False
-25 - 34 years old,9-11 years,False,False,True,False,False,False,True,True,False,False,True,True,False,False,False,True,True,True
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,True,False,True,True,True,True,True,False,False,False,False,True,True,False
-25 - 34 years old,3-5 years,True,True,True,True,True,False,True,True,False,True,False,False,True,True,True,False,False,False
-25 - 34 years old,0-2 years,False,False,False,False,False,False,True,False,False,True,True,False,False,False,False,False,True,True
-,3-5 years,False,False,False,False,False,False,True,True,True,True,False,False,True,False,True,False,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,True,False,False,True,True,True,False,True,True,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,False,False
-45 - 54 years old,30 or more years,False,False,False,False,False,False,True,True,True,True,True,True,True,True,True,True,True,False
-,18-20 years,False,False,False,True,False,True,False,True,True,True,True,False,True,False,False,False,False,False
-35 - 44 years old,18-20 years,False,False,False,False,False,False,True,True,True,True,True,True,False,False,True,True,True,True
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-25 - 34 years old,3-5 years,False,False,True,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-25 - 34 years old,9-11 years,True,False,False,False,False,False,True,True,False,True,True,False,True,False,False,True,False,False
-18 - 24 years old,9-11 years,False,True,False,True,False,False,True,True,True,True,True,True,True,False,False,True,True,True
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,False,True,True,False,True,True
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,False,False,True,True,False,False,False,False,False,True,True
-25 - 34 years old,6-8 years,False,True,True,False,True,False,True,True,False,True,True,True,False,False,False,True,True,False
-,0-2 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,24-26 years,False,False,False,False,False,False,True,True,False,False,True,False,True,False,False,True,True,True
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,True,True,True,True,False,False,True,True,True,False,False
-,0-2 years,False,False,False,False,False,False,False,False,False,True,False,True,False,True,False,False,False,False
-35 - 44 years old,0-2 years,False,False,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,False
-25 - 34 years old,12-14 years,False,False,False,True,False,False,True,False,False,True,True,True,False,True,True,False,True,False
-25 - 34 years old,6-8 years,False,True,False,True,True,False,True,True,False,True,True,False,False,False,True,False,True,False
-18 - 24 years old,3-5 years,True,False,False,False,False,False,True,True,False,True,True,True,True,False,True,False,False,False
-45 - 54 years old,21-23 years,False,False,False,False,False,False,True,True,False,True,True,True,True,False,False,True,False,True
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,True,False,False,False,False,True,True,True,False,True,True,False,True,True,True,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,True,True,True,True,True,False,True,True,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,False,True,False,False,False,True,True,False,True,True,False,False,True,True,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,False,True,True,True,True,True,True,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,False,True,False,False,False,False,False,False
-,0-2 years,False,False,False,False,False,False,False,True,True,True,False,False,False,False,True,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,False,True,True
-18 - 24 years old,6-8 years,False,True,False,True,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-,6-8 years,False,False,False,True,False,False,False,True,False,True,True,False,True,True,True,False,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,True,False,True,True,False,True,True,False,True,True,False,True,True,True,False,False,False
-45 - 54 years old,30 or more years,True,False,False,False,False,False,True,True,False,True,True,True,False,False,False,True,True,True
-,24-26 years,False,False,False,False,False,False,False,False,False,True,False,True,True,True,True,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,False,True,False,True,True,False,False,True,True,False,True,False
-25 - 34 years old,9-11 years,True,False,False,False,False,False,False,True,False,True,False,True,True,True,True,False,False,False
-25 - 34 years old,6-8 years,False,True,False,False,False,False,True,True,False,True,True,False,False,False,False,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,0-2 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,0-2 years,False,True,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,30 or more years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,True,False,True,True,False,True,True,True,True,True,False,False,True,False,True,False,True
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,True,True,True,False,True,True,False,True,False,False
-,9-11 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,False,False,False,True
-,3-5 years,False,False,False,False,False,False,True,True,True,True,True,False,False,False,True,False,True,False
-Under 18 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,True,False,False,True,False,False,False
-18 - 24 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,True,True,True,True,False,False,False
-18 - 24 years old,0-2 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,False,False
-25 - 34 years old,12-14 years,False,True,True,True,True,False,True,True,False,True,True,True,True,True,True,True,True,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,True,True,True,True,False,False,False
-,12-14 years,False,True,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,True,False,False,False
-,15-17 years,False,False,False,False,False,False,True,True,True,True,False,False,False,False,False,False,False,False
-18 - 24 years old,6-8 years,False,False,True,False,False,False,False,True,True,True,True,True,False,False,False,True,True,True
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,False,True,True,False,True,False,True,False,False,False
-,15-17 years,False,False,False,False,False,False,False,False,True,True,True,True,False,True,True,True,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,False,True,True,True,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,False,False
-,6-8 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,15-17 years,True,False,False,False,False,False,True,True,True,True,True,False,False,False,False,True,True,True
-25 - 34 years old,12-14 years,False,False,False,False,False,False,False,False,False,True,False,False,True,True,False,False,False,False
-,12-14 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,True,False,True,True,True,False,True,True,False,False,False
-,0-2 years,False,False,False,False,False,False,False,True,False,False,False,True,True,False,False,False,True,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,False,False,False,True,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,False,False
-,3-5 years,True,True,True,True,False,False,True,True,False,True,True,False,True,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,True,True,True,True,False,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,True,False,False
-25 - 34 years old,6-8 years,False,False,False,True,False,False,True,True,True,True,True,True,True,True,True,True,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,6-8 years,False,True,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,27-29 years,True,True,False,True,False,False,False,False,True,True,True,False,True,False,True,False,False,True
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,True,True,True,True,False,True,True,False,True,False
-35 - 44 years old,0-2 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-,6-8 years,False,False,False,False,False,False,True,True,False,True,False,False,False,False,False,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,False,False,False,True,False,False,False,False,False,True,True
-Under 18 years old,3-5 years,False,True,True,True,False,True,True,True,True,True,True,False,False,False,True,True,True,False
-,18-20 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,27-29 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,True,True,False,True
-,3-5 years,True,False,False,True,False,False,False,True,True,True,False,True,True,False,True,True,False,False
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,True,True,True,False,True,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,False,False,True,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,False,True,True,False,True,False,False,False,False,True
-25 - 34 years old,3-5 years,False,False,True,False,False,False,False,True,False,True,True,False,False,False,False,False,False,True
-,6-8 years,False,True,False,True,True,False,False,True,False,True,True,False,True,True,True,False,False,False
-25 - 34 years old,3-5 years,False,False,True,False,True,True,True,True,False,False,True,False,True,False,True,True,False,True
-18 - 24 years old,3-5 years,False,False,False,True,False,False,True,True,True,True,True,False,False,False,False,True,True,False
-,3-5 years,False,False,False,False,False,False,False,True,False,True,False,False,False,True,True,False,False,False
-18 - 24 years old,6-8 years,True,False,True,True,False,False,True,True,True,True,True,False,False,False,False,True,True,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,6-8 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,6-8 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,6-8 years,False,False,True,False,False,True,True,True,True,True,True,False,True,False,False,True,True,True
-,3-5 years,False,False,True,True,True,False,True,True,False,False,True,False,False,False,True,True,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,,True,False,False,False,False,True,False,False,False,False,False,False,True,False,False,False,False,False
-,6-8 years,False,True,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,False,True,False
-,6-8 years,False,False,False,True,False,False,True,True,True,True,True,True,True,True,True,True,True,True
-18 - 24 years old,6-8 years,False,False,False,False,False,False,True,True,True,True,True,False,False,False,False,True,False,True
-18 - 24 years old,12-14 years,True,False,True,False,False,False,True,True,False,True,True,False,False,False,False,False,True,False
-,0-2 years,False,False,False,False,False,False,False,False,True,True,False,False,False,False,False,True,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,False,False,True,True,False,False,False,False,True,True,True
-55 - 64 years old,30 or more years,False,True,False,False,True,False,False,True,False,True,True,False,False,False,False,False,False,False
-35 - 44 years old,15-17 years,True,False,False,False,False,False,False,True,False,True,True,True,True,True,True,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,12-14 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,9-11 years,False,False,True,True,True,True,True,True,True,True,True,False,False,False,False,True,True,True
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,False,False,True,False,False,True,True,True,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,9-11 years,False,False,True,False,False,True,True,True,False,True,True,False,False,False,True,True,True,True
-,6-8 years,True,False,False,False,False,False,True,True,False,False,True,True,False,False,True,False,False,False
-18 - 24 years old,0-2 years,False,False,False,False,False,False,False,False,True,True,False,False,False,False,False,False,False,False
-35 - 44 years old,18-20 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,True,False,True,True,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,True,True,False,False,True,False,False,False,False,True,True,True
-18 - 24 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,27-29 years,False,False,False,False,False,False,False,True,False,True,True,True,True,True,True,False,False,False
-25 - 34 years old,18-20 years,False,False,True,False,False,False,True,True,False,True,True,False,True,False,False,True,False,True
-18 - 24 years old,6-8 years,False,False,True,False,False,True,True,True,True,True,True,False,False,True,True,False,True,True
-25 - 34 years old,9-11 years,False,False,False,False,False,False,False,False,False,True,True,False,False,False,False,True,True,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,True,True,True,True,False,False,False,False,True,True,True
-,3-5 years,False,True,False,False,False,False,True,True,True,True,False,False,False,False,False,False,False,False
-,9-11 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,True,False,True,False,False,False,True,False,True,True,True,True,True,True,True,False,True,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,True,True,True,True,True,True,True
-25 - 34 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-35 - 44 years old,15-17 years,False,True,False,False,True,False,False,False,False,True,True,False,False,False,False,False,False,False
-25 - 34 years old,12-14 years,False,True,False,False,True,True,False,False,False,False,True,False,False,False,False,False,False,False
-Under 18 years old,0-2 years,False,False,False,True,False,False,False,False,True,True,False,False,True,False,True,False,False,False
-35 - 44 years old,30 or more years,False,False,True,False,False,True,False,True,False,True,True,False,True,True,True,True,True,False
-25 - 34 years old,6-8 years,False,True,False,False,True,True,False,True,False,True,True,False,False,False,True,False,False,False
-,3-5 years,False,False,False,False,False,False,True,True,False,False,False,False,False,False,False,False,False,False
-Under 18 years old,6-8 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,True,True,False,False,False,True,True,False,True,False,True,True,False,True,False,False,False
-25 - 34 years old,6-8 years,True,True,False,True,False,True,True,True,True,True,True,False,True,False,False,False,False,False
-,30 or more years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,True,True,False,True,True,False,False,False,True,True,False,True,True,True,False,False,False
-18 - 24 years old,6-8 years,False,True,False,False,True,False,False,False,True,True,True,False,False,False,False,True,True,False
-18 - 24 years old,9-11 years,True,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-,0-2 years,False,False,False,False,False,False,False,True,True,True,False,True,False,True,True,True,True,False
-,0-2 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,False,False
-18 - 24 years old,3-5 years,False,False,False,True,False,False,True,True,False,True,True,False,False,False,True,True,True,True
-18 - 24 years old,3-5 years,False,False,False,True,False,False,True,True,False,True,False,False,True,True,False,False,True,False
-18 - 24 years old,6-8 years,False,False,False,False,False,False,False,True,True,True,True,False,False,False,True,False,False,False
-25 - 34 years old,6-8 years,False,False,True,True,False,False,True,True,False,True,True,False,False,True,False,False,False,False
-25 - 34 years old,12-14 years,True,False,True,False,False,False,False,True,True,True,True,False,True,False,True,True,True,False
-35 - 44 years old,6-8 years,True,False,False,False,False,False,False,True,True,True,False,False,True,False,False,False,True,False
-,6-8 years,True,False,False,False,False,False,True,True,False,True,True,True,True,True,True,False,False,False
-,0-2 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,12-14 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,3-5 years,True,True,False,True,True,False,True,True,False,True,True,True,True,True,True,True,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,True,True,False,False,True,False,True,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,True,True,False,True,False,False,False,False,False,False,False,False
-,6-8 years,True,False,False,False,False,False,False,True,False,True,False,True,True,False,True,False,False,False
-25 - 34 years old,18-20 years,False,True,False,True,True,False,True,True,True,True,True,True,False,True,True,True,True,True
-,3-5 years,False,False,False,False,False,False,True,True,False,True,False,False,True,False,True,False,False,False
-,0-2 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,True,False,False,True,False,False,False,False,True,True,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-,9-11 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,15-17 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,True,True,False
-,3-5 years,False,True,False,True,False,False,True,True,False,True,False,False,False,True,False,False,False,False
-25 - 34 years old,9-11 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,True,True,True,False
-45 - 54 years old,18-20 years,True,False,False,False,False,False,False,True,False,True,False,True,True,True,True,True,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,9-11 years,False,False,False,False,False,False,True,True,False,True,False,False,False,True,False,False,False,False
-35 - 44 years old,9-11 years,False,False,False,False,True,False,False,True,False,True,True,True,False,True,True,False,True,True
-18 - 24 years old,9-11 years,False,False,False,True,False,True,True,True,True,True,True,True,False,False,True,True,True,True
-,6-8 years,False,False,False,False,False,False,True,False,False,False,False,False,False,False,False,False,False,False
-35 - 44 years old,24-26 years,False,False,False,False,False,False,True,True,False,True,True,True,True,False,True,True,True,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,False,True,True,False,True,False,False,False,False,True,True,False,False,False,False,False,True,False
-,3-5 years,False,True,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-Under 18 years old,9-11 years,False,False,False,False,False,False,True,False,True,True,True,True,False,False,False,True,True,True
-18 - 24 years old,0-2 years,False,False,False,False,False,True,False,True,False,True,False,True,True,False,True,True,False,False
-,6-8 years,False,True,True,True,False,False,False,True,True,True,True,True,False,False,True,False,False,False
-45 - 54 years old,30 or more years,True,False,False,False,False,False,True,True,True,True,True,True,True,False,False,True,True,True
-35 - 44 years old,12-14 years,False,True,False,True,False,False,True,True,False,True,True,True,True,True,True,False,False,False
-,6-8 years,False,False,False,False,False,False,False,True,True,True,True,False,False,True,True,False,False,False
-55 - 64 years old,18-20 years,False,True,False,True,False,True,False,True,False,False,True,False,False,False,False,False,False,False
-,3-5 years,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-25 - 34 years old,6-8 years,True,False,False,False,False,False,True,True,False,False,True,False,False,False,False,True,False,True
-25 - 34 years old,0-2 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,False
-,3-5 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,True,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,True,True,True,False,False,False,False,True,False,True
-25 - 34 years old,0-2 years,False,True,True,True,True,True,False,True,False,False,True,False,False,False,True,False,False,False
-,3-5 years,False,False,False,False,False,False,False,True,False,True,False,False,False,False,False,False,False,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,3-5 years,True,False,False,False,False,False,False,True,False,True,True,False,False,False,False,True,False,False
-,6-8 years,False,False,False,False,False,False,False,True,True,True,True,False,True,False,True,False,False,False
-35 - 44 years old,18-20 years,False,False,False,False,False,False,True,True,False,True,True,False,False,False,False,True,True,True
-18 - 24 years old,0-2 years,True,False,False,False,False,False,True,True,False,False,False,False,False,False,False,False,False,False
-18 - 24 years old,3-5 years,False,False,False,False,False,False,True,True,False,True,True,True,True,True,True,False,False,False
-18 - 24 years old,3-5 years,True,False,False,True,False,False,True,True,False,True,True,False,True,False,True,False,True,False
-25 - 34 years old,6-8 years,False,False,False,False,False,False,False,True,False,True,True,False,False,False,True,False,False,False
-18 - 24 years old,0-2 years,False,False,False,False,False,True,True,True,False,True,True,False,False,False,True,False,True,False
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
-,12-14 years,False,False,False,False,False,False,True,True,False,True,False,False,False,True,False,False,True,False
-25 - 34 years old,9-11 years,True,True,True,False,True,True,False,False,False,True,False,False,False,False,False,False,False,False
-25 - 34 years old,3-5 years,False,False,False,False,False,False,False,False,False,False,True,False,False,False,False,False,False,False
-25 - 34 years old,12-14 years,False,False,False,False,False,False,True,True,True,True,False,True,True,True,True,False,False,False
-18 - 24 years old,9-11 years,False,False,True,True,False,False,True,True,True,True,True,True,True,True,True,False,True,False
-,6-8 years,False,False,False,False,False,False,True,False,False,False,True,False,False,False,False,False,True,True
-,,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
+age,subversion,salary_usd,sqlite,android,ios,firebase,career_satisfaction,java,c++
+25 - 34 years old,False,78000.0,False,False,False,False,Moderately satisfied,True,False
+25 - 34 years old,True,10860.0,False,True,False,True,Slightly satisfied,False,False
+35 - 44 years old,False,18780.0,False,False,False,False,Slightly satisfied,True,False
+25 - 34 years old,False,52627.0,False,False,False,False,Slightly satisfied,True,False
+,False,,False,False,False,False,,True,False
+,False,,False,False,True,False,,True,False
+,False,,False,True,False,False,Extremely satisfied,True,False
+35 - 44 years old,False,80000.0,False,False,False,False,Moderately satisfied,False,False
+,False,,False,False,False,False,Moderately satisfied,False,False
+25 - 34 years old,False,51403.0,True,True,False,False,Extremely satisfied,True,False
+,False,,False,False,False,False,,False,False
+,False,,False,False,False,False,,False,False
+25 - 34 years old,False,48955.0,True,True,True,True,Moderately satisfied,True,False
+,False,,False,False,False,False,,False,False
+25 - 34 years old,False,77232.0,False,False,False,False,Moderately satisfied,True,True
+,False,,False,False,False,False,,True,False
+35 - 44 years old,False,54790.0,False,False,False,False,Slightly dissatisfied,True,False
+,False,,False,False,False,False,,False,False
+18 - 24 years old,False,50000.0,False,False,False,False,Neither satisfied nor dissatisfied,False,False
+18 - 24 years old,False,73433.0,False,False,False,False,Moderately satisfied,True,True
+25 - 34 years old,True,84547.0,False,True,True,True,Slightly satisfied,True,False
+35 - 44 years old,True,138000.0,False,False,False,False,Moderately dissatisfied,True,False
+25 - 34 years old,False,24478.0,False,False,False,False,Moderately satisfied,True,False
+25 - 34 years old,False,7584.0,False,False,False,False,Neither satisfied nor dissatisfied,True,False
+,False,,False,False,False,False,,True,False
+,False,,False,True,False,False,Moderately satisfied,True,False
+18 - 24 years old,False,,False,False,False,False,Slightly dissatisfied,True,True
+25 - 34 years old,False,,False,False,False,False,Slightly satisfied,True,False
+35 - 44 years old,False,120000.0,False,False,False,False,Extremely satisfied,True,False
+,False,,False,False,False,False,Slightly dissatisfied,False,False
+25 - 34 years old,False,56580.0,False,False,False,False,Slightly satisfied,True,False
+,False,,False,False,False,False,,True,False
+45 - 54 years old,False,65000.0,False,False,False,False,Moderately satisfied,True,False
+25 - 34 years old,False,115000.0,False,False,True,False,Slightly satisfied,True,False
+25 - 34 years old,False,102925.0,True,False,False,False,Moderately dissatisfied,True,False
+18 - 24 years old,False,113500.0,False,True,True,True,Moderately satisfied,True,False
+25 - 34 years old,False,2000000.0,False,False,False,False,Slightly satisfied,True,False
+18 - 24 years old,False,100000.0,False,False,True,False,Moderately satisfied,False,False
+,False,,False,False,False,False,,False,False
+18 - 24 years old,False,750000.0,False,True,False,False,,True,False
+25 - 34 years old,False,,False,False,False,False,Slightly satisfied,True,True
+25 - 34 years old,False,20000.0,False,False,False,False,Moderately satisfied,False,True
+18 - 24 years old,False,21916.0,False,False,False,False,Slightly dissatisfied,True,True
+25 - 34 years old,False,155958.0,False,False,False,True,Moderately dissatisfied,True,False
+35 - 44 years old,False,,False,False,False,False,Extremely satisfied,False,False
+,False,,False,False,False,False,,False,False
+35 - 44 years old,True,,False,False,False,False,Moderately dissatisfied,True,False
+25 - 34 years old,True,,False,False,False,False,Moderately satisfied,True,False
+25 - 34 years old,False,90567.0,False,True,False,False,Moderately satisfied,True,True
+25 - 34 years old,False,,False,False,False,False,Slightly satisfied,True,False
+25 - 34 years old,False,8124.0,False,True,False,True,Slightly satisfied,True,False
+,False,,False,False,False,False,Moderately satisfied,False,False
+35 - 44 years old,False,,False,False,False,False,Neither satisfied nor dissatisfied,True,False
+,False,,False,False,False,False,,False,False
+18 - 24 years old,False,,False,False,False,False,Moderately dissatisfied,True,True
+25 - 34 years old,False,12732.0,False,True,True,True,Extremely satisfied,True,True
+,False,,False,False,False,False,,False,False
+,False,,False,False,False,False,,False,False
+25 - 34 years old,False,84816.0,False,False,False,False,Extremely satisfied,True,False
+25 - 34 years old,False,36720.0,False,False,False,False,Slightly dissatisfied,True,False
+25 - 34 years old,False,61194.0,False,False,False,False,Moderately satisfied,True,False
+,False,,False,False,False,False,Moderately satisfied,False,False
+18 - 24 years old,False,11268.0,True,False,False,False,Moderately satisfied,False,False
+,False,,False,False,False,False,,False,False
+45 - 54 years old,False,118344.0,False,False,False,False,Moderately satisfied,True,False
+25 - 34 years old,False,36716.0,False,False,False,False,Extremely dissatisfied,True,True
+25 - 34 years old,False,32316.0,False,False,False,False,Slightly dissatisfied,True,False
+25 - 34 years old,False,,False,False,False,False,Extremely satisfied,True,False
+18 - 24 years old,False,75000.0,False,True,False,True,Extremely satisfied,True,False
+25 - 34 years old,False,49404.0,False,True,False,False,Moderately satisfied,True,True
+,False,,False,False,False,False,,False,False
+,False,62807.0,False,False,False,False,Slightly dissatisfied,False,False
+18 - 24 years old,False,,False,False,False,False,Slightly satisfied,True,False
+,False,,False,False,False,False,Moderately satisfied,True,False
+18 - 24 years old,False,,False,False,False,False,,False,False
+45 - 54 years old,True,130000.0,False,False,False,False,Moderately satisfied,True,True
+55 - 64 years old,False,,False,False,False,False,Moderately satisfied,True,False
+25 - 34 years old,False,140000.0,True,False,False,False,Moderately satisfied,True,False
+25 - 34 years old,True,73428.0,False,False,False,False,Moderately satisfied,False,True
+45 - 54 years old,True,128507.0,False,True,True,False,Extremely satisfied,False,False
+18 - 24 years old,False,14856.0,False,False,False,False,Slightly dissatisfied,True,False
+25 - 34 years old,True,45283.0,False,False,False,False,Extremely satisfied,True,False
+18 - 24 years old,False,38628.0,False,False,False,False,Neither satisfied nor dissatisfied,False,False
+45 - 54 years old,True,,False,False,False,False,Moderately satisfied,False,True
+,False,,False,False,False,False,,False,False
+25 - 34 years old,False,65000.0,True,False,True,False,Moderately satisfied,True,False
+,False,,False,False,False,False,Slightly satisfied,True,False
+25 - 34 years old,False,,False,False,False,True,Neither satisfied nor dissatisfied,True,False
+45 - 54 years old,True,,False,False,False,False,Moderately dissatisfied,True,False
+,False,,True,True,False,False,Moderately satisfied,True,False
+25 - 34 years old,False,118068.0,False,False,False,False,Moderately satisfied,True,False
+Under 18 years old,False,,False,False,False,False,,True,False
+25 - 34 years old,False,149550.0,True,False,True,False,Moderately satisfied,True,False
+,False,,False,False,False,False,Neither satisfied nor dissatisfied,False,False
+,False,,False,False,False,False,,False,False
+25 - 34 years old,True,,False,False,False,False,Slightly satisfied,True,False
+,False,,False,False,False,False,Moderately satisfied,False,False
+18 - 24 years old,False,,False,False,False,False,Moderately dissatisfied,True,False

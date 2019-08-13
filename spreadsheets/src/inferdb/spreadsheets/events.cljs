@@ -90,7 +90,7 @@
    (db/clear-selections db)))
 
 (def ^:private search-column "new property")
-(def ^:private n-models 10)
+(def ^:private n-models 30)
 (def ^:private beta-params {:alpha 0.001, :beta 0.001})
 
 (rf/reg-event-db
@@ -99,6 +99,13 @@
  (fn [db [_ text]]
    (let [row (merge (edn/read-string text)
                     {search-column true})
+
+         _ (.log js/console "rows")
+         _ (.log js/console [row])
+         _ (.log js/console 1)
+         _ (.log js/console "rows-not-flagged")
+         _ (.log js/console data/nyt-data)
+         _ (.log js/console (count data/nyt-data))
          result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
      (rf/dispatch [:search-result result]))
    db))
@@ -108,18 +115,23 @@
  event-interceptors
  (fn [db [_]]
    (let [rows @(rf/subscribe [:rows-flagged-pos])
-         rows (map #(merge % {search-column true}) rows)
+         rows (mapv #(merge % {search-column true}) rows)
+         rows (for [row rows]
+                (into {} (remove (comp nil? second) row)))
          rows-not-flagged @(rf/subscribe [:rows-not-flagged])
-         rows-not-flagged (map #(merge % {search-column nil}) rows-not-flagged)]
-         ;result (search/search model/spec search-column rows rows-not-flagged n-models beta-params)]
 
-     ;; XXX can these be lists or do they have to be vectors??
-     ;; XXX can the values be strings??
-     (.log js/console rows)
-     (.log js/console (count rows))
-     (.log js/console rows-not-flagged)
-     (.log js/console (count rows-not-flagged)))
-     ;(rf/dispatch [:search-result result]))
+         ;; XXX can these be lists or do they have to be vectors??
+         ;; XXX can the values be strings??
+         _ (.log js/console "rows")
+         _ (.log js/console rows)
+         _ (.log js/console (count rows))
+         _ (.log js/console "rows-not-flagged")
+         _ (.log js/console rows-not-flagged)
+         _ (.log js/console (count rows-not-flagged))
+         ;result (search/search model/spec search-column rows rows-not-flagged n-models beta-params)]
+         result (search/search model/spec search-column rows data/nyt-data n-models beta-params)]
+
+     (rf/dispatch [:search-result result]))
    db))
 
 (rf/reg-event-db
