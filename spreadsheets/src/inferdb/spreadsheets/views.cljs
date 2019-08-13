@@ -39,7 +39,7 @@
                 :value @input-text}]
        [:button {:on-click #(rf/dispatch [:search @input-text])
                  :style {:float "right"}}
-        "Search by example"]
+        "Search with query"]
        [:button {:on-click #(rf/dispatch [:search-by-flagged])
                  :style {:float "right"}}
         "Search by flagged"]
