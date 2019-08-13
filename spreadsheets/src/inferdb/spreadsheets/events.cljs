@@ -112,8 +112,7 @@
          ;;result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
         result (if (anomaly-search? text)
                  (search/anomaly-search model/spec
-                                        "foo"
-                                        []
+                                        text
                                         data/nyt-data)
                  (let [row (merge (edn/read-string text) {search-column true})]
                    (search/search model/spec

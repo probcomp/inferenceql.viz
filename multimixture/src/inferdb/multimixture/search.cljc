@@ -150,9 +150,30 @@
   (apply map vector coll))
 
 
+
+(def text "score probability of x")
+(def text2 "score probability of x given y")
+(def text3 "score probability of x given y and z")
+(def text4 "score probability of x given y and z and w")
+
+(defn conditional-query? [text] (clojure.string/includes? text "given"))
+
+(defn parse-condition
+  [text]
+  (mapv clojure.string/trim (clojure.string/split text #"and")))
+
+(defn parse-query
+  [text]
+  (let [[_ main-text] (clojure.string/split text #"probability of ")]
+    (if (conditional-query? main-text)
+        [(clojure.string/trim (first (clojure.string/split main-text #"given ")))
+         (parse-condition(second  (clojure.string/split main-text #"given ")))]
+        [(clojure.string/trim main-text) []])))
+
 (defn anomaly-search
-  [spec target-col condition-cols data]
-  (map (fn [_] 999) data))
+  [spec query-text data]
+  (let [[target-col conditional-cols] (parse-query query-text)]
+    (map (fn [_] 999) data)))
 
 #_(require '[inferdb.spreadsheets.model :as model])
 #_(require '[inferdb.spreadsheets.data :as data])
