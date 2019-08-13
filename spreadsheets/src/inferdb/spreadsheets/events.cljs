@@ -109,8 +109,12 @@
  (fn [db [_]]
    (let [rows @(rf/subscribe [:rows-flagged-pos])
          rows (map #(merge % {search-column true}) rows)
-         rows-not-flagged @(rf/subscribe [:rows-not-flagged])]
+         rows-not-flagged @(rf/subscribe [:rows-not-flagged])
+         rows-not-flagged (map #(merge % {search-column nil}) rows-not-flagged)]
          ;result (search/search model/spec search-column rows rows-not-flagged n-models beta-params)]
+
+     ;; XXX can these be lists or do they have to be vectors??
+     ;; XXX can the values be strings??
      (.log js/console rows)
      (.log js/console (count rows))
      (.log js/console rows-not-flagged)
