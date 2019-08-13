@@ -50,20 +50,13 @@
                :scores (rf/subscribe [:scores])
                :example-flags (rf/subscribe [:example-flags])})
             (fn [{:keys [rows scores example-flags]}]
-              (.log js/console "foo---------")
-              (.log js/console rows)
-              (.log js/console scores)
-              (.log js/console example-flags)
-              (let [foo (cond->> rows
-                            scores (mapv (fn [score row]
-                                           (assoc row "score" score))
-                                         scores)
-                            example-flags (mapv (fn [ex-flag row]
-                                                 (assoc row "example-flag" ex-flag))
-                                           example-flags))]
-                (.log js/console "foo value ------")
-                (.log js/console foo)
-                foo)))
+              (cond->> rows
+                scores (mapv (fn [score row]
+                               (assoc row "score" score))
+                             scores)
+                example-flags (mapv (fn [ex-flag row]
+                                      (assoc row "example-flag" ex-flag))
+                               example-flags))))
 
 (rf/reg-sub :virtual-rows
             (fn [db _]

@@ -56,8 +56,6 @@
 
    ; TODO make this more robust, as row 0 might move
    (let [example-flags (.getDataAtCol hot 0)]
-     (.log js/console "bar--------")
-     (.log js/console example-flags)
      (db/with-example-flags db (js->clj example-flags)))))
 
 (rf/reg-event-db
