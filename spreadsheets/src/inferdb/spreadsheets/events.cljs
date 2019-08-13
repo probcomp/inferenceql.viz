@@ -114,24 +114,46 @@
  :search-by-flagged
  event-interceptors
  (fn [db [_]]
-   (let [rows @(rf/subscribe [:rows-flagged-pos])
-         rows (mapv #(merge % {search-column true}) rows)
-         rows (for [row rows]
-                (into {} (remove (comp nil? second) row)))
-         rows-not-flagged @(rf/subscribe [:rows-not-flagged])
+   (let [remove-nils #(into {} (remove (comp nil? second) %))
+         rows-pairs @(rf/subscribe [:rows-flagged-pos])
+         rows-ids (map first rows-pairs)
+         rows (->> (map second rows-pairs)
+                   (map #(merge % {search-column true}))
+                   (map remove-nils))
 
-         ;; XXX can these be lists or do they have to be vectors??
-         ;; XXX can the values be strings??
+         rows-not-flagged-pairs @(rf/subscribe [:rows-not-flagged])
+         rows-not-flagged-ids (map first rows-not-flagged-pairs)
+         rows-not-flagged (map second rows-not-flagged-pairs)
+
          _ (.log js/console "rows")
          _ (.log js/console rows)
          _ (.log js/console (count rows))
+         _ (.log js/console "rows-ids")
+         _ (.log js/console rows-ids)
+         _ (.log js/console (count rows-ids))
          _ (.log js/console "rows-not-flagged")
          _ (.log js/console rows-not-flagged)
          _ (.log js/console (count rows-not-flagged))
-         ;result (search/search model/spec search-column rows rows-not-flagged n-models beta-params)]
-         result (search/search model/spec search-column rows data/nyt-data n-models beta-params)]
+         _ (.log js/console "rows-not-flagged-ids")
+         _ (.log js/console rows-not-flagged-ids)
+         _ (.log js/console (count rows-not-flagged-ids))
+         calculated-result (search/search model/spec search-column rows rows-not-flagged n-models beta-params)
 
-     (rf/dispatch [:search-result result]))
+         calculated-result-map (zipmap rows-not-flagged-ids calculated-result)
+         pos-result-map (zipmap rows-ids (repeat 1))
+
+         full-result-map (merge calculated-result-map pos-result-map)
+         sorted-pairs (sort-by key full-result-map)
+         scores (map second sorted-pairs)
+
+         _ (.log js/console "result-map")
+         _ (.log js/console calculated-result-map)
+         _ (.log js/console pos-result-map)
+         _ (.log js/console full-result-map)
+         _ (.log js/console sorted-pairs)]
+
+
+     (rf/dispatch [:search-result scores]))
    db))
 
 (rf/reg-event-db

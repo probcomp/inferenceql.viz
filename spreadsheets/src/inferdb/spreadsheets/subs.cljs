@@ -127,7 +127,10 @@
   [{:keys [flags rows]} _]
   (let [clean-flag (fnil str/trim "")
         pos-flag? (fn [flag-str] (= (clean-flag flag-str) "1"))
-        pos-rows (map (fn [flag row] (if (pos-flag? flag) row)) flags rows)
+        rows-with-ids (map vector (range) rows)
+        pos-rows (map (fn [flag row]
+                        (if (pos-flag? flag) row))
+                      flags rows-with-ids)
         pos-rows (remove nil? pos-rows)]
     pos-rows))
 (rf/reg-sub :rows-flagged-pos
@@ -141,11 +144,12 @@
   (let [clean-flag (fnil str/trim "")
         pos-flag? (fn [flag-str] (= (clean-flag flag-str) "1"))
         neg-flag? (fn [flag-str] (= (clean-flag flag-str) "0"))
+        rows-with-ids (map vector (range) rows)
         unflaggged-rows (map (fn [flag row]
                                (if (and (not (pos-flag? flag))
                                         (not (neg-flag? flag)))
                                    row))
-                             flags rows)
+                             flags rows-with-ids)
         unflaggged-rows (remove nil? unflaggged-rows)]
     unflaggged-rows))
 (rf/reg-sub :rows-not-flagged
