@@ -152,7 +152,7 @@
 
        (anomaly-search? text)
        (let [result (search/anomaly-search model/spec
-                                           text
+                                           (str/lower-case text)
                                            data/nyt-data)]
          (rf/dispatch [:search-result result]))
 

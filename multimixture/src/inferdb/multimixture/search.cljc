@@ -165,26 +165,31 @@
   (apply map vector coll))
 
 
-(defn conditional-query? [text] (clojure.string/includes? text "given"))
+(defn conditional-query? [text] (clojure.string/includes? text "GIVEN"))
 
 (defn parse-condition
   [text]
-  (mapv clojure.string/trim (clojure.string/split text #"and")))
+  (mapv clojure.string/trim (clojure.string/split text #"AND")))
 
 (defn parse-query
   [text]
-  (let [[_ main-text] (clojure.string/split text #"probability of ")]
+  (let [[_ main-text] (clojure.string/split text #"PROBABILITY OF ")]
     (if (conditional-query? main-text)
-        [(clojure.string/trim (first (clojure.string/split main-text #"given ")))
-         (parse-condition(second  (clojure.string/split main-text #"given ")))]
+        [(clojure.string/trim (first (clojure.string/split main-text #"GIVEN ")))
+         (parse-condition(second  (clojure.string/split main-text #"GIVEN ")))]
         [(clojure.string/trim main-text) []])))
 
 
+(defn constraints-for-scoring-p
+  [target-col constraint-cols row]
+  (if (= (first constraint-cols) "ROW")
+    (into {} (filter (fn [[k v]] (not (or (nil? v) (= k target-col)))) row))
+    (into {} (filter (fn [[k v]] (not (nil? v)))
+                            (select-keys row constraint-cols)))))
 (defn  score-row-probability
   [row-generator target-col constraint-cols row]
   (let [target (select-keys row [target-col])
-        constraints (into {} (filter (fn [[k v]] (not (nil? v)))
-                            (select-keys row constraint-cols)))]
+        constraints (constraints-for-scoring-p target-col constraint-cols row)]
     (if (nil? (get target target-col))
       1
       (Math/exp (logpdf row-generator target constraints)))))
@@ -214,9 +219,9 @@
         {"x" -0.2 "z" 5}
         {"x" -0.3 "z" 0}
         ])
-(def text1 "score probability of x")
-(def text2 "score probability of x given z")
-(anomaly-search test-spec text1 d))
+(def text1 "SCORE PROBABILITY OF x")
+(def text2 "SCORE PROBABILITY OF x GIVEN z")
+(anomaly-search test-spec text2 d))
 
 
 (defn search
