@@ -43,7 +43,7 @@
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into ["example-flag" "score"] headers)))
+              (into ["score"] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
@@ -54,10 +54,7 @@
               (cond->> rows
                 scores (mapv (fn [score row]
                                (assoc row "score" score))
-                             scores)
-                example-flags (mapv (fn [ex-flag row]
-                                      (assoc row "example-flag" ex-flag))
-                               example-flags))))
+                             scores))))
 
 (rf/reg-sub :virtual-rows
             (fn [db _]
@@ -84,7 +81,7 @@
   (let [data (cell-vector headers rows)
         num-columns (count headers)
 
-        initial-column-setting {:readOnly false}
+        initial-column-setting {:readOnly true}
         rem-column-settings (repeat (dec num-columns) {})
         all-column-settings (cons initial-column-setting rem-column-settings)]
 
