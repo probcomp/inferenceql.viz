@@ -135,9 +135,9 @@
                    num-rows (js/parseInt m1)]
                (rf/dispatch [:simulate {} num-rows])))
 
-           (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"\sAND\s([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)
+           (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)
            (do
-             (let [[_ k1 v1 k2 v2] (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"\sAND\s([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)]
+             (let [[_ k1 v1 k2 v2] (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)]
                (rf/dispatch [:simulate {k1 v1 k2 v2} 1])))
 
            ;(re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=([A-Za-z0-9_]+)" text)
