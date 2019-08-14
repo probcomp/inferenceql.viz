@@ -133,28 +133,37 @@
               (get-in spec [:views new-column-view cluster-idx :parameters new-column-key])))
           rows)))
 
-#_(let [rows [{"x" 0}
-              {"x" 5}]
-        spec [{:vars {"x" :gaussian
-                      "y" :binary}
-               :clusters [{:probability 0.75
-                           :parameters {"x" [0 1]
-                                        "y" [0]}}
-                          {:probability 0.25
-                           :parameters {"x" [5 1]
-                                        "y" [1]}}]}]]
-    (score-rows spec rows "y"))
+
+
+
+(defn logpdf
+  [row-generator target constraints]
+  (let [target-addrs-vals (mmix/with-row-values {} target)
+        constraint-addrs-vals (mmix/with-row-values {} constraints)
+        target-constraint-addrs-vals (mmix/with-row-values {}
+                                                           (merge target
+                                                                  constraints))
+        ;; Run infer to obtain probabilities.
+        [retval trace log-weight-numer] (mp/infer-and-score
+                                         :procedure row-generator
+                                         :observation-trace target-constraint-addrs-vals)
+
+        log-weight-denom (if (empty? constraint-addrs-vals)
+                           ;; There are no constraints: log weight is zero.
+                           0
+                           ;; There are constraints: find marginal probability of constraints.
+                           (let [[retval trace weight] (mp/infer-and-score
+                                                        :procedure row-generator
+                                                        :observation-trace constraint-addrs-vals)]
+                             weight))]
+    (- log-weight-numer log-weight-denom)))
+
+
 
 (defn transpose
   [coll]
   (apply map vector coll))
 
-
-
-(def text "score probability of x")
-(def text2 "score probability of x given y")
-(def text3 "score probability of x given y and z")
-(def text4 "score probability of x given y and z and w")
 
 (defn conditional-query? [text] (clojure.string/includes? text "given"))
 
@@ -170,15 +179,45 @@
          (parse-condition(second  (clojure.string/split main-text #"given ")))]
         [(clojure.string/trim main-text) []])))
 
+
+(defn  score-row-probability
+  [row-generator target-col constraint-cols row]
+  (let [target (select-keys row [target-col])
+        constraints (into {} (filter (fn [[k v]] (not (nil? v)))
+                            (select-keys row constraint-cols)))]
+    (if (nil? (get target target-col))
+      1
+      (Math/exp (logpdf row-generator target constraints)))))
+
+
+
 (defn anomaly-search
   [spec query-text data]
-  (let [[target-col conditional-cols] (parse-query query-text)]
-    (map (fn [_] 999) data)))
+  (let [[target-col conditional-cols] (parse-query query-text)
+         row-generator (optimized-row-generator spec)]
+    (map (fn [row] (score-row-probability  row-generator target-col conditional-cols row)) data)))
 
-#_(require '[inferdb.spreadsheets.model :as model])
-#_(require '[inferdb.spreadsheets.data :as data])
-#_(anomaly-search model/spec "java" [] data/nyt-data)
-#_(clojure.string/includes? "clojure" (clojure.string/lower-case "CL"))
+
+
+(def test-spec
+         {:vars {"x" :gaussian
+                 "z" :gaussian}
+              :views [[{:probability 0.5
+                        :parameters {"x" {:mu 0 :sigma 1}
+                                     "z" {:mu 0 :sigma 1}}}
+                       {:probability 0.5
+                        :parameters {"x" {:mu 5 :sigma 1}
+                                     "z" {:mu 5 :sigma 1}}}]]})
+(comment
+(def rg (optimized-row-generator test-spec))
+(def d [{"x" -0.1 "z" 5}
+        {"x" -0.2 "z" 5}
+        {"x" -0.3 "z" 0}
+        ])
+(def text1 "score probability of x")
+(def text2 "score probability of x given z")
+(anomaly-search test-spec text1 d))
+
 
 (defn search
   [spec new-column-key known-rows unknown-rows n-models beta-params]
