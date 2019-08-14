@@ -17,7 +17,7 @@
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :readOnly            true
-              :height              "30vh"
+              :height              "32vh"
               :width               "100vw"
               :stretchH            "all"
               :licenseKey          "non-commercial-and-evaluation"}
