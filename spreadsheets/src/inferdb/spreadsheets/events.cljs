@@ -125,7 +125,7 @@
 
 (defn score-using-labels-statement?
   [text]
-  (not (nil? (re-matches #"SCORE PROBABILITY USING LABELS" text))))
+  (not (nil? (re-matches #"SCORE PROBABILITY OF LABEL=1 GIVEN ROW" text))))
 
 (rf/reg-event-db
  :search
