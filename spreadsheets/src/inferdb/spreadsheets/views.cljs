@@ -49,14 +49,6 @@
        [:button {:on-click #(rf/dispatch [:search @input-text])
                  :style {:float "right"}}
         "Run InferenceQL"]
-       (comment
-         [:button {:on-click #(rf/dispatch [:search-by-flagged])
-                   :style {:float "right"}}
-          "Search by flagged"])
-       (comment
-         [:button {:on-click #(rf/dispatch [:simulate])
-                   :style {:float "right"}}
-          "Simulate"])
        [:button {:on-click #(rf/dispatch [:clear-simulations])
                  :style {:float "right"}}
         "Delete virtual data"]])))
