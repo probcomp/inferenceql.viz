@@ -10,7 +10,7 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
-(def hooks [:after-deselect :after-selection-end :after-change])
+(def hooks [:after-deselect :after-selection-end :after-change :after-column-sort])
 (def virtual-hot-hooks [:after-deselect :after-selection-end])
 
 (def event-interceptors
@@ -54,16 +54,41 @@
  :after-change
  event-interceptors
  (fn [db [_ hot changes]]
+   (let [example-flags-col (.getDataAtCol hot 0)]
+     (db/with-example-flags db (js->clj example-flags-col)))))
 
-   ; may end up using this later on
-   #_(doseq [change changes])
-     (let [[row prop oldVal newVal] change]
-       ; do something
-       (+ 1 1))
+(rf/reg-event-db
+ :after-column-sort
+ event-interceptors
+ (fn [db [_ hot _cur-sort _dest-sort]]
+   (let [example-flags-col (js->clj (.getDataAtCol hot 0))
+         scores-col (js->clj (.getDataAtCol hot 1))
 
-   ; TODO make this more robust, as row 0 might move
-   (let [example-flags (.getDataAtCol hot 0)]
-     (db/with-example-flags db (js->clj example-flags)))))
+         ;; main table data -- without scores and flags
+         table-data (js->clj (->> (.getData hot)
+                                  (map #(drop 2 %))))
+
+         ;; main table headers -- without scores and flags
+         table-headers (js->clj (drop 2 (.getColHeader hot)))
+
+         table-data-maps (for [table-row table-data]
+                             (zipmap table-headers table-row))]
+
+     (.log js/console "example-flags")
+     (.log js/console example-flags-col)
+     (.log js/console "scores-col")
+     (.log js/console scores-col)
+     (.log js/console "table-data")
+     (.log js/console table-data)
+     (.log js/console "table-data-maps")
+     (.log js/console table-data-maps)
+     (.log js/console "col-headers")
+     (.log js/console table-headers)
+
+     (-> (db/with-example-flags db example-flags-col)
+         (db/with-scores scores-col)
+         (db/with-table-rows table-data-maps)
+         (db/with-table-headers table-headers)))))
 
 (rf/reg-event-db
  :after-selection-end
@@ -151,12 +176,14 @@
            (.log js/console "ERROR: no match for generate call")))
 
        (anomaly-search? text)
-       (let [result (search/anomaly-search model/spec text data/nyt-data)]
+       (let [table-rows @(rf/subscribe [:table-rows])
+             result (search/anomaly-search model/spec text table-rows)]
          (rf/dispatch [:search-result result]))
 
        :else
-       (let [row (merge (edn/read-string text) {search-column true})
-             result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
+       (let [table-rows @(rf/subscribe [:table-rows])
+             row (merge (edn/read-string text) {search-column true})
+             result (search/search model/spec search-column [row] table-rows n-models beta-params)]
          (rf/dispatch [:search-result result]))))
    db))
 

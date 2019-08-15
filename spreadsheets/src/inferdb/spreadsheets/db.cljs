@@ -16,7 +16,7 @@
 (s/def ::selections (s/coll-of ::selection))
 (s/def ::selected-columns (s/coll-of ::header))
 
-(s/def ::score number?)
+(s/def ::score #(or (number? %) (nil? %)))
 (s/def ::scores (s/coll-of ::score))
 
 (s/def ::example-flag #(or (string? %) (nil? %)))
@@ -88,6 +88,10 @@
   [db]
   (get-in db [::selected-columns]))
 
+(defn with-table-headers
+  [db table-headers]
+  (assoc-in db [::headers] table-headers))
+
 (defn table-headers
   [db]
   (get-in db [::headers]))
@@ -111,6 +115,10 @@
 (defn pos-emmitter
   [db]
   (get-in db [::pos-emmitter]))
+
+(defn with-table-rows
+  [db table-rows]
+  (assoc-in db [::rows] table-rows))
 
 (defn with-scores
   [db scores]
