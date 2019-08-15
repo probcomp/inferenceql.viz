@@ -118,7 +118,7 @@
    (importance-resampling :model generate-1col-binary-extension
                           :inputs [spec (count rows) column-key beta-params]
                           :observation-trace (mmix/with-rows {} rows)
-                          :n-particles 500)))
+                          :n-particles 200)))
 
 #_(insert-column spec-test/mmix [{"z" true}] "z" {:alpha 0.001 :beta 0.001})
 
@@ -133,21 +133,96 @@
               (get-in spec [:views new-column-view cluster-idx :parameters new-column-key])))
           rows)))
 
-#_(let [rows [{"x" 0}
-              {"x" 5}]
-        spec [{:vars {"x" :gaussian
-                      "y" :binary}
-               :clusters [{:probability 0.75
-                           :parameters {"x" [0 1]
-                                        "y" [0]}}
-                          {:probability 0.25
-                           :parameters {"x" [5 1]
-                                        "y" [1]}}]}]]
-    (score-rows spec rows "y"))
+
+
+
+(defn logpdf
+  [row-generator target constraints]
+  (let [target-addrs-vals (mmix/with-row-values {} target)
+        constraint-addrs-vals (mmix/with-row-values {} constraints)
+        target-constraint-addrs-vals (mmix/with-row-values {}
+                                                           (merge target
+                                                                  constraints))
+        ;; Run infer to obtain probabilities.
+        [retval trace log-weight-numer] (mp/infer-and-score
+                                         :procedure row-generator
+                                         :observation-trace target-constraint-addrs-vals)
+
+        log-weight-denom (if (empty? constraint-addrs-vals)
+                           ;; There are no constraints: log weight is zero.
+                           0
+                           ;; There are constraints: find marginal probability of constraints.
+                           (let [[retval trace weight] (mp/infer-and-score
+                                                        :procedure row-generator
+                                                        :observation-trace constraint-addrs-vals)]
+                             weight))]
+    (- log-weight-numer log-weight-denom)))
+
+
 
 (defn transpose
   [coll]
   (apply map vector coll))
+
+
+(defn conditional-query? [text] (clojure.string/includes? text "GIVEN"))
+
+(defn parse-condition
+  [text]
+  (mapv clojure.string/trim (clojure.string/split text #"AND")))
+
+(defn parse-query
+  [text]
+  (let [[_ main-text] (clojure.string/split text #"PROBABILITY OF ")]
+    (if (conditional-query? main-text)
+        [(clojure.string/trim (first (clojure.string/split main-text #"GIVEN ")))
+         (parse-condition(second  (clojure.string/split main-text #"GIVEN ")))]
+        [(clojure.string/trim main-text) []])))
+
+
+(defn constraints-for-scoring-p
+  [target-col constraint-cols row]
+  (if (= (first constraint-cols) "ROW")
+    (into {} (filter (fn [[k v]] (not (or (nil? v) (= k target-col)))) row))
+    (into {} (filter (fn [[k v]] (not (nil? v)))
+                            (select-keys row constraint-cols)))))
+(defn  score-row-probability
+  [row-generator target-col constraint-cols row]
+  (let [target (select-keys row [target-col])
+        constraints (constraints-for-scoring-p target-col constraint-cols row)]
+    (if (nil? (get target target-col))
+      1
+      (Math/exp (logpdf row-generator target constraints)))))
+
+
+
+(defn anomaly-search
+  [spec query-text data]
+  (let [[target-col conditional-cols] (parse-query query-text)
+         row-generator (optimized-row-generator spec)]
+    (map (fn [row] (score-row-probability  row-generator target-col conditional-cols row)) data)))
+
+
+
+(def test-spec
+         {:vars {"x" :gaussian
+                 "z" :gaussian}
+              :views [[{:probability 0.5
+                        :parameters {"x" {:mu 0 :sigma 1}
+                                     "z" {:mu 0 :sigma 1}}}
+                       {:probability 0.5
+                        :parameters {"x" {:mu 5 :sigma 1}
+                                     "z" {:mu 5 :sigma 1}}}]]})
+(comment
+(def rg (optimized-row-generator test-spec))
+(def d [{"x" -0.1 "z" 5}
+        {"x" -0.2 "z" 5}
+        {"x" -0.3 "z" 0}
+        ])
+(def text1 "SCORE PROBABILITY OF x")
+(def text2 "SCORE PROBABILITY OF x GIVEN z")
+(anomaly-search test-spec text2 d))
+
 
 (defn search
   [spec new-column-key known-rows unknown-rows n-models beta-params]

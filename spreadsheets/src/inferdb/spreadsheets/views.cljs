@@ -17,7 +17,7 @@
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :readOnly            true
-              :height              "30vh"
+              :height              "32vh"
               :width               "100vw"
               :stretchH            "all"
               :licenseKey          "non-commercial-and-evaluation"}
@@ -39,16 +39,18 @@
                 :value @input-text}]
        [:button {:on-click #(rf/dispatch [:search @input-text])
                  :style {:float "right"}}
-        "Search by example"]
-       [:button {:on-click #(rf/dispatch [:search-by-flagged])
-                 :style {:float "right"}}
-        "Search by flagged"]
-       [:button {:on-click #(rf/dispatch [:simulate])
-                 :style {:float "right"}}
-        "Simulate"]
+        "Run InferenceQL"]
+       (comment
+         [:button {:on-click #(rf/dispatch [:search-by-flagged])
+                   :style {:float "right"}}
+          "Search by flagged"])
+       (comment
+         [:button {:on-click #(rf/dispatch [:simulate])
+                   :style {:float "right"}}
+          "Simulate"])
        [:button {:on-click #(rf/dispatch [:clear-simulations])
                  :style {:float "right"}}
-        "Clear simulations"]])))
+        "Delete virtual data"]])))
 
 (defn vega-lite
   [spec opt generator]
@@ -105,7 +107,13 @@
         left-scroll-pos @(rf/subscribe [:left-scroll-pos])
         pos-emmiter @(rf/subscribe [:pos-emmitter])]
     [:div
+     [:h1 "Real Data"]
+     [:h3 "rows: real developers"]
+     [:h3 "columns: real answers to survey questions"]
      [hot/handsontable {:style {:overflow "hidden"}} [pos-emmiter left-scroll-pos] hot-props]
+     [:h1 "Virtual Data"]
+     [:h3 "rows: virtual developers"]
+     [:h3 "columns: virtual answers to survey questions"]
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} [pos-emmiter left-scroll-pos] virtual-hot-props]
      [search-form "Zane"]
      [:div {:style {:display "flex"

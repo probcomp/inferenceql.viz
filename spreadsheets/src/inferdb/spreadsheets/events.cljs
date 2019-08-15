@@ -1,9 +1,11 @@
 (ns inferdb.spreadsheets.events
   (:require [clojure.edn :as edn]
+            [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
             [inferdb.spreadsheets.data :as data]
             [inferdb.multimixture.search :as search]
+            [inferdb.multimixture :as mmix]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
@@ -32,9 +34,14 @@
 (rf/reg-event-db
  :simulate
  event-interceptors
- (fn [db [event-name]]
-   (let [gen #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)))
-         new-rows (repeatedly 1 gen)]
+ (fn [db [event-name conditions num-rows]]
+   (.log js/console "conditions----")
+   (.log js/console conditions)
+   (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
+         gen #(first (mp/infer-and-score
+                       :procedure (search/optimized-row-generator model/spec)
+                       :observation-trace constraint-addrs-vals))
+         new-rows (repeatedly num-rows gen)]
      (db/with-virtual-rows db new-rows))))
 
 (rf/reg-event-db
@@ -93,14 +100,57 @@
 (def ^:private n-models 30)
 (def ^:private beta-params {:alpha 0.001, :beta 0.001})
 
+
+(defn anomaly-search?
+  [text]
+  (clojure.string/includes? (clojure.string/lower-case text) "probability"))
+
+(defn generate-statement?
+  [text]
+  (clojure.string/includes? (clojure.string/lower-case text) "generate"))
+
 (rf/reg-event-db
  :search
  event-interceptors
  (fn [db [_ text]]
-   (let [row (merge (edn/read-string text)
-                    {search-column true})
-         result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
-     (rf/dispatch [:search-result result]))
+   (let [text (str/trim text)]
+     (cond
+       (generate-statement? text)
+       (do
+         (cond
+           (re-matches #"GENERATE ROW" text)
+           (rf/dispatch [:simulate {} 1])
+
+           (re-matches #"GENERATE ROW (\d+) TIMES" text)
+           (do
+             (let [[_ m1] (re-matches #"GENERATE ROW (\d+) TIMES" text)
+                   num-rows (js/parseInt m1)]
+               (rf/dispatch [:simulate {} num-rows])))
+
+           (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)
+           (do
+             (let [[_ k1 v1 k2 v2] (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)]
+               (rf/dispatch [:simulate {k1 v1 k2 v2} 1])))
+
+           ; NOTE: saving this as an alternate version of the following regex actually used
+           ; TODO: delete later
+           ;(re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=([A-Za-z0-9_]+)" text)
+           (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)
+           (do
+             (let [[_ k1 v1] (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)]
+               (rf/dispatch [:simulate {k1 v1} 1])))
+
+           :else
+           (.log js/console "ERROR: no match for generate call")))
+
+       (anomaly-search? text)
+       (let [result (search/anomaly-search model/spec text data/nyt-data)]
+         (rf/dispatch [:search-result result]))
+
+       :else
+       (let [row (merge (edn/read-string text) {search-column true})
+             result (search/search model/spec search-column [row] data/nyt-data n-models beta-params)]
+         (rf/dispatch [:search-result result]))))
    db))
 
 (rf/reg-event-db
