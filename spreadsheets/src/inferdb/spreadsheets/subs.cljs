@@ -43,7 +43,7 @@
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into ["🏷" "score"] headers)))
+              (into ["🏷" "probability"] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
@@ -53,7 +53,7 @@
             (fn [{:keys [rows scores example-flags]}]
               (cond->> rows
                 scores (mapv (fn [score row]
-                               (assoc row "score" score))
+                               (assoc row "probability" score))
                              scores)
                 example-flags (mapv (fn [ex-flag row]
                                       (assoc row "🏷" ex-flag))
@@ -184,7 +184,7 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (if (or (= "score" column) (= "🏷" column))
+  (let [stattype-kw (if (or (= "probability" column) (= "🏷" column))
                       :gaussian
                       (get-in model/spec [:vars column]))]
     (case stattype-kw
@@ -197,7 +197,7 @@
     (clj->js
      (cond (and (= 1 (count selected-columns))
                 (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "NAME" "score" "🏷"}
+                (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
                                 (first selected-columns))))
            ;; Simulate plot
            (do
@@ -362,7 +362,7 @@
             (fn [{:keys [row columns one-cell-selected]}]
               (when (and one-cell-selected
                          ;; TODO clean up this check
-                         (not (contains? #{"geo_fips" "NAME" "score" "🏷"} (first columns))))
+                         (not (contains? #{"geo_fips" "NAME" "probability" "🏷"} (first columns))))
                 (let [sampled-column (first columns) ; columns that will be sampled
                       constraints (mmix/with-row-values {} (-> row
                                                                (select-keys (keys (:vars model/spec)))
