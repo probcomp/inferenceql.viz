@@ -72,17 +72,6 @@
          table-data-maps (for [table-row table-data]
                              (zipmap table-headers table-row))]
 
-     (.log js/console "example-flags")
-     (.log js/console example-flags-col)
-     (.log js/console "scores-col")
-     (.log js/console scores-col)
-     (.log js/console "table-data")
-     (.log js/console table-data)
-     (.log js/console "table-data-maps")
-     (.log js/console table-data-maps)
-     (.log js/console "col-headers")
-     (.log js/console table-headers)
-
      (-> (db/with-example-flags db example-flags-col)
          (db/with-scores scores-col)
          (db/with-table-rows table-data-maps)
