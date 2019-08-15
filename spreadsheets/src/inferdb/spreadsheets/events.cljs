@@ -36,10 +36,11 @@
  event-interceptors
  (fn [db [event-name conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
-         gen #(first (mp/infer-and-score
-                       :procedure (search/optimized-row-generator model/spec)
-                       :observation-trace constraint-addrs-vals))
-         new-rows (repeatedly num-rows gen)]
+         gen-fn #(first (mp/infer-and-score
+                           :procedure (search/optimized-row-generator model/spec)
+                           :observation-trace constraint-addrs-vals))
+         negative-salary? #(< (% "salary_usd") 0)
+         new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
      (db/with-virtual-rows db new-rows))))
 
 (rf/reg-event-db
