@@ -125,8 +125,8 @@
 
 (defn rows-flagged-pos
   [{:keys [flags rows]} _]
-  (let [clean-flag (fnil str/trim "")
-        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "1"))
+  (let [clean-flag (fnil (comp str/upper-case str/trim) "")
+        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "TRUE"))
         rows-with-ids (map vector (range) rows)
         pos-rows (map (fn [flag row]
                         (if (pos-flag? flag) row))
@@ -141,8 +141,8 @@
 
 (defn rows-flagged-neg
   [{:keys [flags rows]} _]
-  (let [clean-flag (fnil str/trim "")
-        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "0"))
+  (let [clean-flag (fnil (comp str/upper-case str/trim) "")
+        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "FALSE"))
         rows-with-ids (map vector (range) rows)
         neg-rows (map (fn [flag row]
                         (if (neg-flag? flag) row))
@@ -157,9 +157,9 @@
 
 (defn rows-not-flagged
   [{:keys [flags rows]} _]
-  (let [clean-flag (fnil str/trim "")
-        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "1"))
-        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "0"))
+  (let [clean-flag (fnil (comp str/upper-case str/trim) "")
+        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "TRUE"))
+        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "FALSE"))
         rows-with-ids (map vector (range) rows)
         unflaggged-rows (map (fn [flag row]
                                (if (and (not (pos-flag? flag))

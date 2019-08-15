@@ -109,12 +109,19 @@
   [text]
   (clojure.string/includes? (clojure.string/lower-case text) "generate"))
 
+(defn score-using-labels-statement?
+  [text]
+  (not (nil? (re-matches #"SCORE PROBABILITY USING LABELS" text))))
+
 (rf/reg-event-db
  :search
  event-interceptors
  (fn [db [_ text]]
    (let [text (str/trim text)]
      (cond
+       (score-using-labels-statement? text)
+       (rf/dispatch [:search-by-flagged])
+
        (generate-statement? text)
        (do
          (cond
