@@ -123,11 +123,21 @@
   (db/selected-columns db))
 (rf/reg-sub :selected-columns selected-columns)
 
+;; TODO helper functions might be better located elsewhere
+(def clean-flag
+  (fnil (comp str/upper-case str/trim) ""))
+(defn- pos-flag? [flag-str]
+  (let [f (clean-flag flag-str)]
+    (or (= f "TRUE")
+        (= f "1"))))
+(defn- neg-flag? [flag-str]
+  (let [f (clean-flag flag-str)]
+    (or (= f "FALSE")
+        (= f "0"))))
+
 (defn rows-flagged-pos
   [{:keys [flags rows]} _]
-  (let [clean-flag (fnil (comp str/upper-case str/trim) "")
-        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "TRUE"))
-        rows-with-ids (map vector (range) rows)
+  (let [rows-with-ids (map vector (range) rows)
         pos-rows (map (fn [flag row]
                         (if (pos-flag? flag) row))
                       flags rows-with-ids)
@@ -141,9 +151,7 @@
 
 (defn rows-flagged-neg
   [{:keys [flags rows]} _]
-  (let [clean-flag (fnil (comp str/upper-case str/trim) "")
-        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "FALSE"))
-        rows-with-ids (map vector (range) rows)
+  (let [rows-with-ids (map vector (range) rows)
         neg-rows (map (fn [flag row]
                         (if (neg-flag? flag) row))
                       flags rows-with-ids)
@@ -157,10 +165,7 @@
 
 (defn rows-not-flagged
   [{:keys [flags rows]} _]
-  (let [clean-flag (fnil (comp str/upper-case str/trim) "")
-        pos-flag? (fn [flag-str] (= (clean-flag flag-str) "TRUE"))
-        neg-flag? (fn [flag-str] (= (clean-flag flag-str) "FALSE"))
-        rows-with-ids (map vector (range) rows)
+  (let [rows-with-ids (map vector (range) rows)
         unflaggged-rows (map (fn [flag row]
                                (if (and (not (pos-flag? flag))
                                         (not (neg-flag? flag)))
