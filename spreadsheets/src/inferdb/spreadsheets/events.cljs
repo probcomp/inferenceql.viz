@@ -35,8 +35,6 @@
  :simulate
  event-interceptors
  (fn [db [event-name conditions num-rows]]
-   (.log js/console "conditions----")
-   (.log js/console conditions)
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
          gen #(first (mp/infer-and-score
                        :procedure (search/optimized-row-generator model/spec)
