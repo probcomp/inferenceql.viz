@@ -19,7 +19,7 @@
               :colHeaders          []
               :columns             []
               :rowHeaders          true
-              :columnSorting       true
+              :multiColumnSorting  true
               :manualColumnMove    true
               :beforeColumnMove    before-column-move-fn
               :filters             true
