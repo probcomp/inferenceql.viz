@@ -10,7 +10,7 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
-(def hooks [:after-deselect :after-selection-end :after-change :after-column-sort])
+(def hooks [:after-deselect :after-selection-end :after-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end])
 
 (def event-interceptors
@@ -52,9 +52,11 @@
  :after-change
  event-interceptors
  (fn [db [_ hot changes]]
-   (let [example-flags-col (.getDataAtCol hot 0)]
+   (let [example-flags-col (.getSourceDataAtCol hot 0)]
      (db/with-example-flags db (js->clj example-flags-col)))))
 
+;; NOTE this event may no longer be needed
+;; It was part of the attempt to fix make the table sorting persistent.
 (rf/reg-event-db
  :after-column-sort
  event-interceptors

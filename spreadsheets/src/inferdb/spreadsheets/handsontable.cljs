@@ -57,7 +57,11 @@
                {old-settings :settings, old-hooks :hooks} old-props
                {new-settings :settings, new-hooks :hooks} new-props]
            (if (not= old-settings new-settings)
-             (update-hot! @hot-instance (clj->js new-settings)))
+             (let [sorting-plugin (.getPlugin @hot-instance "columnSorting")
+                   sort-config (.getSortConfig sorting-plugin)]
+               (update-hot! @hot-instance (clj->js new-settings))
+               ; Maintain the same sort order as before the update
+               (.sort sorting-plugin sort-config)))
            (if (not= old-x-pos new-x-pos)
              (let [dom-node (dom/dom-node this)
                    jq-obj (js/$. dom-node)
