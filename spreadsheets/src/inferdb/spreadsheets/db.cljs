@@ -122,7 +122,8 @@
 
 (defn with-scores
   [db scores]
-  (assoc-in db [::scores] scores))
+  (let [rounded-scores (map #(/ (.round js/Math (* % 1e4 )) 1e4) scores)];
+    (assoc-in db [::scores] rounded-scores)))
 
 (defn with-virtual-rows
   [db new-v-rows]
