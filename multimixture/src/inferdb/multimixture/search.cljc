@@ -118,7 +118,7 @@
    (importance-resampling :model generate-1col-binary-extension
                           :inputs [spec (count rows) column-key beta-params]
                           :observation-trace (mmix/with-rows {} rows)
-                          :n-particles 200)))
+                          :n-particles 100)))
 
 #_(insert-column spec-test/mmix [{"z" true}] "z" {:alpha 0.001 :beta 0.001})
 

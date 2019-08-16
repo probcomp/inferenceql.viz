@@ -112,7 +112,7 @@
    (db/clear-selections db)))
 
 (def ^:private search-column "new property")
-(def ^:private n-models 30)
+(def ^:private n-models 10)
 (def ^:private beta-params {:alpha 0.001, :beta 0.001})
 
 
