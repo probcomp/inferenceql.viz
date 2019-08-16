@@ -1,271 +1,475 @@
 {
     "columns": {
+        "job_satisfaction": "categorical", 
         "salary_usd": "gaussian", 
-        "sqlite": "categorical", 
         "java": "categorical", 
-        "career_satisfaction": "categorical", 
-        "age": "categorical", 
-        "ios": "categorical", 
+        "python": "categorical", 
+        "bash_shell": "categorical", 
+        "javascript": "categorical", 
         "c++": "categorical", 
-        "subversion": "categorical", 
-        "firebase": "categorical", 
-        "android": "categorical"
+        "linux": "categorical", 
+        "years_coding_professionally": "categorical", 
+        "opinion_on_ai": "categorical"
     }, 
     "categories": {
-        "sqlite": {
+        "job_satisfaction": {
+            "0.0": "Moderately dissatisfied", 
+            "1.0": "Moderately satisfied", 
+            "2.0": "Extremely satisfied", 
+            "3.0": "Slightly dissatisfied", 
+            "4.0": "Slightly satisfied", 
+            "5.0": "Extremely dissatisfied", 
+            "6.0": "Neither satisfied nor dissatisfied"
+        }, 
+        "java": {
             "0.0": "False", 
             "1.0": "True"
         }, 
-        "java": {
-            "0.0": "True", 
-            "1.0": "False"
+        "python": {
+            "0.0": "False", 
+            "1.0": "True"
         }, 
-        "career_satisfaction": {
-            "0.0": "Moderately satisfied", 
-            "1.0": "Slightly satisfied", 
-            "2.0": "Extremely satisfied", 
-            "3.0": "Slightly dissatisfied", 
-            "4.0": "Neither satisfied nor dissatisfied", 
-            "5.0": "Moderately dissatisfied", 
-            "6.0": "Extremely dissatisfied"
+        "linux": {
+            "0.0": "False", 
+            "1.0": "True"
         }, 
-        "age": {
-            "0.0": "25 - 34 years old", 
-            "1.0": "35 - 44 years old", 
-            "2.0": "18 - 24 years old", 
-            "3.0": "45 - 54 years old", 
-            "4.0": "55 - 64 years old", 
-            "5.0": "Under 18 years old"
-        }, 
-        "ios": {
+        "javascript": {
             "0.0": "False", 
             "1.0": "True"
         }, 
         "c++": {
+            "0.0": "True", 
+            "1.0": "False"
+        }, 
+        "bash_shell": {
             "0.0": "False", 
             "1.0": "True"
         }, 
-        "subversion": {
-            "0.0": "False", 
-            "1.0": "True"
+        "years_coding_professionally": {
+            "0.0": "21-23 years", 
+            "1.0": "9-11 years", 
+            "2.0": "6-8 years", 
+            "3.0": "0-2 years", 
+            "4.0": "18-20 years", 
+            "5.0": "3-5 years", 
+            "6.0": "12-14 years", 
+            "7.0": "30 or more years", 
+            "8.0": "27-29 years", 
+            "9.0": "15-17 years", 
+            "10.0": "24-26 years"
         }, 
-        "firebase": {
-            "0.0": "False", 
-            "1.0": "True"
-        }, 
-        "android": {
-            "0.0": "False", 
-            "1.0": "True"
+        "opinion_on_ai": {
+            "0.0": "I don't care about it, or I haven't thought about it.", 
+            "1.0": "I'm excited about the possibilities more than worried about the dangers.", 
+            "2.0": "I'm worried about the dangers more than I'm excited about the possibilities."
         }
     }, 
     "views": [
         [
             {
-                "p": 0.66735537190082639, 
+                "p": 0.27979797979797982, 
+                "job_satisfaction": {
+                    "Extremely satisfied": 0.19751640224301611, 
+                    "Slightly satisfied": 0.14486298723827584, 
+                    "Moderately satisfied": 0.34845619192327154, 
+                    "Neither satisfied nor dissatisfied": 0.071148206231639463, 
+                    "Moderately dissatisfied": 0.043066384895777979, 
+                    "Extremely dissatisfied": 0.032535701894829926, 
+                    "Slightly dissatisfied": 0.16241412557318927
+                }, 
                 "salary_usd": [
-                    22819.340418964086, 
-                    39065.869389279709
+                    44654.789406104297, 
+                    26821.455654354839
                 ], 
-                "sqlite": {
-                    "True": 0.034530724153210901, 
-                    "False": 0.9654692758467891
-                }, 
                 "java": {
-                    "False": 0.48619929058540234, 
-                    "True": 0.51380070941459766
+                    "True": 0.99283154121863804, 
+                    "False": 0.0071684587813620072
                 }, 
-                "career_satisfaction": {
-                    "Extremely satisfied": 0.14528265137663335, 
-                    "Slightly satisfied": 0.17075049083128352, 
-                    "Moderately dissatisfied": 0.06887913301268285, 
-                    "Neither satisfied nor dissatisfied": 0.12830409174019991, 
-                    "Extremely dissatisfied": 0.026432733921599234, 
-                    "Moderately satisfied": 0.35751464683205142, 
-                    "Slightly dissatisfied": 0.10283625228554974
+                "python": {
+                    "True": 0.25370844873789355, 
+                    "False": 0.74629155126210645
                 }, 
-                "age": {
-                    "25 - 34 years old": 0.58888888888888891, 
-                    "Under 18 years old": 0.044444444444444446, 
-                    "45 - 54 years old": 0.016666666666666666, 
-                    "35 - 44 years old": 0.1111111111111111, 
-                    "18 - 24 years old": 0.21666666666666667, 
-                    "55 - 64 years old": 0.022222222222222223
+                "bash_shell": {
+                    "True": 0.16380482084066345, 
+                    "False": 0.83619517915933661
                 }, 
-                "ios": {
-                    "True": 0.018461538461538463, 
-                    "False": 0.98153846153846158
+                "javascript": {
+                    "True": 0.80645161290322576, 
+                    "False": 0.19354838709677419
                 }, 
                 "c++": {
-                    "True": 0.13433733516128432, 
-                    "False": 0.86566266483871579
+                    "False": 0.81659389668781368, 
+                    "True": 0.18340610331218635
                 }, 
-                "subversion": {
-                    "True": 0.046820341997350544, 
-                    "False": 0.95317965800264948
+                "linux": {
+                    "True": 0.16633421903954576, 
+                    "False": 0.83366578096045429
                 }, 
-                "firebase": {
-                    "True": 0.015384615384615385, 
-                    "False": 0.98461538461538467
+                "years_coding_professionally": {
+                    "3-5 years": 0.32055749128919858, 
+                    "30 or more years": 0.0069686411149825784, 
+                    "6-8 years": 0.12195121951219512, 
+                    "27-29 years": 0.0034843205574912892, 
+                    "21-23 years": 0.010452961672473868, 
+                    "15-17 years": 0.010452961672473868, 
+                    "18-20 years": 0.010452961672473868, 
+                    "9-11 years": 0.076655052264808357, 
+                    "12-14 years": 0.03484320557491289, 
+                    "24-26 years": 0.0069686411149825784, 
+                    "0-2 years": 0.39721254355400698
                 }, 
-                "android": {
-                    "True": 0.024615384615384615, 
-                    "False": 0.97538461538461541
+                "opinion_on_ai": {
+                    "I don't care about it, or I haven't thought about it.": 0.078651685393258425, 
+                    "I'm excited about the possibilities more than worried about the dangers.": 0.74906367041198507, 
+                    "I'm worried about the dangers more than I'm excited about the possibilities.": 0.17228464419475656
                 }
             }, 
             {
-                "p": 0.014462809917355372, 
+                "p": 0.18888888888888888, 
+                "job_satisfaction": {
+                    "Extremely satisfied": 0.25662837384271814, 
+                    "Slightly satisfied": 0.098369674330732043, 
+                    "Moderately satisfied": 0.38936147665922261, 
+                    "Neither satisfied nor dissatisfied": 0.062633838957057764, 
+                    "Moderately dissatisfied": 0.088159435652539392, 
+                    "Extremely dissatisfied": 0.037108242261576135, 
+                    "Slightly dissatisfied": 0.067738958296154089
+                }, 
                 "salary_usd": [
-                    333602.04506433447, 
-                    47017.023246904944
+                    103977.26405674336, 
+                    35669.896032453289
                 ], 
-                "sqlite": {
-                    "True": 0.23623073647404236, 
-                    "False": 0.76376926352595764
-                }, 
                 "java": {
-                    "False": 0.35104557484144749, 
-                    "True": 0.64895442515855251
+                    "True": 0.99470899470899465, 
+                    "False": 0.0052910052910052907
                 }, 
-                "career_satisfaction": {
-                    "Extremely satisfied": 0.09030230157959418, 
-                    "Slightly satisfied": 0.31103263494529865, 
-                    "Moderately dissatisfied": 0.09030230157959418, 
-                    "Neither satisfied nor dissatisfied": 0.16387907936816232, 
-                    "Extremely dissatisfied": 0.09030230157959418, 
-                    "Moderately satisfied": 0.16387907936816232, 
-                    "Slightly dissatisfied": 0.09030230157959418
+                "python": {
+                    "True": 0.16438742819666821, 
+                    "False": 0.83561257180333182
                 }, 
-                "age": {
-                    "25 - 34 years old": 0.36363636363636365, 
-                    "Under 18 years old": 0.18181818181818182, 
-                    "45 - 54 years old": 0.090909090909090912, 
-                    "35 - 44 years old": 0.090909090909090912, 
-                    "18 - 24 years old": 0.18181818181818182, 
-                    "55 - 64 years old": 0.090909090909090912
+                "bash_shell": {
+                    "True": 0.48168370878763511, 
+                    "False": 0.51831629121236489
                 }, 
-                "ios": {
-                    "True": 0.44444444444444442, 
-                    "False": 0.55555555555555558
+                "javascript": {
+                    "True": 0.93650793650793651, 
+                    "False": 0.063492063492063489
                 }, 
                 "c++": {
-                    "True": 0.26860296018500751, 
-                    "False": 0.73139703981499249
+                    "False": 0.97220101947201998, 
+                    "True": 0.027798980527979997
                 }, 
-                "subversion": {
-                    "True": 0.13072303106365935, 
-                    "False": 0.86927696893634065
+                "linux": {
+                    "True": 0.15566281385588293, 
+                    "False": 0.84433718614411712
                 }, 
-                "firebase": {
-                    "True": 0.1111111111111111, 
-                    "False": 0.88888888888888884
+                "years_coding_professionally": {
+                    "3-5 years": 0.16161616161616163, 
+                    "30 or more years": 0.015151515151515152, 
+                    "6-8 years": 0.17171717171717171, 
+                    "27-29 years": 0.025252525252525252, 
+                    "21-23 years": 0.025252525252525252, 
+                    "15-17 years": 0.16161616161616163, 
+                    "18-20 years": 0.10606060606060606, 
+                    "9-11 years": 0.16161616161616163, 
+                    "12-14 years": 0.11616161616161616, 
+                    "24-26 years": 0.010101010101010102, 
+                    "0-2 years": 0.045454545454545456
                 }, 
-                "android": {
+                "opinion_on_ai": {
+                    "I don't care about it, or I haven't thought about it.": 0.090425531914893623, 
+                    "I'm excited about the possibilities more than worried about the dangers.": 0.70744680851063835, 
+                    "I'm worried about the dangers more than I'm excited about the possibilities.": 0.20212765957446807
+                }
+            }, 
+            {
+                "p": 0.23838383838383839, 
+                "job_satisfaction": {
+                    "Extremely satisfied": 0.21752873453524152, 
+                    "Slightly satisfied": 0.10318785977815298, 
+                    "Moderately satisfied": 0.36862203332139426, 
+                    "Neither satisfied nor dissatisfied": 0.050101025069504722, 
+                    "Moderately dissatisfied": 0.14402388647711317, 
+                    "Extremely dissatisfied": 0.013348601040440547, 
+                    "Slightly dissatisfied": 0.10318785977815298
+                }, 
+                "salary_usd": [
+                    62558.748253081809, 
+                    25126.686039811146
+                ], 
+                "java": {
+                    "True": 0.99579831932773111, 
+                    "False": 0.0042016806722689074
+                }, 
+                "python": {
+                    "True": 0.71974751727198749, 
+                    "False": 0.28025248272801251
+                }, 
+                "bash_shell": {
+                    "True": 0.75824002321211792, 
+                    "False": 0.24175997678788211
+                }, 
+                "javascript": {
+                    "True": 0.91596638655462181, 
+                    "False": 0.084033613445378158
+                }, 
+                "c++": {
+                    "False": 0.7431479217734589, 
+                    "True": 0.25685207822654105
+                }, 
+                "linux": {
+                    "True": 0.57524437993394073, 
+                    "False": 0.42475562006605927
+                }, 
+                "years_coding_professionally": {
+                    "3-5 years": 0.34008097165991902, 
+                    "30 or more years": 0.0080971659919028341, 
+                    "6-8 years": 0.17813765182186234, 
+                    "27-29 years": 0.004048582995951417, 
+                    "21-23 years": 0.020242914979757085, 
+                    "15-17 years": 0.004048582995951417, 
+                    "18-20 years": 0.03643724696356275, 
+                    "9-11 years": 0.10121457489878542, 
+                    "12-14 years": 0.093117408906882596, 
+                    "24-26 years": 0.012145748987854251, 
+                    "0-2 years": 0.20242914979757085
+                }, 
+                "opinion_on_ai": {
+                    "I don't care about it, or I haven't thought about it.": 0.064377682403433473, 
+                    "I'm excited about the possibilities more than worried about the dangers.": 0.75107296137339052, 
+                    "I'm worried about the dangers more than I'm excited about the possibilities.": 0.18454935622317598
+                }
+            }, 
+            {
+                "p": 0.091919191919191928, 
+                "job_satisfaction": {
+                    "Extremely satisfied": 0.17289264277986238, 
+                    "Slightly satisfied": 0.11282164293442333, 
+                    "Moderately satisfied": 0.41317664216161865, 
+                    "Neither satisfied nor dissatisfied": 0.03272697647383789, 
+                    "Moderately dissatisfied": 0.1228334762419965, 
+                    "Extremely dissatisfied": 0.022715143166264714, 
+                    "Slightly dissatisfied": 0.1228334762419965
+                }, 
+                "salary_usd": [
+                    80464.2004584682, 
+                    39471.274202114502
+                ], 
+                "java": {
+                    "True": 0.16129032258064516, 
+                    "False": 0.83870967741935487
+                }, 
+                "python": {
+                    "True": 0.74431858547685925, 
+                    "False": 0.25568141452314075
+                }, 
+                "bash_shell": {
+                    "True": 0.74714282014837885, 
+                    "False": 0.25285717985162109
+                }, 
+                "javascript": {
+                    "True": 0.010752688172043012, 
+                    "False": 0.989247311827957
+                }, 
+                "c++": {
+                    "False": 0.60156308581835405, 
+                    "True": 0.3984369141816459
+                }, 
+                "linux": {
+                    "True": 0.83432206322235636, 
+                    "False": 0.1656779367776437
+                }, 
+                "years_coding_professionally": {
+                    "3-5 years": 0.28431372549019607, 
+                    "30 or more years": 0.0098039215686274508, 
+                    "6-8 years": 0.12745098039215685, 
+                    "27-29 years": 0.0098039215686274508, 
+                    "21-23 years": 0.0098039215686274508, 
+                    "15-17 years": 0.049019607843137254, 
+                    "18-20 years": 0.039215686274509803, 
+                    "9-11 years": 0.088235294117647065, 
+                    "12-14 years": 0.10784313725490197, 
+                    "24-26 years": 0.0098039215686274508, 
+                    "0-2 years": 0.26470588235294118
+                }, 
+                "opinion_on_ai": {
+                    "I don't care about it, or I haven't thought about it.": 0.032258064516129031, 
+                    "I'm excited about the possibilities more than worried about the dangers.": 0.78494623655913975, 
+                    "I'm worried about the dangers more than I'm excited about the possibilities.": 0.18279569892473119
+                }
+            }, 
+            {
+                "p": 0.083838383838383837, 
+                "job_satisfaction": {
+                    "Extremely satisfied": 0.27501450422844864, 
+                    "Slightly satisfied": 0.057343556087474379, 
+                    "Moderately satisfied": 0.43826771533417935, 
+                    "Neither satisfied nor dissatisfied": 0.046460008680425671, 
+                    "Moderately dissatisfied": 0.079110650901571808, 
+                    "Extremely dissatisfied": 0.0682271034945231, 
+                    "Slightly dissatisfied": 0.035576461273376957
+                }, 
+                "salary_usd": [
+                    124087.86011026936, 
+                    45344.44099059196
+                ], 
+                "java": {
+                    "True": 0.9882352941176471, 
+                    "False": 0.011764705882352941
+                }, 
+                "python": {
+                    "True": 0.53968889008728438, 
+                    "False": 0.46031110991271568
+                }, 
+                "bash_shell": {
+                    "True": 0.86170842355880484, 
+                    "False": 0.13829157644119514
+                }, 
+                "javascript": {
+                    "True": 0.94117647058823528, 
+                    "False": 0.058823529411764705
+                }, 
+                "c++": {
+                    "False": 0.73965978503056873, 
+                    "True": 0.26034021496943133
+                }, 
+                "linux": {
+                    "True": 0.90013674676743693, 
+                    "False": 0.099863253232563162
+                }, 
+                "years_coding_professionally": {
+                    "3-5 years": 0.010638297872340425, 
+                    "30 or more years": 0.063829787234042548, 
+                    "6-8 years": 0.21276595744680851, 
+                    "27-29 years": 0.085106382978723402, 
+                    "21-23 years": 0.042553191489361701, 
+                    "15-17 years": 0.19148936170212766, 
+                    "18-20 years": 0.074468085106382975, 
+                    "9-11 years": 0.13829787234042554, 
+                    "12-14 years": 0.10638297872340426, 
+                    "24-26 years": 0.063829787234042548, 
+                    "0-2 years": 0.010638297872340425
+                }, 
+                "opinion_on_ai": {
+                    "I don't care about it, or I haven't thought about it.": 0.058139534883720929, 
+                    "I'm excited about the possibilities more than worried about the dangers.": 0.70930232558139539, 
+                    "I'm worried about the dangers more than I'm excited about the possibilities.": 0.23255813953488372
+                }
+            }, 
+            {
+                "p": 0.10404040404040404, 
+                "job_satisfaction": {
+                    "Extremely satisfied": 0.12840056159100302, 
+                    "Slightly satisfied": 0.22959663045398171, 
+                    "Moderately satisfied": 0.12840056159100302, 
+                    "Neither satisfied nor dissatisfied": 0.12840056159100302, 
+                    "Moderately dissatisfied": 0.12840056159100302, 
+                    "Extremely dissatisfied": 0.12840056159100302, 
+                    "Slightly dissatisfied": 0.12840056159100302
+                }, 
+                "salary_usd": [
+                    447909.99322354258, 
+                    0.0001
+                ], 
+                "java": {
+                    "True": 0.66666666666666663, 
+                    "False": 0.33333333333333331
+                }, 
+                "python": {
+                    "True": 0.58082914413439346, 
+                    "False": 0.4191708558656066
+                }, 
+                "bash_shell": {
+                    "True": 0.40170482049992823, 
+                    "False": 0.59829517950007172
+                }, 
+                "javascript": {
+                    "True": 0.66666666666666663, 
+                    "False": 0.33333333333333331
+                }, 
+                "c++": {
+                    "False": 0.64132589669997841, 
+                    "True": 0.35867410330002159
+                }, 
+                "linux": {
+                    "True": 0.38153129955669424, 
+                    "False": 0.61846870044330582
+                }, 
+                "years_coding_professionally": {
+                    "3-5 years": 0.083333333333333329, 
+                    "30 or more years": 0.083333333333333329, 
+                    "6-8 years": 0.083333333333333329, 
+                    "27-29 years": 0.083333333333333329, 
+                    "21-23 years": 0.083333333333333329, 
+                    "15-17 years": 0.083333333333333329, 
+                    "18-20 years": 0.083333333333333329, 
+                    "9-11 years": 0.083333333333333329, 
+                    "12-14 years": 0.083333333333333329, 
+                    "24-26 years": 0.083333333333333329, 
+                    "0-2 years": 0.16666666666666666
+                }, 
+                "opinion_on_ai": {
+                    "I don't care about it, or I haven't thought about it.": 0.25, 
+                    "I'm excited about the possibilities more than worried about the dangers.": 0.5, 
+                    "I'm worried about the dangers more than I'm excited about the possibilities.": 0.25
+                }
+            }, 
+            {
+                "p": 0.013131313131313133, 
+                "job_satisfaction": {
+                    "Extremely satisfied": 0.057985592929342404, 
+                    "Slightly satisfied": 0.19508578896655851, 
+                    "Moderately satisfied": 0.24078585431229721, 
+                    "Neither satisfied nor dissatisfied": 0.057985592929342404, 
+                    "Moderately dissatisfied": 0.14938572362081981, 
+                    "Extremely dissatisfied": 0.19508578896655851, 
+                    "Slightly dissatisfied": 0.1036856582750811
+                }, 
+                "salary_usd": [
+                    190008.48026742128, 
+                    34452.95222705543
+                ], 
+                "java": {
                     "True": 0.33333333333333331, 
                     "False": 0.66666666666666663
-                }
-            }, 
-            {
-                "p": 0.23553719008264465, 
-                "salary_usd": [
-                    29568.806399185214, 
-                    40521.718285550829
-                ], 
-                "sqlite": {
-                    "True": 0.37980560865813706, 
-                    "False": 0.62019439134186294
                 }, 
-                "java": {
-                    "False": 0.098531459782486355, 
-                    "True": 0.90146854021751366
+                "python": {
+                    "True": 0.74744461751124003, 
+                    "False": 0.25255538248875997
                 }, 
-                "career_satisfaction": {
-                    "Extremely satisfied": 0.23447373186141401, 
-                    "Slightly satisfied": 0.22517929529576333, 
-                    "Moderately dissatisfied": 0.067173873679701457, 
-                    "Neither satisfied nor dissatisfied": 0.011407254285797265, 
-                    "Extremely dissatisfied": 0.029996127417098662, 
-                    "Moderately satisfied": 0.34600697064922242, 
-                    "Slightly dissatisfied": 0.085762746811002849
+                "bash_shell": {
+                    "True": 0.52926249253879143, 
+                    "False": 0.47073750746120857
                 }, 
-                "age": {
-                    "25 - 34 years old": 0.57291666666666663, 
-                    "Under 18 years old": 0.03125, 
-                    "45 - 54 years old": 0.010416666666666666, 
-                    "35 - 44 years old": 0.09375, 
-                    "18 - 24 years old": 0.27083333333333331, 
-                    "55 - 64 years old": 0.020833333333333332
-                }, 
-                "ios": {
-                    "True": 0.32758620689655171, 
-                    "False": 0.67241379310344829
+                "javascript": {
+                    "True": 0.20000000000000001, 
+                    "False": 0.80000000000000004
                 }, 
                 "c++": {
-                    "True": 0.33022639306387264, 
-                    "False": 0.66977360693612731
+                    "False": 0.27474465384928454, 
+                    "True": 0.72525534615071552
                 }, 
-                "subversion": {
-                    "True": 0.25102590364899824, 
-                    "False": 0.74897409635100176
+                "linux": {
+                    "True": 0.65412572315816064, 
+                    "False": 0.34587427684183936
                 }, 
-                "firebase": {
-                    "True": 0.32758620689655171, 
-                    "False": 0.67241379310344829
+                "years_coding_professionally": {
+                    "3-5 years": 0.125, 
+                    "30 or more years": 0.25, 
+                    "6-8 years": 0.083333333333333329, 
+                    "27-29 years": 0.083333333333333329, 
+                    "21-23 years": 0.125, 
+                    "15-17 years": 0.041666666666666664, 
+                    "18-20 years": 0.041666666666666664, 
+                    "9-11 years": 0.041666666666666664, 
+                    "12-14 years": 0.041666666666666664, 
+                    "24-26 years": 0.083333333333333329, 
+                    "0-2 years": 0.083333333333333329
                 }, 
-                "android": {
-                    "True": 0.56034482758620685, 
-                    "False": 0.43965517241379309
-                }
-            }, 
-            {
-                "p": 0.082644628099173542, 
-                "salary_usd": [
-                    64350.365900572389, 
-                    46255.542987407658
-                ], 
-                "sqlite": {
-                    "True": 0.099792652496834833, 
-                    "False": 0.90020734750316511
-                }, 
-                "java": {
-                    "False": 0.12851340078678708, 
-                    "True": 0.87148659921321303
-                }, 
-                "career_satisfaction": {
-                    "Extremely satisfied": 0.25755907487657886, 
-                    "Slightly satisfied": 0.051095597241594064, 
-                    "Moderately dissatisfied": 0.25755907487657886, 
-                    "Neither satisfied nor dissatisfied": 0.028155210837706866, 
-                    "Extremely dissatisfied": 0.11991675645325565, 
-                    "Moderately satisfied": 0.23461868847269166, 
-                    "Slightly dissatisfied": 0.051095597241594064
-                }, 
-                "age": {
-                    "25 - 34 years old": 0.055555555555555552, 
-                    "Under 18 years old": 0.027777777777777776, 
-                    "45 - 54 years old": 0.3888888888888889, 
-                    "35 - 44 years old": 0.44444444444444442, 
-                    "18 - 24 years old": 0.055555555555555552, 
-                    "55 - 64 years old": 0.027777777777777776
-                }, 
-                "ios": {
-                    "True": 0.095238095238095233, 
-                    "False": 0.90476190476190477
-                }, 
-                "c++": {
-                    "True": 0.3401970275611243, 
-                    "False": 0.65980297243887576
-                }, 
-                "subversion": {
-                    "True": 0.52354160867665678, 
-                    "False": 0.47645839132334322
-                }, 
-                "firebase": {
-                    "True": 0.047619047619047616, 
-                    "False": 0.95238095238095233
-                }, 
-                "android": {
-                    "True": 0.14285714285714285, 
-                    "False": 0.8571428571428571
+                "opinion_on_ai": {
+                    "I don't care about it, or I haven't thought about it.": 0.0625, 
+                    "I'm excited about the possibilities more than worried about the dangers.": 0.6875, 
+                    "I'm worried about the dangers more than I'm excited about the possibilities.": 0.25
                 }
             }
         ]
