@@ -216,6 +216,8 @@
                    y-scale {:nice false}]
                {:$schema
                 "https://vega.github.io/schema/vega-lite/v3.json"
+                :width 400
+                :height 400
                 :data {:name "data"}
                 :autosize {:resize true}
                 :layer (cond-> [{:mark "bar"
@@ -250,6 +252,8 @@
              (let [selected-column (first selected-columns)]
                {:$schema
                 "https://vega.github.io/schema/vega-lite/v3.json",
+                :width 400
+                :height 400
                 :data {:values selection},
                 :mark "bar"
                 :encoding
@@ -308,6 +312,8 @@
                  ;; Scatterplot
                  #{dist/gaussian} {:$schema
                                    "https://vega.github.io/schema/vega-lite/v3.json"
+                                   :width 400
+                                   :height 400
                                    :data {:values selection}
                                    :mark "circle"
                                    :encoding {:x {:field (first selected-columns)
@@ -317,6 +323,8 @@
                  ;; Heatmap
                  #{dist/categorical} {:$schema
                                       "https://vega.github.io/schema/vega-lite/v3.json"
+                                      :width 400
+                                      :height 400
                                       :data {:values selection}
                                       :mark "rect"
                                       :encoding {:x {:field (first selected-columns)
@@ -329,6 +337,8 @@
                  #{dist/gaussian
                    dist/categorical} {:$schema
                                       "https://vega.github.io/schema/vega-lite/v3.json"
+                                      :width 400
+                                      :height 400
                                       :data {:values selection}
                                       :mark {:type "boxplot"
                                              :extent "min-max"}
