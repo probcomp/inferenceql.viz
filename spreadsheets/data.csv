@@ -1,99 +1,101 @@
-age,subversion,salary_usd,sqlite,android,ios,firebase,career_satisfaction,java,c++
-25 - 34 years old,False,78000.0,False,False,False,False,Moderately satisfied,True,False
-25 - 34 years old,True,10860.0,False,True,False,True,Slightly satisfied,False,False
-35 - 44 years old,False,18780.0,False,False,False,False,Slightly satisfied,True,False
-25 - 34 years old,False,52627.0,False,False,False,False,Slightly satisfied,True,False
-,False,,False,False,False,False,,True,False
-,False,,False,False,True,False,,True,False
-,False,,False,True,False,False,Extremely satisfied,True,False
-35 - 44 years old,False,80000.0,False,False,False,False,Moderately satisfied,False,False
-,False,,False,False,False,False,Moderately satisfied,False,False
-25 - 34 years old,False,51403.0,True,True,False,False,Extremely satisfied,True,False
-,False,,False,False,False,False,,False,False
-,False,,False,False,False,False,,False,False
-25 - 34 years old,False,48955.0,True,True,True,True,Moderately satisfied,True,False
-,False,,False,False,False,False,,False,False
-25 - 34 years old,False,77232.0,False,False,False,False,Moderately satisfied,True,True
-,False,,False,False,False,False,,True,False
-35 - 44 years old,False,54790.0,False,False,False,False,Slightly dissatisfied,True,False
-,False,,False,False,False,False,,False,False
-18 - 24 years old,False,50000.0,False,False,False,False,Neither satisfied nor dissatisfied,False,False
-18 - 24 years old,False,73433.0,False,False,False,False,Moderately satisfied,True,True
-25 - 34 years old,True,84547.0,False,True,True,True,Slightly satisfied,True,False
-35 - 44 years old,True,138000.0,False,False,False,False,Moderately dissatisfied,True,False
-25 - 34 years old,False,24478.0,False,False,False,False,Moderately satisfied,True,False
-25 - 34 years old,False,7584.0,False,False,False,False,Neither satisfied nor dissatisfied,True,False
-,False,,False,False,False,False,,True,False
-,False,,False,True,False,False,Moderately satisfied,True,False
-18 - 24 years old,False,,False,False,False,False,Slightly dissatisfied,True,True
-25 - 34 years old,False,,False,False,False,False,Slightly satisfied,True,False
-35 - 44 years old,False,120000.0,False,False,False,False,Extremely satisfied,True,False
-,False,,False,False,False,False,Slightly dissatisfied,False,False
-25 - 34 years old,False,56580.0,False,False,False,False,Slightly satisfied,True,False
-,False,,False,False,False,False,,True,False
-45 - 54 years old,False,65000.0,False,False,False,False,Moderately satisfied,True,False
-25 - 34 years old,False,115000.0,False,False,True,False,Slightly satisfied,True,False
-25 - 34 years old,False,102925.0,True,False,False,False,Moderately dissatisfied,True,False
-18 - 24 years old,False,113500.0,False,True,True,True,Moderately satisfied,True,False
-25 - 34 years old,False,2000000.0,False,False,False,False,Slightly satisfied,True,False
-18 - 24 years old,False,100000.0,False,False,True,False,Moderately satisfied,False,False
-,False,,False,False,False,False,,False,False
-18 - 24 years old,False,750000.0,False,True,False,False,,True,False
-25 - 34 years old,False,,False,False,False,False,Slightly satisfied,True,True
-25 - 34 years old,False,20000.0,False,False,False,False,Moderately satisfied,False,True
-18 - 24 years old,False,21916.0,False,False,False,False,Slightly dissatisfied,True,True
-25 - 34 years old,False,155958.0,False,False,False,True,Moderately dissatisfied,True,False
-35 - 44 years old,False,,False,False,False,False,Extremely satisfied,False,False
-,False,,False,False,False,False,,False,False
-35 - 44 years old,True,,False,False,False,False,Moderately dissatisfied,True,False
-25 - 34 years old,True,,False,False,False,False,Moderately satisfied,True,False
-25 - 34 years old,False,90567.0,False,True,False,False,Moderately satisfied,True,True
-25 - 34 years old,False,,False,False,False,False,Slightly satisfied,True,False
-25 - 34 years old,False,8124.0,False,True,False,True,Slightly satisfied,True,False
-,False,,False,False,False,False,Moderately satisfied,False,False
-35 - 44 years old,False,,False,False,False,False,Neither satisfied nor dissatisfied,True,False
-,False,,False,False,False,False,,False,False
-18 - 24 years old,False,,False,False,False,False,Moderately dissatisfied,True,True
-25 - 34 years old,False,12732.0,False,True,True,True,Extremely satisfied,True,True
-,False,,False,False,False,False,,False,False
-,False,,False,False,False,False,,False,False
-25 - 34 years old,False,84816.0,False,False,False,False,Extremely satisfied,True,False
-25 - 34 years old,False,36720.0,False,False,False,False,Slightly dissatisfied,True,False
-25 - 34 years old,False,61194.0,False,False,False,False,Moderately satisfied,True,False
-,False,,False,False,False,False,Moderately satisfied,False,False
-18 - 24 years old,False,11268.0,True,False,False,False,Moderately satisfied,False,False
-,False,,False,False,False,False,,False,False
-45 - 54 years old,False,118344.0,False,False,False,False,Moderately satisfied,True,False
-25 - 34 years old,False,36716.0,False,False,False,False,Extremely dissatisfied,True,True
-25 - 34 years old,False,32316.0,False,False,False,False,Slightly dissatisfied,True,False
-25 - 34 years old,False,,False,False,False,False,Extremely satisfied,True,False
-18 - 24 years old,False,75000.0,False,True,False,True,Extremely satisfied,True,False
-25 - 34 years old,False,49404.0,False,True,False,False,Moderately satisfied,True,True
-,False,,False,False,False,False,,False,False
-,False,62807.0,False,False,False,False,Slightly dissatisfied,False,False
-18 - 24 years old,False,,False,False,False,False,Slightly satisfied,True,False
-,False,,False,False,False,False,Moderately satisfied,True,False
-18 - 24 years old,False,,False,False,False,False,,False,False
-45 - 54 years old,True,130000.0,False,False,False,False,Moderately satisfied,True,True
-55 - 64 years old,False,,False,False,False,False,Moderately satisfied,True,False
-25 - 34 years old,False,140000.0,True,False,False,False,Moderately satisfied,True,False
-25 - 34 years old,True,73428.0,False,False,False,False,Moderately satisfied,False,True
-45 - 54 years old,True,128507.0,False,True,True,False,Extremely satisfied,False,False
-18 - 24 years old,False,14856.0,False,False,False,False,Slightly dissatisfied,True,False
-25 - 34 years old,True,45283.0,False,False,False,False,Extremely satisfied,True,False
-18 - 24 years old,False,38628.0,False,False,False,False,Neither satisfied nor dissatisfied,False,False
-45 - 54 years old,True,,False,False,False,False,Moderately satisfied,False,True
-,False,,False,False,False,False,,False,False
-25 - 34 years old,False,65000.0,True,False,True,False,Moderately satisfied,True,False
-,False,,False,False,False,False,Slightly satisfied,True,False
-25 - 34 years old,False,,False,False,False,True,Neither satisfied nor dissatisfied,True,False
-45 - 54 years old,True,,False,False,False,False,Moderately dissatisfied,True,False
-,False,,True,True,False,False,Moderately satisfied,True,False
-25 - 34 years old,False,118068.0,False,False,False,False,Moderately satisfied,True,False
-Under 18 years old,False,,False,False,False,False,,True,False
-25 - 34 years old,False,149550.0,True,False,True,False,Moderately satisfied,True,False
-,False,,False,False,False,False,Neither satisfied nor dissatisfied,False,False
-,False,,False,False,False,False,,False,False
-25 - 34 years old,True,,False,False,False,False,Slightly satisfied,True,False
-,False,,False,False,False,False,Moderately satisfied,False,False
-18 - 24 years old,False,,False,False,False,False,Moderately dissatisfied,True,False
+salary_usd,job_satisfaction,years_coding_professionally,linux,c++,javascript,java,python,bash_shell,opinion_on_ai
+72000.0,Moderately satisfied,,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+95000.0,Moderately satisfied,,True,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+43060.0,Slightly dissatisfied,0-2 years,False,True,False,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+46702.0,Moderately satisfied,,False,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+55075.0,Moderately satisfied,3-5 years,True,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+63030.0,Moderately satisfied,15-17 years,False,True,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+55075.0,Moderately satisfied,0-2 years,True,False,True,True,True,False,"I don't care about it, or I haven't thought about it."
+61194.0,,18-20 years,False,False,False,False,False,False,
+111963.0,,,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+119910.0,Moderately satisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+86544.0,Moderately dissatisfied,6-8 years,True,False,True,True,True,False,"I don't care about it, or I haven't thought about it."
+75000.0,Moderately satisfied,3-5 years,True,True,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+45838.0,Slightly dissatisfied,3-5 years,True,False,False,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+61194.0,Moderately satisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+80000.0,Moderately satisfied,6-8 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+115000.0,,,False,False,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+52000.0,Moderately dissatisfied,3-5 years,True,True,True,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+72469.0,,0-2 years,False,False,False,False,False,False,"I don't care about it, or I haven't thought about it."
+79174.0,Extremely satisfied,9-11 years,False,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+47000.0,Moderately dissatisfied,0-2 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+195000.0,,3-5 years,False,True,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+105000.0,Moderately satisfied,3-5 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+62122.0,,0-2 years,False,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+66674.0,Moderately satisfied,9-11 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+120000.0,Moderately satisfied,,True,True,False,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+122930.0,Extremely satisfied,6-8 years,True,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+97910.0,Slightly satisfied,24-26 years,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+85671.0,Moderately satisfied,9-11 years,True,True,False,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+100000.0,Neither satisfied nor dissatisfied,0-2 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+97000.0,Moderately satisfied,,True,False,False,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+55562.0,Moderately satisfied,3-5 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+110149.0,,27-29 years,False,False,False,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+60000.0,Extremely satisfied,,False,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+96538.0,Moderately satisfied,15-17 years,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+66089.0,Moderately satisfied,18-20 years,True,False,False,True,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+63896.0,Slightly dissatisfied,,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+95000.0,Moderately satisfied,0-2 years,True,False,False,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+108000.0,Moderately satisfied,27-29 years,True,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+160000.0,,18-20 years,False,False,False,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+36716.0,Neither satisfied nor dissatisfied,,False,False,False,False,False,False,
+76495.0,Slightly satisfied,,True,True,False,False,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+38000.0,Slightly satisfied,0-2 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+50000.0,Moderately satisfied,,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+43060.0,Slightly dissatisfied,6-8 years,False,True,True,True,False,True,"I don't care about it, or I haven't thought about it."
+22000.0,Slightly dissatisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+130000.0,Extremely satisfied,,True,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+80000.0,,6-8 years,True,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+76492.0,Moderately dissatisfied,12-14 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+150000.0,Extremely satisfied,,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+95000.0,Slightly dissatisfied,9-11 years,False,False,True,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+75636.0,Extremely satisfied,3-5 years,False,False,True,True,True,True,
+46507.0,,,False,False,False,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+56526.0,Neither satisfied nor dissatisfied,6-8 years,False,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+70000.0,Moderately satisfied,,False,False,True,True,False,False,"I don't care about it, or I haven't thought about it."
+78000.0,Moderately satisfied,18-20 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+110000.0,,6-8 years,False,False,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+141000.0,Extremely satisfied,,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+99967.0,Extremely satisfied,,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+160000.0,Extremely satisfied,3-5 years,False,False,False,False,False,False,"I don't care about it, or I haven't thought about it."
+100000.0,Slightly dissatisfied,,True,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+40388.0,,9-11 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+48955.0,Moderately satisfied,3-5 years,True,False,False,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+56000.0,Moderately satisfied,,False,False,True,True,False,False,"I don't care about it, or I haven't thought about it."
+80000.0,Moderately satisfied,6-8 years,True,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+90000.0,Extremely satisfied,3-5 years,False,False,False,False,True,True,I'm excited about the possibilities more than worried about the dangers.
+65190.0,Moderately dissatisfied,,True,False,False,False,True,True,I'm excited about the possibilities more than worried about the dangers.
+55562.0,Moderately dissatisfied,6-8 years,True,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+125000.0,Extremely satisfied,6-8 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+57200.0,Moderately satisfied,3-5 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+170000.0,Slightly satisfied,6-8 years,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+87800.0,Moderately satisfied,3-5 years,False,False,True,True,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+106000.0,Extremely satisfied,0-2 years,False,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+85671.0,Slightly satisfied,3-5 years,True,False,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+100000.0,,3-5 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+85671.0,Moderately satisfied,12-14 years,False,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+80000.0,,15-17 years,False,False,True,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+110000.0,Moderately satisfied,12-14 years,False,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+28178.0,,0-2 years,True,False,False,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+260000.0,Moderately satisfied,,True,True,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+195000.0,Neither satisfied nor dissatisfied,24-26 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+18785.0,Slightly satisfied,6-8 years,False,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+62507.0,Moderately dissatisfied,,True,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+76272.0,Moderately satisfied,6-8 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+148000.0,,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+141000.0,Slightly dissatisfied,,False,False,False,False,False,False,
+79000.0,Extremely satisfied,0-2 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+67313.0,Moderately dissatisfied,,True,True,False,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+300000.0,Extremely satisfied,6-8 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+68879.0,,9-11 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+98000.0,Slightly dissatisfied,18-20 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+15500.0,Slightly satisfied,12-14 years,False,True,True,True,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+140000.0,Moderately satisfied,,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+160000.0,Moderately dissatisfied,18-20 years,False,False,True,True,True,True,"I don't care about it, or I haven't thought about it."
+3757.0,Moderately satisfied,0-2 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+275000.0,Extremely satisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+45144.0,Moderately satisfied,,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+66000.0,Neither satisfied nor dissatisfied,3-5 years,False,False,True,True,False,False,"I don't care about it, or I haven't thought about it."
+91791.0,Moderately dissatisfied,27-29 years,True,True,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+45283.0,Moderately satisfied,3-5 years,True,True,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+88573.0,Moderately dissatisfied,3-5 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
