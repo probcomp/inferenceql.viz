@@ -371,6 +371,9 @@
                 (let [sampled-column (first columns) ; columns that will be sampled
                       constraints (mmix/with-row-values {} (-> row
                                                                (select-keys (keys (:vars model/spec)))
-                                                               (dissoc sampled-column)))]
-                  #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                              :observation-trace constraints))))))
+                                                               (dissoc sampled-column)))
+                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                                         :observation-trace constraints))
+                      negative-salary? #(< (% "salary_usd") 0)]
+                  ;; returns the first result of gen-fn that doesn't have a negative salary
+                  #(take 1 (remove negative-salary? (repeatedly gen-fn)))))))
