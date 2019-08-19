@@ -56,30 +56,6 @@
    (let [example-flags-col (.getSourceDataAtCol hot 0)]
      (db/with-example-flags db (js->clj example-flags-col)))))
 
-;; NOTE this event may no longer be needed
-;; It was part of the attempt to fix make the table sorting persistent.
-(rf/reg-event-db
- :after-column-sort
- event-interceptors
- (fn [db [_ hot _cur-sort _dest-sort]]
-   (let [example-flags-col (js->clj (.getDataAtCol hot 0))
-         scores-col (js->clj (.getDataAtCol hot 1))
-
-         ;; main table data -- without scores and flags
-         table-data (js->clj (->> (.getData hot)
-                                  (map #(drop 2 %))))
-
-         ;; main table headers -- without scores and flags
-         table-headers (js->clj (drop 2 (.getColHeader hot)))
-
-         table-data-maps (for [table-row table-data]
-                             (zipmap table-headers table-row))]
-
-     (-> (db/with-example-flags db example-flags-col)
-         (db/with-scores scores-col)
-         (db/with-table-rows table-data-maps)
-         (db/with-table-headers table-headers)))))
-
 (rf/reg-event-db
  :after-selection-end
  event-interceptors
