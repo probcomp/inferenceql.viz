@@ -45,6 +45,8 @@
        [:input {:type "search"
                 :style {:width "100%"}
                 :on-change #(reset! input-text (-> % .-target .-value))
+                :on-key-press (fn [e] (if (= (.-key e) "Enter")
+                                        (rf/dispatch [:search @input-text])))
                 :value @input-text}]
        [:button {:on-click #(rf/dispatch [:search @input-text])
                  :style {:float "right"}}
