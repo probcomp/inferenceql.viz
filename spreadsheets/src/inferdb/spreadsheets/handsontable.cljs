@@ -59,8 +59,6 @@
            (if (not= old-settings new-settings)
              (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
                    sort-config (.getSortConfig sorting-plugin)]
-               (.log js/console "sort-config")
-               (.log js/console sort-config)
                (update-hot! @hot-instance (clj->js new-settings))
                ; Maintain the same sort order as before the update
                (.sort sorting-plugin sort-config)))
