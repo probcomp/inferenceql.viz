@@ -185,7 +185,7 @@
   (if (= (first constraint-cols) "ROW")
     (into {} (filter (fn [[k v]] (not (or (nil? v) (= k target-col)))) row))
     (into {} (filter (fn [[k v]] (not (nil? v)))
-                            (select-keys row constraint-cols)))))
+                     (select-keys row constraint-cols)))))
 (defn  score-row-probability
   [row-generator target-col constraint-cols row]
   (let [target (select-keys row [target-col])
@@ -214,14 +214,14 @@
                         :parameters {"x" {:mu 5 :sigma 1}
                                      "z" {:mu 5 :sigma 1}}}]]})
 (comment
-(def rg (optimized-row-generator test-spec))
-(def d [{"x" -0.1 "z" 5}
-        {"x" -0.2 "z" 5}
-        {"x" -0.3 "z" 0}
-        ])
-(def text1 "SCORE PROBABILITY OF x")
-(def text2 "SCORE PROBABILITY OF x GIVEN z")
-(anomaly-search test-spec text2 d))
+ (def rg (optimized-row-generator test-spec))
+ (def d [{"x" -0.1 "z" 5}
+         {"x" -0.2 "z" 5}
+         {"x" -0.3 "z" 0}])
+
+ (def text1 "SCORE PROBABILITY OF x")
+ (def text2 "SCORE PROBABILITY OF x GIVEN z")
+ (anomaly-search test-spec text2 d))
 
 
 (defn search
