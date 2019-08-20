@@ -80,7 +80,7 @@
         rem-column-settings (repeat (dec num-columns) {})
         all-column-settings (cons initial-column-setting rem-column-settings)]
 
-    (-> views/default-hot-settings
+    (-> views/real-hot-settings
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] all-column-settings))))

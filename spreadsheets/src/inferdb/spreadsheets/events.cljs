@@ -10,7 +10,7 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
-(def hooks [:after-deselect :after-selection-end :after-change])
+(def real-hot-hooks [:after-deselect :after-selection-end :after-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end])
 
 (def event-interceptors
