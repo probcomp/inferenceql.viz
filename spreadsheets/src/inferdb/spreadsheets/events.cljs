@@ -153,13 +153,13 @@
  (fn [db [_]]
    (let [remove-nils #(into {} (remove (comp nil? second) %))
 
-         pos-rows-pairs @(rf/subscribe [:rows-flagged-pos])
+         pos-rows-pairs @(rf/subscribe [:rows-labeled-pos])
          pos-rows-ids (map first pos-rows-pairs)
          pos-rows (->> (map second pos-rows-pairs)
                    (map #(merge % {search-column true}))
                    (map remove-nils))
 
-         neg-rows-pairs @(rf/subscribe [:rows-flagged-neg])
+         neg-rows-pairs @(rf/subscribe [:rows-labeled-neg])
          neg-rows-ids (map first neg-rows-pairs)
          neg-rows (->> (map second neg-rows-pairs)
                    (map #(merge % {search-column false}))
@@ -167,13 +167,13 @@
 
          example-rows (concat pos-rows neg-rows)
 
-         rows-not-flagged-pairs @(rf/subscribe [:rows-not-flagged])
-         rows-not-flagged-ids (map first rows-not-flagged-pairs)
-         rows-not-flagged (map second rows-not-flagged-pairs)
+         rows-not-labeled-pairs @(rf/subscribe [:rows-not-labeled])
+         rows-not-labeled-ids (map first rows-not-labeled-pairs)
+         rows-not-labeled (map second rows-not-labeled-pairs)
 
-         calced-scores (search/search model/spec search-column example-rows rows-not-flagged n-models beta-params)
+         calced-scores (search/search model/spec search-column example-rows rows-not-labeled n-models beta-params)
 
-         calced-scores-ids-map (zipmap rows-not-flagged-ids calced-scores)
+         calced-scores-ids-map (zipmap rows-not-labeled-ids calced-scores)
          pos-scores-ids-map (zipmap pos-rows-ids (repeat 1))
          neg-scores-ids-map (zipmap neg-rows-ids (repeat 0))
 

@@ -47,8 +47,8 @@
                 scores (mapv (fn [score row]
                                (assoc row "probability" score))
                              scores)
-                labels (mapv (fn [ex-flag row]
-                               (assoc row "🏷" ex-flag))
+                labels (mapv (fn [label row]
+                               (assoc row "🏷" label))
                              labels))))
 
 (rf/reg-sub :virtual-rows
@@ -116,60 +116,60 @@
 (rf/reg-sub :selected-columns selected-columns)
 
 ;; TODO helper functions might be better located elsewhere
-(def clean-flag
+(def clean-label
   (fnil (comp str/upper-case str/trim) ""))
-(defn- pos-flag? [flag-str]
-  (let [f (clean-flag flag-str)]
+(defn- pos-label? [label-str]
+  (let [f (clean-label label-str)]
     (or (= f "TRUE")
         (= f "1"))))
-(defn- neg-flag? [flag-str]
-  (let [f (clean-flag flag-str)]
+(defn- neg-label? [label-str]
+  (let [f (clean-label label-str)]
     (or (= f "FALSE")
         (= f "0"))))
 
-(defn rows-flagged-pos
-  [{:keys [flags rows]} _]
+(defn rows-labeled-pos
+  [{:keys [labels rows]} _]
   (let [rows-with-ids (map vector (range) rows)
-        pos-rows (map (fn [flag row]
-                        (if (pos-flag? flag) row))
-                      flags rows-with-ids)
+        pos-rows (map (fn [label row]
+                        (if (pos-label? label) row))
+                      labels rows-with-ids)
         pos-rows (remove nil? pos-rows)]
     pos-rows))
-(rf/reg-sub :rows-flagged-pos
+(rf/reg-sub :rows-labeled-pos
             (fn [_ _]
-              {:flags (rf/subscribe [:labels])
+              {:labels (rf/subscribe [:labels])
                :rows (rf/subscribe [:table-rows])})
-            rows-flagged-pos)
+            rows-labeled-pos)
 
-(defn rows-flagged-neg
-  [{:keys [flags rows]} _]
+(defn rows-labeled-neg
+  [{:keys [labels rows]} _]
   (let [rows-with-ids (map vector (range) rows)
-        neg-rows (map (fn [flag row]
-                        (if (neg-flag? flag) row))
-                      flags rows-with-ids)
+        neg-rows (map (fn [label row]
+                        (if (neg-label? label) row))
+                      labels rows-with-ids)
         neg-rows (remove nil? neg-rows)]
     neg-rows))
-(rf/reg-sub :rows-flagged-neg
+(rf/reg-sub :rows-labeled-neg
             (fn [_ _]
-              {:flags (rf/subscribe [:labels])
+              {:labels (rf/subscribe [:labels])
                :rows (rf/subscribe [:table-rows])})
-            rows-flagged-neg)
+            rows-labeled-neg)
 
-(defn rows-not-flagged
-  [{:keys [flags rows]} _]
+(defn rows-not-labeled
+  [{:keys [labels rows]} _]
   (let [rows-with-ids (map vector (range) rows)
-        unflaggged-rows (map (fn [flag row]
-                               (if (and (not (pos-flag? flag))
-                                        (not (neg-flag? flag)))
-                                   row))
-                             flags rows-with-ids)
-        unflaggged-rows (remove nil? unflaggged-rows)]
-    unflaggged-rows))
-(rf/reg-sub :rows-not-flagged
+        unlabeled-rows (map (fn [label row]
+                               (if (and (not (pos-label? label))
+                                        (not (neg-label? label)))
+                                 row))
+                            labels rows-with-ids)
+        unlabeled-rows (remove nil? unlabeled-rows)]
+    unlabeled-rows))
+(rf/reg-sub :rows-not-labeled
             (fn [_ _]
-              {:flags (rf/subscribe [:labels])
+              {:labels (rf/subscribe [:labels])
                :rows (rf/subscribe [:table-rows])})
-            rows-not-flagged)
+            rows-not-labeled)
 
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
