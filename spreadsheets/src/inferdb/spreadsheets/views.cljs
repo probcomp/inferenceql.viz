@@ -100,7 +100,7 @@
 
 (defn app
   []
-  (let [hot-props      @(rf/subscribe [:hot-props])
+  (let [real-hot-props      @(rf/subscribe [:real-hot-props])
         virtual-hot-props @(rf/subscribe [:virtual-hot-props])
         selected-maps  @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
@@ -110,7 +110,7 @@
      [:h1 "Real Data"]
      [:h3 "rows: real developers"]
      [:h3 "columns: real answers to survey questions"]
-     [hot/handsontable {:style {:overflow "hidden"}}  hot-props]
+     [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
      [:h1 "Virtual Data"]
      [:h3 "rows: virtual developers"]
      [:h3 "columns: virtual answers to survey questions"]

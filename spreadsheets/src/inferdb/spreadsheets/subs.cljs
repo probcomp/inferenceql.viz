@@ -71,7 +71,7 @@
                      headers)))
         rows))
 
-(defn hot-props
+(defn real-hot-props
   [{:keys [headers rows]} _]
   (let [data (cell-vector headers rows)
         num-columns (count headers)
@@ -84,11 +84,11 @@
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] all-column-settings))))
-(rf/reg-sub :hot-props
+(rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:computed-rows])})
-            hot-props)
+            real-hot-props)
 
 (defn virtual-hot-props
   [{:keys [headers rows]} _]
