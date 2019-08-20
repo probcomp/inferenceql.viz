@@ -164,22 +164,6 @@
   [coll]
   (apply map vector coll))
 
-
-(defn conditional-query? [text] (clojure.string/includes? text "GIVEN"))
-
-(defn parse-condition
-  [text]
-  (mapv clojure.string/trim (clojure.string/split text #"AND")))
-
-(defn parse-query
-  [text]
-  (let [[_ main-text] (clojure.string/split text #"PROBABILITY OF ")]
-    (if (conditional-query? main-text)
-        [(clojure.string/trim (first (clojure.string/split main-text #"GIVEN ")))
-         (parse-condition(second  (clojure.string/split main-text #"GIVEN ")))]
-        [(clojure.string/trim main-text) []])))
-
-
 (defn constraints-for-scoring-p
   [target-col constraint-cols row]
   (if (= (first constraint-cols) "ROW")
@@ -194,15 +178,10 @@
       1
       (Math/exp (logpdf row-generator target constraints)))))
 
-
-
 (defn anomaly-search
-  [spec query-text data]
-  (let [[target-col conditional-cols] (parse-query query-text)
-         row-generator (optimized-row-generator spec)]
-    (map (fn [row] (score-row-probability  row-generator target-col conditional-cols row)) data)))
-
-
+  [spec target-col conditional-cols data]
+  (let [row-generator (optimized-row-generator spec)]
+    (map #(score-row-probability row-generator target-col conditional-cols %) data)))
 
 (def test-spec
          {:vars {"x" :gaussian

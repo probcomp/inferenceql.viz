@@ -82,6 +82,24 @@
   [text]
   (not (nil? (re-matches #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" text))))
 
+;----
+
+(defn conditional-query? [text] (clojure.string/includes? text "GIVEN"))
+
+(defn parse-condition
+  [text]
+  (mapv clojure.string/trim (clojure.string/split text #"AND")))
+
+(defn parse-query
+  [text]
+  (let [[_ main-text] (clojure.string/split text #"PROBABILITY OF ")]
+    (if (conditional-query? main-text)
+        [(clojure.string/trim (first (clojure.string/split main-text #"GIVEN ")))
+         (parse-condition(second  (clojure.string/split main-text #"GIVEN ")))]
+        [(clojure.string/trim main-text) []])))
+
+;----
+
 (rf/reg-event-db
  :search
  event-interceptors
@@ -121,7 +139,8 @@
 
        (anomaly-search? text)
        (let [table-rows @(rf/subscribe [:table-rows])
-             result (search/anomaly-search model/spec text table-rows)]
+             [target-col conditional-cols] (parse-query text)
+             result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
          (rf/dispatch [:search-result result]))
 
        :else
