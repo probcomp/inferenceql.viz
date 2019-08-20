@@ -187,4 +187,4 @@
  :search-result
  event-interceptors
  (fn [db [_ result]]
-   (db/with-scores db result))) ; TODO: This is not resilient to sorting the table
+   (db/with-scores db result))) 
