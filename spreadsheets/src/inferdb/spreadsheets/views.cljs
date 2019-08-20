@@ -38,9 +38,9 @@
                 :style {:width "100%"}
                 :on-change #(reset! input-text (-> % .-target .-value))
                 :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                        (rf/dispatch [:search @input-text])))
+                                        (rf/dispatch [:run-inference-ql @input-text])))
                 :value @input-text}]
-       [:button {:on-click #(rf/dispatch [:search @input-text])
+       [:button {:on-click #(rf/dispatch [:run-inference-ql @input-text])
                  :style {:float "right"}}
         "Run InferenceQL"]
        [:button {:on-click #(rf/dispatch [:clear-simulations])

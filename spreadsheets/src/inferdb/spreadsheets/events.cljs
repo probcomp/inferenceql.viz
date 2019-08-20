@@ -71,7 +71,7 @@
    (db/clear-selections db)))
 
 (rf/reg-event-db
- :search
+ :run-inference-ql
  event-interceptors
  (fn [db [_ text]]
    (condp re-matches (str/trim text)
@@ -92,7 +92,7 @@
        (rf/dispatch [:simulate {k1 v1} 1]))
 
      #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" :>>
-     #(rf/dispatch [:search-by-flagged])
+     #(rf/dispatch [:search-by-labeled])
 
      #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*)" :>>
      (fn [[_ target-col]]
@@ -148,7 +148,7 @@
      (db/with-virtual-rows db new-rows))))
 
 (rf/reg-event-db
- :search-by-flagged
+ :search-by-labeled
  event-interceptors
  (fn [db [_]]
    (let [remove-nils #(into {} (remove (comp nil? second) %))
