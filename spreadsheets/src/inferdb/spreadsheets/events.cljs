@@ -70,84 +70,69 @@
  (fn [db _]
    (db/clear-selections db)))
 
-(defn- anomaly-search?
-  [text]
-  (clojure.string/includes? (clojure.string/lower-case text) "probability"))
-
-(defn- generate-statement?
-  [text]
-  (clojure.string/includes? (clojure.string/lower-case text) "generate"))
-
-(defn- score-using-labels-statement?
-  [text]
-  (not (nil? (re-matches #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" text))))
-
-;----
-
-(defn conditional-query? [text] (clojure.string/includes? text "GIVEN"))
-
-(defn parse-condition
-  [text]
-  (mapv clojure.string/trim (clojure.string/split text #"AND")))
-
-(defn parse-query
-  [text]
-  (let [[_ main-text] (clojure.string/split text #"PROBABILITY OF ")]
-    (if (conditional-query? main-text)
-        [(clojure.string/trim (first (clojure.string/split main-text #"GIVEN ")))
-         (parse-condition(second  (clojure.string/split main-text #"GIVEN ")))]
-        [(clojure.string/trim main-text) []])))
-
-;----
-
 (rf/reg-event-db
  :search
  event-interceptors
  (fn [db [_ text]]
-   (let [text (str/trim text)]
-     (cond
-       (score-using-labels-statement? text)
-       (rf/dispatch [:search-by-flagged])
+   (condp re-matches (str/trim text)
+     #"GENERATE ROW" :>>
+     #(rf/dispatch [:simulate {} 1])
 
-       (generate-statement? text)
-       (do
-         (cond
-           (re-matches #"GENERATE ROW" text)
-           (rf/dispatch [:simulate {} 1])
+     #"GENERATE ROW (\d+) TIMES" :>>
+     (fn [[_ m1]]
+       (let [num-rows (js/parseInt m1)]
+         (rf/dispatch [:simulate {} num-rows])))
 
-           (re-matches #"GENERATE ROW (\d+) TIMES" text)
-           (do
-             (let [[_ m1] (re-matches #"GENERATE ROW (\d+) TIMES" text)
-                   num-rows (js/parseInt m1)]
-               (rf/dispatch [:simulate {} num-rows])))
+     #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" :>>
+     (fn [[_ k1 v1 k2 v2]]
+       (rf/dispatch [:simulate {k1 v1 k2 v2} 1]))
 
-           (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)
-           (do
-             (let [[_ k1 v1 k2 v2] (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)]
-               (rf/dispatch [:simulate {k1 v1 k2 v2} 1])))
+     #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" :>>
+     (fn [[_ k1 v1]]
+       (rf/dispatch [:simulate {k1 v1} 1]))
 
-           ; NOTE: saving this as an alternate version of the following regex actually used
-           ; TODO: delete later
-           ;(re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=([A-Za-z0-9_]+)" text)
-           (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)
-           (do
-             (let [[_ k1 v1] (re-matches #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" text)]
-               (rf/dispatch [:simulate {k1 v1} 1])))
+     #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" :>>
+     #(rf/dispatch [:search-by-flagged])
 
-           :else
-           (.log js/console "ERROR: no match for generate call")))
+     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*)" :>>
+     (fn [[_ target-col]]
+       (rf/dispatch [:anomaly-search target-col []]))
 
-       (anomaly-search? text)
-       (let [table-rows @(rf/subscribe [:table-rows])
-             [target-col conditional-cols] (parse-query text)
-             result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
-         (rf/dispatch [:search-result result]))
+     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*) GIVEN ROW" :>>
+     (fn [[_ target-col]]
+       (rf/dispatch [:anomaly-search target-col ["ROW"]]))
 
-       :else
-       (let [table-rows @(rf/subscribe [:table-rows])
-             row (merge (edn/read-string text) {search-column true})
-             result (search/search model/spec search-column [row] table-rows n-models beta-params)]
-         (rf/dispatch [:search-result result]))))
+     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*) GIVEN ([A-Za-z][A-Za-z0-9_\+]*)" :>>
+     (fn [[_ target-col cond-col-1]]
+       (rf/dispatch [:anomaly-search target-col [cond-col-1]]))
+
+     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*) GIVEN ([A-Za-z][A-Za-z0-9_\+]*) AND ([A-Za-z][A-Za-z0-9_\+]*)" :>>
+     (fn [[_ target-col cond-col-1 cond-col-2]]
+       (rf/dispatch [:anomaly-search target-col [cond-col-1 cond-col-2]]))
+
+     ; Else condition
+     ; Defaults to legacy search-by-example
+     (let [example-row (edn/read-string text)]
+       (rf/dispatch [:search-by-example example-row])))
+   db))
+
+(rf/reg-event-db
+ :search-by-example
+ event-interceptors
+ (fn [db [_ example-row]]
+   (let [table-rows @(rf/subscribe [:table-rows])
+         search-row (merge example-row {search-column true})
+         result (search/search model/spec search-column [search-row] table-rows n-models beta-params)]
+     (rf/dispatch [:search-result result]))
+   db))
+
+(rf/reg-event-db
+ :anomaly-search
+ event-interceptors
+ (fn [db [_ target-col conditional-cols]]
+   (let [table-rows @(rf/subscribe [:table-rows])
+         result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
+     (rf/dispatch [:search-result result]))
    db))
 
 (rf/reg-event-db
