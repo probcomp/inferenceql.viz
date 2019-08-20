@@ -43,7 +43,7 @@
        [:button {:on-click #(rf/dispatch [:run-inference-ql @input-text])
                  :style {:float "right"}}
         "Run InferenceQL"]
-       [:button {:on-click #(rf/dispatch [:clear-simulations])
+       [:button {:on-click #(rf/dispatch [:clear-virtual-data])
                  :style {:float "right"}}
         "Delete virtual data"]])))
 

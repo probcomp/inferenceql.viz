@@ -121,7 +121,7 @@
   (let [cur-v-rows (virtual-rows db)]
     (assoc-in db [::virtual-rows] (concat new-v-rows cur-v-rows))))
 
-(defn clear-simulations
+(defn clear-virtual-rows
   [db]
   (assoc-in db [::virtual-rows] []))
 

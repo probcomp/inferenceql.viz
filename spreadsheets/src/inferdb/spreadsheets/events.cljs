@@ -27,10 +27,10 @@
    (db/default-db)))
 
 (rf/reg-event-db
- :clear-simulations
+ :clear-virtual-data
  event-interceptors
  (fn [db [event-name]]
-   (db/clear-simulations db)))
+   (db/clear-virtual-rows db)))
 
 (rf/reg-event-db
  :after-change
@@ -76,20 +76,20 @@
  (fn [db [_ text]]
    (condp re-matches (str/trim text)
      #"GENERATE ROW" :>>
-     #(rf/dispatch [:simulate {} 1])
+     #(rf/dispatch [:generate-virtual-row {} 1])
 
      #"GENERATE ROW (\d+) TIMES" :>>
      (fn [[_ m1]]
        (let [num-rows (js/parseInt m1)]
-         (rf/dispatch [:simulate {} num-rows])))
+         (rf/dispatch [:generate-virtual-row {} num-rows])))
 
      #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" :>>
      (fn [[_ k1 v1 k2 v2]]
-       (rf/dispatch [:simulate {k1 v1 k2 v2} 1]))
+       (rf/dispatch [:generate-virtual-row {k1 v1 k2 v2} 1]))
 
      #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" :>>
      (fn [[_ k1 v1]]
-       (rf/dispatch [:simulate {k1 v1} 1]))
+       (rf/dispatch [:generate-virtual-row {k1 v1} 1]))
 
      #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" :>>
      #(rf/dispatch [:search-by-labeled])
@@ -136,7 +136,7 @@
    db))
 
 (rf/reg-event-db
- :simulate
+ :generate-virtual-row
  event-interceptors
  (fn [db [event-name conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
