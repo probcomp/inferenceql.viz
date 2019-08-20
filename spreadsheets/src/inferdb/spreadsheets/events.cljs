@@ -16,23 +16,15 @@
 (def event-interceptors
   [rf/debug interceptors/check-spec])
 
+(def ^:private search-column "new property")
+(def ^:private n-models 10)
+(def ^:private beta-params {:alpha 0.001, :beta 0.001})
+
 (rf/reg-event-db
  :initialize-db
  event-interceptors
  (fn [_ _]
    (db/default-db)))
-
-(rf/reg-event-db
- :simulate
- event-interceptors
- (fn [db [event-name conditions num-rows]]
-   (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
-         gen-fn #(first (mp/infer-and-score
-                           :procedure (search/optimized-row-generator model/spec)
-                           :observation-trace constraint-addrs-vals))
-         negative-salary? #(< (% "salary_usd") 0)
-         new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
-     (db/with-virtual-rows db new-rows))))
 
 (rf/reg-event-db
  :clear-simulations
@@ -78,20 +70,15 @@
  (fn [db _]
    (db/clear-selections db)))
 
-(def ^:private search-column "new property")
-(def ^:private n-models 10)
-(def ^:private beta-params {:alpha 0.001, :beta 0.001})
-
-
-(defn anomaly-search?
+(defn- anomaly-search?
   [text]
   (clojure.string/includes? (clojure.string/lower-case text) "probability"))
 
-(defn generate-statement?
+(defn- generate-statement?
   [text]
   (clojure.string/includes? (clojure.string/lower-case text) "generate"))
 
-(defn score-using-labels-statement?
+(defn- score-using-labels-statement?
   [text]
   (not (nil? (re-matches #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" text))))
 
@@ -143,6 +130,18 @@
              result (search/search model/spec search-column [row] table-rows n-models beta-params)]
          (rf/dispatch [:search-result result]))))
    db))
+
+(rf/reg-event-db
+ :simulate
+ event-interceptors
+ (fn [db [event-name conditions num-rows]]
+   (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
+         gen-fn #(first (mp/infer-and-score
+                           :procedure (search/optimized-row-generator model/spec)
+                           :observation-trace constraint-addrs-vals))
+         negative-salary? #(< (% "salary_usd") 0)
+         new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
+     (db/with-virtual-rows db new-rows))))
 
 (rf/reg-event-db
  :search-by-flagged
