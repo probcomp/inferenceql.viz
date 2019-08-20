@@ -105,18 +105,16 @@
         selected-maps  @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
         scores         @(rf/subscribe [:scores])
-        generator      @(rf/subscribe [:generator])
-        left-scroll-pos @(rf/subscribe [:left-scroll-pos])
-        pos-emmiter @(rf/subscribe [:pos-emmitter])]
+        generator      @(rf/subscribe [:generator])]
     [:div
      [:h1 "Real Data"]
      [:h3 "rows: real developers"]
      [:h3 "columns: real answers to survey questions"]
-     [hot/handsontable {:style {:overflow "hidden"}} [pos-emmiter left-scroll-pos] hot-props]
+     [hot/handsontable {:style {:overflow "hidden"}}  hot-props]
      [:h1 "Virtual Data"]
      [:h3 "rows: virtual developers"]
      [:h3 "columns: virtual answers to survey questions"]
-     [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} [pos-emmiter left-scroll-pos] virtual-hot-props]
+     [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}

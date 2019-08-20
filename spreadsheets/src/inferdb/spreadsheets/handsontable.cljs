@@ -19,16 +19,10 @@
 
 (defn handsontable
   ([props]
-   (handsontable {} [nil 0] props))
-  ([attributes [emmitter x-pos] {:keys [settings hooks] :as props}]
+   (handsontable {} props))
+  ([attributes {:keys [settings hooks] :as props}]
    (let [js-settings (clj->js settings)
-         hot-instance (reagent/atom nil)
-         fn-for-scroll-event (fn [& args]
-                               (let [event (first args)
-                                     target (-> event .-target)
-                                     jq-target (js/$. target)
-                                     left-pos (.scrollLeft jq-target)]
-                                 (rf/dispatch [:table-scroll jq-target left-pos])))]
+         hot-instance (reagent/atom nil)]
      (reagent/create-class
       {:display-name "handsontable-reagent"
 
@@ -43,17 +37,13 @@
                                           (fn [& args]
                                             (rf/dispatch (into [key hot] args)))
                                           hot)))
-           ; add callback to dom internal dom node created by hot
-           (let [jq-obj (js/$. dom-node)
-                 nested-jq-obj (.find jq-obj ".ht_master > .wtHolder")]
-              (.on nested-jq-obj "scroll" fn-for-scroll-event))
            ; set the atom to the hot object
            (reset! hot-instance hot)))
 
        :component-did-update
        (fn [this old-argv]
-         (let [[_ old-attributes [old-emmitter old-x-pos] old-props] old-argv
-               [_ new-attributes [new-emmitter new-x-pos] new-props] (reagent/argv this)
+         (let [[_ old-attributes old-props] old-argv
+               [_ new-attributes new-props] (reagent/argv this)
                {old-settings :settings, old-hooks :hooks} old-props
                {new-settings :settings, new-hooks :hooks} new-props]
            (if (not= old-settings new-settings)
@@ -61,16 +51,7 @@
                    sort-config (.getSortConfig sorting-plugin)]
                (update-hot! @hot-instance (clj->js new-settings))
                ; Maintain the same sort order as before the update
-               (.sort sorting-plugin sort-config)))
-           (if (not= old-x-pos new-x-pos)
-             (let [dom-node (dom/dom-node this)
-                   jq-obj (js/$. dom-node)
-                   nested-jq-obj (.find jq-obj ".ht_master > .wtHolder")]
-               (if (not (.is new-emmitter nested-jq-obj))
-                 (do
-                   (.off nested-jq-obj "scroll")
-                   ;(.scrollLeft nested-jq-obj new-x-pos)
-                   (.on nested-jq-obj "scroll" fn-for-scroll-event)))))))
+               (.sort sorting-plugin sort-config)))))
 
        :component-will-unmount
        (fn [this]

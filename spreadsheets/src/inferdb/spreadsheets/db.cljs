@@ -108,14 +108,6 @@
   [db]
   (get-in db [::scores]))
 
-(defn left-scroll-pos
-  [db]
-  (get-in db [::left-scroll-pos]))
-
-(defn pos-emmitter
-  [db]
-  (get-in db [::pos-emmitter]))
-
 (defn with-table-rows
   [db table-rows]
   (assoc-in db [::rows] table-rows))
@@ -132,14 +124,6 @@
 (defn clear-simulations
   [db]
   (assoc-in db [::virtual-rows] []))
-
-(defn with-left-scroll-pos
-  [db pos-emmitter left-scroll-pos]
-  ;(.log js/console left-scroll-pos)
-  ;(.log js/console pos-emmitter)
-  ; TODO make this less ugly
-  (let [first-assoc (assoc-in db [::left-scroll-pos] left-scroll-pos)]
-    (assoc-in first-assoc [::pos-emmitter] pos-emmitter)))
 
 (defn example-flags
   [db]

@@ -23,15 +23,6 @@
    (db/default-db)))
 
 (rf/reg-event-db
- :table-scroll
- []
- (fn [db [event-name emmitter-obj left-scroll-pos]]
-   ;(.log js/console "table-scroll")
-   ;(.log js/console emmitter-obj)
-   ;(.log js/console left-scroll-pos)
-   (db/with-left-scroll-pos db emmitter-obj left-scroll-pos)))
-
-(rf/reg-event-db
  :simulate
  event-interceptors
  (fn [db [event-name conditions num-rows]]
