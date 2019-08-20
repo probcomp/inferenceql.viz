@@ -36,8 +36,8 @@
  :after-change
  event-interceptors
  (fn [db [_ hot changes]]
-   (let [example-flags-col (.getSourceDataAtCol hot 0)]
-     (db/with-example-flags db (js->clj example-flags-col)))))
+   (let [labels-col (.getSourceDataAtCol hot 0)]
+     (db/with-labels db (js->clj labels-col)))))
 
 (rf/reg-event-db
  :after-selection-end
@@ -187,4 +187,4 @@
  :search-result
  event-interceptors
  (fn [db [_ result]]
-   (db/with-scores db result))) 
+   (db/with-scores db result)))

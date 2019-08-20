@@ -19,9 +19,9 @@
 (s/def ::score #(or (number? %) (nil? %)))
 (s/def ::scores (s/coll-of ::score))
 
-(s/def ::example-flag #(or (string? %) (nil? %)))
+(s/def ::label #(or (string? %) (nil? %)))
 ;(s/def ::example-flags (s/coll-of ::example-flag))
-(s/def ::example-flags any?)
+(s/def ::labels any?)
 
 (s/def ::topojson any?)
 
@@ -125,13 +125,13 @@
   [db]
   (assoc-in db [::virtual-rows] []))
 
-(defn example-flags
+(defn labels
   [db]
-  (get-in db [::example-flags]))
+  (get-in db [::labels]))
 
-(defn with-example-flags
-  [db example-flags]
-  (assoc-in db [::example-flags] example-flags))
+(defn with-labels
+  [db labels]
+  (assoc-in db [::labels] labels))
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."

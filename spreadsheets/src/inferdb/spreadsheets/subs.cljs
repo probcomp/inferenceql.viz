@@ -14,9 +14,9 @@
             (fn [db _]
               (db/scores db)))
 
-(rf/reg-sub :example-flags
+(rf/reg-sub :labels
             (fn [db _]
-              (db/example-flags db)))
+              (db/labels db)))
 
 (defn table-headers
   [db _]
@@ -41,15 +41,15 @@
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
-               :example-flags (rf/subscribe [:example-flags])})
-            (fn [{:keys [rows scores example-flags]}]
+               :labels (rf/subscribe [:labels])})
+            (fn [{:keys [rows scores labels]}]
               (cond->> rows
                 scores (mapv (fn [score row]
                                (assoc row "probability" score))
                              scores)
-                example-flags (mapv (fn [ex-flag row]
-                                      (assoc row "🏷" ex-flag))
-                               example-flags))))
+                labels (mapv (fn [ex-flag row]
+                               (assoc row "🏷" ex-flag))
+                             labels))))
 
 (rf/reg-sub :virtual-rows
             (fn [db _]
@@ -137,7 +137,7 @@
     pos-rows))
 (rf/reg-sub :rows-flagged-pos
             (fn [_ _]
-              {:flags (rf/subscribe [:example-flags])
+              {:flags (rf/subscribe [:labels])
                :rows (rf/subscribe [:table-rows])})
             rows-flagged-pos)
 
@@ -151,7 +151,7 @@
     neg-rows))
 (rf/reg-sub :rows-flagged-neg
             (fn [_ _]
-              {:flags (rf/subscribe [:example-flags])
+              {:flags (rf/subscribe [:labels])
                :rows (rf/subscribe [:table-rows])})
             rows-flagged-neg)
 
@@ -167,7 +167,7 @@
     unflaggged-rows))
 (rf/reg-sub :rows-not-flagged
             (fn [_ _]
-              {:flags (rf/subscribe [:example-flags])
+              {:flags (rf/subscribe [:labels])
                :rows (rf/subscribe [:table-rows])})
             rows-not-flagged)
 
