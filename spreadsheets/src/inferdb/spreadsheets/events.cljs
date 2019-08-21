@@ -3,9 +3,9 @@
             [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
-            [inferdb.spreadsheets.data :as data]
-            [inferdb.multimixture.search :as search]
             [inferdb.multimixture :as mmix]
+            [inferdb.multimixture.search :as search]
+            [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
@@ -23,7 +23,7 @@
 (rf/reg-event-db
  :initialize-db
  event-interceptors
- (fn [_ _]
+ (fn [db _]
    (db/default-db)))
 
 (rf/reg-event-db

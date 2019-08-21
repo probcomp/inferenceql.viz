@@ -95,13 +95,13 @@
   [db]
   (get-in db [::rows]))
 
-(defn with-scores
-  [db scores]
-  (assoc-in db [::scores] scores))
-
 (defn scores
   [db]
   (get-in db [::scores]))
+
+(defn with-scores
+  [db scores]
+  (assoc-in db [::scores] scores))
 
 (defn with-virtual-rows
   [db new-v-rows]
