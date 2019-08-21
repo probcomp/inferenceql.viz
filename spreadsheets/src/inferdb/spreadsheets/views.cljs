@@ -14,7 +14,9 @@
               :multiColumnSorting  true
               :manualColumnMove    true
               :beforeColumnMove    hot/freeze-col-1-2-fn
+              :manualColumnResize  true
               :filters             true
+              :dropdownMenu        true
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :readOnly            true
