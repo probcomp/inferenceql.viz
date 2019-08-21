@@ -16,12 +16,11 @@
 (s/def ::selections (s/coll-of ::selection))
 (s/def ::selected-columns (s/coll-of ::header))
 
-(s/def ::score #(or (number? %) (nil? %)))
+(s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
 (s/def ::label #(or (string? %) (nil? %)))
-;(s/def ::example-flags (s/coll-of ::example-flag))
-(s/def ::labels any?)
+(s/def ::labels (s/coll-of ::label))
 
 (s/def ::topojson any?)
 
@@ -38,7 +37,7 @@
                           ::selected-row-index
                           ::row-at-selection-start
                           ::scores
-                          ::example-flags
+                          ::labels
                           ::selected-columns
                           ::topojson
                           ::sampled-rows]))
@@ -100,21 +99,13 @@
   [db]
   (get-in db [::rows]))
 
-(defn virtual-rows
-  [db]
-  (get-in db [::virtual-rows]))
+(defn with-scores
+  [db scores]
+  (assoc-in db [::scores] scores))
 
 (defn scores
   [db]
   (get-in db [::scores]))
-
-(defn with-table-rows
-  [db table-rows]
-  (assoc-in db [::rows] table-rows))
-
-(defn with-scores
-  [db scores]
-  (assoc-in db [::scores] scores))
 
 (defn with-virtual-rows
   [db new-v-rows]
@@ -125,13 +116,17 @@
   [db]
   (assoc-in db [::virtual-rows] []))
 
-(defn labels
+(defn virtual-rows
   [db]
-  (get-in db [::labels]))
+  (get-in db [::virtual-rows]))
 
 (defn with-labels
   [db labels]
   (assoc-in db [::labels] labels))
+
+(defn labels
+  [db]
+  (get-in db [::labels]))
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
