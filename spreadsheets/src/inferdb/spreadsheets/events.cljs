@@ -10,7 +10,7 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :after-change])
+(def real-hot-hooks [:after-deselect :after-selection-end :before-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end])
 
 (def event-interceptors
@@ -33,7 +33,7 @@
    (db/clear-virtual-rows db)))
 
 (rf/reg-event-db
- :after-change
+ :before-change
  event-interceptors
  (fn [db [_ hot changes]]
    (let [labels-col (.getSourceDataAtCol hot 0)]
