@@ -115,61 +115,55 @@
   (db/selected-columns db))
 (rf/reg-sub :selected-columns selected-columns)
 
-;; TODO helper functions might be better located elsewhere
 (def clean-label
   (fnil (comp str/upper-case str/trim) ""))
+
 (defn- pos-label? [label-str]
   (let [f (clean-label label-str)]
     (or (= f "TRUE")
         (= f "1"))))
+
 (defn- neg-label? [label-str]
   (let [f (clean-label label-str)]
     (or (= f "FALSE")
         (= f "0"))))
 
-(defn rows-labeled-pos
-  [{:keys [labels rows]} _]
-  (let [rows-with-ids (map vector (range) rows)
-        pos-rows (map (fn [label row]
-                        (if (pos-label? label) row))
-                      labels rows-with-ids)
-        pos-rows (remove nil? pos-rows)]
-    pos-rows))
-(rf/reg-sub :rows-labeled-pos
-            (fn [_ _]
-              {:labels (rf/subscribe [:labels])
-               :rows (rf/subscribe [:table-rows])})
-            rows-labeled-pos)
+(defn- unlabeled? [label-str]
+  (and (not (pos-label? label-str))
+       (not (neg-label? label-str))))
 
-(defn rows-labeled-neg
-  [{:keys [labels rows]} _]
-  (let [rows-with-ids (map vector (range) rows)
-        neg-rows (map (fn [label row]
-                        (if (neg-label? label) row))
-                      labels rows-with-ids)
-        neg-rows (remove nil? neg-rows)]
-    neg-rows))
-(rf/reg-sub :rows-labeled-neg
+(defn row-ids-labeled-pos
+  [{:keys [labels]} _]
+  (let [labels-with-ids (map vector labels (range))
+        ids (->> (filter #(pos-label? (first %)) labels-with-ids)
+                 (map second))]
+    ids))
+(rf/reg-sub :row-ids-labeled-pos
             (fn [_ _]
-              {:labels (rf/subscribe [:labels])
-               :rows (rf/subscribe [:table-rows])})
-            rows-labeled-neg)
+              {:labels (rf/subscribe [:labels])})
+            row-ids-labeled-pos)
 
-(defn rows-not-labeled
-  [{:keys [labels rows]} _]
-  (let [rows-with-ids (map vector (range) rows)
-        unlabeled-rows (map (fn [label row]
-                               (if (and (not (pos-label? label))
-                                        (not (neg-label? label)))
-                                 row))
-                            labels rows-with-ids)
-        unlabeled-rows (remove nil? unlabeled-rows)]
-    unlabeled-rows))
-(rf/reg-sub :rows-not-labeled
+(defn row-ids-labeled-neg
+  [{:keys [labels]} _]
+  (let [labels-with-ids (map vector labels (range))
+        ids (->> (filter #(neg-label? (first %)) labels-with-ids)
+                 (map second))]
+    ids))
+(rf/reg-sub :row-ids-labeled-neg
             (fn [_ _]
-              {:labels (rf/subscribe [:labels])
-               :rows (rf/subscribe [:table-rows])})
-            rows-not-labeled)
+              {:labels (rf/subscribe [:labels])})
+            row-ids-labeled-neg)
+
+(defn row-ids-unlabeled
+  [{:keys [labels]} _]
+  (let [labels-with-ids (map vector labels (range))
+        ids (->> (filter #(unlabeled? (first %)) labels-with-ids)
+                 (map second))]
+    ids))
+(rf/reg-sub :row-ids-unlabeled
+            (fn [_ _]
+              {:labels (rf/subscribe [:labels])})
+            row-ids-unlabeled)
 
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 

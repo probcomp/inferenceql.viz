@@ -92,7 +92,10 @@
        (rf/dispatch [:generate-virtual-row {k1 v1} 1]))
 
      #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" :>>
-     #(rf/dispatch [:search-by-labeled])
+     #(let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
+            neg-ids @(rf/subscribe [:row-ids-labeled-neg])
+            unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
+       (rf/dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]))
 
      #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*)" :>>
      (fn [[_ target-col]]
@@ -147,40 +150,43 @@
          new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
      (db/with-virtual-rows db new-rows))))
 
+(defn- create-search-examples [pos-rows neg-rows]
+  (let [remove-nil-key-vals #(into {} (remove (comp nil? second) %))
+        pos-rows-examples (->> pos-rows
+                               (map #(merge % {search-column true}))
+                               (map remove-nil-key-vals))
+        neg-rows-examples (->> neg-rows
+                               (map #(merge % {search-column false}))
+                               (map remove-nil-key-vals))
+        examples (concat pos-rows-examples neg-rows-examples)]
+    examples))
+
+(defn- create-scores-map-for-labeled-rows [pos-ids neg-ids]
+  (let [pos-ids-map (zipmap pos-ids (repeat 1))
+        neg-ids-map (zipmap neg-ids (repeat 0))]
+    (merge pos-ids-map neg-ids-map)))
+
 (rf/reg-event-db
  :search-by-labeled
  event-interceptors
- (fn [db [_]]
-   (let [remove-nils #(into {} (remove (comp nil? second) %))
+ (fn [db [_ pos-ids neg-ids unlabeled-ids]]
+   (let [rows @(rf/subscribe [:table-rows])
 
-         pos-rows-pairs @(rf/subscribe [:rows-labeled-pos])
-         pos-rows-ids (map first pos-rows-pairs)
-         pos-rows (->> (map second pos-rows-pairs)
-                   (map #(merge % {search-column true}))
-                   (map remove-nils))
+         pos-rows (map rows pos-ids)
+         neg-rows (map rows neg-ids)
+         unlabeled-rows (map rows unlabeled-ids)
 
-         neg-rows-pairs @(rf/subscribe [:rows-labeled-neg])
-         neg-rows-ids (map first neg-rows-pairs)
-         neg-rows (->> (map second neg-rows-pairs)
-                   (map #(merge % {search-column false}))
-                   (map remove-nils))
+         example-rows (create-search-examples pos-rows neg-rows)
 
-         example-rows (concat pos-rows neg-rows)
+         scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params)
+         scores-ids-map (zipmap unlabeled-ids scores)
 
-         rows-not-labeled-pairs @(rf/subscribe [:rows-not-labeled])
-         rows-not-labeled-ids (map first rows-not-labeled-pairs)
-         rows-not-labeled (map second rows-not-labeled-pairs)
+         scores-ids-map-lab (create-scores-map-for-labeled-rows pos-ids neg-ids)
 
-         calced-scores (search/search model/spec search-column example-rows rows-not-labeled n-models beta-params)
-
-         calced-scores-ids-map (zipmap rows-not-labeled-ids calced-scores)
-         pos-scores-ids-map (zipmap pos-rows-ids (repeat 1))
-         neg-scores-ids-map (zipmap neg-rows-ids (repeat 0))
-
-         scores-ids-map (merge calced-scores-ids-map pos-scores-ids-map neg-scores-ids-map)
-         sorted-scores-ids (sort-by key scores-ids-map)
-         scores (map second sorted-scores-ids)]
-     (rf/dispatch [:search-result scores]))
+         all-scores (->> (merge scores-ids-map scores-ids-map-lab)
+                         (sort-by key)
+                         (map second))]
+     (rf/dispatch [:search-result all-scores]))
    db))
 
 (rf/reg-event-db
