@@ -193,154 +193,146 @@
                 (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
                                 (first selected-columns))))
            ;; Simulate plot
-           (do
-             (.log js/console "vega: Simulate Plot")
-             (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
-                   selected-column-kw (keyword (first selected-columns))
-                   y-axis {:title "distribution of probable values"
-                           :grid false
-                           :labels false
-                           :ticks false}
-                   y-scale {:nice false}]
-               {:$schema
-                "https://vega.github.io/schema/vega-lite/v3.json"
-                :width 400
-                :height 400
-                :data {:name "data"}
-                :autosize {:resize true}
-                :layer (cond-> [{:mark "bar"
-                                 :encoding (condp = (stattype (first selected-columns))
-                                             dist/gaussian {:x {:bin true
-                                                                :field selected-column-kw
-                                                                :type "quantitative"}
-                                                            :y {:aggregate "count"
-                                                                :type "quantitative"
-                                                                :axis y-axis
-                                                                :scale y-scale}}
-                                             dist/categorical {:x {:field selected-column-kw
-                                                                   :type "nominal"}
-                                                               :y {:aggregate "count"
-                                                                   :type "quantitative"
-                                                                   :axis y-axis
-                                                                   :scale y-scale}})}]
-                         (get row-at-selection-start (first selected-columns))
-                         (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
-                                                 :label "Selected row"}]}
-                                :mark {:type "rule"
-                                       :color "red"}
-                                :encoding {:x {:field selected-column-kw
-                                               :type (condp = (stattype (first selected-columns))
-                                                       dist/gaussian "quantitative"
-                                                       dist/categorical "nominal")}}}))}))
+           (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
+                 selected-column-kw (keyword (first selected-columns))
+                 y-axis {:title "distribution of probable values"
+                         :grid false
+                         :labels false
+                         :ticks false}
+                 y-scale {:nice false}]
+             {:$schema
+              "https://vega.github.io/schema/vega-lite/v3.json"
+              :width 400
+              :height 400
+              :data {:name "data"}
+              :autosize {:resize true}
+              :layer (cond-> [{:mark "bar"
+                               :encoding (condp = (stattype (first selected-columns))
+                                           dist/gaussian {:x {:bin true
+                                                              :field selected-column-kw
+                                                              :type "quantitative"}
+                                                          :y {:aggregate "count"
+                                                              :type "quantitative"
+                                                              :axis y-axis
+                                                              :scale y-scale}}
+                                           dist/categorical {:x {:field selected-column-kw
+                                                                 :type "nominal"}
+                                                             :y {:aggregate "count"
+                                                                 :type "quantitative"
+                                                                 :axis y-axis
+                                                                 :scale y-scale}})}]
+                       (get row-at-selection-start (first selected-columns))
+                       (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
+                                               :label "Selected row"}]}
+                              :mark {:type "rule"
+                                     :color "red"}
+                              :encoding {:x {:field selected-column-kw
+                                             :type (condp = (stattype (first selected-columns))
+                                                     dist/gaussian "quantitative"
+                                                     dist/categorical "nominal")}}}))})
 
            (= 1 (count selected-columns))
            ;; Histogram
-           (do
-             (.log js/console "vega: Histogram")
-             (let [selected-column (first selected-columns)]
-               {:$schema
-                "https://vega.github.io/schema/vega-lite/v3.json",
-                :width 400
-                :height 400
-                :data {:values selection},
-                :mark "bar"
-                :encoding
-                (condp = (stattype selected-column)
-                  dist/gaussian {:x {:bin true,
-                                     :field selected-column
-                                     :type "quantitative"}
-                                 :y {:aggregate "count"
-                                     :type "quantitative"}}
+           (let [selected-column (first selected-columns)]
+             {:$schema
+              "https://vega.github.io/schema/vega-lite/v3.json",
+              :width 400
+              :height 400
+              :data {:values selection},
+              :mark "bar"
+              :encoding
+              (condp = (stattype selected-column)
+                dist/gaussian {:x {:bin true,
+                                   :field selected-column
+                                   :type "quantitative"}
+                               :y {:aggregate "count"
+                                   :type "quantitative"}}
 
-                  dist/categorical {:x {:field selected-column
-                                        :type "nominal"}
-                                    :y {:aggregate "count"
-                                        :type "quantitative"}}
+                dist/categorical {:x {:field selected-column
+                                      :type "nominal"}
+                                  :y {:aggregate "count"
+                                      :type "quantitative"}}
 
-                  nil
-                  {})}))
+                nil
+                {})})
 
            (some #{"geo_fips"} selected-columns)
            ;; Choropleth
-           (do
-             (.log js/console "vega: Choropleth")
-             (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
-                   transformed-selection (mapv (fn [row]
-                                                 (update row "geo_fips" #(left-pad (str %) 4 \0)))
-                                               selection)
-                   name {:field "NAME"
-                         :type "nominal"}
-                   color {:field map-column
-                          :type (condp = (stattype map-column)
-                                  dist/gaussian "quantitative"
-                                  dist/categorical "nominal")}]
-               {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-                :width 500
-                :height 300
-                :data {:values js/topojson
-                       :format {:type "topojson"
-                                :feature topojson-feature}}
-                :transform [{:lookup "properties.GEOID"
-                             :from {:data {:values transformed-selection}
-                                    :key "geo_fips"
-                                    "fields" [(:field name) (:field color)]}}]
-                :projection {:type "albersUsa"}
-                :mark "geoshape"
-                :encoding {:tooltip [name color]
-                           :color color}}))
+           (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
+                 transformed-selection (mapv (fn [row]
+                                               (update row "geo_fips" #(left-pad (str %) 4 \0)))
+                                             selection)
+                 name {:field "NAME"
+                       :type "nominal"}
+                 color {:field map-column
+                        :type (condp = (stattype map-column)
+                                dist/gaussian "quantitative"
+                                dist/categorical "nominal")}]
+             {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+              :width 500
+              :height 300
+              :data {:values js/topojson
+                     :format {:type "topojson"
+                              :feature topojson-feature}}
+              :transform [{:lookup "properties.GEOID"
+                           :from {:data {:values transformed-selection}
+                                  :key "geo_fips"
+                                  "fields" [(:field name) (:field color)]}}]
+              :projection {:type "albersUsa"}
+              :mark "geoshape"
+              :encoding {:tooltip [name color]
+                         :color color}})
 
            :else
            ;; Comparison plot
-           (do
-             (.log js/console "vega: Comparison plot")
-             (let [types (into #{}
-                               (map stattype)
-                               (take 2 selected-columns))]
-               (condp = types
-                 ;; Scatterplot
-                 #{dist/gaussian} {:$schema
-                                   "https://vega.github.io/schema/vega-lite/v3.json"
-                                   :width 400
-                                   :height 400
-                                   :data {:values selection}
-                                   :mark "circle"
-                                   :encoding {:x {:field (first selected-columns)
-                                                  :type "quantitative"}
-                                              :y {:field (second selected-columns)
-                                                  :type "quantitative"}}}
-                 ;; Heatmap
-                 #{dist/categorical} {:$schema
-                                      "https://vega.github.io/schema/vega-lite/v3.json"
-                                      :width 400
-                                      :height 400
-                                      :data {:values selection}
-                                      :mark "rect"
-                                      :encoding {:x {:field (first selected-columns)
-                                                     :type "nominal"}
-                                                 :y {:field (second selected-columns)
-                                                     :type "nominal"}
-                                                 :color {:aggregate "count"
-                                                         :type "quantitative"}}}
-                 ;; Bot-and-line
-                 #{dist/gaussian
-                   dist/categorical} {:$schema
-                                      "https://vega.github.io/schema/vega-lite/v3.json"
-                                      :width 400
-                                      :height 400
-                                      :data {:values selection}
-                                      :mark {:type "boxplot"
-                                             :extent "min-max"}
-                                      :encoding {:x {:field (first selected-columns)
-                                                     :type (condp = (stattype (first selected-columns))
-                                                             dist/gaussian "quantitative"
-                                                             dist/categorical "nominal")}
-                                                 :y {:field (second selected-columns)
-                                                     :type (condp = (stattype (second selected-columns))
-                                                             dist/gaussian "quantitative"
-                                                             dist/categorical "nominal")}
-                                                 :color {:aggregate "count"
-                                                         :type "quantitative"}}}
-                 {})))))))
+           (let [types (into #{}
+                             (map stattype)
+                             (take 2 selected-columns))]
+             (condp = types
+               ;; Scatterplot
+               #{dist/gaussian} {:$schema
+                                 "https://vega.github.io/schema/vega-lite/v3.json"
+                                 :width 400
+                                 :height 400
+                                 :data {:values selection}
+                                 :mark "circle"
+                                 :encoding {:x {:field (first selected-columns)
+                                                :type "quantitative"}
+                                            :y {:field (second selected-columns)
+                                                :type "quantitative"}}}
+               ;; Heatmap
+               #{dist/categorical} {:$schema
+                                    "https://vega.github.io/schema/vega-lite/v3.json"
+                                    :width 400
+                                    :height 400
+                                    :data {:values selection}
+                                    :mark "rect"
+                                    :encoding {:x {:field (first selected-columns)
+                                                   :type "nominal"}
+                                               :y {:field (second selected-columns)
+                                                   :type "nominal"}
+                                               :color {:aggregate "count"
+                                                       :type "quantitative"}}}
+               ;; Bot-and-line
+               #{dist/gaussian
+                 dist/categorical} {:$schema
+                                    "https://vega.github.io/schema/vega-lite/v3.json"
+                                    :width 400
+                                    :height 400
+                                    :data {:values selection}
+                                    :mark {:type "boxplot"
+                                           :extent "min-max"}
+                                    :encoding {:x {:field (first selected-columns)
+                                                   :type (condp = (stattype (first selected-columns))
+                                                           dist/gaussian "quantitative"
+                                                           dist/categorical "nominal")}
+                                               :y {:field (second selected-columns)
+                                                   :type (condp = (stattype (second selected-columns))
+                                                           dist/gaussian "quantitative"
+                                                           dist/categorical "nominal")}
+                                               :color {:aggregate "count"
+                                                       :type "quantitative"}}}
+               {}))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:selections             (rf/subscribe [:selections])
