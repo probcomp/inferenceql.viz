@@ -87,10 +87,6 @@
   [db]
   (get-in db [::selected-columns]))
 
-(defn with-table-headers
-  [db table-headers]
-  (assoc-in db [::headers] table-headers))
-
 (defn table-headers
   [db]
   (get-in db [::headers]))
