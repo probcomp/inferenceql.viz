@@ -74,12 +74,12 @@
 (defn real-hot-props
   [{:keys [headers rows]} _]
   (let [data (cell-vector headers rows)
-        num-columns (count headers)
 
+        num-columns (count headers)
         initial-column-setting {:readOnly false}
         rem-column-settings (repeat (dec num-columns) {})
-        all-column-settings (cons initial-column-setting rem-column-settings)]
 
+        all-column-settings (cons initial-column-setting rem-column-settings)]
     (-> views/real-hot-settings
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
@@ -120,11 +120,13 @@
 
 (defn- pos-label? [label-str]
   (let [f (clean-label label-str)]
+    ; TODO add more truthy values
     (or (= f "TRUE")
         (= f "1"))))
 
 (defn- neg-label? [label-str]
   (let [f (clean-label label-str)]
+    ; TODO add more falsey values
     (or (= f "FALSE")
         (= f "0"))))
 
