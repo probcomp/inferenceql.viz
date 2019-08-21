@@ -113,10 +113,14 @@
      (fn [[_ target-col cond-col-1 cond-col-2]]
        (rf/dispatch [:anomaly-search target-col [cond-col-1 cond-col-2]]))
 
-     ; Else condition
-     ; Defaults to legacy search-by-example
-     (let [example-row (edn/read-string text)]
-       (rf/dispatch [:search-by-example example-row])))
+     ; legacy search-by-example
+     #"\{(.+)\}" :>>
+     (fn []
+       (let [example-row (edn/read-string text)]
+         (rf/dispatch [:search-by-example example-row])))
+
+     ; else condition
+     (.error js/console "Could not parse query: \"" text "\""))
    db))
 
 (rf/reg-event-db
