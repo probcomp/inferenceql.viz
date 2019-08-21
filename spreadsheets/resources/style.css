@@ -3,21 +3,7 @@
   background-color: #FAFCE4;
 }
 
-.control-box {
-  float: left;
-  border:1px solid black;
-  border-style: dotted;
-  line-height: 20pt;
-  margin-top: 10px;
-  margin-right: 10px;
-  padding: 4px;
-  font-size: 16px;
-
-  hr {
-    height: 1px;
-  }
-}
-
+/* allows search input to be styled */
 input[type=search]{
    -moz-appearance: none;/* older firefox */
    -webkit-appearance: none; /* safari, chrome, edge and ie mobile */
