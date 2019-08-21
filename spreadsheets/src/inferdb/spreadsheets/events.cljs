@@ -10,8 +10,8 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :before-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end])
+(def real-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :before-change])
+(def virtual-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize])
 
 (def event-interceptors
   [rf/debug interceptors/check-spec])
@@ -38,6 +38,18 @@
  (fn [db [_ hot changes]]
    (let [labels-col (.getSourceDataAtCol hot 0)]
      (db/with-labels db (js->clj labels-col)))))
+
+(rf/reg-event-db
+ :after-column-move
+ event-interceptors
+ (fn [db [_ hot columns target]]
+   db))
+
+(rf/reg-event-db
+ :after-column-resize
+ event-interceptors
+ (fn [db [_ hot current-column new-size is-double-click]]
+   db))
 
 (rf/reg-event-db
  :after-selection-end
