@@ -32,13 +32,19 @@
 (s/def ::row-at-selection-start ::row)
 
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::simulator
+                    :opt [
+                          ::simulator
                           ::simulated-rows
+
+                          ::selected-columns
+                          ;::selections
                           ::selected-row-index
                           ::row-at-selection-start
+
                           ::scores
                           ::labels
-                          ::selected-columns
+
+
                           ::topojson
                           ::sampled-rows]))
 
@@ -68,24 +74,29 @@
   [db selections]
   (assoc db ::selections selections))
 
-(defn with-selected-columns
-  [db columns]
-  (assoc db ::selected-columns columns))
-
-(defn clear-selections
-  [db]
-  (dissoc db
-          ::selections
-          ::selected-row
-          ::selected-columns))
-
 (defn selections
   [db]
   (get-in db [::selections]))
 
+(defn with-selected-columns
+  [db columns]
+  (assoc db ::selected-columns columns))
+
 (defn selected-columns
   [db]
   (get-in db [::selected-columns]))
+
+(defn clear-selections
+  [db]
+  (dissoc db
+          ::selected-columns
+          ::selections
+          ;::selected-row-index
+          ::selected-row))
+          ;::row-at-selection-start
+
+          ;; I think :selected-row-index should be added
+          ;; And :selected-row be removed
 
 (defn table-headers
   [db]
@@ -95,13 +106,17 @@
   [db]
   (get-in db [::rows]))
 
+(defn with-scores
+  [db scores]
+  (assoc-in db [::scores] scores))
+
 (defn scores
   [db]
   (get-in db [::scores]))
 
-(defn with-scores
-  [db scores]
-  (assoc-in db [::scores] scores))
+(defn virtual-rows
+  [db]
+  (get-in db [::virtual-rows]))
 
 (defn with-virtual-rows
   [db new-v-rows]
@@ -111,10 +126,6 @@
 (defn clear-virtual-rows
   [db]
   (assoc-in db [::virtual-rows] []))
-
-(defn virtual-rows
-  [db]
-  (get-in db [::virtual-rows]))
 
 (defn with-labels
   [db labels]
