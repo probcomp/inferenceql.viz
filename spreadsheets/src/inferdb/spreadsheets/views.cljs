@@ -26,8 +26,12 @@
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
 
-(def real-hot-settings (assoc default-hot-settings :hooks events/real-hot-hooks))
-(def virtual-hot-settings (assoc default-hot-settings :hooks events/virtual-hot-hooks))
+(def real-hot-settings (assoc default-hot-settings
+                         :hooks events/real-hot-hooks
+                         :name "real-table"))
+(def virtual-hot-settings (assoc default-hot-settings
+                            :hooks events/virtual-hot-hooks
+                            :name "virtual-table"))
 
 (def ^:private default-search-string "GENERATE ROW")
 

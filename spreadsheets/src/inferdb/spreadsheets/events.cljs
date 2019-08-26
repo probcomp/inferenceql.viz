@@ -42,26 +42,26 @@
 (rf/reg-event-db
  :before-change
  event-interceptors
- (fn [db [_ hot changes]]
+ (fn [db [_ hot id changes]]
    (let [labels-col (.getSourceDataAtCol hot 0)]
      (db/with-labels db (js->clj labels-col)))))
 
 (rf/reg-event-db
  :after-column-move
  event-interceptors
- (fn [db [_ hot columns target]]
+ (fn [db [_ hot id columns target]]
    db))
 
 (rf/reg-event-db
  :after-column-resize
  event-interceptors
- (fn [db [_ hot current-column new-size is-double-click]]
+ (fn [db [_ hot id current-column new-size is-double-click]]
    db))
 
 (rf/reg-event-db
  :after-selection-end
  event-interceptors
- (fn [db [_ hot row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
+ (fn [db [_ hot id row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
    (let [selected-headers (map #(.getColHeader hot %)
                                (range (min col col2) (inc (max col col2))))
          row (js->clj (zipmap (.getColHeader hot)
@@ -86,7 +86,7 @@
 (rf/reg-event-db
  :after-deselect
  event-interceptors
- (fn [db _]
+ (fn [db [_ hot id]]
    (db/clear-selections db)))
 
 (rf/reg-event-db
