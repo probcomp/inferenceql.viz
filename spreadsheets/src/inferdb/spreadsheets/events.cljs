@@ -30,7 +30,8 @@
  :clear-virtual-data
  event-interceptors
  (fn [db [event-name]]
-   (db/clear-virtual-rows db)))
+   (-> (db/clear-virtual-rows db)
+       (db/clear-virtual-scores))))
 
 (rf/reg-event-db
  :before-change
@@ -210,3 +211,9 @@
  event-interceptors
  (fn [db [_ result]]
    (db/with-scores db result)))
+
+(rf/reg-event-db
+ :virtual-search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-virtual-scores db result)))

@@ -18,6 +18,7 @@
 
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
+(s/def ::virtual-scores (s/coll-of ::score))
 
 (s/def ::label #(or (string? %) (nil? %)))
 (s/def ::labels (s/coll-of ::label))
@@ -42,6 +43,7 @@
                           ::row-at-selection-start
 
                           ::scores
+                          ::virtual-scores
                           ::labels
 
 
@@ -113,6 +115,18 @@
 (defn scores
   [db]
   (get-in db [::scores]))
+
+(defn with-virtual-scores
+  [db scores]
+  (assoc-in db [::virtual-scores] scores))
+
+(defn virtual-scores
+  [db]
+  (get-in db [::virtual-scores]))
+
+(defn clear-virtual-scores
+  [db]
+  (dissoc db ::virtual-scores))
 
 (defn virtual-rows
   [db]

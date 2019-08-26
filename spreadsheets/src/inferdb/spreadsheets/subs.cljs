@@ -14,6 +14,10 @@
             (fn [db _]
               (db/scores db)))
 
+(rf/reg-sub :virtual-scores
+            (fn [db _]
+              (db/virtual-scores db)))
+
 (rf/reg-sub :labels
             (fn [db _]
               (db/labels db)))
@@ -51,14 +55,25 @@
                                (assoc row "🏷" label))
                              labels))))
 
-(rf/reg-sub :virtual-rows
-            (fn [db _]
-              (db/virtual-rows db)))
+(rf/reg-sub :virtual-computed-rows
+  (fn [_ _]
+    {:rows (rf/subscribe [:virtual-rows])
+     :scores (rf/subscribe [:virtual-scores])})
+  (fn [{:keys [rows scores]}]
+    (cond->> rows
+      scores (mapv (fn [score row]
+                     (assoc row "probability" score))
+                   scores))))
 
 (defn table-rows
   [db _]
   (db/table-rows db))
 (rf/reg-sub :table-rows table-rows)
+
+(defn virtual-rows
+  [db _]
+  (db/virtual-rows db))
+(rf/reg-sub :virtual-rows virtual-rows)
 
 (defn- cell-vector
   "Takes tabular data represented as a sequence of maps and reshapes the data as a
@@ -102,7 +117,7 @@
 (rf/reg-sub :virtual-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
-               :rows    (rf/subscribe [:virtual-rows])})
+               :rows    (rf/subscribe [:virtual-computed-rows])})
             virtual-hot-props)
 
 (defn selections
