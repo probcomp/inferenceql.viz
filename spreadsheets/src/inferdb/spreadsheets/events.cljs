@@ -34,6 +34,12 @@
        (db/clear-virtual-scores))))
 
 (rf/reg-event-db
+ :clear-virtual-scores
+ event-interceptors
+ (fn [db [event-name]]
+   (db/clear-virtual-scores db)))
+
+(rf/reg-event-db
  :before-change
  event-interceptors
  (fn [db [_ hot changes]]
@@ -151,8 +157,12 @@
  event-interceptors
  (fn [db [_ target-col conditional-cols]]
    (let [table-rows @(rf/subscribe [:table-rows])
-         result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
-     (rf/dispatch [:search-result result]))
+         result (search/anomaly-search model/spec target-col conditional-cols table-rows)
+
+         virtual-rows @(rf/subscribe [:virtual-rows])
+         virtual-result (search/anomaly-search model/spec target-col conditional-cols virtual-rows)]
+     (rf/dispatch [:search-result result])
+     (rf/dispatch [:virtual-search-result virtual-result]))
    db))
 
 (rf/reg-event-db
@@ -203,6 +213,7 @@
          all-scores (->> (merge scores-ids-map scores-ids-map-lab)
                          (sort-by key)
                          (map second))]
+     (rf/dispatch [:clear-virtual-scores])
      (rf/dispatch [:search-result all-scores]))
    db))
 

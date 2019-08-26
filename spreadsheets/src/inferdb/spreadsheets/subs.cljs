@@ -60,10 +60,14 @@
     {:rows (rf/subscribe [:virtual-rows])
      :scores (rf/subscribe [:virtual-scores])})
   (fn [{:keys [rows scores]}]
-    (cond->> rows
-      scores (mapv (fn [score row]
-                     (assoc row "probability" score))
-                   scores))))
+    (let [num-missing-scores (- (count rows) (count scores))
+          dummy-scores (repeat num-missing-scores nil)
+          scores (concat dummy-scores scores)]
+
+      ;; Creation of dummy scores allows correct attaching of old scores to
+      ;; rows even when new rows are generated after a scoring event.
+      (mapv (fn [score row] (assoc row "probability" score))
+            scores rows))))
 
 (defn table-rows
   [db _]
