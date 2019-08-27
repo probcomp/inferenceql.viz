@@ -33,20 +33,13 @@
 (s/def ::row-at-selection-start ::row)
 
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [
-                          ::simulator
-                          ::simulated-rows
-
-                          ::selected-columns
-                          ;::selections
+                    :opt [::selected-columns
+                          ::selections
                           ::selected-row-index
                           ::row-at-selection-start
-
                           ::scores
                           ::virtual-scores
                           ::labels
-
-
                           ::topojson
                           ::sampled-rows]))
 
@@ -65,12 +58,6 @@
 (defn selected-row-index
   [db]
   (get db ::selected-row-index))
-
-(defn selected-row
-  [db]
-  (when-let [row-index (get db ::selected-row)]
-    (nth (get db ::rows)
-         row-index)))
 
 (defn with-selections
   [db selections]
@@ -93,12 +80,8 @@
   (dissoc db
           ::selected-columns
           ::selections
-          ;::selected-row-index
-          ::selected-row))
-          ;::row-at-selection-start
-
-          ;; I think :selected-row-index should be added
-          ;; And :selected-row be removed
+          ::selected-row-index
+          ::row-at-selection-start))
 
 (defn table-headers
   [db]
@@ -155,9 +138,3 @@
   {::headers (into [] (keys (first nyt-data)))
    ::rows nyt-data
    ::virtual-rows []})
-
-(defn one-cell-selected?
-  [db]
-  (and (= 1 (count (selected-columns db)))
-       (= 1 (count (selections db)))
-       (= 1 (count (first (selections db))))))
