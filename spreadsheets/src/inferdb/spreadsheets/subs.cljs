@@ -8,7 +8,8 @@
             [inferdb.spreadsheets.views :as views]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.model :as model]))
+            [inferdb.spreadsheets.model :as model])
+  (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
             (fn [db _]
@@ -27,13 +28,27 @@
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
 
+
 (rf/reg-sub :row-at-selection-start
-            (fn [db _]
-              (db/row-at-selection-start db)))
+            (fn [db [_sub-name table-id]]
+              (db/row-at-selection-start db table-id)))
 
 (rf/reg-sub :selected-row-index
+            (fn [db [_sub-name table-id]]
+              (db/selected-row-index db table-id)))
+
+(rf/reg-sub :selections
+            (fn [db [_sub-name table-id]]
+              (db/selections db table-id)))
+
+(rf/reg-sub :selected-columns
+            (fn [db [_sub-name table-id]]
+              (db/selected-columns db table-id)))
+
+(rf/reg-sub :table-last-selected
             (fn [db _]
-              (db/selected-row-index db)))
+              (db/table-last-selected db)))
+
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -123,16 +138,6 @@
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:virtual-computed-rows])})
             virtual-hot-props)
-
-(defn selections
-  [db _]
-  (db/selections db))
-(rf/reg-sub :selections selections)
-
-(defn selected-columns
-  [db _]
-  (db/selected-columns db))
-(rf/reg-sub :selected-columns selected-columns)
 
 (def clean-label
   (fnil (comp str/upper-case str/trim) ""))
@@ -352,12 +357,18 @@
                                                :color {:aggregate "count"
                                                        :type "quantitative"}}}
                {}))))))
-(rf/reg-sub :vega-lite-spec
-            (fn [_ _]
-              {:selections             (rf/subscribe [:selections])
-               :selected-columns       (rf/subscribe [:selected-columns])
-               :row-at-selection-start (rf/subscribe [:row-at-selection-start])})
-            vega-lite-spec)
+(rf/reg-sub-raw :vega-lite-spec
+                (fn [app-db event]
+                  (reaction
+                    (let [table-id @(rf/subscribe [:table-last-selected])
+                          selections @(rf/subscribe [:selections table-id])
+                          selected-columns @(rf/subscribe [:selected-columns table-id])
+                          row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])
+
+                          data-for-spec {:selections selections
+                                         :selected-columns selected-columns
+                                         :row-at-selection-start row-at-selection-start}]
+                      (vega-lite-spec data-for-spec)))))
 
 (rf/reg-sub :one-cell-selected
             (fn [_ _]

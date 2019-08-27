@@ -78,16 +78,24 @@
                              (.getSelected hot))
          selected-columns (if (<= col col2) selected-headers (reverse selected-headers))]
      (-> db
-         (db/with-selected-columns selected-columns)
-         (db/with-selections selected-maps)
-         (db/with-selected-row-index row-index)
-         (db/with-row-at-selection-start row)))))
+         (db/with-selected-columns id selected-columns)
+         (db/with-selections id selected-maps)
+         (db/with-selected-row-index id row-index)
+         (db/with-row-at-selection-start id row)
+         (db/with-table-last-selected id)))))
+
 
 (rf/reg-event-db
  :after-deselect
  event-interceptors
  (fn [db [_ hot id]]
-   (db/clear-selections db)))
+   (db/clear-selections db id)))
+
+(rf/reg-event-db
+ :table-clicked
+ event-interceptors
+ (fn [db [_ hot id]]
+   (db/with-table-last-selected db id)))
 
 (rf/reg-event-db
  :run-inference-ql

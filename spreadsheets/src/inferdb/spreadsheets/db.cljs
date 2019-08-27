@@ -32,56 +32,61 @@
 
 (s/def ::row-at-selection-start ::row)
 
+(s/def ::table-id string?)
+(s/def ::table-state any?)
+(s/def ::hot-state (s/map-of ::table-id ::table-state))
+
 (s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::selected-columns
-                          ::selections
-                          ::selected-row-index
-                          ::row-at-selection-start
-                          ::scores
+                    :opt [::scores
                           ::virtual-scores
                           ::labels
+                          ::hot-state
                           ::topojson
                           ::sampled-rows]))
 
 (defn with-row-at-selection-start
-  [db row]
-  (assoc db ::row-at-selection-start row))
+  [db table-id row]
+  (assoc-in db [::hot-state table-id ::row-at-selection-start] row))
 
 (defn row-at-selection-start
-  [db]
-  (get db ::row-at-selection-start))
+  [db table-id]
+  (get-in db [::hot-state table-id ::row-at-selection-start]))
 
 (defn with-selected-row-index
-  [db row-index]
-  (assoc db ::selected-row-index row-index))
+  [db table-id row-index]
+  (assoc-in db [::hot-state table-id ::selected-row-index] row-index))
 
 (defn selected-row-index
-  [db]
-  (get db ::selected-row-index))
+  [db table-id]
+  (get-in db [::hot-state table-id ::selected-row-index]))
 
 (defn with-selections
-  [db selections]
-  (assoc db ::selections selections))
+  [db table-id selections]
+  (assoc-in db [::hot-state table-id ::selections] selections))
 
 (defn selections
-  [db]
-  (get-in db [::selections]))
+  [db table-id]
+  (get-in db [::hot-state table-id ::selections]))
 
 (defn with-selected-columns
-  [db columns]
-  (assoc db ::selected-columns columns))
+  [db table-id columns]
+  (assoc-in db [::hot-state table-id ::selected-columns] columns))
 
 (defn selected-columns
-  [db]
-  (get-in db [::selected-columns]))
+  [db table-id]
+  (get-in db [::hot-state table-id ::selected-columns]))
 
 (defn clear-selections
+  [db table-id]
+  (update-in db [::hot-state table-id] dissoc ::selected-columns ::selections ::selected-row-index ::row-at-selection-start))
+
+(defn with-table-last-selected
+  [db table-id]
+  (assoc db ::table-last-selected table-id))
+
+(defn table-last-selected
   [db]
-  (dissoc db
-          ::selected-columns
-          ::selections
-          ::selected-row-index
-          ::row-at-selection-start))
+  (get db ::table-last-selected))
 
 (defn table-headers
   [db]

@@ -38,7 +38,13 @@
        (fn [this]
          (let [dom-node (dom/dom-node this)
                hot (js/Handsontable. dom-node (clj->js (:settings props)))
-               unique-id (str name "-" (.-guid hot))]
+               unique-id name
+
+               click-handler-fn (fn [event]
+                                  ; Fires :table-clicked event
+                                  (rf/dispatch [:table-clicked hot unique-id])
+                                  ; Deselect all cells on alt-click
+                                  (if (.-altKey event) (.deselectCell hot)))]
            ; add callbacks internal to hot object
            (doseq [key hooks]
              (let [camel-key (csk/->camelCase (clj->js key))]
@@ -47,7 +53,9 @@
                                             (rf/dispatch (into [key hot unique-id] args)))
                                           hot)))
            ; set the atom to the hot object
-           (reset! hot-instance hot)))
+           (reset! hot-instance hot)
+
+           (.addEventListener dom-node "click" click-handler-fn)))
 
        :component-did-update
        (fn [this old-argv]
