@@ -4,7 +4,7 @@
             [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
-            [yarn.vega-embed]))
+            [inferdb.spreadsheets.vega :as vega]))
 
 (def default-hot-settings
   {:settings {:data                []
@@ -54,50 +54,6 @@
                  :style {:float "right"}}
         "Delete virtual data"]])))
 
-(defn vega-lite
-  [spec opt generator]
-  (let [run (atom 0)
-        embed (fn [this spec opt generator]
-                (when spec
-                  (let [spec (clj->js spec)
-                        opt (clj->js (merge {:renderer "canvas"
-                                             :mode "vega-lite"}
-                                            opt))]
-                    (cond-> (js/vegaEmbed (r/dom-node this)
-                                          spec
-                                          opt)
-                      generator (.then (fn [res]
-                                         (let [current-run (swap! run inc)]
-                                           (js/requestAnimationFrame
-                                            (fn send []
-                                              (when (= current-run @run)
-                                                (let [datum (generator)
-                                                      changeset (.. js/vega
-                                                                    (changeset)
-                                                                    (insert (clj->js datum)))]
-                                                  (.run (.change (.-view res) "data" changeset)))
-                                                (js/requestAnimationFrame send)))))))
-                      true (.catch (fn [err]
-                                     (js/console.error err)))))))]
-    (r/create-class
-     {:display-name "vega-lite"
-
-      :component-did-mount
-      (fn [this]
-        (embed this spec opt generator))
-
-      :component-will-update
-      (fn [this [_ new-spec new-opt new-generator]]
-        (embed this new-spec new-opt new-generator))
-
-      :component-will-unmount
-      (fn [this]
-        (swap! run inc))
-
-      :reagent-render
-      (fn [spec]
-        [:div#vis])})))
-
 (defn app
   []
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
@@ -125,4 +81,4 @@
      [:div {:style {:display "flex"
                     :justify-content "center"}}
       (when vega-lite-spec
-        [vega-lite vega-lite-spec {:actions false} generator])]]))
+        [vega/vega-lite vega-lite-spec {:actions false} generator])]]))
