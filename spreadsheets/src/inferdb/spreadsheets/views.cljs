@@ -18,7 +18,8 @@
               :filters             true
               :dropdownMenu        true
               :bindRowsWithHeaders true
-              :selectionMode       :multiple
+              :selectionMode       :range
+              :outsideClickDeselects false
               :readOnly            true
               :height              "32vh"
               :width               "100vw"
