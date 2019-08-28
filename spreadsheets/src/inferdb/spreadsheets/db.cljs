@@ -79,19 +79,19 @@
   [db table-id]
   (update-in db [::hot-state table-id] dissoc ::selected-columns ::selections ::selected-row-index ::row-at-selection-start))
 
-(defn with-table-last-selected
+(defn with-table-last-clicked
   [db table-id]
-  (assoc db ::table-last-selected table-id))
+  (assoc db ::table-last-clicked table-id))
 
-(defn table-last-selected
+(defn table-last-clicked
   [db]
-  (get db ::table-last-selected))
+  (get db ::table-last-clicked))
 
-(defn table-not-last-selected
+(defn table-not-last-clicked
   [db]
-  (when-let [table-last-selected (get db ::table-last-selected)]
+  (when-let [table-last-clicked (get db ::table-last-clicked)]
     (let [table-ids (keys (get db ::hot-state))
-          rem-ids (remove #{table-last-selected} table-ids)
+          rem-ids (remove #{table-last-clicked} table-ids)
           other-id (first rem-ids)]
 
       ; Enforcing that there are only two tables whose state we are tracking

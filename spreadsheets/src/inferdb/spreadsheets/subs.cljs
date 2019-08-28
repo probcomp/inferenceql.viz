@@ -45,18 +45,18 @@
             (fn [db [_sub-name table-id]]
               (db/selected-columns db table-id)))
 
-(rf/reg-sub :table-last-selected
+(rf/reg-sub :table-last-clicked
             (fn [db _]
-              (db/table-last-selected db)))
+              (db/table-last-clicked db)))
 
-(rf/reg-sub :table-not-last-selected
+(rf/reg-sub :table-not-last-clicked
             (fn [db _]
-              (db/table-not-last-selected db)))
+              (db/table-not-last-clicked db)))
 
 (rf/reg-sub-raw :selection-info-active
                 (fn [app-db event]
                   (reaction
-                    (let [table-id @(rf/subscribe [:table-last-selected])
+                    (let [table-id @(rf/subscribe [:table-last-clicked])
                           selections @(rf/subscribe [:selections table-id])
                           selected-columns @(rf/subscribe [:selected-columns table-id])
                           row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
@@ -67,7 +67,7 @@
 (rf/reg-sub-raw :selection-info-inactive
                 (fn [app-db event]
                   (reaction
-                    (let [table-id @(rf/subscribe [:table-not-last-selected])
+                    (let [table-id @(rf/subscribe [:table-not-last-clicked])
                           selections @(rf/subscribe [:selections table-id])
                           selected-columns @(rf/subscribe [:selected-columns table-id])
                           row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
@@ -217,7 +217,7 @@
             row-ids-unlabeled)
 
 (defn vega-lite-spec
-   [{:keys [selection-info-active selection-info-inactive table-last-selected table-not-last-selected]}]
+   [{:keys [selection-info-active selection-info-inactive table-last-clicked table-not-last-clicked]}]
   (let [{:keys [selections selected-columns row-at-selection-start]} selection-info-active]
     (when (first selections)
       (clj->js
@@ -239,8 +239,8 @@
             (fn [_ _]
               {:selection-info-active (rf/subscribe [:selection-info-active])
                :selection-info-inactive (rf/subscribe [:selection-info-inactive])
-               :table-last-selected (rf/subscribe [:table-last-selected])
-               :table-not-last-selected (rf/subscribe [:table-not-last-selected])})
+               :table-last-clicked (rf/subscribe [:table-last-clicked])
+               :table-not-last-clicked (rf/subscribe [:table-not-last-clicked])})
             (fn [data-for-spec]
               (vega-lite-spec data-for-spec)))
 

@@ -82,7 +82,7 @@
          (db/with-selections id selected-maps)
          (db/with-selected-row-index id row-index)
          (db/with-row-at-selection-start id row)
-         (db/with-table-last-selected id)))))
+         (db/with-table-last-clicked id)))))
 
 
 (rf/reg-event-db
@@ -95,7 +95,7 @@
  :table-clicked
  event-interceptors
  (fn [db [_ hot id]]
-   (db/with-table-last-selected db id)))
+   (db/with-table-last-clicked db id)))
 
 (rf/reg-event-db
  :run-inference-ql
