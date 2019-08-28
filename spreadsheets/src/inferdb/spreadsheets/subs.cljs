@@ -225,16 +225,16 @@
                   (= 1 (count (first selections)))
                   (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
                                   (first selected-columns))))
-             (vega/gen-simulate-plot selections selected-columns row-at-selection-start)
+             (vega/gen-simulate-plot selected-columns row-at-selection-start)
 
              (= 1 (count selected-columns))
-             (vega/gen-histogram selections selected-columns row-at-selection-start)
+             (vega/gen-histogram selections selected-columns)
 
              (some #{"geo_fips"} selected-columns)
-             (vega/gen-choropleth selections selected-columns row-at-selection-start)
+             (vega/gen-choropleth selections selected-columns)
 
              :else
-             (vega/gen-comparison-plot selections selected-columns row-at-selection-start))))))
+             (vega/gen-comparison-plot selections selected-columns))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:selection-info-active (rf/subscribe [:selection-info-active])

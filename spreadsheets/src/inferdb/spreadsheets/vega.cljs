@@ -67,7 +67,7 @@
       :gaussian dist/gaussian
       :categorical dist/categorical)))
 
-(defn gen-simulate-plot [selections selected-columns row-at-selection-start]
+(defn gen-simulate-plot [selected-columns row-at-selection-start]
  (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
        selected-column-kw (keyword (first selected-columns))
        y-axis {:title "distribution of probable values"
@@ -106,7 +106,7 @@
                                            dist/gaussian "quantitative"
                                            dist/categorical "nominal")}}}))}))
 
-(defn gen-histogram [selections selected-columns row-at-selection-start]
+(defn gen-histogram [selections selected-columns]
   (let [selected-column (first selected-columns)
         selection (first selections)]
     {:$schema
@@ -128,7 +128,7 @@
                               :type "quantitative"}}
         nil {})}))
 
-(defn gen-choropleth [selections selected-columns row-at-selection-start]
+(defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
         map-column (first (filter #(not= "geo_fips" %) selected-columns))
         transformed-selection (mapv (fn [row]
@@ -155,7 +155,7 @@
      :encoding {:tooltip [name color]
                 :color color}}))
 
-(defn gen-comparison-plot [selections selected-columns row-at-selection-start]
+(defn gen-comparison-plot [selections selected-columns]
   (let [selection (first selections)
         types (into #{}
                     (map stattype)
