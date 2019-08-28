@@ -1,7 +1,10 @@
 (ns inferdb.spreadsheets.vega
   "A Handsontable Reagent component."
-  (:require [reagent.core :as r]
-            [yarn.vega-embed]))
+  (:require [yarn.vega-embed]
+            [reagent.core :as r]
+            [clojure.walk :as walk]
+            [metaprob.distributions :as dist]
+            [inferdb.spreadsheets.model :as model]))
 
 (defn vega-lite
   [spec opt generator]
@@ -46,3 +49,59 @@
       :reagent-render
       (fn [spec]
         [:div#vis])})))
+
+(def ^:private topojson-feature "cb_2017_us_cd115_20m")
+
+(defn- left-pad
+  [s n c]
+  (str (apply str (repeat (max 0 (- n (count s)))
+                          c))
+       s))
+
+(defn stattype
+  [column]
+  (let [stattype-kw (if (or (= "probability" column) (= "🏷" column))
+                      :gaussian
+                      (get-in model/spec [:vars column]))]
+    (case stattype-kw
+      :gaussian dist/gaussian
+      :categorical dist/categorical)))
+
+(defn gen-simulate-plot [selections selected-columns row-at-selection-start]
+ (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
+       selected-column-kw (keyword (first selected-columns))
+       y-axis {:title "distribution of probable values"
+               :grid false
+               :labels false
+               :ticks false}
+       y-scale {:nice false}]
+   {:$schema
+    "https://vega.github.io/schema/vega-lite/v3.json"
+    :width 400
+    :height 400
+    :data {:name "data"}
+    :autosize {:resize true}
+    :layer (cond-> [{:mark "bar"
+                     :encoding (condp = (stattype (first selected-columns))
+                                 dist/gaussian {:x {:bin true
+                                                    :field selected-column-kw
+                                                    :type "quantitative"}
+                                                :y {:aggregate "count"
+                                                    :type "quantitative"
+                                                    :axis y-axis
+                                                    :scale y-scale}}
+                                 dist/categorical {:x {:field selected-column-kw
+                                                       :type "nominal"}
+                                                   :y {:aggregate "count"
+                                                       :type "quantitative"
+                                                       :axis y-axis
+                                                       :scale y-scale}})}]
+             (get row-at-selection-start (first selected-columns))
+             (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
+                                     :label "Selected row"}]}
+                    :mark {:type "rule"
+                           :color "red"}
+                    :encoding {:x {:field selected-column-kw
+                                   :type (condp = (stattype (first selected-columns))
+                                           dist/gaussian "quantitative"
+                                           dist/categorical "nominal")}}}))}))

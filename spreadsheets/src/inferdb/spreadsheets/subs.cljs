@@ -1,6 +1,5 @@
 (ns inferdb.spreadsheets.subs
-  (:require [clojure.walk :as walk]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
@@ -8,7 +7,8 @@
             [inferdb.spreadsheets.views :as views]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.model :as model])
+            [inferdb.spreadsheets.model :as model]
+            [inferdb.spreadsheets.vega :as vega])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -237,43 +237,7 @@
                 (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
                                 (first selected-columns))))
            ;; Simulate plot
-           (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
-                 selected-column-kw (keyword (first selected-columns))
-                 y-axis {:title "distribution of probable values"
-                         :grid false
-                         :labels false
-                         :ticks false}
-                 y-scale {:nice false}]
-             {:$schema
-              "https://vega.github.io/schema/vega-lite/v3.json"
-              :width 400
-              :height 400
-              :data {:name "data"}
-              :autosize {:resize true}
-              :layer (cond-> [{:mark "bar"
-                               :encoding (condp = (stattype (first selected-columns))
-                                           dist/gaussian {:x {:bin true
-                                                              :field selected-column-kw
-                                                              :type "quantitative"}
-                                                          :y {:aggregate "count"
-                                                              :type "quantitative"
-                                                              :axis y-axis
-                                                              :scale y-scale}}
-                                           dist/categorical {:x {:field selected-column-kw
-                                                                 :type "nominal"}
-                                                             :y {:aggregate "count"
-                                                                 :type "quantitative"
-                                                                 :axis y-axis
-                                                                 :scale y-scale}})}]
-                       (get row-at-selection-start (first selected-columns))
-                       (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
-                                               :label "Selected row"}]}
-                              :mark {:type "rule"
-                                     :color "red"}
-                              :encoding {:x {:field selected-column-kw
-                                             :type (condp = (stattype (first selected-columns))
-                                                     dist/gaussian "quantitative"
-                                                     dist/categorical "nominal")}}}))})
+           (vega/gen-simulate-plot selections selected-columns row-at-selection-start)
 
            (= 1 (count selected-columns))
            ;; Histogram
