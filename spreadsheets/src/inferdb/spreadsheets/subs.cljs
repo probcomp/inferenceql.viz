@@ -236,19 +236,15 @@
                 (= 1 (count (first selections)))
                 (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
                                 (first selected-columns))))
-           ;; Simulate plot
            (vega/gen-simulate-plot selections selected-columns row-at-selection-start)
 
            (= 1 (count selected-columns))
-           ;; Histogram
            (vega/gen-histogram selections selected-columns row-at-selection-start)
 
            (some #{"geo_fips"} selected-columns)
-           ;; Choropleth
            (vega/gen-choropleth selections selected-columns row-at-selection-start)
 
            :else
-           ;; Comparison plot
            (vega/gen-comparison-plot selections selected-columns row-at-selection-start)))))
 
 (rf/reg-sub :vega-lite-spec
