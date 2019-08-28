@@ -232,13 +232,13 @@
              (vega/gen-simulate-plot cols-1 row-1)
 
              (= 1 (count cols-1))
-             (vega/gen-histogram selects-1 cols-1)
+             (vega/gen-histogram selects-1 cols-1 selects-2 cols-2)
 
              (some #{"geo_fips"} cols-1)
              (vega/gen-choropleth selects-1 cols-1)
 
              :else
-             (vega/gen-comparison-plot selects-1 cols-1))))))
+             (vega/gen-comparison-plot selects-1 cols-1 selects-2 cols-2))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:s-info-active (rf/subscribe [:selection-info-active])
