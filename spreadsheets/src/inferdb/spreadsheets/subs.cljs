@@ -245,30 +245,7 @@
 
            (some #{"geo_fips"} selected-columns)
            ;; Choropleth
-           (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
-                 transformed-selection (mapv (fn [row]
-                                               (update row "geo_fips" #(left-pad (str %) 4 \0)))
-                                             selection)
-                 name {:field "NAME"
-                       :type "nominal"}
-                 color {:field map-column
-                        :type (condp = (stattype map-column)
-                                dist/gaussian "quantitative"
-                                dist/categorical "nominal")}]
-             {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width 500
-              :height 300
-              :data {:values js/topojson
-                     :format {:type "topojson"
-                              :feature topojson-feature}}
-              :transform [{:lookup "properties.GEOID"
-                           :from {:data {:values transformed-selection}
-                                  :key "geo_fips"
-                                  "fields" [(:field name) (:field color)]}}]
-              :projection {:type "albersUsa"}
-              :mark "geoshape"
-              :encoding {:tooltip [name color]
-                         :color color}})
+           (vega/gen-choropleth selections selected-columns row-at-selection-start)
 
            :else
            ;; Comparison plot
