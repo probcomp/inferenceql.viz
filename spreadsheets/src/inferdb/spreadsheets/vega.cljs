@@ -105,3 +105,25 @@
                                    :type (condp = (stattype (first selected-columns))
                                            dist/gaussian "quantitative"
                                            dist/categorical "nominal")}}}))}))
+
+(defn gen-histogram [selections selected-columns row-at-selection-start]
+  (let [selected-column (first selected-columns)
+        selection (first selections)]
+    {:$schema
+     "https://vega.github.io/schema/vega-lite/v3.json"
+     :width 400
+     :height 400
+     :data {:values selection}
+     :mark "bar"
+     :encoding
+     (condp = (stattype selected-column)
+        dist/gaussian {:x {:bin true
+                           :field selected-column
+                           :type "quantitative"}
+                       :y {:aggregate "count"
+                           :type "quantitative"}}
+        dist/categorical {:x {:field selected-column
+                              :type "nominal"}
+                          :y {:aggregate "count"
+                              :type "quantitative"}}
+        nil {})}))

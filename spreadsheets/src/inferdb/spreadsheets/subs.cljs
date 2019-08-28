@@ -241,28 +241,7 @@
 
            (= 1 (count selected-columns))
            ;; Histogram
-           (let [selected-column (first selected-columns)]
-             {:$schema
-              "https://vega.github.io/schema/vega-lite/v3.json",
-              :width 400
-              :height 400
-              :data {:values selection},
-              :mark "bar"
-              :encoding
-              (condp = (stattype selected-column)
-                dist/gaussian {:x {:bin true,
-                                   :field selected-column
-                                   :type "quantitative"}
-                               :y {:aggregate "count"
-                                   :type "quantitative"}}
-
-                dist/categorical {:x {:field selected-column
-                                      :type "nominal"}
-                                  :y {:aggregate "count"
-                                      :type "quantitative"}}
-
-                nil
-                {})})
+           (vega/gen-histogram selections selected-columns row-at-selection-start)
 
            (some #{"geo_fips"} selected-columns)
            ;; Choropleth
