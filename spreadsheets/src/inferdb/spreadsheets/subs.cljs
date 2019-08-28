@@ -249,54 +249,8 @@
 
            :else
            ;; Comparison plot
-           (let [types (into #{}
-                             (map stattype)
-                             (take 2 selected-columns))]
-             (condp = types
-               ;; Scatterplot
-               #{dist/gaussian} {:$schema
-                                 "https://vega.github.io/schema/vega-lite/v3.json"
-                                 :width 400
-                                 :height 400
-                                 :data {:values selection}
-                                 :mark "circle"
-                                 :encoding {:x {:field (first selected-columns)
-                                                :type "quantitative"}
-                                            :y {:field (second selected-columns)
-                                                :type "quantitative"}}}
-               ;; Heatmap
-               #{dist/categorical} {:$schema
-                                    "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width 400
-                                    :height 400
-                                    :data {:values selection}
-                                    :mark "rect"
-                                    :encoding {:x {:field (first selected-columns)
-                                                   :type "nominal"}
-                                               :y {:field (second selected-columns)
-                                                   :type "nominal"}
-                                               :color {:aggregate "count"
-                                                       :type "quantitative"}}}
-               ;; Bot-and-line
-               #{dist/gaussian
-                 dist/categorical} {:$schema
-                                    "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width 400
-                                    :height 400
-                                    :data {:values selection}
-                                    :mark {:type "boxplot"
-                                           :extent "min-max"}
-                                    :encoding {:x {:field (first selected-columns)
-                                                   :type (condp = (stattype (first selected-columns))
-                                                           dist/gaussian "quantitative"
-                                                           dist/categorical "nominal")}
-                                               :y {:field (second selected-columns)
-                                                   :type (condp = (stattype (second selected-columns))
-                                                           dist/gaussian "quantitative"
-                                                           dist/categorical "nominal")}
-                                               :color {:aggregate "count"
-                                                       :type "quantitative"}}}
-               {}))))))
+           (vega/gen-comparison-plot selections selected-columns row-at-selection-start)))))
+
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:selections (rf/subscribe [:selections-activated])
