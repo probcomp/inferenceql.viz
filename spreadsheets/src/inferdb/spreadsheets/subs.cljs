@@ -49,6 +49,26 @@
             (fn [db _]
               (db/table-last-selected db)))
 
+(rf/reg-sub-raw :selections-activated
+                (fn [app-db event]
+                  (reaction
+                    (let [table-id @(rf/subscribe [:table-last-selected])
+                          selections @(rf/subscribe [:selections table-id])]
+                      selections))))
+
+(rf/reg-sub-raw :selected-columns-activated
+                (fn [app-db event]
+                  (reaction
+                    (let [table-id @(rf/subscribe [:table-last-selected])
+                          selected-columns @(rf/subscribe [:selected-columns table-id])]
+                      selected-columns))))
+
+(rf/reg-sub-raw :row-at-selection-start-activated
+                (fn [app-db event]
+                  (reaction
+                    (let [table-id @(rf/subscribe [:table-last-selected])
+                          row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
+                      row-at-selection-start))))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -357,22 +377,17 @@
                                                :color {:aggregate "count"
                                                        :type "quantitative"}}}
                {}))))))
-(rf/reg-sub-raw :vega-lite-spec
-                (fn [app-db event]
-                  (reaction
-                    (let [table-id @(rf/subscribe [:table-last-selected])
-                          selections @(rf/subscribe [:selections table-id])
-                          selected-columns @(rf/subscribe [:selected-columns table-id])
-                          row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])
-
-                          data-for-spec {:selections selections
-                                         :selected-columns selected-columns
-                                         :row-at-selection-start row-at-selection-start}]
-                      (vega-lite-spec data-for-spec)))))
+(rf/reg-sub :vega-lite-spec
+            (fn [_ _]
+              {:selections (rf/subscribe [:selections-activated])
+               :selected-columns (rf/subscribe [:selected-columns-activated])
+               :row-at-selection-start (rf/subscribe [:row-at-selection-start-activated])})
+            (fn [data-for-spec]
+              (vega-lite-spec data-for-spec)))
 
 (rf/reg-sub :one-cell-selected
             (fn [_ _]
-              {:selections (rf/subscribe [:selections])})
+              {:selections (rf/subscribe [:selections-activated])})
             (fn [{:keys [selections]}]
               (= 1
                  (count selections)
@@ -381,8 +396,8 @@
 
 (rf/reg-sub :generator
             (fn [_ _]
-              {:row (rf/subscribe [:row-at-selection-start])
-               :columns (rf/subscribe [:selected-columns])
+              {:row (rf/subscribe [:row-at-selection-start-activated])
+               :columns (rf/subscribe [:selected-columns-activated])
                :one-cell-selected (rf/subscribe [:one-cell-selected])})
             (fn [{:keys [row columns one-cell-selected]}]
               (when (and one-cell-selected
