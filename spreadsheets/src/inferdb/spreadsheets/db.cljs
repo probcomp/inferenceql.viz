@@ -32,15 +32,14 @@
 
 (s/def ::row-at-selection-start ::row)
 
-(s/def ::table-id string?)
+(s/def ::table-id #{:real-table :virtual-table})
 (s/def ::table-state any?)
 (s/def ::hot-state (s/map-of ::table-id ::table-state))
 
-(s/def ::db (s/keys :req [::headers ::rows]
+(s/def ::db (s/keys :req [::headers ::rows ::hot-state]
                     :opt [::scores
                           ::virtual-scores
                           ::labels
-                          ::hot-state
                           ::topojson
                           ::sampled-rows]))
 
@@ -87,6 +86,18 @@
 (defn table-last-selected
   [db]
   (get db ::table-last-selected))
+
+(defn table-not-last-selected
+  [db]
+  (when-let [table-last-selected (get db ::table-last-selected)]
+    (let [table-ids (keys (get db ::hot-state))
+          rem-ids (remove #{table-last-selected} table-ids)
+          other-id (first rem-ids)]
+
+      ; Enforcing that there are only two tables whose state we are tracking
+      ; This is also enforced by the db spec.
+      (assert (= 1 (count rem-ids)))
+      other-id)))
 
 (defn table-headers
   [db]
@@ -142,4 +153,5 @@
   []
   {::headers (into [] (keys (first nyt-data)))
    ::rows nyt-data
-   ::virtual-rows []})
+   ::virtual-rows []
+   ::hot-state {:real-table nil :virtual-table nil}})

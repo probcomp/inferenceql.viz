@@ -38,7 +38,7 @@
        (fn [this]
          (let [dom-node (dom/dom-node this)
                hot (js/Handsontable. dom-node (clj->js (:settings props)))
-               unique-id name
+               unique-id (keyword name)
 
                click-handler-fn (fn [event]
                                   ; Fires :table-clicked event

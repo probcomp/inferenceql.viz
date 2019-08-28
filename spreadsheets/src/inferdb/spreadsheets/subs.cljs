@@ -49,26 +49,31 @@
             (fn [db _]
               (db/table-last-selected db)))
 
-(rf/reg-sub-raw :selections-activated
-                (fn [app-db event]
-                  (reaction
-                    (let [table-id @(rf/subscribe [:table-last-selected])
-                          selections @(rf/subscribe [:selections table-id])]
-                      selections))))
+(rf/reg-sub :table-not-last-selected
+            (fn [db _]
+              (db/table-not-last-selected db)))
 
-(rf/reg-sub-raw :selected-columns-activated
+(rf/reg-sub-raw :selection-info-active
                 (fn [app-db event]
                   (reaction
                     (let [table-id @(rf/subscribe [:table-last-selected])
-                          selected-columns @(rf/subscribe [:selected-columns table-id])]
-                      selected-columns))))
-
-(rf/reg-sub-raw :row-at-selection-start-activated
-                (fn [app-db event]
-                  (reaction
-                    (let [table-id @(rf/subscribe [:table-last-selected])
+                          selections @(rf/subscribe [:selections table-id])
+                          selected-columns @(rf/subscribe [:selected-columns table-id])
                           row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
-                      row-at-selection-start))))
+                      {:selections selections
+                       :selected-columns selected-columns
+                       :row-at-selection-start row-at-selection-start}))))
+
+(rf/reg-sub-raw :selection-info-inactive
+                (fn [app-db event]
+                  (reaction
+                    (let [table-id @(rf/subscribe [:table-not-last-selected])
+                          selections @(rf/subscribe [:selections table-id])
+                          selected-columns @(rf/subscribe [:selected-columns table-id])
+                          row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
+                      {:selections selections
+                       :selected-columns selected-columns
+                       :row-at-selection-start row-at-selection-start}))))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -212,35 +217,36 @@
             row-ids-unlabeled)
 
 (defn vega-lite-spec
-  [{:keys [selections selected-columns row-at-selection-start]}]
-  (when-let [selection (first selections)]
-    (clj->js
-     (cond (and (= 1 (count selected-columns))
-                (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
-                                (first selected-columns))))
-           (vega/gen-simulate-plot selections selected-columns row-at-selection-start)
+   [{:keys [selection-info-active selection-info-inactive table-last-selected table-not-last-selected]}]
+  (let [{:keys [selections selected-columns row-at-selection-start]} selection-info-active]
+    (when (first selections)
+      (clj->js
+       (cond (and (= 1 (count selected-columns))
+                  (= 1 (count (first selections)))
+                  (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
+                                  (first selected-columns))))
+             (vega/gen-simulate-plot selections selected-columns row-at-selection-start)
 
-           (= 1 (count selected-columns))
-           (vega/gen-histogram selections selected-columns row-at-selection-start)
+             (= 1 (count selected-columns))
+             (vega/gen-histogram selections selected-columns row-at-selection-start)
 
-           (some #{"geo_fips"} selected-columns)
-           (vega/gen-choropleth selections selected-columns row-at-selection-start)
+             (some #{"geo_fips"} selected-columns)
+             (vega/gen-choropleth selections selected-columns row-at-selection-start)
 
-           :else
-           (vega/gen-comparison-plot selections selected-columns row-at-selection-start)))))
-
+             :else
+             (vega/gen-comparison-plot selections selected-columns row-at-selection-start))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:selections (rf/subscribe [:selections-activated])
-               :selected-columns (rf/subscribe [:selected-columns-activated])
-               :row-at-selection-start (rf/subscribe [:row-at-selection-start-activated])})
+              {:selection-info-active (rf/subscribe [:selection-info-active])
+               :selection-info-inactive (rf/subscribe [:selection-info-inactive])
+               :table-last-selected (rf/subscribe [:table-last-selected])
+               :table-not-last-selected (rf/subscribe [:table-not-last-selected])})
             (fn [data-for-spec]
               (vega-lite-spec data-for-spec)))
 
 (rf/reg-sub :one-cell-selected
             (fn [_ _]
-              {:selections (rf/subscribe [:selections-activated])})
+              (rf/subscribe [:selection-info-active]))
             (fn [{:keys [selections]}]
               (= 1
                  (count selections)
@@ -249,19 +255,20 @@
 
 (rf/reg-sub :generator
             (fn [_ _]
-              {:row (rf/subscribe [:row-at-selection-start-activated])
-               :columns (rf/subscribe [:selected-columns-activated])
+              {:selection-info (rf/subscribe [:selection-info-active])
                :one-cell-selected (rf/subscribe [:one-cell-selected])})
-            (fn [{:keys [row columns one-cell-selected]}]
-              (when (and one-cell-selected
-                         ;; TODO clean up this check
-                         (not (contains? #{"geo_fips" "NAME" "probability" "🏷"} (first columns))))
-                (let [sampled-column (first columns) ; columns that will be sampled
-                      constraints (mmix/with-row-values {} (-> row
-                                                               (select-keys (keys (:vars model/spec)))
-                                                               (dissoc sampled-column)))
-                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                                         :observation-trace constraints))
-                      negative-salary? #(< (% "salary_usd") 0)]
-                  ;; returns the first result of gen-fn that doesn't have a negative salary
-                  #(take 1 (remove negative-salary? (repeatedly gen-fn)))))))
+            (fn [{:keys [selection-info one-cell-selected]}]
+              (let [row (:row-at-selection-start selection-info)
+                    columns (:selected-columns selection-info)]
+                (when (and one-cell-selected
+                           ;; TODO clean up this check
+                           (not (contains? #{"geo_fips" "NAME" "probability" "🏷"} (first columns))))
+                  (let [sampled-column (first columns) ; columns that will be sampled
+                        constraints (mmix/with-row-values {} (-> row
+                                                                 (select-keys (keys (:vars model/spec)))
+                                                                 (dissoc sampled-column)))
+                        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                                           :observation-trace constraints))
+                        negative-salary? #(< (% "salary_usd") 0)]
+                    ;; returns the first result of gen-fn that doesn't have a negative salary
+                    #(take 1 (remove negative-salary? (repeatedly gen-fn))))))))
