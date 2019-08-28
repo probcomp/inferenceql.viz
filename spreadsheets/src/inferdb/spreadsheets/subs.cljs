@@ -217,30 +217,34 @@
             row-ids-unlabeled)
 
 (defn vega-lite-spec
-   [{:keys [selection-info-active selection-info-inactive table-last-clicked table-not-last-clicked]}]
-  (let [{:keys [selections selected-columns row-at-selection-start]} selection-info-active]
-    (when (first selections)
+   [{:keys [s-info-active s-info-inactive t-clicked t-not-clicked]}]
+  (let [{selects-1 :selections cols-1 :selected-columns row-1 :row-at-selection-start}
+        s-info-active
+
+        {selects-2 :selections cols-2 :selected-columns _row-2 :row-at-selection-start}
+        s-info-inactive]
+    (when (first selects-1)
       (clj->js
-       (cond (and (= 1 (count selected-columns))
-                  (= 1 (count (first selections)))
+       (cond (and (= 1 (count cols-1))
+                  (= 1 (count (first selects-1)))
                   (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
-                                  (first selected-columns))))
-             (vega/gen-simulate-plot selected-columns row-at-selection-start)
+                                  (first cols-1))))
+             (vega/gen-simulate-plot cols-1 row-1)
 
-             (= 1 (count selected-columns))
-             (vega/gen-histogram selections selected-columns)
+             (= 1 (count cols-1))
+             (vega/gen-histogram selects-1 cols-1)
 
-             (some #{"geo_fips"} selected-columns)
-             (vega/gen-choropleth selections selected-columns)
+             (some #{"geo_fips"} cols-1)
+             (vega/gen-choropleth selects-1 cols-1)
 
              :else
-             (vega/gen-comparison-plot selections selected-columns))))))
+             (vega/gen-comparison-plot selects-1 cols-1))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:selection-info-active (rf/subscribe [:selection-info-active])
-               :selection-info-inactive (rf/subscribe [:selection-info-inactive])
-               :table-last-clicked (rf/subscribe [:table-last-clicked])
-               :table-not-last-clicked (rf/subscribe [:table-not-last-clicked])})
+              {:s-info-active (rf/subscribe [:selection-info-active])
+               :s-info-inactive (rf/subscribe [:selection-info-inactive])
+               :t-clicked (rf/subscribe [:table-last-clicked])
+               :t-not-clicked (rf/subscribe [:table-not-last-clicked])})
             (fn [data-for-spec]
               (vega-lite-spec data-for-spec)))
 
