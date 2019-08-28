@@ -211,23 +211,6 @@
               {:labels (rf/subscribe [:labels])})
             row-ids-unlabeled)
 
-(def ^:private topojson-feature "cb_2017_us_cd115_20m")
-
-(defn- left-pad
-  [s n c]
-  (str (apply str (repeat (max 0 (- n (count s)))
-                          c))
-       s))
-
-(defn stattype
-  [column]
-  (let [stattype-kw (if (or (= "probability" column) (= "🏷" column))
-                      :gaussian
-                      (get-in model/spec [:vars column]))]
-    (case stattype-kw
-      :gaussian dist/gaussian
-      :categorical dist/categorical)))
-
 (defn vega-lite-spec
   [{:keys [selections selected-columns row-at-selection-start]}]
   (when-let [selection (first selections)]
