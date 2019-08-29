@@ -10,8 +10,8 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :before-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize])
+(def real-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :before-change])
+(def virtual-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down])
 
 (def event-interceptors
   [rf/debug interceptors/check-spec])
@@ -84,6 +84,12 @@
          (db/with-row-at-selection-start id row)
          (db/with-table-last-clicked id)))))
 
+(rf/reg-event-db
+ :after-on-cell-mouse-down
+ event-interceptors
+ (fn [db [_ hot id _mouse-event coords _TD]]
+   (let [header-clicked (= -1 (.-row coords))]
+     (db/with-header-clicked db id header-clicked))))
 
 (rf/reg-event-db
  :after-deselect
