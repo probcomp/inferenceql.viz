@@ -11,7 +11,7 @@
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
 
 (def real-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :before-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down])
+(def virtual-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :after-change])
 
 (def event-interceptors
   [rf/debug interceptors/check-spec])
@@ -45,6 +45,22 @@
  (fn [db [_ hot id changes]]
    (let [labels-col (.getSourceDataAtCol hot 0)]
      (db/with-labels db (js->clj labels-col)))))
+
+(rf/reg-event-db
+ :after-change
+ event-interceptors
+ (fn [db [_ hot id changes source]]
+
+   ; When the change is the result of loading new table
+   ; into the table.
+    (when (= source "loadData")
+      (if-let [header-clicked @(rf/subscribe [:table-header-clicked id])]
+        (let [current-selection (.getSelectedLast hot)
+              [_row1 col1 _row2 col2] (js->clj current-selection)]
+          ;; Take the current selection and expand it so the whole columns
+          ;; are selected.
+          (.selectColumns hot col1 col2))))
+   db))
 
 (rf/reg-event-db
  :after-column-move
@@ -89,7 +105,7 @@
  event-interceptors
  (fn [db [_ hot id _mouse-event coords _TD]]
    (let [header-clicked (= -1 (.-row coords))]
-     (db/with-header-clicked db id header-clicked))))
+     (db/with-table-header-clicked db id header-clicked))))
 
 (rf/reg-event-db
  :after-deselect

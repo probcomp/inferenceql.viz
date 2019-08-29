@@ -99,11 +99,11 @@
       (assert (= 1 (count rem-ids)))
       other-id)))
 
-(defn with-header-clicked
+(defn with-table-header-clicked
   [db table-id status-flag]
   (assoc-in db [::hot-state table-id ::header-clicked] status-flag))
 
-(defn header-clicked
+(defn table-header-clicked
   [db table-id]
   (get-in db [::hot-state table-id ::header-clicked]))
 

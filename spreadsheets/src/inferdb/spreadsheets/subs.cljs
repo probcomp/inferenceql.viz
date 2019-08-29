@@ -53,6 +53,10 @@
             (fn [db _]
               (db/table-not-last-clicked db)))
 
+(rf/reg-sub :table-header-clicked
+            (fn [db [_sub-name table-id]]
+              (db/table-header-clicked db table-id)))
+
 (rf/reg-sub-raw :selection-info-active
                 (fn [app-db event]
                   (reaction
