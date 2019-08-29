@@ -120,6 +120,19 @@
    (db/with-table-last-clicked db id)))
 
 (rf/reg-event-db
+ :table-deselected
+ event-interceptors
+ (fn [db [_ hot id]]
+   (let [t-clicked @(rf/subscribe [:table-last-clicked])
+         t-not-clicked @(rf/subscribe [:table-not-last-clicked])]
+
+     ; Swith the last clicked table-id to the other table
+     ; if it is currently set to the deselected table's id.
+     (if (= t-clicked id)
+       (db/with-table-last-clicked db t-not-clicked)
+       db))))
+
+(rf/reg-event-db
  :run-inference-ql
  event-interceptors
  (fn [db [_ text]]
