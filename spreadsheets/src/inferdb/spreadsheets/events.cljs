@@ -99,15 +99,29 @@
          (assoc-in [:hot-state id :selected-columns] selected-columns)
          (assoc-in [:hot-state id :selections] selected-maps)
          (assoc-in [:hot-state id :selected-row-index] row-index)
-         (assoc-in [:hot-state id :row-at-selection-start] row)
-         (assoc :table-last-clicked id)))))
+         (assoc-in [:hot-state id :row-at-selection-start] row)))))
 
 (rf/reg-event-db
  :after-on-cell-mouse-down
  event-interceptors
- (fn [db [_ hot id _mouse-event coords _TD]]
-   (let [header-clicked-flag (= -1 (.-row coords))]
-     (assoc-in db [:hot-state id :header-clicked] header-clicked-flag))))
+ (fn [db [_ hot id mouse-event coords _TD]]
+   (let [other-table-id @(rf/subscribe [:other-table id])
+
+         ;; Stores whether the user clicked on one of the column headers.
+         header-clicked-flag (= -1 (.-row coords))
+
+         ;; Stores whether the user held alt during the click.
+         alt-key-pressed (.-altKey mouse-event)
+         ; Switch the last clicked on table-id to the other table on alt-click.
+         new-table-clicked-id (if alt-key-pressed other-table-id id)]
+
+     ; Deselect all cells on alt-click.
+     (if alt-key-pressed
+       (.deselectCell hot))
+
+     (-> db
+       (assoc-in [:hot-state id :header-clicked] header-clicked-flag)
+       (assoc :table-last-clicked new-table-clicked-id)))))
 
 (rf/reg-event-db
  :after-deselect
@@ -115,25 +129,6 @@
  (fn [db [_ hot id]]
    ;; clears selections associated with table
    (update-in db [:hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
-
-(rf/reg-event-db
- :table-clicked
- event-interceptors
- (fn [db [_ hot id]]
-   (assoc db :table-last-clicked id)))
-
-(rf/reg-event-db
- :table-deselected
- event-interceptors
- (fn [db [_ hot id]]
-   (let [t-clicked @(rf/subscribe [:table-last-clicked])
-         t-not-clicked @(rf/subscribe [:table-not-last-clicked])]
-
-     ; Swith the last clicked table-id to the other table
-     ; if it is currently set to the deselected table's id.
-     (if (= t-clicked id)
-       (assoc db :table-last-clicked t-not-clicked)
-       db))))
 
 (rf/reg-event-db
  :run-inference-ql

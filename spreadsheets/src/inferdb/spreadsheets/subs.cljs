@@ -32,13 +32,12 @@
             (fn [db _]
               (get db :table-last-clicked)))
 
-(rf/reg-sub :table-not-last-clicked
-            (fn [db _]
-              (when-let [table-last-clicked (get db :table-last-clicked)]
-                (let [[table-1-id table-2-id] (keys (get db :hot-state))]
-                  (condp = table-last-clicked
-                    table-1-id table-2-id
-                    table-2-id table-1-id)))))
+(rf/reg-sub :other-table
+            (fn [db [_sub-name table-picked]]
+              (let [[table-1-id table-2-id] (keys (get db :hot-state))]
+                (condp = table-picked
+                  table-1-id table-2-id
+                  table-2-id table-1-id))))
 
 (rf/reg-sub :table-state
             (fn [db [_sub-name table-id]]
