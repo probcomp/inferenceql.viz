@@ -56,7 +56,7 @@
    ; into the table.
     (when (= source "loadData")
       (let [table-state @(rf/subscribe [:table-state id])]
-        (if-let [header-clicked (:table-header-clicked table-state)]
+        (if-let [header-clicked (:header-clicked table-state)]
           (let [current-selection (.getSelectedLast hot)
                 [_row1 col1 _row2 col2] (js->clj current-selection)]
             ;; Take the current selection and expand it so the whole columns

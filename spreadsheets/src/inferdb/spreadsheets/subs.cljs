@@ -36,7 +36,7 @@
             (fn [db _]
               (when-let [table-last-clicked (get db :table-last-clicked)]
                 (let [[table-1-id table-2-id] (keys (get db :hot-state))]
-                  (case table-last-clicked
+                  (condp = table-last-clicked
                     table-1-id table-2-id
                     table-2-id table-1-id)))))
 
