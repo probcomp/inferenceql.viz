@@ -197,24 +197,24 @@
 
 (defn vega-lite-spec
    [{:keys [table-states t-clicked]}]
-  (let [{selects-1 :selections cols-1 :selected-columns row-1 :row-at-selection-start}
+  (let [{selections :selections cols :selected-columns row :row-at-selection-start}
         (table-states t-clicked)]
-    (when (first selects-1)
+    (when (first selections)
       (clj->js
-       (cond (and (= 1 (count cols-1))
-                  (= 1 (count (first selects-1)))
+       (cond (and (= 1 (count cols))
+                  (= 1 (count (first selections)))
                   (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
-                                  (first cols-1))))
-             (vega/gen-simulate-plot cols-1 row-1)
+                                  (first cols))))
+             (vega/gen-simulate-plot cols row)
 
-             (= 1 (count cols-1))
+             (= 1 (count cols))
              (vega/gen-histogram table-states t-clicked)
 
-             (some #{"geo_fips"} cols-1)
-             (vega/gen-choropleth selects-1 cols-1)
+             (some #{"geo_fips"} cols)
+             (vega/gen-choropleth selections cols)
 
              :else
-             (vega/gen-comparison-plot selects-1 cols-1))))))
+             (vega/gen-comparison-plot selections cols))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:table-states (rf/subscribe [:both-table-states])
