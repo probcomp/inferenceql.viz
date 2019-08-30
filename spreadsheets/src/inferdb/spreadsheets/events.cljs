@@ -46,6 +46,7 @@
    (let [labels-col (.getSourceDataAtCol hot 0)]
      (db/with-labels db (js->clj labels-col)))))
 
+;; TODO this should be converted to reg-event-fx
 (rf/reg-event-db
  :after-change
  event-interceptors
