@@ -40,76 +40,14 @@
 
 (s/def ::table-last-clicked ::table-id)
 
-(s/def ::db (s/keys :req [::headers ::rows ::virtual-rows ::hot-state]
+(s/def ::db (s/keys :req [::headers ::rows ::virtual-rows]
                     :opt [::scores
                           ::virtual-scores
                           ::labels
-                          ::topojson
-                          ::table-last-clicked]))
+                          ::topojson]
+                    :req-un [::hot-state]
+                    :opt-un [::table-last-clicked]))
 
-(defn with-row-at-selection-start
-  [db table-id row]
-  (assoc-in db [::hot-state table-id ::row-at-selection-start] row))
-
-(defn row-at-selection-start
-  [db table-id]
-  (get-in db [::hot-state table-id ::row-at-selection-start]))
-
-(defn with-selected-row-index
-  [db table-id row-index]
-  (assoc-in db [::hot-state table-id ::selected-row-index] row-index))
-
-(defn selected-row-index
-  [db table-id]
-  (get-in db [::hot-state table-id ::selected-row-index]))
-
-(defn with-selections
-  [db table-id selections]
-  (assoc-in db [::hot-state table-id ::selections] selections))
-
-(defn selections
-  [db table-id]
-  (get-in db [::hot-state table-id ::selections]))
-
-(defn with-selected-columns
-  [db table-id columns]
-  (assoc-in db [::hot-state table-id ::selected-columns] columns))
-
-(defn selected-columns
-  [db table-id]
-  (get-in db [::hot-state table-id ::selected-columns]))
-
-(defn clear-selections
-  [db table-id]
-  (update-in db [::hot-state table-id] dissoc ::selected-columns ::selections ::selected-row-index ::row-at-selection-start))
-
-(defn with-table-last-clicked
-  [db table-id]
-  (assoc db ::table-last-clicked table-id))
-
-(defn table-last-clicked
-  [db]
-  (get db ::table-last-clicked))
-
-(defn table-not-last-clicked
-  [db]
-  (when-let [table-last-clicked (get db ::table-last-clicked)]
-    (let [table-ids (keys (get db ::hot-state))
-          rem-ids (remove #{table-last-clicked} table-ids)
-          other-id (first rem-ids)]
-
-      ; Enforcing that there are only two tables whose state we are tracking
-      ; This is also enforced by the db spec.
-      (assert (= 1 (count rem-ids)))
-      other-id)))
-
-(defn with-table-header-clicked
-  [db table-id status-flag]
-  (assoc-in db [::hot-state table-id ::header-clicked] status-flag))
-
-(defn table-header-clicked
-  [db table-id]
-  (get-in db [::hot-state table-id ::header-clicked]))
 
 (defn table-headers
   [db]
@@ -166,4 +104,4 @@
   {::headers (into [] (keys (first nyt-data)))
    ::rows nyt-data
    ::virtual-rows []
-   ::hot-state {:real-table nil :virtual-table nil}})
+   :hot-state {:real-table nil :virtual-table nil}})

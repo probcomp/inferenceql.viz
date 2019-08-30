@@ -31,31 +31,40 @@
 
 (rf/reg-sub :row-at-selection-start
             (fn [db [_sub-name table-id]]
-              (db/row-at-selection-start db table-id)))
+              (get-in db [:hot-state table-id :row-at-selection-start])))
 
 (rf/reg-sub :selected-row-index
             (fn [db [_sub-name table-id]]
-              (db/selected-row-index db table-id)))
+              (get-in db [:hot-state table-id :selected-row-index])))
 
 (rf/reg-sub :selections
             (fn [db [_sub-name table-id]]
-              (db/selections db table-id)))
+              (get-in db [:hot-state table-id :selections])))
 
 (rf/reg-sub :selected-columns
             (fn [db [_sub-name table-id]]
-              (db/selected-columns db table-id)))
+              (get-in db [:hot-state table-id :selected-columns])))
 
 (rf/reg-sub :table-last-clicked
             (fn [db _]
-              (db/table-last-clicked db)))
+              (get db :table-last-clicked)))
 
 (rf/reg-sub :table-not-last-clicked
             (fn [db _]
-              (db/table-not-last-clicked db)))
+              (when-let [table-last-clicked (get db :table-last-clicked)]
+                (let [table-ids (keys (get db :hot-state))
+                      rem-ids (remove #{table-last-clicked} table-ids)
+                      other-id (first rem-ids)]
+
+                  ; Enforcing that there are only two tables whose state we are tracking
+                  ; This is also enforced by the db spec.
+                  (assert (= 1 (count rem-ids)))
+                  other-id))))
 
 (rf/reg-sub :table-header-clicked
             (fn [db [_sub-name table-id]]
-              (db/table-header-clicked db table-id)))
+              (get-in db [:hot-state table-id :header-clicked])))
+
 
 (rf/reg-sub-raw :selection-info
                 (fn [app-db [_sub-name table-id]]

@@ -94,30 +94,31 @@
                              (.getSelected hot))
          selected-columns (if (<= col col2) selected-headers (reverse selected-headers))]
      (-> db
-         (db/with-selected-columns id selected-columns)
-         (db/with-selections id selected-maps)
-         (db/with-selected-row-index id row-index)
-         (db/with-row-at-selection-start id row)
-         (db/with-table-last-clicked id)))))
+         (assoc-in [:hot-state id :selected-columns] selected-columns)
+         (assoc-in [:hot-state id :selections] selected-maps)
+         (assoc-in [:hot-state id :selected-row-index] row-index)
+         (assoc-in [:hot-state id :row-at-selection-start] row)
+         (assoc :table-last-clicked id)))))
 
 (rf/reg-event-db
  :after-on-cell-mouse-down
  event-interceptors
  (fn [db [_ hot id _mouse-event coords _TD]]
-   (let [header-clicked (= -1 (.-row coords))]
-     (db/with-table-header-clicked db id header-clicked))))
+   (let [header-clicked-flag (= -1 (.-row coords))]
+     (assoc-in db [:hot-state id :header-clicked] header-clicked-flag))))
 
 (rf/reg-event-db
  :after-deselect
  event-interceptors
  (fn [db [_ hot id]]
-   (db/clear-selections db id)))
+   ;; clears selections associated with table
+   (update-in db [:hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
 
 (rf/reg-event-db
  :table-clicked
  event-interceptors
  (fn [db [_ hot id]]
-   (db/with-table-last-clicked db id)))
+   (assoc db :table-last-clicked id)))
 
 (rf/reg-event-db
  :table-deselected
@@ -129,7 +130,7 @@
      ; Swith the last clicked table-id to the other table
      ; if it is currently set to the deselected table's id.
      (if (= t-clicked id)
-       (db/with-table-last-clicked db t-not-clicked)
+       (assoc db :table-last-clicked t-not-clicked)
        db))))
 
 (rf/reg-event-db
