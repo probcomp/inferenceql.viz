@@ -209,7 +209,7 @@
              (vega/gen-simulate-plot cols-1 row-1)
 
              (= 1 (count cols-1))
-             (vega/gen-histogram selects-1 cols-1)
+             (vega/gen-histogram table-states t-clicked)
 
              (some #{"geo_fips"} cols-1)
              (vega/gen-choropleth selects-1 cols-1)

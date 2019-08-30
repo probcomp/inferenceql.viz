@@ -106,27 +106,56 @@
                                            dist/gaussian "quantitative"
                                            dist/categorical "nominal")}}}))}))
 
-(defn gen-histogram [selections selected-columns]
-  (let [selected-column (first selected-columns)
-        selection (first selections)]
+(defn get-col-type [col-name]
+  (condp = (stattype col-name)
+    dist/gaussian "quantitative"
+    dist/categorical "nominal"))
+
+(defn get-col-should-bin [col-name]
+  (condp = (stattype col-name)
+    dist/gaussian true
+    dist/categorical false))
+
+(defn gen-histogram [table-states t-clicked]
+  (let [selection-real (first (get-in table-states [:real-table :selections]))
+        selection-virtual (first (get-in table-states [:virtual-table :selections]))
+
+        col-real (first (get-in table-states [:real-table :selected-columns]))
+        col-virtual (first (get-in table-states [:virtual-table :selected-columns]))
+        make-layered-hist (= col-real col-virtual)
+
+
+        col-to-draw (first (get-in table-states [t-clicked :selected-columns]))
+        col-type (get-col-type col-to-draw)
+        col-binning (get-col-should-bin col-to-draw)
+
+        virtual-layer-opacity (if make-layered-hist 0.5 1.0)
+
+        real-layer {:data {:values selection-real}
+                    :mark {:type "bar" :color "SteelBlue" :opacity 1}
+                    :encoding {:y {:aggregate "count"
+                                   :type "quantitative"}}}
+        virtual-layer {:data {:values selection-virtual}
+                       :mark {:type "bar" :color "DarkKhaki" :opacity virtual-layer-opacity}
+                       :encoding {:y {:aggregate "count"
+                                      :type "quantitative"}}}
+        layers-to-draw (cond
+                         make-layered-hist
+                         [real-layer virtual-layer]
+
+                         (= t-clicked :real-table)
+                         [real-layer]
+
+                         (= t-clicked :virtual-table)
+                         [virtual-layer])]
     {:$schema
      "https://vega.github.io/schema/vega-lite/v3.json"
      :width 400
      :height 400
-     :data {:values selection}
-     :mark "bar"
-     :encoding
-     (condp = (stattype selected-column)
-        dist/gaussian {:x {:bin true
-                           :field selected-column
-                           :type "quantitative"}
-                       :y {:aggregate "count"
-                           :type "quantitative"}}
-        dist/categorical {:x {:field selected-column
-                              :type "nominal"}
-                          :y {:aggregate "count"
-                              :type "quantitative"}}
-        nil {})}))
+     :encoding {:x {:bin col-binning
+                    :field col-to-draw
+                    :type col-type}}
+     :layer layers-to-draw}))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
