@@ -6,6 +6,7 @@
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/cat :row (s/* ::row)))
+(s/def ::virtual-rows (s/cat :row (s/* ::row)))
 (s/def ::headers (s/cat :header (s/* ::header)))
 
 (s/def ::index nat-int?)
@@ -32,16 +33,25 @@
 
 (s/def ::row-at-selection-start ::row)
 
+(s/def ::header-clicked boolean?)
+
 (s/def ::table-id #{:real-table :virtual-table})
-(s/def ::table-state any?)
+(s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
+                                                 ::selected-row-index
+                                                 ::selections
+                                                 ::selected-columns
+                                                 ::header-clicked])))
 (s/def ::hot-state (s/map-of ::table-id ::table-state))
 
-(s/def ::db (s/keys :req [::headers ::rows ::hot-state]
+(s/def ::table-last-clicked ::table-id)
+
+(s/def ::db (s/keys :req [::headers ::rows ::virtual-rows ::hot-state]
                     :opt [::scores
                           ::virtual-scores
                           ::labels
                           ::topojson
-                          ::sampled-rows]))
+                          ::sampled-rows
+                          ::table-last-clicked]))
 
 (defn with-row-at-selection-start
   [db table-id row]
