@@ -57,27 +57,30 @@
             (fn [db [_sub-name table-id]]
               (db/table-header-clicked db table-id)))
 
-(rf/reg-sub-raw :selection-info-active
-                (fn [app-db event]
+(rf/reg-sub-raw :selection-info
+                (fn [app-db [_sub-name table-id]]
                   (reaction
-                    (let [table-id @(rf/subscribe [:table-last-clicked])
-                          selections @(rf/subscribe [:selections table-id])
+                    (let [selections @(rf/subscribe [:selections table-id])
                           selected-columns @(rf/subscribe [:selected-columns table-id])
                           row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
                       {:selections selections
                        :selected-columns selected-columns
                        :row-at-selection-start row-at-selection-start}))))
 
-(rf/reg-sub-raw :selection-info-inactive
+(rf/reg-sub-raw :selection-info-active
                 (fn [app-db event]
                   (reaction
-                    (let [table-id @(rf/subscribe [:table-not-last-clicked])
-                          selections @(rf/subscribe [:selections table-id])
-                          selected-columns @(rf/subscribe [:selected-columns table-id])
-                          row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
-                      {:selections selections
-                       :selected-columns selected-columns
-                       :row-at-selection-start row-at-selection-start}))))
+                    (let [table-id @(rf/subscribe [:table-last-clicked])
+                          selection-info @(rf/subscribe [:selection-info table-id])]
+                      selection-info))))
+
+(rf/reg-sub :selection-info-all
+            (fn [_ _]
+              [(rf/subscribe [:selection-info :real-table])
+               (rf/subscribe [:selection-info :virtual-table])])
+            (fn [[real-table-sel-info virtual-table-sel-info]]
+              {:real-table real-table-sel-info
+               :virtual-table virtual-table-sel-info}))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -221,12 +224,9 @@
             row-ids-unlabeled)
 
 (defn vega-lite-spec
-   [{:keys [s-info-active s-info-inactive t-clicked t-not-clicked]}]
+   [{:keys [s-info t-clicked]}]
   (let [{selects-1 :selections cols-1 :selected-columns row-1 :row-at-selection-start}
-        s-info-active
-
-        {selects-2 :selections cols-2 :selected-columns _row-2 :row-at-selection-start}
-        s-info-inactive]
+        (s-info t-clicked)]
     (when (first selects-1)
       (clj->js
        (cond (and (= 1 (count cols-1))
@@ -236,19 +236,17 @@
              (vega/gen-simulate-plot cols-1 row-1)
 
              (= 1 (count cols-1))
-             (vega/gen-histogram selects-1 cols-1 selects-2 cols-2)
+             (vega/gen-histogram selects-1 cols-1)
 
              (some #{"geo_fips"} cols-1)
              (vega/gen-choropleth selects-1 cols-1)
 
              :else
-             (vega/gen-comparison-plot selects-1 cols-1 selects-2 cols-2))))))
+             (vega/gen-comparison-plot selects-1 cols-1))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:s-info-active (rf/subscribe [:selection-info-active])
-               :s-info-inactive (rf/subscribe [:selection-info-inactive])
-               :t-clicked (rf/subscribe [:table-last-clicked])
-               :t-not-clicked (rf/subscribe [:table-not-last-clicked])})
+              {:s-info (rf/subscribe [:selection-info-all])
+               :t-clicked (rf/subscribe [:table-last-clicked])})
             (fn [data-for-spec]
               (vega-lite-spec data-for-spec)))
 

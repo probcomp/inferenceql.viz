@@ -106,7 +106,7 @@
                                            dist/gaussian "quantitative"
                                            dist/categorical "nominal")}}}))}))
 
-(defn gen-histogram [selections selected-columns selections-2 selected-columns-2]
+(defn gen-histogram [selections selected-columns]
   (let [selected-column (first selected-columns)
         selection (first selections)]
     {:$schema
@@ -155,7 +155,7 @@
      :encoding {:tooltip [name color]
                 :color color}}))
 
-(defn gen-comparison-plot [selections selected-columns selections-2 selected-columns-2]
+(defn gen-comparison-plot [selections selected-columns]
   (let [selection (first selections)
         types (into #{}
                     (map stattype)
