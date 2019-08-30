@@ -214,7 +214,7 @@
              (vega/gen-choropleth selections cols)
 
              :else
-             (vega/gen-comparison-plot selections cols))))))
+             (vega/gen-comparison-plot table-states t-clicked))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
               {:table-states (rf/subscribe [:both-table-states])

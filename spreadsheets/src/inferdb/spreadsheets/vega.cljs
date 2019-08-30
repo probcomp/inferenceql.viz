@@ -186,33 +186,40 @@
      :encoding {:tooltip [name color]
                 :color color}}))
 
-(defn gen-comparison-plot [selections selected-columns]
-  (let [selection (first selections)
-        types (into #{}
-                    (map stattype)
-                    (take 2 selected-columns))]
-    (condp = types
+(defn gen-comparison-plot [table-states t-clicked]
+  (let [selection-real (first (get-in table-states [:real-table :selections]))
+        selection-virtual (first (get-in table-states [:virtual-table :selections]))
+
+        cols-real (take 2 (get-in table-states [:real-table :selected-columns]))
+        cols-virtual (take 2 (get-in table-states [:virtual-table :selected-columns]))
+        make-faceted (= cols-real cols-virtual)
+
+        cols-to-draw (take 2 (get-in table-states [t-clicked :selected-columns]))
+        cols-types (set (doall (map stattype cols-to-draw)))
+
+        selection-temp (first (get-in table-states [t-clicked :selections]))]
+    (condp = cols-types
       ;; Scatterplot
       #{dist/gaussian} {:$schema
                         "https://vega.github.io/schema/vega-lite/v3.json"
                         :width 400
                         :height 400
-                        :data {:values selection}
+                        :data {:values selection-temp}
                         :mark "circle"
-                        :encoding {:x {:field (first selected-columns)
+                        :encoding {:x {:field (first cols-to-draw)
                                        :type "quantitative"}
-                                   :y {:field (second selected-columns)
+                                   :y {:field (second cols-to-draw)
                                        :type "quantitative"}}}
       ;; Heatmap
       #{dist/categorical} {:$schema
                            "https://vega.github.io/schema/vega-lite/v3.json"
                            :width 400
                            :height 400
-                           :data {:values selection}
+                           :data {:values selection-temp}
                            :mark "rect"
-                           :encoding {:x {:field (first selected-columns)
+                           :encoding {:x {:field (first cols-to-draw)
                                           :type "nominal"}
-                                      :y {:field (second selected-columns)
+                                      :y {:field (second cols-to-draw)
                                           :type "nominal"}
                                       :color {:aggregate "count"
                                               :type "quantitative"}}}
@@ -222,15 +229,15 @@
                            "https://vega.github.io/schema/vega-lite/v3.json"
                            :width 400
                            :height 400
-                           :data {:values selection}
+                           :data {:values selection-temp}
                            :mark {:type "boxplot"
                                   :extent "min-max"}
-                           :encoding {:x {:field (first selected-columns)
-                                          :type (condp = (stattype (first selected-columns))
+                           :encoding {:x {:field (first cols-to-draw)
+                                          :type (condp = (stattype (first cols-to-draw))
                                                   dist/gaussian "quantitative"
                                                   dist/categorical "nominal")}
-                                      :y {:field (second selected-columns)
-                                          :type (condp = (stattype (second selected-columns))
+                                      :y {:field (second cols-to-draw)
+                                          :type (condp = (stattype (second cols-to-draw))
                                                   dist/gaussian "quantitative"
                                                   dist/categorical "nominal")}
                                       :color {:aggregate "count"
