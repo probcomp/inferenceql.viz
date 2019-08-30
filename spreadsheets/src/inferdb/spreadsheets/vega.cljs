@@ -187,8 +187,11 @@
                 :color color}}))
 
 (defn gen-comparison-plot [table-states t-clicked]
-  (let [selection-real (first (get-in table-states [:real-table :selections]))
-        selection-virtual (first (get-in table-states [:virtual-table :selections]))
+  (let [selection-real (->> (first (get-in table-states [:real-table :selections]))
+                            (map #(assoc % :table "Real Data")))
+
+        selection-virtual (->> (first (get-in table-states [:virtual-table :selections]))
+                               (map #(assoc % :table "Virtual Data")))
 
         cols-real (take 2 (get-in table-states [:real-table :selected-columns]))
         cols-virtual (take 2 (get-in table-states [:virtual-table :selected-columns]))
@@ -197,39 +200,46 @@
         cols-to-draw (take 2 (get-in table-states [t-clicked :selected-columns]))
         cols-types (set (doall (map stattype cols-to-draw)))
 
-        selection-temp (first (get-in table-states [t-clicked :selections]))]
+        selection-not-faceted (first (get-in table-states [t-clicked :selections]))
+        selection-faceted (concat selection-real selection-virtual)
+        selection-to-use (if make-faceted selection-faceted selection-not-faceted)
+
+        facet-section {:field "table" :type "nominal"}
+        facet-section-to-use (if make-faceted facet-section {})]
     (condp = cols-types
       ;; Scatterplot
       #{dist/gaussian} {:$schema
                         "https://vega.github.io/schema/vega-lite/v3.json"
                         :width 400
                         :height 400
-                        :data {:values selection-temp}
+                        :data {:values selection-to-use}
                         :mark "circle"
                         :encoding {:x {:field (first cols-to-draw)
                                        :type "quantitative"}
                                    :y {:field (second cols-to-draw)
-                                       :type "quantitative"}}}
+                                       :type "quantitative"}
+                                   :facet facet-section-to-use}}
       ;; Heatmap
       #{dist/categorical} {:$schema
                            "https://vega.github.io/schema/vega-lite/v3.json"
                            :width 400
                            :height 400
-                           :data {:values selection-temp}
+                           :data {:values selection-to-use}
                            :mark "rect"
                            :encoding {:x {:field (first cols-to-draw)
                                           :type "nominal"}
                                       :y {:field (second cols-to-draw)
                                           :type "nominal"}
                                       :color {:aggregate "count"
-                                              :type "quantitative"}}}
+                                              :type "quantitative"}
+                                      :facet facet-section-to-use}}
       ;; Bot-and-line
       #{dist/gaussian
         dist/categorical} {:$schema
                            "https://vega.github.io/schema/vega-lite/v3.json"
                            :width 400
                            :height 400
-                           :data {:values selection-temp}
+                           :data {:values selection-to-use}
                            :mark {:type "boxplot"
                                   :extent "min-max"}
                            :encoding {:x {:field (first cols-to-draw)
@@ -241,5 +251,6 @@
                                                   dist/gaussian "quantitative"
                                                   dist/categorical "nominal")}
                                       :color {:aggregate "count"
-                                              :type "quantitative"}}}
+                                              :type "quantitative"}
+                                      :facet facet-section-to-use}}
       {})))
