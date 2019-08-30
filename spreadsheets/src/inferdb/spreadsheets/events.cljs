@@ -55,12 +55,13 @@
    ; When the change is the result of loading new table
    ; into the table.
     (when (= source "loadData")
-      (if-let [header-clicked @(rf/subscribe [:table-header-clicked id])]
-        (let [current-selection (.getSelectedLast hot)
-              [_row1 col1 _row2 col2] (js->clj current-selection)]
-          ;; Take the current selection and expand it so the whole columns
-          ;; are selected.
-          (.selectColumns hot col1 col2))))
+      (let [table-state @(rf/subscribe [:table-state id])]
+        (if-let [header-clicked (:table-header-clicked table-state)]
+          (let [current-selection (.getSelectedLast hot)
+                [_row1 col1 _row2 col2] (js->clj current-selection)]
+            ;; Take the current selection and expand it so the whole columns
+            ;; are selected.
+            (.selectColumns hot col1 col2)))))
    db))
 
 (rf/reg-event-db

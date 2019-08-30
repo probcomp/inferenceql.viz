@@ -28,23 +28,6 @@
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
 
-
-(rf/reg-sub :row-at-selection-start
-            (fn [db [_sub-name table-id]]
-              (get-in db [:hot-state table-id :row-at-selection-start])))
-
-(rf/reg-sub :selected-row-index
-            (fn [db [_sub-name table-id]]
-              (get-in db [:hot-state table-id :selected-row-index])))
-
-(rf/reg-sub :selections
-            (fn [db [_sub-name table-id]]
-              (get-in db [:hot-state table-id :selections])))
-
-(rf/reg-sub :selected-columns
-            (fn [db [_sub-name table-id]]
-              (get-in db [:hot-state table-id :selected-columns])))
-
 (rf/reg-sub :table-last-clicked
             (fn [db _]
               (get db :table-last-clicked)))
@@ -52,44 +35,25 @@
 (rf/reg-sub :table-not-last-clicked
             (fn [db _]
               (when-let [table-last-clicked (get db :table-last-clicked)]
-                (let [table-ids (keys (get db :hot-state))
-                      rem-ids (remove #{table-last-clicked} table-ids)
-                      other-id (first rem-ids)]
+                (let [[table-1-id table-2-id] (keys (get db :hot-state))]
+                  (case table-last-clicked
+                    table-1-id table-2-id
+                    table-2-id table-1-id)))))
 
-                  ; Enforcing that there are only two tables whose state we are tracking
-                  ; This is also enforced by the db spec.
-                  (assert (= 1 (count rem-ids)))
-                  other-id))))
-
-(rf/reg-sub :table-header-clicked
+(rf/reg-sub :table-state
             (fn [db [_sub-name table-id]]
-              (get-in db [:hot-state table-id :header-clicked])))
+              (get-in db [:hot-state table-id])))
 
+(rf/reg-sub :both-table-states
+            (fn [db [_sub-name]]
+              (get db :hot-state)))
 
-(rf/reg-sub-raw :selection-info
-                (fn [app-db [_sub-name table-id]]
-                  (reaction
-                    (let [selections @(rf/subscribe [:selections table-id])
-                          selected-columns @(rf/subscribe [:selected-columns table-id])
-                          row-at-selection-start @(rf/subscribe [:row-at-selection-start table-id])]
-                      {:selections selections
-                       :selected-columns selected-columns
-                       :row-at-selection-start row-at-selection-start}))))
-
-(rf/reg-sub-raw :selection-info-active
+(rf/reg-sub-raw :table-state-active
                 (fn [app-db event]
                   (reaction
                     (let [table-id @(rf/subscribe [:table-last-clicked])
-                          selection-info @(rf/subscribe [:selection-info table-id])]
-                      selection-info))))
-
-(rf/reg-sub :selection-info-all
-            (fn [_ _]
-              [(rf/subscribe [:selection-info :real-table])
-               (rf/subscribe [:selection-info :virtual-table])])
-            (fn [[real-table-sel-info virtual-table-sel-info]]
-              {:real-table real-table-sel-info
-               :virtual-table virtual-table-sel-info}))
+                          table-state @(rf/subscribe [:table-state table-id])]
+                      table-state))))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -233,9 +197,9 @@
             row-ids-unlabeled)
 
 (defn vega-lite-spec
-   [{:keys [s-info t-clicked]}]
+   [{:keys [table-states t-clicked]}]
   (let [{selects-1 :selections cols-1 :selected-columns row-1 :row-at-selection-start}
-        (s-info t-clicked)]
+        (table-states t-clicked)]
     (when (first selects-1)
       (clj->js
        (cond (and (= 1 (count cols-1))
@@ -254,14 +218,14 @@
              (vega/gen-comparison-plot selects-1 cols-1))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:s-info (rf/subscribe [:selection-info-all])
+              {:table-states (rf/subscribe [:both-table-states])
                :t-clicked (rf/subscribe [:table-last-clicked])})
             (fn [data-for-spec]
               (vega-lite-spec data-for-spec)))
 
 (rf/reg-sub :one-cell-selected
             (fn [_ _]
-              (rf/subscribe [:selection-info-active]))
+              (rf/subscribe [:table-state-active]))
             (fn [{:keys [selections]}]
               (= 1
                  (count selections)
@@ -270,7 +234,7 @@
 
 (rf/reg-sub :generator
             (fn [_ _]
-              {:selection-info (rf/subscribe [:selection-info-active])
+              {:selection-info (rf/subscribe [:table-state-active])
                :one-cell-selected (rf/subscribe [:one-cell-selected])})
             (fn [{:keys [selection-info one-cell-selected]}]
               (let [row (:row-at-selection-start selection-info)

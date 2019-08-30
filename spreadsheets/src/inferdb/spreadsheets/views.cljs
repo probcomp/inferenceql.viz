@@ -58,7 +58,6 @@
   []
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
         virtual-hot-props @(rf/subscribe [:virtual-hot-props])
-        selected-maps  @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
         scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]
