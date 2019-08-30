@@ -27,12 +27,7 @@
 (s/def ::topojson any?)
 
 (s/def ::selected-row-index ::row-index)
-
-(s/def ::sampled-row ::row)
-(s/def ::sampled-rows (s/coll-of ::sampled-row))
-
 (s/def ::row-at-selection-start ::row)
-
 (s/def ::header-clicked boolean?)
 
 (s/def ::table-id #{:real-table :virtual-table})
@@ -50,7 +45,6 @@
                           ::virtual-scores
                           ::labels
                           ::topojson
-                          ::sampled-rows
                           ::table-last-clicked]))
 
 (defn with-row-at-selection-start
