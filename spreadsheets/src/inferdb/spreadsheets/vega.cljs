@@ -67,7 +67,9 @@
       :gaussian dist/gaussian
       :categorical dist/categorical)))
 
-(defn gen-simulate-plot [selected-columns row-at-selection-start]
+(def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
+
+(defn gen-simulate-plot [selected-columns row-at-selection-start t-clicked]
  (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
        selected-column-kw (keyword (first selected-columns))
        y-axis {:title "distribution of probable values"
@@ -81,7 +83,7 @@
     :height 400
     :data {:name "data"}
     :autosize {:resize true}
-    :layer (cond-> [{:mark "bar"
+    :layer (cond-> [{:mark {:type "bar" :color (color-for-table t-clicked)}
                      :encoding (condp = (stattype (first selected-columns))
                                  dist/gaussian {:x {:bin true
                                                     :field selected-column-kw
@@ -132,11 +134,11 @@
         virtual-layer-opacity (if make-layered-hist 0.5 1.0)
 
         real-layer {:data {:values selection-real}
-                    :mark {:type "bar" :color "SteelBlue" :opacity 1}
+                    :mark {:type "bar" :color (color-for-table :real-table) :opacity 1}
                     :encoding {:y {:aggregate "count"
                                    :type "quantitative"}}}
         virtual-layer {:data {:values selection-virtual}
-                       :mark {:type "bar" :color "DarkKhaki" :opacity virtual-layer-opacity}
+                       :mark {:type "bar" :color (color-for-table :virtual-table) :opacity virtual-layer-opacity}
                        :encoding {:y {:aggregate "count"
                                       :type "quantitative"}}}
         layers-to-draw (cond

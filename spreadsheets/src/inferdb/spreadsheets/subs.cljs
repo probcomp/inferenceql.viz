@@ -205,7 +205,7 @@
                   (= 1 (count (first selections)))
                   (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
                                   (first cols))))
-             (vega/gen-simulate-plot cols row)
+             (vega/gen-simulate-plot cols row t-clicked)
 
              (= 1 (count cols))
              (vega/gen-histogram table-states t-clicked)
