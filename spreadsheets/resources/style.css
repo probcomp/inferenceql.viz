@@ -1,4 +1,4 @@
-
+/* styling for the virtual data handsontable */
 .virtual-hot .ht_master tr td {
   background-color: #FAFCE4;
 }
@@ -15,29 +15,16 @@ button { font-size: 16px; }
 
 body {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #333;
   margin: 0 auto;
   padding-top: 5px;
-  -webkit-font-smoothing: antialiased;
   font-size: 1.125em;
-  color: #333;
   line-height: 1em;
-}
-
-a {
-  text-decoration: none;
-  color: #09f;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 
 h1 {
   font-size: 1.2em;
-}
-
-h2 {
-  font-size: 2em
 }
 
 h3 {
