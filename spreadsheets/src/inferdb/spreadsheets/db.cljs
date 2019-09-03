@@ -19,7 +19,7 @@
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
-(s/def ::label #(or (string? %) (nil? %)))
+(s/def ::label (s/nilable string?))
 (s/def ::labels (s/coll-of ::label))
 
 (s/def ::topojson any?)
@@ -103,6 +103,10 @@
   [db scores]
   (assoc-in db [::scores] scores))
 
+(defn virtual-rows
+  [db]
+  (get-in db [::virtual-rows]))
+
 (defn with-virtual-rows
   [db new-v-rows]
   (let [cur-v-rows (virtual-rows db)]
@@ -111,10 +115,6 @@
 (defn clear-virtual-rows
   [db]
   (assoc-in db [::virtual-rows] []))
-
-(defn virtual-rows
-  [db]
-  (get-in db [::virtual-rows]))
 
 (defn with-labels
   [db labels]

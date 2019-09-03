@@ -10,6 +10,27 @@
             [inferdb.multimixture.search :as search]
             [inferdb.spreadsheets.model :as model]))
 
+(def label-col-header
+  "Header text for the column used for labeling rows as examples."
+  "🏷")
+(def score-col-header
+  "Header text for the column that shows scores."
+  "probability")
+
+(def vega-width
+  "Width setting for the specs produced by the :vega-lite-spec sub"
+  400)
+(def vega-height
+  "Height setting for the specs produced by the :vega-lite-spec sub"
+  400)
+
+(def vega-map-width
+  "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
+  500)
+(def vega-map-height
+  "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
+  300)
+
 (rf/reg-sub :scores
             (fn [db _]
               (db/scores db)))
@@ -35,7 +56,7 @@
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into ["🏷" "probability"] headers)))
+              (into [label-col-header score-col-header] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
@@ -45,10 +66,10 @@
             (fn [{:keys [rows scores labels]}]
               (cond->> rows
                 scores (mapv (fn [score row]
-                               (assoc row "probability" score))
+                               (assoc row score-col-header score))
                              scores)
                 labels (mapv (fn [label row]
-                               (assoc row "🏷" label))
+                               (assoc row label-col-header label))
                              labels))))
 
 (rf/reg-sub :virtual-rows
@@ -116,17 +137,18 @@
 (rf/reg-sub :selected-columns selected-columns)
 
 (def clean-label
+  "Prepares the user-typed label for checking."
   (fnil (comp str/upper-case str/trim) ""))
 
 (defn- pos-label? [label-str]
   (let [f (clean-label label-str)]
-    ; TODO add more truthy values
+    ;; TODO: add more truthy values
     (or (= f "TRUE")
         (= f "1"))))
 
 (defn- neg-label? [label-str]
   (let [f (clean-label label-str)]
-    ; TODO add more falsey values
+    ;; TODO: add more falsey values
     (or (= f "FALSE")
         (= f "0"))))
 
@@ -177,7 +199,7 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (if (or (= "probability" column) (= "🏷" column))
+  (let [stattype-kw (if (contains? #{score-col-header label-col-header} column)
                       :gaussian
                       (get-in model/spec [:vars column]))]
     (case stattype-kw
@@ -190,7 +212,7 @@
     (clj->js
      (cond (and (= 1 (count selected-columns))
                 (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "NAME" "probability" "🏷"}
+                (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header}
                                 (first selected-columns))))
            ;; Simulate plot
            (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
@@ -202,8 +224,8 @@
                  y-scale {:nice false}]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
-              :width 400
-              :height 400
+              :width vega-width
+              :height vega-height
               :data {:name "data"}
               :autosize {:resize true}
               :layer (cond-> [{:mark "bar"
@@ -236,8 +258,8 @@
            (let [selected-column (first selected-columns)]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json",
-              :width 400
-              :height 400
+              :width vega-width
+              :height vega-height
               :data {:values selection},
               :mark "bar"
               :encoding
@@ -269,8 +291,8 @@
                                 dist/gaussian "quantitative"
                                 dist/categorical "nominal")}]
              {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width 500
-              :height 300
+              :width vega-map-width
+              :height vega-map-height
               :data {:values js/topojson
                      :format {:type "topojson"
                               :feature topojson-feature}}
@@ -292,8 +314,8 @@
                ;; Scatterplot
                #{dist/gaussian} {:$schema
                                  "https://vega.github.io/schema/vega-lite/v3.json"
-                                 :width 400
-                                 :height 400
+                                 :width vega-width
+                                 :height vega-height
                                  :data {:values selection}
                                  :mark "circle"
                                  :encoding {:x {:field (first selected-columns)
@@ -303,8 +325,8 @@
                ;; Heatmap
                #{dist/categorical} {:$schema
                                     "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width 400
-                                    :height 400
+                                    :width vega-width
+                                    :height vega-height
                                     :data {:values selection}
                                     :mark "rect"
                                     :encoding {:x {:field (first selected-columns)
@@ -317,8 +339,8 @@
                #{dist/gaussian
                  dist/categorical} {:$schema
                                     "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width 400
-                                    :height 400
+                                    :width vega-width
+                                    :height vega-height
                                     :data {:values selection}
                                     :mark {:type "boxplot"
                                            :extent "min-max"}
@@ -356,14 +378,15 @@
                :one-cell-selected (rf/subscribe [:one-cell-selected])})
             (fn [{:keys [row columns one-cell-selected]}]
               (when (and one-cell-selected
-                         ;; TODO clean up this check
-                         (not (contains? #{"geo_fips" "NAME" "probability" "🏷"} (first columns))))
+                         ;; TODO: clean up this check
+                         (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header} (first columns))))
                 (let [sampled-column (first columns) ; columns that will be sampled
                       constraints (mmix/with-row-values {} (-> row
                                                                (select-keys (keys (:vars model/spec)))
                                                                (dissoc sampled-column)))
                       gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                                          :observation-trace constraints))
-                      negative-salary? #(< (% "salary_usd") 0)]
+                      negative-salary? #(neg? (% "salary_usd"))]
                   ;; returns the first result of gen-fn that doesn't have a negative salary
+                  ;; TODO: This is dataset-specific
                   #(take 1 (remove negative-salary? (repeatedly gen-fn)))))))

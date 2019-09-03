@@ -23,7 +23,7 @@
 (rf/reg-event-db
  :initialize-db
  event-interceptors
- (fn [db _]
+ (fn [_ _]
    (db/default-db)))
 
 (rf/reg-event-db
@@ -71,7 +71,7 @@
    (db/clear-selections db)))
 
 (rf/reg-event-db
- :run-inference-ql
+ :parse-query
  event-interceptors
  (fn [db [_ text]]
    (condp re-matches (str/trim text)
@@ -150,7 +150,8 @@
          gen-fn #(first (mp/infer-and-score
                            :procedure (search/optimized-row-generator model/spec)
                            :observation-trace constraint-addrs-vals))
-         negative-salary? #(< (% "salary_usd") 0)
+         negative-salary? #(neg? (% "salary_usd"))
+         ;; TODO: This is dataset-specific
          new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
      (db/with-virtual-rows db new-rows))))
 
