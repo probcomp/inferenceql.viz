@@ -133,9 +133,6 @@
               (get-in spec [:views new-column-view cluster-idx :parameters new-column-key])))
           rows)))
 
-
-
-
 (defn logpdf
   [row-generator target constraints]
   (let [target-addrs-vals (mmix/with-row-values {} target)
@@ -157,8 +154,6 @@
                                                         :observation-trace constraint-addrs-vals)]
                              weight))]
     (- log-weight-numer log-weight-denom)))
-
-
 
 (defn transpose
   [coll]
@@ -182,26 +177,6 @@
   [spec target-col conditional-cols data]
   (let [row-generator (optimized-row-generator spec)]
     (map #(score-row-probability row-generator target-col conditional-cols %) data)))
-
-(def test-spec
-         {:vars {"x" :gaussian
-                 "z" :gaussian}
-              :views [[{:probability 0.5
-                        :parameters {"x" {:mu 0 :sigma 1}
-                                     "z" {:mu 0 :sigma 1}}}
-                       {:probability 0.5
-                        :parameters {"x" {:mu 5 :sigma 1}
-                                     "z" {:mu 5 :sigma 1}}}]]})
-(comment
- (def rg (optimized-row-generator test-spec))
- (def d [{"x" -0.1 "z" 5}
-         {"x" -0.2 "z" 5}
-         {"x" -0.3 "z" 0}])
-
- (def text1 "SCORE PROBABILITY OF x")
- (def text2 "SCORE PROBABILITY OF x GIVEN z")
- (anomaly-search test-spec text2 d))
-
 
 (defn search
   [spec new-column-key known-rows unknown-rows n-models beta-params]
