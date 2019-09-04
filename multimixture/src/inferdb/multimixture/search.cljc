@@ -133,9 +133,6 @@
               (get-in spec [:views new-column-view cluster-idx :parameters new-column-key])))
           rows)))
 
-
-
-
 (defn logpdf
   [row-generator target constraints]
   (let [target-addrs-vals (mmix/with-row-values {} target)
@@ -158,8 +155,6 @@
                              weight))]
     (- log-weight-numer log-weight-denom)))
 
-
-
 (defn transpose
   [coll]
   (apply map vector coll))
@@ -170,7 +165,8 @@
     (into {} (filter (fn [[k v]] (not (or (nil? v) (= k target-col)))) row))
     (into {} (filter (fn [[k v]] (not (nil? v)))
                      (select-keys row constraint-cols)))))
-(defn  score-row-probability
+
+(defn score-row-probability
   [row-generator target-col constraint-cols row]
   (let [target (select-keys row [target-col])
         constraints (constraints-for-scoring-p target-col constraint-cols row)]
