@@ -15,6 +15,8 @@
               :manualColumnMove    true
               :beforeColumnMove    hot/freeze-col-1-2-fn
               :manualColumnResize  true
+              :autoWrapCol         false
+              :autoWrapRow         false
               :filters             true
               :dropdownMenu        true
               :bindRowsWithHeaders true
