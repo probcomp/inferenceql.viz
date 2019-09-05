@@ -269,3 +269,9 @@
  event-interceptors
  (fn [db [_ result]]
    (db/with-virtual-scores db result)))
+
+(rf/reg-event-db
+ :set-confidence-threshold
+ event-interceptors
+ (fn [db [_ value]]
+   (assoc db ::db/confidence-threshold value)))

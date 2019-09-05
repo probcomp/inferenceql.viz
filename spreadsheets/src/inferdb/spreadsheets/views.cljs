@@ -39,13 +39,26 @@
 
 (def ^:private default-search-string "GENERATE ROW")
 
+(defn confidence-slider []
+  (let [cur-val @(rf/subscribe [:confidence-threshold])]
+    [:div
+      [:span "Confidence Threshold: "]
+      [:input {:type :range :name :confidence-threshold
+               :min 0 :max 1 :step 0.01
+                       :value cur-val
+                       :on-change (fn [e]
+                                    ;; TODO: find a way to debounce this callback
+                                    (let [new-val (js/parseFloat (-> e .-target .-value))]
+                                      (rf/dispatch [:set-confidence-threshold new-val])))}]
+      [:label cur-val]]))
+
 (defn search-form
   [name]
   (let [input-text (r/atom default-search-string)]
     (fn []
       [:div {:style {:display "flex"}}
        [:input {:type "search"
-                :style {:width "100%"}
+                :style {:width "40%"}
                 :on-change #(reset! input-text (-> % .-target .-value))
                 :on-key-press (fn [e] (if (= (.-key e) "Enter")
                                         (rf/dispatch [:run-inference-ql @input-text])))
@@ -55,7 +68,8 @@
         "Run InferenceQL"]
        [:button {:on-click #(rf/dispatch [:clear-virtual-data])
                  :style {:float "right"}}
-        "Delete virtual data"]])))
+        "Delete virtual data"]
+       [confidence-slider]])))
 
 (defn app
   []
@@ -65,6 +79,7 @@
         scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]
     [:div
+     [search-form "Zane"]
      [:div.table-title
        [:div.main-title
          [:span "Real Data"]]
@@ -79,7 +94,6 @@
          [:div.sub-title
            [:pre "    rows: virtual developers    columns: virtual survey answers"]])]
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
-     [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}
       (when vega-lite-spec

@@ -44,7 +44,8 @@
                     :opt [::scores
                           ::virtual-scores
                           ::labels
-                          ::topojson]
+                          ::topojson
+                          ::confidence-threshold]
                     :req-un [::hot-state]
                     :opt-un [::table-last-clicked]))
 

@@ -291,3 +291,7 @@
    {:missing-cells (rf/subscribe [:missing-cells])})
  (fn [{:keys [missing-cells]}]
    (map :scores missing-cells)))
+
+(rf/reg-sub :confidence-threshold
+            (fn [db _]
+              (get db ::db/confidence-threshold)))
