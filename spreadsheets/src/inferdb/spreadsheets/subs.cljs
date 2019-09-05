@@ -310,15 +310,6 @@
             (fn [db _]
               (get db ::db/confidence-threshold)))
 
-(defn standard-renderer [hot td row col prop value cell-properties]
-  (let [all-args (clj->js [hot td row col prop value cell-properties])
-        td-style (.-style td)
-        text-render-fn js/Handsontable.renderers.TextRenderer]
-
-    ;; Performs standard rendering of text in cell
-    (this-as this
-      (.apply text-render-fn this all-args))))
-
 (defn row-wise-likelihood-threshold-renderer [hot td row col prop value cell-properties row-likelihoods conf-thresh]
   (let [all-args (clj->js [hot td row col prop value cell-properties])
         td-style (.-style td)
