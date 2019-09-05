@@ -250,3 +250,44 @@
                         negative-salary? #(< (% "salary_usd") 0)]
                     ;; returns the first result of gen-fn that doesn't have a negative salary
                     #(take 1 (remove negative-salary? (repeatedly gen-fn))))))))
+
+;;; The following subs are for getting information on the likelihood of
+;;; prexisting data or imputing missing data and getting its likelihood as well.
+
+(rf/reg-sub
+ :row-likelihoods
+ (fn [_ _]
+   {:table-rows (rf/subscribe [:table-rows])})
+ (fn [{:keys [table-rows]}]
+   (let [likelihoods (search/row-likelihoods model/spec table-rows)]
+     likelihoods)))
+
+(rf/reg-sub
+ :cell-likelihoods
+ (fn [_ _]
+   {:table-rows (rf/subscribe [:table-rows])})
+ (fn [{:keys [table-rows]}]
+   (let [likelihoods (search/cell-likelihoods model/spec table-rows)]
+     likelihoods)))
+
+(rf/reg-sub
+ :missing-cells
+ (fn [_ _]
+   {:table-rows (rf/subscribe [:table-rows])
+    :headers (rf/subscribe [:table-headers])})
+ (fn [{:keys [table-rows headers]}]
+   (search/impute-missing-cells model/spec headers table-rows)))
+
+(rf/reg-sub
+ :missing-cells-values
+ (fn [_ _]
+   {:missing-cells (rf/subscribe [:missing-cells])})
+ (fn [{:keys [missing-cells]}]
+   (map :values missing-cells)))
+
+(rf/reg-sub
+ :missing-cells-likelihoods
+ (fn [_ _]
+   {:missing-cells (rf/subscribe [:missing-cells])})
+ (fn [{:keys [missing-cells]}]
+   (map :scores missing-cells)))

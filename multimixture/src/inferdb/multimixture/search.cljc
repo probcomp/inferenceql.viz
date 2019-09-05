@@ -1,5 +1,6 @@
 (ns inferdb.multimixture.search
   (:require [clojure.spec.alpha :as s]
+            [clojure.set :as set]
             [metaprob.distributions :as dist]
             [metaprob.generative-functions :as g :refer [at gen]]
             [metaprob.prelude :as mp]
@@ -178,6 +179,77 @@
   [spec target-col conditional-cols data]
   (let [row-generator (optimized-row-generator spec)]
     (map #(score-row-probability row-generator target-col conditional-cols %) data)))
+
+;;; These functions are for scoring the likelihood for rows
+
+(defn filter-nil-kvs [a-map]
+  (into {} (remove (comp nil? val) a-map)))
+
+(defn score-row-uncond
+  [row-generator row]
+  (let [target (filter-nil-kvs row)
+        constraints {}]
+    (Math/exp (logpdf row-generator target constraints))))
+
+(defn row-likelihoods
+  [spec rows]
+  (let [row-gen (optimized-row-generator spec)]
+    (map #(score-row-uncond row-gen %) rows)))
+
+;;; These functions are for scoring the likelihood for existing cells
+;;; conditional on the rest of the row.
+
+(defn score-cells-in-row
+  [row-generator row]
+  (let [clean-row (filter-nil-kvs row)
+        cell-pairs (seq clean-row)
+        likelihood-pairs (for [[k v] cell-pairs]
+                           (let [target (assoc {} k v)
+                                 constraints (dissoc clean-row k)]
+                             [k (Math/exp (logpdf row-generator target constraints))]))]
+    (into {} likelihood-pairs)))
+
+(defn cell-likelihoods
+  [spec rows]
+  (let [row-gen (optimized-row-generator spec)]
+    (map #(score-cells-in-row row-gen %) rows)))
+
+;;; These functions are for imputing data in empty cells and
+;;; also return a likelihood for the imputed value.
+
+(defn impute-and-score-cell [row-gen row key-to-impute]
+  (let [constraints (mmix/with-row-values {} row)
+        gen-fn #(-> (mp/infer-and-score :procedure row-gen
+                                        :observation-trace constraints)
+                    (first)
+                    (get key-to-impute))
+        samples (repeatedly 20 gen-fn)
+        freq-list (sort-by val (frequencies samples))
+        [top-sample top-sample-count] (first freq-list)
+
+        total-sample-count (count samples)
+        top-sample-prob (/ top-sample-count total-sample-count)]
+    [top-sample top-sample-prob]))
+
+(defn impute-missing-cells-in-row
+  [row-generator headers row]
+  (let [clean-row (filter-nil-kvs row)
+        available-keys (keys clean-row)
+        missing-keys (set/difference (set headers) (set available-keys))
+        values-scores (map #(impute-and-score-cell row-generator clean-row %) missing-keys)
+
+        values (map first values-scores)
+        values-map (zipmap missing-keys values)
+        scores (map second values-scores)
+        scores-map (zipmap missing-keys scores)
+
+        ret-val {:values values-map :scores scores-map}]
+    ret-val))
+
+(defn impute-missing-cells
+  [spec headers rows]
+  (let [row-gen (optimized-row-generator spec)]
+    (map #(impute-missing-cells-in-row row-gen headers %) rows)))
 
 (def test-spec
          {:vars {"x" :gaussian
