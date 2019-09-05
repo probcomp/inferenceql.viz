@@ -10,6 +10,7 @@
   {:settings {:data                []
               :colHeaders          []
               :columns             []
+              :cells               hot/cell-style-fn
               :rowHeaders          true
               :multiColumnSorting  true
               :manualColumnMove    true

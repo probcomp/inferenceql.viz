@@ -25,6 +25,22 @@
     (not (or (< first-col-moving first-unfrozen-index)
              (< target first-unfrozen-index)))))
 
+(defn confidence-based-renderer [hot td row col prop value cell-properties]
+  (let [all-args (clj->js [hot td row col prop value cell-properties])
+        td-style (.-style td)
+        text-render-fn js/Handsontable.renderers.TextRenderer]
+
+    ;; Performs standard rendering of text in cell
+    (this-as this
+      (.apply text-render-fn this all-args))))
+
+    ;; This is how to change style of a cell
+    ;;(set! (.-background td-style) "#CEC")))
+
+(defn cell-style-fn [row col]
+  (let [cell-properties {:renderer confidence-based-renderer}]
+    (clj->js cell-properties)))
+
 (defn handsontable
   ([props]
    (handsontable {} props))
