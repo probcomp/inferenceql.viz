@@ -310,8 +310,10 @@
             (fn [db _]
               (get db ::db/confidence-threshold)))
 
-(defn row-wise-likelihood-threshold-renderer [hot td row col prop value cell-properties row-likelihoods conf-thresh]
-  (let [all-args (clj->js [hot td row col prop value cell-properties])
+(defn row-wise-likelihood-threshold-renderer [renderer-args row-likelihoods conf-thresh]
+  (let [renderer-args-js (clj->js renderer-args)
+        [_hot td row _col _prop _value _cell-properties] renderer-args
+
         td-style (.-style td)
         text-render-fn js/Handsontable.renderers.TextRenderer
 
@@ -320,13 +322,13 @@
 
     ;; Performs standard rendering of text in cell
     (this-as this
-      (.apply text-render-fn this all-args))
+      (.apply text-render-fn this renderer-args-js))
 
     (when row-above-thresh
       (set! (.-background td-style) "#CEC"))))
 
 ;; TODO: Write this
-(defn row-wise-likelihood-gradient-renderer [hot td row col prop value cell-properties])
+(defn row-wise-likelihood-gradient-renderer [renderer-args row-likelihoods])
 
 (rf/reg-sub
  :cells-style-fn
@@ -345,7 +347,10 @@
     :conf-thresh (rf/subscribe [:confidence-threshold])})
  (fn [{:keys [row-likelihoods conf-thresh]}]
    ;; Returns a cell renderer function used by Handsontable.
-   (fn [hot td row col prop value cell-properties]
-     ;; TODO: use &args to capture all args in list and append to it
-     (let [all-args [hot td row col prop value cell-properties row-likelihoods conf-thresh]]
-       (apply row-wise-likelihood-threshold-renderer all-args)))))
+   ;;
+   ;; The function is actually called with this args list:
+   ;; [hot td row col prop value cell-properties]
+   ;; Instead, specifying [& args] here to make it cleaner to
+   ;; pass in data to custom rendering functions.
+   (fn [& args]
+     (row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))))
