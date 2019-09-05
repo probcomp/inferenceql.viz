@@ -110,7 +110,7 @@
         rows))
 
 (defn real-hot-props
-  [{:keys [headers rows]} _]
+  [{:keys [headers rows cells-style-fn]} _]
   (let [data (cell-vector headers rows)
 
         num-columns (count headers)
@@ -121,11 +121,13 @@
     (-> views/real-hot-settings
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
-        (assoc-in [:settings :columns] all-column-settings))))
+        (assoc-in [:settings :columns] all-column-settings)
+        (assoc-in [:settings :cells] cells-style-fn))))
 (rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
-               :rows    (rf/subscribe [:computed-rows])})
+               :rows    (rf/subscribe [:computed-rows])
+               :cells-style-fn (rf/subscribe [:cells-style-fn])})
             real-hot-props)
 
 (defn virtual-hot-props
@@ -263,6 +265,18 @@
      likelihoods)))
 
 (rf/reg-sub
+  :row-likelihoods-normed
+  (fn [_ _]
+    {:row-likelihoods (rf/subscribe [:row-likelihoods])})
+  (fn [{:keys [row-likelihoods]}]
+    (let [min-val (apply min row-likelihoods)
+          max-val (apply max row-likelihoods)
+          scale-factor (Math/abs (- max-val min-val))]
+      (->> row-likelihoods
+        (map #(- % min-val))
+        (map #(/ % scale-factor))))))
+
+(rf/reg-sub
  :cell-likelihoods
  (fn [_ _]
    {:table-rows (rf/subscribe [:table-rows])})
@@ -295,3 +309,52 @@
 (rf/reg-sub :confidence-threshold
             (fn [db _]
               (get db ::db/confidence-threshold)))
+
+(defn standard-renderer [hot td row col prop value cell-properties]
+  (let [all-args (clj->js [hot td row col prop value cell-properties])
+        td-style (.-style td)
+        text-render-fn js/Handsontable.renderers.TextRenderer]
+
+    ;; Performs standard rendering of text in cell
+    (this-as this
+      (.apply text-render-fn this all-args))))
+
+(defn row-wise-likelihood-threshold-renderer [hot td row col prop value cell-properties row-likelihoods conf-thresh]
+  (let [all-args (clj->js [hot td row col prop value cell-properties])
+        td-style (.-style td)
+        text-render-fn js/Handsontable.renderers.TextRenderer
+
+        likelihood-for-row (nth row-likelihoods row)
+        row-above-thresh (> likelihood-for-row conf-thresh)]
+
+    ;; Performs standard rendering of text in cell
+    (this-as this
+      (.apply text-render-fn this all-args))
+
+    (when row-above-thresh
+      (set! (.-background td-style) "#CEC"))))
+
+;; TODO: Write this
+(defn row-wise-likelihood-gradient-renderer [hot td row col prop value cell-properties])
+
+(rf/reg-sub
+ :cells-style-fn
+ (fn [_ _]
+   {:cell-renderer-fn (rf/subscribe [:cell-renderer-fn])})
+ (fn [{:keys [cell-renderer-fn]}]
+   ;; Returns a function used by the :cells option for Handsontable.
+   (fn [row col]
+     (let [cell-properties {:renderer cell-renderer-fn}]
+       (clj->js cell-properties)))))
+
+(rf/reg-sub
+ :cell-renderer-fn
+ (fn [_ _]
+   {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
+    :conf-thresh (rf/subscribe [:confidence-threshold])})
+ (fn [{:keys [row-likelihoods conf-thresh]}]
+   ;; Returns a cell renderer function used by Handsontable.
+   (fn [hot td row col prop value cell-properties]
+     ;; TODO: use &args to capture all args in list and append to it
+     (let [all-args [hot td row col prop value cell-properties row-likelihoods conf-thresh]]
+       (apply row-wise-likelihood-threshold-renderer all-args)))))
