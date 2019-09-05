@@ -40,12 +40,14 @@
 
 (s/def ::table-last-clicked ::table-id)
 
-(s/def ::db (s/keys :req [::headers ::rows ::virtual-rows]
+(s/def ::db (s/keys :req [::headers
+                          ::rows
+                          ::virtual-rows
+                          ::confidence-threshold]
                     :opt [::scores
                           ::virtual-scores
                           ::labels
-                          ::topojson
-                          ::confidence-threshold]
+                          ::topojson]
                     :req-un [::hot-state]
                     :opt-un [::table-last-clicked]))
 
@@ -105,4 +107,5 @@
   {::headers (into [] (keys (first nyt-data)))
    ::rows nyt-data
    ::virtual-rows []
-   :hot-state {:real-table nil :virtual-table nil}})
+   :hot-state {:real-table nil :virtual-table nil}
+   ::confidence-threshold 0.3})
