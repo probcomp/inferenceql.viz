@@ -381,6 +381,8 @@
 ;; TODO: Write this
 (defn row-wise-likelihood-gradient-renderer [renderer-args row-likelihoods])
 
+;; TODO: Avoid the extra check on confidences. Simply compare key presence in
+;; missing-cells-values and missing-cells-values-above-conf-threshold.
 (defn missing-cell-wise-likelihood-threshold-renderer [renderer-args missing-cells-likelihoods computed-headers conf-thresh]
   (let [renderer-args-js (clj->js renderer-args)
         [_hot td row col _prop _value _cell-properties] renderer-args
