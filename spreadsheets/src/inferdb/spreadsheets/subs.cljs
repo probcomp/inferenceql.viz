@@ -310,6 +310,14 @@
             (fn [db _]
               (get db ::db/confidence-threshold)))
 
+(rf/reg-sub :confidence-options
+            (fn [db _]
+              (get db ::db/confidence-options)))
+
+(rf/reg-sub :confidence-option
+            (fn [db [_sub-name path]]
+              (get-in db (into [::db/confidence-options] path))))
+
 (defn row-wise-likelihood-threshold-renderer [renderer-args row-likelihoods conf-thresh]
   (let [renderer-args-js (clj->js renderer-args)
         [_hot td row _col _prop _value _cell-properties] renderer-args

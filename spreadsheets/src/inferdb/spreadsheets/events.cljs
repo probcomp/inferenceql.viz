@@ -275,3 +275,15 @@
  event-interceptors
  (fn [db [_ value]]
    (assoc db ::db/confidence-threshold value)))
+
+(rf/reg-event-db
+ :set-confidence-options
+ event-interceptors
+ (fn [db [_ path value]]
+   (assoc-in db (into [::db/confidence-options] path) value)))
+
+(rf/reg-event-db
+ :update-confidence-options
+ event-interceptors
+ (fn [db [_ f path value]]
+   (update-in db (into [::db/confidence-options] path) f value)))

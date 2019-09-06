@@ -9,6 +9,7 @@
         kixi/stats {:mvn/version "0.5.2"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.7"}
+        reagent-forms {:mvn/version "0.5.43"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "7d40086d486ed452829bce6d8125fbeee691a9a6"}}
  :paths ["src"
