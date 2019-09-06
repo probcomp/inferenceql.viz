@@ -64,15 +64,25 @@
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
-               :labels (rf/subscribe [:labels])})
-            (fn [{:keys [rows scores labels]}]
-              (cond->> rows
-                scores (mapv (fn [score row]
-                               (assoc row "probability" score))
-                             scores)
-                labels (mapv (fn [label row]
-                               (assoc row "🏷" label))
-                             labels))))
+               :labels (rf/subscribe [:labels])
+               :imputed-values (rf/subscribe [:missing-cells-values])
+               :conf-mode (rf/subscribe [:confidence-option [:mode]])})
+            (fn [{:keys [rows scores labels imputed-values conf-mode]}]
+              (let [merge-imputed (= conf-mode :cells-missing)]
+                (cond->> (seq rows)
+                  ;; Merge in the missing values.
+                  merge-imputed (mapv (fn [imputed-values-in-row row]
+                                        (merge row imputed-values-in-row))
+                                      imputed-values)
+
+                  scores (mapv (fn [score row]
+                                 (.log js/console "inside 2!!!!")
+                                 (.log js/console row)
+                                 (assoc row "probability" score))
+                               scores)
+                  labels (mapv (fn [label row]
+                                 (assoc row "🏷" label))
+                               labels)))))
 
 (rf/reg-sub :virtual-computed-rows
   (fn [_ _]
