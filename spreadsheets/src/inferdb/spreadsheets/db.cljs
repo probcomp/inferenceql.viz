@@ -109,5 +109,5 @@
    ::rows nyt-data
    ::virtual-rows []
    :hot-state {:real-table nil :virtual-table nil}
-   ::confidence-threshold 0.3
+   ::confidence-threshold 0.9
    ::confidence-options {:mode :none}})
