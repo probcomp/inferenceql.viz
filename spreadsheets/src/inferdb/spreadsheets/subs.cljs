@@ -352,13 +352,23 @@
  :cell-renderer-fn
  (fn [_ _]
    {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
-    :conf-thresh (rf/subscribe [:confidence-threshold])})
- (fn [{:keys [row-likelihoods conf-thresh]}]
+    :conf-thresh (rf/subscribe [:confidence-threshold])
+    :conf-mode (rf/subscribe [:confidence-option [:mode]])})
+ (fn [{:keys [row-likelihoods conf-thresh conf-mode]}]
+
    ;; Returns a cell renderer function used by Handsontable.
-   ;;
-   ;; The function is actually called with this args list:
-   ;; [hot td row col prop value cell-properties]
-   ;; Instead, specifying [& args] here to make it cleaner to
-   ;; pass in data to custom rendering functions.
-   (fn [& args]
-     (row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))))
+   (case conf-mode
+     :none
+     js/Handsontable.renderers.TextRenderer
+
+     :row
+     ;; The render function is actually called with this args list:
+     ;; [hot td row col prop value cell-properties]
+     ;; Instead, specifying [& args] here to make it cleaner to
+     ;; pass in data to custom rendering functions.
+     (fn [& args]
+       (row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))
+
+     :cells-existing js/Handsontable.renderers.TextRenderer
+
+     :cells-missing js/Handsontable.renderers.TextRenderer)))
