@@ -65,7 +65,7 @@
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
                :labels (rf/subscribe [:labels])
-               :imputed-values (rf/subscribe [:missing-cells-values])
+               :imputed-values (rf/subscribe [:missing-cells-values-above-conf-threshold])
                :conf-mode (rf/subscribe [:confidence-option [:mode]])})
             (fn [{:keys [rows scores labels imputed-values conf-mode]}]
               (let [merge-imputed (= conf-mode :cells-missing)]
@@ -310,11 +310,44 @@
    (map :values missing-cells)))
 
 (rf/reg-sub
+ :missing-cells-values-above-conf-threshold
+ (fn [_ _]
+   {:values (rf/subscribe [:missing-cells-values])
+    :likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :conf-threshold (rf/subscribe [:confidence-threshold])})
+ (fn [{:keys [values likelihoods conf-threshold]}]
+   (for [[row-values row-likelihoods] (map vector values likelihoods)]
+     (->> (map (fn [[val-k val-v] [like-k like-v]]
+                 (if (>= like-v conf-threshold)
+                   [val-k val-v]
+                   nil))
+               row-values row-likelihoods)
+          (remove nil?)
+          (into {})))))
+
+(rf/reg-sub
  :missing-cells-likelihoods
  (fn [_ _]
    {:missing-cells (rf/subscribe [:missing-cells])})
  (fn [{:keys [missing-cells]}]
    (map :scores missing-cells)))
+
+(rf/reg-sub
+  :missing-cells-likelihoods-normed
+  (fn [_ _]
+    {:missing-cells-likelihoods (rf/subscribe [:missing-cells-likelihoods])})
+  (fn [{:keys [missing-cells-likelihoods]}]
+    (let [all-likelihoods (remove nil? (flatten (map vals missing-cells-likelihoods)))
+          min-val (apply min all-likelihoods)
+          max-val (apply max all-likelihoods)
+          scale-factor (Math/abs (- max-val min-val))]
+      ;; Each iteration of this for loop handles
+      ;; a map of missing values for a row
+      (for [row missing-cells-likelihoods]
+        (->> row
+          (map (fn [[k v]] [k (- v min-val)]))
+          (map (fn [[k v]] [k (/ v scale-factor)]))
+          (into {}))))))
 
 (rf/reg-sub :confidence-threshold
             (fn [db _]
@@ -336,7 +369,7 @@
         text-render-fn js/Handsontable.renderers.TextRenderer
 
         likelihood-for-row (nth row-likelihoods row)
-        row-above-thresh (> likelihood-for-row conf-thresh)]
+        row-above-thresh (>= likelihood-for-row conf-thresh)]
 
     ;; Performs standard rendering of text in cell
     (this-as this
@@ -348,6 +381,27 @@
 ;; TODO: Write this
 (defn row-wise-likelihood-gradient-renderer [renderer-args row-likelihoods])
 
+(defn missing-cell-wise-likelihood-threshold-renderer [renderer-args missing-cells-likelihoods computed-headers conf-thresh]
+  (let [renderer-args-js (clj->js renderer-args)
+        [_hot td row col _prop _value _cell-properties] renderer-args
+
+        td-style (.-style td)
+        text-render-fn js/Handsontable.renderers.TextRenderer
+
+        prop-name-of-cell (nth computed-headers col)
+        likelihoods-for-row (nth missing-cells-likelihoods row)
+        likelihood-for-cell (get likelihoods-for-row prop-name-of-cell)]
+
+    ;; Performs standard rendering of text in cell
+    (this-as this
+      (.apply text-render-fn this renderer-args-js))
+
+    (when likelihood-for-cell
+      (let [cell-above-thresh (>= likelihood-for-cell conf-thresh)]
+        (if cell-above-thresh
+          (set! (.-background td-style) "#CEC")
+          (set! (.-background td-style) "#DDD"))))))
+
 (rf/reg-sub
  :cells-style-fn
  (fn [_ _]
@@ -358,25 +412,33 @@
      (let [cell-properties {:renderer cell-renderer-fn}]
        (clj->js cell-properties)))))
 
+;; TODO: make this sub not require likelihoods for everything.
+;; Do it conditionally base on conf-mode.
 (rf/reg-sub
  :cell-renderer-fn
  (fn [_ _]
    {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
+    :missing-cells-likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
     :conf-thresh (rf/subscribe [:confidence-threshold])
-    :conf-mode (rf/subscribe [:confidence-option [:mode]])})
+    :conf-mode (rf/subscribe [:confidence-option [:mode]])
+    :computed-headers (rf/subscribe [:computed-headers])})
  ;; Returns a cell renderer function used by Handsontable.
- (fn [{:keys [row-likelihoods conf-thresh conf-mode]}]
+ (fn [{:keys [row-likelihoods missing-cells-likelihoods conf-thresh conf-mode computed-headers]}]
    (case conf-mode
      :none
      js/Handsontable.renderers.TextRenderer
 
      :row
      (fn [& args]
-       ;; The render function is actually called with this args list:
+       ;; These render functions are actually called with this args list:
        ;; [hot td row col prop value cell-properties]
-       ;; Instead, specifying [& args] here to make it cleaner to
+       ;; Instead, we are specifying [& args] here to make it cleaner to
        ;; pass in data to custom rendering functions.
        (row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))
 
-     :cells-existing js/Handsontable.renderers.TextRenderer
-     :cells-missing js/Handsontable.renderers.TextRenderer)))
+     :cells-existing
+     js/Handsontable.renderers.TextRenderer
+
+     :cells-missing
+     (fn [& args]
+       (missing-cell-wise-likelihood-threshold-renderer args missing-cells-likelihoods computed-headers conf-thresh)))))
