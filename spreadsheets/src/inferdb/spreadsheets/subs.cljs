@@ -1,15 +1,43 @@
 (ns inferdb.spreadsheets.subs
   (:require [clojure.walk :as walk]
+            [clojure.string :as str]
             [re-frame.core :as rf]
+            [metaprob.distributions :as dist]
+            [metaprob.prelude :as mp]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]
-            [inferdb.cgpm.main :as cgpm]
-            [inferdb.spreadsheets.model :as model]
-            [metaprob.distributions :as dist]))
+            [inferdb.multimixture :as mmix]
+            [inferdb.multimixture.search :as search]
+            [inferdb.spreadsheets.model :as model]))
+
+(def label-col-header
+  "Header text for the column used for labeling rows as examples."
+  "🏷")
+(def score-col-header
+  "Header text for the column that shows scores."
+  "probability")
+
+(def vega-width
+  "Width setting for the specs produced by the :vega-lite-spec sub"
+  400)
+(def vega-height
+  "Height setting for the specs produced by the :vega-lite-spec sub"
+  400)
+
+(def vega-map-width
+  "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
+  500)
+(def vega-map-height
+  "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
+  300)
 
 (rf/reg-sub :scores
             (fn [db _]
               (db/scores db)))
+
+(rf/reg-sub :labels
+            (fn [db _]
+              (db/labels db)))
 
 (defn table-headers
   [db _]
@@ -28,17 +56,26 @@
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into ["score"] headers)))
+              (into [label-col-header score-col-header] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
-               :scores (rf/subscribe [:scores])})
-            (fn [{:keys [rows scores]}]
+               :scores (rf/subscribe [:scores])
+               :labels (rf/subscribe [:labels])})
+            (fn [{:keys [rows scores labels]}]
               (cond->> rows
                 scores (mapv (fn [score row]
-                               (assoc row "score" score))
-                             scores))))
+                               (assoc row score-col-header score))
+                             scores)
+                labels (mapv (fn [label row]
+                               (assoc row label-col-header label))
+                             labels))))
+
+(rf/reg-sub :virtual-rows
+            (fn [db _]
+              (db/virtual-rows db)))
+
 (defn table-rows
   [db _]
   (db/table-rows db))
@@ -55,17 +92,39 @@
                      headers)))
         rows))
 
-(defn hot-props
+(defn real-hot-props
   [{:keys [headers rows]} _]
-  (let [data (cell-vector headers rows)]
-    (-> views/default-hot-settings
+  (let [data (cell-vector headers rows)
+
+        num-columns (count headers)
+        initial-column-setting {:readOnly false}
+        rem-column-settings (repeat (dec num-columns) {})
+
+        all-column-settings (cons initial-column-setting rem-column-settings)]
+    (-> views/real-hot-settings
         (assoc-in [:settings :data] data)
-        (assoc-in [:settings :colHeaders] headers))))
-(rf/reg-sub :hot-props
+        (assoc-in [:settings :colHeaders] headers)
+        (assoc-in [:settings :columns] all-column-settings))))
+(rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:computed-rows])})
-            hot-props)
+            real-hot-props)
+
+(defn virtual-hot-props
+  [{:keys [headers rows]} _]
+  (let [data (cell-vector headers rows)
+        num-columns (count headers)
+        column-settings (repeat num-columns {})]
+    (-> views/virtual-hot-settings
+        (assoc-in [:settings :data] data)
+        (assoc-in [:settings :colHeaders] headers)
+        (assoc-in [:settings :columns] column-settings))))
+(rf/reg-sub :virtual-hot-props
+            (fn [_ _]
+              {:headers (rf/subscribe [:computed-headers])
+               :rows    (rf/subscribe [:virtual-rows])})
+            virtual-hot-props)
 
 (defn selections
   [db _]
@@ -77,6 +136,59 @@
   (db/selected-columns db))
 (rf/reg-sub :selected-columns selected-columns)
 
+(def clean-label
+  "Prepares the user-typed label for checking."
+  (fnil (comp str/upper-case str/trim) ""))
+
+(defn- pos-label? [label-str]
+  (let [f (clean-label label-str)]
+    ;; TODO: add more truthy values
+    (or (= f "TRUE")
+        (= f "1"))))
+
+(defn- neg-label? [label-str]
+  (let [f (clean-label label-str)]
+    ;; TODO: add more falsey values
+    (or (= f "FALSE")
+        (= f "0"))))
+
+(defn- unlabeled? [label-str]
+  (and (not (pos-label? label-str))
+       (not (neg-label? label-str))))
+
+(defn row-ids-labeled-pos
+  [{:keys [labels]} _]
+  (let [labels-with-ids (map vector labels (range))
+        ids (->> (filter #(pos-label? (first %)) labels-with-ids)
+                 (map second))]
+    ids))
+(rf/reg-sub :row-ids-labeled-pos
+            (fn [_ _]
+              {:labels (rf/subscribe [:labels])})
+            row-ids-labeled-pos)
+
+(defn row-ids-labeled-neg
+  [{:keys [labels]} _]
+  (let [labels-with-ids (map vector labels (range))
+        ids (->> (filter #(neg-label? (first %)) labels-with-ids)
+                 (map second))]
+    ids))
+(rf/reg-sub :row-ids-labeled-neg
+            (fn [_ _]
+              {:labels (rf/subscribe [:labels])})
+            row-ids-labeled-neg)
+
+(defn row-ids-unlabeled
+  [{:keys [labels]} _]
+  (let [labels-with-ids (map vector labels (range))
+        ids (->> (filter #(unlabeled? (first %)) labels-with-ids)
+                 (map second))]
+    ids))
+(rf/reg-sub :row-ids-unlabeled
+            (fn [_ _]
+              {:labels (rf/subscribe [:labels])})
+            row-ids-unlabeled)
+
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
 (defn- left-pad
@@ -87,9 +199,12 @@
 
 (defn stattype
   [column]
-  (if (= "score" column)
-    dist/gaussian
-    (get model/stattypes column)))
+  (let [stattype-kw (if (contains? #{score-col-header label-col-header} column)
+                      :gaussian
+                      (get-in model/spec [:vars column]))]
+    (case stattype-kw
+      :gaussian dist/gaussian
+      :categorical dist/categorical)))
 
 (defn vega-lite-spec
   [{:keys [selections selected-columns row-at-selection-start]}]
@@ -97,7 +212,7 @@
     (clj->js
      (cond (and (= 1 (count selected-columns))
                 (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "NAME" "score"}
+                (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header}
                                 (first selected-columns))))
            ;; Simulate plot
            (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
@@ -109,6 +224,8 @@
                  y-scale {:nice false}]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json"
+              :width vega-width
+              :height vega-height
               :data {:name "data"}
               :autosize {:resize true}
               :layer (cond-> [{:mark "bar"
@@ -141,6 +258,8 @@
            (let [selected-column (first selected-columns)]
              {:$schema
               "https://vega.github.io/schema/vega-lite/v3.json",
+              :width vega-width
+              :height vega-height
               :data {:values selection},
               :mark "bar"
               :encoding
@@ -172,8 +291,8 @@
                                 dist/gaussian "quantitative"
                                 dist/categorical "nominal")}]
              {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width 500
-              :height 300
+              :width vega-map-width
+              :height vega-map-height
               :data {:values js/topojson
                      :format {:type "topojson"
                               :feature topojson-feature}}
@@ -195,6 +314,8 @@
                ;; Scatterplot
                #{dist/gaussian} {:$schema
                                  "https://vega.github.io/schema/vega-lite/v3.json"
+                                 :width vega-width
+                                 :height vega-height
                                  :data {:values selection}
                                  :mark "circle"
                                  :encoding {:x {:field (first selected-columns)
@@ -204,6 +325,8 @@
                ;; Heatmap
                #{dist/categorical} {:$schema
                                     "https://vega.github.io/schema/vega-lite/v3.json"
+                                    :width vega-width
+                                    :height vega-height
                                     :data {:values selection}
                                     :mark "rect"
                                     :encoding {:x {:field (first selected-columns)
@@ -216,6 +339,8 @@
                #{dist/gaussian
                  dist/categorical} {:$schema
                                     "https://vega.github.io/schema/vega-lite/v3.json"
+                                    :width vega-width
+                                    :height vega-height
                                     :data {:values selection}
                                     :mark {:type "boxplot"
                                            :extent "min-max"}
@@ -252,18 +377,16 @@
                :columns (rf/subscribe [:selected-columns])
                :one-cell-selected (rf/subscribe [:one-cell-selected])})
             (fn [{:keys [row columns one-cell-selected]}]
-              (when one-cell-selected
+              (when (and one-cell-selected
+                         ;; TODO: clean up this check
+                         (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header} (first columns))))
                 (let [sampled-column (first columns) ; columns that will be sampled
-                      constraints (reduce-kv (fn [acc k v]
-                                               (cond-> acc
-                                                 v (assoc k v)))
-                                             {}
-                                             (-> row
-                                                 (select-keys (keys model/stattypes))
-                                                 (dissoc sampled-column)
-                                                 (walk/keywordize-keys)))]
-                  #(cgpm/cgpm-simulate model/model-cgpm
-                                       [(keyword sampled-column)]
-                                       constraints
-                                       {}
-                                       1)))))
+                      constraints (mmix/with-row-values {} (-> row
+                                                               (select-keys (keys (:vars model/spec)))
+                                                               (dissoc sampled-column)))
+                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                                         :observation-trace constraints))
+                      negative-salary? #(neg? (% "salary_usd"))]
+                  ;; returns the first result of gen-fn that doesn't have a negative salary
+                  ;; TODO: This is dataset-specific
+                  #(take 1 (remove negative-salary? (repeatedly gen-fn)))))))

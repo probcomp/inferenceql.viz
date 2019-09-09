@@ -1,0 +1,33 @@
+/* styling for the virtual data handsontable */
+.virtual-hot .ht_master tr td {
+  background-color: #FAFCE4;
+}
+
+/* allows search input to be styled */
+input[type=search]{
+   -moz-appearance: none;/* older firefox */
+   -webkit-appearance: none; /* safari, chrome, edge and ie mobile */
+   appearance: none; /* rest */
+}
+
+input { font-size: 16px; }
+button { font-size: 16px; }
+
+body {
+  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #333;
+  margin: 0 auto;
+  padding-top: 5px;
+  font-size: 1.125em;
+  line-height: 1em;
+}
+
+h1 {
+  font-size: 1.2em;
+}
+
+h3 {
+  font-size: .8em;
+  line-height: .2em;
+}

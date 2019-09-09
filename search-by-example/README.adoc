@@ -49,11 +49,10 @@ The data that was used to build the model. An array of rows. Each row is an obje
 ----
 
 === `inferdb.search_by_example.api.search`
-Takes a hypothetical row and returns an array of pairs. In each returned pair the first element is the index of the row in `inferdb.search_by_example.api.data`, and the second element is the similarity score for that row. The array will be sorted by similarity to the provided row, descending. Since a lower score means a higher degree of similarity, the scores themselves will be in ascending order.
 
 [source,javascript]
 ----
-> inferdb.search_by_example.api.search({"percent_white": 0.6});
+> inferdb.search_by_example.api.search([0] []);
 ----
 [source.javascript]
 ----
@@ -61,35 +60,4 @@ Takes a hypothetical row and returns an array of pairs. In each returned pair th
  [87, 5.354034441842514],
  [104, 5.367275425891225],
  ...]
-----
-
-WARNING: Searching for a row that is too anomalous with respect to the data in `inferdb.search_by_example.api.data` will trigger an error.
-[source,javascript]
-----
-inferdb.search_by_example.api.search({percent_children: 0.9}, "percent_children")
-----
-[source,javascript]
-----
-main.js:1256 Uncaught Error: Example is too anomalous!
-----
-
-=== `inferdb.search_by_example.api.isVeryAnomalous`
-
-[source,javascript]
-----
-> inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.05})
-----
-
-[source,javascript]
-----
-true
-----
-
-[source,javascript]
-----
-> inferdb.search_by_example.api.isVeryAnomalous({"percent_white": 0.4})
-----
-[source,javascript]
-----
-false
 ----

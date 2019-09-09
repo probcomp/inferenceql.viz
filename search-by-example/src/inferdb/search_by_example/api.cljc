@@ -1,40 +1,30 @@
 (ns inferdb.search-by-example.api
-  (:require [clojure.string :as str]
-            [clojure.walk :as walk]
-            [metaprob.distributions :as dist]
+  (:require [clojure.set :as set]
+            [clojure.string :as str]
+            [inferdb.multimixture :as mmix]
+            [inferdb.multimixture.search :as search]
+            [inferdb.multimixture.specification :as spec]
             [inferdb.spreadsheets.data :as data]
-            [inferdb.spreadsheets.model :as model]
-            [inferdb.spreadsheets.search :as search]))
+            [inferdb.spreadsheets.model :as model]))
+
+#?(:clj (def clj->js identity))
+#?(:clj (def js->clj identity))
 
 (def ^:export data (clj->js data/nyt-data))
-
-(def ^:export columns (clj->js (keys model/stattypes)))
-
-(defn- categorical?
-  "Returns `true` if `column` is categorical, `false` otherwise."
-  [column]
-  (= dist/categorical (get model/stattypes column)))
+(def ^:export columns (clj->js (-> model/spec :vars keys)))
 
 (defn- valid-values
   "Returns the valid values for categorical column `column`."
   [column]
-  (let [valid-value-map (->> model/cluster-data
-                             (partition 2)
-                             (map second)
-                             (reduce merge)
-                             (reduce-kv (fn [m k v]
-                                          (if (categorical? k) ; only include categorical variables
-                                            (assoc m k (-> v first keys set)) ; pull out the valid values
-                                            m))
-                                        {}))]
-    (get valid-value-map column)))
+  (-> (spec/parameters model/spec column 0)
+      keys
+      set))
 
 (defn- validation-errors
   "Given a example map `example`, returns a potentially empty vector of validation
   error maps."
   [example]
-  (let [columns (set (keys model/stattypes))
-        {valid-columns true, invalid-columns false} (group-by #(contains? columns %) (keys example))
+  (let [{valid-columns true, invalid-columns false} (group-by #(contains? columns %) (keys example))
         key-errors (mapv (fn [column]
                            {:type :invalid-column
                             :column column
@@ -42,7 +32,7 @@
                          invalid-columns)
         value-errors (keep (fn [column]
                              (let [v (get example column)]
-                               (if (categorical? column)
+                               (if (spec/nominal? model/spec column)
                                  (when-not (contains? (valid-values column) v)
                                    {:type :invalid-value
                                     :column column
@@ -63,7 +53,7 @@
   (case type
     :invalid-column (str "Invalid column: " (pr-str column) "\n"
                          "Valid columns: " (pr-str (into [] columns)) "\n")
-    :invalid-value (if (categorical? column)
+    :invalid-value (if (spec/nominal? model/spec column)
                      (str "Invalid value for nominal column " (pr-str column) ": " (pr-str (:value error)) "\n"
                           "Valid values: " (pr-str (into [] (:valid-values error))) "\n")
                      (str "Invalid value for numerical column " (pr-str column) ": " (pr-str (:value error)) "\n"
@@ -76,22 +66,49 @@
   (let [message (->> errors
                      (map error-message)
                      (str/join "\n"))]
-    (js/Error. message)))
+    #?(:clj (ex-info message {})
+       :cljs (js/Error. message))))
 
-(defn- very-anomalous?
-  [example]
-  (if-let [errors (seq (validation-errors example))]
-    (throw (js-error errors))
-    (search/very-anomalous? (walk/keywordize-keys example))))
+(defn ^:export simulate
+  "Simulates a row from the data table."
+  []
+  (let [generate-row (mmix/row-generator model/spec)]
+    (clj->js (generate-row))))
 
-(defn ^:export isVeryAnomalous
-  "Returns `true` if the provided example is very anomalous."
-  [example]
-  (very-anomalous? (js->clj example :keywordize-keys false)))
+(def ^:private n-models 1)
+(def ^:private beta-params {:alpha 0.01 :beta 0.01})
 
 (defn ^:export search
   "Returns a collection of [row index, similarity score] pairs, sorted by scores."
-  [example]
-  (if (isVeryAnomalous example)
-    (throw (js/Error. "Example is too anomalous!"))
-    (clj->js (search/search-by-example (js->clj example)))))
+  [positive-indexes negative-indexes]
+  (let [positive-indexes (js->clj positive-indexes)
+        negative-indexes (js->clj negative-indexes)
+        new-column-key "search"
+        all-rows data/nyt-data
+        known-indexes (set/union (set positive-indexes) (set negative-indexes))
+        unknown-indexes (set/difference (set (range (count all-rows)))
+                                        known-indexes)
+        unknown-rows (mapv #(nth all-rows %) unknown-indexes)
+        known-rows (mapv #(assoc (nth all-rows %)
+                                 new-column-key
+                                 (contains? positive-indexes %))
+                         known-indexes)]
+    (->> (search/search model/spec
+                        new-column-key
+                        known-rows
+                        unknown-rows
+                        n-models
+                        beta-params)
+         (zipmap unknown-indexes)
+         (into [])
+         (sort-by second >)
+         (clj->js))))
+
+#_(search/search model/spec
+                 "test"
+                 [(first data/nyt-data)]
+                 (->> data/nyt-data (drop 1) (take 10))
+                 1
+                 {:alpha 0.01 :beta 0.01})
+
+#_(search [0] [])

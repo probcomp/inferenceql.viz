@@ -1,6 +1,7 @@
 (ns inferdb.spreadsheets.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
+            [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
             [yarn.vega-embed]))
@@ -8,21 +9,25 @@
 (def default-hot-settings
   {:settings {:data                []
               :colHeaders          []
+              :columns             []
               :rowHeaders          true
-              :columnSorting       true
+              :multiColumnSorting  true
               :manualColumnMove    true
+              :beforeColumnMove    hot/freeze-col-1-2-fn
               :filters             true
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :readOnly            true
-              :height              "30vh"
+              :height              "32vh"
               :width               "100vw"
               :stretchH            "all"
               :licenseKey          "non-commercial-and-evaluation"}
-   :hooks events/hooks})
+   :hooks []})
 
-(def ^:private default-search-string
-  (pr-str {"percent_white" 0.40}))
+(def real-hot-settings (assoc default-hot-settings :hooks events/real-hot-hooks))
+(def virtual-hot-settings (assoc default-hot-settings :hooks events/virtual-hot-hooks))
+
+(def ^:private default-search-string "GENERATE ROW")
 
 (defn search-form
   [name]
@@ -32,10 +37,15 @@
        [:input {:type "search"
                 :style {:width "100%"}
                 :on-change #(reset! input-text (-> % .-target .-value))
+                :on-key-press (fn [e] (if (= (.-key e) "Enter")
+                                        (rf/dispatch [:parse-query @input-text])))
                 :value @input-text}]
-       [:button {:on-click #(rf/dispatch [:search @input-text])
+       [:button {:on-click #(rf/dispatch [:parse-query @input-text])
                  :style {:float "right"}}
-        "Search"]])))
+        "Run InferenceQL"]
+       [:button {:on-click #(rf/dispatch [:clear-virtual-data])
+                 :style {:float "right"}}
+        "Delete virtual data"]])))
 
 (defn vega-lite
   [spec opt generator]
@@ -83,13 +93,21 @@
 
 (defn app
   []
-  (let [hot-props      @(rf/subscribe [:hot-props])
+  (let [real-hot-props      @(rf/subscribe [:real-hot-props])
+        virtual-hot-props @(rf/subscribe [:virtual-hot-props])
         selected-maps  @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
         scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]
     [:div
-     [hot/handsontable {:style {:overflow "hidden"}} hot-props]
+     [:h1 "Real Data"]
+     [:h3 "rows: real developers"]
+     [:h3 "columns: real answers to survey questions"]
+     [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
+     [:h1 "Virtual Data"]
+     [:h3 "rows: virtual developers"]
+     [:h3 "columns: virtual answers to survey questions"]
+     [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [search-form "Zane"]
      [:div {:style {:display "flex"
                     :justify-content "center"}}

@@ -19,6 +19,9 @@
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
 
+(s/def ::label (s/nilable string?))
+(s/def ::labels (s/coll-of ::label))
+
 (s/def ::topojson any?)
 
 (s/def ::selected-row-index ::row-index)
@@ -34,6 +37,7 @@
                           ::selected-row-index
                           ::row-at-selection-start
                           ::scores
+                          ::labels
                           ::selected-columns
                           ::topojson
                           ::sampled-rows]))
@@ -99,11 +103,33 @@
   [db scores]
   (assoc-in db [::scores] scores))
 
+(defn virtual-rows
+  [db]
+  (get-in db [::virtual-rows]))
+
+(defn with-virtual-rows
+  [db new-v-rows]
+  (let [cur-v-rows (virtual-rows db)]
+    (assoc-in db [::virtual-rows] (concat new-v-rows cur-v-rows))))
+
+(defn clear-virtual-rows
+  [db]
+  (assoc-in db [::virtual-rows] []))
+
+(defn with-labels
+  [db labels]
+  (assoc-in db [::labels] labels))
+
+(defn labels
+  [db]
+  (get-in db [::labels]))
+
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
   []
   {::headers (into [] (keys (first nyt-data)))
-   ::rows nyt-data})
+   ::rows nyt-data
+   ::virtual-rows []})
 
 (defn one-cell-selected?
   [db]

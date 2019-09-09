@@ -8,7 +8,6 @@ node-modules-dir := $(current-dir)/../node_modules
 output-to	 := $(output-dir)/main.js
 model-file := $(cache-dir)/model.cljc
 data-file  := $(cache-dir)/data.cljc
-cache-file := $(cache-dir)/pfcas.cljc
 
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/handsontable.full.css
@@ -18,11 +17,11 @@ all: js
 js: $(output-to)
 
 .PHONY: watch
-watch: $(hot-css-resource) $(model-file) $(data-file) $(cache-file)
+watch: $(hot-css-resource) $(model-file) $(data-file)
 	cd ..; clojure -m cljs.main -w $(src-dir) $(cljs-main-opts)
 
 clean:
-	rm -Rf $(model-file) $(data-file) $(cache-file) $(output-dir)
+	rm -Rf $(model-file) $(data-file) $(output-dir)
 
 ### Compilation
 
@@ -36,7 +35,7 @@ cljs-main-opts := \
 		-o $(output-to) \
 		-c $(main-ns)
 
-$(output-to): $(hot-css-resource) $(model-file) $(data-file) $(cache-file)
+$(output-to): $(hot-css-resource) $(model-file) $(data-file)
 	cd ..; clojure -m cljs.main $(cljs-main-opts)
 
 $(node-modules-dir):
@@ -51,8 +50,7 @@ $(hot-css-resource): $(hot-css-file)
 
 model: $(model-file)
 data: $(data-file)
-cache: $(cache-file)
-generated: model data cache
+generated: model data
 
 model-json := $(current-dir)/model.json
 data-csv   := $(current-dir)/data.csv
@@ -62,9 +60,6 @@ $(model-file): model.json
 
 $(data-file): data.csv
 	cd ..; bin/build-data $(data-file) $(data-csv)
-
-$(cache-file): $(model-file) $(data-file)
-	cd ..; bin/build-cache
 
 ### Publishing
 

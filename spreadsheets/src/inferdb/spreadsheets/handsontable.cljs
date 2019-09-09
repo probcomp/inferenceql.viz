@@ -17,6 +17,14 @@
   [hot-instance new-settings]
   (.updateSettings hot-instance new-settings false))
 
+(defn freeze-col-1-2-fn [columns-moving target]
+  """Prevents the movement of the first two columns in the table.
+  Also prevents other columns from moving into those frist two spots."""
+  (let [first-unfrozen-index 2
+        first-col-moving (first (js->clj columns-moving))]
+    (not (or (< first-col-moving first-unfrozen-index)
+             (< target first-unfrozen-index)))))
+
 (defn handsontable
   ([props]
    (handsontable {} props))
@@ -30,24 +38,28 @@
        (fn [this]
          (let [dom-node (dom/dom-node this)
                hot (js/Handsontable. dom-node (clj->js (:settings props)))]
+           ; add callbacks internal to hot object
            (doseq [key hooks]
              (let [camel-key (csk/->camelCase (clj->js key))]
                (js/Handsontable.hooks.add camel-key
                                           (fn [& args]
                                             (rf/dispatch (into [key hot] args)))
                                           hot)))
+           ; set the atom to the hot object
            (reset! hot-instance hot)))
-
-       :should-component-update
-       (fn [this [_ _ old-props] [_ _ {new-settings :settings :as new-props}]]
-         (update-hot! @hot-instance (clj->js new-settings))
-         false)
 
        :component-did-update
        (fn [this old-argv]
-         (let [new-argv (rest (reagent/argv this))]
-           ;; do something
-           ))
+         (let [[_ old-attributes old-props] old-argv
+               [_ new-attributes new-props] (reagent/argv this)
+               {old-settings :settings, old-hooks :hooks} old-props
+               {new-settings :settings, new-hooks :hooks} new-props]
+           (if (not= old-settings new-settings)
+             (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
+                   sort-config (.getSortConfig sorting-plugin)]
+               (update-hot! @hot-instance (clj->js new-settings))
+               ; Maintain the same sort order as before the update
+               (.sort sorting-plugin sort-config)))))
 
        :component-will-unmount
        (fn [this]
