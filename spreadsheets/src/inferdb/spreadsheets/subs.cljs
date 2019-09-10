@@ -118,7 +118,7 @@
         rows))
 
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn]} _]
+  [{:keys [headers rows cells-style-fn context-menu]} _]
   (let [data (cell-vector headers rows)
 
         num-columns (count headers)
@@ -130,12 +130,14 @@
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] all-column-settings)
-        (assoc-in [:settings :cells] cells-style-fn))))
+        (assoc-in [:settings :cells] cells-style-fn)
+        (assoc-in [:settings :contextMenu] context-menu))))
 (rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:computed-rows])
-               :cells-style-fn (rf/subscribe [:cells-style-fn])})
+               :cells-style-fn (rf/subscribe [:cells-style-fn])
+               :context-menu (rf/subscribe [:context-menu])})
             real-hot-props)
 
 (defn virtual-hot-props
@@ -451,3 +453,11 @@
      :cells-missing
      (fn [& args]
        (missing-cell-wise-likelihood-threshold-renderer args missing-cells-likelihoods computed-headers conf-thresh)))))
+
+(rf/reg-sub
+ :context-menu
+ (fn [_ _]
+   {})
+ (fn []
+   ["set_function"
+    "clear_function"]))
