@@ -363,7 +363,10 @@
 
 (defn row-wise-likelihood-threshold-renderer [renderer-args row-likelihoods conf-thresh]
   (let [renderer-args-js (clj->js renderer-args)
-        [_hot td row _col _prop _value _cell-properties] renderer-args
+        [hot td row _col _prop _value _cell-properties] renderer-args
+
+        ; Using physical coords makes rendering resilient to sorting the table.
+        row (.toPhysicalRow hot row)
 
         td-style (.-style td)
         text-render-fn js/Handsontable.renderers.TextRenderer
@@ -385,7 +388,11 @@
 ;; missing-cells-values and missing-cells-values-above-conf-threshold.
 (defn missing-cell-wise-likelihood-threshold-renderer [renderer-args missing-cells-likelihoods computed-headers conf-thresh]
   (let [renderer-args-js (clj->js renderer-args)
-        [_hot td row col _prop _value _cell-properties] renderer-args
+        [hot td row col _prop _value _cell-properties] renderer-args
+
+        ; Using physical coords makes rendering resilient to sorting the table.
+        row (.toPhysicalRow hot row)
+        col (.toPhysicalColumn hot col)
 
         td-style (.-style td)
         text-render-fn js/Handsontable.renderers.TextRenderer
