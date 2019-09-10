@@ -459,5 +459,15 @@
  (fn [_ _]
    {})
  (fn []
-   ["set_function"
-    "clear_function"]))
+   (let [set-function-fn (fn [key selection click-event]
+                           (.log js/console "---------")
+                           (.log js/console key))
+         clear-function-fn (fn [key selection click-event]
+                             (.log js/console "---------")
+                             (.log js/console key))]
+     {:items {"set_function" {:disabled false
+                              :name "Set js function"
+                              :callback set-function-fn}
+              "clear_function" {:disabled false
+                                :name "Clear js function"
+                                :callback clear-function-fn}}})))
