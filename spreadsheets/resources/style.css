@@ -59,3 +59,8 @@ h3 {
   font-size: .8em;
   line-height: .2em;
 }
+
+.code-editor {
+  font-size: 14px;
+  width: 45%;
+}

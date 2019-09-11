@@ -8,7 +8,8 @@
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
             [inferdb.spreadsheets.model :as model]
-            [inferdb.spreadsheets.vega :as vega])
+            [inferdb.spreadsheets.vega :as vega]
+            [inferdb.spreadsheets.modal :as modal])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -460,14 +461,26 @@
    {})
  (fn []
    (let [set-function-fn (fn [key selection click-event]
-                           (.log js/console "---------")
-                           (.log js/console key))
+                           (this-as hot
+                             (let [last-col-num (.. (first selection) -start -col)
+                                   last-col-num-phys (.toPhysicalColumn hot last-col-num)]
+                               (rf/dispatch [:modal {:show? true
+                                                     :child [modal/function-entry last-col-num-phys]}]))))
+
          clear-function-fn (fn [key selection click-event]
-                             (.log js/console "---------")
-                             (.log js/console key))]
-     {:items {"set_function" {:disabled false
+                             ;; no-op
+                             (+ 1 1))
+         disable-fn (fn []
+                     (this-as this
+                       ;; TODO: only enable options on column headers >= 2
+                       false))]
+     {:items {"set_function" {:disabled disable-fn
                               :name "Set js function"
                               :callback set-function-fn}
-              "clear_function" {:disabled false
+              "clear_function" {:disabled disable-fn
                                 :name "Clear js function"
                                 :callback clear-function-fn}}})))
+
+(rf/reg-sub-raw
+ :modal
+ (fn [db _] (reaction (:modal @db))))

@@ -288,3 +288,20 @@
  event-interceptors
  (fn [db [_ f path value]]
    (update-in db (into [::db/confidence-options] path) f value)))
+
+(rf/reg-event-db
+ :modal
+ event-interceptors
+ (fn [db [_ data]]
+   (assoc-in db [:modal] data)))
+
+;; TODO: write me
+(rf/reg-event-db
+ :set-column-function
+ event-interceptors
+ (fn [db [_ col-num source-text]]
+   (let [col-names @(rf/subscribe [:computed-headers])
+         col-name (nth col-names col-num)])
+    ;; TODO: assoc function text with col in db
+    ;; call it column-overrides
+   db))
