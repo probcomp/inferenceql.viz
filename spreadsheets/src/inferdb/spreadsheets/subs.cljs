@@ -463,18 +463,25 @@
 (rf/reg-sub
  :context-menu
  (fn [_ _]
-   {})
- (fn []
+   {:col-overrides (rf/subscribe [:column-overrides])
+    :col-names (rf/subscribe [:computed-headers])})
+ (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
                              (let [last-col-num (.. (first selection) -start -col)
-                                   last-col-num-phys (.toPhysicalColumn hot last-col-num)]
+                                   last-col-num-phys (.toPhysicalColumn hot last-col-num)
+                                   col-name (nth col-names last-col-num-phys)
+
+                                   fn-text (get col-overrides col-name)]
                                (rf/dispatch [:modal {:show? true
-                                                     :child [modal/function-entry last-col-num-phys]}]))))
+                                                     :child [modal/function-entry col-name fn-text]}]))))
 
          clear-function-fn (fn [key selection click-event]
-                             ;; no-op
-                             (+ 1 1))
+                             (this-as hot
+                               (let [last-col-num (.. (first selection) -start -col)
+                                     last-col-num-phys (.toPhysicalColumn hot last-col-num)
+                                     col-name (nth col-names last-col-num-phys)]
+                                 (rf/dispatch [:clear-column-function col-name]))))
          disable-fn (fn []
                      (this-as this
                        ;; TODO: only enable options on column headers >= 2

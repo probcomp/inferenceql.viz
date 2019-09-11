@@ -302,12 +302,18 @@
 (rf/reg-event-db
  :set-column-function
  event-interceptors
- (fn [db [_ col-num source-text]]
-   (let [col-names @(rf/subscribe [:computed-headers])
-         col-name (nth col-names col-num)
-         string-to-compile (str "(" source-text ")")
+ (fn [db [_ col-name source-text]]
+   (let [string-to-compile (str "(" source-text ")")
          ;; TODO catch and print compilation errors gracefully
          compiled-fn (js/eval string-to-compile)]
      (-> db
        (assoc-in [::db/column-overrides col-name] source-text)
        (assoc-in [::db/column-override-fns col-name] compiled-fn)))))
+
+(rf/reg-event-db
+ :clear-column-function
+ event-interceptors
+ (fn [db [_ col-name]]
+   (-> db
+     (update-in [::db/column-overrides] dissoc col-name)
+     (update-in [::db/column-override-fns] dissoc col-name))))

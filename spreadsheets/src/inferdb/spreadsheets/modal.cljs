@@ -42,10 +42,10 @@
    {:value        @an-atom
     :on-change    #(reset! an-atom (-> % .-target .-value))}])
 
-(defn function-entry [col-num]
-  (let [source-text (r/atom "")
+(defn function-entry [col-name fn-text]
+  (let [source-text (r/atom (or fn-text ""))
         set-fn (fn [event]
-                 (dispatch [:set-column-function col-num @source-text])
+                 (dispatch [:set-column-function col-name @source-text])
                  (close-modal))]
     (fn []
       [:div
