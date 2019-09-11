@@ -225,7 +225,7 @@
                                         :observation-trace constraints)
                     (first)
                     (get key-to-impute))
-        samples (repeatedly 40 gen-fn)
+        samples (repeatedly 2 gen-fn)
         freq-list (sort-by val > (frequencies samples))
         [top-sample top-sample-count] (first freq-list)
 
