@@ -248,17 +248,19 @@
 (rf/reg-sub :generator
             (fn [_ _]
               {:selection-info (rf/subscribe [:table-state-active])
-               :one-cell-selected (rf/subscribe [:one-cell-selected])})
-            (fn [{:keys [selection-info one-cell-selected]}]
+               :one-cell-selected (rf/subscribe [:one-cell-selected])
+               :override-fns (rf/subscribe [:column-override-fns])})
+            (fn [{:keys [selection-info one-cell-selected override-fns]}]
               (let [row (:row-at-selection-start selection-info)
-                    columns (:selected-columns selection-info)]
+                    columns (:selected-columns selection-info)
+                    col-to-sample (first columns)
+                    override-fn (get override-fns col-to-sample)]
                 (when (and one-cell-selected
                            ;; TODO clean up this check
-                           (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} (first columns))))
-                  (let [sampled-column (first columns) ; columns that will be sampled
-                        constraints (mmix/with-row-values {} (-> row
+                           (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))
+                  (let [constraints (mmix/with-row-values {} (-> row
                                                                  (select-keys (keys (:vars model/spec)))
-                                                                 (dissoc sampled-column)))
+                                                                 (dissoc col-to-sample)))
                         gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                                            :observation-trace constraints))
                         negative-salary? #(neg? (% "salary_usd"))]
@@ -484,3 +486,11 @@
 (rf/reg-sub-raw
  :modal
  (fn [db _] (reaction (:modal @db))))
+
+(rf/reg-sub :column-override-fns
+            (fn [db _]
+              (get db ::db/column-override-fns)))
+
+(rf/reg-sub :column-overrides
+            (fn [db _]
+              (get db ::db/column-overrides)))
