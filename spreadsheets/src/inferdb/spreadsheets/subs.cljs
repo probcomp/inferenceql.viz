@@ -9,7 +9,8 @@
             [inferdb.multimixture.search :as search]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.vega :as vega]
-            [inferdb.spreadsheets.modal :as modal])
+            [inferdb.spreadsheets.modal :as modal]
+            [inferdb.spreadsheets.utils :as utils])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -245,14 +246,6 @@
                  (count (first selections))
                  (count (keys (first selections))))))
 
-(defn gen-insert-fn [override-fn override-col]
-  (if override-fn
-    (fn [row]
-      (let [deps (js/getArgs override-fn)
-            dep-vals (map #(get row %) deps)
-            new-val (apply override-fn dep-vals)]
-        (assoc row override-col new-val)))
-    identity))
 
 (rf/reg-sub :generator
             (fn [_ _]
@@ -263,8 +256,8 @@
               (let [row (:row-at-selection-start selection-info)
                     columns (:selected-columns selection-info)
                     col-to-sample (first columns)
-                    override-fn (get override-fns col-to-sample)
-                    override-insert-fn (gen-insert-fn override-fn col-to-sample)]
+                    override-map (select-keys override-fns [col-to-sample])
+                    override-insert-fn (utils/gen-insert-fn override-map)]
                 (when (and one-cell-selected
                            ;; TODO clean up this check
                            (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))

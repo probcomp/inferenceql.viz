@@ -8,7 +8,8 @@
             [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
-            [inferdb.spreadsheets.events.interceptors :as interceptors]))
+            [inferdb.spreadsheets.events.interceptors :as interceptors]
+            [inferdb.spreadsheets.utils :as utils]))
 
 (def real-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :before-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :after-change])
@@ -215,8 +216,11 @@
                            :procedure (search/optimized-row-generator model/spec)
                            :observation-trace constraint-addrs-vals))
          negative-salary? #(neg? (% "salary_usd"))
+
+         overrides-map (get db ::db/column-override-fns)
+         overrides-insert-fn (utils/gen-insert-fn overrides-map)
          ;; TODO: This is dataset-specific
-         new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
+         new-rows (take num-rows (map overrides-insert-fn (remove negative-salary? (repeatedly gen-fn))))]
      (db/with-virtual-rows db new-rows))))
 
 (defn- create-search-examples [pos-rows neg-rows]
