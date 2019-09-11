@@ -21,9 +21,7 @@
          "search-by-example/src"
          "search-by-example/test"
          "spreadsheets/src"]
- :aliases {:test {:extra-paths ["test"]
-                  :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-521"}
+ :aliases {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
-                               cheshire {:mvn/version "5.8.1"}}}
-           :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.339"}}}}}
+                               cheshire {:mvn/version "5.8.1"}}}}}

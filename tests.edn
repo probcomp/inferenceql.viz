@@ -5,6 +5,17 @@
          {:id :cgpm
           :source-paths ["cgpm/src"]
           :test-paths ["cgpm/test"]}
-         {:id :multimixture
+         {:id :multimixture-clj
           :source-paths ["multimixture/src"]
-          :test-paths ["multimixture/test"]}]}
+          :test-paths ["multimixture/test"]}
+         {:id :multimixture-cljs
+          :type :kaocha.type/cljs
+          :source-paths ["multimixture/src"]
+          :test-paths ["multimixture/test"]}
+         {:id :search-clj
+          :source-paths ["search-by-example/src"]
+          :test-paths ["search-by-example/test"]}
+         {:id :search-cljs
+          :type :kaocha.type/cljs
+          :source-paths ["search-by-example/src"]
+          :test-paths ["search-by-example/test"]}]}
