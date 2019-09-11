@@ -295,13 +295,15 @@
  (fn [db [_ data]]
    (assoc-in db [:modal] data)))
 
-;; TODO: write me
 (rf/reg-event-db
  :set-column-function
  event-interceptors
  (fn [db [_ col-num source-text]]
    (let [col-names @(rf/subscribe [:computed-headers])
-         col-name (nth col-names col-num)])
-    ;; TODO: assoc function text with col in db
-    ;; call it column-overrides
-   db))
+         col-name (nth col-names col-num)
+         string-to-compile (str "(" source-text ")")
+         ;; TODO catch and print compilation errors gracefully
+         compiled-fn (js/eval string-to-compile)]
+     (-> db
+       (assoc-in [::db/column-overrides (keyword col-name)] source-text)
+       (assoc-in [::db/column-override-fns (keyword col-name)] compiled-fn)))))

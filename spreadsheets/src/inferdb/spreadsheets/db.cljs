@@ -51,7 +51,9 @@
                     :opt [::scores
                           ::virtual-scores
                           ::labels
-                          ::topojson]
+                          ::topojson
+                          ::column-overrides
+                          ::column-override-fns]
                     :req-un [::hot-state]
                     :opt-un [::table-last-clicked]))
 
