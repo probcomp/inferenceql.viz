@@ -245,6 +245,15 @@
                  (count (first selections))
                  (count (keys (first selections))))))
 
+(defn gen-insert-fn [override-fn override-col]
+  (if override-fn
+    (fn [row]
+      (let [deps (js/getArgs override-fn)
+            dep-vals (map #(get row %) deps)
+            new-val (apply override-fn dep-vals)]
+        (assoc row override-col new-val)))
+    identity))
+
 (rf/reg-sub :generator
             (fn [_ _]
               {:selection-info (rf/subscribe [:table-state-active])
@@ -254,7 +263,8 @@
               (let [row (:row-at-selection-start selection-info)
                     columns (:selected-columns selection-info)
                     col-to-sample (first columns)
-                    override-fn (get override-fns col-to-sample)]
+                    override-fn (get override-fns col-to-sample)
+                    override-insert-fn (gen-insert-fn override-fn col-to-sample)]
                 (when (and one-cell-selected
                            ;; TODO clean up this check
                            (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))
@@ -266,7 +276,7 @@
                         negative-salary? #(neg? (% "salary_usd"))]
                     ;; returns the first result of gen-fn that doesn't have a negative salary
                     ;; TODO: This is dataset-specific
-                    #(take 1 (remove negative-salary? (repeatedly gen-fn))))))))
+                    #(take 1 (map override-insert-fn (remove negative-salary? (repeatedly gen-fn)))))))))
 
 ;;; The following subs are for getting information on the likelihood of
 ;;; prexisting data or imputing missing data and getting its likelihood as well.

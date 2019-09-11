@@ -305,5 +305,5 @@
          ;; TODO catch and print compilation errors gracefully
          compiled-fn (js/eval string-to-compile)]
      (-> db
-       (assoc-in [::db/column-overrides (keyword col-name)] source-text)
-       (assoc-in [::db/column-override-fns (keyword col-name)] compiled-fn)))))
+       (assoc-in [::db/column-overrides col-name] source-text)
+       (assoc-in [::db/column-override-fns col-name] compiled-fn)))))
