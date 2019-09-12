@@ -275,16 +275,31 @@
  (fn [db [_ result]]
    (db/with-virtual-scores db result)))
 
+(defn gen-query-str-for-conf-options [type threshold]
+  (case type
+        :none ""
+        :row (str "COLOR ROWS WITH CONFIDENCE OVER " threshold)
+        :cells-existing (str "COLOR CELLS EXISTING WITH CONFIDENCE OVER " threshold)
+        :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))
+
 (rf/reg-event-db
  :set-confidence-threshold
  event-interceptors
  (fn [db [_ value]]
+   ;; set query string
+   (let [conf-mode (get-in db [::db/confidence-options :mode])
+         new-query-string (gen-query-str-for-conf-options conf-mode value)]
+     (rf/dispatch [:set-query-string new-query-string]))
    (assoc db ::db/confidence-threshold value)))
 
 (rf/reg-event-db
  :set-confidence-options
  event-interceptors
  (fn [db [_ path value]]
+   ;; set query string
+   (let [conf-threshold (get db ::db/confidence-threshold)
+         new-query-string (gen-query-str-for-conf-options value conf-threshold)]
+     (rf/dispatch [:set-query-string new-query-string]))
    (assoc-in db (into [::db/confidence-options] path) value)))
 
 (rf/reg-event-db
