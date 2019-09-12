@@ -317,3 +317,9 @@
    (-> db
      (update-in [::db/column-overrides] dissoc col-name)
      (update-in [::db/column-override-fns] dissoc col-name))))
+
+(rf/reg-event-db
+ :set-query-string
+ event-interceptors
+ (fn [db [_ new-val]]
+   (assoc-in db [::db/query-string] new-val)))

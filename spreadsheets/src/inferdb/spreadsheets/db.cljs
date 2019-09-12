@@ -53,7 +53,8 @@
                           ::labels
                           ::topojson
                           ::column-overrides
-                          ::column-override-fns]
+                          ::column-override-fns
+                          ::query-string]
                     :req-un [::hot-state]
                     :opt-un [::table-last-clicked]))
 
@@ -114,4 +115,5 @@
    ::virtual-rows []
    :hot-state {:real-table nil :virtual-table nil}
    ::confidence-threshold 0.9
-   ::confidence-options {:mode :none}})
+   ::confidence-options {:mode :none}
+   ::query-string "GENERATE ROW"})
