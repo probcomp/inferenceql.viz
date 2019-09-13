@@ -277,7 +277,7 @@
 
 (defn gen-query-str-for-conf-options [type threshold]
   (case type
-        :none ""
+        :none "GENERATE ROW" ; NOTE: keep this string unchanged so the app starts with this query 
         :row (str "COLOR ROWS WITH CONFIDENCE OVER " threshold)
         :cells-existing (str "COLOR CELLS EXISTING WITH CONFIDENCE OVER " threshold)
         :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))
