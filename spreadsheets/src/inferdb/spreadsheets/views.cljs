@@ -83,7 +83,9 @@
   [name]
   (let [input-text (rf/subscribe [:query-string])]
     (fn []
-      [:div {:style {:display "flex"}}
+      [:div {:style {:display "flex"
+                     :margin-top "5px"
+                     :margin-bottom "10px"}}
        [:input {:type "search"
                 :style {:width "40%"}
                 :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
@@ -110,14 +112,14 @@
     [:div
      [search-form "Zane"]
      [:div.table-title
-       [:div.main-title
+       [:div.main-title {:style {:width "100px"}}
          [:span "Real Data"]]
        (comment
          [:div.sub-title
              [:pre "    rows: real developers    columns: real survey answers"]])]
      [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
      [:div.table-title
-       [:div.main-title
+       [:div.main-title {:style {:width "100px"}}
          [:span "Virtual Data"]]
        (comment
          [:div.sub-title
