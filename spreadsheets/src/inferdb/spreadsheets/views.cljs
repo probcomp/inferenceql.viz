@@ -113,17 +113,11 @@
      [search-form "Zane"]
      [:div.table-title
        [:div.main-title {:style {:width "100px"}}
-         [:span "Real Data"]]
-       (comment
-         [:div.sub-title
-             [:pre "    rows: real developers    columns: real survey answers"]])]
+         [:span "Real Data"]]]
      [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
      [:div.table-title
        [:div.main-title {:style {:width "100px"}}
-         [:span "Virtual Data"]]
-       (comment
-         [:div.sub-title
-           [:pre "    rows: virtual developers    columns: virtual survey answers"]])]
+         [:span "Virtual Data"]]]
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div {:style {:display "flex"
                     :justify-content "center"
