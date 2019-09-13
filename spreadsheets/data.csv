@@ -1,198 +1,1168 @@
-Name,Country_of_Operator,Operator_Owner,Users,Purpose,Class_of_Orbit,Type_of_Orbit,Perigee_km,Apogee_km,Eccentricity,Period_minutes,Launch_Mass_kg,Dry_Mass_kg,Power_watts,Date_of_Launch,Anticipated_Lifetime,Contractor,Country_of_Contractor,Launch_Site,Launch_Vehicle,Source_Used_for_Orbital_Data,longitude_radians_of_geo,Inclination_radians
-AAUSat-3,Denmark,Aalborg University,Civil,Technology Development,LEO,,770,787,0.00119,100.42,0.8,,,41330,1.0,Aalborg University,Denmark,Satish Dhawan Space Center,PSLV,SC - ASCR,,1.721418241
-"ABS-1 (LMI-1, Lockheed Martin-Intersputnik-1)",International,Asia Broadcasting Satellite,Commercial,Communications,GEO,,35777,35794,0.0002,1436.08,2894.0,1730.0,6800.0,36429,15.0,Lockheed Martin,USA,Baikonur Cosmodrome,Proton,JM/12_08,1.309520538,0.000174533
-"ABS-1A (Koreasat 2, Mugunghwa 2, ABS-1A)",International,Asia Broadcasting Satellite,Commercial,Communications,GEO,,35785,35789,5e-05,1436.13,1459.0,800.0,1600.0,35078,10.0,Lockheed Martin Astro Space,USA,Cape Canaveral,Delta 2,JM/12_08,2.03400671,0.032463124
-"ABS-2i (MBSat, Mobile Broadcasting Satellite, Han Byul)",China (PR),Asia Broadcasting Satellite,Commercial,Communications,GEO,,35780,35793,0.00015,1436.1,4143.0,1700.0,7400.0,38059,12.0,Space Systems/Loral,USA,Cape Canaveral,Atlas 3,JM/12_08,1.308996939,0.000174533
-"ABS-7 (Koreasat 3, Mugungwha 3)",International,Asia Broadcast Satellite,Commercial,Communications,GEO,,35780,35791,0.00013,1436.06,3500.0,1800.0,4800.0,36407,15.0,Lockheed Martin Astro Space,USA,Guiana Space Center,Ariane,JM/12_08,2.027723525,0.000174533
-AcrimSat (Active Cavity Radiometer Irradiance Monitor),USA,"NASA Goddard Space Flight Center, Jet Propulsion Laboratory",Government,Solar Physics,LEO,Sun-Synchronous,670,710,0.00283,98.6,115.0,13.0,10.0,36515,5.0,Orbital Sciences Corp.,USA,Vandenberg AFB,Taurus,www.satellitedebris.net 12/12,,1.706932008
-"Advanced Orion 2 (NROL 6, USA 139)",USA,National Reconnaissance Office (NRO),Military,Electronic Surveillance,GEO,,35560,36013,0.00537,1436.14,4500.0,,,35924,,TRW Space and Electronics,USA,Cape Canaveral,Titan IVA,JM/12_08,-0.253072742,0.134739418
-"Advanced Orion 3 (NROL 19, USA 171)",USA,National Reconnaissance Office (NRO),Military,Electronic Surveillance,GEO,,35589,35984,0.00468,1436.1,4500.0,,,37873,,TRW Space and Electronics,USA,Cape Canaveral,Titan IV,JM/12_08,1.665044106,0.055850536
-"Advanced Orion 4 (NRO L-26, USA 202)",USA,National Reconnaissance Office (NRO),Military,Electronic Surveillance,GEO,,35714,35937,0.00264,1438.8,5000.0,,,39831,,National Reconnaissance Laboratory (?),USA,Cape Canaveral,Delta 4 Heavy,SC - ASCR,0.767944871,0.050440015
-"Advanced Orion 5 (NRO L-32, USA 223)",USA,National Reconnaissance Office (NRO),Military,Electronic Surveillance,GEO,,35500,35500,0.0,,5000.0,,,40503,,National Reconnaissance Laboratory (?),USA,Cape Canaveral,Delta 4 Heavy,SC - ASCR,1.761037215,0.0
-"Advanced Orion 6 (NRO L-15, USA 237)",USA,National Reconnaissance Office (NRO),Military,Electronic Surveillance,GEO,,35771,35805,0.0004,23.94,5000.0,,,41089,,National Reconnaissance Laboratory(?),USA,Cape Canaveral,Delta 4 Heavy,CalSky,1.047197551,0.0
-"AEHF-1 (Advanced Extremely High Frequency satellite-1, USA 214)",USA,US Air Force,Military,Communications,GEO,,35872,36103,0.00273,1446.36,6169.0,,,40404,14.0,Lockheed Martin Space Systems,USA,Cape Canaveral,Atlas 5,SC - ASCR,-1.204277184,0.076096355
-"AEHF-2 (Advanced Extremely High Frequency satellite-2, USA 235)",USA,US Air Force,Military,Communications,GEO,,35700,35700,0.0,1306.29,6169.0,,,41032,14.0,Lockheed Martin Space Systems,USA,Cape Canaveral,Atlas 5,ZARYA,-2.094395102,0.355872634
-"AEHF-3 (Advanced Extremely High Frequency satellite-3, USA 246)",USA,US Air Force,Military,Communications,GEO,,35700,35700,0.0,1306.29,6169.0,,,41535,14.0,Lockheed Martin Space Systems,USA,Cape Canaveral,Atlas 5,ZARYA,,0.355872634
-Aeneas,USA,Department of Homeland Security,Government,Technology Development,LEO,,480,790,0.02213,97.4,3.0,,,41165,,University of Southern California,USA,Vandenberg AFB,Atlas 5,ZARYA,,0.000349066
-Aerocube 4.5A,USA,Aerospace Corporation,Commercial,Technology Development,LEO,,495,791,0.0211,97.5,4.5,,,41165,,Aerospace Corporation,USA,Vandenberg AFB,Atlas 5,ZARYA,,1.127482697
-Aerocube 4.5B,USA,Aerospace Corporation,Commercial,Technology Development,LEO,,499,792,0.02088,97.6,4.5,,,41165,,Aerospace Corporation,USA,Vandenberg AFB,Atlas 5,ZARYA,,1.127482697
-Aerocube 5A,USA,Aerospace Corporation,Commercial,Technology Development,LEO,,443,886,0.03149,98.0,5.0,,,41614,2.0,Aerospace Corporation,USA,Vandenberg AFB,Atlas 5,ZARYA,,2.09963109
-Aerocube 5B,USA,Aerospace Corporation,Commercial,Technology Development,LEO,,443,886,0.03149,98.0,5.0,,,41614,2.0,Aerospace Corporation,USA,Vandenberg AFB,Atlas 5,ZARYA,,2.09963109
-"Afghansat-1 (Eutelsat 28B, Eutelsat 48B, Eutelsat W2M)",Multinational,European Telecommunications Satellite Consortium (EUTELSAT),Commercial,Communications,GEO,,35764,35808,0.00052,1436.08,3460.0,1555.0,7000.0,39802,15.0,EADS Astrium,France,Guiana Space Center,Ariane 5,JM/12_08,0.837758041,0.002094395
-"Africasat-1 (Measat 1, Malaysia East Asia Sat 1)",Malaysia,MEASAT Satellite Systems Sdn. Bhd.,Commercial,Communications,GEO,,35784,35787,4e-05,1436.06,1450.0,650.0,1200.0,35077,12.2,Boeing Satellite Systems,USA,Guiana Space Center,Ariane 44L,JM/12_08,0.803375055,0.019547688
-Afristar,USA,1Worldspace,Commercial,Communications,GEO,,35770,35802,0.00038,1436.09,2704.0,1530.0,5500.0,36096,15.0,Matra Marconi Space-France,France,Guiana Space Center,Ariane 44L,JM/12_08,0.365995544,0.000523599
-"Agila 2/ABS-5 (Agila 2, Mabuhay 1)",International,Asia Broadcast Satellite,Commercial,Communications,GEO,,35769,35802,0.00039,1436.07,3775.0,1800.0,9000.0,35661,15.0,Space Systems/Loral,USA,Xichang Satellite Launch Center,Long March CZ3B,JM/12_08,2.549227905,0.000872665
-AGILE (Astro-rivelatore Gamma a Immagini Leggaro),Italy,Italian Space Agency,Government,Scientific Research,LEO,,510,534,0.00174,95.1,325.0,,,39195,3.0,CarloÊGavazziÊSpace,Italy,Satish Dhawan Space Center,PSLV C8,www.satellitedebris.net 12/12,,0.043633231
-AIM (Aeronomy of Ice in Mesosphere),USA,"Center for Atmospheric Sciences, Hampton University/NASA",Government,Earth Science,LEO,,570,583,0.00094,96.2,215.0,197.0,216.0,39197,2.0,Orbital Sciences Corp.,USA,Vandenberg AFB,Pegasus XL,www.satellitedebris.net 12/12,,1.706932008
-AISSat-1 (Automatic Identification System Satellite-1),Norway,Kongsberg Satellite Services (KSAT),Government,Maritime Tracking/Technology Development,LEO,Sun-Synchronous,615,632,0.00122,97.2,6.0,,,40371,3.0,Kongsberg Seatex AS/University of Toronto Institute for Aerospace Studies,Canada,Sriharikota Launch Station,PSLV,www.satellitedebris.net 12/12,,1.710422667
-AIST-1,Russia,"Samara State Aerospace University, SGAU",Civil,Technology Development,LEO,,599,626,0.00193,96.9,,,,41636,,TsSKB Progress,Russia,Plesetsk Cosmodrome,Soyuz 2-1B,ZARYA,,1.438151304
-AIST-2,Russia,"Samara State Aerospace University, SGAU",Civil,Technology Development,LEO,,558,582,0.00173,96.06,53.0,,,41383,3.0,"Samara State Aerospace University, SGAU",Russia,Baikonur Cosmodrome,Soyuz 2-1A,,,1.132369619
-Akebono (EXOS-D),Japan,"Institute of Space and Aeronautical Science, University of Tokyo",Civil,Space Physics,Elliptical,,264,5732,0.29184,150.4,,294.0,270.0,32560,1.0,"Institute of Space and Aeronautical Science, University of Tokyo",Japan,Uchinoura Space Center,Mu 3S2,JMSatcat304,,1.310742268
-ALiCEÊÊ(AFIT LEO iMESA CNT E),USA,US Air Force Institute of Technology,Military,Technology Development,LEO,,443,886,0.03149,98.0,5.0,,,41614,,US Air Force Institute of Technology,USA,Vandenberg AFB,Atlas 5,ZARYA estimated,,2.09963109
-Alphasat I-XLÊÊ(Inmarsat IV-A F4),UK/ESA,"INMARSAT, Ltd./European Space Agency",Commercial/Government,Communications/Technology Development,GEO,,35786,35787,1e-05,1436.09,6650.0,3370.0,12000.0,41480,15.0,Astrium,France/UK/Germany/Spain,Guiana Space Center,Ariane 5 ECA,ZARYA,0.436332313,0.000349066
-Alsat-2A (Algeria Satellite 2A),Algeria,Centre National des Techniques Spatiales (CNTS),Government,Earth Observation,LEO,Sun-Synchronous,672,674,0.00014,98.2,130.0,,,40371,5.0,EADS Astrium,France/UK/Germany/Spain,Sriharikota Launch Station,PSLV,www.satellitedebris.net 12/12,,1.712167996
-Amazonas-1,Brazil,Hispamar (subsidiary of Hispasat - Spain),Commercial,Communications,GEO,,35776,35797,0.00025,1436.1,4545.0,2000.0,9500.0,38203,15.0,EADS Astrium,France/UK/Germany/Spain,Baikonur Cosmodrome,Proton M,JM/12_08,-1.06499991,0.000698132
-Amazonas-2,Spain,Hispasat,Commercial,Communications,GEO,,35767,35805,0.00045,1436.08,5465.0,,15300.0,40087,15.0,EADS Astrium,France/UK/Germany/Spain,Guiana Space Center,Ariane 5,JM/12_09,-1.064650844,0.000523599
-Amazonas-3,Spain,Hispasat,Commercial,Communications,GEO,,35781,35791,0.00012,1436.05,6265.0,2778.0,14000.0,41312,15.0,Space Systems/Loral,USA,Guiana Space Center,Ariane 5 ECA,SC - ASCR,-1.064650844,0.000523599
-"AMC-1 (Americom 1, GE-1)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35772,35800,0.00033,1436.1,2783.0,1600.0,6500.0,35316,15.0,Lockheed Martin Commercial Space Systems,USA,Cape Canaveral,Atlas 2A,JM/12_08,-1.798038195,0.000523599
-"AMC-10 (Americom-10, GE 10)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35775,35797,0.00026,1436.09,2315.0,907.0,6500.0,38022,15.0,Lockheed Martin,USA,Cape Canaveral,Atlas 2 AS,JM/12_08,-2.355670891,0.000174533
-"AMC-11 (Americom-11, GE 11)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35774,35797,0.00027,1436.07,2340.0,2316.0,6500.0,38126,15.0,Lockheed Martin,USA,Cape Canaveral,Atlas 2 AS,JM/12_08,-2.28515959,0.000698132
-AMC-15 (Americom-15),USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35777,35795,0.00021,1436.08,4200.0,,,38274,15.0,Lockheed Martin,USA,Baikonur Cosmodrome,Proton M,JM/12_08,-1.833293846,0.000698132
-AMC-16 (Americom-16),USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35780,35793,0.00015,1436.1,4312.0,,,38338,15.0,Lockheed Martin Commercial Space Systems,USA,Cape Canaveral,Atlas 5,JM/12_08,-1.483180798,0.000349066
-AMC-18 (Americom 18),USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35773,35800,0.00032,1436.1,2081.0,918.0,,39059,15.0,Lockheed Martin Missiles and Space,USA,Guiana Space Center,Ariane 5,JM/12_08,-1.832072116,0.001047198
-"AMC-2 (Americom 2, GE-2)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35774,35798,0.00028,1436.1,2648.0,1600.0,6500.0,35460,15.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 44L,JM/12_08,-1.762433479,0.000872665
-AMC-21 (Americom 21),USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35778,35793,0.00018,1436.1,2500.0,,5000.0,39674,15.0,Orbital Sciences Corp.,USA,Guiana Space Center,Ariane 5 ECA,JM/12_08,-2.179218104,0.052359878
-"AMC-3 (Americom 3, GE-3)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35777,35795,0.00021,1436.08,2845.0,1600.0,6500.0,35677,15.0,Lockheed Martin Commercial Space Systems,USA,Cape Canaveral,Atlas 2 AS,JM/12_08,-1.517738318,0.000349066
-"AMC-4 (Americom-4, GE-4)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35781,35791,0.00012,1436.1,3909.0,2500.0,,36477,15.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 44LP,JM/12_08,-1.762608012,0.000174533
-"AMC-5 (Americom-5, GE-5)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35777,35796,0.00023,1436.1,1698.0,769.0,,36096,15.0,Alcatel Space Industries,France,Guiana Space Center,Ariane 44L,JM/12_08,-1.377588379,0.000523599
-"AMC-6 (Americom-6, GE-6)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35778,35795,0.0002,1436.12,3901.0,2500.0,,36821,15.0,Lockheed Martin Commercial Space Systems,USA,Baikonur Cosmodrome,Proton K,JM/12_08,-1.256287996,0.000872665
-"AMC-7 (Americom-7, GE-7)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35773,35798,0.0003,1436.08,1935.0,912.0,6500.0,36783,15.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 5G,JM/12_08,-2.390053878,0.000174533
-"AMC-8 (Americom-8, GE-8, Aurora 3)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35773,35798,0.0003,1436.07,2015.0,919.0,3300.0,36879,15.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 5G,JM/12_08,-2.42600766,0.000523599
-"AMC-9 (Americom 9, GE-12)",USA,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35773,35798,0.0003,1436.08,4100.0,2000.0,10000.0,37779,15.0,Alcatel Space Industries,France,Baikonur Cosmodrome,Proton K,JM/12_08,-1.447750615,0.000872665
-Amos 2,Israel,Israel Aircraft Industries,Military/Commercial,Communications,GEO,,35778,35794,0.00019,1436.08,1400.0,646.0,1900.0,37982,12.0,Israel Aircraft Industries (IAI),Israel,Baikonur Cosmodrome,Soyuz-Fregat,JM/12_08,-0.069464104,0.000872665
-Amos 3,Israel,Space-Communication Ltd,Military/Commercial,Communications,GEO,,35783,35789,7e-05,1436.1,,,,39566,12.0,Israel Aircraft Industries (IAI),Israel,Baikonur Cosmodrome,Zenit 3SLB,JM/12_08,-0.069638637,0.000698132
-Amos 4,Israel,Space-Communication Ltd,Military/Commercial,Communications,GEO,,35633,35796,0.00194,1432.0,,,,41517,12.0,Israel Aircraft Industries (IAI),Israel,Baikonur Cosmodrome,Zenit 2SB,,1.134464014,0.000174533
-Amos 5,Israel,Space-Communication Ltd,Military/Commercial,Communications,GEO,,35595,36007,0.00488,1436.08,1600.0,,,40888,15.0,OAO ISS,Russia,Baikonur Cosmodrome,Proton M,JM/1_12,0.296705973,0.001570796
-Amsat-Oscar 7 (AO-7),USA,Amsat-NA,Civil,Amateur Radio,LEO,Sun-Synchronous,1440,1459,0.00121,114.9,29.0,,,27348,,Amsat-NA,USA,Vandenberg AFB,Delta 2310,www.satellitedebris.net 12/12,,1.769763862
-Anik F1,Canada,"Telesat Canada Ltd. (BCE, Inc.)",Commercial,Communications,GEO,,35778,35793,0.00018,1436.08,4710.0,2950.0,15500.0,36851,15.0,Boeing Satellite Systems,USA,Guiana Space Center,Ariane 44L,JM/12_08,-1.872214689,0.000349066
-Anik F1R,Canada,"Telesat Canada Ltd. (BCE, Inc.)",Commercial,Communications,GEO,,35777,35795,0.00021,1436.1,4500.0,,10000.0,38604,15.0,EADS Astrium,France/UK/Germany/Spain,Baikonur Cosmodrome,Proton M,JM/12_08,-1.872738287,0.000349066
-Anik F2,Canada,"Telesat Canada Ltd. (BCE, Inc.)",Commercial,Communications,GEO,,35781,35790,0.00011,1436.08,5910.0,3805.0,16000.0,38186,15.0,Boeing Satellite Systems,USA,Guiana Space Center,Ariane 5,JM/12_08,-1.9385372,0.000174533
-Anik F3,Canada,"Telesat Canada Ltd. (BCE, Inc.)",Commercial,Communications,GEO,,35778,35794,0.00019,1436.1,4715.0,,17500.0,39181,15.0,EADS Astrium,France/UK/Germany/Spain,Baikonur Cosmodrome,Proton M,JM/12_08,-2.071531289,0.000174533
-Anik G1,Canada,"Telesat Canada Ltd. (BCE, Inc.)",Commercial,Communications,GEO,,35773,35799,0.00031,1436.08,4905.0,,17500.0,41379,15.0,Space Systems/Loral,USA,Baikonur Cosmodrome,Proton M,SC - ASCR,-1.872738287,0.000174533
-AprizeSat 1 (LatinSat-C),Argentina,Aprize Satellites Argentina,Commercial,Communications (experimental),LEO,Sun-Synchronous,696,764,0.00479,99.4,12.0,12.0,,38167,,Aprize Satellite,Argentina,Baikonur Cosmodrome,Dnepr 1,www.satellitedebris.net 12/12,,1.710422667
-AprizeSat 2 (LatinSat-D),Argentina,Aprize Satellites Argentina,Commercial,Communications (experimental),LEO,Sun-Synchronous,694,850,0.01092,100.3,12.0,12.0,,38167,,Aprize Satellite,Argentina,Baikonur Cosmodrome,Dnepr 1,www.satellitedebris.net 12/12,,1.713913325
-AprizeSat 3,USA/Argentina,Aprize Satellite/Latin Trade Satellite,Commercial,Communications/Maritime Tracking,LEO,Sun-Synchronous,563,572,0.00065,97.0,12.0,12.0,,40023,,SpaceQuest,USA,Baikonur Cosmodrome,Dnepr,www.satellitedebris.net 12/12,,1.712167996
-AprizeSat 4,USA/Argentina,Aprize Satellite/Latin Trade Satellite,Commercial,Communications/Maritime Tracking,LEO,Sun-Synchronous,604,674,0.00499,97.5,12.0,12.0,,40023,,SpaceQuest,USA,Baikonur Cosmodrome,Dnepr,www.satellitedebris.net 12/12,,1.712167996
-AprizeSat 5,USA/Argentina,Aprize Satellite/Latin Trade Satellite,Commercial,Communications/Maritime Tracking,LEO,Sun-Synchronous,610,694,0.00598,97.8,12.0,12.0,,40772,,SpaceQuest,USA,Dombarovsky Launch Facility,Dnepr 1,www.satellitedebris.net 12/12,,1.713913325
-AprizeSat 6,USA/Argentina,Aprize Satellite/Latin Trade Satellite,Commercial,Communications/Maritime Tracking,LEO,Sun-Synchronous,627,694,0.00476,98.0,12.0,12.0,,40772,,SpaceQuest,USA,Dombarovsky Launch Facility,Dnepr 1,www.satellitedebris.net 12/12,,1.713913325
-AprizeSat 7,USA/Argentina,Aprize Satellite/Latin Trade Satellite,Commercial,Communications/Maritime Tracking,LEO,Sun-Synchronous,594,653,0.00422,97.17,12.0,12.0,,41599,,SpaceQuest,USA,Dombarovsky Launch Facility,Dnepr,ZARYA,,1.706932008
-AprizeSat 8,USA/Argentina,Aprize Satellite/Latin Trade Satellite,Commercial,Communications/Maritime Tracking,LEO,Sun-Synchronous,594,669,0.00536,97.99,12.0,12.0,,41599,,SpaceQuest,USA,Dombarovsky Launch Facility,Dnepr,ZARYA,,1.706932008
-Apstar 1,China (PR),APT Satellite Holdings Ltd.,Commercial,Communications,GEO,,35782,35795,0.00015,1436.21,1383.0,726.0,,34536,,Hughes,USA,Xichang Satellite Launch Center,Long March 3,JM/1_12,2.47732034,0.113446401
-Apstar 1A,China (PR),APT Satellite Holdings Ltd.,Commercial,Communications,GEO,,35779,35790,0.00013,1436.03,1383.0,726.0,,35249,,Hughes,USA,Xichang Satellite Launch Center,Long March 3,JM/1_12,0.898320966,0.102799893
-Apstar 6,China (PR),APT Satellite Holdings Ltd.,Commercial,Communications,GEO,,35778,35794,0.00019,1436.08,4680.0,,,38454,,Alcatel Space Industries,France,Xichang Satellite Launch Center,Long March 3B,JM/12_08,2.339439329,0.000174533
-Apstar 7,China (PR),APT Satellite Holdings Ltd.,Commercial,Communications,GEO,,35864,35874,0.00012,1440.31,5054.0,,,40999,15.0,Thales Alenia Space,France/Italy,Xichang Satellite Launch Center,Long March 3B,,1.335176878,0.000523599
-Arabsat 5C,Multinational,Arab Satellite Communications Org. (ASCO),Government,Communications,GEO,,35766,35805,0.00046,1436.06,4630.0,,,40807,15.0,Astrium/Thales Alenia Space,France,Guiana Space Center,Ariane 5 ECA,JM/1_12,0.348891317,0.001047198
-Arabsat 7F (Nimiq 1),Multinational,Arab Satellite Communications Org. (ASCO),Commercial,Communications,GEO,,35778,35794,0.00019,1436.09,3600.0,1700.0,8600.0,36300,12.0,Lockheed Martin/Spar Aerospace,USA/Canada,Baikonur Cosmodrome,Proton D,JM/12_08,0.776671517,0.000174533
-Ardusat-1,USA,NanoSatisfi Inc.,Commercial,Technology Development,LEO,Sun-Synchronous,410,415,0.00019,92.81,1.0,,,41597,0.25,"NanoSatisfi, Inc.",USA,ISS,JSSOD,ZARYA,,0.901462559
-Artemis (Advanced Data Relay and Technology Mission Satellite),ESA,European Space Agency,Commercial/Government,Communications/Research,GEO,,35771,35803,0.00038,1436.12,3105.0,1500.0,4600.0,37084,10.0,Alenia Spazio,Italy,Guiana Space Center,Ariane 5G,SC - ASCR,0.372802328,0.122696646
-AsiaSat 3S (Asiasat 3SA),China (PR),Asia Satellite Telecommunications Co. Ltd. (SES [Socit Europenne des Satellites (SES)]),Commercial,Communications,GEO,,35780,35792,0.00014,1436.07,3480.0,2500.0,10000.0,36240,15.0,Boeing Satellite Systems,USA,Baikonur Cosmodrome,Proton K,JM/12_08,1.842195025,0.000349066
-AsiaSat 4,China (PR),Asia Satellite Telecommunications Co. Ltd. (SES [Socit Europenne des Satellites (SES)]),Commercial,Communications,GEO,,35784,35789,6e-05,1436.1,4137.0,2275.0,9500.0,37723,15.0,Boeing Satellite Systems,USA,Cape Canaveral,Atlas 3B,JM/12_08,2.133490478,0.0
-AsiaSat 5,China (PR),Asia Satellite Telecommunications Co. Ltd. (SES [Socit Europenne des Satellites (SES)]),Commercial,Communications,GEO,,35778,35795,0.0002,1436.11,3760.0,,,40036,15.0,Space Systems/Loral,USA,Baikonur Cosmodrome,Breeze M,JM/10/09,1.754055898,0.0
-AsiaSat 7,China (PR),Asia Satellite Telecommunications Co. Ltd. (SES [Socit Europenne des Satellites (SES)]),Commercial,Communications,GEO,,35782,35793,0.00013,1436.17,3813.0,,,40872,15.0,Space Systems/Loral,USA,Baikonur Cosmodrome,Proton M,JM/1_12,1.841322361,0.000349066
-AsiaStar,USA,1Worldspace,Commercial,Communications,GEO,,35773,35801,0.00033,1436.15,2775.0,1530.0,5600.0,36606,15.0,Alcatel Space Industries,France,Guiana Space Center,Ariane 5G,JM/12_08,1.832072116,0.000349066
-Astra 1D,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35776,35795,0.00023,1436.08,2924.0,1700.0,3300.0,34639,15.0,Hughes,USA,Guiana Space Center,Ariane 42P,JM/12_08,0.544542727,0.020071286
-Astra 1E,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35774,35799,0.0003,1436.13,3014.0,1800.0,4150.0,34991,14.0,Hughes,USA,Guiana Space Center,Ariane 42L,JM/12_08,0.409628775,0.000698132
-Astra 1F,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35778,35797,0.00023,1436.15,3010.0,1800.0,4400.0,35173,15.0,Hughes,USA,Baikonur Cosmodrome,Proton K,JM/12_08,0.335452282,0.000523599
-Astra 1G,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35780,35791,0.00013,1436.08,3379.0,3010.0,6600.0,35766,15.0,Hughes,USA,Baikonur Cosmodrome,Proton K,JM/12_08,0.335801348,0.000698132
-Astra 1H,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35776,35794,0.00021,1436.04,3690.0,2300.0,6600.0,36329,15.0,Hughes,USA,Baikonur Cosmodrome,Proton D,JM/12_08,0.335103216,0.001047198
-Astra 1KR,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35766,35807,0.00049,1436.1,4332.0,,12000.0,38827,15.0,Lockheed Martin Commercial Space Systems,USA,Cape Canaveral,Atlas 5,JM/12_08,0.334405085,0.001396263
-Astra 1L,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35772,35798,0.00031,1436.03,4500.0,,13000.0,39206,15.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 5 ECA,JM/12_08,0.336848546,0.000872665
-Astra 1M,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35804,35852,0.00057,1438.2,5345.0,,9900.0,39757,15.0,EADS Astrium,France,Baikonur Cosmodrome,Proton M,SC - ASCR 1/09,0.335103216,0.002443461
-Astra 1N,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35715,35780,0.00077,1434.1,5350.0,,,40761,15.0,EADS Astrium,France,Guiana Space Center,Ariane 5 ECA,SC - ASCR 9/11,0.492182849,0.002094395
-Astra 2A,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35776,35797,0.00025,1436.12,3635.0,2500.0,7000.0,36037,15.0,Hughes,USA,Baikonur Cosmodrome,Proton K,JM/12_08,0.491484717,0.001396263
-Astra 2B,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35772,35801,0.00034,1436.11,3315.0,1400.0,7800.0,36783,14.0,Astrium,France/UK/Germany,Guiana Space Center,Ariane 5G,JM/12_08,0.492531915,0.00122173
-Astra 2C,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35768,35804,0.00043,1436.12,3643.0,2000.0,7000.0,37058,15.0,Boeing Satellite Systems,USA,Baikonur Cosmodrome,Proton K,JM/12_08,0.492357382,0.00122173
-Astra 2D,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35770,35802,0.00038,1436.1,1420.0,700.0,1500.0,36879,15.0,Hughes,USA,Guiana Space Center,Ariane 5G,JM/12_08,0.491135652,0.00122173
-Astra 2E,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35781,35793,0.00014,1436.12,6052.0,,13000.0,41546,15.0,EADS Astrium,France,Baikonur Cosmodrome,Proton M,SC - ASCR,0.492182849,0.001919862
-Astra 2F,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35777,35795,0.00021,1436.07,6000.0,2660.0,,41180,15.0,EADS Astrium,France/UK/Germany,Guiana Space Center,Ariane 5 ECA,SC - ASCR,0.492182849,0.001047198
-Astra 3A,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35770,35804,0.0004,1436.07,1500.0,750.0,1500.0,37344,10.0,Boeing Satellite Systems,USA,Guiana Space Center,Ariane 44L,JM/12_08,0.409803308,0.001047198
-Astra 3B,Luxembourg,SES (Socit Europenne des Satellites (SES)),Commercial,Communications,GEO,,35768,35806,0.00045,1436.11,5471.0,,10000.0,40319,15.0,EADS Astrium,France/UK/Germany/Spain,Guiana Space Center,Ariane 5 ECA,SC - ASCR,0.410152374,0.001396263
-Azerspace/Africasat-1a (Azersat-1),Azerbaijan,Ministry of Communications and Information Technologies,Government,Communications,GEO,,35778,35794,0.00019,1436.08,3250.0,1438.0,,41312,15.0,Orbital Sciences Corp.,USA,Guiana Space Center,Ariane 5 ECA,SC - ASCR,0.802851456,0.000698132
-Badr 2 (Badr B),Pakistan,Pakistan Space and Upper Atmosphere Research Commission (SUPARCO),Government/Military,Remote Sensing/Technology Development,LEO,Sun-Synchronous,984,1014,0.00204,105.1,70.0,,,37235,2.0,Pakistan Space and Upper Atmosphere Research Commission (SUPARCO),Pakistan,Baikonur Cosmodrome,Zenit 2,www.satellitedebris.net 12/12,,1.731366618
-Badr 4 (Arabsat 4B),Multinational,Arab Satellite Communications Org. (ASCO),Government,Communications,GEO,,35780,35791,0.00013,1436.06,3304.0,1487.0,,39029,15.0,EADS Astrium,France/UK/Germany/Spain,Baikonur Cosmodrome,Proton M,JM/12_08,0.454134671,0.00122173
-Badr 5 (Arabsat 5B),Multinational,Arab Satellite Communications Org. (ASCO),Government,Communications,GEO,,35834,35883,0.00058,1439.76,5420.0,,,40332,15.0,EADS Astrium,France/UK/Germany/Spain,Baikonur Cosmodrome,Proton,SC - ASCR,0.453785606,0.001047198
-Badr 5A (Arabsat 5A),Multinational,Arab Satellite Communications Org. (ASCO),Government,Communications,GEO,,35605,35623,0.00021,1427.27,4940.0,,,40355,15.0,EADS Astrium,France/UK/Germany/Spain,Guiana Space Center,Ariane 5 ECA,SC - ASCR,0.532325422,0.000523599
-Badr 6 (Arabsat 4AR),Multinational,Arab Satellite Communications Org. (ASCO),Government,Communications,GEO,,35768,35805,0.00044,1436.1,3400.0,,6000.0,39636,15.0,EADS Astrium,France/UK/Germany/Spain,Guiana Space Center,Ariane 5 ECA,JM/12_08,0.455181869,0.000872665
-BeeSat-1 (Berlin Experimental and Educational Satellite 1),Germany,Institut fr Luft- und Raumfahrt,Civil,Technology Development,LEO,Sun-Synchronous,709,718,0.00064,99.0,1.0,,,40079,1.0,TechnischeÊUniversittÊBerlin,Germany,Sriharikota Launch Station,PSLV,www.satellitedebris.net 12/12,,1.715658655
-BeeSat-2 (Berlin Experimental and Educational Satellite 2),Germany,Institut fr Luft- und Raumfahrt,Civil,Technology Development,LEO,Sun-Synchronous,555,579,0.00173,96.01,1.0,,,41383,1.0,TechnischeÊUniversittÊBerlin,Germany,Baikonur Cosmodrome,Soyuz 2-1A,ZARYA,,1.130973355
-BeeSat-3 (Berlin Experimental and Educational Satellite 3),Germany,Institut fr Luft- und Raumfahrt,Civil,Technology Development,LEO,Sun-Synchronous,554,581,0.00195,96.01,1.0,,,41383,1.0,TechnischeÊUniversittÊBerlin,Germany,Baikonur Cosmodrome,Soyuz 2-1A,ZARYA,,1.130973355
-"BeijinGalaxy-1 (Beijing 1 [Tsinghua], Tsinghau-2, China DMC+4)",China (PR),Beijing Landview Mapping Information Technology Co. Ltd (BLMIT),Civil,Earth Observation,LEO,Sun-Synchronous,681,703,0.00156,98.6,166.0,155.0,50.0,38652,7.0,Tsinghua University/University of Surrey,China (PR)/United Kingdom,Plesetsk Cosmodrome,Kosmos 3M,www.satellitedebris.net 12/12,,1.708677338
-Bird 2 (Bispectral InfraRed Detector 2),Germany,Institute of Space Sensor Technology and Planetary Exploration,Government/Civil,Remote Sensing/Technology Development,LEO,Sun-Synchronous,500,521,0.00153,94.8,92.0,77.0,120.0,37186,1.5,Deutsches Zentrum fr Luft- und Raumfahrt,Germany,Satish Dhawan Space Center,PSLV C3,www.satellitedebris.net 12/12,,1.708677338
-BKA (BelKA 2),Belarus,National Academy of Sciences,Government,Remote Sensing,LEO,,503,507,0.00029,94.7,400.0,110.0,300.0,41112,5.0,NPO VNIIEM,Russia,Baikonur Cosmodrome,Soyuz-Fregat,www.satellitedebris.net 12/12,,1.701696021
-Bonum 1 (Most 1),Russia,Russian Satellite Communications Company (Intersputnik),Commercial,Communications,GEO,,35777,35795,0.00021,1436.09,1452.0,620.0,1500.0,36121,12.0,Hughes Space and Communications,USA,Cape Canaveral,Delta 2,JM/12_08,0.976337184,0.000523599
-Brazilsat B-2 (Brasilsat B-2),Brazil,Star One (SES [Socit Europenne des Satellites (SES)]),Military/Commercial,Communications,GEO,,35776,35797,0.00025,1436.11,1780.0,1050.0,1800.0,34786,12.0,Boeing Satellite Systems,USA,Guiana Space Center,Ariane 44LP,JM/12_08,-1.186823891,0.014660766
-Brazilsat B-3 (Brasilsat B-3),Brazil,Star One (SES [Socit Europenne des Satellites (SES)]),Commercial,Communications,GEO,,35769,35803,0.0004,1436.07,1780.0,1050.0,1800.0,35830,12.0,Boeing Satellite Systems,USA,Guiana Space Center,Ariane 44LP,JM/12_08,-1.308298807,0.000698132
-Brazilsat B-4 (Brasilsat B-4),Brazil,Star One (SES [Socit Europenne des Satellites (SES)]),Commercial,Communications,GEO,,35772,35800,0.00033,1436.09,2495.0,1050.0,1800.0,36755,12.0,Boeing Satellite Systems,USA,Guiana Space Center,Ariane 44LP,JM/12_08,-1.46660017,0.00122173
-BRITE-PL-1 (BRIght-star Target Explorer - Poland),Multinational,BRITE-PL Consortium,Government,Space Science,LEO,Sun-Synchronous,594,886,0.02053,99.6,10.0,,,41599,2.0,University of Toronto Institute for Aerospace Studies,Canada,Dombarovsky Launch Facility,Dnepr,ZARYA,,1.705186679
-BSAT-3A,Japan,Broadcasting Satellite System Corp.,Commercial,Communications,GEO,,35778,35794,0.00019,1436.1,1980.0,,,39308,13.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 5 ECA,JM/12_08,1.918291381,0.000523599
-BSAT-3B,Japan,Broadcasting Satellite System Corp.,Commercial,Communications,GEO,,33066,35725,0.03261,1365.61,2060.0,975.0,,40479,15.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 5 ECA,SC - ASCR,1.919862177,0.00122173
-BSAT-3C/JCSat 110-R,Japan,Broadcasting Satellite System Corp./Sky Perfect JSAT Corporation,Commercial,Communications,GEO,,35784,35787,4e-05,1436.04,2910.0,,,40761,15.0,Lockheed Martin Commercial Space Systems,USA,Guiana Space Center,Ariane 5 ECA,SC - ASCR,1.919862177,0.000872665
-C/NOFS (Communication/Navigation Outage Forecasting System),USA,US Air Force,Military,Technology Development,LEO,,403,813,0.02938,96.85,384.0,,,39554,,General Dynamics,USA,L-1011 Aircraft,Pegasus,www.satellitedebris.net 12/12,,0.226892803
-Calipso (Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation),France/USA,Centre National d'Etudes Spatiales (CNES)/NASA,Government,Earth Science,LEO,Sun-Synchronous,702,703,7e-05,98.8,587.0,,550.0,38835,3.0,Alcatel Alenia Space,France,Vandenberg AFB,Delta 2,www.satellitedebris.net 12/12,,1.713913325
-Canopus-BÊ(Kanopus Vulcan 1)Ê,Russia,Scientific Production Corporation (joint stock creation of Russian Space Agency),Government,Remote Sensing,LEO,Sun-Synchronous,501,505,0.00029,94.7,400.0,110.0,300.0,41112,5.0,All-Russia Research Institute of Electromechanics (NPP VNIIEM),Russia,Baikonur Cosmodrome,Soyuz-Fregat,www.satellitedebris.net 12/12,,1.701696021
-Can-X2 (Canadian Advanced Nanospace experiment),Canada,University of Toronto Institute for Aerospace Studies,Civil,Technology Development,LEO,Sun-Synchronous,609,629,0.00143,97.1,7.0,,,39566,,University of Toronto Institute for Aerospace Studies,Canada,Sriharikota Launch Station,PSLV C9,www.satellitedebris.net 12/12,,1.706932008
-Can-X3aÊÊ(BRIght-star Target Explorer (BRITE)),Canada,University of Toronto Institute for Aerospace Studies,Civil,Space Science,LEO,Sun-Synchronous,771,783,0.00084,100.3,5.0,,,41330,,University of Toronto Institute for Aerospace Studies,Canada,Satish Dhawan Space Center,PSLV,SC - ASCR,,1.720894642
-Can-X6 (Canadian Advanced Nanospace experiment  NTS [Nanosatellite Tracking Ships]),Canada,University of Toronto Institute for Aerospace Studies/Com Development International Ltd.,Civil/Commercial,Technology Development,LEO,Sun-Synchronous,611,631,0.00143,97.1,16.0,6.5,,39566,0.5,University of Toronto Institute for Aerospace Studies/Com Development International Ltd.,Canada,Sriharikota Launch Station,PSLV C9,www.satellitedebris.net 12/12,,1.706932008
-CAPE-2 (Cajun Advanced Picosatellite Experiment),USA,University of Louisiana at Lafayette,Civil,Technology Development,LEO,Sun-Synchronous,500,506,0.00044,94.67,,,,41597,,University of Louisiana at Lafayette,USA,Wallops Island Flight Facility,Minotaur,ZARYA,,0.70703288
-CartoSat 1 (IRS P5),India,Indian Space Research Organization (ISRO),Government,Remote Sensing,LEO,Sun-Synchronous,618,619,7e-05,97.1,1560.0,1450.0,1100.0,38477,6.0,Indian Space Research Organization (ISRO),India,Satish Dhawan Space Center,PSLV C6,www.satellitedebris.net 12/12,,1.708677338
-"CartoSat 2 (IRS P7, CartoSat 2AT)",India,Indian Space Research Organization (ISRO),Government,Remote Sensing,LEO,Sun-Synchronous,632,635,0.00021,97.4,680.0,,,39092,,Indian Space Research Organization (ISRO),India,Satish Dhawan Space Center,PSLV C7,www.satellitedebris.net 12/12,,1.692969374
-CartoSat 2A,India,Indian Space Research Organization (ISRO),Military,Remote Sensing,LEO,Sun-Synchronous,624,643,0.00136,97.4,680.0,,,39566,,Indian Space Research Organization (ISRO),India,Sriharikota Launch Station,PSLV C9,www.satellitedebris.net 12/12,,1.708677338
-CartoSat 2B,India,Indian Space Research Organization (ISRO),Government,Remote Sensing,LEO,Sun-Synchronous,622,645,0.00164,97.4,694.0,,,40371,,Indian Space Research Organization (ISRO),India,Sriharikota Launch Station,PSLV,www.satellitedebris.net 12/12,,1.708677338
-Cassiope (CAScade SmallSat and Ionospheric Polar Explorer),Canada,Canadian Space Agency,Government,Earth Science,Elliptical,,325,1486,0.07979,103.11,490.0,,600.0,41546,2.0,Canadian Space Agency,Canada,Vandenberg AFB,Falcon 9,ZARYA,,1.413716694
-CFESat (Cibola Flight Experiment Satellite),USA,Los Alamos National Labs (LANL),Government,Technology Development,LEO,,538,544,0.00043,95.5,159.0,,110.0,39150,,Surrey Satellite Technologies Ltd.,United Kingdom,Cape Canaveral,Atlas 5,www.satellitedebris.net 12/12,,0.617846555
-ChinaSat 6B (Zhong Xing 6B),China (PR),China Satellite Communication Corp. (China Satcom),Commercial/Government,Communications,GEO,,35777,35797,0.00024,1436.1,4600.0,,9500.0,39269,15.0,Thales Alenia Space,France/Italy,Xichang Satellite Launch Center,Long March 3B,JM/12_08,2.017251549,0.000872665
-"Chuangxin 1-1 (Innovation 1-1, Chuang Xin 1, CZ-1-1)",China (PR),Chinese Academy of Sciences,Government,Communications,LEO,Sun-Synchronous,729,748,0.00134,99.6,100.0,,,37915,,China Academy of Sciences,China (PR),Taiyuan Launch Center,Long March 3B,www.satellitedebris.net 12/12,,1.719149313
-Chuangxin 1-2 (Innovation 1-2),China (PR),Chinese Academy of Sciences,Government,Earth Observation,LEO,Sun-Synchronous,785,804,0.00133,98.5,100.8,,,39757,,China Academy of Sciences,China (PR),Jiuquan Satellite Launch Center,Long March 2D,www.satellitedebris.net 12/12,,1.719149313
-Chuangxin 1-3 (Innovation 1-3),China (PR),Chinese Academy of Sciences,Government,Earth Observation,LEO,Sun-Synchronous,784,804,0.0014,100.7,100.0,,,40867,,China Academy of Sciences,China (PR),Jiuquan Satellite Launch Center,Long March 2D,www.satellitedebris.net 12/12,,1.719149313
-Chuangxin-3,China (PR),Chinese Academy of Sciences,Government,Technology Development,LEO,Sun-Synchronous,564,611,0.00338,96.43,200.0,,,41474,,China Academy of Sciences,China (PR),Taiyuan Launch Center,Long March 2C,ZARYA,,1.705186679
-Ciel-2,Canada,Ciel Satellite Group,Commercial,Communications,GEO,,35782,35788,7e-05,1436.05,5585.0,,,39792,15.0,Thales Alenia Space,France,Baikonur Cosmodrome,Proton M,JM/12_08,-2.251474735,0.000872665
-"CINEMA-1 (Cubesat for Ion, Neutral, Electron, Magnetic fields)",USA,University of California-Berkeley/Imperial College-London,Civil,Space Science,LEO,Sun-Synchronous,484,791,0.02191,97.4,3.15,,,41165,,"Space Sciences Laboratory (SSL) of the University of California Berkeley;  Kyung Hee University (KHU), Imperial College London",USA,Vandenberg AFB,Atlas 5,ZARYA,,1.127482697
-"CINEMA-2 (Cubesat for Ion, Neutral, Electron, Magnetic fields)",USA,University of California-Berkeley/Imperial College-London,Civil,Space Science,LEO,Sun-Synchronous,594,731,0.00974,98.0,3.0,,,41599,,"Space Sciences Laboratory (SSL) of the University of California Berkeley;  Kyung Hee University (KHU), Imperial College London",USA,Dombarovsky Launch Facility,Dnepr,ZARYA,,1.706932008
-"CINEMA-3 (Cubesat for Ion, Neutral, Electron, Magnetic fields)",USA,University of California-Berkeley/Imperial College-London,Civil,Space Science,LEO,Sun-Synchronous,594,747,0.01087,98.0,3.0,,,41599,,"Space Sciences Laboratory (SSL) of the University of California Berkeley;  Kyung Hee University (KHU), Imperial College London",USA,Dombarovsky Launch Facility,Dnepr,ZARYA,,1.706932008
-Cloudsat,USA,NASA/Colorado State University,Government/Civil,Earth Science,LEO,Sun-Synchronous,702,703,7e-05,98.8,848.0,,570.0,38835,2.0,NASA Jet Propulsion Laboratory,USA,Vandenberg AFB,Delta 2,www.satellitedebris.net 12/12,,1.713913325
-Compass G-1 (Beidou G1),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35768,35803,0.00042,1436.05,2200.0,,,40194,,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3C,SC - ASCR 4/10,2.522000769,0.031066861
-Compass G-10 (Beidou ISGO-5),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35708,35864,0.00185,1436.08,2300.0,,,40878,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3A,JM/1_12,1.818807614,0.962723615
-Compass G-11 (Beidou G5),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35776,35799,0.00027,1436.15,2300.0,,,40963,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3A,ZARYA,1.029744259,0.032637657
-Compass G-3 (Beidou G3),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35774,35797,0.00027,1436.05,2200.0,,,40331,,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3,SC-ASCR,1.478293876,0.031939525
-Compass G-4 (Beidou G4),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35764,35809,0.00053,1436.1,6000.0,,,40482,,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3C,SC - ASCR,2.792526803,0.024958208
-Compass G-5 (Beidou IGSO-1),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35670,35893,0.00265,1435.82,2200.0,,,40390,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3A,SC - ASCR,2.059488517,0.961501885
-Compass G-6 (Beidou 2-16),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35775,35799,0.00028,1436.11,3800.0,2300.0,,41207,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3C,SC - ASCR,1.396263402,0.032114058
-Compass G-7 (Beidou IGSO-2),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35717,35817,0.00119,1436.12,2200.0,,,40529,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3A,SC - ASCR,2.059488517,0.963945346
-Compass G-8 (Beidou IGSO-3),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35693,37872,0.02525,1435.93,2300.0,,,40642,,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3A,JM/5_11,2.059488517,1.682497399
-Compass G-9 (Beidou ISGO-4),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,GEO,,35708,35879,0.00203,1435.1,2300.0,,,40750,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3A,SC - ASCR,,0.963421747
-Compass M1 (Beidou M1),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,MEO,,21519,21545,0.00047,773.39,2200.0,,,39186,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3A,,,0.964468945
-Compass M3 (Beidou 2-12),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,MEO,,21460,21595,0.00242,773.19,2200.0,,,41027,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3B,ZARYA,,0.962723615
-Compass M4 (Beidou 2-13),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,MEO,,21452,21603,0.00271,773.21,2200.0,,,41027,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3B,ZARYA,,0.961676418
-Compass M5 (Beidou 2-14),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,MEO,,21462,21591,0.00231,773.1,3800.0,,,41170,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3B,SC - ASCR,,0.959931089
-Compass M6 (Beidou 2-15),China (PR),Chinese Defense Ministry,Military,Navigation/Global Positioning,MEO,,21477,21574,0.00174,773.1,3800.0,,,41170,8.0,Space Technology Research Institute (part of CASC),China (PR),Xichang Satellite Launch Center,Long March 3B,SC - ASCR,,0.959931089
-"COMS-1 (Communication, Ocean and Meteorological Satellite; Cheollian)",South Korea,Korea Aerospace Research Institute (KARI),Government,Earth Observation/Meteorology/Communications,GEO,,35783,35791,9e-05,1436.1,2460.0,,,40355,,EADS Astrium/Electronics and Telecommunications Research Institute (ETRI),South Korea,Guiana Space Center,Ariane 5 ECA,SC - ASCR,2.234021443,0.000174533
-COMSATBw-1 (COmmunications SATellite fr BundesWehr),Germany,Armed Forces,Military,Communications,GEO,,35773,35799,0.00031,1436.1,2440.0,,3500.0,40087,15.0,Thales Alenia Space,France/Italy,Guiana Space Center,Ariane 5,JM/12_09,1.099557429,0.000872665
-COMSATBw-2 (COmmunications SATellite fr BundesWehr),Germany,Armed Forces,Military,Communications,GEO,,35780,35794,0.00017,1436.11,2440.0,,3500.0,40319,15.0,Thales Alenia Space,France/Italy,Guiana Space Center,Ariane 5,SC - ASCR,0.230383461,0.001396263
-Coriolis (Windsat),USA,US Air Force/ US Navy/NASA,Military,Earth/Space Science,LEO,Sun-Synchronous,820,841,0.00146,101.5,817.0,395.0,1174.0,37627,3.0,"Spectrum Astro, Inc.",USA,Vandenberg AFB,Titan 2,www.satellitedebris.net 12/12,,1.724385301
-"COSMIC-A (Formosat-3A, Constellation Observing System for Meteorology, Ionosphere and Climate)",Taiwan/USA,"National Space Program Office (NSPO)/University Corporation for Atmospheric Research (UCAR) Boulder, CO",Government/Civil,Remote Sensing,LEO,Sun-Synchronous,764,836,0.00502,100.9,70.0,,46.0,38822,2.0,Orbital Sciences Corp.,USA,Vandenberg AFB,Minotaur,www.satellitedebris.net 12/12,,1.256637061
-"COSMIC-B (Formosat-3B, Constellation Observing System for Meteorology, Ionosphere and Climate)",Taiwan/USA,"National Space Program Office (NSPO)/University Corporation for Atmospheric Research (UCAR) Boulder, CO",Government/Civil,Remote Sensing,LEO,Sun-Synchronous,769,831,0.00432,100.9,70.0,,46.0,38822,2.0,Orbital Sciences Corp.,USA,Vandenberg AFB,Minotaur,www.satellitedebris.net 12/12,,1.256637061
-"COSMIC-D (Formosat-3D, Constellation Observing System for Meteorology, Ionosphere and Climate)",Taiwan/USA,"National Space Program Office (NSPO)/University Corporation for Atmospheric Research (UCAR) Boulder, CO",Government/Civil,Remote Sensing,LEO,Sun-Synchronous,669,746,0.00544,98.9,70.0,,46.0,38822,2.0,Orbital Sciences Corp.,USA,Vandenberg AFB,Minotaur,www.satellitedebris.net 12/12,,1.256637061
-"COSMIC-E (Formosat-3E, Constellation Observing System for Meteorology, Ionosphere and Climate)",Taiwan/USA,"National Space Program Office (NSPO)/University Corporation for Atmospheric Research (UCAR) Boulder, CO",Government/Civil,Remote Sensing,LEO,Sun-Synchronous,751,849,0.00683,100.9,70.0,,46.0,38822,2.0,Orbital Sciences Corp.,USA,Vandenberg AFB,Minotaur,www.satellitedebris.net 12/12,,1.256637061
-"COSMIC-F (Formosat-3F, Constellation Observing System for Meteorology, Ionosphere and Climate)",Taiwan/USA,"National Space Program Office (NSPO)/University Corporation for Atmospheric Research (UCAR) Boulder, CO",Government/Civil,Remote Sensing,LEO,Sun-Synchronous,772,828,0.00391,100.9,70.0,,46.0,38822,2.0,Orbital Sciences Corp.,USA,Vandenberg AFB,Minotaur,www.satellitedebris.net 12/12,,1.256637061
-COSMO-Skymed 1 (Constellation of small Satellites for Mediterranean basin Observation),Italy,Italian Space Agency/Ministry of Defense,Civil/Military,Remote Sensing/Imaging,LEO,Sun-Synchronous,622,623,7e-05,97.2,1700.0,,3600.0,39241,5.0,Thales Alenia Space,France/Italy,Vandenberg AFB,Delta 7000,www.satellitedebris.net 12/12,,1.708677338
-COSMO-Skymed 2 (Constellation of small Satellites for Mediterranean basin Observation),Italy,Italian Space Agency/Ministry of Defense,Military/Government,Earth Observation,LEO,Sun-Synchronous,622,623,7e-05,97.2,1700.0,,,39425,5.0,ThalesÊAleniaÊSpace,Italy,Vandenberg AFB,Delta 2,www.satellitedebris.net 12/12,,1.708677338
-COSMO-Skymed 3 (Constellation of small Satellites for Mediterranean basin Observation),Italy,Italian Space Agency/Ministry of Defense,Military/Government,Earth Observation,LEO,Sun-Synchronous,622,623,7e-05,97.2,1700.0,,,39746,5.0,ThalesÊAleniaÊSpace,Italy,Vandenberg AFB,Delta 7420,www.satellitedebris.net 12/12,,1.708677338
-COSMO-Skymed 4 (Constellation of small Satellites for Mediterranean basin Observation),Italy,Italian Space Agency/Ministry of Defense,Military/Government,Earth Observation,LEO,Sun-Synchronous,622,623,7e-05,97.2,1700.0,,,40488,5.0,ThalesÊAleniaÊSpace,Italy,Vandenberg AFB,Delta 2,www.satellitedebris.net 12/12,,1.708677338
-Cryosat-2,ESA,European Space Agency (ESA),Government,Earth Observation,LEO,,713,724,0.00078,99.2,720.0,,,40276,3.0,EADS Astrium,France/UK/Germany/Spain,Baikonur Cosmodrome,Dnepr,www.satellitedebris.net 12/12,,1.605702912
-Cubebug 1ÊÊ(Capitn Beto),Argentina,"Argentinian Ministry of Science, Technology and Productive Innovation/Radio Club Bariloche",Civil,Technology Development,LEO,Sun-Synchronous,630,653,0.00164,97.55,2.0,,,41390,,"Argentinian Ministry of Science, Technology and Productive Innovation",Argentina,Jiuquan Satellite Launch Center,Chang Zheng 2D,SC - ASCR,,1.711295332
-"Cubebug 2 (Manolito, LO-74)",Argentina,"Argentinian Ministry of Science, Technology and Productive Innovation/Radio Club Bariloche",Civil,Technology Development,LEO,Sun-Synchronous,594,715,0.00861,97.8,2.0,,,41599,,"Argentinian Ministry of Science, Technology and Productive Innovation",Argentina,Dombarovsky Launch Facility,Dnepr,ZARYA,,1.706932008
-"Cubesat XI-IV (Oscar 57, CO-57)",Japan,"Department of Astronautics, University of Tokyo",Civil,Technology Development,LEO,Sun-Synchronous,815,830,0.00104,101.3,,1.0,,37802,,"Department of Astronautics, University of Tokyo",Japan,Plesetsk Cosmodrome,Dnepr,www.satellitedebris.net 12/12,,1.722639972
-"Cubesat XI-V (Oscar 58, CO-58)",Japan,"Department of Astronautics, University of Tokyo",Civil,Technology Development,LEO,Sun-Synchronous,678,703,0.00177,98.6,1.0,1.0,,38652,,"Department of Astronautics, University of Tokyo",Japan,Plesetsk Cosmodrome,Kosmos 3M,www.satellitedebris.net 12/12,,1.708677338
-CUNYSat-1ÊÊ(City University of New York Satellite-1),USA,City University of New York,Civil,Technology Development,LEO,,443,886,0.03149,98.0,1.0,,,41614,,City University of New York,USA,Vandenberg AFB,Atlas 5,ZARYA estimated,,2.09963109
-CUSat-1 (Cornell University Satellite 1),USA,"Space Systems Design Studio, Cornell University",Civil,Technology Development,LEO,,326,1465,0.07838,102.89,,,2.2,41546,0.5,"Space Systems Design Studio, Cornell University",USA,Vandenberg AFB,Falcon 9,SC - ASCR,,1.413542161
-"Cute-1 (Cubical Titech Engineering satellite, Oscar 55, CO-55)",Japan,Tokyo Institute of Technology,Civil,Technology Development,LEO,Sun-Synchronous,814,829,0.00104,101.3,,1.0,,37802,1.0,Tokyo Institute of Technology,Japan,Plesetsk Cosmodrome,Dnepr,www.satellitedebris.net 12/12,,1.722639972
-Cute-1.7 + APD II (Cubical Titech Engineering satellite+Avalanche Photodiode),Japan,Tokyo Institute of Technology,Civil,Technology Development,LEO,Sun-Synchronous,609,628,0.00136,97.1,,,,39566,1.0,Tokyo Institute of Technology,Japan,Sriharikota Launch Station,PSLV C9,www.satellitedebris.net 12/12,,1.706932008
-DANDE (Drag and Atmospheric Neutral Density Explorer),USA,"University of Colorado, Boulder",Civil/Government,Technology Development,LEO,,326,1475,0.07902,103.0,50.0,38.0,,41546,1.5,"University of Colorado, Boulder",USA,Vandenberg AFB,Falcon 9,SC - ASCR,,1.413716694
-Deimos 1,Spain,Deimos Imaging/DMC International Imaging (DMCII),Government,Earth Observation,LEO,Sun-Synchronous,661,662,7e-05,98.0,90.0,,,40023,5.0,Surrey Satellite Technologies Ltd.,United Kingdom,Baikonur Cosmodrome,Dnepr,www.satellitedebris.net 12/12,,1.710422667
-Delfi-C3 (DO-64),Netherlands,"Technical University, Delft",Civil,Technology Development,LEO,Sun-Synchronous,598,616,0.00129,96.8,6.5,,,39566,,Technical University of Delft,Netherlands,Sriharikota Launch Station,PSLV C9,www.satellitedebris.net 12/12,,1.706932008
-Delfi-n3Xt,Netherlands,"Technical University, Delft",Civil,Technology Development,LEO,Sun-Synchronous,594,780,0.01318,98.5,4.5,,,41599,,Technical University of Delft,Netherlands,Dombarovsky Launch Facility,Dnepr,ZARYA,,1.705186679
-DirecTV-10,USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35785,35788,4e-05,1436.1,5900.0,3700.0,18000.0,39270,15.0,Boeing Space and Intelligence Systems,USA,Baikonur Cosmodrome,Proton M,JM/12_08,-1.793151273,0.000698132
-DirecTV-11,USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35786,35786,0.0,1436.1,5900.0,,,39526,,Boeing Satellite Development Center,USA,Sea Launch (Odyssey),Zenit 3SL,JM/12_08,-1.731541151,0.000523599
-DirecTV-12,USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35785,35786,1e-05,1436.04,5900.0,,8700.0,40176,15.0,Boeing Space Systems,USA,Baikonur Cosmodrome,Breeze M,SC - ASCR,-1.794198471,0.001570796
-DirecTV-1R,Russia,Russian Satellite Communications Co.,Commercial,Communications,GEO,,35778,35795,0.0002,1436.1,3420.0,2304.0,8700.0,36443,15.0,Hughes Electronics Corp.,USA,Sea Launch (Odyssey),Zenit 3SL,JM/12_08,0.975639052,0.000523599
-DirecTV-4S,USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35780,35792,0.00014,1436.09,4300.0,2100.0,8100.0,37222,15.0,Hughes Electronics Corp.,USA,Guiana Space Center,Ariane 44LP,JM/12_08,-1.765400538,0.000872665
-DirecTV-5 (Tempo 1),USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35773,35799,0.00031,1436.08,4300.0,3640.0,,37383,15.0,Space Systems/Loral,USA,Baikonur Cosmodrome,Proton K,JM/12_08,-1.920734842,0.00122173
-DirecTV-7S,USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35774,35797,0.00027,1436.1,5483.0,3500.0,13000.0,38111,15.0,Space Systems/Loral,USA,Sea Launch,Zenit 3SL,JM/12_08,-2.077639942,0.000174533
-DirecTV-8,USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35777,35796,0.00023,1436.1,3800.0,,8200.0,38494,12.0,Space Systems/Loral,USA,Baikonur Cosmodrome,Proton M/Breeze M,JM/12_08,-1.759466419,0.000349066
-DirecTV-9S,USA,"DirecTV, Inc.",Commercial,Communications,GEO,,35774,35798,0.00028,1436.1,5500.0,2364.0,13900.0,39003,15.0,Space Systems/Loral,USA,Guiana Space Center,Ariane 5 ECA,JM/12_08,-1.764178808,0.000523599
-DLR Tubsat,Germany,Deutsches Zentrum fr Luft- und Raumfahrt,Government,Earth Science,LEO,Sun-Synchronous,712,732,0.00141,99.2,45.0,,120.0,36306,1.0,"Institute of Aeronautics and Astronautics, Technical University of Berlin",Germany,Satish Dhawan Space Center,PSLV C2,www.satellitedebris.net 12/12,,1.720894642
-"DMSP 5D-2 F13 (Defense Meteorological Satellites Program, USA 109)",USA,DoD/NOAA,Military,Earth Science/Meteorology,LEO,Sun-Synchronous,845,855,0.00069,101.93,1134.0,823.0,900.0,34782,5.0,General Electric Astro Space,USA,Vandenberg AFB,Atlas E,JMSatcat304,,1.724385301
-"DMSP 5D-2 F14 (Defense Meteorological Satellites Program, USA 131)",USA,DoD/NOAA,Military,Earth Science/Meteorology,LEO,Sun-Synchronous,842,855,0.0009,101.9,1134.0,823.0,900.0,35524,5.0,Lockheed Martin Missiles and Space,USA,Vandenberg AFB,Titan 2,JMSatcat304,,1.72613063
-"DMSP 5D-3 F15 (Defense Meteorological Satellites Program, USA 147)",USA,DoD/NOAA,Military,Earth Science/Meteorology,LEO,Sun-Synchronous,837,851,0.00097,101.8,1152.0,823.0,900.0,36506,5.0,Lockheed Martin Missiles and Space,USA,Vandenberg AFB,Titan 2,JMSatcat304,,1.72613063
-"DMSP 5D-3 F16 (Defense Meteorological Satellites Program, USA 172)",USA,DoD/NOAA,Military,Earth Science/Meteorology,LEO,Sun-Synchronous,843,852,0.00062,101.87,1154.0,825.0,900.0,37912,5.0,Lockheed Martin Missiles and Space,USA,Vandenberg AFB,Titan 2,JMSatcat304,,1.72613063
-"DMSP 5D-3 F17 (Defense Meteorological Satellites Program, USA 191)",USA,DoD/NOAA,Military,Earth Science/Meteorology,LEO,Sun-Synchronous,842,855,0.0009,101.89,1154.0,825.0,900.0,39025,5.0,Lockheed Martin Missiles and Space,USA,Vandenberg AFB,Delta 4,SC - ASCR,,1.724210768
+Purpose,Perigee_km,Apogee_km,Period_minutes,Type_of_Orbit
+Technology Development,770.0,787.0,100.42,
+Communications,35777.0,35794.0,1436.08,
+Communications,35785.0,35789.0,1436.13,
+Communications,35780.0,35793.0,1436.1,
+Communications,35780.0,35791.0,1436.06,
+Solar Physics,670.0,710.0,98.6,Sun-Synchronous
+Electronic Surveillance,35560.0,36013.0,1436.14,
+Electronic Surveillance,35589.0,35984.0,1436.1,
+Electronic Surveillance,35714.0,35937.0,1438.8,
+Electronic Surveillance,35500.0,35500.0,,
+Electronic Surveillance,35771.0,35805.0,23.94,
+Communications,35872.0,36103.0,1446.36,
+Communications,35700.0,35700.0,1306.29,
+Communications,35700.0,35700.0,1306.29,
+Technology Development,480.0,790.0,97.4,
+Technology Development,495.0,791.0,97.5,
+Technology Development,499.0,792.0,97.6,
+Technology Development,443.0,886.0,98.0,
+Technology Development,443.0,886.0,98.0,
+Communications,35764.0,35808.0,1436.08,
+Communications,35784.0,35787.0,1436.06,
+Communications,35770.0,35802.0,1436.09,
+Communications,35769.0,35802.0,1436.07,
+Scientific Research,510.0,534.0,95.1,
+Earth Science,570.0,583.0,96.2,
+Maritime Tracking/Technology Development,615.0,632.0,97.2,Sun-Synchronous
+Technology Development,599.0,626.0,96.9,
+Technology Development,558.0,582.0,96.06,
+Space Physics,264.0,5732.0,150.4,
+Technology Development,443.0,886.0,98.0,
+Communications/Technology Development,35786.0,35787.0,1436.09,
+Earth Observation,672.0,674.0,98.2,Sun-Synchronous
+Communications,35776.0,35797.0,1436.1,
+Communications,35767.0,35805.0,1436.08,
+Communications,35781.0,35791.0,1436.05,
+Communications,35772.0,35800.0,1436.1,
+Communications,35775.0,35797.0,1436.09,
+Communications,35774.0,35797.0,1436.07,
+Communications,35777.0,35795.0,1436.08,
+Communications,35780.0,35793.0,1436.1,
+Communications,35773.0,35800.0,1436.1,
+Communications,35774.0,35798.0,1436.1,
+Communications,35778.0,35793.0,1436.1,
+Communications,35777.0,35795.0,1436.08,
+Communications,35781.0,35791.0,1436.1,
+Communications,35777.0,35796.0,1436.1,
+Communications,35778.0,35795.0,1436.12,
+Communications,35773.0,35798.0,1436.08,
+Communications,35773.0,35798.0,1436.07,
+Communications,35773.0,35798.0,1436.08,
+Communications,35778.0,35794.0,1436.08,
+Communications,35783.0,35789.0,1436.1,
+Communications,35633.0,35796.0,1432.0,
+Communications,35595.0,36007.0,1436.08,
+Amateur Radio,1440.0,1459.0,114.9,Sun-Synchronous
+Communications,35778.0,35793.0,1436.08,
+Communications,35777.0,35795.0,1436.1,
+Communications,35781.0,35790.0,1436.08,
+Communications,35778.0,35794.0,1436.1,
+Communications,35773.0,35799.0,1436.08,
+Communications (experimental),696.0,764.0,99.4,Sun-Synchronous
+Communications (experimental),694.0,850.0,100.3,Sun-Synchronous
+Communications/Maritime Tracking,563.0,572.0,97.0,Sun-Synchronous
+Communications/Maritime Tracking,604.0,674.0,97.5,Sun-Synchronous
+Communications/Maritime Tracking,610.0,694.0,97.8,Sun-Synchronous
+Communications/Maritime Tracking,627.0,694.0,98.0,Sun-Synchronous
+Communications/Maritime Tracking,594.0,653.0,97.17,Sun-Synchronous
+Communications/Maritime Tracking,594.0,669.0,97.99,Sun-Synchronous
+Communications,35782.0,35795.0,1436.21,
+Communications,35779.0,35790.0,1436.03,
+Communications,35778.0,35794.0,1436.08,
+Communications,35864.0,35874.0,1440.31,
+Communications,35766.0,35805.0,1436.06,
+Communications,35778.0,35794.0,1436.09,
+Technology Development,410.0,415.0,92.81,Sun-Synchronous
+Communications/Research,35771.0,35803.0,1436.12,
+Communications,35780.0,35792.0,1436.07,
+Communications,35784.0,35789.0,1436.1,
+Communications,35778.0,35795.0,1436.11,
+Communications,35782.0,35793.0,1436.17,
+Communications,35773.0,35801.0,1436.15,
+Communications,35776.0,35795.0,1436.08,
+Communications,35774.0,35799.0,1436.13,
+Communications,35778.0,35797.0,1436.15,
+Communications,35780.0,35791.0,1436.08,
+Communications,35776.0,35794.0,1436.04,
+Communications,35766.0,35807.0,1436.1,
+Communications,35772.0,35798.0,1436.03,
+Communications,35804.0,35852.0,1438.2,
+Communications,35715.0,35780.0,1434.1,
+Communications,35776.0,35797.0,1436.12,
+Communications,35772.0,35801.0,1436.11,
+Communications,35768.0,35804.0,1436.12,
+Communications,35770.0,35802.0,1436.1,
+Communications,35781.0,35793.0,1436.12,
+Communications,35777.0,35795.0,1436.07,
+Communications,35770.0,35804.0,1436.07,
+Communications,35768.0,35806.0,1436.11,
+Communications,35778.0,35794.0,1436.08,
+Remote Sensing/Technology Development,984.0,1014.0,105.1,Sun-Synchronous
+Communications,35780.0,35791.0,1436.06,
+Communications,35834.0,35883.0,1439.76,
+Communications,35605.0,35623.0,1427.27,
+Communications,35768.0,35805.0,1436.1,
+Technology Development,709.0,718.0,99.0,Sun-Synchronous
+Technology Development,555.0,579.0,96.01,Sun-Synchronous
+Technology Development,554.0,581.0,96.01,Sun-Synchronous
+Earth Observation,681.0,703.0,98.6,Sun-Synchronous
+Remote Sensing/Technology Development,500.0,521.0,94.8,Sun-Synchronous
+Remote Sensing,503.0,507.0,94.7,
+Communications,35777.0,35795.0,1436.09,
+Communications,35776.0,35797.0,1436.11,
+Communications,35769.0,35803.0,1436.07,
+Communications,35772.0,35800.0,1436.09,
+Space Science,594.0,886.0,99.6,Sun-Synchronous
+Communications,35778.0,35794.0,1436.1,
+Communications,33066.0,35725.0,1365.61,
+Communications,35784.0,35787.0,1436.04,
+Technology Development,403.0,813.0,96.85,
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Remote Sensing,501.0,505.0,94.7,Sun-Synchronous
+Technology Development,609.0,629.0,97.1,Sun-Synchronous
+Space Science,771.0,783.0,100.3,Sun-Synchronous
+Technology Development,611.0,631.0,97.1,Sun-Synchronous
+Technology Development,500.0,506.0,94.67,Sun-Synchronous
+Remote Sensing,618.0,619.0,97.1,Sun-Synchronous
+Remote Sensing,632.0,635.0,97.4,Sun-Synchronous
+Remote Sensing,624.0,643.0,97.4,Sun-Synchronous
+Remote Sensing,622.0,645.0,97.4,Sun-Synchronous
+Earth Science,325.0,1486.0,103.11,
+Technology Development,538.0,544.0,95.5,
+Astrophysics,9999.0,138825.0,3808.92,Deep Highly Eccentric
+Communications,35777.0,35797.0,1436.1,
+Communications,729.0,748.0,99.6,Sun-Synchronous
+Earth Observation,785.0,804.0,98.5,Sun-Synchronous
+Earth Observation,784.0,804.0,100.7,Sun-Synchronous
+Technology Development,564.0,611.0,96.43,Sun-Synchronous
+Communications,35782.0,35788.0,1436.05,
+Space Science,484.0,791.0,97.4,Sun-Synchronous
+Space Science,594.0,731.0,98.0,Sun-Synchronous
+Space Science,594.0,747.0,98.0,Sun-Synchronous
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Navigation/Global Positioning,35768.0,35803.0,1436.05,
+Navigation/Global Positioning,35708.0,35864.0,1436.08,
+Navigation/Global Positioning,35776.0,35799.0,1436.15,
+Navigation/Global Positioning,35774.0,35797.0,1436.05,
+Navigation/Global Positioning,35764.0,35809.0,1436.1,
+Navigation/Global Positioning,35670.0,35893.0,1435.82,
+Navigation/Global Positioning,35775.0,35799.0,1436.11,
+Navigation/Global Positioning,35717.0,35817.0,1436.12,
+Navigation/Global Positioning,35693.0,37872.0,1435.93,
+Navigation/Global Positioning,35708.0,35879.0,1435.1,
+Navigation/Global Positioning,21519.0,21545.0,773.39,
+Navigation/Global Positioning,21460.0,21595.0,773.19,
+Navigation/Global Positioning,21452.0,21603.0,773.21,
+Navigation/Global Positioning,21462.0,21591.0,773.1,
+Navigation/Global Positioning,21477.0,21574.0,773.1,
+Earth Observation/Meteorology/Communications,35783.0,35791.0,1436.1,
+Communications,35773.0,35799.0,1436.1,
+Communications,35780.0,35794.0,1436.11,
+Earth/Space Science,820.0,841.0,101.5,Sun-Synchronous
+Remote Sensing,764.0,836.0,100.9,Sun-Synchronous
+Remote Sensing,769.0,831.0,100.9,Sun-Synchronous
+Remote Sensing,669.0,746.0,98.9,Sun-Synchronous
+Remote Sensing,751.0,849.0,100.9,Sun-Synchronous
+Remote Sensing,772.0,828.0,100.9,Sun-Synchronous
+Remote Sensing/Imaging,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,713.0,724.0,99.2,
+Technology Development,630.0,653.0,97.55,Sun-Synchronous
+Technology Development,594.0,715.0,97.8,Sun-Synchronous
+Technology Development,815.0,830.0,101.3,Sun-Synchronous
+Technology Development,678.0,703.0,98.6,Sun-Synchronous
+Technology Development,443.0,886.0,98.0,
+Technology Development,326.0,1465.0,102.89,
+Technology Development,814.0,829.0,101.3,Sun-Synchronous
+Technology Development,609.0,628.0,97.1,Sun-Synchronous
+Technology Development,326.0,1475.0,103.0,
+Earth Observation,661.0,662.0,98.0,Sun-Synchronous
+Technology Development,598.0,616.0,96.8,Sun-Synchronous
+Technology Development,594.0,780.0,98.5,Sun-Synchronous
+Communications,35785.0,35788.0,1436.1,
+Communications,35786.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.04,
+Communications,35778.0,35795.0,1436.1,
+Communications,35780.0,35792.0,1436.09,
+Communications,35773.0,35799.0,1436.08,
+Communications,35774.0,35797.0,1436.1,
+Communications,35777.0,35796.0,1436.1,
+Communications,35774.0,35798.0,1436.1,
+Earth Science,712.0,732.0,99.2,Sun-Synchronous
+Earth Science/Meteorology,845.0,855.0,101.93,Sun-Synchronous
+Earth Science/Meteorology,842.0,855.0,101.9,Sun-Synchronous
+Earth Science/Meteorology,837.0,851.0,101.8,Sun-Synchronous
+Earth Science/Meteorology,843.0,852.0,101.87,Sun-Synchronous
+Earth Science/Meteorology,842.0,855.0,101.89,Sun-Synchronous
+Earth Science/Meteorology,842.0,859.0,101.94,Sun-Synchronous
+Technology Development,559.0,582.0,96.08,Sun-Synchronous
+Technology Development,594.0,815.0,98.8,Sun-Synchronous
+Technology Development,594.0,815.0,98.8,Sun-Synchronous
+Technology Development,35775.0,35799.0,1436.12,
+Communications,35771.0,35802.0,1436.12,
+Communications,35760.0,35814.0,1436.1,
+Communications,35757.0,35817.0,1436.1,
+Communications,35706.0,35868.0,1436.13,
+Communications,35774.0,35799.0,1436.12,
+Communications,35718.0,35855.0,1436.1,
+Communications,35756.0,35817.0,1436.11,
+Communications,35784.0,35784.0,1436.1,
+Early Warning,35780.0,35800.0,1436.27,
+Early Warning,35897.0,35909.0,142.08,
+Early Warning,35765.0,35810.0,1436.14,
+Early Warning,35741.0,35832.0,1436.12,
+Earth Observation,662.0,680.0,98.2,Sun-Synchronous
+Earth Observation,585.0,603.0,96.56,Sun-Synchronous
+Technology Development,596.0,639.0,97.0,Sun-Synchronous
+Communications,35776.0,35795.0,1436.07,
+Communications,35780.0,35792.0,1436.0,
+Communications,35778.0,35793.0,1436.1,
+Communications,35782.0,35791.0,1436.11,
+Communications,35785.0,35789.0,1436.11,
+Communications,35789.0,35803.0,1436.57,
+Communications,35776.0,35796.0,1436.06,
+Communications,35781.0,35794.0,1436.13,
+Communications,35783.0,35790.0,1436.11,
+Communications,35775.0,35798.0,1436.12,
+Communications,35782.0,35789.0,1436.07,
+Communications,35783.0,35789.0,1436.1,
+Communications,35775.0,35797.0,1436.08,
+Communications,35773.0,35799.0,1436.1,
+Technology Development,639.0,694.0,98.1,Sun-Synchronous
+Meteorology,35323.0,35750.0,1423.35,
+Electronic Intelligence/Technology Development,675.0,692.0,98.43,Polar
+Electronic Intelligence/Technology Development,677.0,692.0,98.46,Polar
+Electronic Intelligence/Technology Development,675.0,692.0,98.43,Polar
+Electronic Intelligence/Technology Development,677.0,692.0,98.45,Polar
+Earth Observation/Research,678.0,690.0,98.4,Sun-Synchronous
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Remote Sensing,702.0,703.0,98.8,Sun-Synchronous
+Earth Observation,701.0,704.0,98.8,Sun-Synchronous
+Remote Sensing,530.0,547.0,95.4,Sun-Synchronous
+Remote Sensing,508.0,514.0,94.8,Sun-Synchronous
+Technology Development,306.0,1313.0,101.08,
+Technology Development,658.0,671.0,98.03,Sun-Synchronous
+Communications,35761.0,35810.0,1436.06,
+Communications,35776.0,35796.0,1436.09,
+Communications,35781.0,35822.0,1436.09,
+Communications,35768.0,35805.0,1436.1,
+Communications,35779.0,35795.0,1436.12,
+Communications,35762.0,35810.0,1436.1,
+Communications,35754.0,35817.0,1436.06,
+Communications,35772.0,35799.0,1436.1,
+Communications,35770.0,35802.0,1436.09,
+Communications,35725.0,35767.0,1434.03,
+Communications,35780.0,35790.0,1436.04,
+Communications,35788.0,35794.0,1436.1,
+Communications,35781.0,35790.0,1436.06,
+Communications,35766.0,35806.0,1436.08,
+Communications,35786.0,35787.0,1436.09,
+Communications,35778.0,35793.0,1436.08,
+Communications,35766.0,35806.0,1436.07,
+Communications,35784.0,35794.0,1436.21,
+Communications,35757.0,35815.0,1436.07,
+Communications,35777.0,35797.0,1436.12,
+Communications,35769.0,35805.0,1436.08,
+Communications,35774.0,35799.0,1436.09,
+Communications,35780.0,35800.0,1436.28,
+Communications,35769.0,35802.0,1436.07,
+Communications,35766.0,35806.0,1436.1,
+Communications,35775.0,35799.0,1436.1,
+Communications,35756.0,35815.0,1436.06,
+Communications,35759.0,35812.0,1436.06,
+Communications,35786.0,35787.0,1436.09,
+Communications,35714.0,35856.0,1436.01,
+Maritime Tracking,806.0,821.0,101.2,Sun-Synchronous
+Communications,35781.0,35790.0,1436.06,
+Communications,35783.0,35790.0,1436.11,
+Communications,35774.0,35798.0,1436.1,
+Communications,35785.0,35788.0,1436.1,
+Communications,35777.0,35795.0,1436.1,
+Communications,35782.0,35791.0,1436.1,
+Communications,35987.0,35995.0,1446.57,
+Communications,35420.0,35940.0,1430.6,
+Technology Development,538.0,540.0,95.4,
+Technology Development,627.0,654.0,97.54,Sun-Synchronous
+Technology Development,488.0,500.0,94.49,
+Technology Development,488.0,500.0,94.49,
+Earth Science,35777.0,35791.0,1436.0,
+Earth Science,35767.0,35803.0,1436.04,
+Earth Science,35760.0,35816.0,1436.19,
+Earth Science,820.0,835.0,101.5,Sun-Synchronous
+Earth Science,827.0,828.0,101.5,Sun-Synchronous
+Earth Science,827.0,828.0,101.45,
+Astrophysics,537.0,556.0,95.6,
+Reconnaissance,1101.0,1107.0,107.35,
+Reconnaissance,1068.0,1107.0,107.0,
+Reconnaissance,1066.0,1081.0,106.7,
+Space Science,443.0,886.0,98.0,
+Space Science,443.0,886.0,98.0,
+Earth Science,500.0,506.0,94.68,
+Communications,35745.0,35829.0,1436.13,
+Remote Sensing,890.0,893.0,102.8,Sun-Synchronous
+Earth Observation,790.0,823.0,101.0,Intermediate
+Communications,594.0,683.0,97.4,
+Communications,35785.0,35795.0,1436.11,
+Communications,35775.0,35796.0,1436.07,
+Communications,35781.0,35790.0,1436.07,
+Communications,35776.0,35795.0,1436.07,
+Communications,35776.0,35795.0,1436.07,
+Communications,35775.0,35798.0,1436.1,
+Communications,35774.0,35799.0,1436.1,
+Communications,35774.0,35798.0,1436.1,
+Communications,35776.0,35796.0,1436.1,
+Communications,35771.0,35801.0,1436.08,
+Communications,35778.0,35795.0,1436.11,
+Communications,35776.0,35794.0,1436.06,
+Communications,35775.0,35798.0,1436.1,
+Communications,35784.0,35788.0,1436.11,
+Navigation/Global Positioning,23242.0,23307.0,846.98,
+Navigation/Global Positioning,23240.0,23306.0,846.88,
+Navigation/Global Positioning,23214.0,23233.0,844.76,
+Navigation/Global Positioning,23217.0,23227.0,844.69,
+Remote Sensing,630.0,654.0,97.56,
+Communications,35782.0,35790.0,1436.1,
+Communications,35774.0,35801.0,1436.16,
+Technology Development,593.0,819.0,98.9,Sun-Synchronous
+Technology Development,522.0,569.0,95.6,
+Technology Development,508.0,586.0,95.6,
+Remote Sensing,671.0,686.0,98.3,Sun-Synchronous
+Space Physics,3905.0,104552.0,2474.83,Deep Highly Eccentric
+Earth Science,701.0,704.0,98.8,Sun-Synchronous
+Communications,1407.0,1412.0,114.0,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1406.0,1422.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1416.0,114.1,Intermediate
+Communications,900.0,1413.0,114.1,Intermediate
+Communications,1477.0,1478.0,114.1,Intermediate
+Communications,1411.0,1417.0,114.1,Intermediate
+Communications,1411.0,1416.0,114.1,Intermediate
+Communications,1415.0,1416.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1411.0,1416.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1411.0,1414.0,114.0,Intermediate
+Communications,1411.0,1416.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1416.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.08,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1459.0,1739.0,118.2,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1360.0,1400.0,113.35,Intermediate
+Communications,915.0,927.0,103.44,Intermediate
+Communications,1409.0,1418.0,114.08,Intermediate
+Communications,918.0,928.0,103.48,Intermediate
+Communications,1370.0,1391.0,113.96,Intermediate
+Navigation/Global Positioning,19116.0,19146.0,675.78,
+Navigation/Global Positioning,19134.0,19141.0,676.1,
+Navigation/Global Positioning,19118.0,19125.0,675.39,
+Navigation/Global Positioning,19130.0,19130.0,675.75,
+Navigation/Global Positioning,19130.0,19130.0,675.75,
+Navigation/Global Positioning,19130.0,19130.0,675.75,
+Navigation/Global Positioning,19094.0,19171.0,675.83,
+Navigation/Global Positioning,19124.0,19133.0,675.67,
+Navigation/Global Positioning,19142.0,19378.0,680.91,
+Navigation/Global Positioning,18981.0,19126.0,672.7,
+Navigation/Global Positioning,19147.0,19365.0,680.75,
+Navigation/Global Positioning,19092.0,19141.0,675.2,
+Navigation/Global Positioning,19134.0,19145.0,676.1,
+Navigation/Global Positioning,19136.0,19141.0,676.07,
+Navigation/Global Positioning,19112.0,19142.0,675.62,
+Navigation/Global Positioning,18922.0,19135.0,671.71,
+Navigation/Global Positioning,19132.0,19419.0,681.53,
+Navigation/Global Positioning,19119.0,19146.0,675.85,
+Navigation/Global Positioning,19131.0,19133.0,675.81,
+Navigation/Global Positioning,18864.0,19130.0,670.47,
+Navigation/Global Positioning,19098.0,19129.0,675.08,
+Navigation/Global Positioning,19128.0,19135.0,675.81,
+Navigation/Global Positioning,18909.0,19123.0,671.2,
+Navigation/Global Positioning,19116.0,19380.0,680.43,
+Navigation/Global Positioning,19079.0,19175.0,675.61,
+Navigation/Global Positioning,19126.0,19158.0,676.2,
+Navigation/Global Positioning,19142.0,19204.0,677.46,
+Navigation/Global Positioning,19150.0,19199.0,677.5,
+Navigation/Global Positioning,19139.0,19212.0,677.54,
+Navigation/Global Positioning,19130.0,19162.0,676.38,
+Navigation/Global Positioning,19087.0,19173.0,675.73,
+Earth Science/Meteorology,35768.0,35801.0,1436.0,
+Earth Science/Meteorology,35170.0,35170.0,1436.0,
+Earth Science/Meteorology,35786.0,35788.0,1436.14,
+Communications,35772.0,35800.0,1436.08,
+Earth Observation,669.0,690.0,98.35,Sun-Synchronous
+Communications,1398.0,1415.0,113.9,Intermediate
+Communications,1405.0,1415.0,114.0,Intermediate
+Communications,1408.0,1417.0,114.0,Intermediate
+Communications,1497.0,1510.0,116.1,Intermediate
+Communications,1478.0,1510.0,115.9,Intermediate
+Communications,1482.0,1507.0,115.86,
+Communications,1480.0,1511.0,115.9,Intermediate
+Communications,1493.0,1508.0,116.0,
+Communications,1494.0,1509.0,116.02,
+Earth Science,435.0,450.0,93.4,Polar
+Earth Science,434.0,451.0,93.4,Polar
+Earth Science,668.0,670.0,98.1,Sun-Synchronous
+Communications,35777.0,35795.0,1436.07,
+Communications,35761.0,35811.0,1436.1,
+Communications,35763.0,35810.0,1436.1,
+Communications/Technology Development,35776.0,35796.0,1436.07,
+Communications,35757.0,35814.0,1436.0,
+Communications/Navigation,35782.0,35796.0,1436.23,
+Meteorology,782.0,803.0,100.7,
+Meteorology,965.0,967.0,104.4,
+Communications,601.0,636.0,97.1,Sun-Synchronous
+Reconnaissance,681.0,683.0,98.0,Sun-Synchronous
+Reconnaissance,679.0,682.0,98.37,Sun-Synchronous
+Communications,35769.0,35803.0,1436.08,
+Astrophysics,535.0,551.0,95.5,Intermediate
+Solar Physics,670.0,696.0,98.4,
+Space Science,952.0,1155.0,106.27,
+Communications,35764.0,35808.0,1436.08,
+Communications,35764.0,35809.0,1436.11,
+Communications,35782.0,35786.0,1435.95,
+Remote Sensing,628.0,665.0,97.7,Polar
+Remote Sensing,621.0,673.0,97.7,Polar
+Remote Sensing,489.0,503.0,94.53,
+Radar Calibration,499.0,504.0,94.65,
+Communications,35777.0,35796.0,1436.1,
+Technology Development,650.0,669.0,97.9,Sun-Synchronous
+Astrophysics/Planetary Science,555.0,559.0,95.8,Intermediate
+Technology Development,590.0,640.0,96.9,Sun-Synchronous
+Communications,35770.0,35803.0,1436.07,
+Communications,35775.0,35799.0,1436.14,
+Technology Development,590.0,639.0,96.9,Sun-Synchronous
+Reconnaissance,485.0,491.0,94.36,Sun-Synchronous
+Reconnaissance,484.0,492.0,94.37,Sun-Synchronous
+Reconnaissance,484.0,492.0,94.37,Sun-Synchronous
+Reconnaissance,588.0,591.0,96.47,Sun-Synchronous
+Reconnaissance,512.0,514.0,94.89,Sun-Synchronous
+Reconnaissance,509.0,514.0,94.85,Sun-Synchronous
+Reconnaissance,,,,Sun-Synchronous
+Remote Sensing,678.0,680.0,98.3,Sun-Synchronous
+Electronic Surveillance,1111.0,37564.0,684.0,Molniya
+Electronic Surveillance,1112.0,37580.0,684.0,Molniya
+Remote Sensing,620.0,637.0,97.3,Sun-Synchronous
+Communications,35764.0,35808.0,1436.08,
+Communications,35763.0,35809.0,1436.1,
+Communications,35609.0,35642.0,1427.91,
+Communications,35769.0,35803.0,1436.07,
+Communications,35772.0,35799.0,1436.08,
+Communications,35773.0,35800.0,1436.11,
+Communications,35775.0,35798.0,1436.1,
+Communications,35784.0,35790.0,1436.13,
+Meteorology,35780.0,35793.0,1436.1,
+Communications,35764.0,35809.0,1436.1,
+Meteorology,35782.0,35791.0,1436.09,
+Communications/Earth Science,35765.0,35807.0,1436.08,
+Communications,35777.0,35796.0,1436.1,
+Communications,35760.0,35811.0,1436.08,
+Communications,37782.0,37791.0,1436.11,
+Space Physics,2284.0,152812.0,4032.86,Deep Highly Eccentric
+Communications,35776.0,35796.0,1436.08,
+Communications,35783.0,35789.0,1436.08,
+Communications,35778.0,35795.0,1436.1,
+Communications,35771.0,35800.0,1436.05,
+Communications,35776.0,35798.0,1436.12,
+Communications,35783.0,35791.0,1436.19,
+Communications,35770.0,35804.0,1436.12,
+Communications,35775.0,35797.0,1436.09,
+Communications,35768.0,35801.0,1436.01,
+Communications,35785.0,35788.0,1436.11,
+Communications,35780.0,35790.0,1436.03,
+Communications,35774.0,35811.0,1436.39,
+Communications,35781.0,35792.0,1436.11,
+Communications,35781.0,35797.0,1436.21,
+Communications,35778.0,35793.0,1436.1,
+Communications,35779.0,35794.0,1436.1,
+Communications,35774.0,35798.0,1436.09,
+Communications,35778.0,35795.0,1436.12,
+Communications,35775.0,35797.0,1436.09,
+Communications,35775.0,35797.0,1436.08,
+Communications,35776.0,35796.0,1436.1,
+Communications,35776.0,35795.0,1436.07,
+Communications,35774.0,35798.0,1436.08,
+Communications,35775.0,35797.0,1436.08,
+Communications,35782.0,35792.0,1436.14,
+Communications,35775.0,35798.0,1436.12,
+Communications,35775.0,35797.0,1436.1,
+Communications,35773.0,358802.0,1436.16,
+Communications,35782.0,35789.0,1436.07,
+Communications,35768.0,35805.0,1436.12,
+Communications,35775.0,35796.0,1436.07,
+Communications,35770.0,35803.0,1436.1,
+Communications,35769.0,35804.0,1436.11,
+Communications,35800.0,35892.0,1439.15,
+Scientific Research,401.0,422.0,92.8,Intermediate
+Space Physics,7000.0,320000.0,0.22,Deep Highly Eccentric
+Technology Development,469.0,890.0,98.3,
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,708.0,711.0,99.0,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,775.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,747.0,751.0,99.8,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,744.0,753.0,99.8,Polar
+Communications,777.0,778.0,100.4,Polar
+Communications,773.0,782.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,745.0,754.0,99.8,Polar
+Communications,777.0,778.0,100.4,Polar
+Communications,748.0,750.0,99.8,Polar
+Space Science,620.0,664.0,97.5,Sun-Synchronous
+Navigation,35712.0,35872.0,1436.0,
+Remote Sensing,817.0,823.0,101.3,Sun-Synchronous
+Technology Development,710.0,721.0,99.1,Sun-Synchronous
+Earth Science,1332.0,1344.0,112.4,Intermediate
+Communications,35772.0,35801.0,1436.1,
+Communications,35784.0,35789.0,1436.11,
+Communications,35780.0,35791.0,1436.03,
+Communications,35778.0,35794.0,1436.09,
+Communications,35788.0,35794.0,1436.1,
+Communications,33782.0,37768.0,1435.52,
+Communications,35776.0,35797.0,1436.1,
+Communications,35780.0,35794.0,1436.12,
+Earth Observation,839.0,866.0,102.0,
+Meteorology,35783.0,35789.0,1436.08,
+Communications,35786.0,35788.0,1436.13,
+Reconnaissance,800.0,800.0,100.87,Sun-Synchronous
+Reconnaissance,202.0,1041.0,97.13,Sun-Synchronous
+Reconnaissance,264.0,1050.0,97.0,Sun-Synchronous
+Reconnaissance,200.0,1000.0,97.0,Sun-Synchronous
+Reconnaissance,257.0,997.0,97.25,Sun-Synchronous
+Technology Development,35778.0,35792.0,1436.04,
+Technology Development,35776.0,35796.0,1436.1,
+Technology Development,651.0,667.0,97.92,
+Earth Observation/Technology Development,676.0,698.0,98.5,Sun-Synchronous
+Earth Observation,679.0,696.0,98.5,Sun-Synchronous
+Earth Observation,535.0,552.0,95.5,Sun-Synchronous
+Reconnaissance,497.0,501.0,94.6,
+Communications,35780.0,35792.0,1436.1,
+Communications,35780.0,35794.0,1436.12,
+Remote Sensing,291.0,317.0,90.61,
+Technology Development,498.0,499.0,94.58,
+Surveillance,671.0,675.0,98.2,Intermediate
+Surveillance,574.0,676.0,97.21,Intermediate
+Surveillance,713.0,716.0,99.08,Intermediate
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Earth Science,700.0,705.0,98.8,Sun-Synchronous
+Earth Observation/Technology Development,617.0,637.0,97.2,Sun-Synchronous
+Communications,610.0,668.0,97.5,Intermediate
+Communications,603.0,717.0,97.9,Intermediate
+Communications,35760.0,35812.0,1436.1,
+Reconnaissance,900.0,911.0,103.1,Sun-Synchronous
+Communications,35778.0,35793.0,1436.8,
+Communications,35772.0,35801.0,1436.09,
+Technology Development,984.0,1014.0,105.1,Sun-Synchronous
+Technology Development,305.0,1297.0,100.9,
+Technology Development,457.0,816.0,97.45,
+Technology Development,443.0,886.0,98.0,
+Communications,35782.0,35791.0,1436.12,
+Communications,35778.0,35794.0,1436.1,
+Communications,35728.0,35788.0,1434.6,
+Earth Science,853.0,868.0,102.2,
+Surveillance,35598.0,35976.0,1436.13,
+Surveillance,33674.0,37900.0,1436.12,
+Communications,961.0,39388.0,645.98,Molniya
+Communications,964.0,39396.0,717.88,Molniya
+Communications,1006.0,39362.0,718.04,Molniya
+Meteorology,818.0,820.0,101.3,Polar
+Earth Science/Meteorology,35784.0,35791.0,1436.15,
+Earth Science/Meteorology,35770.0,35797.0,1435.96,
+Earth Science/Meteorology,35781.0,35793.0,1436.1,
+Earth Science/Meteorology,35775.0,35795.0,1436.0,
+Earth Science/Meteorology,820.0,821.0,101.3,Polar
+Earth Science/Meteorology,819.0,822.0,101.3,Polar
+Communications,35784.0,35791.0,1436.16,
+Communications,35754.0,35819.0,1436.13,
+Communications,35765.0,35809.0,1436.13,
+Communications,35764.0,35768.0,1435.04,
+Communications,35753.0,35820.0,1436.12,
+Communications,35768.0,35806.0,1436.13,
+Earth Observation/Technology Development,1481.0,1510.0,115.9,
+Remote Sensing/Earth Science,805.0,821.0,101.2,Sun-Synchronous
+Astrophysics,817.0,832.0,101.4,Sun-Synchronous
+Technology Development,669.0,690.0,98.3,Sun-Synchronous
+Communications,35763.0,35809.0,1436.09,
+Communications,35776.0,35796.0,1436.09,
+Technology Development,500.0,525.0,94.9,Sun-Synchronous
+Meteorology/Navigation,35778.0,35796.0,1436.1,
+Meteorology,35776.0,35797.0,1436.1,
+Communications,35800.0,35800.0,1436.1,
+Communications,35800.0,35900.0,1436.1,
+Communications,654.0,659.0,97.9,Polar
+Communications/Technology Development,583.0,672.0,97.3,Polar
+Communications,35775.0,35795.0,1436.04,
+Navigation/Global Positioning,19781.0,20582.0,717.94,
+Navigation/Global Positioning,19959.0,20403.0,717.93,
+Navigation/Global Positioning,20120.0,20244.0,717.97,
+Navigation/Global Positioning,20104.0,20260.0,717.97,
+Navigation/Global Positioning,19986.0,20315.0,716.69,
+Navigation/Global Positioning,20080.0,20284.0,717.97,
+Navigation/Global Positioning,20134.0,20227.0,717.91,
+Navigation/Global Positioning,19912.0,20449.0,717.91,
+Navigation/Global Positioning,20109.0,20257.0,718.01,
+Navigation/Global Positioning,20188.0,20224.0,718.94,
+Navigation/Global Positioning,20451.0,20464.0,729.18,
+Navigation/Global Positioning,20174.0,20191.0,718.0,
+Navigation/Global Positioning,20184.0,20247.0,719.32,
+Navigation/Global Positioning,19963.0,20327.0,716.47,
+Navigation/Global Positioning,20089.0,20276.0,717.98,
+Navigation/Global Positioning,20072.0,20292.0,717.96,
+Navigation/Global Positioning,19938.0,20426.0,718.0,
+Navigation/Global Positioning,20123.0,20247.0,718.09,
+Navigation/Global Positioning,20096.0,20268.0,717.97,
+Navigation/Global Positioning,20133.0,20234.0,718.03,
+Navigation/Global Positioning,20184.0,20427.0,722.98,
+Navigation/Global Positioning,20177.0,20498.0,724.28,
+Navigation/Global Positioning,20104.0,20266.0,718.09,
+Navigation/Global Positioning,20155.0,20344.0,720.71,
+Navigation/Global Positioning,20063.0,20433.0,720.65,
+Navigation/Global Positioning,20142.0,20221.0,717.95,
+Navigation/Global Positioning,20020.0,20342.0,717.93,
+Navigation/Global Positioning,20206.0,20366.0,722.19,
+Navigation/Global Positioning,20149.0,20213.0,717.93,
+Navigation/Global Positioning,20150.0,20311.0,719.92,
+Navigation/Global Positioning,20135.0,20152.0,716.4,
+Navigation/Global Positioning,20160.0,20209.0,718.07,
+Space Observation,772.0,786.0,100.4,Sun-Synchronous
+Technology Development,398.0,405.0,97.6,
+Communications,35793.0,35795.0,1436.1,
+Earth Observation,691.0,705.0,98.7,Sun-Synchronous
+Earth Observation/Technology Development,661.0,696.0,98.3,Sun-Synchronous
+Communications,35764.0,35808.0,1436.08,
+Communications,35795.0,35813.0,1436.23,
+Communications,35779.0,35793.0,1436.08,
+Communications,35779.0,35794.0,1436.1,
+Communications,35700.0,35700.0,1436.1,
+Communications,35764.0,35809.0,1436.09,
+Earth Science/Meteorology,800.0,816.0,101.0,Sun-Synchronous
+Earth Science/Meteorology,842.0,857.0,101.9,Sun-Synchronous
+Meteorology,843.0,864.0,102.0,Sun-Synchronous
+Meteorology,845.0,864.0,102.0,Sun-Synchronous
+Meteorology,827.0,827.0,101.4,Polar
+Technology Development,499.0,502.0,94.63,Sun-Synchronous
+Communications,35778.0,35795.0,1436.1,
+Communications,35776.0,35798.0,1436.15,
+Communications,35779.0,35793.0,1436.08,
+Communications,35776.0,35796.0,1436.08,
+Communications,35776.0,35797.0,1436.12,
+Communications,35775.0,35798.0,1436.12,
+Communications,35773.0,35798.0,1436.08,
+Communications,35779.0,35794.0,1436.11,
+Communications,35784.0,35792.0,1436.17,
+Communications,35772.0,35799.0,1436.08,
+Space Science,613.0,632.0,97.2,
+Scientific Research,624.0,654.0,97.48,Sun-Synchronous
+Communications,8063.0,8069.0,287.93,
+Communications,8062.0,8069.0,287.93,
+Communications,8064.0,8068.0,287.94,
+Communications,8063.0,8069.0,287.93,
+Remote Sensing,722.0,724.0,99.2,Sun-Synchronous
+Astrophysics/Earth Science,569.0,573.0,96.1,Sun-Synchronous
+Remote Sensing/Reconnaissance,367.0,764.0,95.97,Retrograde
+Remote Sensing/Reconnaissance,340.0,576.0,93.75,
+Remote Sensing/Reconnaissance,343.0,589.0,93.91,
+Technology Development,594.0,797.0,98.7,Sun-Synchronous
+Communications,35773.0,35799.0,1436.08,
+Communications,35778.0,35796.0,1436.12,
+Communications,35774.0,35797.0,1436.08,
+Communications,35774.0,35799.0,1436.1,
+Communications,35775.0,35795.0,1436.04,
+Communications,770.0,776.0,100.3,Intermediate
+Communications,769.0,777.0,100.3,Intermediate
+Communications,770.0,776.0,100.3,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,789.0,794.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,789.0,794.0,100.7,Intermediate
+Communications,787.0,796.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,791.0,792.0,100.7,Intermediate
+Communications,789.0,793.0,100.7,Intermediate
+Communications,788.0,794.0,100.7,Intermediate
+Communications,788.0,794.0,100.7,Intermediate
+Communications,790.0,792.0,100.7,Intermediate
+Communications,788.0,796.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,786.0,796.0,100.7,Intermediate
+Communications,787.0,796.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,768.0,838.0,100.9,Intermediate
+Communications,772.0,774.0,100.3,Intermediate
+Communications,772.0,774.0,100.3,Intermediate
+Communications,771.0,774.0,100.3,Intermediate
+Communications,768.0,778.0,100.3,Intermediate
+Communications,769.0,777.0,100.3,Intermediate
+Technology Development,499.0,504.0,94.6,Sun-Synchronous
+Technology Development,499.0,504.0,94.6,Sun-Synchronous
+Reconnaissance,396.0,410.0,92.62,
+Technology Development,499.0,504.0,94.6,Sun-Synchronous
+Earth Science,635.0,839.0,99.5,Sun-Synchronous
+Communications,35786.0,35800.0,1436.1,
+Communications,35784.0,35789.0,1436.13,
+Communications,35780.0,35792.0,1436.09,
+Communications,35786.0,35787.0,1436.12,
+Earth Science,692.0,694.0,98.6,Sun-Synchronous
+Navigation,949.0,1016.0,104.74,Intermediate
+Navigation,969.0,1016.0,105.0,Intermediate
+Navigation,967.0,1013.0,104.9,Intermediate
+Navigation,960.0,1008.0,104.8,Intermediate
+Navigation,961.0,1011.0,104.8,Intermediate
+Navigation,949.0,1008.0,104.7,Intermediate
+Navigation,907.0,968.0,103.8,Intermediate
+Navigation,954.0,1011.0,104.8,Intermediate
+Navigation,916.0,945.0,103.6,Intermediate
+Navigation,968.0,1022.0,105.0,Intermediate
+Technology Development/Communications,789.0,796.0,100.7,Intermediate
+Reconnaissance,714.0,733.0,99.2,Sun-Synchronous
+Technology Development,499.0,507.0,94.68,Sun-Synchronous
+Solar Physics,725.0,729.0,99.3,Sun-Synchronous
+Technology Development,410.0,414.0,92.81,Sun-Synchronous
+Earth Observation,697.0,699.0,98.7,Sun-Synchronous
+Earth Observation,678.0,691.0,98.45,Sun-Synchronous
+Earth Observation,600.0,627.0,97.0,Sun-Synchronous
+Technology Demonstration,553.0,676.0,96.98,Sun-Synchronous
+Technology Demonstration,708.0,728.0,99.2,Sun-Synchronous
+Earth Observation,813.0,820.0,101.21,Sun-Synchronous
+Technology Development,500.0,506.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,589.0,640.0,96.9,Sun-Synchronous
+Communications,35774.0,35798.0,1436.09,Sun-Synchronous
+Earth Observation,448.0,450.0,93.6,Sun-Synchronous
+Navigation,32618.0,38950.0,1436.0,
+Earth Observation,791.0,793.0,100.7,Sun-Synchronous
+Amateur Radio,1885.0,2165.0,127.45,
+Communications,35612.0,35949.0,1435.79,
+Communications,35784.0,35788.0,1436.06,
+Communications,35777.0,35797.0,1436.13,
+Technology Development,1199.0,1202.0,109.42,Polar
+Earth Observation,613.0,646.0,97.3,
+Earth Observation,621.0,638.0,97.3,
+Earth Observation,621.0,637.0,97.3,
+Earth Observation,621.0,638.0,97.3,
+Earth Observation,617.0,642.0,97.3,
+Earth Observation,667.0,697.0,98.4,Sun-Synchronous
+Communications,35786.0,35787.0,1436.1,
+Remote Sensing,663.0,688.0,98.3,Intermediate
+Technology Development,595.0,638.0,97.0,Sun-Synchronous
+Earth Observation,817.0,823.0,101.3,Sun-Synchronous
+Earth Observation,564.0,571.0,96.0,
+Earth Observation,459.0,472.0,93.9,
+Surveillance,538.0,541.0,95.4,Sun-Synchronous
+Surveillance,415.0,427.0,41.2,
+Communications,1436.0,1448.0,114.7,Intermediate
+Communications,1480.0,1511.0,115.9,Intermediate
+Communications,1477.0,1509.0,115.8,Intermediate
+Communications,1478.0,1510.0,115.8,Intermediate
+Communications,1498.0,1509.0,116.0,Intermediate
+Communications,1482.0,1507.0,115.9,Intermediate
+Communications,1495.0,1506.0,116.0,Intermediate
+Communications,1493.0,1496.0,115.9,Intermediate
+Communications,1484.0,1505.0,115.9,Intermediate
+Communications,1481.0,1512.0,115.9,Intermediate
+Communications,1473.0,1516.0,115.86,Intermediate
+Communications,1473.0,1516.0,115.86,Intermediate
+Communications,1475.0,1514.0,115.86,Intermediate
+Communications,1478.0,1509.0,115.9,Intermediate
+Communications,1477.0,1507.0,115.8,Intermediate
+Communications,1482.0,1511.0,115.8,Intermediate
+Space Physics,17240.0,120715.0,3431.1,Deep Highly Eccentric
+Earth Observation/Research,702.0,704.0,98.8,Sun-Synchronous
+Earth Observation,653.0,655.0,97.8,Sun-Synchronous
+Space Physics,16809.0,120768.0,3418.2,Deep Highly Eccentric
+Space Physics,17007.0,120923.0,3430.28,Deep Highly Eccentric
+Space Observation,772.0,787.0,100.4,Sun-Synchronous
+Earth Science,782.0,785.0,100.53,Sun-Synchronous
+Surveillance,468.0,505.0,94.3,
+Surveillance,470.0,503.0,94.34,
+Surveillance,473.0,496.0,94.3,
+Surveillance,448.0,486.0,94.4,
+Surveillance,474.0,502.0,94.37,
+Communications,35777.0,35794.0,1436.08,
+Communications,35779.0,35792.0,1436.08,
+Communications,35776.0,35796.0,1436.1,
+Communications,35779.0,35795.0,1436.1,
+Technology Development,697.0,747.0,99.2,Sun-Synchronous
+Technology Development,696.0,780.0,99.6,Sun-Synchronous
+Communications,652.0,714.0,98.4,Sun-Synchronous
+Communications,649.0,746.0,98.7,Sun-Synchronous
+Communications,651.0,725.0,98.5,Sun-Synchronous
+Communications,648.0,758.0,98.8,Sun-Synchronous
+Communications,650.0,736.0,98.6,Sun-Synchronous
+Scientific Research,603.0,702.0,97.8,Intermediate
+Remote Sensing/Research,696.0,734.0,99.1,Sun-Synchronous
+Earth Observation/Research,656.0,677.0,98.1,
+Early Warning,35778.0,35795.0,1436.11,
+Early Warning,35770.0,35790.0,1436.11,
+Reconnaissance,538.0,541.0,95.43,
+Electronic Surveillance/Ocean,1100.0,1100.0,107.26,Intermediate
+Electronic Surveillance/Ocean,1100.0,1100.0,107.26,Intermediate
+Electronic Surveillance/Ocean,1013.0,1200.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1011.0,1202.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1016.0,1203.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1017.0,1203.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1015.0,1200.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1016.0,1201.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1014.0,1201.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1019.0,1205.0,107.5,Intermediate
+Electronic Surveillance/Ocean,1012.0,1203.0,107.4,
+Electronic Surveillance/Ocean,1012.0,1203.0,107.4,
+Meteorology/Earth Observation,716.0,776.0,99.7,Intermediate
+Meteorology/Earth Observation,735.0,760.0,99.8,Intermediate
+Space Science,638.0,649.0,97.6,Intermediate
+Space Science,35779.0,35791.0,1436.03,
+Electronic Surveillance,35758.0,35815.0,1436.13,
+Communications,35761.0,35812.0,1436.1,
+Communications,500.0,39850.0,717.7,Molniya
+Communications,400.0,39966.0,718.0,Molniya
+Communications,35770.0,35803.0,14.36,
+Electronic Surveillance,35771.0,35805.0,23.94,
+Technology Development,661.0,673.0,98.1,Sun-Synchronous
+Technology Development,607.0,627.0,97.0,Sun-Synchronous
+Communications,35781.0,35793.0,1436.1,
+Communications,35778.0,35798.0,1436.19,
+Communications,35850.0,35852.0,1439.41,
+Communications,35781.0,35792.0,1436.1,
+Communications,35783.0,35791.0,1436.12,
+Communications,35757.0,35816.0,1436.09,
+Communications,35783.0,35790.0,1436.1,
+Communications,35777.0,35795.0,1436.07,
+Space Physics,686.0,703.0,98.7,Sun-Synchronous
+Technology Development,686.0,704.0,98.7,Sun-Synchronous
+Technology Development,688.0,703.0,98.7,Sun-Synchronous
+Technology Development,689.0,704.0,98.7,Sun-Synchronous
+Technology Development,583.0,601.0,96.5,Sun-Synchronous
+Technology Development,661.0,673.0,98.08,Sun-Synchronous
+Technology Development,599.0,616.0,96.85,Sun-Synchronous
+Space Physics,579.0,606.0,96.5,Sun-Synchronous
+Space Physics,587.0,598.0,96.5,Sun-Synchronous
+Space Physics,591.0,594.0,96.5,Sun-Synchronous
+Space Physics,594.0,595.0,96.6,Sun-Synchronous
+Space Physics,581.0,607.0,96.6,Sun-Synchronous
+Space Physics,578.0,603.0,96.5,Sun-Synchronous
+Reconnaissance,584.0,603.0,96.6,Sun-Synchronous
+Reconnaissance,586.0,602.0,96.6,Sun-Synchronous
+Space Physics,534.0,591.0,95.9,Sun-Synchronous
+Technology Development,623.0,650.0,97.44,
+Technology Development,624.0,651.0,97.46,
+Remote Sensing,586.0,601.0,96.6,Sun-Synchronous
+Remote Sensing/Research,785.0,803.0,100.8,Sun-Synchronous
+Remote Sensing/Research,784.0,802.0,100.7,Sun-Synchronous
+Remote Sensing/Research,739.0,755.0,99.7,
+Technology Development,668.0,672.0,98.15,Sun-Synchronous
+Earth Observation,684.0,701.0,98.6,Sun-Synchronous
+Communications,35769.0,35802.0,1436.06,
+Communications,35788.0,35802.0,1436.52,
+Communications/Research,681.0,703.0,98.6,Sun-Synchronous
+Communications,35794.0,35796.0,1436.1,
+Communications,23783.0,47100.0,1418.5,
+Communications,12849.0,47048.0,1148.43,
+Communications,6179.0,47086.0,994.83,
+Communications,35776.0,35795.0,1436.1,
+Communications,35774.0,35798.0,1436.0,
+Communications,35785.0,35791.0,1436.16,
+Communications,35779.0,35795.0,1436.12,
+Communications,35775.0,35797.0,1436.07,
+Communications,35774.0,35797.0,1436.06,
+Communications,35773.0,35801.0,1436.15,
+Communications,35771.0,35802.0,1436.1,
+Communications,35700.0,35803.0,1436.1,
+Communications,35770.0,35803.0,1436.1,
+Communications,35786.0,35793.0,1436.24,
+Remote Sensing,567.0,599.0,96.34,
+Communications,35782.0,35791.0,1436.09,
+Communications,1200.0,11600.0,240.0,
+Technology Development,495.0,791.0,97.5,
+Technology Development,483.0,789.0,97.4,
+Technology Development,443.0,886.0,98.0,
+Technology Development,443.0,886.0,98.0,
+Earth Observation,759.0,760.0,100.0,Sun-Synchronous
+Communications,443.0,886.0,98.0,
+Technology Development,657.0,665.0,98.0,Sun-Synchronous
+Astrophysics,600.0,633.0,97.0,Intermediate
+Communications,35785.0,35787.0,1436.1,
+Communications,35785.0,35787.0,1436.1,
+Communications,35785.0,35787.0,1436.1,
+Communications,35745.0,35826.0,1436.1,
+Astrophysics,1000.0,330000.0,0.22,
+Technology Development,608.0,35717.0,637.65,
+Technology Development,627.0,35697.0,637.64,
+Earth Observation,824.0,826.0,101.4,Sun-Synchronous
+Earth Observation,696.0,699.0,98.73,Sun-Synchronous
+Technology Development,850.0,868.0,102.1,
+Earth Observation,622.0,624.0,97.2,
+Communications,35783.0,35791.0,1436.12,
+Communications,35703.0,35778.0,1436.0,
+Communications,35776.0,35796.0,1436.1,
+Communications,35791.0,35848.0,1437.78,
+Remote Sensing,500.0,506.0,94.6,
+Technology Development,650.0,650.0,97.73,Sun-Synchronous
+Technology Development,497.0,507.0,94.66,
+Technology Development,772.0,783.0,100.4,Sun-Synchronous
+Communications,1417.0,1431.0,114.3,Intermediate
+Communications,1417.0,1425.0,114.2,Intermediate
+Communications,1415.0,1419.0,114.2,Intermediate
+Communications,1468.0,1506.0,115.7,Intermediate
+Communications,1466.0,1506.0,115.7,Intermediate
+Communications,1467.0,1503.0,115.7,Intermediate
+Communications,1465.0,1502.0,115.6,Intermediate
+Communications,1471.0,1495.0,115.5,Intermediate
+Communications,1474.0,1495.0,115.6,Intermediate
+Technology Development,298.0,1482.0,102.77,
+Technology Development,593.0,626.0,96.88,
+Technology Development,867.0,879.0,102.41,Sun-Synchronous
+Technology Development,1347.0,1352.0,112.68,
+Technology Development,1339.0,1351.0,112.58,
+Technology Development,614.0,634.0,97.2,Sun-Synchronous
+Communications,35778.0,35794.0,1436.1,
+Communications,35779.0,35793.0,1436.09,
+Communications,35781.0,35792.0,1436.12,
+Astrophysics,548.0,558.0,95.7,Intermediate
+Earth Science,473.0,476.0,93.9,Polar
+Earth Science,473.0,476.0,93.9,Polar
+Earth Science,486.0,496.0,94.0,Polar
+Astrophysics,571.0,590.0,96.3,Intermediate
+Technology Development,710.0,720.0,99.1,Sun-Synchronous
+Communications,35778.0,35792.0,1436.06,
+Communications,35772.0,35801.0,1436.09,
+Technology Development,658.0,11836.0,235.16,
+Technology Development,443.0,886.0,98.0,
+Earth Observation,507.0,510.0,94.8,Sun-Synchronous
+Space Physics,17313.0,120961.0,3442.0,Deep Highly Eccentric
+Communications,35768.0,35802.0,1436.04,
+Communications,35732.0,35844.0,1436.18,
+Communications,35780.0,35785.0,1435.88,
+Communications,35693.0,35878.0,1436.06,
+Communications,35773.0,35796.0,1436.99,
+Communications,35773.0,35787.0,1435.7,
+Communications,35767.0,35803.0,1436.04,
+Communications,35768.0,35808.0,1436.2,
+Communications,35768.0,35809.0,1436.11,
+Reconnaissance,405.0,580.0,94.5,
+Communications,35778.0,35796.0,1436.13,
+Communications,35781.0,35793.0,1436.1,
+Communications,35774.0,35801.0,1436.13,
+Communications,35773.0,35799.0,1436.09,
+Communications,35783.0,35791.0,1436.1,
+Communications,35778.0,35795.0,1436.1,
+Remote Sensing,507.0,509.0,94.8,
+Communications,35783.0,35791.0,1436.11,
+Remote Sensing/Reconnaissance,529.0,598.0,95.9,
+Technology Development,501.0,505.0,94.7,Sun-Synchronous
+Communications,35775.0,35798.0,1436.1,
+Communications,35777.0,35796.0,1436.1,
+Communications,35786.0,35796.0,1436.3,
+Space Physics,461.0,87304.0,1868.98,
+Space Physics,467.0,87260.0,1867.91,
+Space Physics,474.0,87526.0,1875.53,
+Earth Observation,824.0,826.0,101.4,Sun-Synchronous
+Communications,35777.0,35795.0,1436.07,
+Communications,35773.0,35798.0,1436.1,
+Communications,35779.0,35794.0,1436.1,
+Communications,35764.0,35807.0,1436.07,
+Communications,35766.0,35807.0,1436.1,
+Technology Development,464.0,475.0,94.0,
+Technology Development,360.0,361.0,91.8,
+Earth Observation,488.0,504.0,94.5,
+Earth Observation,485.0,505.0,94.5,
+Communications,35769.0,35813.0,1436.08,
+Communications,37778.0,37794.0,1436.1,
+Communications,35768.0,35802.0,1436.0,
+Technology Development,456.0,459.0,93.7,Sun-Synchronous
+Astrophysics,612.0,613.0,97.0,Intermediate
+Technology Development,611.0,631.0,97.1,Sun-Synchronous
+Communications,35773.0,35799.0,1436.07,
+Earth Observation/Technology Development,681.0,704.0,98.6,Sun-Synchronous
+Technology Development,594.0,764.0,98.1,Sun-Synchronous
+Earth Observation,400.0,400.0,92.6,Intermediate
+Electronic Surveillance,1210.0,38740.0,709.61,Molniya
+Electronic Surveillance,844.0,858.0,102.0,Intermediate
+Technology Development,770.0,784.0,100.3,Sun-Synchronous
+Communications,35778.0,35793.0,1436.06,
+Communications,35738.0,35834.0,1436.1,
+Communications,35786.0,35787.0,1436.1,
+Communications,35766.0,35807.0,1436.12,
+Communications,35763.0,35775.0,1435.22,
+Communications,35744.0,35829.0,1436.12,
+Communications,35738.0,35835.0,1436.11,
+Communications,35772.0,35794.0,1435.94,
+Earth Observation,660.0,662.0,98.0,Sun-Synchronous
+Scientific Research,696.0,795.0,99.7,Sun-Synchronous
+Scientific Research,504.0,640.0,97.0,Sun-Synchronous
+Early Warning,35696.0,35904.0,1436.39,
+Early Warning,542.0,39807.0,717.66,Molniya
+Early Warning,667.0,39697.0,717.9,Molniya
+Early Warning,563.0,39128.0,704.3,Molniya
+Communications,593.0,700.0,97.6,
+Earth Science,591.0,30534.0,539.06,
+Earth Science,595.0,30657.0,541.4,
+Technology Development,594.0,699.0,97.6,
+Communications,35777.0,35796.0,1436.1,
+Technology Development,494.0,504.0,94.6,Sun-Synchronous
+Communications/Maritime Tracking,847.0,867.0,102.1,Sun-Synchronous
+Communications/Maritime Tracking,479.0,490.0,94.3,Sun-Synchronous
+Communications,35775.0,35796.0,1436.09,
+Communications,35782.0,35791.0,1436.1,
+Communications,35742.0,35776.0,1434.69,
+Earth Observation,682.0,685.0,98.43,
+Remote Sensing,622.0,654.0,97.48,
+Communications,35783.0,35790.0,1436.1,
+Communications,35786.0,35787.0,1436.12,
+Communications,35785.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.1,
+Communications,35776.0,35796.0,1436.1,
+Astrophysics,186.0,470310.0,19700.45,Cislunar
+Earth Observation,594.0,849.0,99.2,Sun-Synchronous
+Earth Observation,491.0,494.0,94.5,Sun-Synchronous
+Earth Observation,765.0,767.0,100.2,Sun-Synchronous
+Technology Development,593.0,640.0,97.3,Sun-Synchronous
+Technology Development,342.0,358.0,91.54,
+Technology Development,306.0,1261.0,100.5,
+Technology Development,489.0,501.0,94.51,
+Communications,35782.0,35790.0,1436.1,
+Communications,35784.0,35787.0,1436.09,
+Communications,35784.0,35789.0,1436.13,
+Communications,35785.0,35788.0,1436.11,
+Space Physics,7079.0,114027.0,2872.15,Deep Highly Eccentric
+Earth Observation,801.0,823.0,101.1,Sun-Synchronous
+Communications,35778.0,35792.0,1436.06,
+Communications,1193.0,1205.0,109.4,Sun-Synchronous
+Communications,35743.0,35823.0,1435.92,
+Communications,35780.0,35791.0,1436.07,
+Communications,35773.0,35800.0,1436.1,
+Communications,35774.0,35796.0,1436.06,
+Communications,35694.0,35866.0,1435.76,
+Communications,35784.0,35789.0,1436.11,
+Remote Sensing,625.0,628.0,97.2,Sun-Synchronous
+Remote Sensing,626.0,668.0,97.7,Sun-Synchronous
+Remote Sensing,487.0,496.0,94.4,Sun-Synchronous
+Remote Sensing,506.0,507.0,94.8,Sun-Synchronous
+Remote Sensing,469.0,481.0,94.1,Sun-Synchronous
+Remote Sensing,1201.0,1207.0,109.5,Sun-Synchronous
+Remote Sensing,1080.0,1089.0,106.93,Sun-Synchronous
+Remote Sensing,1079.0,1090.0,106.93,Sun-Synchronous
+Remote Sensing,1032.0,1081.0,106.33,Sun-Synchronous
+Remote Sensing,1076.0,1111.0,107.12,Sun-Synchronous
+Remote Sensing,1080.0,1111.0,107.13,Sun-Synchronous
+Remote Sensing,890.0,1112.0,105.14,Sun-Synchronous
+Remote Sensing,509.0,513.0,94.84,Sun-Synchronous
+Remote Sensing,1201.0,1207.0,109.51,Sun-Synchronous
+Remote Sensing,633.0,661.0,97.7,Sun-Synchronous
+Remote Sensing,625.0,627.0,97.2,Sun-Synchronous
+Remote Sensing,635.0,658.0,97.7,Sun-Synchronous
+Remote Sensing,440.0,450.0,93.5,Sun-Synchronous
+Remote Sensing,511.0,512.0,94.9,Sun-Synchronous
+Remote Sensing,628.0,665.0,97.7,Sun-Synchronous
+Remote Sensing,1192.0,1205.0,109.4,Sun-Synchronous
+Remote Sensing,1017.0,1164.0,107.1,Sun-Synchronous
+Remote Sensing,1017.0,1164.0,107.1,Sun-Synchronous
+Remote Sensing,1017.0,1164.0,107.1,Sun-Synchronous
+Scientific Research,802.0,824.0,101.2,Sun-Synchronous
+Technology Development,1479.0,1508.0,115.8,Intermediate
+Technology Development,594.0,683.0,94.4,Sun-Synchronous
+Remote Sensing,444.0,454.0,93.6,Sun-Synchronous
+Reconnaissance,555.0,606.0,96.3,Sun-Synchronous
+Scientific Research,619.0,653.0,97.4,Sun-Synchronous
+Scientific Research,620.0,653.0,97.5,Sun-Synchronous
+Communications,35775.0,35797.0,1436.05,
+Communications,35775.0,35803.0,1436.24,
+Communications,35759.0,35807.0,1435.92,
+Communications,35778.0,35796.0,1436.13,
+Communications,35773.0,35799.0,1436.05,
+Communications,35767.0,35807.0,1436.1,
+Communications,35781.0,35792.0,1436.09,
+Communications,35759.0,35812.0,1436.1,
+Earth Observation,763.0,773.0,100.2,Sun-Synchronous
+Earth Observation,500.0,504.0,94.7,Sun-Synchronous
