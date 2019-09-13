@@ -504,3 +504,7 @@
 (rf/reg-sub :column-overrides
             (fn [db _]
               (get db ::db/column-overrides)))
+
+(rf/reg-sub :query-string
+            (fn [db _]
+              (get db ::db/query-string)))

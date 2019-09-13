@@ -45,12 +45,11 @@
                             :hooks events/virtual-hot-hooks
                             :name "virtual-table"))
 
-(def ^:private default-search-string "GENERATE ROW")
-
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:confidence-threshold])]
-    [:div
+    [:div {:style {:margin-left "40px"}}
       [:span "Confidence Threshold: "]
+      [:br]
       [:input {:type :range :name :confidence-threshold
                :min 0 :max 1 :step 0.01
                        :value cur-val
@@ -61,9 +60,10 @@
       [:label cur-val]]))
 
 (def confidence-options
-  [:div.condition-set
+  [:div.condition-set {:style {:margin-left "10px"}}
     [:div.condition-option
       [:label "Mode:"]
+      [:br]
       [:select.form-control {:field :list :id :mode}
        [:option {:key :none} "none"]
        [:option {:key :row} "row-wise"]
@@ -81,12 +81,14 @@
 
 (defn search-form
   [name]
-  (let [input-text (r/atom default-search-string)]
+  (let [input-text (rf/subscribe [:query-string])]
     (fn []
-      [:div {:style {:display "flex"}}
+      [:div {:style {:display "flex"
+                     :margin-top "5px"
+                     :margin-bottom "10px"}}
        [:input {:type "search"
                 :style {:width "40%"}
-                :on-change #(reset! input-text (-> % .-target .-value))
+                :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
                 :on-key-press (fn [e] (if (= (.-key e) "Enter")
                                         (rf/dispatch [:parse-query @input-text])))
                 :value @input-text}]
@@ -110,21 +112,24 @@
     [:div
      [search-form "Zane"]
      [:div.table-title
-       [:div.main-title
+       [:div.main-title {:style {:width "100px"}}
          [:span "Real Data"]]
        (comment
          [:div.sub-title
              [:pre "    rows: real developers    columns: real survey answers"]])]
      [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
      [:div.table-title
-       [:div.main-title
+       [:div.main-title {:style {:width "100px"}}
          [:span "Virtual Data"]]
        (comment
          [:div.sub-title
            [:pre "    rows: virtual developers    columns: virtual survey answers"]])]
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div {:style {:display "flex"
-                    :justify-content "center"}}
+                    :justify-content "center"
+                    :border-top "solid"
+                    :border-width "1px"
+                    :border-color "#cccccc"}}
       (when vega-lite-spec
         [vega/vega-lite vega-lite-spec {:actions false} generator])]
      [modal/modal]]))

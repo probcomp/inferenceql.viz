@@ -15,14 +15,18 @@
 .table-title {
   margin-left: 0px;
   margin-right: 0px;
-  margin-top: 4px;
+  margin-top: 0px;
   margin-bottom: 0px;
   overflow: auto;
 }
 
 .main-title {
   float: left;
-  font-weight: bold;
+  background-color: #f0f0f0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #cccccc;
+  border-bottom: none;
 }
 
 .sub-title {
@@ -64,4 +68,8 @@ h3 {
   font-size: 14px;
   width: 100%;
   height: 400px;
+}
+
+select {
+   font-size: 16px;
 }
