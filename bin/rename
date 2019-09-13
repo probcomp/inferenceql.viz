@@ -3,6 +3,7 @@
 (require '[clojure.data.csv :as csv])
 (require '[clojure.edn :as edn])
 (require '[clojure.java.io :as io])
+(require '[clojure.set])
 (require '[clojure.string :as string])
 (require '[clojure.tools.cli :as cli])
 (require '[clojure.walk :as walk])
@@ -26,7 +27,7 @@
     :id :help]])
 
 (defn usage [options-summary]
-  (->> ["Usage: bin/rename-columns [options]"
+  (->> ["Usage: bin/rename [options]"
         ""
         "Options:"
         options-summary]
@@ -35,6 +36,8 @@
 (defn error-msg [errors]
   (str "The following errors occurred while parsing your command:\n\n"
        (string/join \newline errors)))
+
+(def required-options #{:data :model :column :rename})
 
 (defn validate-args
   [args]
@@ -45,10 +48,9 @@
           errors
           {:ok? false :exit-message (error-msg errors)}
 
-          (not (clojure.set/subset? #{:data :model :column :rename} (set (keys options))))
+          (not (clojure.set/subset? required-options (set (keys options))))
           {:ok? false :exit-message (str "Missing required arguments: "
-                                         (->> (clojure.set/difference #{:data :model :column :rename}
-                                                                      (keys options))
+                                         (->> (clojure.set/difference required-options (keys options))
                                               (map #(str "--" (name %)))
                                               (clojure.string/join ", "))
                                          "\n\n"
@@ -58,8 +60,7 @@
           {:ok? true :options options})))
 
 (defn exit [status msg]
-  (prn "Would exit: " status msg)
-  #_
+  (println msg)
   (System/exit status))
 
 (defn update-model-json!
@@ -102,3 +103,5 @@
     (if exit-message
       (exit (if ok? 0 1) exit-message)
       (rename options))))
+
+(apply -main *command-line-args*)
