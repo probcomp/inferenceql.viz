@@ -71,27 +71,16 @@
     (json/generate-string $ {:pretty true})
     (spit model $)))
 
-(defn- csv-data->maps [csv-data]
-  (map zipmap
-       (->> (first csv-data) ; headers
-            #_(map keyword)
-            repeat)
-       (rest csv-data)))
-
 (defn update-data-csv!
   [{:keys [data column rename]}]
   (let [csv-data (with-open [reader (io/reader data)]
-                   (doall (csv/read-csv reader)))
-        updated-data (->> (csv-data->maps csv-data)
-                          (mapv (fn [row]
-                                  (update row column #(get rename % %))))
-                          (mapv (fn [row-map]
-                                  (mapv (fn [column]
-                                          (get row-map column))
-                                        (first csv-data)))) ; headers
-                          (into [(first csv-data)]))]
+                   (let [[header & rows] (csv/read-csv reader)
+                         column-index (.indexOf header column)]
+                     (into [header]
+                           (map (fn [row] (update row column-index #(get rename % %))))
+                           rows)))]
     (with-open [writer (io/writer data)]
-      (csv/write-csv writer updated-data))))
+      (csv/write-csv writer csv-data))))
 
 (defn rename
   [options]
