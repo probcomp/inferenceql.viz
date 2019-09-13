@@ -237,9 +237,11 @@
                         :data {:values selection-to-use}
                         :mark "circle"
                         :encoding {:x {:field (first cols-to-draw)
-                                       :type "quantitative"}
+                                       :type "quantitative"
+                                       :scale {:type "symlog"}}
                                    :y {:field (second cols-to-draw)
-                                       :type "quantitative"}
+                                       :type "quantitative"
+                                       :scale {:type "symlog"}}
                                    :facet facet-section-to-use}}
       ;; Heatmap
       #{dist/categorical} {:$schema
