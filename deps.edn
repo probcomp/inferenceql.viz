@@ -3,8 +3,10 @@
         org.clojure/data.json {:mvn/version "0.2.6"}
         org.clojure/data.csv {:mvn/version"0.1.4"}
         org.clojure/math.combinatorics {:mvn/version "0.1.6"}
+        org.clojure/tools.cli {:mvn/version "0.4.2"}
         binaryage/devtools {:mvn/version "0.9.10"}
         camel-snake-kebab {:mvn/version "0.4.0"}
+        cheshire {:mvn/version "5.8.1"}
         expound {:mvn/version "0.7.2"}
         kixi/stats {:mvn/version "0.5.2"}
         reagent {:mvn/version "0.8.1"}
@@ -25,6 +27,5 @@
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-521"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
-                               lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
-                               cheshire {:mvn/version "5.8.1"}}}
+                               lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}}}
            :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.339"}}}}}
