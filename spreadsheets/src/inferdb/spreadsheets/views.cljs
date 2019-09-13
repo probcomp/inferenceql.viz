@@ -47,8 +47,9 @@
 
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:confidence-threshold])]
-    [:div
+    [:div {:style {:margin-left "40px"}}
       [:span "Confidence Threshold: "]
+      [:br]
       [:input {:type :range :name :confidence-threshold
                :min 0 :max 1 :step 0.01
                        :value cur-val
@@ -59,9 +60,10 @@
       [:label cur-val]]))
 
 (def confidence-options
-  [:div.condition-set
+  [:div.condition-set {:style {:margin-left "10px"}}
     [:div.condition-option
       [:label "Mode:"]
+      [:br]
       [:select.form-control {:field :list :id :mode}
        [:option {:key :none} "none"]
        [:option {:key :row} "row-wise"]
