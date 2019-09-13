@@ -126,7 +126,10 @@
            [:pre "    rows: virtual developers    columns: virtual survey answers"]])]
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div {:style {:display "flex"
-                    :justify-content "center"}}
+                    :justify-content "center"
+                    :border-top "solid"
+                    :border-width "1px"
+                    :border-color "#cccccc"}}
       (when vega-lite-spec
         [vega/vega-lite vega-lite-spec {:actions false} generator])]
      [modal/modal]]))
