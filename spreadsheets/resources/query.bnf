@@ -1,0 +1,16 @@
+select = <"SELECT"> <ws> what (<ws> from)? (<ws> limit)?
+<what> = paren-selectable (<","> <ws> paren-selectable)*
+<from> = <"FROM"> <ws> <"("> generate <")">
+<paren-selectable> = selectable | <"("> selectable <")">
+<selectable> = probability | star
+generate = <"GENERATE *"> (<ws> given)? <ws> <"FROM model">
+probability = <"PROBABILITY OF"> <ws> (column | binding) (<ws> given)? <ws> <"FROM model">
+star = <"*">
+given = <"GIVEN"> <ws> (star | bindings)
+<bindings> = binding (<ws> <"AND"> <ws> binding)*
+binding = column <"="> value
+<column> = #'[a-zA-Z_]+'
+<value> = #'\"([^\"]+)\"'
+limit = <"LIMIT"> <ws> number
+<number> = #'[0-9]+'
+ws = #'\s+'

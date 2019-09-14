@@ -6,6 +6,7 @@
         binaryage/devtools {:mvn/version "0.9.10"}
         camel-snake-kebab {:mvn/version "0.4.0"}
         expound {:mvn/version "0.7.2"}
+        instaparse {:mvn/version "1.4.10"}
         kixi/stats {:mvn/version "0.5.2"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.7"}
@@ -20,7 +21,8 @@
          "multimixture/test"
          "search-by-example/src"
          "search-by-example/test"
-         "spreadsheets/src"]
+         "spreadsheets/src"
+         "spreadsheets/resources"]
  :aliases {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
