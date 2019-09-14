@@ -1,5 +1,6 @@
 (ns inferdb.spreadsheets.query
   (:require [clojure.core.match :refer [match]]
+            [clojure.edn :as edn]
             [instaparse.core :as insta]
             [metaprob.prelude :as mp]
             [inferdb.multimixture :as mmix]
@@ -21,7 +22,7 @@
    <bindings> = binding (<ws> <\"AND\"> <ws> binding)*
    <binding> = column <\"=\"> value
    <column> = #'[a-zA-Z_]+'
-   <value> = #'\\\"([^\\\"]+)\\\"'
+   value = #'\\\"([^\\\"]+)\\\"'
    <limit> = <\"LIMIT\"> <ws> nat
    nat = #'[0-9]+'
    ws = #'\\s+'\n")
@@ -51,14 +52,14 @@
     {:type :generated
      :values s}
 
-    [[:probability [:prob-column column]] [:star]]
-    {:type :anomaly-search
-     :column column}
-
     [[:probability [:prob-column column] [:prob-given]] [:star]]
     {:type :anomaly-search
      :column column
      :given true}
+
+    [[:probability [:prob-column column]] [:star]]
+    {:type :anomaly-search
+     :column column}
 
     [[:probability [:prob-binding label value] [:prob-given]] [:star]]
     {:type :search-by-labeled
@@ -69,15 +70,17 @@
             #?(:clj (println error-msg)
                :cljs (js/alert error-msg)))))
 
+(def transform-map
+  {:select transform-select
+   :from transform-from
+   :gen-given hash-map
+   :value edn/read-string
+   :nat parse-unsigned-int})
+
 (defn issue
   [q]
   (let [ast (parser q)]
-    (insta/transform
-     {:select transform-select
-      :from transform-from
-      :gen-given hash-map
-      :nat parse-unsigned-int}
-     ast)))
+    (insta/transform transform-map ast)))
 
 #_(issue "SELECT * FROM (GENERATE * FROM model) LIMIT 1")
 #_(issue "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model) LIMIT 3")
@@ -88,7 +91,8 @@
 #_(issue "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *" [{"salary_usd" 80000 "linux" "True"}])
 #_(issue "SELECT (PROBABILITY OF label=\"True\" GIVEN * FROM model), *")
 
+#_(insta/transform transform-map (parser "\"False\"" :start :value))
 
 #_(parser "SELECT * FROM (GENERATE * FROM model) LIMIT 1")
 #_(parser "SELECT * FROM (GENERATE * GIVEN java=\"False\" FROM model) LIMIT 1")
-#_(parser "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *")
+                   #_(parser "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *")
