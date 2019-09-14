@@ -141,8 +141,7 @@
          (rf/dispatch [:search-by-example example-row])))
 
                                         ; else condition
-     (.error js/console "Could not parse query: \"" text "\""))
-   db))
+     (.error js/console "Could not parse query: \"" text "\""))))
 
 (rf/reg-event-db
  :search-by-example
