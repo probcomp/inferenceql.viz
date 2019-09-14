@@ -144,7 +144,7 @@
 (rf/reg-event-db
  :generate-virtual-row
  event-interceptors
- (fn [db [event-name conditions num-rows]]
+ (fn [db [_ conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
          gen-fn #(first (mp/infer-and-score
                            :procedure (search/optimized-row-generator model/spec)

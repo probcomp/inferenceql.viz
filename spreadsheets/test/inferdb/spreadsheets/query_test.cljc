@@ -8,10 +8,11 @@
                    (parser "GIVEN java=\"False\" AND linux=\"True\""
                            :start :given))
 
-(as-> "SELECT * FROM (GENERATE * FROM model) LIMIT 1" $
-  (parser $ :start :select)
-  (query/transform-map))
-
+(deftest select
+  (are [query] (seq (query/issue query))
+    "SELECT * FROM (GENERATE * FROM model) LIMIT 1"
+    "SELECT * FROM (GENERATE * FROM model) LIMIT 2"
+    "SELECT * FROM (GENERATE * GIVEN java=\"False\" FROM model) LIMIT 1"))
 
 (deftest valid-select
   (are [query] (nil? (insta/get-failure (parser query :start :select)))
@@ -33,8 +34,12 @@
     "GENERATE * GIVEN java=\"False\" FROM model"
     "GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model"))
 
-(deftest valid-given
-  (are [query] (nil? (insta/get-failure (parser query :start :given)))
+(deftest valid-prob-given
+  (are [query] (nil? (insta/get-failure (parser query :start :prob-given)))
+    "GIVEN *"))
+
+(deftest valid-gen-given
+  (are [query] (nil? (insta/get-failure (parser query :start :gen-given)))
     "GIVEN java=\"False\""
     "GIVEN java=\"False\" AND linux=\"True\""))
 
