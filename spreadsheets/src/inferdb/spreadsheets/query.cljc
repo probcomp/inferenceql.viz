@@ -63,7 +63,11 @@
     [[:probability [:prob-binding label value] [:prob-given]] [:star]]
     {:type :anomaly-search
      :given true
-     :binding {label value}}))
+     :binding {label value}}
+
+    :else (let [error-msg (str "Unmatched parse tree: " (pr-str (vec args)))]
+            #?(:clj (println error-msg)
+               :cljs (js/alert error-msg)))))
 
 (defn issue
   [q]
@@ -77,6 +81,8 @@
 
 #_(issue "SELECT * FROM (GENERATE * FROM model) LIMIT 1")
 #_(issue "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model) LIMIT 3")
+
+#_(issue  "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *")
 
 #_(issue "SELECT (PROBABILITY OF salary_usd FROM model), *" [{}])
 #_(issue "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *" [{"salary_usd" 80000 "linux" "True"}])

@@ -79,12 +79,12 @@
      {:type :generated :values v}
      (db/with-virtual-rows db v)
 
-     {:type :anomaly-search :column column}
-     (do (rf/dispatch [:anomaly-search column []])
-         db)
-
      {:type :anomaly-search :column column :given true}
      (do (rf/dispatch [:anomaly-search column ["ROW"]])
+         db)
+
+     {:type :anomaly-search :column column}
+     (do (rf/dispatch [:anomaly-search column []])
          db)
 
      {:type :anomaly-search :binding {"label" true}}
