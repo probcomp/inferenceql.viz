@@ -43,7 +43,10 @@
    (let [trace (mmix/with-row-values {} obs)
          sample #(first (mp/infer-and-score :procedure row-generator
                                             :observation-trace trace))]
-     (repeatedly limit sample))))
+     (->> (repeatedly sample)
+          ;; TODO: This is a hack for Strange Loop 2019
+          (remove #(some (every-pred number? neg?) (vals %)))
+          (take limit)))))
 
 (defn transform-select
   [& args]
