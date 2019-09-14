@@ -9,10 +9,11 @@
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]
-            [inferdb.spreadsheets.query :as query]))
+            [inferdb.spreadsheets.query :as query]
+            [inferdb.spreadsheets.utils :as utils]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :after-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end])
+(def real-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :before-change])
+(def virtual-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :after-change])
 
 (def event-interceptors
   [rf/debug interceptors/check-spec])
@@ -31,19 +32,56 @@
  :clear-virtual-data
  event-interceptors
  (fn [db [event-name]]
-   (db/clear-virtual-rows db)))
+   (-> (db/clear-virtual-rows db)
+       (db/clear-virtual-scores))))
 
+(rf/reg-event-db
+ :clear-virtual-scores
+ event-interceptors
+ (fn [db [event-name]]
+   (db/clear-virtual-scores db)))
+
+(rf/reg-event-db
+ :before-change
+ event-interceptors
+ (fn [db [_ hot id changes]]
+   (let [labels-col (.getSourceDataAtCol hot 0)]
+     (db/with-labels db (js->clj labels-col)))))
+
+;; TODO this should be converted to reg-event-fx
 (rf/reg-event-db
  :after-change
  event-interceptors
- (fn [db [_ hot changes]]
-   (let [labels-col (.getSourceDataAtCol hot 0)]
-     (db/with-labels db (js->clj labels-col)))))
+ (fn [db [_ hot id changes source]]
+
+   ; When the change is the result of loading new table
+   ; into the table.
+    (when (= source "loadData")
+      (let [table-state @(rf/subscribe [:table-state id])]
+        (if-let [header-clicked (:header-clicked table-state)]
+          (let [current-selection (.getSelectedLast hot)
+                [_row1 col1 _row2 col2] (js->clj current-selection)]
+            ;; Take the current selection and expand it so the whole columns
+            ;; are selected.
+            (.selectColumns hot col1 col2)))))
+   db))
+
+(rf/reg-event-db
+ :after-column-move
+ event-interceptors
+ (fn [db [_ hot id columns target]]
+   db))
+
+(rf/reg-event-db
+ :after-column-resize
+ event-interceptors
+ (fn [db [_ hot id current-column new-size is-double-click]]
+   db))
 
 (rf/reg-event-db
  :after-selection-end
  event-interceptors
- (fn [db [_ hot row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
+ (fn [db [_ hot id row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
    (let [selected-headers (map #(.getColHeader hot %)
                                (range (min col col2) (inc (max col col2))))
          row (js->clj (zipmap (.getColHeader hot)
@@ -60,16 +98,39 @@
                              (.getSelected hot))
          selected-columns (if (<= col col2) selected-headers (reverse selected-headers))]
      (-> db
-         (db/with-selected-columns selected-columns)
-         (db/with-selections selected-maps)
-         (db/with-selected-row-index row-index)
-         (db/with-row-at-selection-start row)))))
+         (assoc-in [:hot-state id :selected-columns] selected-columns)
+         (assoc-in [:hot-state id :selections] selected-maps)
+         (assoc-in [:hot-state id :selected-row-index] row-index)
+         (assoc-in [:hot-state id :row-at-selection-start] row)))))
+
+(rf/reg-event-db
+ :after-on-cell-mouse-down
+ event-interceptors
+ (fn [db [_ hot id mouse-event coords _TD]]
+   (let [other-table-id @(rf/subscribe [:other-table id])
+
+         ;; Stores whether the user clicked on one of the column headers.
+         header-clicked-flag (= -1 (.-row coords))
+
+         ;; Stores whether the user held alt during the click.
+         alt-key-pressed (.-altKey mouse-event)
+         ; Switch the last clicked on table-id to the other table on alt-click.
+         new-table-clicked-id (if alt-key-pressed other-table-id id)]
+
+     ; Deselect all cells on alt-click.
+     (if alt-key-pressed
+       (.deselectCell hot))
+
+     (-> db
+       (assoc-in [:hot-state id :header-clicked] header-clicked-flag)
+       (assoc :table-last-clicked new-table-clicked-id)))))
 
 (rf/reg-event-db
  :after-deselect
  event-interceptors
- (fn [db _]
-   (db/clear-selections db)))
+ (fn [db [_ hot id]]
+   ;; clears selections associated with table
+   (update-in db [:hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
 
 (rf/reg-event-db
  :parse-query
@@ -166,8 +227,12 @@
  event-interceptors
  (fn [db [_ target-col conditional-cols]]
    (let [table-rows @(rf/subscribe [:table-rows])
-         result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
-     (rf/dispatch [:search-result result]))
+         result (search/anomaly-search model/spec target-col conditional-cols table-rows)
+
+         virtual-rows @(rf/subscribe [:virtual-rows])
+         virtual-result (search/anomaly-search model/spec target-col conditional-cols virtual-rows)]
+     (rf/dispatch [:search-result result])
+     (rf/dispatch [:virtual-search-result virtual-result]))
    db))
 
 (rf/reg-event-db
@@ -179,8 +244,11 @@
                          :procedure (search/optimized-row-generator model/spec)
                          :observation-trace constraint-addrs-vals))
          negative-salary? #(neg? (% "salary_usd"))
+
+         overrides-map (get db ::db/column-override-fns)
+         overrides-insert-fn (utils/gen-insert-fn overrides-map)
          ;; TODO: This is dataset-specific
-         new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
+         new-rows (take num-rows (map overrides-insert-fn (remove negative-salary? (repeatedly gen-fn))))]
      (db/with-virtual-rows db new-rows))))
 
 (defn- create-search-examples [pos-rows neg-rows]
@@ -219,6 +287,7 @@
          all-scores (->> (merge scores-ids-map scores-ids-map-lab)
                          (sort-by key)
                          (map second))]
+     (rf/dispatch [:clear-virtual-scores])
      (rf/dispatch [:search-result all-scores]))
    db))
 
@@ -227,3 +296,73 @@
  event-interceptors
  (fn [db [_ result]]
    (db/with-scores db result)))
+
+(rf/reg-event-db
+ :virtual-search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-virtual-scores db result)))
+
+(defn gen-query-str-for-conf-options [type threshold]
+  (case type
+        :none "GENERATE ROW" ; NOTE: keep this string unchanged so the app starts with this query
+        :row (str "COLOR ROWS WITH CONFIDENCE OVER " threshold)
+        :cells-existing (str "COLOR CELLS EXISTING WITH CONFIDENCE OVER " threshold)
+        :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))
+
+(rf/reg-event-db
+ :set-confidence-threshold
+ event-interceptors
+ (fn [db [_ value]]
+   ;; set query string
+   (let [conf-mode (get-in db [::db/confidence-options :mode])
+         new-query-string (gen-query-str-for-conf-options conf-mode value)]
+     (rf/dispatch [:set-query-string new-query-string]))
+   (assoc db ::db/confidence-threshold value)))
+
+(rf/reg-event-db
+ :set-confidence-options
+ event-interceptors
+ (fn [db [_ path value]]
+   ;; set query string
+   (let [conf-threshold (get db ::db/confidence-threshold)
+         new-query-string (gen-query-str-for-conf-options value conf-threshold)]
+     (rf/dispatch [:set-query-string new-query-string]))
+   (assoc-in db (into [::db/confidence-options] path) value)))
+
+(rf/reg-event-db
+ :update-confidence-options
+ event-interceptors
+ (fn [db [_ f path value]]
+   (update-in db (into [::db/confidence-options] path) f value)))
+
+(rf/reg-event-db
+ :modal
+ event-interceptors
+ (fn [db [_ data]]
+   (assoc-in db [:modal] data)))
+
+(rf/reg-event-db
+ :set-column-function
+ event-interceptors
+ (fn [db [_ col-name source-text]]
+   (let [string-to-compile (str "(" source-text ")")
+         ;; TODO catch and print compilation errors gracefully
+         compiled-fn (js/eval string-to-compile)]
+     (-> db
+       (assoc-in [::db/column-overrides col-name] source-text)
+       (assoc-in [::db/column-override-fns col-name] compiled-fn)))))
+
+(rf/reg-event-db
+ :clear-column-function
+ event-interceptors
+ (fn [db [_ col-name]]
+   (-> db
+     (update-in [::db/column-overrides] dissoc col-name)
+     (update-in [::db/column-override-fns] dissoc col-name))))
+
+(rf/reg-event-db
+ :set-query-string
+ event-interceptors
+ (fn [db [_ new-val]]
+   (assoc-in db [::db/query-string] new-val)))

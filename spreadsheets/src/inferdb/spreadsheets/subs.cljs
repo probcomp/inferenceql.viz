@@ -1,6 +1,5 @@
 (ns inferdb.spreadsheets.subs
-  (:require [clojure.walk :as walk]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
@@ -8,32 +7,19 @@
             [inferdb.spreadsheets.views :as views]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.model :as model]))
-
-(def label-col-header
-  "Header text for the column used for labeling rows as examples."
-  "🏷")
-(def score-col-header
-  "Header text for the column that shows scores."
-  "probability")
-
-(def vega-width
-  "Width setting for the specs produced by the :vega-lite-spec sub"
-  400)
-(def vega-height
-  "Height setting for the specs produced by the :vega-lite-spec sub"
-  400)
-
-(def vega-map-width
-  "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
-  500)
-(def vega-map-height
-  "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
-  300)
+            [inferdb.spreadsheets.model :as model]
+            [inferdb.spreadsheets.vega :as vega]
+            [inferdb.spreadsheets.modal :as modal]
+            [inferdb.spreadsheets.utils :as utils])
+  (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
             (fn [db _]
               (db/scores db)))
+
+(rf/reg-sub :virtual-scores
+            (fn [db _]
+              (db/virtual-scores db)))
 
 (rf/reg-sub :labels
             (fn [db _]
@@ -44,42 +30,83 @@
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
 
-(rf/reg-sub :row-at-selection-start
+(rf/reg-sub :table-last-clicked
             (fn [db _]
-              (db/row-at-selection-start db)))
+              (get db :table-last-clicked)))
 
-(rf/reg-sub :selected-row-index
-            (fn [db _]
-              (db/selected-row-index db)))
+(rf/reg-sub :other-table
+            (fn [db [_sub-name table-picked]]
+              (let [[table-1-id table-2-id] (keys (get db :hot-state))]
+                (condp = table-picked
+                  table-1-id table-2-id
+                  table-2-id table-1-id))))
+
+(rf/reg-sub :table-state
+            (fn [db [_sub-name table-id]]
+              (get-in db [:hot-state table-id])))
+
+(rf/reg-sub :both-table-states
+            (fn [db [_sub-name]]
+              (get db :hot-state)))
+
+(rf/reg-sub-raw :table-state-active
+                (fn [app-db event]
+                  (reaction
+                    (let [table-id @(rf/subscribe [:table-last-clicked])
+                          table-state @(rf/subscribe [:table-state table-id])]
+                      table-state))))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into [label-col-header score-col-header] headers)))
+              (into [vega/label-col-header vega/score-col-header] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
-               :labels (rf/subscribe [:labels])})
-            (fn [{:keys [rows scores labels]}]
-              (cond->> rows
-                scores (mapv (fn [score row]
-                               (assoc row score-col-header score))
-                             scores)
-                labels (mapv (fn [label row]
-                               (assoc row label-col-header label))
-                             labels))))
+               :labels (rf/subscribe [:labels])
+               :imputed-values (rf/subscribe [:missing-cells-values-above-conf-threshold])
+               :conf-mode (rf/subscribe [:confidence-option [:mode]])})
+            (fn [{:keys [rows scores labels imputed-values conf-mode]}]
+              (let [merge-imputed (= conf-mode :cells-missing)]
+                (cond->> (seq rows)
+                  ;; Merge in the missing values.
+                  merge-imputed (mapv (fn [imputed-values-in-row row]
+                                        (merge row imputed-values-in-row))
+                                      imputed-values)
 
-(rf/reg-sub :virtual-rows
-            (fn [db _]
-              (db/virtual-rows db)))
+                  scores (mapv (fn [score row]
+                                 (assoc row vega/score-col-header score))
+                               scores)
+                  labels (mapv (fn [label row]
+                                 (assoc row vega/label-col-header label))
+                               labels)))))
+
+(rf/reg-sub :virtual-computed-rows
+  (fn [_ _]
+    {:rows (rf/subscribe [:virtual-rows])
+     :scores (rf/subscribe [:virtual-scores])})
+  (fn [{:keys [rows scores]}]
+    (let [num-missing-scores (- (count rows) (count scores))
+          dummy-scores (repeat num-missing-scores nil)
+          scores (concat dummy-scores scores)]
+
+      ;; Creation of dummy scores allows correct attaching of old scores to
+      ;; rows even when new rows are generated after a scoring event.
+      (mapv (fn [score row] (assoc row vega/score-col-header score))
+            scores rows))))
 
 (defn table-rows
   [db _]
   (db/table-rows db))
 (rf/reg-sub :table-rows table-rows)
+
+(defn virtual-rows
+  [db _]
+  (db/virtual-rows db))
+(rf/reg-sub :virtual-rows virtual-rows)
 
 (defn- cell-vector
   "Takes tabular data represented as a sequence of maps and reshapes the data as a
@@ -93,7 +120,7 @@
         rows))
 
 (defn real-hot-props
-  [{:keys [headers rows]} _]
+  [{:keys [headers rows cells-style-fn context-menu]} _]
   (let [data (cell-vector headers rows)
 
         num-columns (count headers)
@@ -104,11 +131,15 @@
     (-> views/real-hot-settings
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
-        (assoc-in [:settings :columns] all-column-settings))))
+        (assoc-in [:settings :columns] all-column-settings)
+        (assoc-in [:settings :cells] cells-style-fn)
+        (assoc-in [:settings :contextMenu] context-menu))))
 (rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
-               :rows    (rf/subscribe [:computed-rows])})
+               :rows    (rf/subscribe [:computed-rows])
+               :cells-style-fn (rf/subscribe [:cells-style-fn])
+               :context-menu (rf/subscribe [:context-menu])})
             real-hot-props)
 
 (defn virtual-hot-props
@@ -123,18 +154,8 @@
 (rf/reg-sub :virtual-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
-               :rows    (rf/subscribe [:virtual-rows])})
+               :rows    (rf/subscribe [:virtual-computed-rows])})
             virtual-hot-props)
-
-(defn selections
-  [db _]
-  (db/selections db))
-(rf/reg-sub :selections selections)
-
-(defn selected-columns
-  [db _]
-  (db/selected-columns db))
-(rf/reg-sub :selected-columns selected-columns)
 
 (def clean-label
   "Prepares the user-typed label for checking."
@@ -189,204 +210,301 @@
               {:labels (rf/subscribe [:labels])})
             row-ids-unlabeled)
 
-(def ^:private topojson-feature "cb_2017_us_cd115_20m")
-
-(defn- left-pad
-  [s n c]
-  (str (apply str (repeat (max 0 (- n (count s)))
-                          c))
-       s))
-
-(defn stattype
-  [column]
-  (let [stattype-kw (if (contains? #{score-col-header label-col-header} column)
-                      :gaussian
-                      (get-in model/spec [:vars column]))]
-    (case stattype-kw
-      :gaussian dist/gaussian
-      :categorical dist/categorical)))
-
 (defn vega-lite-spec
-  [{:keys [selections selected-columns row-at-selection-start]}]
-  (when-let [selection (first selections)]
-    (clj->js
-     (cond (and (= 1 (count selected-columns))
-                (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header}
-                                (first selected-columns))))
-           ;; Simulate plot
-           (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
-                 selected-column-kw (keyword (first selected-columns))
-                 y-axis {:title "distribution of probable values"
-                         :grid false
-                         :labels false
-                         :ticks false}
-                 y-scale {:nice false}]
-             {:$schema
-              "https://vega.github.io/schema/vega-lite/v3.json"
-              :width vega-width
-              :height vega-height
-              :data {:name "data"}
-              :autosize {:resize true}
-              :layer (cond-> [{:mark "bar"
-                               :encoding (condp = (stattype (first selected-columns))
-                                           dist/gaussian {:x {:bin true
-                                                              :field selected-column-kw
-                                                              :type "quantitative"}
-                                                          :y {:aggregate "count"
-                                                              :type "quantitative"
-                                                              :axis y-axis
-                                                              :scale y-scale}}
-                                           dist/categorical {:x {:field selected-column-kw
-                                                                 :type "nominal"}
-                                                             :y {:aggregate "count"
-                                                                 :type "quantitative"
-                                                                 :axis y-axis
-                                                                 :scale y-scale}})}]
-                       (get row-at-selection-start (first selected-columns))
-                       (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
-                                               :label "Selected row"}]}
-                              :mark {:type "rule"
-                                     :color "red"}
-                              :encoding {:x {:field selected-column-kw
-                                             :type (condp = (stattype (first selected-columns))
-                                                     dist/gaussian "quantitative"
-                                                     dist/categorical "nominal")}}}))})
+   [{:keys [table-states t-clicked]}]
+  (let [{selections :selections cols :selected-columns row :row-at-selection-start}
+        (table-states t-clicked)]
+    (when (first selections)
+      (clj->js
+       (cond (and (= 1 (count cols))
+                  (= 1 (count (first selections)))
+                  (not (contains? #{"geo_fips" "NAME" vega/label-col-header vega/score-col-header}
+                                  (first cols))))
+             (vega/gen-simulate-plot cols row t-clicked)
 
-           (= 1 (count selected-columns))
-           ;; Histogram
-           (let [selected-column (first selected-columns)]
-             {:$schema
-              "https://vega.github.io/schema/vega-lite/v3.json",
-              :width vega-width
-              :height vega-height
-              :data {:values selection},
-              :mark "bar"
-              :encoding
-              (condp = (stattype selected-column)
-                dist/gaussian {:x {:bin true,
-                                   :field selected-column
-                                   :type "quantitative"}
-                               :y {:aggregate "count"
-                                   :type "quantitative"}}
+             (= 1 (count cols))
+             (vega/gen-histogram table-states t-clicked)
 
-                dist/categorical {:x {:field selected-column
-                                      :type "nominal"}
-                                  :y {:aggregate "count"
-                                      :type "quantitative"}}
+             (some #{"geo_fips"} cols)
+             (vega/gen-choropleth selections cols)
 
-                nil
-                {})})
-
-           (some #{"geo_fips"} selected-columns)
-           ;; Choropleth
-           (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
-                 transformed-selection (mapv (fn [row]
-                                               (update row "geo_fips" #(left-pad (str %) 4 \0)))
-                                             selection)
-                 name {:field "NAME"
-                       :type "nominal"}
-                 color {:field map-column
-                        :type (condp = (stattype map-column)
-                                dist/gaussian "quantitative"
-                                dist/categorical "nominal")}]
-             {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width vega-map-width
-              :height vega-map-height
-              :data {:values js/topojson
-                     :format {:type "topojson"
-                              :feature topojson-feature}}
-              :transform [{:lookup "properties.GEOID"
-                           :from {:data {:values transformed-selection}
-                                  :key "geo_fips"
-                                  "fields" [(:field name) (:field color)]}}]
-              :projection {:type "albersUsa"}
-              :mark "geoshape"
-              :encoding {:tooltip [name color]
-                         :color color}})
-
-           :else
-           ;; Comparison plot
-           (let [types (into #{}
-                             (map stattype)
-                             (take 2 selected-columns))]
-             (condp = types
-               ;; Scatterplot
-               #{dist/gaussian} {:$schema
-                                 "https://vega.github.io/schema/vega-lite/v3.json"
-                                 :width vega-width
-                                 :height vega-height
-                                 :data {:values selection}
-                                 :mark "circle"
-                                 :encoding {:x {:field (first selected-columns)
-                                                :type "quantitative"}
-                                            :y {:field (second selected-columns)
-                                                :type "quantitative"}}}
-               ;; Heatmap
-               #{dist/categorical} {:$schema
-                                    "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width vega-width
-                                    :height vega-height
-                                    :data {:values selection}
-                                    :mark "rect"
-                                    :encoding {:x {:field (first selected-columns)
-                                                   :type "nominal"}
-                                               :y {:field (second selected-columns)
-                                                   :type "nominal"}
-                                               :color {:aggregate "count"
-                                                       :type "quantitative"}}}
-               ;; Bot-and-line
-               #{dist/gaussian
-                 dist/categorical} {:$schema
-                                    "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width vega-width
-                                    :height vega-height
-                                    :data {:values selection}
-                                    :mark {:type "boxplot"
-                                           :extent "min-max"}
-                                    :encoding {:x {:field (first selected-columns)
-                                                   :type (condp = (stattype (first selected-columns))
-                                                           dist/gaussian "quantitative"
-                                                           dist/categorical "nominal")}
-                                               :y {:field (second selected-columns)
-                                                   :type (condp = (stattype (second selected-columns))
-                                                           dist/gaussian "quantitative"
-                                                           dist/categorical "nominal")}
-                                               :color {:aggregate "count"
-                                                       :type "quantitative"}}}
-               {}))))))
+             :else
+             (vega/gen-comparison-plot table-states t-clicked))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:selections             (rf/subscribe [:selections])
-               :selected-columns       (rf/subscribe [:selected-columns])
-               :row-at-selection-start (rf/subscribe [:row-at-selection-start])})
-            vega-lite-spec)
+              {:table-states (rf/subscribe [:both-table-states])
+               :t-clicked (rf/subscribe [:table-last-clicked])})
+            (fn [data-for-spec]
+              (vega-lite-spec data-for-spec)))
 
 (rf/reg-sub :one-cell-selected
             (fn [_ _]
-              {:selections (rf/subscribe [:selections])})
+              (rf/subscribe [:table-state-active]))
             (fn [{:keys [selections]}]
               (= 1
                  (count selections)
                  (count (first selections))
                  (count (keys (first selections))))))
 
+
 (rf/reg-sub :generator
             (fn [_ _]
-              {:row (rf/subscribe [:row-at-selection-start])
-               :columns (rf/subscribe [:selected-columns])
-               :one-cell-selected (rf/subscribe [:one-cell-selected])})
-            (fn [{:keys [row columns one-cell-selected]}]
-              (when (and one-cell-selected
-                         ;; TODO: clean up this check
-                         (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header} (first columns))))
-                (let [sampled-column (first columns) ; columns that will be sampled
-                      constraints (mmix/with-row-values {} (-> row
-                                                               (select-keys (keys (:vars model/spec)))
-                                                               (dissoc sampled-column)))
-                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                                         :observation-trace constraints))
-                      negative-salary? #(neg? (% "salary_usd"))]
-                  ;; returns the first result of gen-fn that doesn't have a negative salary
-                  ;; TODO: This is dataset-specific
-                  #(take 1 (remove negative-salary? (repeatedly gen-fn)))))))
+              {:selection-info (rf/subscribe [:table-state-active])
+               :one-cell-selected (rf/subscribe [:one-cell-selected])
+               :override-fns (rf/subscribe [:column-override-fns])})
+            (fn [{:keys [selection-info one-cell-selected override-fns]}]
+              (let [row (:row-at-selection-start selection-info)
+                    columns (:selected-columns selection-info)
+                    col-to-sample (first columns)
+                    override-map (select-keys override-fns [col-to-sample])
+                    override-insert-fn (utils/gen-insert-fn override-map)]
+                (when (and one-cell-selected
+                           ;; TODO clean up this check
+                           (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))
+                  (let [constraints (mmix/with-row-values {} (-> row
+                                                                 (select-keys (keys (:vars model/spec)))
+                                                                 (dissoc col-to-sample)))
+                        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                                           :observation-trace constraints))
+                        negative-salary? #(neg? (% "salary_usd"))]
+                    ;; returns the first result of gen-fn that doesn't have a negative salary
+                    ;; TODO: This is dataset-specific
+                    #(take 1 (map override-insert-fn (remove negative-salary? (repeatedly gen-fn)))))))))
+
+;;; The following subs are for getting information on the likelihood of
+;;; prexisting data or imputing missing data and getting its likelihood as well.
+
+(rf/reg-sub
+ :row-likelihoods
+ (fn [_ _]
+   {:table-rows (rf/subscribe [:table-rows])})
+ (fn [{:keys [table-rows]}]
+   (let [likelihoods (search/row-likelihoods model/spec table-rows)]
+     likelihoods)))
+
+(rf/reg-sub
+  :row-likelihoods-normed
+  (fn [_ _]
+    {:row-likelihoods (rf/subscribe [:row-likelihoods])})
+  (fn [{:keys [row-likelihoods]}]
+    (let [min-val (apply min row-likelihoods)
+          max-val (apply max row-likelihoods)
+          scale-factor (Math/abs (- max-val min-val))]
+      (->> row-likelihoods
+        (map #(- % min-val))
+        (map #(/ % scale-factor))))))
+
+(rf/reg-sub
+ :cell-likelihoods
+ (fn [_ _]
+   {:table-rows (rf/subscribe [:table-rows])})
+ (fn [{:keys [table-rows]}]
+   (let [likelihoods (search/cell-likelihoods model/spec table-rows)]
+     likelihoods)))
+
+(rf/reg-sub
+ :missing-cells
+ (fn [_ _]
+   {:table-rows (rf/subscribe [:table-rows])
+    :headers (rf/subscribe [:table-headers])})
+ (fn [{:keys [table-rows headers]}]
+   (search/impute-missing-cells model/spec headers table-rows)))
+
+(rf/reg-sub
+ :missing-cells-values
+ (fn [_ _]
+   {:missing-cells (rf/subscribe [:missing-cells])})
+ (fn [{:keys [missing-cells]}]
+   (map :values missing-cells)))
+
+(rf/reg-sub
+ :missing-cells-values-above-conf-threshold
+ (fn [_ _]
+   {:values (rf/subscribe [:missing-cells-values])
+    :likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :conf-threshold (rf/subscribe [:confidence-threshold])})
+ (fn [{:keys [values likelihoods conf-threshold]}]
+   (for [[row-values row-likelihoods] (map vector values likelihoods)]
+     (->> (map (fn [[val-k val-v] [like-k like-v]]
+                 (if (>= like-v conf-threshold)
+                   [val-k val-v]
+                   nil))
+               row-values row-likelihoods)
+          (remove nil?)
+          (into {})))))
+
+(rf/reg-sub
+ :missing-cells-likelihoods
+ (fn [_ _]
+   {:missing-cells (rf/subscribe [:missing-cells])})
+ (fn [{:keys [missing-cells]}]
+   (map :scores missing-cells)))
+
+(rf/reg-sub
+  :missing-cells-likelihoods-normed
+  (fn [_ _]
+    {:missing-cells-likelihoods (rf/subscribe [:missing-cells-likelihoods])})
+  (fn [{:keys [missing-cells-likelihoods]}]
+    (let [all-likelihoods (remove nil? (flatten (map vals missing-cells-likelihoods)))
+          min-val (apply min all-likelihoods)
+          max-val (apply max all-likelihoods)
+          scale-factor (Math/abs (- max-val min-val))]
+      ;; Each iteration of this for loop handles
+      ;; a map of missing values for a row
+      (for [row missing-cells-likelihoods]
+        (->> row
+          (map (fn [[k v]] [k (- v min-val)]))
+          (map (fn [[k v]] [k (/ v scale-factor)]))
+          (into {}))))))
+
+(rf/reg-sub :confidence-threshold
+            (fn [db _]
+              (get db ::db/confidence-threshold)))
+
+(rf/reg-sub :confidence-options
+            (fn [db _]
+              (get db ::db/confidence-options)))
+
+(rf/reg-sub :confidence-option
+            (fn [db [_sub-name path]]
+              (get-in db (into [::db/confidence-options] path))))
+
+(defn row-wise-likelihood-threshold-renderer [renderer-args row-likelihoods conf-thresh]
+  (let [renderer-args-js (clj->js renderer-args)
+        [hot td row _col _prop _value _cell-properties] renderer-args
+
+        ; Using physical coords makes rendering resilient to sorting the table.
+        row (.toPhysicalRow hot row)
+
+        td-style (.-style td)
+        text-render-fn js/Handsontable.renderers.TextRenderer
+
+        likelihood-for-row (nth row-likelihoods row)
+        row-above-thresh (>= likelihood-for-row conf-thresh)]
+
+    ;; Performs standard rendering of text in cell
+    (this-as this
+      (.apply text-render-fn this renderer-args-js))
+
+    (when row-above-thresh
+      (set! (.-background td-style) "#CEC"))))
+
+;; TODO: Write this
+(defn row-wise-likelihood-gradient-renderer [renderer-args row-likelihoods])
+
+;; TODO: Avoid the extra check on confidences. Simply compare key presence in
+;; missing-cells-values and missing-cells-values-above-conf-threshold.
+(defn missing-cell-wise-likelihood-threshold-renderer [renderer-args missing-cells-likelihoods computed-headers conf-thresh]
+  (let [renderer-args-js (clj->js renderer-args)
+        [hot td row col _prop _value _cell-properties] renderer-args
+
+        ; Using physical coords makes rendering resilient to sorting the table.
+        row (.toPhysicalRow hot row)
+        col (.toPhysicalColumn hot col)
+
+        td-style (.-style td)
+        text-render-fn js/Handsontable.renderers.TextRenderer
+
+        prop-name-of-cell (nth computed-headers col)
+        likelihoods-for-row (nth missing-cells-likelihoods row)
+        likelihood-for-cell (get likelihoods-for-row prop-name-of-cell)]
+
+    ;; Performs standard rendering of text in cell
+    (this-as this
+      (.apply text-render-fn this renderer-args-js))
+
+    (when likelihood-for-cell
+      (let [cell-above-thresh (>= likelihood-for-cell conf-thresh)]
+        (if cell-above-thresh
+          (set! (.-background td-style) "#CEC")
+          (set! (.-background td-style) "#DDD"))))))
+
+(rf/reg-sub
+ :cells-style-fn
+ (fn [_ _]
+   {:cell-renderer-fn (rf/subscribe [:cell-renderer-fn])})
+ (fn [{:keys [cell-renderer-fn]}]
+   ;; Returns a function used by the :cells option for Handsontable.
+   (fn [row col]
+     (let [cell-properties {:renderer cell-renderer-fn}]
+       (clj->js cell-properties)))))
+
+;; TODO: make this sub not require likelihoods for everything.
+;; Do it conditionally base on conf-mode.
+(rf/reg-sub
+ :cell-renderer-fn
+ (fn [_ _]
+   {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
+    :missing-cells-likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :conf-thresh (rf/subscribe [:confidence-threshold])
+    :conf-mode (rf/subscribe [:confidence-option [:mode]])
+    :computed-headers (rf/subscribe [:computed-headers])})
+ ;; Returns a cell renderer function used by Handsontable.
+ (fn [{:keys [row-likelihoods missing-cells-likelihoods conf-thresh conf-mode computed-headers]}]
+   (case conf-mode
+     :none
+     js/Handsontable.renderers.TextRenderer
+
+     :row
+     (fn [& args]
+       ;; These render functions are actually called with this args list:
+       ;; [hot td row col prop value cell-properties]
+       ;; Instead, we are specifying [& args] here to make it cleaner to
+       ;; pass in data to custom rendering functions.
+       (row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))
+
+     :cells-existing
+     js/Handsontable.renderers.TextRenderer
+
+     :cells-missing
+     (fn [& args]
+       (missing-cell-wise-likelihood-threshold-renderer args missing-cells-likelihoods computed-headers conf-thresh)))))
+
+(rf/reg-sub
+ :context-menu
+ (fn [_ _]
+   {:col-overrides (rf/subscribe [:column-overrides])
+    :col-names (rf/subscribe [:computed-headers])})
+ (fn [{:keys [col-overrides col-names]}]
+   (let [set-function-fn (fn [key selection click-event]
+                           (this-as hot
+                             (let [last-col-num (.. (first selection) -start -col)
+                                   last-col-num-phys (.toPhysicalColumn hot last-col-num)
+                                   col-name (nth col-names last-col-num-phys)
+
+                                   fn-text (get col-overrides col-name)]
+                               (rf/dispatch [:modal {:show? true
+                                                     :child [modal/function-entry col-name fn-text]}]))))
+
+         clear-function-fn (fn [key selection click-event]
+                             (this-as hot
+                               (let [last-col-num (.. (first selection) -start -col)
+                                     last-col-num-phys (.toPhysicalColumn hot last-col-num)
+                                     col-name (nth col-names last-col-num-phys)]
+                                 (rf/dispatch [:clear-column-function col-name]))))
+         disable-fn (fn []
+                     (this-as this
+                       ;; TODO: only enable options on column headers >= 2
+                       false))]
+     {:items {"set_function" {:disabled disable-fn
+                              :name "Set js function"
+                              :callback set-function-fn}
+              "clear_function" {:disabled disable-fn
+                                :name "Clear js function"
+                                :callback clear-function-fn}}})))
+
+(rf/reg-sub-raw
+ :modal
+ (fn [db _] (reaction (:modal @db))))
+
+(rf/reg-sub :column-override-fns
+            (fn [db _]
+              (get db ::db/column-override-fns)))
+
+(rf/reg-sub :column-overrides
+            (fn [db _]
+              (get db ::db/column-overrides)))
+
+(rf/reg-sub :query-string
+            (fn [db _]
+              (get db ::db/query-string)))

@@ -28,7 +28,7 @@
 (defn handsontable
   ([props]
    (handsontable {} props))
-  ([attributes {:keys [settings hooks] :as props}]
+  ([attributes {:keys [settings hooks name] :as props}]
    (let [js-settings (clj->js settings)
          hot-instance (reagent/atom nil)]
      (reagent/create-class
@@ -37,13 +37,15 @@
        :component-did-mount
        (fn [this]
          (let [dom-node (dom/dom-node this)
-               hot (js/Handsontable. dom-node (clj->js (:settings props)))]
+               hot (js/Handsontable. dom-node (clj->js (:settings props)))
+               unique-id (keyword name)]
+
            ; add callbacks internal to hot object
            (doseq [key hooks]
              (let [camel-key (csk/->camelCase (clj->js key))]
                (js/Handsontable.hooks.add camel-key
                                           (fn [& args]
-                                            (rf/dispatch (into [key hot] args)))
+                                            (rf/dispatch (into [key hot unique-id] args)))
                                           hot)))
            ; set the atom to the hot object
            (reset! hot-instance hot)))

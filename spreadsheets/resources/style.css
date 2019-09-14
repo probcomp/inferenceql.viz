@@ -1,6 +1,41 @@
-/* styling for the virtual data handsontable */
+/* css changes for handsontable -- start */
+.ht_master tr td {
+  font-size: 14px;
+}
+
+.handsontable th {
+  font-size: 14px;
+}
+
 .virtual-hot .ht_master tr td {
   background-color: #FAFCE4;
+}
+/* css changes for handsontable -- end */
+
+.table-title {
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  overflow: auto;
+}
+
+.main-title {
+  float: left;
+  background-color: #f0f0f0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #cccccc;
+  border-bottom: none;
+}
+
+.sub-title {
+  float: left;
+  margin-top: 3px;
+}
+
+.sub-titel, pre {
+  margin: 0.0em;
 }
 
 /* allows search input to be styled */
@@ -15,12 +50,9 @@ button { font-size: 16px; }
 
 body {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  font-size: 1.125em;
   -webkit-font-smoothing: antialiased;
   color: #333;
-  margin: 0 auto;
-  padding-top: 5px;
-  font-size: 1.125em;
-  line-height: 1em;
 }
 
 h1 {
@@ -30,4 +62,14 @@ h1 {
 h3 {
   font-size: .8em;
   line-height: .2em;
+}
+
+.code-editor {
+  font-size: 14px;
+  width: 100%;
+  height: 400px;
+}
+
+select {
+   font-size: 16px;
 }
