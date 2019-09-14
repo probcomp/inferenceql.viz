@@ -11,20 +11,20 @@
 #?(:clj (def js->clj identity))
 
 (def ^:export data (clj->js data/nyt-data))
-(def ^:export columns (clj->js (-> model/spec :vars keys)))
+(def ^:export columns (clj->js (spec/variables model/spec)))
 
 (defn- valid-values
   "Returns the valid values for categorical column `column`."
-  [column]
-  (-> (spec/parameters model/spec column 0)
+  [spec column]
+  (-> (spec/parameters spec column 0)
       keys
       set))
 
 (defn- validation-errors
   "Given a example map `example`, returns a potentially empty vector of validation
   error maps."
-  [example]
-  (let [{valid-columns true, invalid-columns false} (group-by #(contains? columns %) (keys example))
+  [spec example]
+  (let [{valid-columns true, invalid-columns false} (group-by #(contains? (spec/variables spec) %) (keys example))
         key-errors (mapv (fn [column]
                            {:type :invalid-column
                             :column column
@@ -32,12 +32,12 @@
                          invalid-columns)
         value-errors (keep (fn [column]
                              (let [v (get example column)]
-                               (if (spec/nominal? model/spec column)
-                                 (when-not (contains? (valid-values column) v)
+                               (if (spec/nominal? spec column)
+                                 (when-not (contains? (valid-values spec column) v)
                                    {:type :invalid-value
                                     :column column
                                     :column-type :nominal
-                                    :valid-values (valid-values column)
+                                    :valid-values (valid-values spec column)
                                     :value v})
                                  (when-not (number? v)
                                    {:type :invalid-value
