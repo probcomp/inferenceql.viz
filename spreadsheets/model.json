@@ -13,13 +13,13 @@
     }, 
     "categories": {
         "job_satisfaction": {
-            "0.0": "Moderately dissatisfied", 
-            "1.0": "Moderately satisfied", 
-            "2.0": "Extremely satisfied", 
-            "3.0": "Slightly dissatisfied", 
-            "4.0": "Slightly satisfied", 
-            "5.0": "Extremely dissatisfied", 
-            "6.0": "Neither satisfied nor dissatisfied"
+            "0.0": "b) Moderately dissatisfied", 
+            "1.0": "f) Moderately satisfied", 
+            "2.0": "g) Extremely satisfied", 
+            "3.0": "c) Slightly dissatisfied", 
+            "4.0": "e) Slightly satisfied", 
+            "5.0": "a) Extremely dissatisfied", 
+            "6.0": "d) Neither satisfied nor dissatisfied"
         }, 
         "java": {
             "0.0": "False", 
@@ -46,17 +46,17 @@
             "1.0": "True"
         }, 
         "years_coding_professionally": {
-            "0.0": "21-23 years", 
-            "1.0": "9-11 years", 
-            "2.0": "6-8 years", 
-            "3.0": "0-2 years", 
-            "4.0": "18-20 years", 
-            "5.0": "3-5 years", 
-            "6.0": "12-14 years", 
-            "7.0": "30 or more years", 
-            "8.0": "27-29 years", 
-            "9.0": "15-17 years", 
-            "10.0": "24-26 years"
+            "0.0": "h) 21-23 years", 
+            "1.0": "d) 9-11 years", 
+            "2.0": "c) 6-8 years", 
+            "3.0": "a) 0-2 years", 
+            "4.0": "e) 18-20 years", 
+            "5.0": "b) 3-5 years", 
+            "6.0": "f) 12-14 years", 
+            "7.0": "k) 30 or more years", 
+            "8.0": "j) 27-29 years", 
+            "9.0": "g) 15-17 years", 
+            "10.0": "i) 24-26 years"
         }, 
         "opinion_on_ai": {
             "0.0": "I don't care about it, or I haven't thought about it.", 
@@ -69,13 +69,13 @@
             {
                 "p": 0.27979797979797982, 
                 "job_satisfaction": {
-                    "Extremely satisfied": 0.19751640224301611, 
-                    "Slightly satisfied": 0.14486298723827584, 
-                    "Moderately satisfied": 0.34845619192327154, 
-                    "Neither satisfied nor dissatisfied": 0.071148206231639463, 
-                    "Moderately dissatisfied": 0.043066384895777979, 
-                    "Extremely dissatisfied": 0.032535701894829926, 
-                    "Slightly dissatisfied": 0.16241412557318927
+                    "g) Extremely satisfied": 0.19751640224301611, 
+                    "e) Slightly satisfied": 0.14486298723827584, 
+                    "f) Moderately satisfied": 0.34845619192327154, 
+                    "d) Neither satisfied nor dissatisfied": 0.071148206231639463, 
+                    "b) Moderately dissatisfied": 0.043066384895777979, 
+                    "a) Extremely dissatisfied": 0.032535701894829926, 
+                    "c) Slightly dissatisfied": 0.16241412557318927
                 }, 
                 "salary_usd": [
                     44654.789406104297, 
@@ -106,17 +106,17 @@
                     "False": 0.83366578096045429
                 }, 
                 "years_coding_professionally": {
-                    "3-5 years": 0.32055749128919858, 
-                    "30 or more years": 0.0069686411149825784, 
-                    "6-8 years": 0.12195121951219512, 
-                    "27-29 years": 0.0034843205574912892, 
-                    "21-23 years": 0.010452961672473868, 
-                    "15-17 years": 0.010452961672473868, 
-                    "18-20 years": 0.010452961672473868, 
-                    "9-11 years": 0.076655052264808357, 
-                    "12-14 years": 0.03484320557491289, 
-                    "24-26 years": 0.0069686411149825784, 
-                    "0-2 years": 0.39721254355400698
+                    "b) 3-5 years": 0.32055749128919858, 
+                    "k) 30 or more years": 0.0069686411149825784, 
+                    "c) 6-8 years": 0.12195121951219512, 
+                    "j) 27-29 years": 0.0034843205574912892, 
+                    "h) 21-23 years": 0.010452961672473868, 
+                    "g) 15-17 years": 0.010452961672473868, 
+                    "e) 18-20 years": 0.010452961672473868, 
+                    "d) 9-11 years": 0.076655052264808357, 
+                    "f) 12-14 years": 0.03484320557491289, 
+                    "i) 24-26 years": 0.0069686411149825784, 
+                    "a) 0-2 years": 0.39721254355400698
                 }, 
                 "opinion_on_ai": {
                     "I don't care about it, or I haven't thought about it.": 0.078651685393258425, 
@@ -127,13 +127,13 @@
             {
                 "p": 0.18888888888888888, 
                 "job_satisfaction": {
-                    "Extremely satisfied": 0.25662837384271814, 
-                    "Slightly satisfied": 0.098369674330732043, 
-                    "Moderately satisfied": 0.38936147665922261, 
-                    "Neither satisfied nor dissatisfied": 0.062633838957057764, 
-                    "Moderately dissatisfied": 0.088159435652539392, 
-                    "Extremely dissatisfied": 0.037108242261576135, 
-                    "Slightly dissatisfied": 0.067738958296154089
+                    "g) Extremely satisfied": 0.25662837384271814, 
+                    "e) Slightly satisfied": 0.098369674330732043, 
+                    "f) Moderately satisfied": 0.38936147665922261, 
+                    "d) Neither satisfied nor dissatisfied": 0.062633838957057764, 
+                    "b) Moderately dissatisfied": 0.088159435652539392, 
+                    "a) Extremely dissatisfied": 0.037108242261576135, 
+                    "c) Slightly dissatisfied": 0.067738958296154089
                 }, 
                 "salary_usd": [
                     103977.26405674336, 
@@ -164,17 +164,17 @@
                     "False": 0.84433718614411712
                 }, 
                 "years_coding_professionally": {
-                    "3-5 years": 0.16161616161616163, 
-                    "30 or more years": 0.015151515151515152, 
-                    "6-8 years": 0.17171717171717171, 
-                    "27-29 years": 0.025252525252525252, 
-                    "21-23 years": 0.025252525252525252, 
-                    "15-17 years": 0.16161616161616163, 
-                    "18-20 years": 0.10606060606060606, 
-                    "9-11 years": 0.16161616161616163, 
-                    "12-14 years": 0.11616161616161616, 
-                    "24-26 years": 0.010101010101010102, 
-                    "0-2 years": 0.045454545454545456
+                    "b) 3-5 years": 0.16161616161616163, 
+                    "k) 30 or more years": 0.015151515151515152, 
+                    "c) 6-8 years": 0.17171717171717171, 
+                    "j) 27-29 years": 0.025252525252525252, 
+                    "h) 21-23 years": 0.025252525252525252, 
+                    "g) 15-17 years": 0.16161616161616163, 
+                    "e) 18-20 years": 0.10606060606060606, 
+                    "d) 9-11 years": 0.16161616161616163, 
+                    "f) 12-14 years": 0.11616161616161616, 
+                    "i) 24-26 years": 0.010101010101010102, 
+                    "a) 0-2 years": 0.045454545454545456
                 }, 
                 "opinion_on_ai": {
                     "I don't care about it, or I haven't thought about it.": 0.090425531914893623, 
@@ -185,13 +185,13 @@
             {
                 "p": 0.23838383838383839, 
                 "job_satisfaction": {
-                    "Extremely satisfied": 0.21752873453524152, 
-                    "Slightly satisfied": 0.10318785977815298, 
-                    "Moderately satisfied": 0.36862203332139426, 
-                    "Neither satisfied nor dissatisfied": 0.050101025069504722, 
-                    "Moderately dissatisfied": 0.14402388647711317, 
-                    "Extremely dissatisfied": 0.013348601040440547, 
-                    "Slightly dissatisfied": 0.10318785977815298
+                    "g) Extremely satisfied": 0.21752873453524152, 
+                    "e) Slightly satisfied": 0.10318785977815298, 
+                    "f) Moderately satisfied": 0.36862203332139426, 
+                    "d) Neither satisfied nor dissatisfied": 0.050101025069504722, 
+                    "b) Moderately dissatisfied": 0.14402388647711317, 
+                    "a) Extremely dissatisfied": 0.013348601040440547, 
+                    "c) Slightly dissatisfied": 0.10318785977815298
                 }, 
                 "salary_usd": [
                     62558.748253081809, 
@@ -222,17 +222,17 @@
                     "False": 0.42475562006605927
                 }, 
                 "years_coding_professionally": {
-                    "3-5 years": 0.34008097165991902, 
-                    "30 or more years": 0.0080971659919028341, 
-                    "6-8 years": 0.17813765182186234, 
-                    "27-29 years": 0.004048582995951417, 
-                    "21-23 years": 0.020242914979757085, 
-                    "15-17 years": 0.004048582995951417, 
-                    "18-20 years": 0.03643724696356275, 
-                    "9-11 years": 0.10121457489878542, 
-                    "12-14 years": 0.093117408906882596, 
-                    "24-26 years": 0.012145748987854251, 
-                    "0-2 years": 0.20242914979757085
+                    "b) 3-5 years": 0.34008097165991902, 
+                    "k) 30 or more years": 0.0080971659919028341, 
+                    "c) 6-8 years": 0.17813765182186234, 
+                    "j) 27-29 years": 0.004048582995951417, 
+                    "h) 21-23 years": 0.020242914979757085, 
+                    "g) 15-17 years": 0.004048582995951417, 
+                    "e) 18-20 years": 0.03643724696356275, 
+                    "d) 9-11 years": 0.10121457489878542, 
+                    "f) 12-14 years": 0.093117408906882596, 
+                    "i) 24-26 years": 0.012145748987854251, 
+                    "a) 0-2 years": 0.20242914979757085
                 }, 
                 "opinion_on_ai": {
                     "I don't care about it, or I haven't thought about it.": 0.064377682403433473, 
@@ -243,13 +243,13 @@
             {
                 "p": 0.091919191919191928, 
                 "job_satisfaction": {
-                    "Extremely satisfied": 0.17289264277986238, 
-                    "Slightly satisfied": 0.11282164293442333, 
-                    "Moderately satisfied": 0.41317664216161865, 
-                    "Neither satisfied nor dissatisfied": 0.03272697647383789, 
-                    "Moderately dissatisfied": 0.1228334762419965, 
-                    "Extremely dissatisfied": 0.022715143166264714, 
-                    "Slightly dissatisfied": 0.1228334762419965
+                    "g) Extremely satisfied": 0.17289264277986238, 
+                    "e) Slightly satisfied": 0.11282164293442333, 
+                    "f) Moderately satisfied": 0.41317664216161865, 
+                    "d) Neither satisfied nor dissatisfied": 0.03272697647383789, 
+                    "b) Moderately dissatisfied": 0.1228334762419965, 
+                    "a) Extremely dissatisfied": 0.022715143166264714, 
+                    "c) Slightly dissatisfied": 0.1228334762419965
                 }, 
                 "salary_usd": [
                     80464.2004584682, 
@@ -280,17 +280,17 @@
                     "False": 0.1656779367776437
                 }, 
                 "years_coding_professionally": {
-                    "3-5 years": 0.28431372549019607, 
-                    "30 or more years": 0.0098039215686274508, 
-                    "6-8 years": 0.12745098039215685, 
-                    "27-29 years": 0.0098039215686274508, 
-                    "21-23 years": 0.0098039215686274508, 
-                    "15-17 years": 0.049019607843137254, 
-                    "18-20 years": 0.039215686274509803, 
-                    "9-11 years": 0.088235294117647065, 
-                    "12-14 years": 0.10784313725490197, 
-                    "24-26 years": 0.0098039215686274508, 
-                    "0-2 years": 0.26470588235294118
+                    "b) 3-5 years": 0.28431372549019607, 
+                    "k) 30 or more years": 0.0098039215686274508, 
+                    "c) 6-8 years": 0.12745098039215685, 
+                    "j) 27-29 years": 0.0098039215686274508, 
+                    "h) 21-23 years": 0.0098039215686274508, 
+                    "g) 15-17 years": 0.049019607843137254, 
+                    "e) 18-20 years": 0.039215686274509803, 
+                    "d) 9-11 years": 0.088235294117647065, 
+                    "f) 12-14 years": 0.10784313725490197, 
+                    "i) 24-26 years": 0.0098039215686274508, 
+                    "a) 0-2 years": 0.26470588235294118
                 }, 
                 "opinion_on_ai": {
                     "I don't care about it, or I haven't thought about it.": 0.032258064516129031, 
@@ -301,13 +301,13 @@
             {
                 "p": 0.083838383838383837, 
                 "job_satisfaction": {
-                    "Extremely satisfied": 0.27501450422844864, 
-                    "Slightly satisfied": 0.057343556087474379, 
-                    "Moderately satisfied": 0.43826771533417935, 
-                    "Neither satisfied nor dissatisfied": 0.046460008680425671, 
-                    "Moderately dissatisfied": 0.079110650901571808, 
-                    "Extremely dissatisfied": 0.0682271034945231, 
-                    "Slightly dissatisfied": 0.035576461273376957
+                    "g) Extremely satisfied": 0.27501450422844864, 
+                    "e) Slightly satisfied": 0.057343556087474379, 
+                    "f) Moderately satisfied": 0.43826771533417935, 
+                    "d) Neither satisfied nor dissatisfied": 0.046460008680425671, 
+                    "b) Moderately dissatisfied": 0.079110650901571808, 
+                    "a) Extremely dissatisfied": 0.0682271034945231, 
+                    "c) Slightly dissatisfied": 0.035576461273376957
                 }, 
                 "salary_usd": [
                     124087.86011026936, 
@@ -338,17 +338,17 @@
                     "False": 0.099863253232563162
                 }, 
                 "years_coding_professionally": {
-                    "3-5 years": 0.010638297872340425, 
-                    "30 or more years": 0.063829787234042548, 
-                    "6-8 years": 0.21276595744680851, 
-                    "27-29 years": 0.085106382978723402, 
-                    "21-23 years": 0.042553191489361701, 
-                    "15-17 years": 0.19148936170212766, 
-                    "18-20 years": 0.074468085106382975, 
-                    "9-11 years": 0.13829787234042554, 
-                    "12-14 years": 0.10638297872340426, 
-                    "24-26 years": 0.063829787234042548, 
-                    "0-2 years": 0.010638297872340425
+                    "b) 3-5 years": 0.010638297872340425, 
+                    "k) 30 or more years": 0.063829787234042548, 
+                    "c) 6-8 years": 0.21276595744680851, 
+                    "j) 27-29 years": 0.085106382978723402, 
+                    "h) 21-23 years": 0.042553191489361701, 
+                    "g) 15-17 years": 0.19148936170212766, 
+                    "e) 18-20 years": 0.074468085106382975, 
+                    "d) 9-11 years": 0.13829787234042554, 
+                    "f) 12-14 years": 0.10638297872340426, 
+                    "i) 24-26 years": 0.063829787234042548, 
+                    "a) 0-2 years": 0.010638297872340425
                 }, 
                 "opinion_on_ai": {
                     "I don't care about it, or I haven't thought about it.": 0.058139534883720929, 
@@ -359,13 +359,13 @@
             {
                 "p": 0.10404040404040404, 
                 "job_satisfaction": {
-                    "Extremely satisfied": 0.12840056159100302, 
-                    "Slightly satisfied": 0.22959663045398171, 
-                    "Moderately satisfied": 0.12840056159100302, 
-                    "Neither satisfied nor dissatisfied": 0.12840056159100302, 
-                    "Moderately dissatisfied": 0.12840056159100302, 
-                    "Extremely dissatisfied": 0.12840056159100302, 
-                    "Slightly dissatisfied": 0.12840056159100302
+                    "g) Extremely satisfied": 0.12840056159100302, 
+                    "e) Slightly satisfied": 0.22959663045398171, 
+                    "f) Moderately satisfied": 0.12840056159100302, 
+                    "d) Neither satisfied nor dissatisfied": 0.12840056159100302, 
+                    "b) Moderately dissatisfied": 0.12840056159100302, 
+                    "a) Extremely dissatisfied": 0.12840056159100302, 
+                    "c) Slightly dissatisfied": 0.12840056159100302
                 }, 
                 "salary_usd": [
                     447909.99322354258, 
@@ -396,17 +396,17 @@
                     "False": 0.61846870044330582
                 }, 
                 "years_coding_professionally": {
-                    "3-5 years": 0.083333333333333329, 
-                    "30 or more years": 0.083333333333333329, 
-                    "6-8 years": 0.083333333333333329, 
-                    "27-29 years": 0.083333333333333329, 
-                    "21-23 years": 0.083333333333333329, 
-                    "15-17 years": 0.083333333333333329, 
-                    "18-20 years": 0.083333333333333329, 
-                    "9-11 years": 0.083333333333333329, 
-                    "12-14 years": 0.083333333333333329, 
-                    "24-26 years": 0.083333333333333329, 
-                    "0-2 years": 0.16666666666666666
+                    "b) 3-5 years": 0.083333333333333329, 
+                    "k) 30 or more years": 0.083333333333333329, 
+                    "c) 6-8 years": 0.083333333333333329, 
+                    "j) 27-29 years": 0.083333333333333329, 
+                    "h) 21-23 years": 0.083333333333333329, 
+                    "g) 15-17 years": 0.083333333333333329, 
+                    "e) 18-20 years": 0.083333333333333329, 
+                    "d) 9-11 years": 0.083333333333333329, 
+                    "f) 12-14 years": 0.083333333333333329, 
+                    "i) 24-26 years": 0.083333333333333329, 
+                    "a) 0-2 years": 0.16666666666666666
                 }, 
                 "opinion_on_ai": {
                     "I don't care about it, or I haven't thought about it.": 0.25, 
@@ -417,13 +417,13 @@
             {
                 "p": 0.013131313131313133, 
                 "job_satisfaction": {
-                    "Extremely satisfied": 0.057985592929342404, 
-                    "Slightly satisfied": 0.19508578896655851, 
-                    "Moderately satisfied": 0.24078585431229721, 
-                    "Neither satisfied nor dissatisfied": 0.057985592929342404, 
-                    "Moderately dissatisfied": 0.14938572362081981, 
-                    "Extremely dissatisfied": 0.19508578896655851, 
-                    "Slightly dissatisfied": 0.1036856582750811
+                    "g) Extremely satisfied": 0.057985592929342404, 
+                    "e) Slightly satisfied": 0.19508578896655851, 
+                    "f) Moderately satisfied": 0.24078585431229721, 
+                    "d) Neither satisfied nor dissatisfied": 0.057985592929342404, 
+                    "b) Moderately dissatisfied": 0.14938572362081981, 
+                    "a) Extremely dissatisfied": 0.19508578896655851, 
+                    "c) Slightly dissatisfied": 0.1036856582750811
                 }, 
                 "salary_usd": [
                     190008.48026742128, 
@@ -454,17 +454,17 @@
                     "False": 0.34587427684183936
                 }, 
                 "years_coding_professionally": {
-                    "3-5 years": 0.125, 
-                    "30 or more years": 0.25, 
-                    "6-8 years": 0.083333333333333329, 
-                    "27-29 years": 0.083333333333333329, 
-                    "21-23 years": 0.125, 
-                    "15-17 years": 0.041666666666666664, 
-                    "18-20 years": 0.041666666666666664, 
-                    "9-11 years": 0.041666666666666664, 
-                    "12-14 years": 0.041666666666666664, 
-                    "24-26 years": 0.083333333333333329, 
-                    "0-2 years": 0.083333333333333329
+                    "b) 3-5 years": 0.125, 
+                    "k) 30 or more years": 0.25, 
+                    "c) 6-8 years": 0.083333333333333329, 
+                    "j) 27-29 years": 0.083333333333333329, 
+                    "h) 21-23 years": 0.125, 
+                    "g) 15-17 years": 0.041666666666666664, 
+                    "e) 18-20 years": 0.041666666666666664, 
+                    "d) 9-11 years": 0.041666666666666664, 
+                    "f) 12-14 years": 0.041666666666666664, 
+                    "i) 24-26 years": 0.083333333333333329, 
+                    "a) 0-2 years": 0.083333333333333329
                 }, 
                 "opinion_on_ai": {
                     "I don't care about it, or I haven't thought about it.": 0.0625, 
