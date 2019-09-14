@@ -87,7 +87,7 @@
      (do (rf/dispatch [:anomaly-search column []])
          db)
 
-     {:type :search-by-labeled :binding {"label" "\"True\""} :given true}
+     {:type :search-by-labeled :binding {"label" "True"} :given true}
      (let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
            neg-ids @(rf/subscribe [:row-ids-labeled-neg])
            unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
