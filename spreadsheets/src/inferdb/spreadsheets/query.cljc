@@ -1,23 +1,39 @@
 (ns inferdb.spreadsheets.query
   (:require [clojure.core.match :refer [match]]
-            [clojure.java.io :as io]
             [instaparse.core :as insta]
             [metaprob.prelude :as mp]
             [inferdb.multimixture :as mmix]
             [inferdb.spreadsheets.model :as model]))
 
-#_(let [parser (insta/parser (io/resource "query.bnf"))]
-    (parser "GENERATE"))
+(def bnf
+  "select = <\"SELECT\"> <ws> what (<ws> from)?
+   <what> = paren-selectable (<\",\"> <ws> paren-selectable)*
+   <paren-selectable> = selectable | <\"(\"> selectable <\")\">
+   <selectable> = probability | star
+   <generate> = <\"GENERATE *\"> (<ws> gen-given)? <ws> <\"FROM model\">
+   probability = <\"PROBABILITY OF\"> <ws> (prob-column | prob-binding) (<ws> prob-given)? <ws> <\"FROM model\">
+   prob-column = column
+   prob-binding = binding
+   star = <\"*\">
+   from = <\"FROM\"> <ws> <\"(\"> generate <\")\"> <ws> limit
+   gen-given = <\"GIVEN\"> <ws> bindings
+   prob-given = <\"GIVEN\"> <ws> <star>
+   <bindings> = binding (<ws> <\"AND\"> <ws> binding)*
+   <binding> = column <\"=\"> value
+   <column> = #'[a-zA-Z_]+'
+   <value> = #'\\\"([^\\\"]+)\\\"'
+   <limit> = <\"LIMIT\"> <ws> nat
+   nat = #'[0-9]+'
+   ws = #'\\s+'\n")
 
-#_(set! *print-length* 10)
-
-(def parser (insta/parser (io/resource "query.bnf")))
+(def parser (insta/parser bnf))
 
 (def row-generator (mmix/row-generator model/spec))
 
 (defn parse-unsigned-int
   [s]
-  (Integer/parseUnsignedInt s))
+  #?(:clj (Integer/parseUnsignedInt s)
+     :cljs (js/parseInt s)))
 
 (defn- transform-from
   ([limit]
@@ -30,19 +46,30 @@
 
 (defn transform-select
   [& args]
-  args
-  #_
   (match (vec args)
     [[:star] s]
-    [[:probability ]]
-    s))
+    {:type :generated
+     :values s}
+
+    [[:probability [:prob-column column]] [:star]]
+    {:type :anomaly-search
+     :column column}
+
+    [[:probability [:prob-column column] [:prob-given]] [:star]]
+    {:type :anomaly-search
+     :column column
+     :given true}
+
+    [[:probability [:prob-binding label value] [:prob-given]] [:star]]
+    {:type :anomaly-search
+     :given true
+     :binding {label value}}))
 
 (defn issue
   [q]
   (let [ast (parser q)]
     (insta/transform
      {:select transform-select
-
       :from transform-from
       :gen-given hash-map
       :nat parse-unsigned-int}
@@ -51,8 +78,10 @@
 #_(issue "SELECT * FROM (GENERATE * FROM model) LIMIT 1")
 #_(issue "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model) LIMIT 3")
 
-#_(issue "SELECT (PROBABILITY OF salary_usd FROM model), *")
-#_(issue "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *")
+#_(issue "SELECT (PROBABILITY OF salary_usd FROM model), *" [{}])
+#_(issue "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *" [{"salary_usd" 80000 "linux" "True"}])
+#_(issue "SELECT (PROBABILITY OF label=\"True\" GIVEN * FROM model), *")
+
 
 #_(parser "SELECT * FROM (GENERATE * FROM model) LIMIT 1")
 #_(parser "SELECT * FROM (GENERATE * GIVEN java=\"False\" FROM model) LIMIT 1")
