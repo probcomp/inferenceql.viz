@@ -1,19 +1,24 @@
 (ns inferdb.spreadsheets.query-test
-  (:require [clojure.java.io :as io]
-            [clojure.test :as test :refer [are deftest is]]
-            [instaparse.core :as insta]))
+  (:require [clojure.test :as test :refer [are deftest is]]
+            [instaparse.core :as insta]
+            [inferdb.spreadsheets.query :as query :refer [parser]]))
 
-(def parser (insta/parser (io/resource "query.bnf")))
+#_(parser "GENERATE * FROM model" :start :generate)
+#_(insta/transform query/transform-map
+                   (parser "GIVEN java=\"False\" AND linux=\"True\""
+                           :start :given))
 
-#_(parser "SELECT (PROBABILITY OF label=\"True\" GIVEN * FROM model), *"
-          :start :select)
+(as-> "SELECT * FROM (GENERATE * FROM model) LIMIT 1" $
+  (parser $ :start :select)
+  (query/transform-map))
+
 
 (deftest valid-select
   (are [query] (nil? (insta/get-failure (parser query :start :select)))
     "SELECT * FROM (GENERATE * FROM model) LIMIT 1"
     "SELECT * FROM (GENERATE * FROM model) LIMIT 2"
-    "SELECT * FROM (GENERATE * GIVEN java=\"False\" FROM model)"
-    "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model)"
+    "SELECT * FROM (GENERATE * GIVEN java=\"False\" FROM model) LIMIT 1"
+    "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model) LIMIT 1"
     "SELECT (PROBABILITY OF salary_usd FROM model), *"
     "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *"
     "SELECT (PROBABILITY OF label=\"True\" GIVEN * FROM model), *"

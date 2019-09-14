@@ -5,7 +5,6 @@
             [metaprob.prelude :as mp]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]))
