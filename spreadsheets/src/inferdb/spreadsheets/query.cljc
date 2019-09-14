@@ -61,7 +61,7 @@
      :given true}
 
     [[:probability [:prob-binding label value] [:prob-given]] [:star]]
-    {:type :anomaly-search
+    {:type :search-by-labeled
      :given true
      :binding {label value}}
 
