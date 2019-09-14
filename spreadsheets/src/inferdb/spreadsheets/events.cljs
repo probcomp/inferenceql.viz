@@ -75,24 +75,32 @@
  :parse-query
  event-interceptors
  (fn [db [_ text]]
-   (match (query/issue text)
-     {:type :generated :values v}
-     (db/with-virtual-rows db v)
+   (let [command (query/issue text)]
+     (match command
+       {:type :generated :values v}
+       (db/with-virtual-rows db v)
 
-     {:type :anomaly-search :column column :given true}
-     (do (rf/dispatch [:anomaly-search column ["ROW"]])
+       {:type :anomaly-search :column column :given true}
+       (do (rf/dispatch [:anomaly-search column ["ROW"]])
+           db)
+
+       {:type :anomaly-search :column column}
+       (do (rf/dispatch [:anomaly-search column []])
+           db)
+
+       {:type :search-by-labeled :binding {"label" "True"} :given true}
+       (let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
+             neg-ids @(rf/subscribe [:row-ids-labeled-neg])
+             unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
+         (rf/dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids])
          db)
 
-     {:type :anomaly-search :column column}
-     (do (rf/dispatch [:anomaly-search column []])
-         db)
-
-     {:type :search-by-labeled :binding {"label" "True"} :given true}
-     (let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
-           neg-ids @(rf/subscribe [:row-ids-labeled-neg])
-           unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
-       (rf/dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids])
-       db))
+       :else
+       (let [logged-msg (str "Unimplemented command: " (pr-str command))
+             alerted-msg "Invalid query syntax."]
+         (js/console.error logged-msg)
+         (js/alert alerted-msg)
+         db)))
 
    #_
    (condp re-matches (str/trim text)

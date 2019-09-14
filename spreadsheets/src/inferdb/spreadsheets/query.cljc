@@ -69,9 +69,16 @@
      :given true
      :binding {label value}}
 
-    :else (let [error-msg (str "Unmatched parse tree: " (pr-str (vec args)))]
-            #?(:clj (println error-msg)
-               :cljs (js/alert error-msg)))))
+    :else
+    (let [logged-msg (str "Unmatched parse tree: " (pr-str (vec args)))
+          alerted-msg "Invalid query syntax."]
+      #?(:clj (binding [*out* *err*]
+                (println logged-msg))
+         :cljs (js/console.error logged-msg))
+      #?(:clj (binding [*out* *err*]
+                (println alerted-msg))
+         :cljs (js/alert alerted-msg))
+      {})))
 
 (def transform-map
   {:select transform-select
@@ -98,4 +105,4 @@
 
 #_(parser "SELECT * FROM (GENERATE * FROM model) LIMIT 1")
 #_(parser "SELECT * FROM (GENERATE * GIVEN java=\"False\" FROM model) LIMIT 1")
-                   #_(parser "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *")
+#_(parser "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *")
