@@ -1,14 +1,15 @@
 (ns inferdb.spreadsheets.events
-  (:require [clojure.edn :as edn]
+  (:require [clojure.core.match :refer [match]]
+            [clojure.edn :as edn]
             [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]
+            [inferdb.spreadsheets.query :as query]
             [inferdb.spreadsheets.utils :as utils]))
 
 (def real-hot-hooks [:after-deselect :after-selection-end :after-column-move :after-column-resize :after-on-cell-mouse-down :before-change])
@@ -135,6 +136,26 @@
  :parse-query
  event-interceptors
  (fn [db [_ text]]
+   (match (query/issue text)
+     {:type :generated :values v}
+     (db/with-virtual-rows db v)
+
+     {:type :anomaly-search :column column :given true}
+     (do (rf/dispatch [:anomaly-search column ["ROW"]])
+         db)
+
+     {:type :anomaly-search :column column}
+     (do (rf/dispatch [:anomaly-search column []])
+         db)
+
+     {:type :search-by-labeled :binding {"label" "True"} :given true}
+     (let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
+           neg-ids @(rf/subscribe [:row-ids-labeled-neg])
+           unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
+       (rf/dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids])
+       db))
+
+   #_
    (condp re-matches (str/trim text)
      #"GENERATE ROW" :>>
      #(rf/dispatch [:generate-virtual-row {} 1])
@@ -156,7 +177,7 @@
      #(let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
             neg-ids @(rf/subscribe [:row-ids-labeled-neg])
             unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
-       (rf/dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]))
+        (rf/dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]))
 
      #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*)" :>>
      (fn [[_ target-col]]
@@ -174,15 +195,14 @@
      (fn [[_ target-col cond-col-1 cond-col-2]]
        (rf/dispatch [:anomaly-search target-col [cond-col-1 cond-col-2]]))
 
-     ; legacy search-by-example
+                                        ; legacy search-by-example
      #"\{(.+)\}" :>>
      (fn []
        (let [example-row (edn/read-string text)]
          (rf/dispatch [:search-by-example example-row])))
 
-     ; else condition
-     (.error js/console "Could not parse query: \"" text "\""))
-   db))
+                                        ; else condition
+     (.error js/console "Could not parse query: \"" text "\""))))
 
 (rf/reg-event-db
  :search-by-example
@@ -210,11 +230,11 @@
 (rf/reg-event-db
  :generate-virtual-row
  event-interceptors
- (fn [db [event-name conditions num-rows]]
+ (fn [db [_ conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
          gen-fn #(first (mp/infer-and-score
-                           :procedure (search/optimized-row-generator model/spec)
-                           :observation-trace constraint-addrs-vals))
+                         :procedure (search/optimized-row-generator model/spec)
+                         :observation-trace constraint-addrs-vals))
          negative-salary? #(neg? (% "salary_usd"))
 
          overrides-map (get db ::db/column-override-fns)
@@ -277,7 +297,7 @@
 
 (defn gen-query-str-for-conf-options [type threshold]
   (case type
-        :none "GENERATE ROW" ; NOTE: keep this string unchanged so the app starts with this query 
+        :none "GENERATE ROW" ; NOTE: keep this string unchanged so the app starts with this query
         :row (str "COLOR ROWS WITH CONFIDENCE OVER " threshold)
         :cells-existing (str "COLOR CELLS EXISTING WITH CONFIDENCE OVER " threshold)
         :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))

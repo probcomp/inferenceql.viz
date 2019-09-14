@@ -1,6 +1,6 @@
 (ns inferdb.multimixture.specification-test
   (:require [clojure.spec.alpha :as s]
-            [clojure.test :as test :refer [deftest testing is are]]
+            [clojure.test :as test :refer [deftest testing is]]
             [expound.alpha :as expound]
             [inferdb.multimixture.specification :as spec]))
 
