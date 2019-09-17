@@ -100,8 +100,6 @@
                                 #(mp/infer-and-score :procedure model
                                                      :inputs inputs
                                                      :observation-trace observation-trace))]
-    (prn "n-particles" n-particles)
-    (prn "categoricals" (map last particles))
     (nth particles (dist/log-categorical (map last particles)))))
 
 (s/fdef insert-column
