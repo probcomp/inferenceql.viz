@@ -20,7 +20,7 @@ toc::[]
 Running `make` will compile a stand-alone `.js` bundle to `out/main.js`.
 
 == About the dataset
-Each row in the dataset represents a U.S. congressional district.
+Each row in the dataset represents one of 100 randomly sampled respondents from the the 2019 https://insights.stackoverflow.com/survey[Stack Overflow developer survey].
 
 == Usage
 
