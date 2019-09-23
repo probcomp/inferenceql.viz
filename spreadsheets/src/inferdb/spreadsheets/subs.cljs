@@ -8,7 +8,8 @@
             [inferdb.spreadsheets.views :as views]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.model :as model]))
+            [inferdb.spreadsheets.model :as model])
+  (:require-macros [reagent.ratom :refer [reaction]]))
 
 (def label-col-header
   "Header text for the column used for labeling rows as examples."
@@ -44,13 +45,31 @@
   (db/table-headers db))
 (rf/reg-sub :table-headers table-headers)
 
-(rf/reg-sub :row-at-selection-start
+(rf/reg-sub :table-last-clicked
             (fn [db _]
-              (db/row-at-selection-start db)))
+              (get db ::db/table-last-clicked)))
 
-(rf/reg-sub :selected-row-index
-            (fn [db _]
-              (db/selected-row-index db)))
+(rf/reg-sub :other-table
+            (fn [db [_sub-name table-picked]]
+              (let [[table-1-id table-2-id] (keys (get db ::db/hot-state))]
+                (condp = table-picked
+                  table-1-id table-2-id
+                  table-2-id table-1-id))))
+
+(rf/reg-sub :table-state
+            (fn [db [_sub-name table-id]]
+              (get-in db [::db/hot-state table-id])))
+
+(rf/reg-sub :both-table-states
+            (fn [db [_sub-name]]
+              (get db ::db/hot-state)))
+
+(rf/reg-sub-raw :table-state-active
+                (fn [app-db event]
+                  (reaction
+                    (let [table-id @(rf/subscribe [:table-last-clicked])
+                          table-state @(rf/subscribe [:table-state table-id])]
+                      table-state))))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -125,16 +144,6 @@
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:virtual-rows])})
             virtual-hot-props)
-
-(defn selections
-  [db _]
-  (db/selections db))
-(rf/reg-sub :selections selections)
-
-(defn selected-columns
-  [db _]
-  (db/selected-columns db))
-(rf/reg-sub :selected-columns selected-columns)
 
 (def clean-label
   "Prepares the user-typed label for checking."
@@ -357,14 +366,12 @@
                {}))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              {:selections             (rf/subscribe [:selections])
-               :selected-columns       (rf/subscribe [:selected-columns])
-               :row-at-selection-start (rf/subscribe [:row-at-selection-start])})
+              (rf/subscribe [:table-state-active]))
             vega-lite-spec)
 
 (rf/reg-sub :one-cell-selected
             (fn [_ _]
-              {:selections (rf/subscribe [:selections])})
+              (rf/subscribe [:table-state-active]))
             (fn [{:keys [selections]}]
               (= 1
                  (count selections)
@@ -373,20 +380,21 @@
 
 (rf/reg-sub :generator
             (fn [_ _]
-              {:row (rf/subscribe [:row-at-selection-start])
-               :columns (rf/subscribe [:selected-columns])
+              {:selection-info (rf/subscribe [:table-state-active])
                :one-cell-selected (rf/subscribe [:one-cell-selected])})
-            (fn [{:keys [row columns one-cell-selected]}]
-              (when (and one-cell-selected
-                         ;; TODO: clean up this check
-                         (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header} (first columns))))
-                (let [sampled-column (first columns) ; columns that will be sampled
-                      constraints (mmix/with-row-values {} (-> row
-                                                               (select-keys (keys (:vars model/spec)))
-                                                               (dissoc sampled-column)))
-                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                                         :observation-trace constraints))
-                      negative-salary? #(neg? (% "salary_usd"))]
-                  ;; returns the first result of gen-fn that doesn't have a negative salary
-                  ;; TODO: This is dataset-specific
-                  #(take 1 (remove negative-salary? (repeatedly gen-fn)))))))
+            (fn [{:keys [selection-info one-cell-selected]}]
+              (let [row (:row-at-selection-start selection-info)
+                    columns (:selected-columns selection-info)
+                    col-to-sample (first columns)]
+                (when (and one-cell-selected
+                           ;; TODO clean up this check
+                           (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header} col-to-sample)))
+                  (let [constraints (mmix/with-row-values {} (-> row
+                                                                 (select-keys (keys (:vars model/spec)))
+                                                                 (dissoc col-to-sample)))
+                        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                                           :observation-trace constraints))
+                        negative-salary? #(neg? (% "salary_usd"))]
+                    ;; returns the first result of gen-fn that doesn't have a negative salary
+                    ;; TODO: This is dataset-specific
+                    #(take 1 (remove negative-salary? (repeatedly gen-fn))))))))

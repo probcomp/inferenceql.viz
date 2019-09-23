@@ -16,7 +16,8 @@
               :beforeColumnMove    hot/freeze-col-1-2-fn
               :filters             true
               :bindRowsWithHeaders true
-              :selectionMode       :multiple
+              :selectionMode       :range
+              :outsideClickDeselects false
               :readOnly            true
               :height              "32vh"
               :width               "100vw"
@@ -24,8 +25,12 @@
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
 
-(def real-hot-settings (assoc default-hot-settings :hooks events/real-hot-hooks))
-(def virtual-hot-settings (assoc default-hot-settings :hooks events/virtual-hot-hooks))
+(def real-hot-settings (assoc default-hot-settings
+                              :hooks events/real-hot-hooks
+                              :name "real-table"))
+(def virtual-hot-settings (assoc default-hot-settings
+                                 :hooks events/virtual-hot-hooks
+                                 :name "virtual-table"))
 
 (def ^:private default-search-string "GENERATE ROW")
 
@@ -95,7 +100,6 @@
   []
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
         virtual-hot-props @(rf/subscribe [:virtual-hot-props])
-        selected-maps  @(rf/subscribe [:selections])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
         scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]

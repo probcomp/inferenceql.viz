@@ -6,6 +6,7 @@
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/cat :row (s/* ::row)))
+(s/def ::virtual-rows ::rows)
 (s/def ::headers (s/cat :header (s/* ::header)))
 
 (s/def ::index nat-int?)
@@ -25,67 +26,27 @@
 (s/def ::topojson any?)
 
 (s/def ::selected-row-index ::row-index)
-
-(s/def ::sampled-row ::row)
-(s/def ::sampled-rows (s/coll-of ::sampled-row))
-
 (s/def ::row-at-selection-start ::row)
+(s/def ::header-clicked boolean?)
 
-(s/def ::db (s/keys :req [::headers ::rows]
-                    :opt [::simulator
-                          ::simulated-rows
-                          ::selected-row-index
-                          ::row-at-selection-start
-                          ::scores
+(s/def ::table-id #{:real-table :virtual-table})
+(s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
+                                                 ::selected-row-index
+                                                 ::selections
+                                                 ::selected-columns
+                                                 ::header-clicked])))
+(s/def ::hot-state (s/map-of ::table-id ::table-state))
+
+(s/def ::table-last-clicked ::table-id)
+
+(s/def ::db (s/keys :req [::headers
+                          ::rows
+                          ::virtual-rows
+                          ::hot-state]
+                    :opt [::scores
                           ::labels
-                          ::selected-columns
                           ::topojson
-                          ::sampled-rows]))
-
-(defn with-row-at-selection-start
-  [db row]
-  (assoc db ::row-at-selection-start row))
-
-(defn row-at-selection-start
-  [db]
-  (get db ::row-at-selection-start))
-
-(defn with-selected-row-index
-  [db row-index]
-  (assoc db ::selected-row-index row-index))
-
-(defn selected-row-index
-  [db]
-  (get db ::selected-row-index))
-
-(defn selected-row
-  [db]
-  (when-let [row-index (get db ::selected-row)]
-    (nth (get db ::rows)
-         row-index)))
-
-(defn with-selections
-  [db selections]
-  (assoc db ::selections selections))
-
-(defn with-selected-columns
-  [db columns]
-  (assoc db ::selected-columns columns))
-
-(defn clear-selections
-  [db]
-  (dissoc db
-          ::selections
-          ::selected-row
-          ::selected-columns))
-
-(defn selections
-  [db]
-  (get-in db [::selections]))
-
-(defn selected-columns
-  [db]
-  (get-in db [::selected-columns]))
+                          ::table-last-clicked]))
 
 (defn table-headers
   [db]
@@ -129,10 +90,5 @@
   []
   {::headers (into [] (keys (first nyt-data)))
    ::rows nyt-data
-   ::virtual-rows []})
-
-(defn one-cell-selected?
-  [db]
-  (and (= 1 (count (selected-columns db)))
-       (= 1 (count (selections db)))
-       (= 1 (count (first (selections db))))))
+   ::virtual-rows []
+   ::hot-state {:real-table nil :virtual-table nil}})

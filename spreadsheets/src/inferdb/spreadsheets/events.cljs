@@ -9,8 +9,8 @@
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.query :as query]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :after-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end])
+(def real-hot-hooks [:after-deselect :after-selection-end :after-change :after-on-cell-mouse-down])
+(def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down])
 
 (def event-interceptors
   [rf/debug interceptors/check-spec])
@@ -34,14 +34,14 @@
 (rf/reg-event-db
  :after-change
  event-interceptors
- (fn [db [_ hot changes]]
+ (fn [db [_ hot id changes]]
    (let [labels-col (.getSourceDataAtCol hot 0)]
      (db/with-labels db (js->clj labels-col)))))
 
 (rf/reg-event-db
  :after-selection-end
  event-interceptors
- (fn [db [_ hot row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
+ (fn [db [_ hot id row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
    (let [selected-headers (map #(.getColHeader hot %)
                                (range (min col col2) (inc (max col col2))))
          row (js->clj (zipmap (.getColHeader hot)
@@ -58,16 +58,39 @@
                              (.getSelected hot))
          selected-columns (if (<= col col2) selected-headers (reverse selected-headers))]
      (-> db
-         (db/with-selected-columns selected-columns)
-         (db/with-selections selected-maps)
-         (db/with-selected-row-index row-index)
-         (db/with-row-at-selection-start row)))))
+         (assoc-in [::db/hot-state id :selected-columns] selected-columns)
+         (assoc-in [::db/hot-state id :selections] selected-maps)
+         (assoc-in [::db/hot-state id :selected-row-index] row-index)
+         (assoc-in [::db/hot-state id :row-at-selection-start] row)))))
+
+(rf/reg-event-db
+ :after-on-cell-mouse-down
+ event-interceptors
+ (fn [db [_ hot id mouse-event coords _TD]]
+   (let [other-table-id @(rf/subscribe [:other-table id])
+
+         ;; Stores whether the user clicked on one of the column headers.
+         header-clicked-flag (= -1 (.-row coords))
+
+         ;; Stores whether the user held alt during the click.
+         alt-key-pressed (.-altKey mouse-event)
+         ; Switch the last clicked on table-id to the other table on alt-click.
+         new-table-clicked-id (if alt-key-pressed other-table-id id)]
+
+     ; Deselect all cells on alt-click.
+     (when alt-key-pressed
+       (.deselectCell hot))
+
+     (-> db
+         (assoc-in [::db/hot-state id :header-clicked] header-clicked-flag)
+         (assoc ::db/table-last-clicked new-table-clicked-id)))))
 
 (rf/reg-event-db
  :after-deselect
  event-interceptors
- (fn [db _]
-   (db/clear-selections db)))
+ (fn [db [_ hot id]]
+   ;; clears selections associated with table
+   (update-in db [::db/hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
 
 (rf/reg-event-fx
  :parse-query
