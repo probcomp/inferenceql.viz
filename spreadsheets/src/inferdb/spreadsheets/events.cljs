@@ -1,14 +1,13 @@
 (ns inferdb.spreadsheets.events
-  (:require [clojure.edn :as edn]
-            [clojure.string :as str]
+  (:require [clojure.core.match :refer [match]]
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.data :as data]
-            [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.db :as db]
-            [inferdb.spreadsheets.events.interceptors :as interceptors]))
+            [inferdb.spreadsheets.events.interceptors :as interceptors]
+            [inferdb.spreadsheets.model :as model]
+            [inferdb.spreadsheets.query :as query]))
 
 (def real-hot-hooks [:after-deselect :after-selection-end :after-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end])
@@ -70,58 +69,34 @@
  (fn [db _]
    (db/clear-selections db)))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :parse-query
  event-interceptors
- (fn [db [_ text]]
-   (condp re-matches (str/trim text)
-     #"GENERATE ROW" :>>
-     #(rf/dispatch [:generate-virtual-row {} 1])
+ (fn [{:keys [db]} [_ text]]
+   (let [command (query/parse text)]
+     (match command
+       {:type :generated :values v}
+       {:db (db/with-virtual-rows db v)}
 
-     #"GENERATE ROW (\d+) TIMES" :>>
-     (fn [[_ m1]]
-       (let [num-rows (js/parseInt m1)]
-         (rf/dispatch [:generate-virtual-row {} num-rows])))
+       {:type :anomaly-search :column column :given true}
+       {:dispatch [:anomaly-search column ["ROW"]]}
 
-     #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\" AND ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" :>>
-     (fn [[_ k1 v1 k2 v2]]
-       (rf/dispatch [:generate-virtual-row {k1 v1 k2 v2} 1]))
+       {:type :anomaly-search :column column}
+       {:dispatch [:anomaly-search column []]}
 
-     #"GENERATE ROW GIVEN ([A-Za-z][A-Za-z0-9_\+]*)=\"(.+)\"" :>>
-     (fn [[_ k1 v1]]
-       (rf/dispatch [:generate-virtual-row {k1 v1} 1]))
+       {:type :search-by-labeled :binding {"label" "True"} :given true}
+       (let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
+             neg-ids @(rf/subscribe [:row-ids-labeled-neg])
+             unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
+         {:dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]})
 
-     #"SCORE PROBABILITY OF label=\"True\" GIVEN ROW" :>>
-     #(let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
-            neg-ids @(rf/subscribe [:row-ids-labeled-neg])
-            unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
-       (rf/dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]))
-
-     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*)" :>>
-     (fn [[_ target-col]]
-       (rf/dispatch [:anomaly-search target-col []]))
-
-     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*) GIVEN ROW" :>>
-     (fn [[_ target-col]]
-       (rf/dispatch [:anomaly-search target-col ["ROW"]]))
-
-     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*) GIVEN ([A-Za-z][A-Za-z0-9_\+]*)" :>>
-     (fn [[_ target-col cond-col-1]]
-       (rf/dispatch [:anomaly-search target-col [cond-col-1]]))
-
-     #"SCORE PROBABILITY OF ([A-Za-z][A-Za-z0-9_\+]*) GIVEN ([A-Za-z][A-Za-z0-9_\+]*) AND ([A-Za-z][A-Za-z0-9_\+]*)" :>>
-     (fn [[_ target-col cond-col-1 cond-col-2]]
-       (rf/dispatch [:anomaly-search target-col [cond-col-1 cond-col-2]]))
-
-     ; legacy search-by-example
-     #"\{(.+)\}" :>>
-     (fn []
-       (let [example-row (edn/read-string text)]
-         (rf/dispatch [:search-by-example example-row])))
-
-     ; else condition
-     (.error js/console "Could not parse query: \"" text "\""))
-   db))
+       :else
+       (let [logged-msg (str "Unimplemented command: " (pr-str command))
+             alerted-msg "Invalid query syntax."]
+         ;; TODO: These could be their own effects!
+         (js/console.error logged-msg)
+         (js/alert alerted-msg)
+         {})))))
 
 (rf/reg-event-db
  :search-by-example
@@ -145,11 +120,11 @@
 (rf/reg-event-db
  :generate-virtual-row
  event-interceptors
- (fn [db [event-name conditions num-rows]]
+ (fn [db [_ conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
          gen-fn #(first (mp/infer-and-score
-                           :procedure (search/optimized-row-generator model/spec)
-                           :observation-trace constraint-addrs-vals))
+                         :procedure (search/optimized-row-generator model/spec)
+                         :observation-trace constraint-addrs-vals))
          negative-salary? #(neg? (% "salary_usd"))
          ;; TODO: This is dataset-specific
          new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
