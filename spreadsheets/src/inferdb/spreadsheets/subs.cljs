@@ -1,6 +1,5 @@
 (ns inferdb.spreadsheets.subs
-  (:require [clojure.walk :as walk]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
@@ -8,29 +7,9 @@
             [inferdb.spreadsheets.views :as views]
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
-            [inferdb.spreadsheets.model :as model])
+            [inferdb.spreadsheets.model :as model]
+            [inferdb.spreadsheets.vega :as vega])
   (:require-macros [reagent.ratom :refer [reaction]]))
-
-(def label-col-header
-  "Header text for the column used for labeling rows as examples."
-  "🏷")
-(def score-col-header
-  "Header text for the column that shows scores."
-  "probability")
-
-(def vega-width
-  "Width setting for the specs produced by the :vega-lite-spec sub"
-  400)
-(def vega-height
-  "Height setting for the specs produced by the :vega-lite-spec sub"
-  400)
-
-(def vega-map-width
-  "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
-  500)
-(def vega-map-height
-  "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
-  300)
 
 (rf/reg-sub :scores
             (fn [db _]
@@ -75,7 +54,7 @@
             (fn [_ _]
               (rf/subscribe [:table-headers]))
             (fn [headers]
-              (into [label-col-header score-col-header] headers)))
+              (into [vega/label-col-header vega/score-col-header] headers)))
 
 (rf/reg-sub :computed-rows
             (fn [_ _]
@@ -85,10 +64,10 @@
             (fn [{:keys [rows scores labels]}]
               (cond->> rows
                 scores (mapv (fn [score row]
-                               (assoc row score-col-header score))
+                               (assoc row vega/score-col-header score))
                              scores)
                 labels (mapv (fn [label row]
-                               (assoc row label-col-header label))
+                               (assoc row vega/label-col-header label))
                              labels))))
 
 (rf/reg-sub :virtual-rows
@@ -198,176 +177,32 @@
               {:labels (rf/subscribe [:labels])})
             row-ids-unlabeled)
 
-(def ^:private topojson-feature "cb_2017_us_cd115_20m")
-
-(defn- left-pad
-  [s n c]
-  (str (apply str (repeat (max 0 (- n (count s)))
-                          c))
-       s))
-
-(defn stattype
-  [column]
-  (let [stattype-kw (if (contains? #{score-col-header label-col-header} column)
-                      :gaussian
-                      (get-in model/spec [:vars column]))]
-    (case stattype-kw
-      :gaussian dist/gaussian
-      :categorical dist/categorical)))
-
 (defn vega-lite-spec
-  [{:keys [selections selected-columns row-at-selection-start]}]
-  (when-let [selection (first selections)]
-    (clj->js
-     (cond (and (= 1 (count selected-columns))
-                (= 1 (count (first selections)))
-                (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header}
-                                (first selected-columns))))
-           ;; Simulate plot
-           (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
-                 selected-column-kw (keyword (first selected-columns))
-                 y-axis {:title "distribution of probable values"
-                         :grid false
-                         :labels false
-                         :ticks false}
-                 y-scale {:nice false}]
-             {:$schema
-              "https://vega.github.io/schema/vega-lite/v3.json"
-              :width vega-width
-              :height vega-height
-              :data {:name "data"}
-              :autosize {:resize true}
-              :layer (cond-> [{:mark "bar"
-                               :encoding (condp = (stattype (first selected-columns))
-                                           dist/gaussian {:x {:bin true
-                                                              :field selected-column-kw
-                                                              :type "quantitative"}
-                                                          :y {:aggregate "count"
-                                                              :type "quantitative"
-                                                              :axis y-axis
-                                                              :scale y-scale}}
-                                           dist/categorical {:x {:field selected-column-kw
-                                                                 :type "nominal"}
-                                                             :y {:aggregate "count"
-                                                                 :type "quantitative"
-                                                                 :axis y-axis
-                                                                 :scale y-scale}})}]
-                       (get row-at-selection-start (first selected-columns))
-                       (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
-                                               :label "Selected row"}]}
-                              :mark {:type "rule"
-                                     :color "red"}
-                              :encoding {:x {:field selected-column-kw
-                                             :type (condp = (stattype (first selected-columns))
-                                                     dist/gaussian "quantitative"
-                                                     dist/categorical "nominal")}}}))})
+  [{:keys [table-states t-clicked]}]
+  (let [{selections :selections cols :selected-columns row :row-at-selection-start}
+        (table-states t-clicked)]
+    (when (first selections)
+      (clj->js
+       (cond (and (= 1 (count cols))
+                  (= 1 (count (first selections)))
+                  (not (contains? #{"geo_fips" "NAME" vega/label-col-header vega/score-col-header}
+                                  (first cols))))
+             (vega/gen-simulate-plot cols row t-clicked)
 
-           (= 1 (count selected-columns))
-           ;; Histogram
-           (let [selected-column (first selected-columns)]
-             {:$schema
-              "https://vega.github.io/schema/vega-lite/v3.json",
-              :width vega-width
-              :height vega-height
-              :data {:values selection},
-              :mark "bar"
-              :encoding
-              (condp = (stattype selected-column)
-                dist/gaussian {:x {:bin true,
-                                   :field selected-column
-                                   :type "quantitative"}
-                               :y {:aggregate "count"
-                                   :type "quantitative"}}
+             (= 1 (count cols))
+             (vega/gen-histogram table-states t-clicked)
 
-                dist/categorical {:x {:field selected-column
-                                      :type "nominal"}
-                                  :y {:aggregate "count"
-                                      :type "quantitative"}}
+             (some #{"geo_fips"} cols)
+             (vega/gen-choropleth selections cols)
 
-                nil
-                {})})
-
-           (some #{"geo_fips"} selected-columns)
-           ;; Choropleth
-           (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
-                 transformed-selection (mapv (fn [row]
-                                               (update row "geo_fips" #(left-pad (str %) 4 \0)))
-                                             selection)
-                 name {:field "NAME"
-                       :type "nominal"}
-                 color {:field map-column
-                        :type (condp = (stattype map-column)
-                                dist/gaussian "quantitative"
-                                dist/categorical "nominal")}]
-             {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width vega-map-width
-              :height vega-map-height
-              :data {:values js/topojson
-                     :format {:type "topojson"
-                              :feature topojson-feature}}
-              :transform [{:lookup "properties.GEOID"
-                           :from {:data {:values transformed-selection}
-                                  :key "geo_fips"
-                                  "fields" [(:field name) (:field color)]}}]
-              :projection {:type "albersUsa"}
-              :mark "geoshape"
-              :encoding {:tooltip [name color]
-                         :color color}})
-
-           :else
-           ;; Comparison plot
-           (let [types (into #{}
-                             (map stattype)
-                             (take 2 selected-columns))]
-             (condp = types
-               ;; Scatterplot
-               #{dist/gaussian} {:$schema
-                                 "https://vega.github.io/schema/vega-lite/v3.json"
-                                 :width vega-width
-                                 :height vega-height
-                                 :data {:values selection}
-                                 :mark "circle"
-                                 :encoding {:x {:field (first selected-columns)
-                                                :type "quantitative"}
-                                            :y {:field (second selected-columns)
-                                                :type "quantitative"}}}
-               ;; Heatmap
-               #{dist/categorical} {:$schema
-                                    "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width vega-width
-                                    :height vega-height
-                                    :data {:values selection}
-                                    :mark "rect"
-                                    :encoding {:x {:field (first selected-columns)
-                                                   :type "nominal"}
-                                               :y {:field (second selected-columns)
-                                                   :type "nominal"}
-                                               :color {:aggregate "count"
-                                                       :type "quantitative"}}}
-               ;; Bot-and-line
-               #{dist/gaussian
-                 dist/categorical} {:$schema
-                                    "https://vega.github.io/schema/vega-lite/v3.json"
-                                    :width vega-width
-                                    :height vega-height
-                                    :data {:values selection}
-                                    :mark {:type "boxplot"
-                                           :extent "min-max"}
-                                    :encoding {:x {:field (first selected-columns)
-                                                   :type (condp = (stattype (first selected-columns))
-                                                           dist/gaussian "quantitative"
-                                                           dist/categorical "nominal")}
-                                               :y {:field (second selected-columns)
-                                                   :type (condp = (stattype (second selected-columns))
-                                                           dist/gaussian "quantitative"
-                                                           dist/categorical "nominal")}
-                                               :color {:aggregate "count"
-                                                       :type "quantitative"}}}
-               {}))))))
+             :else
+             (vega/gen-comparison-plot table-states t-clicked))))))
 (rf/reg-sub :vega-lite-spec
             (fn [_ _]
-              (rf/subscribe [:table-state-active]))
-            vega-lite-spec)
+              {:table-states (rf/subscribe [:both-table-states])
+               :t-clicked (rf/subscribe [:table-last-clicked])})
+            (fn [data-for-spec]
+              (vega-lite-spec data-for-spec)))
 
 (rf/reg-sub :one-cell-selected
             (fn [_ _]
@@ -388,7 +223,7 @@
                     col-to-sample (first columns)]
                 (when (and one-cell-selected
                            ;; TODO clean up this check
-                           (not (contains? #{"geo_fips" "NAME" score-col-header label-col-header} col-to-sample)))
+                           (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))
                   (let [constraints (mmix/with-row-values {} (-> row
                                                                  (select-keys (keys (:vars model/spec)))
                                                                  (dissoc col-to-sample)))
