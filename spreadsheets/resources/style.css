@@ -1,7 +1,27 @@
-/* styling for the virtual data handsontable */
-.virtual-hot .ht_master tr td {
-  background-color: #FAFCE4;
+body {
+  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  font-size: 1.125em;
+  -webkit-font-smoothing: antialiased;
+  color: #333;
 }
+
+/* --------------- styling for table titles --------------- */
+
+.table-title {
+  float: left;
+  background-color: #f0f0f0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #cccccc;
+  border-bottom: none;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  margin-left: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* --------------- styling for search input --------------- */
 
 /* allows search input to be styled */
 input[type=search]{
@@ -13,21 +33,35 @@ input[type=search]{
 input { font-size: 16px; }
 button { font-size: 16px; }
 
-body {
-  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  color: #333;
-  margin: 0 auto;
-  padding-top: 5px;
-  font-size: 1.125em;
-  line-height: 1em;
+#search-form {
+  display: flex;
+  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
-h1 {
-  font-size: 1.2em;
+#search-input {
+  width: 100%;
 }
 
-h3 {
-  font-size: .8em;
-  line-height: .2em;
+/* --------------- styling for vega-vizualization --------------- */
+
+#viz-container {
+  display: flex;
+  justify-content: center;
+  border-top: solid;
+  border-width: 1px;
+  border-color: #cccccc;
+}
+
+/* --------------- styling for handsontables --------------- */
+
+.ht_master tr td {
+  font-size: 14px;
+}
+
+.handsontable th {
+  font-size: 14px;
+}
+.virtual-hot .ht_master tr td {
+  background-color: #FAFCE4;
 }

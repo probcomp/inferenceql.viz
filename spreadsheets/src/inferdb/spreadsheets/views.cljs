@@ -49,13 +49,12 @@
   [name]
   (let [input-text (r/atom default-search-string)]
     (fn []
-      [:div {:style {:display "flex"}}
-       [:input {:type "search"
-                :style {:width "100%"}
-                :on-change #(reset! input-text (-> % .-target .-value))
-                :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                        (rf/dispatch [:parse-query @input-text])))
-                :value @input-text}]
+      [:div#search-form
+       [:input#search-input {:type "search"
+                             :on-change #(reset! input-text (-> % .-target .-value))
+                             :on-key-press (fn [e] (if (= (.-key e) "Enter")
+                                                     (rf/dispatch [:parse-query @input-text])))
+                             :value @input-text}]
        [:button {:on-click #(rf/dispatch [:parse-query @input-text])
                  :style {:float "right"}}
         "Run InferenceQL"]
@@ -71,16 +70,11 @@
         scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]
     [:div
-     [:h1 "Real Data"]
-     [:h3 "rows: real developers"]
-     [:h3 "columns: real answers to survey questions"]
-     [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
-     [:h1 "Virtual Data"]
-     [:h3 "rows: virtual developers"]
-     [:h3 "columns: virtual answers to survey questions"]
-     [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [search-form "Zane"]
-     [:div {:style {:display "flex"
-                    :justify-content "center"}}
+     [:div.table-title [:span "Real Data"]]
+     [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
+     [:div.table-title [:span "Virtual Data"]]
+     [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
+     [:div#viz-container
       (when vega-lite-spec
         [vega/vega-lite vega-lite-spec {:actions false} generator])]]))
