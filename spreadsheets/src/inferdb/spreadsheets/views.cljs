@@ -1,6 +1,7 @@
 (ns inferdb.spreadsheets.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
+            [reagent-forms.core :as forms]
             [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
@@ -45,6 +46,39 @@
 
 (def ^:private default-search-string "GENERATE ROW")
 
+(defn confidence-slider []
+  (let [cur-val @(rf/subscribe [:confidence-threshold])]
+    [:div#conf-slider
+      [:span "Confidence Threshold: "]
+      [:br]
+      [:input {:type :range :name :confidence-threshold
+               :min 0 :max 1 :step 0.01
+                       :value cur-val
+                       :on-change (fn [e]
+                                    (let [new-val (js/parseFloat (-> e .-target .-value))]
+                                      (rf/dispatch [:set-confidence-threshold new-val])))}]
+      [:label cur-val]]))
+
+(defn confidence-mode []
+  (let [template [:div#conf-mode
+                  [:label "Mode:"]
+                  [:br]
+                  [:select.form-control {:field :list :id :mode}
+                   [:option {:key :none} "none"]
+                   [:option {:key :row} "row-wise"]
+                   [:option {:key :cells-existing} "cell-wise (existing)"]
+                   [:option {:key :cells-missing} "cell-wise (missing)"]]]
+
+        ;; Function map that allows `template` reagent-forms template to
+        ;; communicate with the reframe db.
+        events {:get (fn [path] @(rf/subscribe [:confidence-option path]))
+                :save! (fn [path value] (rf/dispatch [:set-confidence-options path value]))
+                :update! (fn [path save-fn value]
+                           ;; save-fn should accept two arguments: old-value, new-value
+                           (rf/dispatch [:update-confidence-options save-fn path value]))
+                :doc (fn [] @(rf/subscribe [:confidence-options]))}]
+    [forms/bind-fields template events]))
+
 (defn search-form
   [name]
   (let [input-text (r/atom default-search-string)]
@@ -60,7 +94,9 @@
         "Run InferenceQL"]
        [:button {:on-click #(rf/dispatch [:clear-virtual-data])
                  :style {:float "right"}}
-        "Delete virtual data"]])))
+        "Delete virtual data"]
+       [confidence-slider]
+       [confidence-mode]])))
 
 (defn app
   []

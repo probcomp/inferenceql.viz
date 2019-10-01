@@ -43,7 +43,9 @@
 (s/def ::db (s/keys :req [::headers
                           ::rows
                           ::virtual-rows
-                          ::hot-state]
+                          ::hot-state
+                          ::confidence-threshold
+                          ::confidence-options]
                     :opt [::scores
                           ::virtual-scores
                           ::labels
@@ -105,4 +107,6 @@
   {::headers (into [] (keys (first nyt-data)))
    ::rows nyt-data
    ::virtual-rows []
-   ::hot-state {:real-table nil :virtual-table nil}})
+   ::hot-state {:real-table nil :virtual-table nil}
+   ::confidence-threshold 0.9
+   ::confidence-options {:mode :none}})

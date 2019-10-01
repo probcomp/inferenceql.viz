@@ -252,3 +252,15 @@
                     ;; returns the first result of gen-fn that doesn't have a negative salary
                     ;; TODO: This is dataset-specific
                     #(take 1 (remove negative-salary? (repeatedly gen-fn))))))))
+
+(rf/reg-sub :confidence-threshold
+            (fn [db _]
+              (get db ::db/confidence-threshold)))
+
+(rf/reg-sub :confidence-options
+            (fn [db _]
+              (get db ::db/confidence-options)))
+
+(rf/reg-sub :confidence-option
+            (fn [db [_sub-name path]]
+              (get-in db (into [::db/confidence-options] path))))
