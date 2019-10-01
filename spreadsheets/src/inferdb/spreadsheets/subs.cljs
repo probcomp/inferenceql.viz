@@ -85,7 +85,7 @@
 
       ;; Creation of dummy scores allows correct attaching of old scores to
       ;; rows even when new rows are generated after a scoring event.
-      (mapv (fn [score row] (assoc row score-col-header score))
+      (mapv (fn [score row] (assoc row vega/score-col-header score))
             scores rows))))
 
 (defn table-rows
