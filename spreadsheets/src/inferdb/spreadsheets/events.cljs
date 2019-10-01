@@ -9,8 +9,8 @@
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.query :as query]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :after-change :after-on-cell-mouse-down])
-(def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down])
+(def real-hot-hooks [:after-deselect :after-selection-end :after-change :after-on-cell-mouse-down :before-change])
+(def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
 
 (def event-interceptors
   [rf/debug interceptors/check-spec])
@@ -39,11 +39,27 @@
    (db/clear-virtual-scores db)))
 
 (rf/reg-event-db
- :after-change
+ :before-change
  event-interceptors
  (fn [db [_ hot id changes]]
    (let [labels-col (.getSourceDataAtCol hot 0)]
      (db/with-labels db (js->clj labels-col)))))
+
+(rf/reg-event-fx
+ :after-change
+ event-interceptors
+ (fn [{:keys [db]} [_ hot id changes source]]
+   ;; When the change is the result of loading new table
+   ;; into the table.
+   (when (= source "loadData")
+     (let [table-state @(rf/subscribe [:table-state id])]
+       (if-let [header-clicked (:header-clicked table-state)]
+         (let [current-selection (.getSelectedLast hot)
+               [_row1 col1 _row2 col2] (js->clj current-selection)]
+           ;; Take the current selection and expand it so the whole columns
+           ;; are selected.
+           (.selectColumns hot col1 col2))))
+    {})))
 
 (rf/reg-event-db
  :after-selection-end
