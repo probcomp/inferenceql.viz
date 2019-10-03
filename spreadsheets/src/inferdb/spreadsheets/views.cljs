@@ -44,8 +44,6 @@
                                  :hooks events/virtual-hot-hooks
                                  :name "virtual-table"))
 
-(def ^:private default-search-string "GENERATE ROW")
-
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:confidence-threshold])]
     [:div#conf-slider
@@ -81,11 +79,11 @@
 
 (defn search-form
   [name]
-  (let [input-text (r/atom default-search-string)]
+  (let [input-text (rf/subscribe [:query-string])]
     (fn []
       [:div#search-form
        [:input#search-input {:type "search"
-                             :on-change #(reset! input-text (-> % .-target .-value))
+                             :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
                              :on-key-press (fn [e] (if (= (.-key e) "Enter")
                                                      (rf/dispatch [:parse-query @input-text])))
                              :value @input-text}]

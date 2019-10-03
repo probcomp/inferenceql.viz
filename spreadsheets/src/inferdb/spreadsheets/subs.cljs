@@ -264,3 +264,7 @@
 (rf/reg-sub :confidence-option
             (fn [db [_sub-name path]]
               (get-in db (into [::db/confidence-options] path))))
+
+(rf/reg-sub :query-string
+            (fn [db _]
+              (get db ::db/query-string)))

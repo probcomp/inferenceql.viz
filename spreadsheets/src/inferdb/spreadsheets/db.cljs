@@ -45,7 +45,8 @@
                           ::virtual-rows
                           ::hot-state
                           ::confidence-threshold
-                          ::confidence-options]
+                          ::confidence-options
+                          ::query-string]
                     :opt [::scores
                           ::virtual-scores
                           ::labels
@@ -109,4 +110,5 @@
    ::virtual-rows []
    ::hot-state {:real-table nil :virtual-table nil}
    ::confidence-threshold 0.9
-   ::confidence-options {:mode :none}})
+   ::confidence-options {:mode :none}
+   ::query-string ""})
