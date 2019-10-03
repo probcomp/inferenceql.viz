@@ -9,7 +9,7 @@
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.query :as query]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :after-change :after-on-cell-mouse-down :before-change])
+(def real-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :before-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
 
 (def event-interceptors
