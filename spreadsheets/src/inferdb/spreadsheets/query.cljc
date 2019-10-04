@@ -1,19 +1,14 @@
 (ns inferdb.spreadsheets.query
-  #?(:cljs (:require-macros [inferdb.spreadsheets.query :refer [inline-resource]]))
+  #?(:clj (:require [inferdb.spreadsheets.io :as sio])
+     :cljs (:require-macros [inferdb.spreadsheets.io :as sio]))
   (:require [clojure.core.match :refer [match]]
             [clojure.edn :as edn]
-            #?(:clj [clojure.java.io :as io])
             [instaparse.core :as insta]
             [metaprob.prelude :as mp]
             [inferdb.multimixture :as mmix]
             [inferdb.spreadsheets.model :as model]))
 
-#?(:clj (defmacro inline-resource
-          "Inlines the contents of the named resource as a string."
-          [n]
-          (slurp (io/resource n))))
-
-(def parser (insta/parser (inline-resource "query.bnf")))
+(def parser (insta/parser (sio/inline-resource "query.bnf")))
 (def ^:private row-generator (mmix/row-generator model/spec))
 
 (defn- parse-unsigned-int

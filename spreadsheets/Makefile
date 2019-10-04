@@ -7,7 +7,6 @@ node-modules-dir := $(current-dir)/../node_modules
 
 output-to	 := $(output-dir)/main.js
 model-file := $(cache-dir)/model.cljc
-data-file  := $(cache-dir)/data.cljc
 
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/handsontable.full.css
@@ -49,17 +48,13 @@ $(hot-css-resource): $(hot-css-file)
 ### Generated files
 
 model: $(model-file)
-data: $(data-file)
-generated: model data
+generated: model
 
 model-json := $(current-dir)/model.json
 data-csv   := $(current-dir)/data.csv
 
 $(model-file): model.json
 	cd ..; bin/build-model $(model-file) $(model-json)
-
-$(data-file): data.csv
-	cd ..; bin/build-data $(data-file) $(data-csv)
 
 ### Publishing
 
