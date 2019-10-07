@@ -267,3 +267,34 @@
  event-interceptors
  (fn [db [_ new-val]]
    (assoc-in db [::db/query-string] new-val)))
+
+(rf/reg-event-db
+ :set-modal
+ event-interceptors
+ (fn [db [_ data]]
+   (assoc-in db [::db/modal] data)))
+
+(rf/reg-event-db
+ :clear-modal
+ event-interceptors
+ (fn [db [_]]
+   (assoc-in db [::db/modal] {:child nil})))
+
+(rf/reg-event-db
+ :set-column-function
+ event-interceptors
+ (fn [db [_ col-name source-text]]
+   (let [string-to-compile (str "(" source-text ")")
+         ;; TODO catch and print compilation errors gracefully
+         evaled-fn (js/eval string-to-compile)]
+     (-> db
+         (assoc-in [::db/column-overrides col-name] source-text)
+         (assoc-in [::db/column-override-fns col-name] evaled-fn)))))
+
+(rf/reg-event-db
+ :clear-column-function
+ event-interceptors
+ (fn [db [_ col-name]]
+   (-> db
+       (update-in [::db/column-overrides] dissoc col-name)
+       (update-in [::db/column-override-fns] dissoc col-name))))

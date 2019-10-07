@@ -8,7 +8,8 @@
             [inferdb.multimixture :as mmix]
             [inferdb.multimixture.search :as search]
             [inferdb.spreadsheets.model :as model]
-            [inferdb.spreadsheets.vega :as vega])
+            [inferdb.spreadsheets.vega :as vega]
+            [inferdb.spreadsheets.modal :as modal])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -110,7 +111,7 @@
         rows))
 
 (defn real-hot-props
-  [{:keys [headers rows]} _]
+  [{:keys [headers rows context-menu]} _]
   (let [data (cell-vector headers rows)
 
         num-columns (count headers)
@@ -121,11 +122,13 @@
     (-> views/real-hot-settings
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
-        (assoc-in [:settings :columns] all-column-settings))))
+        (assoc-in [:settings :columns] all-column-settings)
+        (assoc-in [:settings :contextMenu] context-menu))))
 (rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
-               :rows    (rf/subscribe [:computed-rows])})
+               :rows    (rf/subscribe [:computed-rows])
+               :context-menu (rf/subscribe [:context-menu])})
             real-hot-props)
 
 (defn virtual-hot-props
@@ -268,3 +271,49 @@
 (rf/reg-sub :query-string
             (fn [db _]
               (get db ::db/query-string)))
+
+(rf/reg-sub
+ :context-menu
+ (fn [_ _]
+   {:col-overrides (rf/subscribe [:column-overrides])
+    :col-names (rf/subscribe [:computed-headers])})
+ (fn [{:keys [col-overrides col-names]}]
+   (let [set-function-fn (fn [key selection click-event]
+                           (this-as hot
+                             (let [last-col-num (.. (first selection) -start -col)
+                                   last-col-num-phys (.toPhysicalColumn hot last-col-num)
+                                   col-name (nth col-names last-col-num-phys)
+                                   fn-text (get col-overrides col-name)
+
+                                   modal-child [modal/js-function-entry-modal col-name fn-text]]
+                               (rf/dispatch [:set-modal {:child modal-child}]))))
+
+         clear-function-fn (fn [key selection click-event]
+                             (this-as hot
+                               (let [last-col-num (.. (first selection) -start -col)
+                                     last-col-num-phys (.toPhysicalColumn hot last-col-num)
+                                     col-name (nth col-names last-col-num-phys)]
+                                 (rf/dispatch [:clear-column-function col-name]))))
+
+         disable-fn (fn []
+                     (this-as this
+                       ;; TODO: only enable options on column headers >= 2
+                       false))]
+     {:items {"set_function" {:disabled disable-fn
+                              :name "Set js function"
+                              :callback set-function-fn}
+              "clear_function" {:disabled disable-fn
+                                :name "Clear js function"
+                                :callback clear-function-fn}}})))
+
+(rf/reg-sub :modal
+            (fn [db _]
+              (::db/modal db)))
+
+(rf/reg-sub :column-override-fns
+            (fn [db _]
+              (get db ::db/column-override-fns)))
+
+(rf/reg-sub :column-overrides
+            (fn [db _]
+              (get db ::db/column-overrides)))

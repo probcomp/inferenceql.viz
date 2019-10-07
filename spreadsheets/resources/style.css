@@ -79,3 +79,18 @@ select {
 .virtual-hot .ht_master tr td {
   background-color: #FAFCE4;
 }
+
+/* --------------- styling for js-function entry modal popup --------------- */
+
+.js-function-entry-modal {
+  background-color: white;
+  padding:          16px;
+  border-radius:    6px;
+  text-align: center;
+}
+
+.code-editor {
+  font-size: 14px;
+  width: 100%;
+  height: 400px;
+}

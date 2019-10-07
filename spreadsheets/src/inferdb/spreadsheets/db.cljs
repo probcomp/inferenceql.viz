@@ -30,6 +30,8 @@
 (s/def ::row-at-selection-start ::row)
 (s/def ::header-clicked boolean?)
 
+;;; Specs related to storing the state of both handsontables
+
 (s/def ::table-id #{:real-table :virtual-table})
 (s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
                                                  ::selected-row-index
@@ -39,6 +41,24 @@
 (s/def ::hot-state (s/map-of ::table-id ::table-state))
 
 (s/def ::table-last-clicked ::table-id)
+
+;;; Specs related to foreign function overrides on columns.
+
+(s/def ::column-name ::header)
+(s/def ::function-text string?)
+(s/def ::function-obj fn?)
+(s/def ::column-overrides (s/map-of ::column-name ::function-text))
+(s/def ::column-override-fns (s/map-of ::column-name ::function-obj))
+
+;;; Specs related to modal for entering foreign functions.
+
+(s/def ::reagent-comp fn?)
+(s/def ::child (s/nilable (s/tuple ::reagent-comp
+                                   ::column-name
+                                   (s/nilable ::function-text))))
+(s/def ::size #{:extra-small :small :large :extra-large})
+(s/def ::modal (s/keys :opt-un [::child
+                                ::size]))
 
 (s/def ::db (s/keys :req [::headers
                           ::rows
@@ -51,7 +71,10 @@
                           ::virtual-scores
                           ::labels
                           ::topojson
-                          ::table-last-clicked]))
+                          ::table-last-clicked
+                          ::column-overrides
+                          ::column-override-fns
+                          ::modal]))
 
 (defn table-headers
   [db]

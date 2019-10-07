@@ -5,7 +5,8 @@
             [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
-            [inferdb.spreadsheets.vega :as vega]))
+            [inferdb.spreadsheets.vega :as vega]
+            [inferdb.spreadsheets.modal :as modal]))
 
 (def default-hot-settings
   {:settings {:data                []
@@ -111,4 +112,5 @@
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div#viz-container
       (when vega-lite-spec
-        [vega/vega-lite vega-lite-spec {:actions false} generator])]]))
+        [vega/vega-lite vega-lite-spec {:actions false} generator])]
+     [modal/modal]]))
