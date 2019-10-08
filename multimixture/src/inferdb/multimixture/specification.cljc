@@ -63,36 +63,36 @@
 (s/def ::multi-mixture
   (s/keys :req-un [::vars ::views]))
 
-(s/fdef parse-json
+(s/fdef from-json
   :args (s/cat :json (s/map-of string? any?))
   :ret ::multi-mixture)
 
-#?(:clj (defn parse-json
-          [{:strs [columns views]}]
-          (let [vars (reduce-kv (fn [m k v]
-                                  (assoc m k (keyword v)))
-                                {}
-                                columns)
-                views (mapv (fn [view]
-                              (mapv (fn [cluster]
-                                      (let [column-parameters (dissoc cluster "p")]
-                                        {:probability (get cluster "p")
-                                         :parameters (reduce-kv (fn [m column parameters]
-                                                                  (let [stattype (get vars column)]
-                                                                    (assoc m
-                                                                           column
-                                                                           (case stattype
-                                                                             :gaussian (zipmap [:mu :sigma] parameters)
-                                                                             :categorical parameters))))
-                                                                {}
-                                                                column-parameters)}))
-                                    view))
-                            views)]
-            {:vars vars
-             :views views})))
+(defn from-json
+  [{:strs [columns views]}]
+  (let [vars (reduce-kv (fn [m k v]
+                          (assoc m k (keyword v)))
+                        {}
+                        columns)
+        views (mapv (fn [view]
+                      (mapv (fn [cluster]
+                              (let [column-parameters (dissoc cluster "p")]
+                                {:probability (get cluster "p")
+                                 :parameters (reduce-kv (fn [m column parameters]
+                                                          (let [stattype (get vars column)]
+                                                            (assoc m
+                                                                   column
+                                                                   (case stattype
+                                                                     :gaussian (zipmap [:mu :sigma] parameters)
+                                                                     :categorical parameters))))
+                                                        {}
+                                                        column-parameters)}))
+                            view))
+                    views)]
+    {:vars vars
+     :views views}))
 
 
-#_(parse-json (json/read-str (slurp "/Users/zane/projects/inferenceql/model.json")))
+#_(from-json (json/read-str (slurp "/Users/zane/projects/inferenceql/model.json")))
 #_(stest/instrument)
 
 (s/fdef cluster-variables

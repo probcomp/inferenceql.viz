@@ -9,7 +9,6 @@ clean:
 	rm -Rf $(output-dir)
 
 $(output-to):
-	$(MAKE) -w -C ../spreadsheets generated
 	cd ..; clojure -m cljs.main \
 		-co $(compile-opts) \
 		-d $(output-dir) \
