@@ -1,13 +1,12 @@
 (ns inferdb.aide.main
   (:refer-clojure :exclude [map apply replicate])
-  #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen let-traced]]))
+  #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen]]))
   (:require
-   #?(:clj [metaprob.generative-functions :refer [gen make-constrained-generator let-traced]]
-      :cljs [metaprob.generative-functions :refer [make-constrained-generator]])
+   #?(:clj [metaprob.generative-functions :refer [apply-at at gen make-constrained-generator]]
+      :cljs [metaprob.generative-functions :refer [apply-at at make-constrained-generator]])
    [metaprob.trace :as trace]
-   [metaprob.prelude :refer [map replicate expt infer-and-score]]
+   [metaprob.prelude :refer [map replicate infer-and-score]]
    [metaprob.distributions :as dist]
-   [clojure.pprint :refer [pprint]]
    [metaprob.inference :as inf]))
 
 (def log-likelihood-weighting

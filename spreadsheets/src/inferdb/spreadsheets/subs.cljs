@@ -1,7 +1,6 @@
 (ns inferdb.spreadsheets.subs
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
-            [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]

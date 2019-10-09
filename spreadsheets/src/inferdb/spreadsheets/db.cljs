@@ -1,7 +1,6 @@
 (ns inferdb.spreadsheets.db
   (:require [clojure.spec.alpha :as s]
-            [inferdb.spreadsheets.data :refer [nyt-data]]
-            [metaprob.distributions :as dist]))
+            [inferdb.spreadsheets.data :refer [nyt-data]]))
 
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))

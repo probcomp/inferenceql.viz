@@ -1,8 +1,6 @@
 (ns inferdb.spreadsheets.views
-  (:require [reagent.core :as r]
-            [re-frame.core :as rf]
+  (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]
-            [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
             [inferdb.spreadsheets.vega :as vega]

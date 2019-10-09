@@ -2,8 +2,8 @@
   "CGPM interface utilities"
   (:refer-clojure :exclude [map apply])
   (:require
-    [metaprob.prelude :refer [map]]
-    [metaprob.inference]))
+   [metaprob.prelude :refer [map]]
+   [metaprob.inference]))
 
 ;;; Compute simple average of items.
 (defn compute-avg

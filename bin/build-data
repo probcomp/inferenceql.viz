@@ -3,7 +3,6 @@
 (require '[inferdb.spreadsheets.build-data :as build])
 (require '[clojure.data.csv :as csv])
 (require '[clojure.java.io :as io])
-(require '[clojure.edn :as edn])
 
 (when (< (count *command-line-args*) 2)
   (do

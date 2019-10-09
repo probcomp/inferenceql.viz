@@ -1,7 +1,7 @@
 (ns inferdb.aide-test
   (:refer-clojure :exclude [map apply replicate])
   (:require
-   [metaprob.generative-functions :refer [gen let-traced]]
+   [metaprob.generative-functions :refer [at gen let-traced]]
    [metaprob.prelude :refer [map]]
    [inferdb.aide.main :as aide]
    [metaprob.distributions :as dist]

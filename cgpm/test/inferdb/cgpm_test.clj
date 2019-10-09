@@ -1,7 +1,7 @@
 (ns inferdb.cgpm-test
   (:require [clojure.test :refer [deftest is testing]]
             [metaprob.distributions :as dist]
-            [metaprob.generative-functions :refer [apply-at at gen]]
+            [metaprob.generative-functions :refer [at gen]]
             [metaprob.prelude :as mp]
             [inferdb.cgpm.main :as cgpm]))
 
