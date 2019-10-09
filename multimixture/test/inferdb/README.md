@@ -27,50 +27,56 @@ on whether we are testing:
 
 We'll use the following row generator structure to test: 
 ```
-(def generate-crosscat-row
-  (multi-mixture
-    (view
-      {"x" gaussian
-       "y" gaussian
-       "a" categorical
-       "b" categorical}
-      (clusters
-       0.166666666 {"x" [3 1]
-                    "y" [4 0.1]
-                    "a" [[1 0 0 0 0 0]]
-                    "b" [[0.95 0.01 0.01 0.01 0.01 0.01]]}
-       0.166666666 {"x" [3 0.1]
-                    "y" [4 1]
-                    "a" [[0 1 0 0 0 0]]
-                    "b" [[0.01 0.95 0.01 0.01 0.01 0.01]]}
-       0.166666667 {"x" [8 0.5]
-                    "y" [10 1]
-                    "a" [[0 0 1 0 0 0]]
-                    "b" [[0.01 0.01 0.95 0.01 0.01 0.01]]}
-       0.166666666 {"x" [14 0.5]
-                    "y" [7 0.5]
-                    "a" [[0 0 0 1 0 0]]
-                    "b" [[0.01 0.01 0.01 0.95 0.01 0.01]]}
-       0.166666666 {"x" [16 0.5]
-                    "y" [9 0.5]
-                    "a" [[0 0 0 0 1 0]]
-                    "b" [[0.01 0.01 0.01 0.01 0.95 0.01]]}
-       0.166666666 {"x" [9  2.5]
-                    "y" [16 0.1]
-                    "a" [[0 0 0 0 0 1]]
-                    "b" [[0.01 0.01 0.01 0.01 0.01 0.95]]}))
-    (view
-      {"z" gaussian
-       "c" categorical}
-      (clusters
-       0.25 {"z" [0 1]
-             "c" [[1 0 0 0]]}
-       0.25 {"z" [10 1]
-             "c" [[0 1 0 0]]}
-       0.25 {"z" [20 1]
-             "c" [[0 0 1 0]]}
-       0.25 {"z" [30 1]
-             "c" [[0 0 0 1]]}))))
+(def multi-mixture
+   {:vars {"x" :gaussian
+           "y" :gaussian
+           "z" :gaussian
+           "a" :categorical
+           "b" :categorical
+           "c" :categorical}
+    :views [[  {:probability 0.166666666
+                :parameters {"x" {:mu 3 :sigma 1}
+                             "y" {:mu 4 :sigma 0.1}
+                             "a" {"0" 1.0 "1" 0.0 "2" 0.0 "3" 0.0 "4" 0.0 "5" 0.0}
+                             "b" {"0" 0.95, "1" 0.01, "2" 0.01, "3" 0.01, "4" 0.01, "5" 0.01}}}
+               {:probability 0.166666666
+                :parameters {"x" {:mu 3 :sigma 0.1}
+                             "y" {:mu 4 :sigma 1}
+                             "a" {"0" 0.0 "1" 1.0 "2" 0.0 "3" 0.0 "4" 0.0 "5" 0.0}
+                             "b" {"0" 0.01, "1" 0.95, "2" 0.01, "3" 0.01, "4" 0.01, "5" 0.01}}}
+               {:probability 0.166666666
+                :parameters {"x" {:mu 8  :sigma 0.5}
+                             "y" {:mu 10 :sigma 1}
+                             "a" {"0" 0.0 "1" 0.0 "2" 1.0 "3" 0.0 "4" 0.0 "5" 0.0}
+                             "b" {"0" 0.01, "1" 0.01, "2" 0.95, "3" 0.01, "4" 0.01, "5" 0.01}}}
+               {:probability 0.166666666
+                :parameters {"x" {:mu 14  :sigma 0.5}
+                             "y" {:mu  7  :sigma 0.5}
+                             "a" {"0" 0.0 "1" 0.0 "2" 0.0 "3" 1.0 "4" 0.0 "5" 0.0}
+                             "b" {"0" 0.01, "1" 0.01, "2" 0.01, "3" 0.95, "4" 0.01, "5" 0.01}}}
+               {:probability 0.166666666
+                :parameters {"x" {:mu 16  :sigma 0.5}
+                             "y" {:mu  9  :sigma 0.5}
+                             "a" {"0" 0.0 "1" 0.0 "2" 0.0 "3" 0.0 "4" 1.0 "5" 0.0}
+                             "b" {"0" 0.01, "1" 0.01, "2" 0.01, "3" 0.01, "4" 0.95, "5" 0.01}}}
+               {:probability 0.166666666
+                :parameters {"x" {:mu  9  :sigma 2.5}
+                             "y" {:mu 16  :sigma 0.1}
+                             "a" {"0" 0.0 "1" 0.0 "2" 0.0 "3" 0.0 "4" 0.0 "5" 1.0}
+                             "b" {"0" 0.01, "1" 0.01, "2" 0.01, "3" 0.01, "4" 0.01, "5" 0.95}}}]
+              [{:probability 0.25
+                :parameters {"z" {:mu 0 :sigma 1}
+                             "c" {"0" 1.0, "1" 0.0, "2" 0.0, "3" 0.0}}}
+               {:probability 0.25
+                :parameters {"z" {:mu 15 :sigma 1}
+                             "c" {"0" 0.0, "1" 1.0, "2" 0.0, "3" 0.0}}}
+               {:probability 0.25
+                :parameters {"z" {:mu 30 :sigma 1}
+                             "c" {"0" 0.0, "1" 0.0, "2" 1.0, "3" 0.0}}}
+               {:probability 0.25
+                :parameters {"z" {:mu 15 :sigma 8}
+                             "c" {"0" 0.0, "1" 0.0, "2" 0.0, "3" 1.0}}}]]})
+(def row-generator (search/optimized-row-generator multi-mixture))
 ```
 Column `a` is a categorical that also serves as a deterministic indicator of the
 Gaussian components in `x` and `y`. `b` is a noisy copy of `a`. 
