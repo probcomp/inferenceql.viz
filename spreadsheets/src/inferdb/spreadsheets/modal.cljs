@@ -14,10 +14,9 @@
   [:div.modal-wrapper
    [:div {:class "modal-backdrop"
           :on-click (fn [event]
-                      (do
-                        (rf/dispatch [:clear-modal])
-                        (.preventDefault event)
-                        (.stopPropagation event)))}]
+                      (rf/dispatch [:clear-modal])
+                      (.preventDefault event)
+                      (.stopPropagation event))}]
    [:div {:class "modal-child"
           :style {:width (case size
                            :extra-small "15%"
