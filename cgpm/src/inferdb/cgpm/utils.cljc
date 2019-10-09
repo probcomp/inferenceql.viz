@@ -1,12 +1,9 @@
 (ns inferdb.cgpm.utils
+  "CGPM interface utilities"
   (:refer-clojure :exclude [map apply])
   (:require
     [metaprob.prelude :refer [map]]
     [metaprob.inference]))
-
-; ------------------------
-; CGPM INTERFACE UTILITIES
-; ------------------------
 
 ; Compute simple average of items.
 (defn compute-avg

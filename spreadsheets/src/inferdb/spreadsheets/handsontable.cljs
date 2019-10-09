@@ -18,8 +18,8 @@
   (.updateSettings hot-instance new-settings false))
 
 (defn freeze-col-1-2-fn [columns-moving target]
-  """Prevents the movement of the first two columns in the table.
-  Also prevents other columns from moving into those frist two spots."""
+  "Prevents the movement of the first two columns in the table.
+  Also prevents other columns from moving into those frist two spots."
   (let [first-unfrozen-index 2
         first-col-moving (first (js->clj columns-moving))]
     (not (or (< first-col-moving first-unfrozen-index)

@@ -44,8 +44,9 @@
 ;;; These functions are for imputing data in empty cells and
 ;;; also returning a likelihoods for the imputed values.
 
-(defn impute-and-score-cell [row-gen row key-to-impute]
+(defn impute-and-score-cell
   "Returns an imputed value of `key-to-impute` along with its likelihood"
+  [row-gen row key-to-impute]
   (let [constraints (mmix/with-row-values {} row)
         gen-fn #(-> (mp/infer-and-score :procedure row-gen
                                         :observation-trace constraints)
