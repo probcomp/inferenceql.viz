@@ -10,7 +10,8 @@
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.vega :as vega]
             [inferdb.spreadsheets.modal :as modal]
-            [inferdb.spreadsheets.column-overrides :as co])
+            [inferdb.spreadsheets.column-overrides :as co]
+            [inferdb.spreadsheets.renderers :as rends])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -112,7 +113,7 @@
         rows))
 
 (defn real-hot-props
-  [{:keys [headers rows context-menu]} _]
+  [{:keys [headers rows cells-style-fn context-menu]} _]
   (let [data (cell-vector headers rows)
 
         num-columns (count headers)
@@ -124,11 +125,13 @@
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] all-column-settings)
+        (assoc-in [:settings :cells] cells-style-fn)
         (assoc-in [:settings :contextMenu] context-menu))))
 (rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:computed-rows])
+               :cells-style-fn (rf/subscribe [:cells-style-fn])
                :context-menu (rf/subscribe [:context-menu])})
             real-hot-props)
 
@@ -321,3 +324,51 @@
 (rf/reg-sub :column-overrides
             (fn [db _]
               (get db ::db/column-overrides)))
+
+(rf/reg-sub
+  :row-likelihoods-normed
+  (fn [_ _]
+    nil))
+
+(rf/reg-sub
+  :missing-cells-likelihoods-normed
+  (fn [_ _]
+    nil))
+
+(rf/reg-sub
+ :cells-style-fn
+ (fn [_ _]
+   {:cell-renderer-fn (rf/subscribe [:cell-renderer-fn])})
+ (fn [{:keys [cell-renderer-fn]}]
+   ;; Returns a function used by the :cells property in Handsontable's options.
+   (fn [row col]
+     (clj->js {:renderer cell-renderer-fn}))))
+
+(rf/reg-sub
+ :cell-renderer-fn
+ (fn [_ _]
+   {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
+    :missing-cells-likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :conf-thresh (rf/subscribe [:confidence-threshold])
+    :conf-mode (rf/subscribe [:confidence-option [:mode]])
+    :computed-headers (rf/subscribe [:computed-headers])})
+ ;; Returns a cell renderer function used by Handsontable.
+ (fn [{:keys [row-likelihoods missing-cells-likelihoods conf-thresh conf-mode computed-headers]}]
+   (case conf-mode
+     :none
+     js/Handsontable.renderers.TextRenderer
+
+     :row
+     (fn [& args]
+       ;; These render functions are actually called with this args list:
+       ;; [hot td row col prop value cell-properties]
+       ;; Instead, we are specifying [& args] here to make it cleaner to
+       ;; pass in data to custom rendering functions.
+       (rends/row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))
+
+     :cells-existing
+     js/Handsontable.renderers.TextRenderer
+
+     :cells-missing
+     (fn [& args]
+       (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-likelihoods computed-headers conf-thresh)))))
