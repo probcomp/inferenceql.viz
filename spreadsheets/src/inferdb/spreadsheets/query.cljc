@@ -20,20 +20,15 @@
   ([limit]
    (transform-from {} limit))
   ([obs limit]
-   (let [trace (mmix/with-row-values {} obs)
-         sample #(first (mp/infer-and-score :procedure row-generator
-                                            :observation-trace trace))]
-     (->> (repeatedly sample)
-          ;; TODO: This is a hack for Strange Loop 2019
-          (remove #(some (every-pred number? neg?) (vals %)))
-          (take limit)))))
+   [:generate obs limit]))
 
 (defn- transform-select
   [& args]
   (match (vec args)
-    [[:star] s]
-    {:type :generated
-     :values s}
+    [[:star] [:generate obs limit]]
+    {:type :generate-virtual-row
+     :conditions obs
+     :num-rows limit}
 
     [[:probability [:prob-column column] [:prob-given]] [:star]]
     {:type :anomaly-search

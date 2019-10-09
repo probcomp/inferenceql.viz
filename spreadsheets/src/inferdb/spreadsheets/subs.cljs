@@ -251,10 +251,10 @@
                                                                  (dissoc col-to-sample)))
                         gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                                            :observation-trace constraints))
-                        negative-salary? #(neg? (% "salary_usd"))]
+                        has-negative-vals? #(some (every-pred number? neg?) (vals %))]
                     ;; returns the first result of gen-fn that doesn't have a negative salary
-                    ;; TODO: This is dataset-specific
-                    #(take 1 (remove negative-salary? (repeatedly gen-fn))))))))
+                    ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
+                    #(take 1 (remove has-negative-vals? (repeatedly gen-fn))))))))
 
 (rf/reg-sub :confidence-threshold
             (fn [db _]

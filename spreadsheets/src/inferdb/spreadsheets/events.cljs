@@ -121,8 +121,8 @@
  (fn [{:keys [db]} [_ text]]
    (let [command (query/parse text)]
      (match command
-       {:type :generated :values v}
-       {:db (db/with-virtual-rows db v)}
+       {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
+       {:dispatch [:generate-virtual-row c num-rows]}
 
        {:type :anomaly-search :column column :given true}
        {:dispatch [:anomaly-search column ["ROW"]]}
@@ -174,9 +174,10 @@
          gen-fn #(first (mp/infer-and-score
                          :procedure (search/optimized-row-generator model/spec)
                          :observation-trace constraint-addrs-vals))
-         negative-salary? #(neg? (% "salary_usd"))
-         ;; TODO: This is dataset-specific
-         new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
+         has-negative-vals? #(some (every-pred number? neg?) (vals %))
+
+         ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
+         new-rows (take num-rows (remove has-negative-vals? (repeatedly gen-fn)))]
      (db/with-virtual-rows db new-rows))))
 
 (defn- create-search-examples [pos-rows neg-rows]
