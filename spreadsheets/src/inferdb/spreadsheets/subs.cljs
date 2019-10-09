@@ -9,7 +9,8 @@
             [inferdb.multimixture.search :as search]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.vega :as vega]
-            [inferdb.spreadsheets.modal :as modal])
+            [inferdb.spreadsheets.modal :as modal]
+            [inferdb.spreadsheets.column-overrides :as co])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -238,11 +239,14 @@
 (rf/reg-sub :generator
             (fn [_ _]
               {:selection-info (rf/subscribe [:table-state-active])
-               :one-cell-selected (rf/subscribe [:one-cell-selected])})
-            (fn [{:keys [selection-info one-cell-selected]}]
+               :one-cell-selected (rf/subscribe [:one-cell-selected])
+               :override-fns (rf/subscribe [:column-override-fns])})
+            (fn [{:keys [selection-info one-cell-selected override-fns]}]
               (let [row (:row-at-selection-start selection-info)
                     columns (:selected-columns selection-info)
-                    col-to-sample (first columns)]
+                    col-to-sample (first columns)
+                    override-map (select-keys override-fns [col-to-sample])
+                    override-insert-fn (co/gen-insert-fn override-map)]
                 (when (and one-cell-selected
                            ;; TODO clean up this check
                            (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))
@@ -254,7 +258,7 @@
                         has-negative-vals? #(some (every-pred number? neg?) (vals %))]
                     ;; returns the first result of gen-fn that doesn't have a negative salary
                     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
-                    #(take 1 (remove has-negative-vals? (repeatedly gen-fn))))))))
+                    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn)))))))))
 
 (rf/reg-sub :confidence-threshold
             (fn [db _]

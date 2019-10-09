@@ -7,7 +7,8 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]
             [inferdb.spreadsheets.model :as model]
-            [inferdb.spreadsheets.query :as query]))
+            [inferdb.spreadsheets.query :as query]
+            [inferdb.spreadsheets.column-overrides :as co]))
 
 (def real-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :before-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
@@ -176,8 +177,11 @@
                          :observation-trace constraint-addrs-vals))
          has-negative-vals? #(some (every-pred number? neg?) (vals %))
 
+         overrides-map (get db ::db/column-override-fns)
+         overrides-insert-fn (co/gen-insert-fn overrides-map)
+
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
-         new-rows (take num-rows (remove has-negative-vals? (repeatedly gen-fn)))]
+         new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
      (db/with-virtual-rows db new-rows))))
 
 (defn- create-search-examples [pos-rows neg-rows]
