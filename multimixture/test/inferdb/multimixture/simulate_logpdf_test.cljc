@@ -4,6 +4,7 @@
             [expound.alpha :as expound]
             [clojure.java.io :as io]
             [clojure.string :as str]
+            [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture.specification :as spec]
             [inferdb.multimixture.search :as search] ;; XXX: why on earth is the "optimized" row generator in search???
@@ -156,18 +157,6 @@
             mu (spec/mu multi-mixture (name variable) cluster)]
         (is (= point-value mu))))))
 
-(defn save-json
-          "Writes the provided Vega-Lite JSON to a file in the charts directory with the
-          provided prefix."
-          [file-prefix vl-json]
-          (let [file-path (str "multimixture/out/" file-prefix ".vl.json")]
-            (io/make-parents file-path)
-            (spit file-path vl-json)))
-
-(defn column-subset [data columns]
-  (let [row-subset (fn [row] (select-keys row columns))]
-    (map row-subset data)))
-
 (def row-generator (search/optimized-row-generator multi-mixture))
 
 (deftest test-smoke-row-generator
@@ -191,19 +180,19 @@
                                                        point))
                                           test-points)
                   samples (take plot-point-count (repeatedly row-generator))]
-              (save-json "simulations-x-y"
+              (utils/save-json "simulations-x-y"
                                (plot/scatter-plot-json ["x" "y"]
                                                        samples
                                                        point-data
                                                        [0 18]
                                                        "View 1: X, Y, A, B"))
-              (save-json "simulations-z"
-                               (plot/hist-plot (column-subset samples ["z" "c"])
+              (utils/save-json "simulations-z"
+                               (plot/hist-plot (utils/column-subset samples ["z" "c"])
                                                ["z" "c"]
                                                "Dim Z and C"))
               (doseq [variable #{"a" "b" "c"}]
-                (save-json (str "simulations-" (name variable))
-                                 (plot/bar-plot (column-subset samples [variable])
+                (utils/save-json (str "simulations-" (name variable))
+                                 (plot/bar-plot (utils/column-subset samples [variable])
                                                 (str "Dim " (-> variable name str/upper-case))
                                                 plot-point-count)))
               (is (= (count samples) plot-point-count)))))
