@@ -1,4 +1,4 @@
-(ns inferdb.multimixture.simulate-logpdf-test
+(ns inferdb.multimixture.basic-queries-test
   (:require [clojure.spec.alpha :as s]
             [clojure.test :as test :refer [deftest testing is]]
             [expound.alpha :as expound]
@@ -7,6 +7,7 @@
             [inferdb.utils :as utils]
             [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture.specification :as spec]
+            [inferdb.multimixture.basic-queries :as bq]
             [inferdb.multimixture.search :as search] ;; XXX: why on earth is the "optimized" row generator in search???
             ))
 
@@ -159,8 +160,19 @@
 
 (def row-generator (search/optimized-row-generator multi-mixture))
 
+
+;; Some smoke tests.
 (deftest test-smoke-row-generator
  (is (map? (row-generator))))
+
+(deftest test-smoke-simulate
+ (is (= 3 (count (bq/simulate row-generator {} 3)))))
+
+(deftest test-smoke-simulate-conditional
+ (is (= 999. (get (first (bq/simulate row-generator {"x" 999.} 3)) "x"))))
+
+
+
 
 (def plot-point-count 1000)
 ;; The purpose of this test is to help the reader understand the test suite. It
