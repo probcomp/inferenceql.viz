@@ -72,14 +72,10 @@
                 :parameters {"z" {:mu 15 :sigma 8}
                              "c" {"0" 0.0, "1" 0.0, "2" 0.0, "3" 1.0}}}]]})
 
-(spec/view-variables (first (:views multi-mixture)))
-
-
 (deftest multi-mixture-is-valid
   (when-not (s/valid? ::spec/multi-mixture multi-mixture)
     (expound/expound ::spec/multi-mixture multi-mixture))
   (is (s/valid? ::spec/multi-mixture multi-mixture)))
-
 
 (def test-points
   [{:x 3  :y 4}
@@ -134,8 +130,10 @@
                            (map #(euclidean-distance [x y] %)))]
         (is (apply = distances))))))
 
-
-(def variables (keys (:vars multi-mixture)))
+;; XXX When I ported this, I got really derailed, because the whole machinery
+;; below relies on variables not being all variables in the spec, but just the
+;; variables in the first view.
+(def variables (spec/view-variables (first (:views multi-mixture))))
 
 (def numerical-variables
   (into #{}
@@ -160,7 +158,6 @@
 
 (def row-generator (search/optimized-row-generator multi-mixture))
 
-
 ;; Some smoke tests.
 (deftest test-smoke-row-generator
  (is (map? (row-generator))))
@@ -170,9 +167,6 @@
 
 (deftest test-smoke-simulate-conditional
  (is (= 999. (get (first (bq/simulate row-generator {"x" 999.} 3)) "x"))))
-
-
-
 
 (def plot-point-count 1000)
 ;; The purpose of this test is to help the reader understand the test suite. It
@@ -208,6 +202,44 @@
                                                 (str "Dim " (-> variable name str/upper-case))
                                                 plot-point-count)))
               (is (= (count samples) plot-point-count)))))
+
+
+(def simulation-count 100)
+(def threshold 0.5)
+
+(defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+(defn- almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
+(defn- almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
+
+(deftest simulations-conditioned-on-determinstic-category
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (testing (str "Conditioned on  deterministic category" cluster)
+      ;; We simulate all variables together in a single test like this because
+      ;; there's currently a performance benefit to doing so.
+      (let [point (test-point point-id)
+            samples (bq/simulate row-generator
+                                 {"a" (str cluster)}
+                                 simulation-count)]
+        (doseq [variable variables]
+            (cond (spec/numerical? multi-mixture variable)
+                  (let [samples (utils/col variable samples)]
+          (testing (str "validate variable " variable)
+                    (testing "mean"
+                      (is (almost-equal? (get point (keyword variable))
+                                         (utils/average samples))))
+                    #_(testing "standard deviation"
+                      (let [analytical-std (spec/sigma multi-mixture variable cluster)]
+                        (is (utils/within-factor? analytical-std
+                                                  (utils/std samples)
+                                                  2)))))
+
+                  (spec/nominal? multi-mixture variable)
+                  #_(testing "validate simulated categorical probabilities"
+                    (let [variable-samples (utils/column-subset samples [variable])
+                          actual-probabilities (spec/categorical-probabilities multi-mixture variable cluster)
+                          possible-values (range 6)
+                          probabilities (utils/probability-vector variable-samples possible-values)]
+                      (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
 
 (use 'clojure.test)
 (run-tests)
