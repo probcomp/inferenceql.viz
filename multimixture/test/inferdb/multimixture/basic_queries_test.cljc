@@ -8,7 +8,7 @@
             [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture.specification :as spec]
             [inferdb.multimixture.basic-queries :as bq]
-            [inferdb.multimixture.search :as search] ;; XXX: why on earth is the "optimized" row generator in search???
+            [inferdb.multimixture.search :as search] ;; XXX: why is the "optimized" row generator in search?
             ))
 
 ;; The following data generator has some interesting properties:
@@ -240,6 +240,34 @@
                           possible-values (range 6)
                           probabilities (utils/probability-vector variable-samples possible-values)]
                       (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
+
+
+(deftest simulations-conditioned-on-points
+  (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
+    (testing (str "Conditioned on point P" point-id)
+      (let [point (test-point point-id)
+            samples (cgpm/cgpm-simulate crosscat-cgpm
+                                        (into categorical-variables
+                                              [:cluster-for-x :cluster-for-y])
+                                        point
+                                        {}
+                                        simulation-count)]
+        (testing "validate cluster assignments"
+          (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
+                id-samples-y (utils/column-subset samples [:cluster-for-y])
+                cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
+                true-p-cluster (apply spec/categorical-probabilities multi-mixture :a clusters)]
+            (is (utils/equal-sample-values id-samples-x id-samples-y))
+            (is (almost-equal-vectors? true-p-cluster cluster-p-fraction))))
+        (testing "validate distribution of categorical variable"
+          (doseq [variable categorical-variables]
+            (testing variable
+              (let [variable-samples (utils/column-subset samples [variable])
+                    possible-values (range 6)
+                    true-probabilities (apply spec/categorical-probabilities multi-mixture variable clusters)
+                    p-fraction (utils/probability-vector variable-samples possible-values)]
+                (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
+
 
 (use 'clojure.test)
 (run-tests)
