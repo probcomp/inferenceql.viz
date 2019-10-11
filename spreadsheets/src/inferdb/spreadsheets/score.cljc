@@ -3,6 +3,7 @@
             [inferdb.multimixture.search :as search]
             [inferdb.multimixture :as mmix]
             [metaprob.prelude :as mp]
+            [inferdb.multimixture.basic-queries :as bq]
             [clojure.set :as set]))
 
 ;;; These functions are for scoring the likelihood of entire rows.
@@ -12,7 +13,7 @@
   [row-generator row]
   (let [target (util/filter-nil-kvs row)
         constraints {}]
-    (Math/exp (search/logpdf row-generator target constraints))))
+    (Math/exp (bq/logpdf row-generator target constraints))))
 
 (defn row-likelihoods
   "Returns a sequence of likelihoods for `rows`"
@@ -32,7 +33,7 @@
         likelihood-pairs (for [[k v] cell-pairs]
                            (let [target (assoc {} k v)
                                  constraints (dissoc clean-row k)]
-                             [k (Math/exp (search/logpdf row-generator target constraints))]))]
+                             [k (Math/exp (bq/logpdf row-generator target constraints))]))]
     (into {} likelihood-pairs)))
 
 (defn cell-likelihoods

@@ -5,6 +5,7 @@
             [metaprob.prelude :as mp]
             [inferdb.distributions :as idbdist]
             [inferdb.multimixture :as mmix]
+            [inferdb.multimixture.basic-queries :as bq]
             [inferdb.multimixture.specification :as spec]))
 
 (s/fdef optimized-row-generator
@@ -133,28 +134,6 @@
               (get-in spec [:views new-column-view cluster-idx :parameters new-column-key])))
           rows)))
 
-(defn logpdf
-  [row-generator target constraints]
-  (let [target-addrs-vals (mmix/with-row-values {} target)
-        constraint-addrs-vals (mmix/with-row-values {} constraints)
-        target-constraint-addrs-vals (mmix/with-row-values {}
-                                                           (merge target
-                                                                  constraints))
-        ;; Run infer to obtain probabilities.
-        [retval trace log-weight-numer] (mp/infer-and-score
-                                         :procedure row-generator
-                                         :observation-trace target-constraint-addrs-vals)
-
-        log-weight-denom (if (empty? constraint-addrs-vals)
-                           ;; There are no constraints: log weight is zero.
-                           0
-                           ;; There are constraints: find marginal probability of constraints.
-                           (let [[retval trace weight] (mp/infer-and-score
-                                                        :procedure row-generator
-                                                        :observation-trace constraint-addrs-vals)]
-                             weight))]
-    (- log-weight-numer log-weight-denom)))
-
 (defn transpose
   [coll]
   (apply map vector coll))
@@ -171,7 +150,7 @@
         constraints (constraints-for-scoring-p target-col constraint-cols row)]
     (if (nil? (get target target-col))
       1
-      (Math/exp (logpdf row-generator target constraints)))))
+      (Math/exp (bq/logpdf row-generator target constraints)))))
 
 (defn anomaly-search
   [spec target-col conditional-cols data]
