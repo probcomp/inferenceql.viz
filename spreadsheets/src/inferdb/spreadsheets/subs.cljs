@@ -326,13 +326,13 @@
 
 (rf/reg-sub
   :row-likelihoods-normed
-  (fn [_ _]
-    nil))
+  (fn [db _]
+    (get db ::db/row-likelihoods)))
 
 (rf/reg-sub
   :missing-cells-likelihoods-normed
-  (fn [_ _]
-    nil))
+  (fn [db _]
+    (map :scores (get db ::db/missing-cells))))
 
 (rf/reg-sub
  :cells-style-fn
