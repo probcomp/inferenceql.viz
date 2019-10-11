@@ -243,9 +243,6 @@
                           probabilities (utils/probability-vector variable-samples possible-values)]
                       (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
 
-
-
-
 (def point-cluster-mapping (invert-map cluster-point-mapping))
 (defn- true-categorical-p
   [point-cluster-mapping point]
@@ -255,9 +252,6 @@
                                  (/ 1 (count possible-clusters))
                                  0.)])
                 (range 6)))))
-
-
-
 
 ;; Below, we're making use of the fact that each value of "a" determines a
 ;; cluster.
