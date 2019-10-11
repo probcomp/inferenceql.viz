@@ -56,20 +56,38 @@
         (fn [i] (almost-equal?  (nth a i) (nth b i) difference-metric threshold))]
     (all? (map call-almost-equal (range (count a))))))
 
+
+(defn almost-equal-maps?
+  "Returns true if maps `a` and `b` are approximately equal. Takes a difference
+  metric (presumably from `inferdb.metrics`) as its second argument."
+  [a b difference-metric threshold]
+  (let [ks (keys a)]
+    (almost-equal-vectors? (map #(get a %) ks)
+                           (map #(get b %) ks)
+                           difference-metric threshold)))
+
+
 (defn within-factor? [a b factor]
   (<= (/ b factor) a (* b factor)))
 
-(defn probability-for-categories [sample-vector]
+(defn probability-for-observed-categories [sample-vector]
   (let [fraction (fn [item] {(first (vals (first item)))
                              (float (/ (second item)
                                        (count sample-vector)))})
         occurences (frequencies sample-vector)]
     (apply merge (mapv fraction occurences))))
 
+(defn probability-for-categories [sample-vector categories]
+    (let [observed (probability-for-observed-categories sample-vector)]
+      (into observed (map (fn [category](if (contains? observed category) nil [category 0.]))
+                    categories))))
+
 (defn probability-vector [samples possible-values]
-  (let [probability-map (probability-for-categories samples)]
+  (let [probability-map (probability-for-observed-categories samples)]
     (map #(get probability-map % 0)
          possible-values)))
+
+
 
 (defn equal-sample-values [samples-1 samples-2]
   (= (map (comp set vals) samples-1)
