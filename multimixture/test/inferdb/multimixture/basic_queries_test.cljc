@@ -9,6 +9,7 @@
             [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture.specification :as spec]
             [inferdb.multimixture.basic-queries :as bq]
+            [metaprob.distributions :as dist]
             [inferdb.multimixture.search :as search] ;; XXX: why is the "optimized" row generator in search?
             ))
 
@@ -135,12 +136,10 @@
 ;; below relies on variables not being all variables in the spec, but just the
 ;; variables in the first view.
 (def variables (spec/view-variables (first (:views multi-mixture))))
-
 (def numerical-variables
   (into #{}
         (filter #(spec/numerical? multi-mixture %))
         variables))
-
 (def categorical-variables
   (into #{}
         (filter #(spec/nominal? multi-mixture %))
@@ -270,6 +269,23 @@
                 cluster-p-fraction (utils/probability-for-categories samples-a (map str (range 6)))
                 true-p-category (true-categorical-p point-cluster-mapping point-id)]
             (is (almost-equal-maps? true-p-category cluster-p-fraction))))))))
+
+(deftest logpdf-numerical-given-categorical
+  (doseq [[cluster point-id] cluster-point-mapping]
+    (let [point (stringify-keys
+                  (select-keys (test-point point-id) (map keyword numerical-variables)))
+          analytical-logpdf (transduce (map (fn [variable]
+                                              (let [mu (spec/mu multi-mixture variable cluster)
+                                                    sigma (spec/sigma multi-mixture variable cluster)]
+                                                (dist/score-gaussian (get point variable) [mu sigma]))))
+                                       +
+                                       numerical-variables)
+          queried-logpdf (bq/logpdf row-generator
+                                    point
+                                    {"a" (str cluster)})]
+
+      (is (almost-equal-p? analytical-logpdf queried-logpdf)))))
+
 
 (use 'clojure.test)
 (run-tests)
