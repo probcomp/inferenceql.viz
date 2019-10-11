@@ -169,6 +169,9 @@
 (deftest test-smoke-simulate-conditional
  (is (= 999. (get (first (bq/simulate row-generator {"x" 999.} 3)) "x"))))
 
+(deftest test-smoke-logpdf
+ (is (float? (bq/logpdf row-generator {"x" 0.} {"y" 1.}))))
+
 (def plot-point-count 1000)
 ;; The purpose of this test is to help the reader understand the test suite. It
 ;; generates Vega-Lite JSON as a side effect which can be rendered into charts.
