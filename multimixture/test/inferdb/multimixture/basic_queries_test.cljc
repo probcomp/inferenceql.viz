@@ -1,6 +1,7 @@
 (ns inferdb.multimixture.basic-queries-test
   (:require [clojure.spec.alpha :as s]
             [clojure.test :as test :refer [deftest testing is]]
+            [clojure.walk :as walk :refer [stringify-keys]]
             [expound.alpha :as expound]
             [clojure.java.io :as io]
             [clojure.string :as str]
@@ -209,6 +210,7 @@
 
 (defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 (defn- almost-equal-vectors? [a b] (utils/almost-equal-vectors? a b utils/relerr threshold))
+(defn- almost-equal-maps? [a b] (utils/almost-equal-maps? a b utils/relerr threshold))
 (defn- almost-equal-p? [a b] (utils/almost-equal? a b utils/relerr 0.01))
 
 (deftest simulations-conditioned-on-determinstic-category
@@ -242,32 +244,35 @@
                       (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
 
 
+
+
+(def point-cluster-mapping (invert-map cluster-point-mapping))
+(defn- true-categorical-p
+  [point-cluster-mapping point]
+  (let [possible-clusters (get point-cluster-mapping point)]
+  (into {} (map (fn [cluster] [(str cluster)
+                               (if (contains? possible-clusters cluster)
+                                 (/ 1 (count possible-clusters))
+                                 0.)])
+                (range 6)))))
+
+
+
+
+;; Below, we're making use of the fact that each value of "a" determines a
+;; cluster.
 (deftest simulations-conditioned-on-points
   (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
     (testing (str "Conditioned on point P" point-id)
-      (let [point (test-point point-id)
-            samples (cgpm/cgpm-simulate crosscat-cgpm
-                                        (into categorical-variables
-                                              [:cluster-for-x :cluster-for-y])
-                                        point
-                                        {}
-                                        simulation-count)]
-        (testing "validate cluster assignments"
-          (let [id-samples-x (utils/column-subset samples [:cluster-for-x])
-                id-samples-y (utils/column-subset samples [:cluster-for-y])
-                cluster-p-fraction (utils/probability-vector id-samples-x (range 6))
-                true-p-cluster (apply spec/categorical-probabilities multi-mixture :a clusters)]
-            (is (utils/equal-sample-values id-samples-x id-samples-y))
-            (is (almost-equal-vectors? true-p-cluster cluster-p-fraction))))
-        (testing "validate distribution of categorical variable"
-          (doseq [variable categorical-variables]
-            (testing variable
-              (let [variable-samples (utils/column-subset samples [variable])
-                    possible-values (range 6)
-                    true-probabilities (apply spec/categorical-probabilities multi-mixture variable clusters)
-                    p-fraction (utils/probability-vector variable-samples possible-values)]
-                (is (almost-equal-vectors? true-probabilities p-fraction))))))))))
-
+      (let [point (stringify-keys (test-point point-id))
+            samples (bq/simulate row-generator
+                                 point
+                                 simulation-count)]
+        (testing "validate cluster assignments/categorical distribution"
+          (let [samples-a (utils/column-subset samples ["a"])
+                cluster-p-fraction (utils/probability-for-categories samples-a (map str (range 6)))
+                true-p-category (true-categorical-p point-cluster-mapping point-id)]
+            (is (almost-equal-maps? true-p-category cluster-p-fraction))))))))
 
 (use 'clojure.test)
 (run-tests)
