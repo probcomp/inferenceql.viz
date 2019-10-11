@@ -3,7 +3,21 @@
             [inferdb.multimixture.search :as search]
             [inferdb.multimixture :as mmix]
             [metaprob.prelude :as mp]
+            [medley.core :as medley]
             [clojure.set :as set]))
+
+(defn- min-max-normalizer-fn [nums]
+  "Returns a function that rescales a number from `nums` to the range [0,1]."
+  (let [min-n (apply min nums)
+        max-n (apply max nums)
+        scale-factor (util/abs (- max-n min-n))]
+    #(/ (- % min-n)
+        scale-factor)))
+
+(defn min-max-normalize [nums]
+  "Re-scales each item in `nums` to the range [0,1]."
+  (let [normalizer (min-max-normalizer-fn nums)]
+    (map normalizer nums)))
 
 ;;; These functions are for scoring the likelihood of entire rows.
 
@@ -15,10 +29,15 @@
     (Math/exp (search/logpdf row-generator target constraints))))
 
 (defn row-likelihoods
-  "Returns a sequence of likelihoods for `rows`"
+  "Returns a sequence of normalized likelihoods for `rows`"
   [spec rows]
-  (let [row-gen (search/optimized-row-generator spec)]
-    (map #(score-row-uncond row-gen %) rows)))
+  (let [row-gen (search/optimized-row-generator spec)
+        likelihoods (map #(score-row-uncond row-gen %) rows)
+        distinct-vals-present (> (count (distinct likelihoods)) 1)]
+    (if distinct-vals-present
+      (min-max-normalize likelihoods)
+      ;; Just return the raw likelihoods when we can't normalize
+      likelihoods)))
 
 ;;; These functions are for scoring the likelihood of existing cells
 ;;; conditional on the rest of the cells in that row.
@@ -39,6 +58,7 @@
   "Returns the likelihood of all the cells in `rows`"
   [spec rows]
   (let [row-gen (search/optimized-row-generator spec)]
+    ;; TODO normalize scores before returning.
     (map #(score-cells-in-row row-gen %) rows)))
 
 ;;; These functions are for imputing data in empty cells and
@@ -76,8 +96,35 @@
         ret-val {:values values-map :scores scores-map}]
     ret-val))
 
+(defn normalize-missing-cells-likelihoods
+  "Normalizes likelihoods across a whole seq of maps (`likelihood-maps`)
+  each containing likelihoods for missing cells in a row."
+  [likelihood-maps]
+  (let [all-likelihoods (mapcat vals likelihood-maps)
+        normalizer (min-max-normalizer-fn all-likelihoods)
+
+        ;; Normalizes every value in a map of likelihoods for
+        ;; missing cells in a row.
+        normalize-row-fn #(medley/map-vals normalizer %)]
+    (map normalize-row-fn likelihood-maps)))
+
 (defn impute-missing-cells
-  "Returns imputed values and likelihoods for all missing values in `rows`"
+  "Returns imputed values and normalized likelihoods for
+  all missing values in `rows`"
   [spec headers rows]
-  (let [row-gen (search/optimized-row-generator spec)]
-    (map #(impute-missing-cells-in-row row-gen headers %) rows)))
+  (let [row-gen (search/optimized-row-generator spec)
+        values-and-scores (map #(impute-missing-cells-in-row row-gen headers %) rows)
+        values (map :values values-and-scores)
+        scores (map :scores values-and-scores)
+
+        all-scores (mapcat vals scores)
+        distinct-scores-present (> (count (distinct all-scores)) 1)
+
+        norm-scores (if distinct-scores-present
+                      (normalize-missing-cells-likelihoods scores)
+
+                      ;; Just return the raw likelihoods when we can't normalize.
+                      scores)]
+
+    ;; Returns imputed values with normalized likelihoods for each row
+    (map #(assoc {} :values %1 :scores %2) values norm-scores)))
