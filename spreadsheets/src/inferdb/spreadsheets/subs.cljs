@@ -10,7 +10,8 @@
             [inferdb.spreadsheets.vega :as vega]
             [inferdb.spreadsheets.modal :as modal]
             [inferdb.spreadsheets.column-overrides :as co]
-            [inferdb.spreadsheets.renderers :as rends])
+            [inferdb.spreadsheets.renderers :as rends]
+            [medley.core :as medley])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -66,15 +67,22 @@
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
-               :labels (rf/subscribe [:labels])})
-            (fn [{:keys [rows scores labels]}]
-              (cond->> rows
-                scores (mapv (fn [score row]
-                               (assoc row vega/score-col-header score))
-                             scores)
-                labels (mapv (fn [label row]
-                               (assoc row vega/label-col-header label))
-                             labels))))
+               :labels (rf/subscribe [:labels])
+               :imputed-values (rf/subscribe [:missing-cells-values-above-conf-threshold])
+               :conf-mode (rf/subscribe [:confidence-option [:mode]])})
+            (fn [{:keys [rows scores labels imputed-values conf-mode]}]
+              (let [merge-imputed (and (= conf-mode :cells-missing)
+                                       (seq imputed-values))]
+                (cond->> rows
+                  merge-imputed (mapv (fn [imputed-values-in-row row]
+                                        (merge row imputed-values-in-row))
+                                      imputed-values)
+                  scores (mapv (fn [score row]
+                                 (assoc row vega/score-col-header score))
+                               scores)
+                  labels (mapv (fn [label row]
+                                 (assoc row vega/label-col-header label))
+                               labels)))))
 
 (rf/reg-sub :virtual-computed-rows
   (fn [_ _]
@@ -330,9 +338,27 @@
     (get db ::db/row-likelihoods)))
 
 (rf/reg-sub
+ :missing-cells-values
+ (fn [db _]
+   (map :values (get db ::db/missing-cells))))
+
+(rf/reg-sub
   :missing-cells-likelihoods-normed
   (fn [db _]
     (map :scores (get db ::db/missing-cells))))
+
+(rf/reg-sub
+ :missing-cells-values-above-conf-threshold
+ (fn [_ _]
+   {:values (rf/subscribe [:missing-cells-values])
+    :likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :conf-threshold (rf/subscribe [:confidence-threshold])})
+ (fn [{:keys [values likelihoods conf-threshold]}]
+   (for [[row-values row-likelihoods] (map vector values likelihoods)]
+     (let [above-threshold? (fn [col-name]
+                             (let [lh (get row-likelihoods col-name)]
+                               (>= lh conf-threshold)))]
+       (medley/filter-keys above-threshold? row-values)))))
 
 (rf/reg-sub
  :cells-style-fn
