@@ -6,6 +6,10 @@
             [medley.core :as medley]
             [clojure.set :as set]))
 
+(def ^:private imputation-sample-size
+  "The number of imputed values used to determine the value a missing cell."
+  10)
+
 (defn- min-max-normalizer-fn [nums]
   "Returns a function that rescales a number from `nums` to the range [0,1]."
   (let [min-n (apply min nums)
@@ -72,7 +76,7 @@
                                         :observation-trace constraints)
                     (first)
                     (get key-to-impute))
-        samples (repeatedly 2 gen-fn)
+        samples (repeatedly imputation-sample-size gen-fn)
         freq-list (sort-by val > (frequencies samples))
         [top-sample top-sample-count] (first freq-list)
 
