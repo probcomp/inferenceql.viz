@@ -2,15 +2,14 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.test :as test :refer [deftest testing is]]
             [clojure.walk :as walk :refer [stringify-keys]]
+            #?(:clj [clojure.string :as str])
             [expound.alpha :as expound]
-            [clojure.java.io :as io]
-            [clojure.string :as str]
+            #?(:clj [inferdb.plotting.generate-vljson :as plot])
             [inferdb.utils :as utils]
-            [inferdb.plotting.generate-vljson :as plot]
             [inferdb.multimixture.specification :as spec]
             [inferdb.multimixture.basic-queries :as bq]
-            [metaprob.distributions :as dist]
             [inferdb.multimixture.search :as search] ;; XXX: why is the "optimized" row generator in search?
+            [metaprob.distributions :as dist]
             ))
 
 ;; The following data generator has some interesting properties:
@@ -175,8 +174,7 @@
 ;; generates Vega-Lite JSON as a side effect which can be rendered into charts.
 ;; See https://github.com/probcomp/inferenceql/issues/81 for why it is
 ;; Clojure-only.
-;; XXX: Ulli's REPL doesn't allow for conditional reads.
-(deftest visual-test
+#?(:clj (deftest visual-test
           ;; This tests saves plots for all simulated data in out/json results/
           ;; Charts can be generated with `make charts`.
           (testing "(smoke) simulate n complete rows and save them as vl-json"
@@ -203,7 +201,7 @@
                                  (plot/bar-plot (utils/column-subset samples [variable])
                                                 (str "Dim " (-> variable name str/upper-case))
                                                 plot-point-count)))
-              (is (= (count samples) plot-point-count)))))
+              (is (= (count samples) plot-point-count))))))
 
 
 (def simulation-count 100)
