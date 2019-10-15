@@ -1,12 +1,11 @@
 (ns inferdb.multimixture.info-theory-queries-test
   (:require [clojure.test :as test :refer [deftest testing is]]
-            ;;#?(:clj [inferdb.plotting.generate-vljson :as plot]) ;;XXX Do I need this?
-            [inferdb.multimixture.specification :as spec]
             [inferdb.utils :as utils]
+            #?(:clj [inferdb.plotting.generate-vljson :as plot])
+            [inferdb.multimixture.specification :as spec]
             [inferdb.multimixture.info-theory-queries :as itq]
-            [inferdb.multimixture.basic-queries :as bq]
             [inferdb.multimixture.search :as search] ;; XXX: why is the "optimized" row generator in search?
-            [inferdb.plotting.generate-vljson :as plot]))
+            [inferdb.multimixture.basic-queries :as bq]))
 
 (def multi-mixture
   {:vars {"x" :gaussian
@@ -46,7 +45,7 @@
 ;; How many points do we want to create for our plot?
 (def n 1000)
 
-(deftest crosscatsimulate-simulate-MI-model
+#?(:clj (deftest simulate-from-MI-model
   "This tests saves plots for all simulated data in out/json results/"
   ;; Charts can be generated with make charts.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
@@ -68,7 +67,7 @@
                                                []
                                                [-4 6]
                                                "View 2: V W"))
-      (is (= (count samples) n)))))
+      (is (= (count samples) n))))))
 
 
 (def num-samples 100)
