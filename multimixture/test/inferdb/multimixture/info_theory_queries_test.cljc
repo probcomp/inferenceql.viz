@@ -39,7 +39,9 @@
 (deftest test-smoke-row-generator
  (is (map? (row-generator))))
 (deftest test-smoke-mi
- (is (float? (itq/mutual-information row-generator ["x"] ["y"] {} 2))))
+ (is (utils/positive-float? (itq/mutual-information row-generator ["x"] ["y"] {} 2))))
+(deftest test-smoke-mi
+ (is (float? (itq/mutual-information row-generator ["x"] ["y"] {"a" "0"} 2))))
 
 ;; How many points do we want to create for our plot?
 (def n 1000)
