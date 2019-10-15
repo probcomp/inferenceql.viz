@@ -97,3 +97,6 @@
   "Returns the index of the maximum value in the provided vector."
   [xs]
   (first (apply max-key second (map-indexed vector xs))))
+
+(defn positive-float? [value]
+  (and (pos? value) (float? value)))
