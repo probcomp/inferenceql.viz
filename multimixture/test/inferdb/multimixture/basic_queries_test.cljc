@@ -242,7 +242,6 @@
                         (is (utils/within-factor? analytical-std
                                                   (utils/std samples)
                                                   2)))))
-
                   (spec/nominal? multi-mixture variable))))))))
 
 (defn- true-categorical-p
