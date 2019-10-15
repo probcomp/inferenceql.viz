@@ -70,5 +70,20 @@
                                                "View 2: V W"))
       (is (= (count samples) n)))))
 
+
+(def num-samples 100)
+(def threshold 0.01)
+(defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
+
+
+(deftest positive-mi
+ (is (< 0.5 (itq/mutual-information row-generator ["x"] ["y"] {} num-samples))))
+
+(deftest zero-mi
+ (is (almost-equal? 0. (itq/mutual-information row-generator ["v"] ["w"] {} num-samples))))
+
+(deftest zero-cmi
+ (is (almost-equal? 0. (itq/mutual-information row-generator ["x"] ["y"] {"a" "0"} num-samples))))
+
 (use 'clojure.test)
 (run-tests)
