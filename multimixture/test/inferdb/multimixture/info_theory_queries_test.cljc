@@ -85,5 +85,5 @@
 (deftest zero-cmi
  (is (almost-equal? 0. (itq/mutual-information row-generator ["x"] ["y"] {"a" "0"} num-samples))))
 
-(use 'clojure.test)
-(run-tests)
+(deftest zero-cmi-marginal
+ (is (almost-equal? 0. (itq/mutual-information row-generator ["x"] ["y"] ["a"] num-samples))))
