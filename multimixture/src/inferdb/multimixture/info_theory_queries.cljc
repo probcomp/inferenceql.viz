@@ -4,6 +4,9 @@
             [inferdb.utils :as utils]
             [inferdb.multimixture.basic-queries :as bq]))
 
+;; XXX: Is this wrong? Should first compute lopdf-joint, lopdf-0, lopdf-1 using
+;; 3 calls to `average` and then compute (- logpdf-joint (+ logpdf-0 logpdf-1))?
+;; If so, why is this working so well (i.e. all the tests pass)?
 (defn- mi-inner-eq [row-generator joint-target target-0 target-1 condition sample]
   (let [logpdf-0 (bq/logpdf row-generator (select-keys sample target-0) condition)
         logpdf-1 (bq/logpdf row-generator (select-keys sample target-1) condition)
