@@ -23,7 +23,6 @@
 ;;
 ;; I'd encourage everyone who works with the file to run the tests in this file
 ;; and then run make charts to see how the components relate.
-
 (def multi-mixture
    {:vars {"x" :gaussian
            "y" :gaussian
@@ -31,32 +30,32 @@
            "a" :categorical
            "b" :categorical
            "c" :categorical}
-    :views [[  {:probability 0.166666666
+    :views [[  {:probability 0.1666666666666
                 :parameters {"x" {:mu 3 :sigma 1}
                              "y" {:mu 4 :sigma 0.1}
                              "a" {"0" 1.0 "1" 0.0 "2" 0.0 "3" 0.0 "4" 0.0 "5" 0.0}
                              "b" {"0" 0.95, "1" 0.01, "2" 0.01, "3" 0.01, "4" 0.01, "5" 0.01}}}
-               {:probability 0.166666666
+               {:probability  0.1666666666666
                 :parameters {"x" {:mu 3 :sigma 0.1}
                              "y" {:mu 4 :sigma 1}
                              "a" {"0" 0.0 "1" 1.0 "2" 0.0 "3" 0.0 "4" 0.0 "5" 0.0}
                              "b" {"0" 0.01, "1" 0.95, "2" 0.01, "3" 0.01, "4" 0.01, "5" 0.01}}}
-               {:probability 0.166666666
+               {:probability 0.1666666666666
                 :parameters {"x" {:mu 8  :sigma 0.5}
                              "y" {:mu 10 :sigma 1}
                              "a" {"0" 0.0 "1" 0.0 "2" 1.0 "3" 0.0 "4" 0.0 "5" 0.0}
                              "b" {"0" 0.01, "1" 0.01, "2" 0.95, "3" 0.01, "4" 0.01, "5" 0.01}}}
-               {:probability 0.166666666
+               {:probability 0.1666666666666
                 :parameters {"x" {:mu 14  :sigma 0.5}
                              "y" {:mu  7  :sigma 0.5}
                              "a" {"0" 0.0 "1" 0.0 "2" 0.0 "3" 1.0 "4" 0.0 "5" 0.0}
                              "b" {"0" 0.01, "1" 0.01, "2" 0.01, "3" 0.95, "4" 0.01, "5" 0.01}}}
-               {:probability 0.166666666
+               {:probability 0.1666666666666
                 :parameters {"x" {:mu 16  :sigma 0.5}
                              "y" {:mu  9  :sigma 0.5}
                              "a" {"0" 0.0 "1" 0.0 "2" 0.0 "3" 0.0 "4" 1.0 "5" 0.0}
                              "b" {"0" 0.01, "1" 0.01, "2" 0.01, "3" 0.01, "4" 0.95, "5" 0.01}}}
-               {:probability 0.166666666
+               {:probability 0.16666666666667
                 :parameters {"x" {:mu  9  :sigma 2.5}
                              "y" {:mu 16  :sigma 0.1}
                              "a" {"0" 0.0 "1" 0.0 "2" 0.0 "3" 0.0 "4" 0.0 "5" 1.0}
@@ -286,6 +285,52 @@
 
       (is (almost-equal-p? analytical-logpdf queried-logpdf)))))
 
+;; I've added those because it for debugging purposes.
+(deftest logpdf-categoricals-given-point-one-component-model
+  (let [mmix-simple {:vars {"x" :gaussian
+                            "a" :categorical
+                            "b" :categorical}
+                     :views [[{:probability 1.
+                               :parameters {"x" {:mu 3 :sigma 1}
+                                            "a" {"0" 1.0 "1" 0.0}
+                                            "b" {"0" 0.95, "1" 0.05}}}]]}
+        simple-row-gen (search/optimized-row-generator mmix-simple)]
+    (is (= 0.95 (Math/exp (bq/logpdf simple-row-gen {"b" "0"} {"x" 3.}))))))
+(logpdf-categoricals-given-point-one-component-model)
+
+(deftest logpdf-categoricals-given-point-two-component-mix
+  (let [mmix-simple {:vars {"x" :gaussian
+                            "a" :categorical
+                            "b" :categorical}
+                     :views [[{:probability 0.95
+                               :parameters {"x" {:mu 3 :sigma 1}
+                                            "a" {"0" 1.0 "1" 0.0}
+                                            "b" {"0" 1.0, "1" 0.0}}}
+                              {:probability 0.05
+                               :parameters {"x" {:mu 3 :sigma 1}
+                                            "a" {"0" 1.0 "1" 0.0}
+                                            "b" {"0" 0.0 "1" 1.0 }}}]]}
+        simple-row-gen (search/optimized-row-generator mmix-simple)]
+    (is (almost-equal-p? 0.95 (Math/exp (bq/logpdf simple-row-gen {"b" "0"} {"x" 3.}))))))
+
+(def points-unique-cluster-mapping (select-keys
+                                     point-cluster-mapping
+                                     (for [[k v] point-cluster-mapping :when (= (count v) 1)] k)))
+
+(def categories
+  (keys
+    (get (:parameters (first (first (multi-mixture :views)))) "a")))
+
+(deftest logpdf-categoricals-given-points-that-identify-unique-cluster
+  (doseq [[point-id cluster-set] points-unique-cluster-mapping]
+    (doseq [category categories]
+      (testing (str "Point " point-id " Observing b=" category)
+        (let [point (stringify-keys (test-point point-id))
+              cluster (first cluster-set)
+              analytical-pdf (get
+                               (get (:parameters (nth (first (:views multi-mixture )) cluster)) "b") category)
+              queried-pdf   (Math/exp (bq/logpdf row-generator {"b" category} point))]
+          (is (almost-equal-p? analytical-pdf queried-pdf)))))))
 
 (use 'clojure.test)
 (run-tests)
