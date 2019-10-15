@@ -77,6 +77,7 @@
     (expound/expound ::spec/multi-mixture multi-mixture))
   (is (s/valid? ::spec/multi-mixture multi-mixture)))
 
+;; XXX: the test points are still defined using keys instead of strings.
 (def test-points
   [{:x 3  :y 4}
    {:x 8  :y 10}
@@ -118,7 +119,6 @@
                (update m v (fnil conj #{}) k))
              {}
              m))
-
 
 (defn euclidean-distance
   [p1 p2]
@@ -163,18 +163,18 @@
             mu (spec/mu multi-mixture (name variable) cluster)]
         (is (= point-value mu))))))
 
+;; Define the row-generator used below.
 (def row-generator (search/optimized-row-generator multi-mixture))
 
-;; Some smoke tests.
+;; Some smoke tests. Because the code for the tests didn't run anymore as state
+;; lost in a squash-merge, I needed those smoke tests to gain confidence on all
+;; datastructure beeing correct.
 (deftest test-smoke-row-generator
  (is (map? (row-generator))))
-
 (deftest test-smoke-simulate
  (is (= 3 (count (bq/simulate row-generator {} 3)))))
-
 (deftest test-smoke-simulate-conditional
  (is (= 999. (get (first (bq/simulate row-generator {"x" 999.} 3)) "x"))))
-
 (deftest test-smoke-logpdf
  (is (float? (bq/logpdf row-generator {"x" 0.} {"y" 1.}))))
 
@@ -263,6 +263,8 @@
 ;; Below, we're making use of the fact that each value of "a" determines a
 ;; cluster.
 (deftest simulations-conditioned-on-points
+  ;; Tests that if we simulate conditioned on the test points we are simulating
+  ;; from the right clusters.
   (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
     (testing (str "Conditioned on point P" point-id)
       (let [point (stringify-keys (test-point point-id))
@@ -276,6 +278,7 @@
             (is (almost-equal-maps? true-p-category cluster-p-fraction))))))))
 
 (deftest logpdf-numerical-given-categorical
+  ;; Test logpdf of test points given the categorical that maps to clusters.
   (doseq [[cluster point-id] cluster-point-mapping]
     (let [point (stringify-keys
                   (select-keys (test-point point-id) (map keyword numerical-variables)))
@@ -291,8 +294,13 @@
 
       (is (almost-equal-p? analytical-logpdf queried-logpdf)))))
 
-;; I've added those because it for debugging purposes.
+;; XXX -- not sure what to do with the next two tests. I have added to gain
+;; evidence that logPDF works for categoricals conditioned on numerical variables.
+;; There more complicated machinery for the larger mmix model did not do that
+;; for me. I don't know where those tests should go.
+;; They are not documented in the README
 (deftest logpdf-categoricals-given-point-one-component-model
+  ;; Tests a 3 dimensional, single component model.
   (let [mmix-simple {:vars {"x" :gaussian
                             "a" :categorical
                             "b" :categorical}
@@ -303,8 +311,9 @@
         simple-row-gen (search/optimized-row-generator mmix-simple)]
     (is (= 0.95 (Math/exp (bq/logpdf simple-row-gen {"b" "0"} {"x" 3.}))))))
 (logpdf-categoricals-given-point-one-component-model)
-
+;;; XXX -- same as above.
 (deftest logpdf-categoricals-given-point-two-component-mix
+  ;; Tests a 3 dimensional, two component model.
   (let [mmix-simple {:vars {"x" :gaussian
                             "a" :categorical
                             "b" :categorical}
