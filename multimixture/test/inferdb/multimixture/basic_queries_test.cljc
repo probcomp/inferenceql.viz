@@ -95,6 +95,15 @@
    ;; P4 between clusters 4 and 5
    4 5
    5 6})
+(def point-cluster-mapping {1 #{0 1}, 2 #{2}, 3 #{3}, 4 #{3 4}, 5 #{4}, 6 #{5}})
+(def points-unique-cluster-mapping (select-keys
+                                     point-cluster-mapping
+                                     (for [[k v] point-cluster-mapping
+                                           :when (= (count v) 1)] k)))
+(def points-two-cluster-mapping (select-keys
+                                     point-cluster-mapping
+                                     (for [[k v] point-cluster-mapping
+                                           :when (= (count v) 2)] k)))
 
 (defn test-point
   "Retrieves a given point given its ID. Note that point IDs are different from
@@ -242,7 +251,6 @@
                           probabilities (utils/probability-vector variable-samples possible-values)]
                       (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
 
-(def point-cluster-mapping (invert-map cluster-point-mapping))
 (defn- true-categorical-p
   [point-cluster-mapping point]
   (let [possible-clusters (get point-cluster-mapping point)]
@@ -311,15 +319,15 @@
         simple-row-gen (search/optimized-row-generator mmix-simple)]
     (is (almost-equal-p? 0.95 (Math/exp (bq/logpdf simple-row-gen {"b" "0"} {"x" 3.}))))))
 
-(def points-unique-cluster-mapping (select-keys
-                                     point-cluster-mapping
-                                     (for [[k v] point-cluster-mapping :when (= (count v) 1)] k)))
-
+;; Define categories that are possible for "a" and "b". Relies on the assumption
+;; that "a" and "b" have the same categories.
 (def categories
   (keys
     (get (:parameters (first (first (multi-mixture :views)))) "a")))
 
 (deftest logpdf-categoricals-given-points-that-identify-unique-cluster
+  ;; Test logpdf of categical "b" given test points that uniquely map to one
+  ;; cluster.
   (doseq [[point-id cluster-set] points-unique-cluster-mapping]
     (doseq [category categories]
       (testing (str "Point " point-id " Observing b=" category)
