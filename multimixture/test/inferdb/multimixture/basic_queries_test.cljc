@@ -237,19 +237,13 @@
                     (testing "mean"
                       (is (almost-equal? (get point (keyword variable))
                                          (utils/average samples))))
-                    #_(testing "standard deviation"
+                    (testing "standard deviation"
                       (let [analytical-std (spec/sigma multi-mixture variable cluster)]
                         (is (utils/within-factor? analytical-std
                                                   (utils/std samples)
                                                   2)))))
 
-                  (spec/nominal? multi-mixture variable)
-                  #_(testing "validate simulated categorical probabilities"
-                    (let [variable-samples (utils/column-subset samples [variable])
-                          actual-probabilities (spec/categorical-probabilities multi-mixture variable cluster)
-                          possible-values (range 6)
-                          probabilities (utils/probability-vector variable-samples possible-values)]
-                      (is (almost-equal-vectors? probabilities actual-probabilities)))))))))))
+                  (spec/nominal? multi-mixture variable))))))))
 
 (defn- true-categorical-p
   [point-cluster-mapping point]
