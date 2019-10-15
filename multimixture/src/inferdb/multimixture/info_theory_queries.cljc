@@ -11,6 +11,6 @@
     (- logpdf-joint (+ logpdf-0 logpdf-1))))
 
 (defn mutual-information [row-generator target-0 target-1 condition num-samples]
-  (let [samples (bq/simulate row-generator {} num-samples)
+  (let [samples (bq/simulate row-generator condition num-samples)
         joint-target (concat target-0 target-1)]
     (utils/average (map #(mi-inner-eq row-generator joint-target target-0 target-1 condition % ) samples))))
