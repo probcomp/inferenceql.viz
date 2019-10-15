@@ -338,5 +338,17 @@
               queried-pdf   (Math/exp (bq/logpdf row-generator {"b" category} point))]
           (is (almost-equal-p? analytical-pdf queried-pdf)))))))
 
-(use 'clojure.test)
-(run-tests)
+
+(deftest logpdf-categoricals-given-points-that-belong-to-two-clusters
+  ;; Test logpdf of categical "a" given test points that map to two clusters.
+  (doseq [[point-id cluster-set] points-two-cluster-mapping]
+    (doseq [category categories]
+      (testing (str "Point " point-id " Observing a=" category)
+         (let [point (stringify-keys (test-point point-id))
+              analytical-pdf (if (contains? (set (map str cluster-set)) category)
+                               0.5 ;; There are exactly two clusters that are equally
+                                   ;; to have generated this observation.
+                               0   ;; No component is likely to have generated this observation
+                               )
+              queried-pdf   (Math/exp (bq/logpdf row-generator {"a" category} point))]
+          (is (almost-equal-p? analytical-pdf queried-pdf)))))))
