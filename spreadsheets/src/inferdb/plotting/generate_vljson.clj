@@ -3,8 +3,8 @@
 
 (defn scatter-plot-json
   [columns values test-points domain title]
-    (let [color (if (contains? (first values) :a) {:field "a" :type "nominal"} {})
-          shape (if (contains? (first values) :b) {:field "b" :type "nominal"} {})]
+    (let [color (if (contains? (first values) "a") {:field "a" :type "nominal"} {})
+          shape (if (contains? (first values) "b") {:field "b" :type "nominal"} {})]
     (cheshire/generate-string
       {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
        :background "white"

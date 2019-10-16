@@ -167,12 +167,12 @@
 (defn mu
   "Returns the mu for the given variable."
   [mmix variable cluster-idx]
-  (first (parameters mmix variable cluster-idx)))
+  (:mu (parameters mmix variable cluster-idx)))
 
 (defn sigma
   "Returns the sigma for the given variable."
   [mmix variable cluster-idx]
-  (second (parameters mmix variable cluster-idx)))
+  (:sigma (parameters mmix variable cluster-idx)))
 
 (defn cluster-probability
   [mmix view-idx cluster-idx]
