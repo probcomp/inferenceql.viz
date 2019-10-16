@@ -64,7 +64,8 @@
   (let [ks (keys a)]
     (almost-equal-vectors? (map #(get a %) ks)
                            (map #(get b %) ks)
-                           difference-metric threshold)))
+                           difference-metric 
+                           threshold)))
 
 
 (defn within-factor? [a b factor]
@@ -79,15 +80,15 @@
 
 (defn probability-for-categories [sample-vector categories]
     (let [observed (probability-for-observed-categories sample-vector)]
-      (into observed (map (fn [category](if (contains? observed category) nil [category 0.]))
+      (into observed (keep (fn [category]
+                             (when-not (contains? observed category)
+                               [category 0.]))
                     categories))))
 
 (defn probability-vector [samples possible-values]
   (let [probability-map (probability-for-observed-categories samples)]
     (map #(get probability-map % 0)
          possible-values)))
-
-
 
 (defn equal-sample-values [samples-1 samples-2]
   (= (map (comp set vals) samples-1)

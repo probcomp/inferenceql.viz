@@ -76,6 +76,7 @@ We'll use the following row generator structure to test:
                {:probability 0.25
                 :parameters {"z" {:mu 15 :sigma 8}
                              "c" {"0" 0.0, "1" 0.0, "2" 0.0, "3" 1.0}}}]]})
+                             
 (def row-generator (search/optimized-row-generator multi-mixture))
 ```
 Column `a` is a categorical that also serves as a deterministic indicator of the

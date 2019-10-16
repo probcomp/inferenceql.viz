@@ -30,4 +30,3 @@
                                                         :observation-trace constraint-addrs-vals)]
                              weight))]
     (- log-weight-numer log-weight-denom)))
-
