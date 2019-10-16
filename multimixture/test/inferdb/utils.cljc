@@ -42,29 +42,30 @@
     (map row-subset data)))
 
 (defn almost-equal?
-  "Returns true if scalars `a` and `b` are approximately equal. Takes a difference
-  metric (presumably from `inferdb.metrics`) as its second argument."
-  [a b difference-metric threshold]
-  (< (difference-metric a b) threshold))
+  "Returns true if scalars `a` and `b` are approximately equal. Takes a distance
+  metric (presumably from `inferdb.metrics`) as its second argument. An example
+  for a distance metric is Euclidean distance."
+  [a b distance-metric threshold]
+  (< (distance-metric a b) threshold))
 
 (defn almost-equal-vectors?
-  "Returns true if vectors `a` and `b` are approximately equal. Takes a difference
+  "Returns true if vectors `a` and `b` are approximately equal. Takes a distance
   metric (presumably from `inferdb.metrics`) as its second argument."
-  [a b difference-metric threshold]
+  [a b distance-metric threshold]
   (assert (count a) (count b))
   (let [call-almost-equal
-        (fn [i] (almost-equal?  (nth a i) (nth b i) difference-metric threshold))]
+        (fn [i] (almost-equal?  (nth a i) (nth b i) distance-metric threshold))]
     (all? (map call-almost-equal (range (count a))))))
 
 
 (defn almost-equal-maps?
-  "Returns true if maps `a` and `b` are approximately equal. Takes a difference
+  "Returns true if maps `a` and `b` are approximately equal. Takes a distance
   metric (presumably from `inferdb.metrics`) as its second argument."
-  [a b difference-metric threshold]
+  [a b distance-metric threshold]
   (let [ks (keys a)]
     (almost-equal-vectors? (map #(get a %) ks)
                            (map #(get b %) ks)
-                           difference-metric 
+                           distance-metric
                            threshold)))
 
 
