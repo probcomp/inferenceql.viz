@@ -143,6 +143,7 @@
 ;; below relies on variables not being all variables in the spec, but just the
 ;; variables in the first view.
 (def variables (spec/view-variables (first (:views multi-mixture))))
+
 (def numerical-variables
   (into #{}
         (filter #(spec/numerical? multi-mixture %))
