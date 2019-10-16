@@ -6,9 +6,9 @@
             [inferdb.multimixture.basic-queries :as bq]))
 
 (defn mutual-information [row-generator target-a target-b condition num-samples]
-    ;; Estimate mutual information. We allow for the condition to be either
-    ;; fully specified as a map (i.e. columns and their values) or as a list of
-    ;; column names without their values.
+    "Estimate mutual information. We allow for the condition to be either
+     fully specified as a map (i.e. columns and their values) or as a list of
+     column names without their values."
     (let [samples (bq/simulate row-generator condition num-samples)
           joint-target (concat target-a target-b)
           constraint (if (map? condition)
