@@ -12,7 +12,7 @@
 (deftest row-scoring
   (let [rows (take 2 db-rows)
         likelihoods (score/row-likelihoods model/spec rows)]
-    ; We get back a sequence of numbers.
+    ;; We get back a sequence of numbers.
     (is (seq? likelihoods))
     (is (every? number? likelihoods))))
 

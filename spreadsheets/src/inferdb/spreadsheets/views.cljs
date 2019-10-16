@@ -1,8 +1,6 @@
 (ns inferdb.spreadsheets.views
-  (:require [reagent.core :as r]
-            [re-frame.core :as rf]
+  (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]
-            [inferdb.spreadsheets.data :as data]
             [inferdb.spreadsheets.events :as events]
             [inferdb.spreadsheets.handsontable :as hot]
             [inferdb.spreadsheets.vega :as vega]
@@ -79,7 +77,7 @@
     [forms/bind-fields template events]))
 
 (defn search-form
-  [name]
+  []
   (let [input-text (rf/subscribe [:query-string])]
     (fn []
       [:div#search-form
@@ -102,10 +100,9 @@
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
         virtual-hot-props @(rf/subscribe [:virtual-hot-props])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
-        scores         @(rf/subscribe [:scores])
         generator      @(rf/subscribe [:generator])]
     [:div
-     [search-form "Zane"]
+     [search-form]
      [:div.table-title [:span "Real Data"]]
      [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
      [:div.table-title [:span "Virtual Data"]]

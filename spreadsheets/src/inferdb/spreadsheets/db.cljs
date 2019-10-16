@@ -1,7 +1,6 @@
 (ns inferdb.spreadsheets.db
   (:require [clojure.spec.alpha :as s]
-            [inferdb.spreadsheets.data :refer [nyt-data]]
-            [metaprob.distributions :as dist]))
+            [inferdb.spreadsheets.data :refer [nyt-data]]))
 
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
@@ -60,6 +59,18 @@
 (s/def ::modal (s/keys :opt-un [::child
                                 ::size]))
 
+;;; Specs related to computed likelihoods and missing cells
+
+(s/def ::row-likelihoods (s/coll-of ::score))
+
+(s/def :ms/scores (s/map-of ::column-name ::score))
+(s/def :ms/values (s/map-of ::column-name any?))
+(s/def :ms/map-for-row (s/keys :req-un [:ms/scores
+                                        :ms/values]))
+(s/def ::missing-cells (s/coll-of :ms/map-for-row))
+
+;;; Primary DB spec.
+
 (s/def ::db (s/keys :req [::headers
                           ::rows
                           ::virtual-rows
@@ -74,7 +85,9 @@
                           ::table-last-clicked
                           ::column-overrides
                           ::column-override-fns
-                          ::modal]))
+                          ::modal
+                          ::row-likelihoods
+                          ::missing-cells]))
 
 (defn table-headers
   [db]

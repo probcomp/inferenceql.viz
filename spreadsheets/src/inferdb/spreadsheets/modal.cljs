@@ -14,10 +14,9 @@
   [:div.modal-wrapper
    [:div {:class "modal-backdrop"
           :on-click (fn [event]
-                      (do
-                        (rf/dispatch [:clear-modal])
-                        (.preventDefault event)
-                        (.stopPropagation event)))}]
+                      (rf/dispatch [:clear-modal])
+                      (.preventDefault event)
+                      (.stopPropagation event))}]
    [:div {:class "modal-child"
           :style {:width (case size
                            :extra-small "15%"
@@ -27,23 +26,26 @@
                            "50%")}}
     child]])
 
-(defn modal []
+(defn modal
   "Reagent component for rendering modal contents."
+  []
   (let [modal (rf/subscribe [:modal])]
     (fn []
       [:div
        (when (:child @modal)
          [modal-panel @modal])])))
 
-(defn- code-editor [an-atom]
+(defn- code-editor
   "Reagent component for entering a javascript function as text."
+  [an-atom]
   [:textarea.code-editor
    {:value        @an-atom
     :on-change    #(reset! an-atom (-> % .-target .-value))}])
 
-(defn js-function-entry-modal [col-name fn-text]
+(defn js-function-entry-modal
   "Reagent component that provides editing and setting of a js-function.
   It is intended to be set as the contents of the modal"
+  [col-name fn-text]
   (let [source-text (r/atom (or fn-text ""))
         ;; This gets called below when the set button is clicked.
         set-fn (fn [event]

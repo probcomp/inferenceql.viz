@@ -1,10 +1,10 @@
 (ns inferdb.cgpm.main
   (:refer-clojure :exclude [map reduce apply])
   (:require
-    [metaprob.prelude :as prelude :refer [map]]
-    [metaprob.distributions]
-    [inferdb.cgpm.utils :as utils]
-    [metaprob.inference]))
+   [metaprob.prelude :as prelude :refer [map]]
+   [metaprob.distributions]
+   [inferdb.cgpm.utils :as utils]
+   [metaprob.inference]))
 
 ;; ----------------------
 ;; STATISTICAL DATA TYPES
