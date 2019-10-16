@@ -39,7 +39,7 @@
  (is (map? (row-generator))))
 (deftest test-smoke-mi
  (is (utils/positive-float? (itq/mutual-information row-generator ["x"] ["y"] {} 2))))
-(deftest test-smoke-mi
+(deftest test-smoke-cmi
  (is (float? (itq/mutual-information row-generator ["x"] ["y"] {"a" "0"} 2))))
 
 ;; How many points do we want to create for our plot?
