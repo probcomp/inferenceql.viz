@@ -4,7 +4,7 @@
             #?(:clj [inferdb.plotting.generate-vljson :as plot])
             [inferdb.multimixture.specification :as spec]
             [inferdb.multimixture.info-theory-queries :as itq]
-            [inferdb.multimixture.search :as search] ;; XXX: why is the "optimized" row generator in search?
+            [inferdb.multimixture.search :as search]
             [inferdb.multimixture.basic-queries :as bq]))
 
 (def multi-mixture
