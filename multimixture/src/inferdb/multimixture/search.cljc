@@ -140,10 +140,13 @@
 
 (defn constraints-for-scoring-p
   [target-col constraint-cols row]
-  (if (= (first constraint-cols) "ROW")
-    (into {} (filter (fn [[k v]] (not (or (nil? v) (= k target-col)))) row))
-    (into {} (filter (fn [[k v]] (not (nil? v)))
-                     (select-keys row constraint-cols)))))
+  (->> (if (= (first constraint-cols) "ROW")
+         (remove (comp #{target-col} key)
+                 row)
+         (select-keys row constraint-cols))
+       (remove (comp nil? val))
+       (into {})))
+
 (defn  score-row-probability
   [row-generator target-col constraint-cols row]
   (let [target (select-keys row [target-col])

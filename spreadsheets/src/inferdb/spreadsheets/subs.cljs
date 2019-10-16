@@ -1,7 +1,6 @@
 (ns inferdb.spreadsheets.subs
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
-            [metaprob.distributions :as dist]
             [metaprob.prelude :as mp]
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.views :as views]
@@ -9,7 +8,10 @@
             [inferdb.multimixture.search :as search]
             [inferdb.spreadsheets.model :as model]
             [inferdb.spreadsheets.vega :as vega]
-            [inferdb.spreadsheets.modal :as modal])
+            [inferdb.spreadsheets.modal :as modal]
+            [inferdb.spreadsheets.column-overrides :as co]
+            [inferdb.spreadsheets.renderers :as rends]
+            [medley.core :as medley])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (rf/reg-sub :scores
@@ -65,15 +67,22 @@
             (fn [_ _]
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
-               :labels (rf/subscribe [:labels])})
-            (fn [{:keys [rows scores labels]}]
-              (cond->> rows
-                scores (mapv (fn [score row]
-                               (assoc row vega/score-col-header score))
-                             scores)
-                labels (mapv (fn [label row]
-                               (assoc row vega/label-col-header label))
-                             labels))))
+               :labels (rf/subscribe [:labels])
+               :imputed-values (rf/subscribe [:missing-cells-values-above-conf-threshold])
+               :conf-mode (rf/subscribe [:confidence-option [:mode]])})
+            (fn [{:keys [rows scores labels imputed-values conf-mode]}]
+              (let [merge-imputed (and (= conf-mode :cells-missing)
+                                       (seq imputed-values))]
+                (cond->> rows
+                  merge-imputed (mapv (fn [imputed-values-in-row row]
+                                        (merge row imputed-values-in-row))
+                                      imputed-values)
+                  scores (mapv (fn [score row]
+                                 (assoc row vega/score-col-header score))
+                               scores)
+                  labels (mapv (fn [label row]
+                                 (assoc row vega/label-col-header label))
+                               labels)))))
 
 (rf/reg-sub :virtual-computed-rows
   (fn [_ _]
@@ -111,7 +120,7 @@
         rows))
 
 (defn real-hot-props
-  [{:keys [headers rows context-menu]} _]
+  [{:keys [headers rows cells-style-fn context-menu]} _]
   (let [data (cell-vector headers rows)
 
         num-columns (count headers)
@@ -123,11 +132,13 @@
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] all-column-settings)
+        (assoc-in [:settings :cells] cells-style-fn)
         (assoc-in [:settings :contextMenu] context-menu))))
 (rf/reg-sub :real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:computed-headers])
                :rows    (rf/subscribe [:computed-rows])
+               :cells-style-fn (rf/subscribe [:cells-style-fn])
                :context-menu (rf/subscribe [:context-menu])})
             real-hot-props)
 
@@ -238,11 +249,14 @@
 (rf/reg-sub :generator
             (fn [_ _]
               {:selection-info (rf/subscribe [:table-state-active])
-               :one-cell-selected (rf/subscribe [:one-cell-selected])})
-            (fn [{:keys [selection-info one-cell-selected]}]
+               :one-cell-selected (rf/subscribe [:one-cell-selected])
+               :override-fns (rf/subscribe [:column-override-fns])})
+            (fn [{:keys [selection-info one-cell-selected override-fns]}]
               (let [row (:row-at-selection-start selection-info)
                     columns (:selected-columns selection-info)
-                    col-to-sample (first columns)]
+                    col-to-sample (first columns)
+                    override-map (select-keys override-fns [col-to-sample])
+                    override-insert-fn (co/gen-insert-fn override-map)]
                 (when (and one-cell-selected
                            ;; TODO clean up this check
                            (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))
@@ -251,10 +265,10 @@
                                                                  (dissoc col-to-sample)))
                         gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                                            :observation-trace constraints))
-                        negative-salary? #(neg? (% "salary_usd"))]
+                        has-negative-vals? #(some (every-pred number? neg?) (vals %))]
                     ;; returns the first result of gen-fn that doesn't have a negative salary
-                    ;; TODO: This is dataset-specific
-                    #(take 1 (remove negative-salary? (repeatedly gen-fn))))))))
+                    ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
+                    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn)))))))))
 
 (rf/reg-sub :confidence-threshold
             (fn [db _]
@@ -317,3 +331,69 @@
 (rf/reg-sub :column-overrides
             (fn [db _]
               (get db ::db/column-overrides)))
+
+(rf/reg-sub
+  :row-likelihoods-normed
+  (fn [db _]
+    (get db ::db/row-likelihoods)))
+
+(rf/reg-sub
+ :missing-cells-values
+ (fn [db _]
+   (map :values (get db ::db/missing-cells))))
+
+(rf/reg-sub
+  :missing-cells-likelihoods-normed
+  (fn [db _]
+    (map :scores (get db ::db/missing-cells))))
+
+(rf/reg-sub
+ :missing-cells-values-above-conf-threshold
+ (fn [_ _]
+   {:values (rf/subscribe [:missing-cells-values])
+    :likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :conf-threshold (rf/subscribe [:confidence-threshold])})
+ (fn [{:keys [values likelihoods conf-threshold]}]
+   (for [[row-values row-likelihoods] (map vector values likelihoods)]
+     (let [above-threshold? (fn [col-name]
+                             (let [lh (get row-likelihoods col-name)]
+                               (>= lh conf-threshold)))]
+       (medley/filter-keys above-threshold? row-values)))))
+
+(rf/reg-sub
+ :cells-style-fn
+ (fn [_ _]
+   {:cell-renderer-fn (rf/subscribe [:cell-renderer-fn])})
+ (fn [{:keys [cell-renderer-fn]}]
+   ;; Returns a function used by the :cells property in Handsontable's options.
+   (fn [row col]
+     (clj->js {:renderer cell-renderer-fn}))))
+
+(rf/reg-sub
+ :cell-renderer-fn
+ (fn [_ _]
+   {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
+    :missing-cells-likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :conf-thresh (rf/subscribe [:confidence-threshold])
+    :conf-mode (rf/subscribe [:confidence-option [:mode]])
+    :computed-headers (rf/subscribe [:computed-headers])})
+ ;; Returns a cell renderer function used by Handsontable.
+ (fn [{:keys [row-likelihoods missing-cells-likelihoods conf-thresh conf-mode computed-headers]}]
+   (case conf-mode
+     :none
+     js/Handsontable.renderers.TextRenderer
+
+     :row
+     (fn [& args]
+       ;; These render functions are actually called with this args list:
+       ;; [hot td row col prop value cell-properties]
+       ;; Instead, we are specifying [& args] here to make it cleaner to
+       ;; pass in data to custom rendering functions.
+       (rends/row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))
+
+     :cells-existing
+     js/Handsontable.renderers.TextRenderer
+
+     :cells-missing
+     (fn [& args]
+       (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-likelihoods computed-headers conf-thresh)))))

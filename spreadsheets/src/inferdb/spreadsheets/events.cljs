@@ -7,7 +7,9 @@
             [inferdb.spreadsheets.db :as db]
             [inferdb.spreadsheets.events.interceptors :as interceptors]
             [inferdb.spreadsheets.model :as model]
-            [inferdb.spreadsheets.query :as query]))
+            [inferdb.spreadsheets.query :as query]
+            [inferdb.spreadsheets.column-overrides :as co]
+            [inferdb.spreadsheets.score :as score]))
 
 (def real-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :before-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
@@ -121,8 +123,8 @@
  (fn [{:keys [db]} [_ text]]
    (let [command (query/parse text)]
      (match command
-       {:type :generated :values v}
-       {:db (db/with-virtual-rows db v)}
+       {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
+       {:dispatch [:generate-virtual-row c num-rows]}
 
        {:type :anomaly-search :column column :given true}
        {:dispatch [:anomaly-search column ["ROW"]]}
@@ -174,9 +176,13 @@
          gen-fn #(first (mp/infer-and-score
                          :procedure (search/optimized-row-generator model/spec)
                          :observation-trace constraint-addrs-vals))
-         negative-salary? #(neg? (% "salary_usd"))
-         ;; TODO: This is dataset-specific
-         new-rows (take num-rows (remove negative-salary? (repeatedly gen-fn)))]
+         has-negative-vals? #(some (every-pred number? neg?) (vals %))
+
+         overrides-map (get db ::db/column-override-fns)
+         overrides-insert-fn (co/gen-insert-fn overrides-map)
+
+         ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
+         new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
      (db/with-virtual-rows db new-rows))))
 
 (defn- create-search-examples [pos-rows neg-rows]
@@ -252,9 +258,26 @@
  event-interceptors
  (fn [{:keys [db]} [_ path value]]
    (let [conf-threshold (get db ::db/confidence-threshold)
-         new-query-string (query-for-conf-options value conf-threshold)]
-     {:db (assoc-in db (into [::db/confidence-options] path) value)
-      :dispatch [:set-query-string new-query-string]})))
+         new-query-string (query-for-conf-options value conf-threshold)
+
+         ;; Determine if a load event needs to take place.
+         load-event (when (= path [:mode])
+                      (cond
+                        (and (= value :row)
+                             (nil? (get db ::db/row-likelihoods)))
+                        [:compute-row-likelihoods]
+
+                        (and (= value :cells-missing)
+                             (nil? (get db ::db/missing-cells)))
+                        [:compute-missing-cells]
+
+                        ;; Default case: no event
+                        :else
+                        nil))
+         query-string-event [:set-query-string new-query-string]
+         event-list [query-string-event load-event]]
+    {:db (assoc-in db (into [::db/confidence-options] path) value)
+     :dispatch-n event-list})))
 
 (rf/reg-event-db
  :update-confidence-options
@@ -298,3 +321,20 @@
    (-> db
        (update-in [::db/column-overrides] dissoc col-name)
        (update-in [::db/column-override-fns] dissoc col-name))))
+
+(rf/reg-event-db
+ :compute-row-likelihoods
+ event-interceptors
+ (fn [db [_]]
+   (let [table-rows (get db ::db/rows)
+         likelihoods (score/row-likelihoods model/spec table-rows)]
+     (assoc db ::db/row-likelihoods likelihoods))))
+
+(rf/reg-event-db
+ :compute-missing-cells
+ event-interceptors
+ (fn [db [_]]
+   (let [table-rows (get db ::db/rows)
+         headers (get db ::db/headers)
+         missing-cells (score/impute-missing-cells model/spec headers table-rows)]
+     (assoc db ::db/missing-cells missing-cells))))

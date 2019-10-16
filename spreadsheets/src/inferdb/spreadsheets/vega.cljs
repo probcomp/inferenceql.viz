@@ -93,8 +93,7 @@
       :categorical dist/categorical)))
 
 (defn gen-simulate-plot [selected-columns row-at-selection-start t-clicked]
- (let [selected-row-kw (walk/keywordize-keys row-at-selection-start)
-       selected-column-kw (keyword (first selected-columns))
+ (let [selected-column-kw (keyword (first selected-columns))
        y-axis {:title "distribution of probable values"
                :grid false
                :labels false

@@ -18,8 +18,8 @@
   (.updateSettings hot-instance new-settings false))
 
 (defn freeze-col-1-2-fn [columns-moving target]
-  """Prevents the movement of the first two columns in the table.
-  Also prevents other columns from moving into those frist two spots."""
+  "Prevents the movement of the first two columns in the table.
+  Also prevents other columns from moving into those frist two spots."
   (let [first-unfrozen-index 2
         first-col-moving (first (js->clj columns-moving))]
     (not (or (< first-col-moving first-unfrozen-index)
@@ -40,14 +40,14 @@
                hot (js/Handsontable. dom-node (clj->js (:settings props)))
                unique-id (keyword name)]
 
-           ; add callbacks internal to hot object
+           ;; add callbacks internal to hot object
            (doseq [key hooks]
              (let [camel-key (csk/->camelCase (clj->js key))]
                (js/Handsontable.hooks.add camel-key
                                           (fn [& args]
                                             (rf/dispatch (into [key hot unique-id] args)))
                                           hot)))
-           ; set the atom to the hot object
+           ;; set the atom to the hot object
            (reset! hot-instance hot)))
 
        :component-did-update
@@ -60,7 +60,7 @@
              (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
                    sort-config (.getSortConfig sorting-plugin)]
                (update-hot! @hot-instance (clj->js new-settings))
-               ; Maintain the same sort order as before the update
+               ;; Maintain the same sort order as before the update
                (.sort sorting-plugin sort-config)))))
 
        :component-will-unmount
