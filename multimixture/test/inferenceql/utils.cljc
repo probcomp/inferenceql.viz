@@ -57,7 +57,6 @@
         (fn [i] (almost-equal?  (nth a i) (nth b i) difference-metric threshold))]
     (all? (map call-almost-equal (range (count a))))))
 
-
 (defn almost-equal-maps?
   "Returns true if maps `a` and `b` are approximately equal. Takes a distance
   metric (presumably from `inferenceql.metrics`) as its second argument."
@@ -67,7 +66,6 @@
                            (map #(get b %) ks)
                            distance-metric
                            threshold)))
-
 
 (defn within-factor? [a b factor]
   (<= (/ b factor) a (* b factor)))
@@ -91,6 +89,7 @@
     (map #(get probability-map % 0)
          possible-values)))
 
+
 (defn equal-sample-values [samples-1 samples-2]
   (= (map (comp set vals) samples-1)
      (map (comp set vals) samples-2)))
@@ -99,3 +98,6 @@
   "Returns the index of the maximum value in the provided vector."
   [xs]
   (first (apply max-key second (map-indexed vector xs))))
+
+(defn pos-float? [value]
+  (and (pos? value) (float? value)))
