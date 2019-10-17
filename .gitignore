@@ -11,3 +11,7 @@
 /spreadsheets/out/
 /spreadsheets/resources/handsontable.full.css
 /spreadsheets/src/inferdb/spreadsheets/pfcas.cljc
+
+*/out/*
+*.sw*
+
