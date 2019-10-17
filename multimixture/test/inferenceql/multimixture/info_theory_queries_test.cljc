@@ -1,11 +1,11 @@
-(ns inferdb.multimixture.info-theory-queries-test
+(ns inferenceql.multimixture.info-theory-queries-test
   (:require [clojure.test :as test :refer [deftest testing is]]
-            [inferdb.utils :as utils]
-            #?(:clj [inferdb.plotting.generate-vljson :as plot])
-            [inferdb.multimixture.specification :as spec]
-            [inferdb.multimixture.info-theory-queries :as itq]
-            [inferdb.multimixture.search :as search]
-            [inferdb.multimixture.basic-queries :as bq]))
+            [inferenceql.utils :as utils]
+            #?(:clj [inferenceql.plotting.generate-vljson :as plot])
+            [inferenceql.multimixture.specification :as spec]
+            [inferenceql.multimixture.info-theory-queries :as itq]
+            [inferenceql.multimixture.search :as search]
+            [inferenceql.multimixture.basic-queries :as bq]))
 
 (def multi-mixture
   {:vars {"x" :gaussian

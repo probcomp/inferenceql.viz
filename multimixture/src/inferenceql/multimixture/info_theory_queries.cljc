@@ -1,9 +1,9 @@
-(ns inferdb.multimixture.info-theory-queries
+(ns inferenceql.multimixture.info-theory-queries
   (:require [metaprob.prelude :as mp]
-            [inferdb.multimixture :as mmix]
-            [inferdb.multimixture.search :as search]
-            [inferdb.utils :as utils]
-            [inferdb.multimixture.basic-queries :as bq]))
+            [inferenceql.multimixture :as mmix]
+            [inferenceql.multimixture.search :as search]
+            [inferenceql.utils :as utils]
+            [inferenceql.multimixture.basic-queries :as bq]))
 
 (defn mutual-information [row-generator target-a target-b condition num-samples]
     "Estimate mutual information. We allow for the condition to be either
