@@ -48,27 +48,27 @@
 (def sampled-points-for-plot 1000)
 
 #?(:clj (deftest simulate-from-MI-model
-  "This tests saves plots for all simulated data in out/json results/"
-  ;; Charts can be generated with make charts.
-  (testing "(smoke) simulate n complete rows and save them as vl-json"
-    (let [samples (bq/simulate
-                   row-generator
-                   {}
-                   sampled-points-for-plot)]
-      (utils/save-json "simulations-for-mi-x-y"
-                       (plot/scatter-plot-json ["x" "y"]
-                                               samples
-                                               []
-                                               [0 5]
-                                               "View 1: X, Y, A"))
-      (utils/save-json "simulations-for-mi-v-w"
-                       (plot/scatter-plot-json ["v" "w"]
-                                               (utils/column-subset samples
-                                                                    ["v" "w"])
-                                               []
-                                               [-4 6]
-                                               "View 2: V W"))
-      (is (= sampled-points-for-plot (count samples)))))))
+          "This tests saves plots for all simulated data in out/json results/"
+          ;; Charts can be generated with make charts.
+         (testing "(smoke) simulate n complete rows and save them as vl-json"
+           (let [samples (bq/simulate
+                          row-generator
+                          {}
+                          sampled-points-for-plot)]
+             (utils/save-json "simulations-for-mi-x-y"
+                              (plot/scatter-plot-json ["x" "y"]
+                                                      samples
+                                                      []
+                                                      [0 5]
+                                                      "View 1: X, Y, A"))
+             (utils/save-json "simulations-for-mi-v-w"
+                              (plot/scatter-plot-json ["v" "w"]
+                                                      (utils/column-subset samples
+                                                                           ["v" "w"])
+                                                      []
+                                                      [-4 6]
+                                                      "View 2: V W"))
+             (is (= sampled-points-for-plot (count samples)))))))
 
 
 (def num-samples 100)
