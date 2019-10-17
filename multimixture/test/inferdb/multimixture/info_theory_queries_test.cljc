@@ -35,25 +35,26 @@
 
 ;; Define the row-generator used below.
 (def row-generator (search/optimized-row-generator multi-mixture))
+
 (deftest test-smoke-row-generator
  (is (map? (row-generator))))
+
 (deftest test-smoke-mi
- (is (utils/positive-float? (itq/mutual-information row-generator ["x"] ["y"] {} 2))))
+ (is (utils/pos-float? (itq/mutual-information row-generator ["x"] ["y"] {} 2))))
+
 (deftest test-smoke-cmi
  (is (float? (itq/mutual-information row-generator ["x"] ["y"] {"a" "0"} 2))))
 
-;; How many points do we want to create for our plot?
-(def n 1000)
+(def sampled-points-for-plot 1000)
 
 #?(:clj (deftest simulate-from-MI-model
   "This tests saves plots for all simulated data in out/json results/"
   ;; Charts can be generated with make charts.
   (testing "(smoke) simulate n complete rows and save them as vl-json"
-    (let [num-samples n
-          samples (bq/simulate
+    (let [samples (bq/simulate
                    row-generator
                    {}
-                   num-samples)]
+                   sampled-points-for-plot)]
       (utils/save-json "simulations-for-mi-x-y"
                        (plot/scatter-plot-json ["x" "y"]
                                                samples
@@ -67,7 +68,7 @@
                                                []
                                                [-4 6]
                                                "View 2: V W"))
-      (is (= (count samples) n))))))
+      (is (= sampled-points-for-plot (count samples)))))))
 
 
 (def num-samples 100)

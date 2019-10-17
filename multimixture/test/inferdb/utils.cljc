@@ -100,5 +100,5 @@
   [xs]
   (first (apply max-key second (map-indexed vector xs))))
 
-(defn positive-float? [value]
+(defn pos-float? [value]
   (and (pos? value) (float? value)))
