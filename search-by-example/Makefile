@@ -13,4 +13,4 @@ $(output-to):
 		-co $(compile-opts) \
 		-d $(output-dir) \
 		-o $(output-to) \
-		-c inferdb.search-by-example.api
+		-c inferenceql.search-by-example.api

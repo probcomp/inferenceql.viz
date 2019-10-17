@@ -2,7 +2,7 @@ current-dir      := $(shell pwd)
 output-dir       := $(current-dir)/out
 src-dir          := $(current-dir)/src
 resource-dir     := $(current-dir)/resources
-cache-dir        := $(current-dir)/src/inferdb/spreadsheets
+cache-dir        := $(current-dir)/src/inferenceql/spreadsheets
 node-modules-dir := $(current-dir)/../node_modules
 
 output-to	 := $(output-dir)/main.js
@@ -25,7 +25,7 @@ clean:
 
 compile-opts := $(current-dir)/build.edn
 output-to	   := $(output-dir)/main.js
-main-ns      := inferdb.spreadsheets.core
+main-ns      := inferenceql.spreadsheets.core
 
 cljs-main-opts := \
 		-co $(compile-opts) \
@@ -46,7 +46,7 @@ $(hot-css-resource): $(hot-css-file)
 
 ### Publishing
 
-surge-domain = inferdb-spreadsheet.surge.sh
+surge-domain = inferenceql-spreadsheet.surge.sh
 
 .PHONY: publish
 publish: $(output-to)

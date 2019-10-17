@@ -1,2 +1,2 @@
-{:main "inferdb.search-by-example.api"
+{:main "inferenceql.search-by-example.api"
  :optimizations :advanced}

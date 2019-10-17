@@ -1,5 +1,5 @@
 {:preloads [devtools.preload]
- :main "inferdb.spreadsheets.core"
+ :main "inferenceql.spreadsheets.core"
  :asset-path "out"
  :foreign-libs [{:file "node_modules/vega/build/vega.js"
                  :file-min "node_modules/vega/build/vega.min.js"

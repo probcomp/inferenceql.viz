@@ -24,35 +24,35 @@ Each row in the dataset represents one of 100 randomly sampled respondents from 
 
 == Usage
 
-=== `inferdb.search_by_example.api.columns`
+=== `inferenceql.search_by_example.api.columns`
 The columns that can be used in a search example.
 
 [source,javascript]
 ----
-> inferdb.search_by_example.api.columns
+> inferenceql.search_by_example.api.columns
 ----
 [source,javascript]
 ----
 ["percent_owned", "percent_married", "nyt_political_prediction", ...]
 ----
 
-=== `inferdb.search_by_example.api.data`
+=== `inferenceql.search_by_example.api.data`
 The data that was used to build the model. An array of rows. Each row is an object where the keys are column names.
 
 [source,javascript]
 ----
-> inferdb.search_by_example.api.data
+> inferenceql.search_by_example.api.data
 ----
 [source,javascript]
 ----
 [{percent_owned: 0.681, percent_married: 0.4635 ...} ...]
 ----
 
-=== `inferdb.search_by_example.api.search`
+=== `inferenceql.search_by_example.api.search`
 
 [source,javascript]
 ----
-> inferdb.search_by_example.api.search([0] []);
+> inferenceql.search_by_example.api.search([0] []);
 ----
 [source.javascript]
 ----
