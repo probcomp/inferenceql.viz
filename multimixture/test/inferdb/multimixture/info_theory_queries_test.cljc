@@ -73,6 +73,7 @@
 
 (def num-samples 100)
 (def threshold 0.01)
+
 (defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 
 
