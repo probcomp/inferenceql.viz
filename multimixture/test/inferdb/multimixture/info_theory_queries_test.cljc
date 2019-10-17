@@ -76,7 +76,6 @@
 
 (defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 
-
 (deftest positive-mi
  (is (< 0.5 (itq/mutual-information row-generator ["x"] ["y"] {} num-samples))))
 
