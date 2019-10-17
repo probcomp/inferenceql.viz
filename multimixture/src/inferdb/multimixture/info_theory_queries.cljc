@@ -12,17 +12,17 @@
     (let [samples (bq/simulate row-generator condition num-samples)
           joint-target (concat target-a target-b)
           constraint (if (map? condition)
-            (repeat num-samples condition)
-            (map #(select-keys % condition) samples))
-          indices   (range num-samples)
+                         (repeat num-samples condition)
+                         (map #(select-keys % condition) samples))
           logpdf-estimate (fn [target]
-                            (utils/average (map #(bq/logpdf row-generator
-                                                            (select-keys (nth samples %)
-                                                                         target)
-                                                            (nth constraint %))
-                                                indices)))
+                            (utils/average (map-indexed (fn [i sample]
+                                                          (bq/logpdf row-generator
+                                                                     (select-keys sample target)
+                                                                     (nth constraint i)))
+                                                samples)))
           ;; TODO: will we get perf improvements if the run one map for all of the below?
           logpdf-a  (logpdf-estimate target-a)
           logpdf-b  (logpdf-estimate target-b)
           logpdf-ab (logpdf-estimate joint-target)]
       (- logpdf-ab (+ logpdf-a logpdf-b))))
+
