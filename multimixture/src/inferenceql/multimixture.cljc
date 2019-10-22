@@ -7,64 +7,33 @@
             [metaprob.distributions :as dist]
             [inferenceql.multimixture.specification :as spec]))
 
-#_(def mmix
-    [{:vars {"x" :gaussian
-             "y" :categorical}
-      :clusters [{:probability 1
-                  :parameters {"x" [2 3]
-                               "y" [[0.1 0.2 0.3 0.4]]}}]}
-     {:vars {"a" :gaussian
-             "b" :categorical}
-      :clusters [{:probability 0.4
-                  :parameters {"a" [4 5]
-                               "b" [[0.9 0.01 0.02 0.03 0.04]]}}
-                 {:probability 0.6
-                  :parameters {"a" [6 7]
-                               "b" [[0.99 0.001 0.002 0.003 0.004]]}}]}])
-
-;; This is a duplicate of inferenceql.multimixture.specification/view-variables,
-;; only it doesn't keywordize the results before returning them. Probably the
-;; right thing to do is to change that version to not keywordize variables
-;; either, delete this one, and then have the callers who depend on the results
-;; being keywords do that conversion themselves.
-(defn view-variables
-  "Returns the variables assigned to given view."
-  [view]
-  (set (keys (get-in view [0 :parameters]))))
-
 (defn row-generator
   "Returns a generative function that samples a row from the provided view
   specification."
-  [{:keys [vars views] :as spec}]
-  (let [view-var-index (zipmap (range) (map view-variables spec))
-        var-view-index (reduce-kv (fn [m view variables]
-                                    (merge m (zipmap variables (repeat view))))
-                                  {}
-                                  view-var-index)
-        metadata {:spec spec
-                  :view-var-index view-var-index
-                  :var-view-index var-view-index}
-        f (gen []
-            (into {} (doall (map-indexed (fn [i clusters]
-                                           (let [cluster-idx (at `(:cluster-assignments-for-view ~i) dist/categorical (mapv :probability clusters))
-                                                 cluster (nth clusters cluster-idx)]
-                                             (reduce-kv (fn [m variable params]
-                                                          (let [primitive (case (get vars variable)
-                                                                            :binary dist/flip
-                                                                            :gaussian dist/gaussian
-                                                                            :categorical dist/categorical)
-                                                                params (case (get vars variable)
-                                                                         :binary [params]
-                                                                         :gaussian [(:mu params) (:sigma params)]
-                                                                         :categorical [params])]
-                                                            (assoc m variable (apply-at `(:columns ~variable) primitive params))))
-                                                        {}
-                                                        (:parameters cluster))))
-                                         views))))]
-    (with-meta f (merge (meta f) metadata))))
+  [{:keys [vars views]}]
+  (gen []
+    (let [partial-row (fn partial-row [i clusters]
+                        (let [cluster-idx (at `(:cluster-assignments-for-view ~i)
+                                              dist/categorical
+                                              (mapv :probability clusters))
+                              cluster (nth clusters cluster-idx)]
+                          (reduce-kv (fn [m variable params]
+                                       (let [primitive (case (get vars variable)
+                                                         :binary dist/flip
+                                                         :gaussian dist/gaussian
+                                                         :categorical dist/categorical)
+                                             params (case (get vars variable)
+                                                      :binary [params]
+                                                      :gaussian [(:mu params) (:sigma params)]
+                                                      :categorical [params])]
+                                         (assoc m variable (apply-at `(:columns ~variable) primitive params))))
+                                     {}
+                                     (:parameters cluster))))]
 
-#_(row-generator mmix)
-#_((row-generator mmix))
+      (->> views
+           (map-indexed partial-row)
+           (reduce merge)))))
+
 #_(meta (row-generator mmix))
 #_(mp/infer-and-score :procedure (row-generator mmix))
 
