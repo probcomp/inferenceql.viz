@@ -1,9 +1,6 @@
 (ns inferenceql.spreadsheets.data
   (:require [clojure.string :as str]
-            #?(:clj [inferenceql.spreadsheets.io :as sio])
-            #?(:clj [clojure.data.csv :as csv]
-               :cljs [goog.labs.format.csv :as csv]))
-  #?(:cljs (:require-macros [inferenceql.spreadsheets.io :as sio])))
+            [inferenceql.spreadsheets.config :as config]))
 
 (defn- float-string?
   "Returns true if `s` is a string containing only a number with a decimal, false
@@ -43,7 +40,6 @@
         (rest csv-data)))
 
 (def nyt-data
-  (->> (sio/inline-resource "data.csv")
-       #?(:clj (csv/read-csv) :cljs (csv/parse))
+  (->> (:data config/config)
        (mapv fix-row)
        (csv-data->maps)))

@@ -1,0 +1,3 @@
+#or [#maybe-include "config.edn"
+     {:model #json "model.json"
+      :data #csv "data.csv"}]
