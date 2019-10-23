@@ -11,11 +11,6 @@
 (def parser (insta/parser (sio/inline-resource "query.bnf")))
 (def ^:private row-generator (mmix/row-generator model/spec))
 
-(defn- parse-unsigned-int
-  [s]
-  #?(:clj (Integer/parseUnsignedInt s)
-     :cljs (js/parseInt s)))
-
 (defn- transform-from
   ([limit]
    (transform-from {} limit))
@@ -59,12 +54,13 @@
   {:select transform-select
    :from transform-from
    :gen-given hash-map
-   :value edn/read-string
-   :nat parse-unsigned-int})
+   :nat edn/read-string
+   :float edn/read-string
+   :int edn/read-string})
 
 (defn parse
   "Parses a string containing an InferenceQL query and produces a map representing
   the query to be performed."
-  [q]
-  (let [ast (parser q)]
+  [& args]
+  (let [ast (apply parser args)]
     (insta/transform transform-map ast)))

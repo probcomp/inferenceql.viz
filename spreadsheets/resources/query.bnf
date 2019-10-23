@@ -13,7 +13,10 @@ prob-given = <'GIVEN'> <ws> <star>
 <bindings> = binding (<ws> <'AND'> <ws> binding)*
 <binding> = column <'='> value
 <column> = #'[a-zA-Z_]+'
-value = #'\"([^\"]+)\"'
+<value> = string | nat | float | int
 <limit> = <'LIMIT'> <ws> nat
-nat = #'[0-9]+'
+string = #'\"([^\"]+)\"'
+nat = #'\d+'
+float = #'-?\d+\.\d+(E-?\d+)?'
+int = #'-?\d+'
 ws = #'\s+'

@@ -1,7 +1,25 @@
 (ns inferenceql.spreadsheets.query-test
-  (:require [clojure.test :as test :refer [are deftest]]
+  (:require [clojure.test :as test :refer [are deftest is]]
+            [clojure.test.check.clojure-test :refer [defspec]]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop]
             [instaparse.core :as insta]
             [inferenceql.spreadsheets.query :as query]))
+
+(defspec nat-parsing
+  (prop/for-all [n gen/nat]
+    (let [s (pr-str n)]
+      (is (= n (query/parse s :start :nat))))))
+
+(defspec int-parsing
+  (prop/for-all [n gen/int]
+    (let [s (pr-str n)]
+      (is (= n (query/parse s :start :int))))))
+
+(defspec float-parsing
+  (prop/for-all [n (gen/double* {:infinite? false :NaN? false})]
+    (let [s (pr-str n)]
+      (is (== n (query/parse s :start :float))))))
 
 (deftest valid-select
   (are [start query] (nil? (insta/get-failure (query/parser query :start start)))
