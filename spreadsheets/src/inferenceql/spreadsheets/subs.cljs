@@ -212,14 +212,16 @@
 
 (defn vega-lite-spec
   [{:keys [table-states t-clicked]}]
-  (let [{selections :selections cols :selected-columns row :row-at-selection-start}
-        (table-states t-clicked)]
+  (let [{selections :selections cols :selected-columns row :row-at-selection-start} (table-states t-clicked)
+        ;; These are column names that cannot be simulated
+        ;; `vega/label-col-header` and `vega/score-col-header` are not part of any dataset.
+        ;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
+        invalid-for-sim #{"geo_fips" "NAME" vega/label-col-header vega/score-col-header}]
     (when (first selections)
       (clj->js
        (cond (and (= 1 (count cols))
                   (= 1 (count (first selections)))
-                  (not (contains? #{"geo_fips" "NAME" vega/label-col-header vega/score-col-header}
-                                  (first cols))))
+                  (not (invalid-for-sim (first cols))))
              (vega/gen-simulate-plot cols row t-clicked)
 
              (= 1 (count cols))
