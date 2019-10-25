@@ -40,28 +40,42 @@
  (fn [db [event-name]]
    (db/clear-virtual-scores db)))
 
+;; Used to detect changes in the :real-data handsontable
 (rf/reg-event-db
  :before-change
  event-interceptors
- (fn [db [_ hot id changes]]
+ (fn [db [_ hot id changes source]]
+   ;; Checks if a specific change is to a cell in column 0.
+   (let [change-to-col-0? (fn [change]
+                            (let [[_row col _prev-val _new-val] change]
+                              (= col 0)))]
+     ;; Changes should only be happening in the first column (the label column).
+     (assert (every? change-to-col-0? changes))
+     ;; Changes should only be the result of user edits.
+     (assert (= source "edit")))
+
    (let [labels-col (.getSourceDataAtCol hot 0)]
      (db/with-labels db (js->clj labels-col)))))
 
+;; Used to detect changes in the :virtual-data handsontable
 (rf/reg-event-fx
  :after-change
  event-interceptors
  (fn [{:keys [db]} [_ hot id changes source]]
-   ;; When the change is the result of loading new table
-   ;; into the table.
-   (when (= source "loadData")
-     (let [table-state @(rf/subscribe [:table-state id])]
-       (if-let [header-clicked (:header-clicked table-state)]
-         (let [current-selection (.getSelectedLast hot)
-               [_row1 col1 _row2 col2] (js->clj current-selection)]
-           ;; Take the current selection and expand it so the whole columns
-           ;; are selected.
-           (.selectColumns hot col1 col2))))
-    {})))
+
+   ;; `changes` should be null when source of changes is loadData (see docs for why).
+   (assert (= nil changes))
+   ;; Setting the table's data via the `virtual-hot-props` sub should be the only way it is changing.
+   (assert (= source "loadData"))
+
+   (let [table-state @(rf/subscribe [:table-state id])]
+     (if-let [header-clicked (:header-clicked table-state)]
+       (let [current-selection (.getSelectedLast hot)
+             [_row1 col1 _row2 col2] (js->clj current-selection)]
+         ;; Take the current selection and expand it so the whole columns
+         ;; are selected.
+         (.selectColumns hot col1 col2))))
+   {}))
 
 (rf/reg-event-db
  :after-selection-end
