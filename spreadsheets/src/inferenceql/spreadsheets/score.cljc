@@ -5,7 +5,31 @@
             [metaprob.prelude :as mp]
             [inferenceql.multimixture.basic-queries :as bq]
             [medley.core :as medley]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clojure.spec.alpha :as s]))
+
+;; General specs for scoring functions.
+
+(s/def ::score number?)
+
+;; Specs for row-wise scoring functions.
+
+(s/def ::row-likelihoods (s/coll-of ::score))
+(s/fdef row-likelihoods :ret ::row-likelihoods)
+
+;; Specs for cell-wise scoring functions.
+
+(s/def ::value any?)
+(s/def ::value-score-map (s/keys :req-un [::value ::score]))
+(s/fdef impute-and-score-cell :ret ::value-score-map)
+
+(s/def ::column-name string?)
+(s/def ::map-for-row (s/map-of ::column-name ::value-score-map))
+(s/fdef impute-missing-cells-in-row :ret ::map-for-row)
+
+(s/def ::missing-vals-and-scores (s/coll-of :ms/map-for-row))
+(s/fdef normalize-missing-cells-scores :ret ::missing-vals-and-scores)
+(s/fdef impute-missing-cells :ret ::missing-vals-and-scores)
 
 (def ^:private imputation-sample-size
   "The number of imputed values used to determine the value a missing cell."
