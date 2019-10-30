@@ -10,6 +10,7 @@
           :test-paths ["multimixture/test"]}
          {:id :multimixture-cljs
           :type :kaocha.type/cljs
+          :cljs/timeout 20000
           :source-paths ["multimixture/src"]
           :test-paths ["multimixture/test"]}
          {:id :search-clj
@@ -17,6 +18,7 @@
           :test-paths ["search-by-example/test"]}
          {:id :search-cljs
           :type :kaocha.type/cljs
+          :cljs/timeout 20000
           :source-paths ["search-by-example/src"]
           :test-paths ["search-by-example/test"]}
          {:id :spreadsheets-clj

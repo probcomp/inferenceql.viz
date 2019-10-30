@@ -29,13 +29,28 @@
                                          (assoc m variable (apply-at `(:columns ~variable) primitive params))))
                                      {}
                                      (:parameters cluster))))]
-
       (->> views
            (map-indexed partial-row)
            (reduce merge)))))
 
-#_(meta (row-generator mmix))
-#_(mp/infer-and-score :procedure (row-generator mmix))
+(defn cluster-row-generator
+  "Returns a generative function that samples a partial row from the provided cluster
+  in a given view, with respect to a given specification."
+  [cluster vars]
+  (gen []
+    (reduce-kv
+     (fn [m variable params]
+       (let [primitive (case (get vars variable)
+                         :binary dist/flip
+                         :gaussian dist/gaussian
+                         :categorical dist/categorical)
+             params (case (get vars variable)
+                      :binary [params]
+                      :gaussian [(:mu params) (:sigma params)]
+                      :categorical [params])]
+         (assoc m variable (apply-at `(:columns ~variable) primitive params))))
+     {}
+     (:parameters cluster))))
 
 (defn with-cluster-assignment
   "Sets the cluster assignment in trace for view index view-i to cluster index
@@ -112,6 +127,5 @@
 
 #_(let [spec spec-test/mmix]
     (->> (all-latents spec)
-         #_
-         (map (comp last #(mp/infer-and-score :procedure (row-generator spec)
-                                              :observation-trace %)))))
+         #_(map (comp last #(mp/infer-and-score :procedure (row-generator spec)
+                                                :observation-trace %)))))

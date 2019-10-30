@@ -41,12 +41,6 @@
                                                   :observation-trace trace))]
              [v trace score])))))))
 
-#_(require '[inferenceql.multimixture.specification-test :as spec-test])
-#_(optimized-row-generator spec-test/mmix)
-#_((optimized-row-generator spec-test/mmix))
-#_(second (mp/infer-and-score :procedure (optimized-row-generator spec-test/mmix)))
-#_(repeatedly 1 #(mp/infer-and-score :procedure (optimized-row-generator spec-test/mmix)))
-
 (s/fdef generate-1col-binary-extension
   :args (s/cat :spec ::spec/multi-mixture
                :row-count pos-int?
@@ -66,10 +60,6 @@
                                                                         (at `(:cluster-parameters ~i)
                                                                             #?(:clj idbdist/beta
                                                                                :cljs idbdist/beta)
-                                                                            #_
-                                                                            alpha
-                                                                            #_
-                                                                            beta
                                                                             {:alpha alpha
                                                                              :beta beta}))))
                                                       clusters)))))
@@ -77,22 +67,6 @@
       (doseq [i (range row-count)]
         (at `(:rows ~i) new-row-generator))
       new-spec)))
-
-#_(let [rows [{"x" 0, "z" true}
-              {"x" 5, "z" false}]
-        spec {:vars {"x" :gaussian}
-              :views [[{:probability 0.75
-                        :parameters {"x" {:mu 0 :sigma 1}}}
-                       {:probability 0.25
-                        :parameters {"x" {:mu 5 :sigma 1}}}]]}]
-    #_
-    (expound.alpha/expound ::spec/multi-mixture spec)
-    #_
-    (mp/infer-and-score :procedure (optimized-row-generator spec))
-    #_
-    (mp/infer-and-score :procedure generate-1col-binary-extension
-                        :inputs [spec (count rows) "y" {:alpha 0.001 :beta 0.001}])
-    (generate-1col-binary-extension spec 10 "z" {:alpha 0.001 :beta 0.001}))
 
 (defn importance-resampling
   [& {:keys [model inputs observation-trace n-particles]
@@ -120,8 +94,6 @@
                           :inputs [spec (count rows) column-key beta-params]
                           :observation-trace (mmix/with-rows {} rows)
                           :n-particles 100)))
-
-#_(insert-column spec-test/mmix [{"z" true}] "z" {:alpha 0.001 :beta 0.001})
 
 (defn score-rows
   [spec rows new-column-key]
@@ -169,65 +141,3 @@
           (map #(/ (reduce + %)
                    n-models))
           (transpose predictions))))
-
-(comment
-
-  (let [unknown-rows [{"x" 0}
-                      {"x" 5}]
-        known-rows [{"x" 0 "y" true}
-                    {"x" 5 "y" false}]
-        spec {:vars {"x" :gaussian
-                     "z" :gaussian}
-              :views [[{:probability 0.5
-                        :parameters {"x" {:mu 0 :sigma 2}}}
-                       {:probability 0.5
-                        :parameters {"x" {:mu 5 :sigma 2}}}]
-                      [{:probability 0.5
-                        :parameters {"z" {:mu 0 :sigma 2}}}
-                       {:probability 0.5
-                        :parameters {"z" {:mu 5 :sigma 2}}}]]}]
-    (search spec "y" known-rows unknown-rows 10 {:alpha 0.001 :beta 0.001}))
-
-  (let [unknown-rows [{"x" true}
-                      {"x" false}]
-        known-rows [{"x" true "y" true}]
-        beta-params {:alpha 0.01 :beta 0.01}
-        spec {:vars {"x" :categorical}
-              :views [[{:probability 0.5
-                        :parameters {"x" {true 1 false 0}}}
-                       {:probability 0.5
-                        :parameters {"x" {true 0 false 1}}}]]}]
-    #_(generate-1col-binary-extension spec 100 "y" beta-params)
-    #_(insert-column spec known-rows "y" beta-params)
-    #_(mp/exp (last (mp/infer-and-score :procedure (optimized-row-generator spec)
-                                        :observation-trace (mmix/with-row-values {} {"x" true}))))
-    #_ (update-in (mp/infer-and-score :procedure (mmix/row-generator spec)
-                                      :observation-trace #_{} (mmix/with-row-values {} {"x" true}))
-                  [2]
-                  mp/exp)
-    #_(mp/exp (last (mp/infer-and-score :procedure (optimized-row-generator spec)
-                                        :observation-trace (mmix/with-row-values {} {"x" true}))))
-    (search spec "y" known-rows unknown-rows 100 beta-params))
-
-  (require '[clojure.spec.test.alpha])
-  (require 'cljs.spec.test.alpha)
-
-  (dist/beta 0.001 0.001)
-
-  (frequencies (repeatedly 100 #(dist/categorical {true 1 false 0})))
-
-  (require '[inferenceql.spreadsheets.model :as model])
-  (require '[inferenceql.spreadsheets.data :as data])
-  (zipmap (map #(select-keys % ["git"]) data/nyt-data)
-          (search model/spec "new" [{"git" "True", "new" true}
-                                    {"git" "False", "new" false}]
-                  data/nyt-data 5 {:alpha 0.001 :beta 0.001}))
-
-  (second (mp/infer-and-score :procedure (mmix/row-generator model/spec)))
-
-  (require 'inferenceql.spreadsheets.model)
-  (require 'cljs.pprint)
-  (cljs.pprint/pprint (insert-column inferenceql.spreadsheets.model/spec [] "z" {:alpha 0.001 :beta 0.001}))
-
-
-  (cljs.pprint/pprint [{:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 0}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 1}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 2}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 3}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 4}, 1 {:value 1}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 0}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 0}, 2 {:value 1}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 1}, 2 {:value 0}}} {:columns {"c#" {:value "True"}, "new property" {:value true}}, :cluster-assignments-for-view {0 {:value 5}, 1 {:value 1}, 2 {:value 1}}}]))
