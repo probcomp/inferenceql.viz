@@ -13,13 +13,6 @@
   "Header text for the column that shows scores."
   "probability")
 
-(def vega-width
-  "Width setting for the specs produced by the :vega-lite-spec sub"
-  400)
-(def vega-height
-  "Height setting for the specs produced by the :vega-lite-spec sub"
-  400)
-
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
   500)
@@ -116,8 +109,6 @@
        y-scale {:nice false}]
    {:$schema
     "https://vega.github.io/schema/vega-lite/v3.json"
-    :width vega-width
-    :height vega-height
     :data {:name "data"}
     :autosize {:resize true}
     :layer (cond-> [{:mark {:type "bar" :color (color-for-table t-clicked)}
@@ -189,8 +180,6 @@
                          [virtual-layer])]
     {:$schema
      "https://vega.github.io/schema/vega-lite/v3.json"
-     :width vega-width
-     :height vega-height
      :encoding {:x {:bin col-binning
                     :field col-to-draw
                     :type col-type}}
@@ -228,8 +217,6 @@
   Useful for comparing quatitative-quantitative data."
   [data cols-to-draw facet-column]
   (let [spec {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width vega-width
-              :height vega-height
               :data {:values data}
               :mark "circle"
               :encoding {:x {:field (first cols-to-draw)
@@ -245,8 +232,6 @@
   Useful for comparing nominal-nominal data."
   [data cols-to-draw facet-column]
   (let [spec {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width vega-width
-              :height vega-height
               :data {:values data}
               :mark "rect"
               :encoding {:x {:field (first cols-to-draw)
@@ -270,8 +255,6 @@
                      dist/gaussian "quantitative"
                      dist/categorical "nominal")
         spec {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
-              :width vega-width
-              :height vega-height
               :data {:values data}
               :mark {:type "boxplot"
                      :extent "min-max"}
