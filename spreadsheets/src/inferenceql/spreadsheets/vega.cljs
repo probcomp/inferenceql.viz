@@ -20,6 +20,13 @@
   "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
   300)
 
+(def vega-strip-plot-quant-size
+  "Size of the strip plot for the quantitative dimension"
+  350)
+(def vega-strip-plot-step-size
+  "Width of each band in the strip plot in the categorical dimension"
+  30)
+
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
 (def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
@@ -271,11 +278,9 @@
 (defn- strip-plot-size-helper
   "Return a vega-lite height/width size setting given `col-name` a column name from the table"
   [col-name]
-  (let [gaussian-size 350
-        catergorical-step-size 30]
-    (condp = (stattype col-name)
-      dist/gaussian gaussian-size
-      dist/categorical {:step catergorical-step-size})))
+  (condp = (stattype col-name)
+    dist/gaussian vega-strip-plot-quant-size
+    dist/categorical {:step vega-strip-plot-step-size}))
 
 (defn- strip-plot
   "Generates vega-lite spec for a strip plot.
