@@ -31,6 +31,16 @@
 
 (def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
 
+
+(def ^:private default-vega-embed-options {:renderer "svg"
+                                           :mode "vega-lite"
+                                           :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
+                                                    :legend {:labelFontSize 12 :titleFontSize 12}
+                                                    :header {:labelFontSize 14}
+                                                    :mark {:tooltip true}
+                                                    ;; Remove title from faceted plots.
+                                                    :headerFacet {:title nil}}})
+
 (defn vega-lite
   "vega-lite reagent component"
   [spec opt generator]
@@ -38,8 +48,7 @@
         embed (fn [this spec opt generator]
                 (when spec
                   (let [spec (clj->js spec)
-                        opt (clj->js (merge {:renderer "canvas"
-                                             :mode "vega-lite"}
+                        opt (clj->js (merge default-vega-embed-options
                                             opt))]
                     (cond-> (js/vegaEmbed (r/dom-node this)
                                           spec
