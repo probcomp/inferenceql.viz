@@ -4,10 +4,10 @@
     "canvas": "^2.5.0",
     "handsontable": "^7.0.2",
     "isomorphic-ws": "^4.0.1",
-    "vega": "^5.4.0",
+    "vega": "^5.9.0",
     "vega-cli": "^5.4.0",
-    "vega-embed": "^4.2.0",
-    "vega-lite": "^3.2.1",
+    "vega-embed": "^6.0.0",
+    "vega-lite": "^4.0.0",
     "ws": "7.1.2"
   }
 }
