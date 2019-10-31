@@ -23,20 +23,19 @@
 
 (deftest valid-select
   (are [start query] (nil? (insta/get-failure (query/parser query :start start)))
-    :select "SELECT * FROM (GENERATE * FROM model) LIMIT 1"
-    :select "SELECT * FROM (GENERATE * FROM model) LIMIT 2"
-    :select "SELECT * FROM (GENERATE * GIVEN java=\"False\" FROM model) LIMIT 1"
-    :select "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model) LIMIT 1"
-    :select "SELECT (PROBABILITY OF salary_usd FROM model), *"
-    :select "SELECT (PROBABILITY OF salary_usd GIVEN * FROM model), *"
-    :select "SELECT (PROBABILITY OF label=\"True\" GIVEN * FROM model), *"
-    :select "SELECT * FROM (GENERATE * FROM model) LIMIT 100"
-    :select "SELECT (PROBABILITY OF doctors_visits GIVEN * FROM model), *"
-    :select "SELECT (PROBABILITY OF label=\"True\" GIVEN * FROM model), *"
+    :select "SELECT * FROM (GENERATE * USING model) LIMIT 2"
+    :select "SELECT * FROM (GENERATE * GIVEN java=\"False\" USING model) LIMIT 1"
+    :select "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" USING model) LIMIT 1"
+    :select "SELECT (PROBABILITY OF salary_usd USING model), *"
+    :select "SELECT (PROBABILITY OF salary_usd GIVEN * USING model), *"
+    :select "SELECT (PROBABILITY OF label=\"True\" GIVEN * USING model), *"
+    :select "SELECT * FROM (GENERATE * USING model) LIMIT 100"
+    :select "SELECT (PROBABILITY OF doctors_visits GIVEN * USING model), *"
+    :select "SELECT (PROBABILITY OF label=\"True\" GIVEN * USING model), *"
 
-    :generate "GENERATE * FROM model"
-    :generate "GENERATE * GIVEN java=\"False\" FROM model"
-    :generate "GENERATE * GIVEN java=\"False\" AND linux=\"True\" FROM model"
+    :generate "GENERATE * USING model"
+    :generate "GENERATE * GIVEN java=\"False\" USING model"
+    :generate "GENERATE * GIVEN java=\"False\" AND linux=\"True\" USING model"
 
     :column "java"
     :column "linux"
