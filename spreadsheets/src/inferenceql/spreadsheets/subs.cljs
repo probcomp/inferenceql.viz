@@ -50,12 +50,12 @@
             (fn [db [_sub-name]]
               (get db ::db/hot-state)))
 
-(rf/reg-sub-raw :table-state-active
-                (fn [app-db event]
-                  (reaction
-                    (let [table-id @(rf/subscribe [:table-last-clicked])
-                          table-state @(rf/subscribe [:table-state table-id])]
-                      table-state))))
+(rf/reg-sub :table-state-active
+            (fn [_ _]
+              {:table-id (rf/subscribe [:table-last-clicked])
+               :table-states (rf/subscribe [:both-table-states])})
+            (fn [{:keys [table-id table-states]}]
+              (get table-states table-id)))
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
