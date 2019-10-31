@@ -4,7 +4,9 @@
             [reagent.core :as reagent]
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
-            [inferenceql.spreadsheets.views :as views]))
+            [inferenceql.spreadsheets.views :as views]
+            ;; requiring trials of generative functions
+            [inferenceql.spreadsheets.clojure-conj.trial]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
