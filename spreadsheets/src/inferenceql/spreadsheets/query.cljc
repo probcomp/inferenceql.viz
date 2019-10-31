@@ -54,6 +54,7 @@
   {:select transform-select
    :from transform-from
    :gen-given hash-map
+   :symbol edn/read-string
    :nat edn/read-string
    :float edn/read-string
    :int edn/read-string})

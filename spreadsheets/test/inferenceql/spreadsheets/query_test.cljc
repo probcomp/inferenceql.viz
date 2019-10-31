@@ -21,7 +21,7 @@
     (let [s (pr-str n)]
       (is (== n (query/parse s :start :float))))))
 
-(deftest valid-select
+(deftest parsing-success
   (are [start query] (nil? (insta/get-failure (query/parser query :start start)))
     :select "SELECT * FROM (GENERATE * USING model) LIMIT 2"
     :select "SELECT * FROM (GENERATE * GIVEN java=\"False\" USING model) LIMIT 1"
@@ -47,9 +47,16 @@
     :bindings "java=\"False\""
     :bindings "java=\"False\" AND linux=\"True\""
 
+    :symbol "abc"
+    :symbol "abc123"
+
     :value "\"True\""
     :value "\"False\""
 
     :ws " "
     :ws "  "
     :ws "\t"))
+
+(deftest parsing-failure
+  (are [start query] (some? (insta/get-failure (query/parser query :start start)))
+    :symbol "123abc"))
