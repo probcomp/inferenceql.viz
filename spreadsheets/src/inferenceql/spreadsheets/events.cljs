@@ -321,12 +321,16 @@
  :set-column-function
  event-interceptors
  (fn [db [_ col-name source-text]]
-   (let [string-to-compile (str "(" source-text ")")
-         ;; TODO catch and print compilation errors gracefully
-         evaled-fn (js/eval string-to-compile)]
-     (-> db
-         (assoc-in [::db/column-overrides col-name] source-text)
-         (assoc-in [::db/column-override-fns col-name] evaled-fn)))))
+   (try (if-let [evaled-fn (js/eval (str "(" source-text ")"))]
+          (-> db
+              (assoc-in [::db/column-overrides col-name] source-text)
+              (assoc-in [::db/column-override-fns col-name] evaled-fn))
+          db)
+        (catch :default e
+          (js/alert (str "There was an error evaluating your Javascript function.\n"
+                         "See the browser console for more information."))
+          (.error js/console e)
+          db))))
 
 (rf/reg-event-db
  :clear-column-function
