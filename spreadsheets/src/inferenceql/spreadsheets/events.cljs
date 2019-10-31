@@ -318,9 +318,12 @@
  :clear-column-function
  event-interceptors
  (fn [db [_ col-name]]
-   (-> db
-       (update-in [::db/column-overrides] dissoc col-name)
-       (update-in [::db/column-override-fns] dissoc col-name))))
+   (if (and (get-in db [::db/column-overrides col-name])
+            (get-in db [::db/column-override-fns col-name]))
+     (-> db
+         (update-in [::db/column-overrides] dissoc col-name)
+         (update-in [::db/column-override-fns] dissoc col-name))
+     db)))
 
 (rf/reg-event-db
  :compute-row-likelihoods
