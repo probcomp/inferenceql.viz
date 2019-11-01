@@ -1,10 +1,11 @@
 select = <'SELECT'> <ws> what <ws> from
 what = paren-selectable (<','> <ws> paren-selectable)*
 <paren-selectable> = selectable | <'('> selectable <')'>
-<selectable> = probability | star | column
+<selectable> = probability | star | result-column
 star = <'*'>
-from = <'FROM'> <ws> table
-table = symbol
+from = <'FROM'> <ws> table (<','> <ws> table)*
+result-column = (table <'.'>)? column
+<table> = symbol
 column = symbol | string
 value = string | nat | float | int
 symbol = #'[a-zA-Z]\w*'

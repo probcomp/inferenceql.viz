@@ -20,21 +20,26 @@
 (defn- transform-select
   [& args]
   (match (vec args)
-    [xform [:from [:table table]]]
-    {:what xform
-     :table table}))
+    [[:what & columns] [:from table]]
+    {:table table
+     :xform (if (some #{[:star]} columns)
+              (map identity)
+              (let [columns (map #(if (qualified-symbol? %)
+                                    %
+                                    (symbol (str table)
+                                            (str %)))
+                                 columns)]
+                (map #(select-keys % columns))))}))
 
-
-(defn- transform-what
-  [& selectables]
-  (if (some #{[:star]} selectables)
-    (map identity)
-    (let [columns (filter string? selectables)]
-      (map #(select-keys % columns)))))
+(defn transform-result-column
+  ([column]
+   (symbol (str column)))
+  ([table column]
+   (symbol (str table) (str column))))
 
 (def ^:private transform-map
   {:select transform-select
-   :what transform-what
+   :result-column transform-result-column
    :column str
    :string edn/read-string
    :symbol edn/read-string})
@@ -47,34 +52,18 @@
     (insta/transform transform-map ast)))
 
 (defn execute
-  [{:keys [what table] :as query} env]
-  (into [] what (get env table)))
+  [{:keys [xform table]} env]
+  (into [] xform (get env table)))
 
 (comment
 
-  (clojure.repl/doc into)
+  (let [query (parse "SELECT x, y FROM table")]
+    (execute query {'table '[{table/x 1 table/y 2 table/z 3 table/q 0}
+                             {table/x 4 table/y 5 table/z 6 table/q 7}]}))
 
-  ;; SELECT a, b, c
-  (into []
-        (map #(select-keys % ["a" "b" "c"]))
-        [{"a" 1 "b" 2 "c" 3 "d" 4}
-         {"a" 1 "b" 2 "c" 3 "d" 4}
-         {"a" 1 "b" 2 "c" 3 "d" 4}
-         {"a" 1 "b" 2 "c" 3 "d" 4}])
+  {'table [{"x" 1 "y" 2 "z" 3 "q" 0}
+           {"x" 4 "y" 5 "z" 6 "q" 7}]}
 
-  (let [xform (comp (map inc)
-                    (remove even?))]
-    (into [] xform (range 10)))
-
-  (parse "hi" :start :column)
-
-  (edn/read-string "hi")
-
-  (let [query (parse "SELECT x FROM table")]
-    (execute query {'table [{"x" 1 "y" 2 "z" 3 "q" 0}
-                            {"x" 4 "y" 5 "z" 6 "q" 7}]}))
-
-  (parse "SELECT hi" :start :select)
-  (parse "SELECT *, x FROM table")
+  (parse "SELECT test.x, y FROM table")
 
   )
