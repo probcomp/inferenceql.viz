@@ -7,7 +7,9 @@
    [metaprob.distributions :refer [flip uniform gaussian categorical]]
    [metaprob.inference :as inf]
    [metaprob.trace :as trace]
-   [clojure.pprint :refer [pprint]]))
+   [clojure.pprint :refer [pprint]]
+
+   [inferenceql.spreadsheets.clojure-conj.data :as data]))
 
    ;; prelude distributions generative-functions
 

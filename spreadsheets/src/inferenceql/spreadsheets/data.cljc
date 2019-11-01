@@ -43,3 +43,16 @@
   (->> (:data config/config)
        (mapv fix-row)
        (csv-data->maps)))
+
+(comment
+  (def stack-overflow-data
+    (->> (:stack-overflow config/config)
+         (mapv fix-row)
+         (csv-data->maps)))
+
+  #?(:cljs (.log js/console (first (:data config/config))))
+  #?(:cljs (.log js/console (first (:stack-overflow config/config))))
+  #?(:cljs (.log js/console (keys config/config))))
+
+  ;(print (first (:data config/config)))
+  ;(print (first (:stack-overflow config/config)))
