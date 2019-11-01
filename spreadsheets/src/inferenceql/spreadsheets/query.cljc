@@ -20,44 +20,20 @@
 (defn- transform-select
   [& args]
   (match (vec args)
-    [[:star] [:generate obs limit]]
-    {:type :generate-virtual-row
-     :conditions obs
-     :num-rows limit}
+    [xform [:from [:table table]]]
+    {:what xform
+     :table table}))
 
-    [[:probability [:prob-column column] [:prob-given]] [:star]]
-    {:type :anomaly-search
-     :column column
-     :given true}
-
-    [[:probability [:prob-column column]] [:star]]
-    {:type :anomaly-search
-     :column column}
-
-    [[:probability [:prob-binding label value] [:prob-given]] [:star]]
-    {:type :search-by-labeled
-     :given true
-     :binding {label value}}
-
-    :else
-    (let [logged-msg (str "Unmatched parse tree: " (pr-str (vec args)))
-          alerted-msg "Invalid query syntax."]
-      #?(:clj (binding [*out* *err*]
-                (println logged-msg))
-         :cljs (js/console.error logged-msg))
-      #?(:clj (binding [*out* *err*]
-                (println alerted-msg))
-         :cljs (js/alert alerted-msg))
-      {})))
+(defn- transform-what
+  [& columns]
+  (map #(select-keys % columns)))
 
 (def ^:private transform-map
   {:select transform-select
-   :from transform-from
-   :gen-given hash-map
-   :symbol edn/read-string
-   :nat edn/read-string
-   :float edn/read-string
-   :int edn/read-string})
+   :what transform-what
+   :column str
+   :string edn/read-string
+   :symbol edn/read-string})
 
 (defn parse
   "Parses a string containing an InferenceQL query and produces a map representing
@@ -65,3 +41,35 @@
   [& args]
   (let [ast (apply parser args)]
     (insta/transform transform-map ast)))
+
+(defn execute
+  [{:keys [what table] :as query} env]
+  (into [] what (get env table)))
+
+(comment
+
+  (clojure.repl/doc into)
+
+  ;; SELECT a, b, c
+  (into []
+        (map #(select-keys % ["a" "b" "c"]))
+        [{"a" 1 "b" 2 "c" 3 "d" 4}
+         {"a" 1 "b" 2 "c" 3 "d" 4}
+         {"a" 1 "b" 2 "c" 3 "d" 4}
+         {"a" 1 "b" 2 "c" 3 "d" 4}])
+
+  (let [xform (comp (map inc)
+                    (remove even?))]
+    (into [] xform (range 10)))
+
+  (parse "hi" :start :column)
+
+  (edn/read-string "hi")
+
+  (let [query (parse "SELECT \"x\", y, z FROM table")]
+    (execute query {'table [{"x" 1 "y" 2 "z" 3 "q" 0}]}))
+
+  (parse "SELECT hi" :start :select)
+  (parse "SELECT *, hi")
+
+  )

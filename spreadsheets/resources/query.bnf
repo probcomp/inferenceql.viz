@@ -1,25 +1,27 @@
-select = <'SELECT'> <ws> what (<ws> from)?
-<what> = paren-selectable (<','> <ws> paren-selectable)*
+select = <'SELECT'> <ws> what <ws> from
+what = paren-selectable (<','> <ws> paren-selectable)*
 <paren-selectable> = selectable | <'('> selectable <')'>
-<selectable> = probability | star
-<generate> = <'GENERATE *'> (<ws> gen-given)? <ws> using
-probability = <'PROBABILITY OF'> <ws> (prob-column | prob-binding) (<ws> prob-given)? <ws> using
-using = <'USING'> <ws> model
-model = symbol
-prob-column = column
-prob-binding = binding
+<selectable> = probability | star | column
 star = <'*'>
-from = <'FROM'> <ws> <'('> generate <')'> <ws> limit
-gen-given = <'GIVEN'> <ws> bindings
-prob-given = <'GIVEN'> <ws> <star>
-<bindings> = binding (<ws> <'AND'> <ws> binding)*
-<binding> = column <'='> value
-<column> = #'[a-zA-Z_]+'
-<value> = string | nat | float | int
-<limit> = <'LIMIT'> <ws> nat
+from = <'FROM'> <ws> table
+table = symbol
+column = symbol | string
+value = string | nat | float | int
 symbol = #'[a-zA-Z]\w*'
 string = #'\"([^\"]+)\"'
 nat = #'\d+'
 float = #'-?\d+\.\d+(E-?\d+)?'
 int = #'-?\d+'
 ws = #'\s+'
+
+using = <'USING'> <ws> model
+model = symbol
+generate = <'GENERATE *'> (<ws> gen-given)? <ws> using
+probability = <'PROBABILITY OF'> <ws> (prob-column | prob-binding) (<ws> prob-given)? <ws> using
+prob-column = column
+prob-binding = binding
+gen-given = <'GIVEN'> <ws> bindings
+prob-given = <'GIVEN'> <ws> <star>
+bindings = binding (<ws> <'AND'> <ws> binding)*
+binding = column <'='> value
+limit = <'LIMIT'> <ws> nat
