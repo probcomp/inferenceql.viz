@@ -24,9 +24,13 @@
     {:what xform
      :table table}))
 
+
 (defn- transform-what
-  [& columns]
-  (map #(select-keys % columns)))
+  [& selectables]
+  (if (some #{[:star]} selectables)
+    (map identity)
+    (let [columns (filter string? selectables)]
+      (map #(select-keys % columns)))))
 
 (def ^:private transform-map
   {:select transform-select
@@ -66,10 +70,11 @@
 
   (edn/read-string "hi")
 
-  (let [query (parse "SELECT \"x\", y, z FROM table")]
-    (execute query {'table [{"x" 1 "y" 2 "z" 3 "q" 0}]}))
+  (let [query (parse "SELECT x FROM table")]
+    (execute query {'table [{"x" 1 "y" 2 "z" 3 "q" 0}
+                            {"x" 4 "y" 5 "z" 6 "q" 7}]}))
 
   (parse "SELECT hi" :start :select)
-  (parse "SELECT *, hi")
+  (parse "SELECT *, x FROM table")
 
   )
