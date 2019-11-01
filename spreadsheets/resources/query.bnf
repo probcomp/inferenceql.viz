@@ -1,28 +1,19 @@
-select = <'SELECT'> <ws> what <ws> from
+select = <'SELECT'> <ws> what <ws> from (<ws> where)?
 what = paren-selectable (<','> <ws> paren-selectable)*
 <paren-selectable> = selectable | <'('> selectable <')'>
-<selectable> = probability | star | result-column
+<selectable> = star | result-column
 star = <'*'>
-from = <'FROM'> <ws> table (<','> <ws> table)*
+from = <'FROM'> <ws> table
+where = <'WHERE'> <ws> predicate
+predicate = result-column comparator (result-column | value)
+comparator = '=' | '!='
 result-column = (table <'.'>)? column
 <table> = symbol
 column = symbol | string
-value = string | nat | float | int
+<value> = string | nat | float | int
 symbol = #'[a-zA-Z]\w*'
 string = #'\"([^\"]+)\"'
 nat = #'\d+'
 float = #'-?\d+\.\d+(E-?\d+)?'
 int = #'-?\d+'
 ws = #'\s+'
-
-using = <'USING'> <ws> model
-model = symbol
-generate = <'GENERATE *'> (<ws> gen-given)? <ws> using
-probability = <'PROBABILITY OF'> <ws> (prob-column | prob-binding) (<ws> prob-given)? <ws> using
-prob-column = column
-prob-binding = binding
-gen-given = <'GIVEN'> <ws> bindings
-prob-given = <'GIVEN'> <ws> <star>
-bindings = binding (<ws> <'AND'> <ws> binding)*
-binding = column <'='> value
-limit = <'LIMIT'> <ws> nat
