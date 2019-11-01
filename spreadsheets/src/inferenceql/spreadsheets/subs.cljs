@@ -312,9 +312,15 @@
                                  (rf/dispatch [:clear-column-function col-name]))))
 
          disable-fn (fn []
-                     (this-as this
-                       ;; TODO: only enable options on column headers >= 2
-                       false))]
+                     (this-as hot
+                       (let [last-selected (.getSelectedRangeLast hot)
+                             from-col (.. last-selected -from -col)
+                             to-col (.. last-selected -to -col)
+                             from-row (.. last-selected -from -row)]
+
+                         ;; Disable the menu when either more than one column is selected
+                         ;; or when the selection does not start from a cell in the header row.
+                         (or (not= from-col to-col) (not= from-row 0)))))]
      {:items {"set_function" {:disabled disable-fn
                               :name "Set js function"
                               :callback set-function-fn}
