@@ -46,9 +46,20 @@
 
 (defn transform-result-column
   ([column]
-   (symbol (str column)))
+   (let [col-symbol (symbol (str column))]
+     {:name col-symbol :func #(get % col-symbol)}))
   ([table column]
-   (symbol (str table) (str column))))
+   (let [col-symbol (symbol (str table) (str column))]
+     {:name col-symbol :func #(get % col-symbol)})))
+
+(defn transform-what [& result-column-transformers]
+  [:what (reduce (fn [acc transformer]
+            (fn [row]
+              (assoc (acc row)
+                     (:name transformer)
+                     ((:func transformer) row))))
+          (constantly {})
+          result-column-transformers)])
 
 (defn transform-where
   [& stuff]
