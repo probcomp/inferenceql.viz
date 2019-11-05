@@ -1,10 +1,11 @@
-select = <'SELECT'> <ws> what <ws> from (<ws> where)?
+select = <'SELECT'> <ws> what <ws> from (<ws> where)? (<ws> limit)?
 what = paren-selectable (<','> <ws> paren-selectable)*
 <paren-selectable> = selectable | <'('> selectable <')'>
 <selectable> = star | result-column
 star = <'*'>
 from = <'FROM'> <ws> table
 where = <'WHERE'> <ws> predicate
+limit = <'LIMIT'> <ws> nat
 predicate = result-column comparator (result-column | value)
 comparator = '=' | '!='
 result-column = (table <'.'>)? column
