@@ -66,6 +66,7 @@
    :where transform-where
    :result-column transform-result-column
    :column str
+   :null (constantly nil)
    :string edn/read-string
    :symbol edn/read-string
    :int edn/read-string})

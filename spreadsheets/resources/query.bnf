@@ -10,7 +10,8 @@ comparator = '=' | '!='
 result-column = (table <'.'>)? column
 <table> = symbol
 column = symbol | string
-<value> = string | nat | float | int
+<value> = string | nat | float | int | null
+null = 'NULL' | 'null'
 symbol = #'[a-zA-Z]\w*'
 string = #'\"([^\"]+)\"'
 nat = #'\d+'
