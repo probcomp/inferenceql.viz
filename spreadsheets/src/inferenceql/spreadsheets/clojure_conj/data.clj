@@ -42,11 +42,16 @@
                             f-count (get freqs :false 0)
                             total (+ t-count f-count)]
                         (assert (not= total 0))
-                        {:true (/ t-count total)
-                         :false (/ f-count total)}))]
+                        {:true (double (/ t-count total))
+                         :false (double (/ f-count total))}))]
                         ;{:true (format "%.2f" (double (/ t-count total)))
                         ; :false (format "%.2f" (double (/ f-count total)))}))]
     (medley/map-vals make-tf-map items-freqs-map)))
+
+(def items-flip-statements
+  (let [make-flip-statement (fn [tf-map]
+                              (list (quote flip) (get tf-map :true)))]
+    (medley/map-vals make-flip-statement items-tf-map)))
 
 (def salary-map
   (let [salary-data (map #(get % "CompTotal") so-data)]

@@ -25,3 +25,21 @@
     (infer-and-score :procedure flip-n-coins
                      :inputs [n]
                      :observation-trace trace-with-n-flips)))
+
+(def so-model-1
+  (gen []
+    (let [row {"AWS" (at "AWS" flip 0.2639442971479545),
+               "React.js" (at "React.js" flip 0.3056965334809757),
+               "Rust" (at "Rust" flip 0.03190626819993377),
+               "JavaScript" (at "JavaScript" flip 0.6762552958238646),
+               "C++" (at "C++" flip 0.2343751784307232),
+               "Clojure" (at "Clojure" flip 0.01432013612123012),
+               "Java" (at "Java" flip 0.4101565622537656),
+               "Docker" (at "Docker" flip 0.3123621676536908),
+               "Kubernetes" (at "Kubernetes" flip 0.08468171568748915)}]
+      row)))
+
+(so-model-1)
+
+(infer-and-score :procedure so-model-1
+                 :inputs [])
