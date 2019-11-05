@@ -49,9 +49,10 @@
     (medley/map-vals make-tf-map items-freqs-map)))
 
 (def items-flip-statements
-  (let [make-flip-statement (fn [tf-map]
-                              (list (quote flip) (get tf-map :true)))]
-    (medley/map-vals make-flip-statement items-tf-map)))
+  (let [make-flip-statement (fn [item-name tf-map]
+                              (let [new-val (list 'at item-name 'flip (get tf-map :true))]
+                               [item-name new-val]))]
+    (medley/map-kv make-flip-statement items-tf-map)))
 
 (def salary-map
   (let [salary-data (map #(get % "CompTotal") so-data)]

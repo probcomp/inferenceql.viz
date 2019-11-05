@@ -8,7 +8,8 @@
    [metaprob.inference :as inf]
    [metaprob.trace :as trace]
    [clojure.pprint :refer [pprint]]
-   [inferenceql.spreadsheets.clojure-conj.data :as data]))
+   [inferenceql.spreadsheets.clojure-conj.data :as data]
+   [inferenceql.spreadsheets.clojure-conj.plotting :as plotting]))
 
 
 (def flip-n-coins
@@ -39,7 +40,6 @@
                "Kubernetes" (at "Kubernetes" flip 0.08468171568748915)}]
       row)))
 
-(so-model-1)
-
-(infer-and-score :procedure so-model-1
-                 :inputs [])
+;; Use this with `drawTrace` in the browser.
+(let [[_ trace _] (infer-and-score :procedure so-model-1 :inputs [])]
+  (print (plotting/trace-as-json-str trace)))
