@@ -1,17 +1,15 @@
 (ns inferenceql.spreadsheets.clojure-conj.trial
-  (:require-macros [metaprob.generative-functions :refer [gen let-traced]])
+  #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen let-traced]]))
   (:require
    [metaprob.prelude :as mp :refer [infer-and-score]]
-   [metaprob.generative-functions :as g :refer [apply-at at]]
-
+   #?(:clj [metaprob.generative-functions :refer [apply-at at gen let-traced]]
+      :cljs [metaprob.generative-functions :refer [apply-at at]])
    [metaprob.distributions :refer [flip uniform gaussian categorical]]
    [metaprob.inference :as inf]
    [metaprob.trace :as trace]
    [clojure.pprint :refer [pprint]]
-
    [inferenceql.spreadsheets.clojure-conj.data :as data]))
 
-   ;; prelude distributions generative-functions
 
 (def flip-n-coins
   (gen [n]
