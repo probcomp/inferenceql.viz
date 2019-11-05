@@ -23,40 +23,33 @@
 
 (deftest parsing-success
   (are [start query] (nil? (insta/get-failure (query/parser query :start start)))
-    :select "SELECT * FROM (GENERATE * USING model) LIMIT 2"
-    :select "SELECT * FROM (GENERATE * GIVEN java=\"False\" USING model) LIMIT 1"
-    :select "SELECT * FROM (GENERATE * GIVEN java=\"False\" AND linux=\"True\" USING model) LIMIT 1"
-    :select "SELECT (PROBABILITY OF salary_usd USING model), *"
-    :select "SELECT (PROBABILITY OF salary_usd GIVEN * USING model), *"
-    :select "SELECT (PROBABILITY OF label=\"True\" GIVEN * USING model), *"
-    :select "SELECT * FROM (GENERATE * USING model) LIMIT 100"
-    :select "SELECT (PROBABILITY OF doctors_visits GIVEN * USING model), *"
-    :select "SELECT (PROBABILITY OF label=\"True\" GIVEN * USING model), *"
-
-    :generate "GENERATE * USING model"
-    :generate "GENERATE * GIVEN java=\"False\" USING model"
-    :generate "GENERATE * GIVEN java=\"False\" AND linux=\"True\" USING model"
-
-    :column "java"
-    :column "linux"
-
-    :limit "LIMIT 0"
-    :limit "LIMIT 7"
-    :limit "LIMIT 24"
-
-    :bindings "java=\"False\""
-    :bindings "java=\"False\" AND linux=\"True\""
-
-    :symbol "abc"
-    :symbol "abc123"
-
-    :value "\"True\""
-    :value "\"False\""
-
-    :ws " "
-    :ws "  "
-    :ws "\t"))
+    :select "SELECT test.x FROM table"))
 
 (deftest parsing-failure
   (are [start query] (some? (insta/get-failure (query/parser query :start start)))
     :symbol "123abc"))
+
+(deftest execute-smoke
+  (let [db '{table [{table/x 1 table/y 2}
+                    {table/x 1 table/y 3}
+                    {          table/y 4}]}]
+    (are [query result] (= result (query/execute (query/parse query) db))
+      "SELECT table.x FROM table"
+      '[{table/x 1}
+        {table/x 1}
+        {table/x nil}]
+
+      "SELECT table.y FROM table"
+      '[{table/y 2}
+        {table/y 3}
+        {table/y 4}]
+
+      "SELECT table.y FROM table WHERE table.y=2"
+      '[{table/y 2}]
+
+      "SELECT table.y FROM table WHERE table.x=NULL"
+      '[{table/y 4}]
+
+      "SELECT table.y FROM table WHERE table.x!=NULL"
+      '[{table/y 2}
+        {table/y 3}])))
