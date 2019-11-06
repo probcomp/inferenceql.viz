@@ -40,10 +40,11 @@
                "Kubernetes" (at "Kubernetes" flip 0.08468171568748915)}]
       row)))
 
-(defn draw-trace-command []
+(defn demo-draw-trace []
   ;; Use this with `drawTrace` in the browser.
   (let [[_ trace _] (infer-and-score :procedure so-model-1 :inputs [])]
-    (print (tracep/trace-as-json-str trace))))
+    ;(print (tracep/trace-as-json-str trace))))
+    (tracep/view-trace trace)))
 
 (defn demo-simple-table-plot [n]
   (let [rows (repeatedly n so-model-1)
@@ -66,3 +67,4 @@
 
 ;(demo-simple-table-plot 20)
 ;(demo-partioned-table-plot)
+;(demo-draw-trace)
