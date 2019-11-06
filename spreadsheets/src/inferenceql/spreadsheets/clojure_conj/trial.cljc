@@ -78,13 +78,13 @@
                              {:row row-id :col col-idx :val (get row col-name) :col-name col-name :separator sep-cell :group group-id})))]
     (tablep/spec-with-data (mapcat make-row-elems (range) all-rows))))
 
-(defn spec-simulated-partitioned-v2 [n]
-  (let [row-group-1 (repeatedly n so-model-1)
-        row-group-2 (repeatedly n so-model-1)
-        row-group-3 (repeatedly n so-model-1)
+(defn spec-simulated-partitioned-v2 []
+  (let [row-group-1 (repeatedly 20 so-model-1)
+        row-group-2 (repeatedly 15 so-model-1)
+        row-group-3 (repeatedly 5 so-model-1)
         all-groups [row-group-1 row-group-2 row-group-3]
 
-        colors [["blue" "lightblue"] ["green" "lightgreen"] ["red" "lightred"]]]
+        colors [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]]
     (tablep/spec-with-mult-partitions all-groups colors)))
 
 ;(spec-simulated-rows 20)

@@ -118,16 +118,7 @@
        :angle {:value -90},
        :align {:value "left"},
        :baseline {:value "middle"},
-       :fill [{:value "black"}]}}}
-   {:type "rect",
-    :from {:data "rowset"},
-    :encode
-    {:update
-     {:x {:scale "xpos", :field "col"},
-      :y {:scale "ypos", :field "row"},
-      :width {:scale "xpos", :band 1, :offset -1},
-      :height {:scale "ypos", :band 1, :offset -1},
-      :fill {:scale "binary-color", :field "val"}}}}]})
+       :fill [{:value "black"}]}}}]})
 
 (defn spec-with-data [data]
   (let [complete-spec (assoc-in table-plot-spec [:data 0 :values] data)]
@@ -138,7 +129,7 @@
 (defn add-colors [spec colors]
   (let [add-color (fn [spec group-id color-group]
                     (let [[true-col false-col] color-group
-                          new-scale {:name (str "group_color_" group-id),
+                          new-scale {:name (str "group-color-" group-id),
                                      :type "ordinal",
                                      :range [true-col false-col "#c1c1c1"],
                                      :domain [true false "NA"]}]
@@ -182,13 +173,26 @@
                         (update-in spec [:data] conj new-section)))]
     (reduce add-section spec (range (count parts)))))
 
-(defn add-marks-sections [parts])
-
-;(defn add-divider-mark)
+(defn add-marks-sections [spec parts]
+  (let [make-section (fn [group-id]
+                       {:type "rect",
+                        :from {:data (str "group-" group-id),}
+                        :encode
+                        {:update
+                         {:x {:scale "xpos", :field "col"},
+                          :y {:scale "ypos", :field "row"},
+                          :width {:scale "xpos", :band 1, :offset -1},
+                          :height {:scale "ypos", :band 1, :offset -1},
+                          :fill {:scale (str "group-color-" group-id), :field "val"}}}})
+        add-section (fn [spec group-id]
+                      (let [new-section (make-section group-id)]
+                        (update-in spec [:marks] conj new-section)))]
+    (reduce add-section spec (range (count parts)))))
 
 (defn spec-with-mult-partitions [parts colors]
   (let [final-spec (-> table-plot-spec-multi
                        (add-colors colors)
                        (add-primary-data parts)
-                       (add-secondary-data parts))]
+                       (add-secondary-data parts)
+                       (add-marks-sections parts))]
     (print (json/write-str final-spec))))
