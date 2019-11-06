@@ -68,6 +68,67 @@
       :height {:scale "ypos", :band 1, :offset -1},
       :fill {:scale "binary-color", :field "val"}}}}]})
 
+(def table-plot-spec-multi
+ {:$schema "https://vega.github.io/schema/vega/v5.json",
+  :width 770,
+  :height 770,
+  :padding 2,
+
+  :signals
+  [{:name "cellSize", :value 10}
+   {:name "count", :update "length(data('rowset'))"}
+   {:name "width", :update "span(range('position'))"}
+   {:name "height", :update "width"}],
+
+  :data
+  [{:name "rowset",
+    :values []}
+   {:name "column-names",
+    :source "rowset",
+    :transform [{:type "aggregate", :groupby ["col" "col-name"]}]}]
+
+  :scales
+  [{:name "binary-color",
+    :type "ordinal",
+    :range ["blue" "lightblue" "#c1c1c1"],
+    :domain [true false "NA"]}
+   {:name "xpos-bak",
+    :type "band",
+    :domain {:data "rowset", :field "col", :sort true},
+    :range {:step {:signal "cellSize"}}}
+   {:name "xpos",
+    :type "band",
+    :domain {:data "rowset", :field "col", :sort true},
+    :range {:step {:signal "cellSize"}}}
+   {:name "ypos",
+    :type "band",
+    :domain {:data "rowset", :field "row", :sort true},
+    :range {:step {:signal "cellSize"}}}],
+
+  :marks
+  [{:type "text",
+     :name "columns",
+     :from {:data "column-names"},
+     :encode
+     {:update
+      {:x {:scale "xpos", :field "col", :band 0.5},
+       :y {:offset -2},
+       :text {:field "col-name"},
+       :fontSize {:value 10},
+       :angle {:value -90},
+       :align {:value "left"},
+       :baseline {:value "middle"},
+       :fill [{:value "black"}]}}}
+   {:type "rect",
+    :from {:data "rowset"},
+    :encode
+    {:update
+     {:x {:scale "xpos", :field "col"},
+      :y {:scale "ypos", :field "row"},
+      :width {:scale "xpos", :band 1, :offset -1},
+      :height {:scale "ypos", :band 1, :offset -1},
+      :fill {:scale "binary-color", :field "val"}}}}]})
+
 (defn spec-with-data [data]
   (let [complete-spec (assoc-in table-plot-spec [:data 0 :values] data)]
     (print (json/write-str complete-spec))))
@@ -109,13 +170,25 @@
 
 (defn add-primary-data [spec parts]
   (let [data-section (create-primary-data parts)]
-    (assoc-in spec [:data 0 :values] data)))
+    (assoc-in spec [:data 0 :values] data-section)))
+
+(defn add-secondary-data [spec parts]
+  (let [make-section (fn [group-id]
+                       {:name (str "group-" group-id)
+                        :source "rowset"
+                        :transform [{:type "filter", :expr (str "datum.group == " group-id)}]})
+        add-section (fn [spec group-id]
+                      (let [new-section (make-section group-id)]
+                        (update-in spec [:data] conj new-section)))]
+    (reduce add-section spec (range (count parts)))))
 
 (defn add-marks-sections [parts])
 
 (defn add-divider-mark)
 
 (defn spec-with-mult-partitions [parts colors]
-  (let [spec-with-colors (add-colors table-plot-spec colors)
-        final-spec (add-primary-data spec-with-colors parts)]
+  (let [final-spec (-> table-plot-spec-multi
+                       (add-colors colors)
+                       (add-primary-data parts)
+                       (add-secondary-data parts))]
     (print (json/write-str final-spec))))
