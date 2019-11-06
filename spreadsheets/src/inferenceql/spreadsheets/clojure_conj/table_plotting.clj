@@ -184,7 +184,7 @@
 
 (defn add-marks-sections [parts])
 
-(defn add-divider-mark)
+;(defn add-divider-mark)
 
 (defn spec-with-mult-partitions [parts colors]
   (let [final-spec (-> table-plot-spec-multi
