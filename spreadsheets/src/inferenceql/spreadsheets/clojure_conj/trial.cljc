@@ -90,4 +90,4 @@
 ;(spec-simulated-rows 20)
 ;(spec-simulated-partitioned 3)
 
-;(spec-simulated-partitioned-v2 3)
+(spec-simulated-partitioned-v2)

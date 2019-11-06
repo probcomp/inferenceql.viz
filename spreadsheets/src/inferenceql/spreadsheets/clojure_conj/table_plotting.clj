@@ -72,16 +72,24 @@
   (let [complete-spec (assoc-in table-plot-spec [:data 0 :values] data)]
     (print (json/write-str complete-spec))))
 
-(defn spec-with-mult-partitions [parts colors])
+;---------------------------
 
+(defn add-colors [spec colors]
+  (let [add-color (fn [spec group-id color-group]
+                    (let [[true-col false-col] color-group
+                          new-scale {:name (str "group_color_" group-id),
+                                     :type "ordinal",
+                                     :range [true-col false-col "#c1c1c1"],
+                                     :domain [true false "NA"]}]
+                      (update-in spec [:scales] conj new-scale)))]
+    (reduce-kv add-color spec colors)))
 
-(defn spec-simulated-partitioned [n]
-  (let [row-group-1 (map #(assoc % "group" 1) (repeatedly n so-model-1))
-        row-group-2 (map #(assoc % "group" 2) (repeatedly n so-model-1))
-        row-group-3 (map #(assoc % "group" 3) (repeatedly n so-model-1))
-        all-groups [row-group-1 row-group-2 row-group-3]
+(defn create-primary-data [parts]
+  (let [attach-group-label (fn [group-rows id]
+                             (map #(assoc % "group" id) group-rows))
+        all-groups (map attach-group-label parts (range))
 
-        col-order (->> (keys (first row-group-1))
+        col-order (->> (keys (first (first all-groups)))
                        (remove #{"group"})
                        (sort)
                        (map vector (range)))
@@ -97,4 +105,17 @@
                            (let [sep-cell (nil? (get row col-name))
                                  group-id (get row "group")]
                              {:row row-id :col col-idx :val (get row col-name) :col-name col-name :separator sep-cell :group group-id})))]
-    (tablep/spec-with-data (mapcat make-row-elems (range) all-rows))))
+    (mapcat make-row-elems (range) all-rows)))
+
+(defn add-primary-data [spec parts]
+  (let [data-section (create-primary-data parts)]
+    (assoc-in spec [:data 0 :values] data)))
+
+(defn add-marks-sections [parts])
+
+(defn add-divider-mark)
+
+(defn spec-with-mult-partitions [parts colors]
+  (let [spec-with-colors (add-colors table-plot-spec colors)
+        final-spec (add-primary-data spec-with-colors parts)]
+    (print (json/write-str final-spec))))
