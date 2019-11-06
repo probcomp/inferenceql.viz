@@ -9,8 +9,8 @@
    [metaprob.trace :as trace]
    [clojure.pprint :refer [pprint]]
    [inferenceql.spreadsheets.clojure-conj.data :as data]
-   [inferenceql.spreadsheets.clojure-conj.plotting :as plotting]))
-
+   [inferenceql.spreadsheets.clojure-conj.trace-plotting :as tracep]
+   [inferenceql.spreadsheets.clojure-conj.table-plotting :as tablep]))
 
 (def flip-n-coins
   (gen [n]
@@ -42,4 +42,16 @@
 
 ;; Use this with `drawTrace` in the browser.
 (let [[_ trace _] (infer-and-score :procedure so-model-1 :inputs [])]
-  (print (plotting/trace-as-json-str trace)))
+  (print (tracep/trace-as-json-str trace)))
+
+(defn spec-simulated-rows [n]
+  (let [rows (repeatedly n so-model-1)
+        col-order (->> (keys (first rows))
+                       (sort)
+                       (map vector (range)))
+        make-row (fn [row-id row]
+                     (for [[col-idx col-name] col-order]
+                       {:row row-id :col col-idx :val (get row col-name) :col-name col-name}))]
+    (tablep/spec-with-data (mapcat make-row (range) rows))))
+
+;(spec-simulated-rows 20)

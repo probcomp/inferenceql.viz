@@ -20,23 +20,23 @@
         {"row": 1, "col": 3, "val": true, "col-name": "something"},
         {"row": 2, "col": 1, "val": "NA", "col-name": "something"},
         {"row": 2, "col": 2, "val": "NA", "col-name": "blah"},
-        {"row": 2, "col": 3, "val": "NA", "col-name": "something"}
+        {"row": 2, "col": 3, "val": "NA", "col-name": "something"},
+        {"row": 3, "col": 10, "val": "NA", "col-name": "something", "render": false}
+      ]
+    },
+    {
+      "name": "column-names",
+      "source": "rowset",
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["col", "col-name"]
+        }
       ]
     }
   ],
 
   "scales": [
-    {
-      "name": "binary-color-backup",
-      "type": "ordinal",
-      "range": "category",
-      "domain": {
-        "fields": [
-          {"data": "rowset", "field": "val"}
-        ],
-        "sort": true
-      }
-    },
     {
       "name": "binary-color",
       "type": "ordinal",
@@ -44,6 +44,12 @@
       "domain": [true, false, "NA"]
     },
 
+    {
+      "name": "xpos-bak",
+      "type": "band",
+      "domain": {"data": "rowset", "field": "col", "sort": true},
+      "range": {"step": {"signal": "cellSize"}}
+    },
     {
       "name": "xpos",
       "type": "band",
@@ -62,7 +68,7 @@
     {
       "type": "text",
       "name": "columns",
-      "from": {"data": "rowset"},
+      "from": {"data": "column-names"},
       "encode": {
         "update": {
           "x": {"scale": "xpos", "field": "col", "band": 0.5},

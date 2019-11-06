@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.clojure-conj.plotting
+(ns inferenceql.spreadsheets.clojure-conj.trace-plotting
   (:require
    [clojure.data.json :as json]
    [clojure.java.io :as io]
@@ -20,6 +20,7 @@
   [tr]
   (json/write-str (trace-as-json tr)))
 
+;; TODO: delete this?
 (defn- plot-trace
   ([trace-json] (plot-trace trace-json 600 600))
   ([trace-json s] (plot-trace trace-json s s))
