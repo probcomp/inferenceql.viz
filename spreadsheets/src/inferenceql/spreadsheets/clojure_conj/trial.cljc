@@ -40,11 +40,12 @@
                "Kubernetes" (at "Kubernetes" flip 0.08468171568748915)}]
       row)))
 
-;; Use this with `drawTrace` in the browser.
-(let [[_ trace _] (infer-and-score :procedure so-model-1 :inputs [])]
-  (print (tracep/trace-as-json-str trace)))
+(defn draw-trace-command []
+  ;; Use this with `drawTrace` in the browser.
+  (let [[_ trace _] (infer-and-score :procedure so-model-1 :inputs [])]
+    (print (tracep/trace-as-json-str trace))))
 
-(defn spec-simulated-rows [n]
+(defn demo-simple-table-plot [n]
   (let [rows (repeatedly n so-model-1)
         col-order (->> (keys (first rows))
                        (sort)
@@ -54,31 +55,7 @@
                        {:row row-id :col col-idx :val (get row col-name) :col-name col-name}))]
     (tablep/spec-with-data (mapcat make-row (range) rows))))
 
-(defn spec-simulated-partitioned [n]
-  (let [row-group-1 (map #(assoc % "group" 1) (repeatedly n so-model-1))
-        row-group-2 (map #(assoc % "group" 2) (repeatedly n so-model-1))
-        row-group-3 (map #(assoc % "group" 3) (repeatedly n so-model-1))
-        all-groups [row-group-1 row-group-2 row-group-3]
-
-        col-order (->> (keys (first row-group-1))
-                       (remove #{"group"})
-                       (sort)
-                       (map vector (range)))
-        col-names (map second col-order)
-
-        separator-group [(zipmap col-names (repeat nil))]
-
-        joined-groups (interpose separator-group all-groups)
-        all-rows (flatten joined-groups)
-
-        make-row-elems (fn [row-id row]
-                         (for [[col-idx col-name] col-order]
-                           (let [sep-cell (nil? (get row col-name))
-                                 group-id (get row "group")]
-                             {:row row-id :col col-idx :val (get row col-name) :col-name col-name :separator sep-cell :group group-id})))]
-    (tablep/spec-with-data (mapcat make-row-elems (range) all-rows))))
-
-(defn spec-simulated-partitioned-v2 []
+(defn demo-partioned-table-plot []
   (let [row-group-1 (repeatedly 20 so-model-1)
         row-group-2 (repeatedly 15 so-model-1)
         row-group-3 (repeatedly 5 so-model-1)
@@ -87,7 +64,5 @@
         colors [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]]
     (tablep/spec-with-mult-partitions all-groups colors)))
 
-;(spec-simulated-rows 20)
-;(spec-simulated-partitioned 3)
-
-;(spec-simulated-partitioned-v2)
+;(demo-simple-table-plot 20)
+;(demo-partioned-table-plot)
