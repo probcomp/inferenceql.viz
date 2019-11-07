@@ -19,6 +19,8 @@
           trace-addr (str "flip: " rounded-weight)]
       (at trace-addr flip weight))))
 
+;----------------------------------
+
 (def so-model-1
   (gen []
     (let [col-probs {"AWS" 0.2639442971479545
@@ -104,7 +106,7 @@
 ;(demo-partioned-table-plot)
 ;(demo-draw-trace)
 
-(demo-partioned-table-plot-2)
+;(demo-partioned-table-plot-2)
 
 ;----------------------------------------------
 
