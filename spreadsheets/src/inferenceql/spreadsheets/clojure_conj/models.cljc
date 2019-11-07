@@ -1,7 +1,8 @@
-(ns inferenceql.spreadsheets.clojure-conj.trial
+(ns inferenceql.spreadsheets.clojure-conj.models
+  (:refer-clojure :exclude [map replicate apply])
   #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen let-traced]]))
   (:require
-   [metaprob.prelude :as mp :refer [infer-and-score]]
+   [metaprob.prelude :as mp :refer [infer-and-score map replicate apply]]
    #?(:clj [metaprob.generative-functions :refer [apply-at at gen let-traced]]
       :cljs [metaprob.generative-functions :refer [apply-at at]])
    [metaprob.distributions :refer [flip uniform gaussian categorical]]
@@ -41,9 +42,7 @@
       row)))
 
 (defn demo-draw-trace []
-  ;; Use this with `drawTrace` in the browser.
   (let [[_ trace _] (infer-and-score :procedure so-model-1 :inputs [])]
-    ;(print (tracep/trace-as-json-str trace))))
     (tracep/view-trace trace)))
 
 (defn demo-simple-table-plot [n]
@@ -68,3 +67,12 @@
 ;(demo-simple-table-plot 20)
 ;(demo-partioned-table-plot)
 ;(demo-draw-trace)
+
+(flip-n-coins 5)
+
+(let [[_ trace-with-n-flips _]
+      (infer-and-score :procedure flip-n-coins :inputs [5])]
+  (tracep/view-trace trace-with-n-flips))
+
+
+(infer-and-score :procedure flip-n-coins :inputs [5])
