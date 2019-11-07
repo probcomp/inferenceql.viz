@@ -13,11 +13,6 @@
                   (mapv fix-row)
                   (csv-data->maps)))
 
-(def items-to-find
-  {"LanguageWorkedWith" ["Clojure" "C++" "Rust" "Java" "JavaScript"]
-   "PlatformWorkedWith" ["Kubernetes" "Docker" "AWS"]
-   "WebFrameWorkedWith" ["React.js"]})
-
 (defn has-item? [column-name item-name data-map]
   (let [items-str (get data-map column-name)
         items (str/split items-str #";")]
@@ -25,18 +20,34 @@
           (some #{item-name} items) :true
           :else :false)))
 
-(def items-map
+(def so-data-clj (filter
+                  #(= (has-item? "LanguageWorkedWith" "Clojure" %) :true)
+                  so-data))
+
+(def so-data-not-clj (filter
+                      #(= (has-item? "LanguageWorkedWith" "Clojure" %) :false)
+                      so-data))
+
+(def items-to-find
+  {"LanguageWorkedWith" ["Clojure" "C++" "Rust" "Java" "JavaScript"]
+   "PlatformWorkedWith" ["Kubernetes" "Docker" "AWS"]
+   "WebFrameWorkedWith" ["React.js"]})
+
+;--------------------------------
+
+
+(defn items-map [rows]
   (let [build-item-group (fn [accum group-name items-in-group]
                             (let [p (for [item items-in-group]
-                                      (map (partial has-item? group-name item) so-data))
+                                      (map (partial has-item? group-name item) rows))
                                   p-map (zipmap items-in-group p)]
                               (merge accum p-map)))]
    (reduce-kv build-item-group {} items-to-find)))
 
-(def items-freqs-map
+(defn items-freqs-map [items-map]
   (medley/map-vals frequencies items-map))
 
-(def items-tf-map
+(defn items-tf-map [items-freqs-map]
   (let [make-tf-map (fn [freqs]
                       (let [t-count (get freqs :true 0)
                             f-count (get freqs :false 0)
@@ -48,12 +59,39 @@
                         ; :false (format "%.2f" (double (/ f-count total)))}))]
     (medley/map-vals make-tf-map items-freqs-map)))
 
-(def items-flip-statements
-  (let [make-flip-statement (fn [item-name tf-map]
-                              (let [new-val (list 'at item-name 'flip (get tf-map :true))]
-                               [item-name new-val]))]
-    (medley/map-kv make-flip-statement items-tf-map)))
-
-(def salary-map
-  (let [salary-data (map #(get % "CompTotal") so-data)]
+(defn salary-map [data]
+  (let [salary-data (map #(get % "CompTotal") data)]
     (assoc {} "CompTotal" salary-data)))
+
+;--------------------------------
+
+(def uncond-freqs (-> so-data
+                      (items-map)
+                      (items-freqs-map)))
+
+(def uncond-tf (items-tf-map uncond-freqs))
+
+(def clojure-dev-prob
+  (let [clojure-freqs (get uncond-freqs "Clojure")
+        total (+ (:true clojure-freqs) (:false clojure-freqs))
+        ratio (/ (:true clojure-freqs) total)]
+    ratio))
+
+(def clj-tf (-> so-data-clj
+                (items-map)
+                (items-freqs-map)
+                (items-tf-map)))
+
+(def not-clj-tf (-> so-data-not-clj
+                    (items-map)
+                    (items-freqs-map)
+                    (items-tf-map)))
+
+(defn print-probs [tf-map]
+  (for [[col probs] tf-map]
+    (println (str "\"" col "\"") (:true probs))))
+
+
+(comment
+  (print-probs clj-tf)
+  (print-probs not-clj-tf))
