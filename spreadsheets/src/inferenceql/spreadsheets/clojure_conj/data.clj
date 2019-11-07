@@ -44,6 +44,25 @@
                               (merge accum p-map)))]
    (reduce-kv build-item-group {} items-to-find)))
 
+(defn items-subset
+  "Return subset of columns in each row.
+  Useful for sending to table plotting functions."
+  [rows]
+  (let [make-pair (fn [group-name item row]
+                    (case (has-item? group-name item row)
+                      :true [item true]
+                      :false [item false]
+                      :NA [item "NA"]))
+        group-items (apply concat
+                            (for [[group-name items] items-to-find]
+                              (for [item items]
+                                [group-name item])))]
+    ;; Make one map for each row with our desired fields.
+    (for [r rows]
+      (into {}
+        (for [[group-name item] group-items]
+          (make-pair group-name item r))))))
+
 (defn items-freqs-map [items-map]
   (medley/map-vals frequencies items-map))
 
@@ -65,11 +84,15 @@
 
 ;--------------------------------
 
+;;; Data for the unconditional model
+
 (def uncond-freqs (-> so-data
                       (items-map)
                       (items-freqs-map)))
 
 (def uncond-tf (items-tf-map uncond-freqs))
+
+;;; Data for the conditional model
 
 (def clojure-dev-prob
   (let [clojure-freqs (get uncond-freqs "Clojure")
@@ -87,10 +110,16 @@
                     (items-freqs-map)
                     (items-tf-map)))
 
+;;; For printing and copying probabilities
+
 (defn print-probs [tf-map]
   (for [[col probs] tf-map]
     (println (str "\"" col "\"") (:true probs))))
 
+;;; Subsetted data maps for passing to table plotting functions. 
+
+(def data-subset-clj (take 20 (items-subset so-data-clj)))
+(def data-subset-not-clj (take 20 (items-subset so-data-not-clj)))
 
 (comment
   (print-probs clj-tf)

@@ -95,9 +95,16 @@
         colors [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]]
     (tablep/spec-with-mult-partitions all-groups colors)))
 
+(defn demo-partioned-table-plot-2 []
+  (let [all-groups [data/data-subset-clj data/data-subset-not-clj]
+        colors [["blue" "lightblue"] ["green" "lightgreen"]]]
+    (tablep/spec-with-mult-partitions all-groups colors)))
+
 ;(demo-simple-table-plot 20)
 ;(demo-partioned-table-plot)
 ;(demo-draw-trace)
+
+(demo-partioned-table-plot-2)
 
 ;----------------------------------------------
 
