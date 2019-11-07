@@ -30,16 +30,60 @@
 
 (def so-model-1
   (gen []
-    (let [row {"AWS" (at "AWS" flip 0.2639442971479545),
-               "React.js" (at "React.js" flip 0.3056965334809757),
-               "Rust" (at "Rust" flip 0.03190626819993377),
-               "JavaScript" (at "JavaScript" flip 0.6762552958238646),
-               "C++" (at "C++" flip 0.2343751784307232),
-               "Clojure" (at "Clojure" flip 0.01432013612123012),
-               "Java" (at "Java" flip 0.4101565622537656),
-               "Docker" (at "Docker" flip 0.3123621676536908),
-               "Kubernetes" (at "Kubernetes" flip 0.08468171568748915)}]
-      row)))
+    (let [col-probs {"AWS" 0.2639442971479545
+                     "React.js"  0.3056965334809757
+                     "Rust"  0.03190626819993377
+                     "JavaScript" 0.6762552958238646
+                     "C++" 0.2343751784307232
+                     "Clojure" 0.01432013612123012
+                     "Java" 0.4101565622537656
+                     "Docker" 0.3123621676536908
+                     "Kubernetes" 0.08468171568748915}
+          vals (for [[col prob] col-probs]
+                 (at col flip prob))]
+      (zipmap (keys col-probs) vals))))
+
+;----------------------------------
+
+(defn so-model-2
+  (gen []
+    (let-traced [clojure-prob 0.1 ;; TODO add a real probability here
+                 clojure-dev (flip clojure-prob)]
+      (if clojure-dev
+        (so-model-2-clojure)
+        (so-model-2-no-clojure)))))
+
+(defn so-model-2-clojure
+  (gen []
+    (let [col-probs {"AWS" 0.2639442971479545
+                     "React.js"  0.3056965334809757
+                     "Rust"  0.03190626819993377
+                     "JavaScript" 0.6762552958238646
+                     "C++" 0.2343751784307232
+                     "Clojure" 0.01432013612123012
+                     "Java" 0.4101565622537656
+                     "Docker" 0.3123621676536908
+                     "Kubernetes" 0.08468171568748915}
+          vals (for [[col prob] col-probs]
+                 (at col flip prob))]
+      (zipmap (keys col-probs) vals))))
+
+(defn so-model-2-no-clojure
+  (gen []
+    (let [col-probs {"AWS" 0.2639442971479545
+                     "React.js"  0.3056965334809757
+                     "Rust"  0.03190626819993377
+                     "JavaScript" 0.6762552958238646
+                     "C++" 0.2343751784307232
+                     "Clojure" 0.01432013612123012
+                     "Java" 0.4101565622537656
+                     "Docker" 0.3123621676536908
+                     "Kubernetes" 0.08468171568748915}
+          vals (for [[col prob] col-probs]
+                 (at col flip prob))]
+      (zipmap (keys col-probs) vals))))
+
+;----------------------------------
 
 (defn demo-draw-trace []
   (let [[_ trace _] (infer-and-score :procedure so-model-1 :inputs [])]
@@ -68,11 +112,14 @@
 ;(demo-partioned-table-plot)
 ;(demo-draw-trace)
 
-(flip-n-coins 5)
+(comment
+  (let [[_ trace-with-n-flips _]
+        (infer-and-score :procedure flip-n-coins :inputs [5])]
+    (tracep/view-trace trace-with-n-flips))
+  (infer-and-score :procedure flip-n-coins :inputs [5]))
 
-(let [[_ trace-with-n-flips _]
-      (infer-and-score :procedure flip-n-coins :inputs [5])]
-  (tracep/view-trace trace-with-n-flips))
+;------
 
-
-(infer-and-score :procedure flip-n-coins :inputs [5])
+(comment
+  (so-model-1)
+  (tracep/view-trace (second (infer-and-score :procedure so-model-1))))
