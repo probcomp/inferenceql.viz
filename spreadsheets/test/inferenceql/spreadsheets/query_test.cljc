@@ -30,26 +30,26 @@
     :symbol "123abc"))
 
 (deftest execute-smoke
-  (let [db '{table [{table/x 1 table/y 2}
-                    {table/x 1 table/y 3}
-                    {          table/y 4}]}]
+  (let [db {"table" [{"x" 1 "y" 2}
+                     {"x" 1 "y" 3}
+                     {      "y" 4}]}]
     (are [query result] (= result (query/execute (query/parse query) db))
       "SELECT table.x FROM table"
-      '[{table/x 1}
-        {table/x 1}
-        {table/x nil}]
+      '[{"x" 1}
+        {"x" 1}
+        {"x" nil}]
 
       "SELECT table.y FROM table"
-      '[{table/y 2}
-        {table/y 3}
-        {table/y 4}]
+      '[{"y" 2}
+        {"y" 3}
+        {"y" 4}]
 
       "SELECT table.y FROM table WHERE table.y=2"
-      '[{table/y 2}]
+      '[{"y" 2}]
 
       "SELECT table.y FROM table WHERE table.x=NULL"
-      '[{table/y 4}]
+      '[{"y" 4}]
 
       "SELECT table.y FROM table WHERE table.x!=NULL"
-      '[{table/y 2}
-        {table/y 3}])))
+      '[{"y" 2}
+        {"y" 3}])))

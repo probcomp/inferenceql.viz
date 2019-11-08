@@ -1,21 +1,39 @@
 select = <'SELECT'> <ws> what <ws> from (<ws> where)? (<ws> limit)?
 what = paren-selectable (<','> <ws> paren-selectable)*
 <paren-selectable> = selectable | <'('> selectable <')'>
-<selectable> = star | result-column
+<selectable> = star | result-column | probability
 star = <'*'>
 from = <'FROM'> <ws> table
 where = <'WHERE'> <ws> predicate
 limit = <'LIMIT'> <ws> nat
+
 predicate = result-column comparator (result-column | value)
-comparator = '=' | '!='
+comparator = equals | does-not-equal
+<equals> = '='
+<does-not-equal> = '!='
+
+probability = <'PROBABILITY'> <ws> of <ws> given <ws> using
+of = <'OF'> <ws> events
+given = <'GIVEN'> <ws> events
+using = <'USING'> <ws> model
+
+events = event (<ws>? <','> <ws>? event)*
+event = qualified-variable <ws>? <equals> <ws>? value
+qualified-variable = model <'.'> variable
+
 result-column = (table <'.'>)? column
-<table> = symbol
 column = symbol | string
+variable =  symbol | string
+
+model = symbol | string
+table = symbol | string
 <value> = string | nat | float | int | null
+
 null = 'NULL' | 'null'
 symbol = #'[a-zA-Z]\w*'
 string = #'\"([^\"]+)\"'
 nat = #'\d+'
 float = #'-?\d+\.\d+(E-?\d+)?'
 int = #'-?\d+'
+
 ws = #'\s+'
