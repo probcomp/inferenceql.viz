@@ -7,6 +7,7 @@
             [metaprob.prelude :as mp]
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.basic-queries :as mmix.basic-queries]
+            [inferenceql.multimixture.search  :as search]
             [inferenceql.spreadsheets.model :as model]))
 
 (def parser (insta/parser (sio/inline-resource "query.bnf")))
@@ -29,58 +30,58 @@
   ;; TODO: Assume only one model for now
   variable)
 
-(comment
-
-  ((parse "SELECT t.x FROM t" :start :select)
-   {"t" []})
-
-  (parser "PROBABILITY OF model.x=1, model.y=2 GIVEN model.y=0 USING model" :start :probability)
-  (parse "PROBABILITY OF model.x=1, model.y=2 GIVEN model.y=0 USING model" :start :probability)
-
-  )
-
 (defn- transform-select
   [& args]
   (fn [env]
     (let [[_ table] (find-node :from args)
-          [_ what-xf] (find-node :what args)
+          [_ what-f] (find-node :what args)
+          what-xf (what-f env)
           where-xf (if-let [[_ where-xf] (find-node :where args)]
                      where-xf
                      (map identity))
           limit-xf (if-let [[_ limit] (find-node :limit args)]
                      (take limit)
-                     (map identity))]
-      {:table table
-       :xform (comp where-xf what-xf limit-xf)})))
+                     (map identity))
+          xf (comp where-xf what-xf limit-xf)
+          rows (get env table)]
+      (into [] xf rows))))
 
 (defn transform-result-column
   ([column]
    {:name column
-    :func #(get % column)})
+    :func (fn [env]
+            #(get % column))})
   ([table column]
    {:name column
-    :func #(get % column)}))
+    :func (fn [env]
+            #(get % column))}))
 
 (defn- transform-probability
   [& form]
   (match form
     ([[:of of]
       [:given given]
-      [:using model]] :seq)
+      [:using model-sym]] :seq)
     {:name (str (gensym)) ; TODO What/how to name this?
-     :func (fn probability-for-row [row]
-             ;; TODO: Allow `given` to refer to row variables
-             (mmix.basic-queries/logpdf model of given))}))
+     :func (fn [env]
+             (let [model (get env model-sym)]
+               (assert (some? model))
+               (fn probability [row]
+                 ;; TODO: Allow `given` to refer to row variables
+                 (mp/exp (mmix.basic-queries/logpdf model of given)))))}))
 
 (defn transform-what [& result-column-transformers]
-  (let [f (reduce (fn [next-f {:keys [name func]}]
-                    (fn [row]
-                      (assoc (next-f row)
-                             name
-                             (func row))))
-                  (constantly {})
-                  result-column-transformers)]
-    [:what (map f)]))
+  [:what
+   (fn [env]
+     (let [f (reduce (fn [acc {:keys [name func]}]
+                       (let [f (func env)]
+                         (fn [row]
+                           (assoc (acc row)
+                                  name
+                                  (f row)))))
+                     (constantly {})
+                     result-column-transformers)]
+       (map f)))])
 
 (defn transform-where
   [& form]
@@ -122,8 +123,3 @@
   [& args]
   (let [ast (apply parser args)]
     (insta/transform transform-map ast)))
-
-(defn execute
-  [f env]
-  (let [{:keys [xform table]} (f env)]
-    (into [] xform (get env table))))
