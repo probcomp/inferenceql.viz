@@ -15,12 +15,6 @@
    [inferenceql.multimixture.basic-queries :as bq]
    [inferenceql.multimixture :as mmix]))
 
-(def t-flip
-  (gen [weight]
-    (let [rounded-weight (format "%.3f" weight)
-          trace-addr (str "flip: " rounded-weight)]
-      (at trace-addr flip weight))))
-
 (def count-model-row-gen
   (gen []
     (let [col-probs {"AWS" 0.2639442971479545

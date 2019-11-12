@@ -13,7 +13,8 @@
    [inferenceql.spreadsheets.clojure-conj.trace-plotting :as tracep]
    [inferenceql.spreadsheets.clojure-conj.table-plotting :as tablep]
    [inferenceql.multimixture.basic-queries :as bq]
-   [inferenceql.multimixture :as mmix]))
+   [inferenceql.multimixture :as mmix]
+   [inferenceql.spreadsheets.clojure-conj.models.util :refer [t-flip]]))
 
 (def clj-row-gen
   (gen []
@@ -27,7 +28,7 @@
                      "Docker" 0.6016666666666667
                      "Kubernetes" 0.2341666666666667}
           vals (for [[col prob] col-probs]
-                 (at `(:columns ~col) flip prob))]
+                 (at `(:columns ~col) t-flip prob))]
       (zipmap (keys col-probs) vals))))
 
 (def no-clj-row-gen
@@ -42,13 +43,13 @@
                      "Docker" 0.3086742424242424
                      "Kubernetes" 0.08257575757575758}
           vals (for [[col prob] col-probs]
-                 (at `(:columns ~col) flip prob))]
+                 (at `(:columns ~col) t-flip prob))]
       (zipmap (keys col-probs) vals))))
 
 (def cond-count-model-row-gen
   (gen []
     (let-traced [clojure-prob 0.01432013612123012
-                 clojure-dev (flip clojure-prob)]
+                 clojure-dev (t-flip clojure-prob)]
       (if clojure-dev
         (at '() clj-row-gen)
         (at '() no-clj-row-gen)))))
@@ -85,3 +86,5 @@
             (mp/infer-and-score :procedure row-generator :observation-trace trace-with-clojure))))))))
 
 (def cond-count-model (make-cond-count-model cond-count-model-row-gen))
+
+;(tracep/view-trace (second (infer-and-score :procedure cond-count-model)))

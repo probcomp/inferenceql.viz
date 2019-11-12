@@ -9,6 +9,14 @@
                                            :observation-trace constraint-addrs-vals))]
     (take num-rows (repeatedly gen-fn))))
 
+(defn simulate-trace
+  ;;; TODO: Delete me?
+  [generative-model constraints num-rows]
+  (let [constraint-addrs-vals (mmix/with-row-values {} constraints)
+        gen-fn #(second (mp/infer-and-score :procedure generative-model
+                                            :observation-trace constraint-addrs-vals))]
+    (take num-rows (repeatedly gen-fn))))
+
 (defn logpdf
   [row-generator target constraints]
   (let [target-addrs-vals (mmix/with-row-values {} target)
