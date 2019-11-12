@@ -2,16 +2,18 @@
   (:refer-clojure :exclude [map replicate apply])
   #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen let-traced]]))
   (:require
-   [metaprob.prelude :as mp :refer [infer-and-score map replicate apply]]
-   #?(:clj [metaprob.generative-functions :refer [apply-at at gen let-traced]]
-      :cljs [metaprob.generative-functions :refer [apply-at at]])
-   [metaprob.distributions :refer [flip uniform gaussian categorical exactly]]
+   [metaprob.prelude :as mp :refer [infer-and-score map replicate apply exp]]
+   #?(:clj [metaprob.generative-functions :refer [apply-at at make-generative-function gen let-traced]]
+      :cljs [metaprob.generative-functions :refer [apply-at at make-generative-function]])
+   [metaprob.distributions :as dist :refer [flip uniform gaussian categorical exactly]]
    [metaprob.inference :as inf]
    [metaprob.trace :as trace]
    [clojure.pprint :refer [pprint]]
    [inferenceql.spreadsheets.clojure-conj.data :as data]
    [inferenceql.spreadsheets.clojure-conj.trace-plotting :as tracep]
-   [inferenceql.spreadsheets.clojure-conj.table-plotting :as tablep]))
+   [inferenceql.spreadsheets.clojure-conj.table-plotting :as tablep]
+   [inferenceql.multimixture.basic-queries :as bq]
+   [inferenceql.multimixture :as mmix]))
 
 (def t-flip
   (gen [weight]
@@ -20,6 +22,8 @@
       (at trace-addr flip weight))))
 
 ;----------------------------------
+
+;; TODO look at lecture notes from Ulli.
 
 (def so-model-1
   (gen []
@@ -33,10 +37,25 @@
                      "Docker" 0.3123621676536908
                      "Kubernetes" 0.08468171568748915}
           vals (for [[col prob] col-probs]
-                 (at col t-flip prob))]
+                 (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
-;----------------------------------
+(def so-model-1-row-generator
+  (make-generative-function
+   so-model-1
+   (gen [partial-trace]
+     (gen []
+       (let [[v t s] (mp/infer-and-score :procedure so-model-1 :observation-trace partial-trace)]
+         ;; NOTE: returning the new trace, not the partial trace as in search.clj
+         ;; Maybe that was a bug in search.clj?
+         [v t s])))))
+
+
+;(so-model-2-row-generator)
+;(tracep/view-trace (second (infer-and-score :procedure so-model-2)))
+;(tracep/view-trace (second (infer-and-score :procedure so-model-2-row-generator)))
+
+;--------------------------------
 
 (def so-model-2-clojure
   (gen []
@@ -50,7 +69,7 @@
                      "Docker" 0.6016666666666667
                      "Kubernetes" 0.2341666666666667}
           vals (for [[col prob] col-probs]
-                 (at col t-flip prob))]
+                 (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
 (def so-model-2-no-clojure
@@ -65,16 +84,44 @@
                      "Docker" 0.3086742424242424
                      "Kubernetes" 0.08257575757575758}
           vals (for [[col prob] col-probs]
-                 (at col t-flip prob))]
+                 (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
 (def so-model-2
   (gen []
     (let-traced [clojure-prob 0.01432013612123012
-                 clojure-dev (t-flip clojure-prob)]
+                 clojure-dev (flip clojure-prob)]
       (if clojure-dev
         (at "clj-count-model" so-model-2-clojure)
         (at "not-clj-count-model" so-model-2-no-clojure)))))
+
+(def so-model-2-row-generator
+  (make-generative-function
+   so-model-2
+   (gen [partial-trace]
+     (let [has-clojure (trace/trace-has-value? partial-trace '("clojure-dev"))]
+       (if (not has-clojure)
+         (let [all-clojure-traces (map #(trace/trace-set-value {} '("clojure-dev") %) [true false])
+               all-traces (mapv #(merge partial-trace %) all-clojure-traces)
+               all-logscores  (mapv #(last (mp/infer-and-score :procedure so-model-2
+                                                               :observation-trace %))
+                                    all-traces)
+               all-scores (map mp/exp all-logscores)
+               all-zeroes (every? #(== 0 %) all-scores)
+               log-normalizer (if all-zeroes ##-Inf (dist/logsumexp all-logscores))
+               score          log-normalizer
+               categorical-params (if all-zeroes
+                                    (mmix/uniform-categorical-params (count all-scores))
+                                    (dist/normalize-numbers all-scores))]
+           (gen []
+             (let [i     (dist/categorical categorical-params)
+                   trace (nth all-traces i)
+                   v     (first (mp/infer-and-score :procedure so-model-2
+                                                    :observation-trace trace))]
+               ;; NOTE: why don't we return the trace returned by infer-and-score here?
+               [v trace score])))
+        (gen []
+          (mp/infer-and-score :procedure so-model-2 :observation-trace partial-trace)))))))
 
 ;----------------------------------
 
@@ -116,3 +163,71 @@
 
   (so-model-2)
   (tracep/view-trace (second (infer-and-score :procedure so-model-2))))
+
+;----------------------------------------------
+
+(comment
+  (def demo-uncond-model
+    (gen []
+      (let [col-probs {"AWS" 0.45
+                       "React"  0.3
+                       "Java" 0.9}
+            vals (for [[col prob] col-probs]
+                   (at col flip prob))]
+        (zipmap (keys col-probs) vals))))
+
+  (def trace  {"AWS" {:value true}, "React" {:value true}, "Java" {:value true}})
+  (def trace  {"React" {:value true}, "Java" {:value true}})
+
+  (let [[v t s] (infer-and-score :procedure demo-uncond-model :observation-trace trace)]
+    (println t)
+    (println "score: " (exp s))
+    (println "manual score: " (* 0.6 0.3 0.9))
+    (= (* 0.6 0.3 0.9) (exp s)))
+
+  ;--------------------------------
+
+  (def demo-uncond-model
+    (gen []
+      (let [col-probs {"AWS" 0.45
+                       "React"  0.3}
+            vals (for [[col prob] col-probs]
+                   (at col flip prob))]
+        (zipmap (keys col-probs) vals))))
+
+  (def trace  {"AWS" {:value true} "React" {:value true}})
+
+  (let [[v t s] (infer-and-score :procedure demo-uncond-model :observation-trace trace)]
+    (println t)
+    (println "score: " (exp s))
+    (println "manual score: " (* 0.6 0.3 0.9))
+    (= (* 0.6 0.3 0.9) (exp s)))
+
+  (* 0.45 0.3)
+
+  ;--------------------------------
+
+  (def experimental-model
+    (gen []
+      (let-traced [clojure-prob 0.4
+                   clojure-dev (flip clojure-prob)]
+        (if clojure-dev
+          {"AWS" (at "AWS" flip 0.2)
+           "C++" (at "C++" flip 0.3)}
+          {"AWS" (at "AWS" flip 0.6)
+           "C++" (at "C++" flip 0.7)}))))
+
+  (experimental-model)
+
+
+  (def trace {"AWS" {:value true}})
+  (let [[v t s] (infer-and-score :procedure experimental-model :observation-trace trace)]
+    (println t)
+    (exp s))
+
+  ;clojure false case
+  (/ (* 0.6 0.6 0.7) (* 0.6 0.7))
+
+  (/ (* 0.4 0.2 0.3) (* 0.4 0.3)))
+
+  ;-----------------------------------
