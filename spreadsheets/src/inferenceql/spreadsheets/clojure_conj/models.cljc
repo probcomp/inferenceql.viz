@@ -23,9 +23,7 @@
 
 ;----------------------------------
 
-;; TODO look at lecture notes from Ulli.
-
-(def so-model-1
+(def count-model-row-gen
   (gen []
     (let [col-probs {"AWS" 0.2639442971479545
                      "React.js"  0.3056965334809757
@@ -40,24 +38,21 @@
                  (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
-(def so-model-1-row-generator
+(defn make-count-model [row-generator]
   (make-generative-function
-   so-model-1
+   row-generator
    (gen [partial-trace]
      (gen []
-       (let [[v t s] (mp/infer-and-score :procedure so-model-1 :observation-trace partial-trace)]
+       (let [[v t s] (mp/infer-and-score :procedure row-generator :observation-trace partial-trace)]
          ;; NOTE: returning the new trace, not the partial trace as in search.clj
          ;; Maybe that was a bug in search.clj?
          [v t s])))))
 
-
-;(so-model-2-row-generator)
-;(tracep/view-trace (second (infer-and-score :procedure so-model-2)))
-;(tracep/view-trace (second (infer-and-score :procedure so-model-2-row-generator)))
+(def count-model (make-count-model count-model-row-gen))
 
 ;--------------------------------
 
-(def so-model-2-clojure
+(def clj-row-gen
   (gen []
     (let [col-probs {"AWS" 0.5233333333333333
                      "React.js" 0.5765054294175715
@@ -72,7 +67,7 @@
                  (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
-(def so-model-2-no-clojure
+(def no-clj-row-gen
   (gen []
     (let [col-probs {"AWS" 0.2605176767676768
                      "React.js" 0.3016945432884486
@@ -87,23 +82,23 @@
                  (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
-(def so-model-2
+(def cond-count-model-row-gen
   (gen []
     (let-traced [clojure-prob 0.01432013612123012
                  clojure-dev (flip clojure-prob)]
       (if clojure-dev
-        (at "clj-count-model" so-model-2-clojure)
-        (at "not-clj-count-model" so-model-2-no-clojure)))))
+        (at "clj-count-model" clj-row-gen)
+        (at "not-clj-count-model" no-clj-row-gen)))))
 
-(def so-model-2-row-generator
+(defn make-cond-count-model [row-generator]
   (make-generative-function
-   so-model-2
+   row-generator
    (gen [partial-trace]
      (let [has-clojure (trace/trace-has-value? partial-trace '("clojure-dev"))]
        (if (not has-clojure)
          (let [all-clojure-traces (map #(trace/trace-set-value {} '("clojure-dev") %) [true false])
                all-traces (mapv #(merge partial-trace %) all-clojure-traces)
-               all-logscores  (mapv #(last (mp/infer-and-score :procedure so-model-2
+               all-logscores  (mapv #(last (mp/infer-and-score :procedure row-generator
                                                                :observation-trace %))
                                     all-traces)
                all-scores (map mp/exp all-logscores)
@@ -116,17 +111,19 @@
            (gen []
              (let [i     (dist/categorical categorical-params)
                    trace (nth all-traces i)
-                   v     (first (mp/infer-and-score :procedure so-model-2
+                   v     (first (mp/infer-and-score :procedure row-generator
                                                     :observation-trace trace))]
                ;; NOTE: why don't we return the trace returned by infer-and-score here?
                [v trace score])))
         (gen []
-          (mp/infer-and-score :procedure so-model-2 :observation-trace partial-trace)))))))
+          (mp/infer-and-score :procedure row-generator :observation-trace partial-trace)))))))
+
+(def cond-count-model (make-cond-count-model cond-count-model-row-gen))
 
 ;----------------------------------
 
 (defn demo-simple-table-plot [n]
-  (let [rows (repeatedly n so-model-1)
+  (let [rows (repeatedly n count-model)
         col-order (->> (keys (first rows))
                        (sort)
                        (map vector (range)))
@@ -136,9 +133,9 @@
     (tablep/spec-with-data (mapcat make-row (range) rows))))
 
 (defn demo-partioned-table-plot []
-  (let [row-group-1 (repeatedly 20 so-model-1)
-        row-group-2 (repeatedly 15 so-model-1)
-        row-group-3 (repeatedly 5 so-model-1)
+  (let [row-group-1 (repeatedly 20 count-model)
+        row-group-2 (repeatedly 15 count-model)
+        row-group-3 (repeatedly 5 count-model)
         all-groups [row-group-1 row-group-2 row-group-3]
 
         colors [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]]
@@ -158,11 +155,8 @@
 ;----------------------------------------------
 
 (comment
-  (so-model-1)
-  (tracep/view-trace (second (infer-and-score :procedure so-model-1)))
-
-  (so-model-2)
-  (tracep/view-trace (second (infer-and-score :procedure so-model-2))))
+  (count-model)
+  (tracep/view-trace (second (infer-and-score :procedure count-model))))
 
 ;----------------------------------------------
 
