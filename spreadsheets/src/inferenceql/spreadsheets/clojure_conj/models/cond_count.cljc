@@ -74,10 +74,11 @@
            (gen []
              (let [i     (dist/categorical categorical-params)
                    trace (nth all-traces i)
-                   v     (first (mp/infer-and-score :procedure row-generator
-                                                    :observation-trace trace))]
+                   [v t _] (mp/infer-and-score :procedure row-generator :observation-trace trace)]
                ;; NOTE: why don't we return the trace returned by infer-and-score here?
-               [v trace score])))
+               ;; UPDATE: now, returning trace frm infer-and-score. Check with Ulli to make sure
+               ;; this is ok.
+               [v t score])))
         (let [clojure-val (trace/trace-value partial-trace '(:columns "Clojure"))
               trace-with-clojure (trace/trace-set-value partial-trace '("clojure-dev") clojure-val)]
           (gen []

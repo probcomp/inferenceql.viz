@@ -13,7 +13,8 @@
    [inferenceql.spreadsheets.clojure-conj.trace-plotting :as tracep]
    [inferenceql.spreadsheets.clojure-conj.table-plotting :as tablep]
    [inferenceql.multimixture.basic-queries :as bq]
-   [inferenceql.multimixture :as mmix]))
+   [inferenceql.multimixture :as mmix]
+   [inferenceql.spreadsheets.clojure-conj.models.cond-count :refer [make-cond-count-model]]))
 
 (def clj-row-gen
   (gen []
@@ -40,36 +41,6 @@
       (if clojure-dev
         (at '() clj-row-gen)
         (at '() no-clj-row-gen)))))
-
-(defn make-cond-count-model [row-generator]
-  (make-generative-function
-   row-generator
-   (gen [partial-trace]
-     (let [has-clojure (trace/trace-has-value? partial-trace '(:columns "Clojure"))]
-       (if (not has-clojure)
-         (let [all-clojure-traces (map #(trace/trace-set-value {} '("clojure-dev") %) [true false])
-               all-traces (mapv #(merge partial-trace %) all-clojure-traces)
-               all-logscores  (mapv #(last (mp/infer-and-score :procedure row-generator
-                                                               :observation-trace %))
-                                    all-traces)
-               all-scores (map mp/exp all-logscores)
-               all-zeroes (every? #(== 0 %) all-scores)
-               log-normalizer (if all-zeroes ##-Inf (dist/logsumexp all-logscores))
-               score          log-normalizer
-               categorical-params (if all-zeroes
-                                    (mmix/uniform-categorical-params (count all-scores))
-                                    (dist/normalize-numbers all-scores))]
-           (gen []
-             (let [i     (dist/categorical categorical-params)
-                   trace (nth all-traces i)
-                   v     (first (mp/infer-and-score :procedure row-generator
-                                                    :observation-trace trace))]
-               ;; NOTE: why don't we return the trace returned by infer-and-score here?
-               [v trace score])))
-        (let [clojure-val (trace/trace-value partial-trace '(:columns "Clojure"))
-              trace-with-clojure (trace/trace-set-value partial-trace '("clojure-dev") clojure-val)]
-          (gen []
-            (mp/infer-and-score :procedure row-generator :observation-trace trace-with-clojure))))))))
 
 (def cond-count-model (make-cond-count-model cond-count-model-row-gen))
 
