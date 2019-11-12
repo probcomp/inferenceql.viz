@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.clojure-conj.models.cond-count
+(ns inferenceql.spreadsheets.clojure-conj.models.cond-count-simple
   (:refer-clojure :exclude [map replicate apply])
   #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen let-traced]]))
   (:require
@@ -17,37 +17,25 @@
 
 (def clj-row-gen
   (gen []
-    (let [col-probs {"AWS" 0.5233333333333333
-                     "React.js" 0.5765054294175715
-                     "Rust" 0.1618819776714514
-                     "JavaScript" 0.6977671451355661
-                     "C++" 0.2575757575757576
+    (let [col-probs {"AWS" 0.40
                      "Clojure" 1.0
-                     "Java" 0.5382775119617225
-                     "Docker" 0.6016666666666667
-                     "Kubernetes" 0.2341666666666667}
+                     "Java" 0.25}
           vals (for [[col prob] col-probs]
                  (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
 (def no-clj-row-gen
   (gen []
-    (let [col-probs {"AWS" 0.2605176767676768
-                     "React.js" 0.3016945432884486
-                     "Rust" 0.03001795748131843
-                     "JavaScript" 0.6759427677692174
-                     "C++" 0.2340381162022823
-                     "Clojure" 0.0
-                     "Java" 0.4082951978219313
-                     "Docker" 0.3086742424242424
-                     "Kubernetes" 0.08257575757575758}
+    (let [col-probs {"AWS" 0.80
+                     "Clojure" 0
+                     "Java" 0.90}
           vals (for [[col prob] col-probs]
                  (at `(:columns ~col) flip prob))]
       (zipmap (keys col-probs) vals))))
 
 (def cond-count-model-row-gen
   (gen []
-    (let-traced [clojure-prob 0.01432013612123012
+    (let-traced [clojure-prob 0.20
                  clojure-dev (flip clojure-prob)]
       (if clojure-dev
         (at '() clj-row-gen)
@@ -84,3 +72,56 @@
             (mp/infer-and-score :procedure row-generator :observation-trace trace-with-clojure))))))))
 
 (def cond-count-model (make-cond-count-model cond-count-model-row-gen))
+
+;----------------------------------
+
+;; Testing simulate()
+
+(defn get-frequency-of
+  "Utility function for testing"
+  [rows col-name]
+  (let [results (frequencies (map #(get % col-name) rows))
+        total (reduce + (vals results))]
+    (double (/ (get results true) total))))
+
+(def cc-model-test (bq/simulate cond-count-model {"Clojure" false} 5000))
+(get-frequency-of cc-model-test "AWS")
+;; 0.8
+
+(def cc-model-test (bq/simulate cond-count-model {"AWS" true} 5000))
+(get-frequency-of cc-model-test "Clojure")
+
+(def cc-model-test (bq/simulate cond-count-model {"AWS" true} 5000))
+(get-frequency-of cc-model-test "Java")
+
+;----------------------------------
+
+;; Testing logpdf()
+
+(exp (bq/logpdf cond-count-model {"Clojure" true} {}))
+
+(exp (bq/logpdf cond-count-model {"AWS" true} {}))
+(+ (* 0.4 0.2) (* 0.8 0.8))
+
+(exp (bq/logpdf cond-count-model {"Java" true} {}))
+(+ (* 0.25 0.2) (* 0.9 0.8))
+
+(exp (bq/logpdf cond-count-model {"AWS" true} {"Clojure" true}))
+;; 0.4
+
+(exp (bq/logpdf cond-count-model {"AWS" true} {"Clojure" false}))
+;; 0.8
+
+(exp (bq/logpdf cond-count-model {"AWS" true} {"Java" true}))
+;; p(Java)
+(+ (* 0.25 0.2) (* 0.9 0.8))
+;; p(AWS, Java)
+(+ (* 0.25 0.4 0.2) (* 0.9 0.8 0.8))
+;; p(AWS, Java) / P(Java)
+(/ (+ (* 0.25 0.4 0.2) (* 0.9 0.8 0.8))
+   (+ (* 0.25 0.2) (* 0.9 0.8)))
+
+(exp (bq/logpdf cond-count-model {"Clojure" true} {"AWS" true}))
+;; p(Clojure, AWS) / p(AWS)
+(/ (* 0.4 0.2)
+   (+ (* 0.4 0.2) (* 0.8 0.8)))
