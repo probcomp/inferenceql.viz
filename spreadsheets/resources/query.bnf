@@ -7,12 +7,9 @@ limit = <'LIMIT'> <ws> nat
 <source> = generate | from-table
 
 <paren-selectable> = selectable | <'('> selectable <')'>
-<selectable> = result-column | probability
+<selectable> = star | result-column | probability
 
-predicate = result-column comparator (result-column | value)
-comparator = equals | does-not-equal
-<equals> = '='
-<does-not-equal> = '!='
+star = <'*'>
 
 probability = <'PROBABILITY'> <ws> of <ws> given <ws> using
 of = <'OF'> <ws> events
@@ -20,13 +17,18 @@ given = <'GIVEN'> <ws> events
 using = <'USING'> <ws> model
 
 from-table = table
-generate = <'GENERATE'> <ws> generated (<ws> given)? <ws> using
-generated = qualified-variable (<','> <ws> qualified-variable)*
+generate = <'GENERATE'> <ws> qualified-variables (<ws> given)? <ws> using
+qualified-variables = qualified-variable (<','> <ws> qualified-variable)*
+
+predicate = result-column comparator (result-column | value)
+comparator = equals | does-not-equal
+<equals> = '='
+<does-not-equal> = '!='
 
 events = event (<ws>? <','> <ws>? event)*
 event = qualified-variable <ws>? <equals> <ws>? value
 
-result-column = (table <'.'>)? column
+result-column = table <'.'> column
 column = symbol | string
 
 qualified-variable = model <'.'> variable

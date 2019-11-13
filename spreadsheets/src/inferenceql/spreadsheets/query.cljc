@@ -30,27 +30,29 @@
     (let [[_ from-f] (find-node args :from)
           [_ what-f] (find-node args :what)
           what-xf (what-f env)
-          where-xf (if-let [[_ where-xf] (find-node args :where)]
-                     where-xf
+          where-xf (if-let [[_ where-f] (find-node args :where)]
+                     (where-f env)
                      (map identity))
           limit-xf (if-let [[_ limit] (find-node args :limit)]
                      (take limit)
                      (map identity))
-          _ (prn from-f)
-          _ (assert (fn? from-f))
           xf (comp where-xf what-xf limit-xf)
           from (from-f env)]
       (into [] xf from))))
 
-(defn transform-result-column
+(defn- transform-star
+  []
+  (constantly identity))
+
+(defn- transform-result-column
   ([column]
-   {:name column
-    :func (fn [_env]
-            #(get % column))})
+   (fn [_env]
+     (fn [row]
+       {column (get row column)})))
   ([_table column] ; TODO: joins
-   {:name column
-    :func (fn [_env]
-            #(get % column))}))
+   (fn [_env]
+     (fn [row]
+       {column (get row column)}))))
 
 (defn- transform-probability
   [& form]
@@ -58,12 +60,12 @@
     ([[:of of]
       [:given given]
       [:using model-sym]] :seq)
-    {:name (str (gensym)) ; TODO: naming
-     :func (fn [env]
-             (let [model (get env model-sym)]
-               (assert (some? model))
-               (fn probability [_row] ; TODO: joins
-                 (mp/exp (mmix.basic-queries/logpdf model of given)))))}))
+    (fn [env]
+      (let [model (get env model-sym)]
+        (assert (some? model))
+        (fn probability [_row] ; TODO: joins
+          {(str (gensym))
+           (mp/exp (mmix.basic-queries/logpdf model of given))})))))
 
 (defn- transform-from-table
   [table]
@@ -72,7 +74,7 @@
 
 (defn- transform-generate
   [& form]
-  (let [[_ & generated] (find-node form :generated)
+  (let [[_ & qualified-variables] (find-node form :qualified-variables)
         [_ given] (find-node form :given)
         [_ model-sym] (find-node form :using)]
     (fn [env]
@@ -80,16 +82,15 @@
         (assert (some? model))
         (repeatedly #(-> (mmix.basic-queries/simulate model given 1)
                          (first)
-                         (select-keys generated)))))))
+                         (select-keys qualified-variables)))))))
 
 (defn transform-what [& result-column-transformers]
   [:what
    (fn [env]
-     (let [f (reduce (fn [acc {:keys [name func]}]
-                       (let [f (func env)]
+     (let [f (reduce (fn [acc make-f]
+                       (let [f (make-f env)]
                          (fn [row]
-                           (assoc (acc row)
-                                  name
+                           (merge (acc row)
                                   (f row)))))
                      (constantly {})
                      result-column-transformers)]
@@ -98,11 +99,13 @@
 (defn transform-where
   [& form]
   (match (vec form)
-    [[:predicate {:name column} [:comparator c] value]]
+    [[:predicate make-f [:comparator c] value]]
     (let [comp-f (case c
                    "=" =
                    "!=" not=)]
-      [:where (filter #(comp-f (get % column) value))])))
+      [:where (fn [env]
+                (let [f (make-f env)]
+                  (filter #(comp-f (-> % f vals first) value))))])))
 
 (def ^:private transform-map
   {:select transform-select
@@ -110,6 +113,7 @@
    :where transform-where
 
    ;; what
+   :star transform-star
    :probability transform-probability
 
    ;; from
@@ -117,7 +121,6 @@
    :generate transform-generate
 
    ;; where
-
    :events merge
    :event hash-map
 

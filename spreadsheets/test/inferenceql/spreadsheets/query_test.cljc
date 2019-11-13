@@ -35,6 +35,9 @@
                       {"x" 1 "y" 3}
                       {      "y" 4}]}]
     (are [query result] (= result ((query/parse query) env))
+      "SELECT * FROM table"
+      (get env "table")
+
       "SELECT table.x FROM table"
       [{"x" 1}
        {"x" 1}
