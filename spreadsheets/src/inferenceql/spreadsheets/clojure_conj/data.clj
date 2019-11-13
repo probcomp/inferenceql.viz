@@ -4,7 +4,8 @@
     [clojure.data.csv :as csv]
     [clojure.java.io :as io]
     [clojure.string :as str]
-    [medley.core :as medley]))
+    [medley.core :as medley]
+    [clojure.data.json :as json]))
 
 (def data-filename "stack-overflow.csv")
 
@@ -110,17 +111,37 @@
                     (items-freqs-map)
                     (items-tf-map)))
 
+(def clj-freqs (-> so-data-clj
+                (items-map)
+                (items-freqs-map)))
+
+(def not-clj-freqs (-> so-data-not-clj
+                    (items-map)
+                    (items-freqs-map)))
 ;;; For printing and copying probabilities
 
 (defn print-probs [tf-map]
   (for [[col probs] tf-map]
     (println (str "\"" col "\"") (:true probs))))
 
-;;; Subsetted data maps for passing to table plotting functions. 
+;;; Subsetted data maps for passing to table plotting functions.
 
-(def data-subset-clj (take 20 (items-subset so-data-clj)))
-(def data-subset-not-clj (take 20 (items-subset so-data-not-clj)))
+(def data-subset-clj (items-subset so-data-clj))
+(def data-subset-not-clj (items-subset so-data-not-clj))
+(def data-subset (items-subset so-data))
 
 (comment
   (print-probs clj-tf)
   (print-probs not-clj-tf))
+
+(defn freqs-to-vega-data [freqs]
+  (let [reduce-col (fn [accum col-name col-map]
+                     (let [new-lines (for [[val-type val-count] col-map]
+                                       {:column col-name :value val-type :count val-count})]
+                       (concat accum new-lines)))]
+    (reduce-kv reduce-col [] freqs)))
+
+(comment
+  (print (json/write-str (freqs-to-vega-data uncond-freqs)))
+  (print (json/write-str (freqs-to-vega-data clj-freqs)))
+  (print (json/write-str (freqs-to-vega-data not-clj-freqs))))
