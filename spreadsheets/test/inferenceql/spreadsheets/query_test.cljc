@@ -74,3 +74,24 @@
 
       "SELECT PROBABILITY OF model.x=\"a\" GIVEN model.y=\"b\" USING model FROM table"
       [0.0 0.0 0.0])))
+
+(deftest generate-smoke
+  (let [spec {:vars {"x" :categorical
+                     "y" :categorical}
+              :views [[{:probability 0.5
+                        :parameters {"x" {"a" 1.0}
+                                     "y" {"a" 1.0}}}
+                       {:probability 0.5
+                        :parameters {"x" {"b" 1.0}
+                                     "y" {"b" 1.0}}}]]}
+        env {"table" [{"x" 1 "y" 2}
+                      {"x" 1 "y" 3}
+                      {"x" 2 "y" 4}]
+             "model" (search/optimized-row-generator spec)}]
+    (are [query result] (= result ((query/parse query) env))
+      "SELECT model.x FROM GENERATE model.x GIVEN model.y=\"a\" USING model LIMIT 1"
+      [{"x" "a"}]
+
+      "SELECT model.x FROM GENERATE model.x GIVEN model.y=\"b\" USING model LIMIT 2"
+      [{"x" "b"}
+       {"x" "b"}])))
