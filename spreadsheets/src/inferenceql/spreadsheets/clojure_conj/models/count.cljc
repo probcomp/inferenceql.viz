@@ -1,8 +1,8 @@
 (ns inferenceql.spreadsheets.clojure-conj.models.count
-  (:refer-clojure :exclude [map replicate apply])
+  (:refer-clojure :exclude [replicate])
   #?(:cljs (:require-macros [metaprob.generative-functions :refer [gen let-traced]]))
   (:require
-   [metaprob.prelude :as mp :refer [infer-and-score map replicate apply exp]]
+   [metaprob.prelude :as mp :refer [infer-and-score replicate exp]]
    #?(:clj [metaprob.generative-functions :refer [apply-at at make-generative-function gen let-traced]]
       :cljs [metaprob.generative-functions :refer [apply-at at make-generative-function]])
    [metaprob.distributions :as dist :refer [flip uniform gaussian categorical exactly]]
@@ -13,7 +13,11 @@
    [inferenceql.spreadsheets.clojure-conj.trace-plotting :as tracep]
    [inferenceql.spreadsheets.clojure-conj.table-plotting :as tablep]
    [inferenceql.multimixture.basic-queries :as bq]
-   [inferenceql.multimixture :as mmix]))
+   [inferenceql.multimixture :as mmix]
+   [inferenceql.spreadsheets.clojure-conj.models.util :refer [t-flip]]
+   [clojure.string :as string]
+   [clojure.data.csv :as csv]
+   [clojure.java.io :as io]))
 
 (def count-model-row-gen
   (gen []
@@ -27,7 +31,7 @@
                      "Docker" 0.3123621676536908
                      "Kubernetes" 0.08468171568748915}
           vals (for [[col prob] col-probs]
-                 (at `(:columns ~col) flip prob))]
+                 (at `(:columns ~col) t-flip prob))]
       (zipmap (keys col-probs) vals))))
 
 (defn make-count-model [row-generator]
@@ -46,9 +50,8 @@
 
 ;;; Demos of table and trace plotting functions.
 
-(defn demo-simple-table-plot [n]
-  (let [rows (repeatedly n count-model)
-        col-order (->> (keys (first rows))
+(defn simple-table-plot [rows]
+  (let [col-order (->> (keys (first rows))
                        (sort)
                        (map vector (range)))
         make-row (fn [row-id row]
@@ -70,8 +73,31 @@
         colors [["blue" "lightblue"] ["green" "lightgreen"]]]
     (tablep/spec-with-mult-partitions all-groups colors)))
 
-;(demo-simple-table-plot 20)
+;(def rows (repeatedly 10 count-model)
+;(simple-table-plot rows)
+
 ;(demo-partioned-table-plot)
 ;(demo-partioned-table-plot-2)
 
 ;(tracep/view-trace (second (infer-and-score :procedure count-model)))
+
+(defn print-row [row]
+  (let [str-reducer (fn [str-accum col-name col-val]
+                      (let [part (str "\"" col-name "\" " col-val " ")]
+                        (str str-accum part)))]
+    (println (str "{" (string/trim (reduce-kv str-reducer "" row)) "}"))))
+
+;(def demo-data (repeatedly 10 count-model))
+;(simple-table-plot demo-data)
+;(map print-row demo-data)
+
+(defn write-data-to-csv [data-maps filename]
+  (let [col-names (keys (first data-maps))
+        data (map vals data-maps)
+        all-rows (cons col-names data)]
+    (with-open [writer (io/writer filename)]
+      (csv/write-csv writer all-rows))))
+
+;(write-data-to-csv data/data-subset "presentation/data.csv")
+;(write-data-to-csv data/data-subset-clj "presentation/data-clj.csv")
+;(write-data-to-csv data/data-subset-not-clj "presentation/data-not-clj.csv")
