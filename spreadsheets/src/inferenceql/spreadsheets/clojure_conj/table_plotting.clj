@@ -155,17 +155,18 @@
   (let [data-section (create-primary-data parts)]
     (assoc-in spec [:data 0 :values] data-section)))
 
-(defn add-secondary-data [spec parts]
+(defn add-secondary-data [spec num-parts]
   (let [make-section (fn [group-id]
                        {:name (str "group-" group-id)
                         :source "rowset"
                         :transform [{:type "filter", :expr (str "datum.group == " group-id)}]})
         add-section (fn [spec group-id]
                       (let [new-section (make-section group-id)]
-                        (update-in spec [:data] conj new-section)))]
-    (reduce add-section spec (range (count parts)))))
+                        (update-in spec [:data] conj new-section)))
+        partition-ids (range num-parts)]
+    (reduce add-section spec partition-ids)))
 
-(defn add-marks-sections [spec parts]
+(defn add-marks-sections [spec num-parts]
   (let [make-section (fn [group-id]
                        {:type "rect",
                         :from {:data (str "group-" group-id),}
@@ -178,13 +179,14 @@
                           :fill {:scale (str "group-color-" group-id), :field "val"}}}})
         add-section (fn [spec group-id]
                       (let [new-section (make-section group-id)]
-                        (update-in spec [:marks] conj new-section)))]
-    (reduce add-section spec (range (count parts)))))
+                        (update-in spec [:marks] conj new-section)))
+        partition-ids (range num-parts)]
+    (reduce add-section spec partition-ids)))
 
 (defn spec-with-mult-partitions [parts colors]
   (let [final-spec (-> table-plot-spec-multi
                        (add-colors colors)
                        (add-primary-data parts)
-                       (add-secondary-data parts)
-                       (add-marks-sections parts))]
+                       (add-secondary-data (count parts))
+                       (add-marks-sections (count parts)))]
     (print (json/write-str final-spec))))
