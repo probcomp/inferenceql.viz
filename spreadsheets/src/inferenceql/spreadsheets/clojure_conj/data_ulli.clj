@@ -5,18 +5,31 @@
     [clojure.java.io :as io]
     [clojure.string :as str]
     [medley.core :as medley]
-    [clojure.data.json :as json]))
+    [clojure.data.json :as json]
+    [inferenceql.spreadsheets.clojure-conj.table-plotting-views :as plot]))
 
 (def data-filename "stackoverflow-demo-subset-v4.csv")
 (def partitions-filename "partitions.json")
 
 ;----------------------------
 
+(defn manager-binary [val]
+  "Turns to nominal manager column into a binary"
+  (case val
+    "Not sure" "False"
+    "No" "False"
+    "Yes" "True"
+    "I am already a manager" "True"
+    nil "NA"))
+
 (def csv-lines (-> data-filename (io/resource) (slurp) (csv/read-csv) (vec)))
 (def so-data (->> csv-lines
                   (mapv fix-row)
                   (csv-data->maps)
-                  (map (fn [id row] (assoc row "id" id)) (range))))
+                  ;; add row ids
+                  (map (fn [id row] (assoc row "id" id)) (range))
+                  ;; make manager column binary
+                  (map #(update % "aspire_to_be_manager" manager-binary))))
 
 (def column-mapping (zipmap (range) (first csv-lines)))
 
@@ -61,4 +74,4 @@
   (let [colors (generate-colors cluster-ids)]))
 
     ; TODO write this function.
-    ;(tablep/spec-with-mult-views view-ids cluster-ids view-col-assignments cluster-so-data colors)))
+    ;(plot/spec-mult-views view-ids cluster-ids view-col-assignments cluster-so-data colors)))
