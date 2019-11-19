@@ -48,7 +48,7 @@
 (def clustered-so-data (assign-partitions-to-rows so-data views))
 
 ;------------------------------------
-;; Visualizing partitions 
+;; Visualizing partitions
 
 (defn generate-colors [cluster-ids]
   (let [color-list [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]

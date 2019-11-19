@@ -68,6 +68,12 @@
       :height {:scale "ypos", :band 1, :offset -1},
       :fill {:scale "binary-color", :field "val"}}}}]})
 
+(defn spec-with-data [data]
+  (let [complete-spec (assoc-in table-plot-spec [:data 0 :values] data)]
+    (print (json/write-str complete-spec))))
+
+;---------------------------
+
 (def table-plot-spec-multi
  {:$schema "https://vega.github.io/schema/vega/v5.json",
   :width 770,
@@ -112,11 +118,6 @@
        :baseline {:value "middle"},
        :fill [{:value "black"}]}}}]})
 
-(defn spec-with-data [data]
-  (let [complete-spec (assoc-in table-plot-spec [:data 0 :values] data)]
-    (print (json/write-str complete-spec))))
-
-;---------------------------
 
 (defn add-colors [spec colors]
   (let [add-color (fn [spec group-id color-group]
