@@ -27,9 +27,12 @@
 (def model-1 (get partition-data "0"))
 (def model-1-iter (get model-1 "9"))
 
-(def col-view-assignments (->> (get model-1-iter "view-partitions")
+(def view-col-assignments (->> (get model-1-iter "view-partitions")
                                (medley/map-keys #(Integer/parseInt %))
-                               (medley/map-keys #(get column-mapping %))))
+                               (medley/map-keys #(get column-mapping %))
+                               (group-by second)
+                               (medley/map-vals #(map first %))))
+
 (def views (get model-1-iter "view-row-partitions"))
 
 (def view-ids (keys views))
@@ -43,3 +46,19 @@
     (reduce-kv add-view-info rows views)))
 
 (def clustered-so-data (assign-partitions-to-rows so-data views))
+
+;------------------------------------
+;; Visualizing partitions 
+
+(defn generate-colors [cluster-ids]
+  (let [color-list [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]
+        grab-colors (fn [cids-in-view]
+                      (assert (<= (count cids-in-view) (count color-list)))
+                      (zipmap cids-in-view color-list))]
+    (medley/map-vals grab-colors cluster-ids)))
+
+(defn demo-multi-view-plot []
+  (let [colors (generate-colors cluster-ids)]))
+
+    ; TODO write this function.
+    ;(tablep/spec-with-mult-views view-ids cluster-ids view-col-assignments cluster-so-data colors)))

@@ -77,31 +77,6 @@
         colors [["blue" "lightblue"] ["green" "lightgreen"]]]
     (tablep/spec-with-mult-partitions all-groups colors)))
 
-;; TODO implement the last function.
-(defn demo-multi-view-table-plot []
-  (let [g1 (repeatedly 20 count-model)
-        g2 (repeatedly 15 count-model)
-        g3 (repeatedly 5 count-model)
-
-        g1-clustered (map #(assoc % :view-1 1 :view-2 1 :view-3 1) g1)
-        g2-clustered (map #(assoc % :view-1 2 :view-2 1 :view-3 1) g2)
-        g3-clustered (map #(assoc % :view-1 3 :view-2 2 :view-3 1) g3)
-
-        all-groups [g1-clustered g2-clustered g3-clustered]
-
-        ;; view partition number -> columns
-        columns {:view-1 ["AWS" "C++" "Clojure"]
-                 :view-2 ["Docker" "Java" "JavaScript" "Kubernetes" "React.js"]
-                 :view-3 ["Rust"]}
-        colors {:view-1 [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]
-                :view-2 [["blue" "lightblue"] ["green" "lightgreen"]]
-                :view-3 [["blue" "lightblue"]]}
-        cluster-ids {:view-1 [1 2 3]
-                     :view-2 [1 2]
-                     :view-3 [1]}]))
-    ; TODO write this function.
-    ;(tablep/spec-with-mult-views cluster-ids all-groups columns colors)))
-
 ;(def rows (repeatedly 10 count-model))
 ;(simple-table-plot rows)
 
