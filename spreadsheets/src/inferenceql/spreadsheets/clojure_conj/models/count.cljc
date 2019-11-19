@@ -59,10 +59,14 @@
                        {:row row-id :col col-idx :val (get row col-name) :col-name col-name}))]
     (tablep/spec-with-data (mapcat make-row (range) rows))))
 
+;; TODO make ID's get used.
 (defn demo-partioned-table-plot []
-  (let [row-group-1 (repeatedly 20 count-model)
-        row-group-2 (repeatedly 15 count-model)
-        row-group-3 (repeatedly 5 count-model)
+  (let [new-rows (repeatedly 40 count-model)
+        rows-with-ids (map (fn [row id] (assoc row "id" id)) new-rows (range))
+        row-group-1 (take 20 rows-with-ids)
+        row-group-2 (take 15 (drop 20 rows-with-ids))
+        row-group-3 (take 5 (drop 35 rows-with-ids))
+
         all-groups [row-group-1 row-group-2 row-group-3]
 
         colors [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]]
@@ -73,6 +77,7 @@
         colors [["blue" "lightblue"] ["green" "lightgreen"]]]
     (tablep/spec-with-mult-partitions all-groups colors)))
 
+;; TODO implement the last function.
 (defn demo-multi-view-table-plot []
   (let [g1 (repeatedly 20 count-model)
         g2 (repeatedly 15 count-model)
