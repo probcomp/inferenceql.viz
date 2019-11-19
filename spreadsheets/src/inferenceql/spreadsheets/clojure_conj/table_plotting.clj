@@ -88,15 +88,7 @@
     :transform [{:type "aggregate", :groupby ["col" "col-name"]}]}]
 
   :scales
-  [{:name "binary-color",
-    :type "ordinal",
-    :range ["blue" "lightblue" "#c1c1c1"],
-    :domain [true false "NA"]}
-   {:name "xpos-bak",
-    :type "band",
-    :domain {:data "rowset", :field "col", :sort true},
-    :range {:step {:signal "cellSize"}}}
-   {:name "xpos",
+  [{:name "xpos",
     :type "band",
     :domain {:data "rowset", :field "col", :sort true},
     :range {:step {:signal "cellSize"}}}
