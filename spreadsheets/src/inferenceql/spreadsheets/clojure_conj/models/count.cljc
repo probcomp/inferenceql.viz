@@ -73,13 +73,39 @@
         colors [["blue" "lightblue"] ["green" "lightgreen"]]]
     (tablep/spec-with-mult-partitions all-groups colors)))
 
-;(def rows (repeatedly 10 count-model)
+(defn demo-multi-view-table-plot []
+  (let [g1 (repeatedly 20 count-model)
+        g2 (repeatedly 15 count-model)
+        g3 (repeatedly 5 count-model)
+
+        g1-clustered (map #(assoc % :view-1 1 :view-2 1 :view-3 1) g1)
+        g2-clustered (map #(assoc % :view-1 2 :view-2 1 :view-3 1) g2)
+        g3-clustered (map #(assoc % :view-1 3 :view-2 2 :view-3 1) g3)
+
+        all-groups [g1-clustered g2-clustered g3-clustered]
+
+        ;; view partition number -> columns
+        columns {:view-1 ["AWS" "C++" "Clojure"]
+                 :view-2 ["Docker" "Java" "JavaScript" "Kubernetes" "React.js"]
+                 :view-3 ["Rust"]}
+        colors {:view-1 [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]
+                :view-2 [["blue" "lightblue"] ["green" "lightgreen"]]
+                :view-3 [["blue" "lightblue"]]}
+        cluster-ids {:view-1 [1 2 3]
+                     :view-2 [1 2]
+                     :view-3 [1]}]))
+    ; TODO write this function.
+    ;(tablep/spec-with-mult-views cluster-ids all-groups columns colors)))
+
+;(def rows (repeatedly 10 count-model))
 ;(simple-table-plot rows)
 
 ;(demo-partioned-table-plot)
 ;(demo-partioned-table-plot-2)
 
 ;(tracep/view-trace (second (infer-and-score :procedure count-model)))
+
+;-------------------------------------
 
 (defn print-row [row]
   (let [str-reducer (fn [str-accum col-name col-val]
@@ -90,6 +116,8 @@
 ;(def demo-data (repeatedly 10 count-model))
 ;(simple-table-plot demo-data)
 ;(map print-row demo-data)
+
+;-------------------------------------
 
 (defn write-data-to-csv [data-maps filename]
   (let [col-names (keys (first data-maps))
