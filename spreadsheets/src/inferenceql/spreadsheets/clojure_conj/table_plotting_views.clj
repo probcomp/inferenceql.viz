@@ -54,7 +54,7 @@
                           new-scale {:name (str "group-color-" group-id),
                                      :type "ordinal",
                                      :range [true-col false-col "#c1c1c1"],
-                                     :domain [true false "NA"]}]
+                                     :domain ["True" "False" "NA"]}]
                       (update-in spec [:scales] conj new-scale)))]
     (reduce-kv add-color spec colors)))
 

@@ -61,6 +61,12 @@
 
 (def clustered-so-data (assign-partitions-to-rows so-data views))
 
+;; TEMP hack for testing
+(def clustered-so-data (take 50 clustered-so-data))
+
+
+
+
 ;------------------------------------
 ;; Visualizing partitions
 
@@ -75,4 +81,4 @@
   (let [colors (generate-colors cluster-ids)]
     (plot/spec-mult-views view-ids cluster-ids view-col-assignments clustered-so-data colors)))
 
-;(demo-multi-view-plot)
+(demo-multi-view-plot)
