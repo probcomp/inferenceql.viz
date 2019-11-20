@@ -46,7 +46,8 @@
                                (group-by second)
                                (medley/map-vals #(map first %))))
 
-(def views (get model-1-iter "view-row-partitions"))
+(def views (->> (get model-1-iter "view-row-partitions")
+                (medley/map-keys #(Integer/parseInt %))))
 
 (def view-ids (keys views))
 (def cluster-ids
@@ -71,7 +72,7 @@
     (medley/map-vals grab-colors cluster-ids)))
 
 (defn demo-multi-view-plot []
-  (let [colors (generate-colors cluster-ids)]))
+  (let [colors (generate-colors cluster-ids)]
+    (plot/spec-mult-views view-ids cluster-ids view-col-assignments clustered-so-data colors)))
 
-    ; TODO write this function.
-    ;(plot/spec-mult-views view-ids cluster-ids view-col-assignments cluster-so-data colors)))
+;(demo-multi-view-plot)

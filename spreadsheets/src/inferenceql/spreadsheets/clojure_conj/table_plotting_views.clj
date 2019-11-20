@@ -48,7 +48,6 @@
        :baseline {:value "middle"},
        :fill [{:value "black"}]}}}]})
 
-
 (defn add-colors [spec colors]
   (let [add-color (fn [spec group-id color-group]
                     (let [[true-col false-col] color-group
@@ -59,45 +58,39 @@
                       (update-in spec [:scales] conj new-scale)))]
     (reduce-kv add-color spec colors)))
 
-(defn create-primary-data [parts]
-  (let [attach-group-label (fn [group-rows id]
-                             (map #(assoc % "group" id) group-rows))
-        all-groups (map attach-group-label parts (range))
+(defn create-primary-data [data cols vid cids]
+  (let [cluster-key (str "view-" vid)
+        rows-by-cid (group-by #(get % cluster-key) data)
 
-        col-order (->> (keys (first (first all-groups)))
-                       (remove #{"group"})
-                       (sort)
-                       (map vector (range)))
-        col-names (map second col-order)
+        separator-group [(zipmap cols (repeat nil))]
 
-        separator-group [(zipmap col-names (repeat nil))]
+        joined-clusters (interpose separator-group (vals rows-by-cid))
+        all-rows (flatten joined-clusters)
 
-        joined-groups (interpose separator-group all-groups)
-        all-rows (flatten joined-groups)
 
-        make-row-elems (fn [row-id row]
-                         (for [[col-idx col-name] col-order]
-                           (let [sep-cell (nil? (get row col-name))
-                                 group-id (get row "group")]
-                             {:row row-id :col col-idx :val (get row col-name) :col-name col-name :separator sep-cell :group group-id})))]
-    (mapcat make-row-elems (range) all-rows)))
+        make-cell-elems (fn [y-pos row]
+                          (let [col-pos (map vector (range) cols)]
+                            (for [[col-idx col-name] col-pos]
+                              (let [sep-cell (nil? (get row col-name))
+                                    group-id (get row cluster-key)]
+                                {:row y-pos :col col-idx :val (get row col-name) :col-name col-name :separator sep-cell :group group-id}))))]
+    (mapcat make-cell-elems (range) all-rows)))
 
-(defn add-primary-data [spec parts]
-  (let [data-section (create-primary-data parts)]
+(defn add-primary-data [spec data cols vid cids]
+  (let [data-section (create-primary-data data cols vid cids)]
     (assoc-in spec [:data 0 :values] data-section)))
 
-(defn add-secondary-data [spec num-parts]
+(defn add-secondary-data [spec cids]
   (let [make-section (fn [group-id]
                        {:name (str "group-" group-id)
                         :source "rowset"
                         :transform [{:type "filter", :expr (str "datum.group == " group-id)}]})
         add-section (fn [spec group-id]
                       (let [new-section (make-section group-id)]
-                        (update-in spec [:data] conj new-section)))
-        partition-ids (range num-parts)]
-    (reduce add-section spec partition-ids)))
+                        (update-in spec [:data] conj new-section)))]
+    (reduce add-section spec cids)))
 
-(defn add-marks-sections [spec num-parts]
+(defn add-marks-sections [spec cids]
   (let [make-section (fn [group-id]
                        {:type "rect",
                         :from {:data (str "group-" group-id),}
@@ -110,27 +103,22 @@
                           :fill {:scale (str "group-color-" group-id), :field "val"}}}})
         add-section (fn [spec group-id]
                       (let [new-section (make-section group-id)]
-                        (update-in spec [:marks] conj new-section)))
-        partition-ids (range num-parts)]
-    (reduce add-section spec partition-ids)))
+                        (update-in spec [:marks] conj new-section)))]
+    (reduce add-section spec cids)))
 
-(defn spec-with-mult-partitions [parts colors]
-  (let [final-spec (-> spec
-                       (add-colors colors)
-                       (add-primary-data parts)
-                       (add-secondary-data (count parts))
-                       (add-marks-sections (count parts)))]
-    (print (json/write-str final-spec))))
+(defn spec-mult-views [view-ids cluster-ids view-col-assignments so-data colors]
+  (let [vid (first view-ids)
+        cids (get cluster-ids vid)
+        cols (get view-col-assignments vid)
+        colors (get colors vid)
 
-;; TODO write this
-(defn spec-mult-views [view-ids cluster-ids view-col-assignments cluster-so-data colors]
-  (let [final-spec (-> spec
+        final-spec (-> spec
                        (add-colors colors)
-                       (add-primary-data parts)
-                       (add-secondary-data (count parts))
-                       (add-marks-sections (count parts))
+                       (add-primary-data so-data cols vid cids)
+
+                       (add-secondary-data cids)
+                       (add-marks-sections cids))]
 
                        ;; TODO write these
-                       (add-column-data)
-                       (add-row-data))]
+                       ;;(add-columns cols-in-view))]
     (print (json/write-str final-spec))))
