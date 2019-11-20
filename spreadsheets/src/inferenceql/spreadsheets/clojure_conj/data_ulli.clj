@@ -37,48 +37,35 @@
 
 (def partition-data (-> partitions-filename (io/resource) (slurp) (json/read-str)))
 
-(def model-1 (get partition-data "0"))
-(def model-1-iter (get model-1 "9"))
+(defn write-specs [model-num iter-num]
+  (let [model (get partition-data model-num)
+        iter (get model iter-num)
 
-(def view-col-assignments (->> (get model-1-iter "view-partitions")
-                               (medley/map-keys #(Integer/parseInt %))
-                               (medley/map-keys #(get column-mapping %))
-                               (group-by second)
-                               (medley/map-vals #(map first %))))
+        view-col-assignments (->> (get iter "view-partitions")
+                                  (medley/map-keys #(Integer/parseInt %))
+                                  (medley/map-keys #(get column-mapping %))
+                                  (group-by second)
+                                  (medley/map-vals #(map first %)))
 
-(def views (->> (get model-1-iter "view-row-partitions")
-                (medley/map-keys #(Integer/parseInt %))))
+        views (->> (get iter "view-row-partitions")
+                   (medley/map-keys #(Integer/parseInt %)))
 
-(def view-ids (keys views))
-(def cluster-ids
-  (medley/map-vals #(vec (distinct %)) views))
+        view-ids (keys views)
+        cluster-ids (medley/map-vals #(vec (distinct %)) views)
 
-(defn assign-partitions-to-rows [rows views]
-  (let [add-view-info (fn [rows view-id cluster-assignments]
-                        (let [view-name (str "view-" view-id)]
-                          (map (fn [row c-assignment] (assoc row view-name c-assignment)) rows cluster-assignments)))]
-    (reduce-kv add-view-info rows views)))
+        assign-partitions-to-rows
+        (fn [rows views]
+          (let [add-view-info (fn [rows view-id cluster-assignments]
+                                (let [view-name (str "view-" view-id)]
+                                  (map (fn [row c-assignment] (assoc row view-name c-assignment)) rows cluster-assignments)))]
+            (reduce-kv add-view-info rows views)))
 
-(def clustered-so-data (assign-partitions-to-rows so-data views))
+        clustered-so-data (assign-partitions-to-rows so-data views)
 
-;; TEMP hack for testing
-(def clustered-so-data (take 50 clustered-so-data))
+        ;; TEMP hack for testing
+        clustered-so-data (take 50 clustered-so-data)
 
+        filename-prefix (str "model-" model-num "-iter-" iter-num "-")]
+    (plot/write-specs filename-prefix view-ids cluster-ids view-col-assignments clustered-so-data)))
 
-
-
-;------------------------------------
-;; Visualizing partitions
-
-(defn generate-colors [cluster-ids]
-  (let [color-list [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]
-        grab-colors (fn [cids-in-view]
-                      (assert (<= (count cids-in-view) (count color-list)))
-                      (zipmap cids-in-view color-list))]
-    (medley/map-vals grab-colors cluster-ids)))
-
-(defn demo-multi-view-plot []
-  (let [colors (generate-colors cluster-ids)]
-    (plot/spec-mult-views view-ids cluster-ids view-col-assignments clustered-so-data colors)))
-
-;(demo-multi-view-plot)
+;(write-specs "0" "9")

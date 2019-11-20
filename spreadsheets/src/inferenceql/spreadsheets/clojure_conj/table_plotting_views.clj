@@ -2,7 +2,8 @@
   (:require
    [clojure.data.json :as json]
    [clojure.java.io :as io]
-   [clojure.walk :as walk]))
+   [clojure.walk :as walk]
+   [medley.core :as medley]))
 
 (def spec
  {:$schema "https://vega.github.io/schema/vega/v5.json",
@@ -126,9 +127,8 @@
                         (update-in spec [:marks] conj new-section)))]
     (reduce add-section spec cids)))
 
-(defn spec-mult-views [view-ids cluster-ids view-col-assignments so-data colors]
-  (let [vid (first view-ids)
-        cids (get cluster-ids vid)
+(defn spec-for-view [vid cluster-ids view-col-assignments so-data colors]
+  (let [cids (get cluster-ids vid)
         cols (get view-col-assignments vid)
         colors (get colors vid)
 
@@ -141,4 +141,20 @@
 
                        ;; TODO write these
                        ;;(add-columns cols-in-view))]
-    (print (json/write-str final-spec))))
+    (json/write-str final-spec)))
+
+(defn generate-colors [cluster-ids]
+  (let [color-list [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]
+        grab-colors (fn [cids-in-view]
+                      (assert (<= (count cids-in-view) (count color-list)))
+                      (zipmap cids-in-view color-list))]
+    (medley/map-vals grab-colors cluster-ids)))
+
+(def spec-dir "specs/")
+
+(defn write-specs [filename-prefix view-ids cluster-ids view-col-assignments so-data]
+  (let [colors (generate-colors cluster-ids)]
+    (for [vid view-ids]
+      (let [spec (spec-for-view vid cluster-ids view-col-assignments so-data colors)
+            spec-file-name (str filename-prefix "view-" vid ".vg.json")]
+        (spit (str spec-dir spec-file-name) spec)))))
