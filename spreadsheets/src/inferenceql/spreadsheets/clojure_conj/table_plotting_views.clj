@@ -4,7 +4,10 @@
    [clojure.java.io :as io]
    [clojure.walk :as walk]
    [medley.core :as medley]
-   [clojure.java.shell :refer [sh]]))
+   [clojure.java.shell :refer [sh]]
+   [com.evocomputing.colors :as colors]
+   [inferenceql.spreadsheets.clojure-conj.color-palette :as palette]))
+
 
 (def spec
  {:$schema "https://vega.github.io/schema/vega/v5.json",
@@ -145,12 +148,16 @@
     (json/write-str final-spec)))
 
 (defn generate-colors [cluster-ids]
-  ;; TODO add more colors to this list
-  (let [color-list [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]
+  (let [gen-colors (fn [num-colors]
+                     (let [dark-colors (palette/rainbow-hsl num-colors :start 120 :s 100 :l 50)
+                           light-colors (map #(colors/lighten % 40) dark-colors)
+                           dark-colors (map colors/rgb-hexstr dark-colors)
+                           light-colors (map colors/rgb-hexstr light-colors)]
+                       (map vector dark-colors light-colors)))
+
         grab-colors (fn [cids-in-view]
-                      (assert (<= (count cids-in-view) (count color-list))
-                              (str "cluster colors required: " (count cids-in-view)))
-                      (zipmap cids-in-view color-list))]
+                      (let [color-list (gen-colors (count cids-in-view))]
+                        (zipmap cids-in-view color-list)))]
     (medley/map-vals grab-colors cluster-ids)))
 
 (def spec-dir "specs/")

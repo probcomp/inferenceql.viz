@@ -70,3 +70,4 @@
 
 ;(write-specs "0" "9")
 ;(write-specs "3" "9")
+;(write-specs "4" "9")
