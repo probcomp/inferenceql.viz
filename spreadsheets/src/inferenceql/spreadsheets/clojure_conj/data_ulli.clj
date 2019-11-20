@@ -81,4 +81,4 @@
   (let [colors (generate-colors cluster-ids)]
     (plot/spec-mult-views view-ids cluster-ids view-col-assignments clustered-so-data colors)))
 
-(demo-multi-view-plot)
+;(demo-multi-view-plot)

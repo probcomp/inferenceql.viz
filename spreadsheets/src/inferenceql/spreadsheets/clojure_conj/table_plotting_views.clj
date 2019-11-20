@@ -11,10 +11,11 @@
   :padding 2,
 
   :signals
-  [{:name "cellSize", :value 10}
+  [{:name "cellSizeX", :value 20}
+   {:name "cellSizeY", :value 5}
    {:name "count", :update "length(data('rowset'))"}
    {:name "width", :update "span(range('position'))"}
-   {:name "height", :update "width"}],
+   {:name "height", :update "width"},]
 
   :data
   [{:name "rowset",
@@ -27,11 +28,11 @@
   [{:name "xpos",
     :type "band",
     :domain {:data "rowset", :field "col", :sort true},
-    :range {:step {:signal "cellSize"}}}
+    :range {:step {:signal "cellSizeX"}}}
    {:name "ypos",
     :type "band",
     :domain {:data "rowset", :field "row", :sort true},
-    :range {:step {:signal "cellSize"}}}],
+    :range {:step {:signal "cellSizeY"}}}],
 
   :marks
   [{:type "text",
