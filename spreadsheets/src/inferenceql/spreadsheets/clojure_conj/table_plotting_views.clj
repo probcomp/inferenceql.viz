@@ -22,7 +22,12 @@
     :values []}
    {:name "column-names",
     :source "rowset",
-    :transform [{:type "aggregate", :groupby ["col" "col-name"]}]}]
+    :transform [{:type "aggregate", :groupby ["col" "col-name"]}]}
+   {:name "row-names",
+    :source "rowset",
+    ;; id -- original row number
+    ;; row -- row number in vega plot (accounts for separators)
+    :transform [{:type "aggregate", :groupby ["id" "row"]}]}]
 
   :scales
   [{:name "xpos",
@@ -46,6 +51,19 @@
        :fontSize {:value 10},
        :angle {:value -90},
        :align {:value "left"},
+       :baseline {:value "middle"},
+       :fill [{:value "black"}]}}}
+   {:type "text",
+     :name "rows",
+     :from {:data "row-names"},
+     :encode
+     {:update
+      {:y {:scale "ypos", :field "row", :band 0.5},
+       :x {:offset -2},
+       :text {:field "id"},
+       :fontSize {:value 6},
+       :angle {:value 0},
+       :align {:value "right"},
        :baseline {:value "middle"},
        :fill [{:value "black"}]}}}]})
 
@@ -73,8 +91,9 @@
                           (let [col-pos (map vector (range) cols)]
                             (for [[col-idx col-name] col-pos]
                               (let [sep-cell (nil? (get row col-name))
+                                    id (get row "id")
                                     group-id (get row cluster-key)]
-                                {:row y-pos :col col-idx :val (get row col-name) :col-name col-name :separator sep-cell :group group-id}))))]
+                                {:row y-pos :col col-idx :val (get row col-name) :col-name col-name :id id :separator sep-cell :group group-id}))))]
     (mapcat make-cell-elems (range) all-rows)))
 
 (defn add-primary-data [spec data cols vid cids]
