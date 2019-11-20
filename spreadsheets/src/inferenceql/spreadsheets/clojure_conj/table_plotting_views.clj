@@ -3,7 +3,8 @@
    [clojure.data.json :as json]
    [clojure.java.io :as io]
    [clojure.walk :as walk]
-   [medley.core :as medley]))
+   [medley.core :as medley]
+   [clojure.java.shell :refer [sh]]))
 
 (def spec
  {:$schema "https://vega.github.io/schema/vega/v5.json",
@@ -144,17 +145,32 @@
     (json/write-str final-spec)))
 
 (defn generate-colors [cluster-ids]
+  ;; TODO add more colors to this list
   (let [color-list [["blue" "lightblue"] ["green" "lightgreen"] ["firebrick" "salmon"]]
         grab-colors (fn [cids-in-view]
-                      (assert (<= (count cids-in-view) (count color-list)))
+                      (assert (<= (count cids-in-view) (count color-list))
+                              (str "cluster colors required: " (count cids-in-view)))
                       (zipmap cids-in-view color-list))]
     (medley/map-vals grab-colors cluster-ids)))
 
 (def spec-dir "specs/")
 
 (defn write-specs [filename-prefix view-ids cluster-ids view-col-assignments so-data]
-  (let [colors (generate-colors cluster-ids)]
-    (for [vid view-ids]
-      (let [spec (spec-for-view vid cluster-ids view-col-assignments so-data colors)
-            spec-file-name (str filename-prefix "view-" vid ".vg.json")]
-        (spit (str spec-dir spec-file-name) spec)))))
+  (let [colors (generate-colors cluster-ids)
+        filenames (map #(str filename-prefix "view-" %) view-ids)
+        filenames-vega (map #(str spec-dir % ".vg.json") filenames)
+        filenames-images (map #(str spec-dir % ".png") filenames)
+
+        specs (map #(spec-for-view % cluster-ids view-col-assignments so-data colors) view-ids)
+
+        spec-to-png (fn [spec-path img-path]
+                      (sh "vg2png" spec-path img-path))]
+    (doseq [[path spec] (map vector filenames-vega specs)]
+      (spit path spec))
+
+    ;; TODO Why does writing the previous block like this output specs that are clojure maps instead
+    ;; of json objects that returned by `json/write-str`?
+    ;(doall (map (fn [path filename] (spit path spec)) filenames-vega specs))
+
+    (doseq [[spec-path img-path] (map vector filenames-vega filenames-images)]
+      (spec-to-png spec-path img-path))))
