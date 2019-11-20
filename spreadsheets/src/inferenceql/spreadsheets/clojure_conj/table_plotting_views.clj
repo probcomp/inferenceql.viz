@@ -164,7 +164,7 @@
         specs (map #(spec-for-view % cluster-ids view-col-assignments so-data colors) view-ids)
 
         spec-to-png (fn [spec-path img-path]
-                      (sh "vg2png" spec-path img-path))]
+                      (sh "vg2png" "-s 2" spec-path img-path))]
     (doseq [[path spec] (map vector filenames-vega specs)]
       (spit path spec))
 

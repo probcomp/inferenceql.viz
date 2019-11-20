@@ -69,4 +69,4 @@
     (plot/write-specs filename-prefix view-ids cluster-ids view-col-assignments clustered-so-data)))
 
 ;(write-specs "0" "9")
-;(write-specs "4" "9")
+;(write-specs "3" "9")
