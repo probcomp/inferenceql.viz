@@ -11,8 +11,8 @@
   :padding 2,
 
   :signals
-  [{:name "cellSizeX", :value 20}
-   {:name "cellSizeY", :value 5}
+  [{:name "cellSizeX", :value 40}
+   {:name "cellSizeY", :value 10}
    {:name "count", :update "length(data('rowset'))"}
    {:name "width", :update "span(range('position'))"}
    {:name "height", :update "width"},]
@@ -48,7 +48,7 @@
       {:x {:scale "xpos", :field "col", :band 0.5},
        :y {:offset -2},
        :text {:field "col-name"},
-       :fontSize {:value 10},
+       :fontSize {:value 16},
        :angle {:value -90},
        :align {:value "left"},
        :baseline {:value "middle"},
@@ -61,7 +61,7 @@
       {:y {:scale "ypos", :field "row", :band 0.5},
        :x {:offset -2},
        :text {:field "id"},
-       :fontSize {:value 6},
+       :fontSize {:value 10},
        :angle {:value 0},
        :align {:value "right"},
        :baseline {:value "middle"},
