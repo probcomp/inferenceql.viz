@@ -39,5 +39,14 @@
 
 ;----------------------------
 
-;(let [model-num "0"]
-;  (plot/viz-model partition-data so-data column-mapping model-num))
+;; Plotting
+
+(defn plot-model [model-num]
+  (plot/viz-model partition-data so-data column-mapping (str model-num)))
+
+(defn plot-all-models []
+  (let [num-models (count (keys partition-data))]
+    (for [model-num (range num-models)]
+      (plot-model model-num))))
+
+;(plot-all-models)

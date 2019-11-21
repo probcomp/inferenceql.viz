@@ -242,17 +242,18 @@
   (fs/mkdirs (str base-path gif-dir)))
 
 (defn viz-model [partition-data so-data column-mapping model-num]
-  (let [model-dir (str viz-dir "model-" model-num "/")]
+  "Plots all iterations and an animated gif of the given `model-num`."
+  (let [model-dir (str viz-dir "model-" model-num "/")
+
+        ;; number of iterations of this model that we have data for
+        num-iters (count (keys (get partition-data model-num)))]
     (make-model-dir model-dir)
 
-    (doseq [iter-num (range 10)]
+    (doseq [iter-num (range num-iters)]
       (viz-iter model-num (str iter-num) model-dir partition-data so-data column-mapping))
 
     (let [iter-png-wildcard (str model-dir view-comp-png-dir "iter-*.png")
           anim-loc (str model-dir gif-dir "model-" model-num ".gif")]
-
-      ;; mogrify -gravity South -extent 3000x3000 -background white -colorspace RGB *png
-      ;; identify -format '%w %h\n' *.png | awk '($1>w){w=$1} ($2>h){h=$2} END{print w"x"h}'
 
       ;; Resize all images to the max width and height between all of them.
       (let [file-sizes (:out (sh "identify" "-format" "%w %h\n" iter-png-wildcard))
