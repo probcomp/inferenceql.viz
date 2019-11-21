@@ -164,7 +164,7 @@
 
 (defn write-specs [filename-prefix view-ids cluster-ids view-col-assignments so-data]
   (let [colors (generate-colors cluster-ids)
-        filenames (map #(str filename-prefix "view-" %) view-ids)
+        filenames (map #(str filename-prefix "-view-" %) view-ids)
         filenames-vega (map #(str spec-dir % ".vg.json") filenames)
         filenames-images (map #(str spec-dir % ".png") filenames)
 
@@ -172,6 +172,8 @@
 
         spec-to-png (fn [spec-path img-path]
                       (sh "vg2png" "-s 2" spec-path img-path))]
+
+    ;; Write specs.
     (doseq [[path spec] (map vector filenames-vega specs)]
       (spit path spec))
 
@@ -179,5 +181,14 @@
     ;; of json objects that returned by `json/write-str`?
     ;(doall (map (fn [path filename] (spit path spec)) filenames-vega specs))
 
+    ;; Convert specs to pngs.
     (doseq [[spec-path img-path] (map vector filenames-vega filenames-images)]
-      (spec-to-png spec-path img-path))))
+      (spec-to-png spec-path img-path))
+
+    ;; Horizontally concatentate all view pngs.
+    (let [num-views (count view-ids)
+          output-filename (str spec-dir filename-prefix ".png")
+          arg-list (concat ["montage"]
+                           filenames-images
+                           ["-tile" (str num-views "x1") "-geometry" "+50+50" output-filename])]
+      (apply sh arg-list))))
