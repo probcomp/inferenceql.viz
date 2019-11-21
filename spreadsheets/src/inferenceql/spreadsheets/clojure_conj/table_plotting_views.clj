@@ -186,9 +186,8 @@
       (spec-to-png spec-path img-path))
 
     ;; Horizontally concatentate all view pngs.
-    (let [num-views (count view-ids)
-          output-filename (str spec-dir filename-prefix ".png")
+    (let [output-filename (str spec-dir filename-prefix ".png")
           arg-list (concat ["montage"]
                            filenames-images
-                           ["-tile" (str num-views "x1") "-geometry" "+50+50" output-filename])]
+                           ["-tile" "x1" "-geometry" "+50+50" "-gravity" "South" output-filename])]
       (apply sh arg-list))))
