@@ -260,4 +260,4 @@
             max-size (:out (sh "awk" "($1>w){w=$1} ($2>h){h=$2} END{print w\"x\"h}" :in file-sizes))]
         (sh "mogrify" "-gravity" "North" "-extent" max-size "-background" "white" "-colorspace" "RGB" iter-png-wildcard))
 
-      (sh "convert" "-dispose" "previous" "-delay" "300" iter-png-wildcard "-loop" "1" anim-loc))))
+      (sh "convert" "-dispose" "previous" "-delay" "200" iter-png-wildcard "-loop" "1" anim-loc))))
