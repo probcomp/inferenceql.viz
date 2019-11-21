@@ -154,17 +154,16 @@
     (json/write-str final-spec)))
 
 (defn generate-colors [cluster-ids]
-  (let [gen-colors (fn [num-colors]
-                     (let [dark-colors (palette/rainbow-hsl num-colors :start 120 :s 100 :l 50)
-                           light-colors (map #(colors/lighten % 40) dark-colors)
-                           dark-colors (map colors/rgb-hexstr dark-colors)
-                           light-colors (map colors/rgb-hexstr light-colors)]
-                       (map vector dark-colors light-colors)))
+  (let [colors ["#1f77b4" "#aec7e8" "#ff7f0e" "#ffbb78" "#2ca02c"
+                "#98df8a" "#d62728" "#ff9896" "#9467bd" "#c5b0d5"
+                "#8c564b" "#c49c94" "#e377c2" "#f7b6d2" "#7f7f7f"
+                "#c7c7c7" "#bcbd22" "#dbdb8d" "#17becf" "#9edae5"]
+        color-list (cycle (partition 2 colors))
 
         grab-colors (fn [cids-in-view]
-                      (let [color-list (gen-colors (count cids-in-view))]
-                        (zipmap cids-in-view color-list)))]
+                      (zipmap cids-in-view color-list))]
     (medley/map-vals grab-colors cluster-ids)))
+
 
 (def viz-dir "viz/")
 (def spec-dir "specs/")

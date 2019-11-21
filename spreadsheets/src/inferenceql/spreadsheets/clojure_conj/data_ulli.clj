@@ -39,5 +39,5 @@
 
 ;----------------------------
 
-(let [model-num "0"]
-  (plot/viz-model partition-data so-data column-mapping model-num))
+;(let [model-num "0"]
+;  (plot/viz-model partition-data so-data column-mapping model-num))
