@@ -160,13 +160,15 @@
                         (zipmap cids-in-view color-list)))]
     (medley/map-vals grab-colors cluster-ids)))
 
-(def spec-dir "specs/")
+(def spec-dir "viz/specs/")
+(def view-png-dir "viz/views/")
+(def view-comp-png-dir "viz/comp/")
 
 (defn write-specs [filename-prefix view-ids cluster-ids view-col-assignments so-data]
   (let [colors (generate-colors cluster-ids)
         filenames (map #(str filename-prefix "-view-" %) view-ids)
         filenames-vega (map #(str spec-dir % ".vg.json") filenames)
-        filenames-images (map #(str spec-dir % ".png") filenames)
+        filenames-images (map #(str view-png-dir % ".png") filenames)
 
         specs (map #(spec-for-view % cluster-ids view-col-assignments so-data colors) view-ids)
 
@@ -186,7 +188,7 @@
       (spec-to-png spec-path img-path))
 
     ;; Horizontally concatentate all view pngs.
-    (let [output-filename (str spec-dir filename-prefix ".png")
+    (let [output-filename (str view-comp-png-dir filename-prefix ".png")
           arg-list (concat ["montage"]
                            filenames-images
                            ["-tile" "x1" "-geometry" "+50+50" "-gravity" "South" output-filename])]

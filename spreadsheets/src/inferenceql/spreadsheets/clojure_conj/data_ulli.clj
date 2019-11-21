@@ -68,5 +68,5 @@
         filename-prefix (str "model-" model-num "-iter-" iter-num)]
     (plot/write-specs filename-prefix view-ids cluster-ids view-col-assignments clustered-so-data)))
 
-(doseq [model-num (range 5)])
-  ;(write-specs (str model-num) "9"))
+;(doseq [model-num (range 5)]
+;  (write-specs (str model-num) "9"))
