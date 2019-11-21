@@ -21,7 +21,9 @@
    {:name "cellSizeY", :value 10}
    {:name "count", :update "length(data('rowset'))"}
    {:name "width", :update "span(range('position'))"}
-   {:name "height", :update "width"},]
+   {:name "height", :update "width"},
+   ;; TODO make this get used in other parts of the code.
+   {:name "yOffset", :value 200},]
 
   :data
   [{:name "rowset",
@@ -52,7 +54,8 @@
      :encode
      {:update
       {:x {:scale "xpos", :field "col", :band 0.5},
-       :y {:offset -2},
+      ;; TODO don't hard code this.
+       :y {:offset 198},
        :text {:field "col-name"},
        :fontSize {:value 16},
        :angle {:value -90},
@@ -64,7 +67,8 @@
      :from {:data "row-names"},
      :encode
      {:update
-      {:y {:scale "ypos", :field "row", :band 0.5},
+      ;; TODO don't hard code this.
+      {:y {:scale "ypos", :field "row", :band 0.5 :offset 200},
        :x {:offset -2},
        :text {:field "id"},
        :fontSize {:value 10},
@@ -123,7 +127,8 @@
                         :encode
                         {:update
                          {:x {:scale "xpos", :field "col"},
-                          :y {:scale "ypos", :field "row"},
+                          ;; TODO don't hard code this.
+                          :y {:scale "ypos", :field "row" :offset 200},
                           :width {:scale "xpos", :band 1, :offset -1},
                           :height {:scale "ypos", :band 1, :offset -1},
                           :fill {:scale (str "group-color-" group-id), :field "val"}}}})
@@ -194,7 +199,7 @@
     (let [output-filename (str model-dir view-comp-png-dir filename-prefix ".png")
           arg-list (concat ["montage"]
                            filenames-images
-                           ["-tile" "x1" "-geometry" "+50+50" "-gravity" "South" output-filename])]
+                           ["-tile" "x1" "-geometry" "+50+50" "-gravity" "North" output-filename])]
       (apply sh arg-list))))
 
 (defn viz-iter [model-num iter-num model-dir partition-data so-data column-mapping]
@@ -246,6 +251,13 @@
 
     (let [iter-png-wildcard (str model-dir view-comp-png-dir "iter-*.png")
           anim-loc (str model-dir gif-dir "model-" model-num ".gif")]
-      (sh "convert" "-dispose" "previous" "-delay" "150" iter-png-wildcard "-loop" "1" anim-loc))))
 
-    ;; TODO resize all pictures so animation looks good
+      ;; mogrify -gravity South -extent 3000x3000 -background white -colorspace RGB *png
+      ;; identify -format '%w %h\n' *.png | awk '($1>w){w=$1} ($2>h){h=$2} END{print w"x"h}'
+
+      ;; Resize all images to the max width and height between all of them.
+      (let [file-sizes (:out (sh "identify" "-format" "%w %h\n" iter-png-wildcard))
+            max-size (:out (sh "awk" "($1>w){w=$1} ($2>h){h=$2} END{print w\"x\"h}" :in file-sizes))]
+        (sh "mogrify" "-gravity" "North" "-extent" max-size "-background" "white" "-colorspace" "RGB" iter-png-wildcard))
+
+      (sh "convert" "-dispose" "previous" "-delay" "300" iter-png-wildcard "-loop" "1" anim-loc))))
