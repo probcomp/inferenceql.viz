@@ -37,36 +37,7 @@
 
 (def partition-data (-> partitions-filename (io/resource) (slurp) (json/read-str)))
 
-(defn write-specs [model-num iter-num]
-  (let [model (get partition-data model-num)
-        iter (get model iter-num)
+;----------------------------
 
-        view-col-assignments (->> (get iter "view-partitions")
-                                  (medley/map-keys #(Integer/parseInt %))
-                                  (medley/map-keys #(get column-mapping %))
-                                  (group-by second)
-                                  (medley/map-vals #(map first %)))
-
-        views (->> (get iter "view-row-partitions")
-                   (medley/map-keys #(Integer/parseInt %)))
-
-        view-ids (keys views)
-        cluster-ids (medley/map-vals #(vec (distinct %)) views)
-
-        assign-partitions-to-rows
-        (fn [rows views]
-          (let [add-view-info (fn [rows view-id cluster-assignments]
-                                (let [view-name (str "view-" view-id)]
-                                  (map (fn [row c-assignment] (assoc row view-name c-assignment)) rows cluster-assignments)))]
-            (reduce-kv add-view-info rows views)))
-
-        clustered-so-data (assign-partitions-to-rows so-data views)
-
-        ;; TEMP hack for testing
-        clustered-so-data (take 50 clustered-so-data)
-
-        filename-prefix (str "model-" model-num "-iter-" iter-num)]
-    (plot/write-specs filename-prefix view-ids cluster-ids view-col-assignments clustered-so-data)))
-
-;(doseq [model-num (range 5)]
-;  (write-specs (str model-num) "9"))
+(let [model-num "0"]
+  (plot/viz-model partition-data so-data column-mapping model-num))

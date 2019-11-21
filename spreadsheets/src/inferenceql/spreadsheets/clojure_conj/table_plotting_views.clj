@@ -6,13 +6,14 @@
    [medley.core :as medley]
    [clojure.java.shell :refer [sh]]
    [com.evocomputing.colors :as colors]
-   [inferenceql.spreadsheets.clojure-conj.color-palette :as palette]))
+   [inferenceql.spreadsheets.clojure-conj.color-palette :as palette]
+   [me.raynes.fs :as fs]))
 
 
 (def spec
  {:$schema "https://vega.github.io/schema/vega/v5.json",
-  :width 770,
-  :height 770,
+  :width 2000,
+  :height 2000,
   :padding 2,
 
   :signals
@@ -160,15 +161,17 @@
                         (zipmap cids-in-view color-list)))]
     (medley/map-vals grab-colors cluster-ids)))
 
-(def spec-dir "viz/specs/")
-(def view-png-dir "viz/views/")
-(def view-comp-png-dir "viz/comp/")
+(def viz-dir "viz/")
+(def spec-dir "specs/")
+(def view-png-dir "views/")
+(def view-comp-png-dir "comp/")
+(def gif-dir "anim/")
 
-(defn write-specs [filename-prefix view-ids cluster-ids view-col-assignments so-data]
+(defn write-specs [model-dir filename-prefix view-ids cluster-ids view-col-assignments so-data]
   (let [colors (generate-colors cluster-ids)
         filenames (map #(str filename-prefix "-view-" %) view-ids)
-        filenames-vega (map #(str spec-dir % ".vg.json") filenames)
-        filenames-images (map #(str view-png-dir % ".png") filenames)
+        filenames-vega (map #(str model-dir spec-dir % ".vg.json") filenames)
+        filenames-images (map #(str model-dir view-png-dir % ".png") filenames)
 
         specs (map #(spec-for-view % cluster-ids view-col-assignments so-data colors) view-ids)
 
@@ -188,8 +191,61 @@
       (spec-to-png spec-path img-path))
 
     ;; Horizontally concatentate all view pngs.
-    (let [output-filename (str view-comp-png-dir filename-prefix ".png")
+    (let [output-filename (str model-dir view-comp-png-dir filename-prefix ".png")
           arg-list (concat ["montage"]
                            filenames-images
                            ["-tile" "x1" "-geometry" "+50+50" "-gravity" "South" output-filename])]
       (apply sh arg-list))))
+
+(defn viz-iter [model-num iter-num model-dir partition-data so-data column-mapping]
+  (let [model (get partition-data model-num)
+        iter (get model iter-num)
+
+        view-col-assignments (->> (get iter "view-partitions")
+                                  (medley/map-keys #(Integer/parseInt %))
+                                  (medley/map-keys #(get column-mapping %))
+                                  (group-by second)
+                                  (medley/map-vals #(map first %)))
+
+        views (->> (get iter "view-row-partitions")
+                   (medley/map-keys #(Integer/parseInt %)))
+
+        view-ids (keys views)
+        cluster-ids (medley/map-vals #(vec (distinct %)) views)
+
+        assign-partitions-to-rows
+        (fn [rows views]
+          (let [add-view-info (fn [rows view-id cluster-assignments]
+                                (let [view-name (str "view-" view-id)]
+                                  (map (fn [row c-assignment] (assoc row view-name c-assignment)) rows cluster-assignments)))]
+            (reduce-kv add-view-info rows views)))
+
+        clustered-so-data (assign-partitions-to-rows so-data views)
+
+        ;; TEMP hack for testing
+        clustered-so-data (take 50 clustered-so-data)
+
+        filename-prefix (str "iter-" iter-num)]
+    (write-specs model-dir filename-prefix view-ids cluster-ids view-col-assignments clustered-so-data)))
+
+(defn make-model-dir [base-path]
+  ;; Make clean model directory.
+  (if (fs/directory? base-path)
+    (fs/delete-dir base-path))
+  (fs/mkdirs (str base-path spec-dir))
+  (fs/mkdirs (str base-path view-png-dir))
+  (fs/mkdirs (str base-path view-comp-png-dir))
+  (fs/mkdirs (str base-path gif-dir)))
+
+(defn viz-model [partition-data so-data column-mapping model-num]
+  (let [model-dir (str viz-dir "model-" model-num "/")]
+    (make-model-dir model-dir)
+
+    (doseq [iter-num (range 10)]
+      (viz-iter model-num (str iter-num) model-dir partition-data so-data column-mapping))
+
+    (let [iter-png-wildcard (str model-dir view-comp-png-dir "iter-*.png")
+          anim-loc (str model-dir gif-dir "model-" model-num ".gif")]
+      (sh "convert" "-dispose" "previous" "-delay" "150" iter-png-wildcard "-loop" "1" anim-loc))))
+
+    ;; TODO resize all pictures so animation looks good
