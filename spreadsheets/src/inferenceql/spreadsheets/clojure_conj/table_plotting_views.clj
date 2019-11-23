@@ -3,6 +3,7 @@
    [clojure.data.json :as json]
    [clojure.java.io :as io]
    [clojure.walk :as walk]
+   [clojure.set :as set]
    [medley.core :as medley]
    [clojure.java.shell :refer [sh]]
    [com.evocomputing.colors :as colors]
@@ -90,10 +91,12 @@
 (defn create-primary-data [data cols vid cids]
   (let [cluster-key (str "view-" vid)
         rows-by-cid (group-by #(get % cluster-key) data)
+        rows-by-cid (sort-by first rows-by-cid)
+        rows-to-use (map second rows-by-cid)
 
         separator-group [(zipmap cols (repeat nil))]
 
-        joined-clusters (interpose separator-group (vals rows-by-cid))
+        joined-clusters (interpose separator-group rows-to-use)
         all-rows (flatten joined-clusters)
 
 
@@ -153,16 +156,32 @@
                        ;;(add-columns cols-in-view))]
     (json/write-str final-spec)))
 
-(defn generate-colors [cluster-ids]
+(defn generate-colors [cluster-ids data-with-cluster-ids]
   (let [colors ["#1f77b4" "#aec7e8" "#ff7f0e" "#ffbb78" "#2ca02c"
                 "#98df8a" "#d62728" "#ff9896" "#9467bd" "#c5b0d5"
                 "#8c564b" "#c49c94" "#e377c2" "#f7b6d2" "#7f7f7f"
                 "#c7c7c7" "#bcbd22" "#dbdb8d" "#17becf" "#9edae5"]
         color-list (cycle (partition 2 colors))
 
-        grab-colors (fn [cids-in-view]
-                      (zipmap cids-in-view color-list))]
-    (medley/map-vals grab-colors cluster-ids)))
+
+        grab-colors (fn [vid cids-in-view]
+                      (let [view-key-str (str "view-" vid)
+                            cids-used (distinct (map #(get % view-key-str) data-with-cluster-ids))
+                            cids-not-used (set/difference (set cids-in-view) (set cids-used))
+
+                            sorted-cids (concat (sort cids-used) (sort cids-not-used))]
+                        (comment
+                          (println "cids: ")
+                          (println cids-in-view)
+                          (println "cids actually used: ")
+                          (println cids-used)
+                          (println "cids all: ")
+                          (println sorted-cids)
+                          (println  "cids not used: ")
+                          (println cids-not-used))
+
+                        (zipmap sorted-cids color-list)))]
+    (medley/map-kv-vals grab-colors cluster-ids)))
 
 
 (def viz-dir "viz/")
@@ -172,7 +191,7 @@
 (def gif-dir "anim/")
 
 (defn write-specs [model-dir filename-prefix view-ids cluster-ids view-col-assignments so-data]
-  (let [colors (generate-colors cluster-ids)
+  (let [colors (generate-colors cluster-ids so-data)
         filenames (map #(str filename-prefix "-view-" %) view-ids)
         filenames-vega (map #(str model-dir spec-dir % ".vg.json") filenames)
         filenames-images (map #(str model-dir view-png-dir % ".png") filenames)
