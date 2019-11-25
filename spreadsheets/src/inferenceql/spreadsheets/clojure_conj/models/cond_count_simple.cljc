@@ -10,7 +10,7 @@
    [metaprob.trace :as trace]
    [clojure.pprint :refer [pprint]]
    [inferenceql.spreadsheets.clojure-conj.data :as data]
-   [inferenceql.spreadsheets.clojure-conj.trace-plotting :as tracep]
+   [inferenceql.spreadsheets.clojure-conj.trace-plotting.core :as tracep]
    [inferenceql.spreadsheets.clojure-conj.table-plotting :as tablep]
    [inferenceql.multimixture.basic-queries :as bq]
    [inferenceql.multimixture :as mmix]
