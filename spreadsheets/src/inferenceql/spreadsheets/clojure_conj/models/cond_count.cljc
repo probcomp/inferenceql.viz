@@ -14,6 +14,8 @@
    [inferenceql.multimixture :as mmix]
    [inferenceql.spreadsheets.clojure-conj.models.util :refer [t-flip]]))
 
+;;; Actual conditional count model, with real probabilities taken from the data.
+
 (def clj-row-gen
   (gen []
     (let [col-probs {"AWS" 0.5233333333333333

@@ -7,6 +7,9 @@
     [medley.core :as medley]
     [clojure.data.json :as json]))
 
+;;; A bunch of utility functions used from extracting counts from the data. And also for
+;;; reformatting it as needed.   
+
 (def data-filename "stack-overflow.csv")
 
 (def csv-lines (-> data-filename (io/resource) (slurp) (csv/read-csv) (vec)))

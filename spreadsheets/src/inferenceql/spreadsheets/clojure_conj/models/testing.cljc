@@ -13,6 +13,9 @@
    [inferenceql.multimixture.basic-queries :as bq]
    [inferenceql.multimixture :as mmix]))
 
+;;; A bunch of random tests. For exploring and understanding the scores that come out of
+;;; infer-and-score.
+
 (comment
   (def demo-uncond-model
     (gen []

@@ -19,6 +19,8 @@
    [clojure.data.csv :as csv]
    [clojure.java.io :as io]))
 
+;;; Real count model with probabilities taken from the data.
+
 (def count-model-row-gen
   (gen []
     (let [col-probs {"AWS" 0.2639442971479545

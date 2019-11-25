@@ -14,6 +14,9 @@
    [inferenceql.multimixture :as mmix]
    [inferenceql.spreadsheets.clojure-conj.models.cond-count :refer [make-cond-count-model]]))
 
+;;; Simple conditional count model with only 3 colums and made up probabilities.
+;;; Used to check that simulate and logpdf are working as expected on the returned model.
+
 (def clj-row-gen
   (gen []
     (let [col-probs {"AWS" 0.40
