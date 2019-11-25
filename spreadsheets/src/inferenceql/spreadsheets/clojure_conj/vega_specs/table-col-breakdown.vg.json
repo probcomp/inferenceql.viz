@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
-  "description": "Used to plot break down of colums with values true/false/undefined.",
+  "description": "Used to plot break down of colums with values true/false/undefined. Not used by other source files currently",
   "data": {
     "values": [
         {"column":"AWS","value":"false","count":58567},{"column":"AWS","value":"NA","count":7115},{"column":"AWS","value":"true","count":20633},{"column":"React.js","value":"false","count":44547},{"column":"React.js","value":"NA","count":22522},{"column":"React.js","value":"true","count":19246},{"column":"Rust","value":"false","count":83724},{"column":"Rust","value":"true","count":2591},{"column":"JavaScript","value":"true","count":58344},{"column":"JavaScript","value":"false","count":27971},{"column":"C++","value":"false","count":66114},{"column":"C++","value":"true","count":20201},{"column":"Clojure","value":"false","count":86315},{"column":"Java","value":"true","count":35242},{"column":"Java","value":"false","count":51073},{"column":"Docker","value":"false","count":54753},{"column":"Docker","value":"NA","count":7115},{"column":"Docker","value":"true","count":24447},{"column":"Kubernetes","value":"false","count":72660},{"column":"Kubernetes","value":"NA","count":7115},{"column":"Kubernetes","value":"true","count":6540}
