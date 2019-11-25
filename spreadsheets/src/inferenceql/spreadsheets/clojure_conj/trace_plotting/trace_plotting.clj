@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.clojure-conj.trace-plotting
+(ns inferenceql.spreadsheets.clojure-conj.core
   (:require
    [clojure.data.json :as json]
    [clojure.java.io :as io]
