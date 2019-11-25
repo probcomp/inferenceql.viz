@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.clojure-conj.data
+(ns inferenceql.spreadsheets.clojure-conj.models.data
   (:require
     [inferenceql.spreadsheets.data :refer [fix-row csv-data->maps]]
     [clojure.data.csv :as csv]
