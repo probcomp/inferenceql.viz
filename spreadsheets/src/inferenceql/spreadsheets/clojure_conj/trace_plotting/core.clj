@@ -33,7 +33,7 @@
        [:meta {:charset "UTF-8"}]
        [:title "Plotting"]]
       [:body
-       [:script {:src "js/plot-trace.js"}]
+       [:script {:src "../js/plot-trace.js"}]
 
        [:div {:style (format "height: %d; width: %d" (+ h 50) (+ w 100))}
         [:svg {:id id :width (+ w 100) :height h}
@@ -50,7 +50,7 @@
 
 (defn view-trace
   [trace]
-  (let [base-filename "spreadsheets/src/inferenceql/spreadsheets/clojure_conj/trace_plotting/scratch"
+  (let [base-filename "spreadsheets/src/inferenceql/spreadsheets/clojure_conj/trace_plotting/scratch/trace-"
         id (.toString (java.util.UUID/randomUUID))
         filename (str base-filename id ".html")]
     (trace-to-file trace filename)
