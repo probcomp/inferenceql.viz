@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.clojure-conj.data-ulli
+(ns inferenceql.spreadsheets.clojure-conj.animation.data-ulli
   (:require
     [inferenceql.spreadsheets.data :refer [fix-row csv-data->maps]]
     [clojure.data.csv :as csv]
@@ -6,7 +6,7 @@
     [clojure.string :as str]
     [medley.core :as medley]
     [clojure.data.json :as json]
-    [inferenceql.spreadsheets.clojure-conj.table-plotting-views :as plot]))
+    [inferenceql.spreadsheets.clojure-conj.animation.plot :as plot]))
 
 (def data-filename "stackoverflow-demo-subset-v4.csv")
 (def partitions-filename "partitions.json")
@@ -49,4 +49,4 @@
     (for [model-num (range num-models)]
       (plot-model model-num))))
 
-;(plot-all-models)
+; (plot-all-models)

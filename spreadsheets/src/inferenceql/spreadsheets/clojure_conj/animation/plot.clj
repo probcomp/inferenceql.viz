@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.clojure-conj.table-plotting-views
+(ns inferenceql.spreadsheets.clojure-conj.animation.plot
   (:require
    [clojure.data.json :as json]
    [clojure.java.io :as io]
