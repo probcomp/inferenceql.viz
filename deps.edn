@@ -16,7 +16,6 @@
         reagent-forms {:mvn/version "0.5.43"}
         me.raynes/fs {:mvn/version "1.4.6"}
         hiccup {:mvn/version "1.0.5"}
-        com.evocomputing/colors {:mvn/version "1.0.4"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"

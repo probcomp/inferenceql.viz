@@ -6,8 +6,6 @@
    [clojure.set :as set]
    [medley.core :as medley]
    [clojure.java.shell :refer [sh]]
-   [com.evocomputing.colors :as colors]
-   [inferenceql.spreadsheets.clojure-conj.color-palette :as palette]
    [me.raynes.fs :as fs]))
 
 
