@@ -1,0 +1,12 @@
+;; Augments the build.edn for spreadsheets app.
+;; Used to set watch dirs and hooks.
+
+^{:watch-dirs ["spreadsheets/src" "multimixture/src"]
+  :css-dirs ["spreadsheets/resources"]
+
+  ;; This hook ensures that we have our js-libraries downloaded.
+  :pre-build-hooks [figwheel-build-support/get-node-modules]
+
+  ;; This hook copies static files into the target build directory.
+  :post-build-hooks [figwheel-build-support/copy-static-files]}
+{}
