@@ -25,8 +25,10 @@
           (set! (.-background td-style) "#CEC"))))))
 
 (defn missing-cell-wise-likelihood-threshold-renderer
-  "Color missing-cells that have likelihood greater than or equal to `conf-thresh`"
-  [renderer-args missing-cells-likelihoods computed-headers conf-thresh]
+  "Color missing-cells that have a likelihood greater than or equal to `conf-thresh`.
+  `missing-vals-and-scores` is a row-wise collection of missing values and scores. It has already
+  been filtered for missing cells with scores that are >= our `_conf-thresh`."
+  [renderer-args missing-vals-and-scores computed-headers _conf-thresh]
   (let [renderer-args-js (clj->js renderer-args)
         [hot td row col _prop _value _cell-properties] renderer-args
 
@@ -45,13 +47,12 @@
     (this-as this
       (.apply text-render-fn this renderer-args-js))
 
-    ;; Color cells when we have likelihoods for the cells loaded
-    (when (seq missing-cells-likelihoods)
-      (let [likelihoods-for-row (nth missing-cells-likelihoods row)
-            likelihood-for-cell (get likelihoods-for-row prop-name-of-cell)]
-        ;; When this was a missing cell that we computed a value for.
-        (when likelihood-for-cell
-          (let [cell-above-thresh (>= likelihood-for-cell conf-thresh)]
-            (if cell-above-thresh
-              (set! (.-background td-style) color-above-thresh)
-              (set! (.-background td-style) color-below-thresh))))))))
+    ;; Color cells when we have missing-cells information loaded.
+    (when (seq missing-vals-and-scores)
+      (let [vals-and-scores-for-row (nth missing-vals-and-scores row)
+            val-and-score-map-for-cell (get vals-and-scores-for-row prop-name-of-cell)]
+        ;; When we are coloring a missing cell that beat our confidence threshold.
+        (when val-and-score-map-for-cell
+          (if (:meets-threshold val-and-score-map-for-cell)
+            (set! (.-background td-style) color-above-thresh)
+            (set! (.-background td-style) color-below-thresh)))))))
