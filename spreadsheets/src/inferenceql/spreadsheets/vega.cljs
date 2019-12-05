@@ -31,7 +31,6 @@
 
 (def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
 
-
 (def ^:private default-vega-embed-options {:renderer "svg"
                                            :mode "vega-lite"
                                            :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
@@ -100,6 +99,13 @@
     (case stattype-kw
       :gaussian dist/gaussian
       :categorical dist/categorical)))
+
+(defn- vega-type
+  "Return a vega-lite type given `col-name` a column name from the table"
+  [col-name]
+  (condp = (stattype col-name)
+    dist/gaussian "quantitative"
+    dist/categorical "nominal"))
 
 (defn gen-simulate-plot [selected-columns row-at-selection-start t-clicked]
  (let [selected-column-kw (keyword (first selected-columns))
@@ -279,6 +285,56 @@
       (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
       spec)))
 
+(defn- strip-plot-size-helper
+  "Return a vega-lite height/width size setting given `col-name` a column name from the table"
+  [col-name]
+  (let [gaussian-size 350
+        catergorical-step-size 30]
+    (condp = (stattype col-name)
+      dist/gaussian gaussian-size
+      dist/categorical {:step catergorical-step-size})))
+
+(defn- strip-plot
+  "Generates vega-lite spec for a strip plot.
+  Useful for comparing quantitative-nominal data."
+  [data cols-to-draw facet-column]
+  (let [[x-field y-field] cols-to-draw
+        [x-type y-type] (map vega-type cols-to-draw)
+        [width height] (map strip-plot-size-helper cols-to-draw)
+        spec {:$schema "https://vega.github.io/schema/vega-lite/v4.0.0-beta.json"
+              :width width
+              :height height
+              :data {:values data}
+              :mark {:type "tick"}
+              :encoding {:x {:field x-field
+                             :type x-type
+                             :axis {:grid true :gridDash [2 2]}}
+                         :y {:field y-field
+                             :type y-type
+                             :axis {:grid true :gridDash [2 2]}}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
+
+(defn- table-bubble-plot
+  "Generates vega-lite spec for a table-bubble plot.
+  Useful for comparing nominal-nominal data."
+  [data cols-to-draw facet-column]
+  (let [[x-field y-field] cols-to-draw
+        spec {:$schema "https://vega.github.io/schema/vega-lite/v4.0.0-beta.json"
+              :autosize {:type "pad"}
+              :data {:values data}
+              :mark {:type "circle"}
+              :encoding {:x {:field x-field
+                             :type "nominal"}
+                         :y {:field y-field
+                             :type "nominal"}
+                         :size {:aggregate "count"
+                                :type "quantitative"}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
+
 (defn gen-comparison-plot [table-states t-clicked]
   (let [selection-real (->> (first (get-in table-states [:real-table :selections]))
                             (map #(assoc % :table "Real Data")))
@@ -304,7 +360,7 @@
         facet-column (if make-faceted "table" nil)]
     (condp = cols-types
       #{dist/gaussian} (scatter-plot selection-to-use cols-to-draw facet-column)
-      #{dist/categorical} (heatmap-plot selection-to-use cols-to-draw facet-column)
-      #{dist/gaussian dist/categorical} (box-and-line-plot selection-to-use cols-to-draw facet-column)
+      #{dist/categorical} (table-bubble-plot selection-to-use cols-to-draw facet-column)
+      #{dist/gaussian dist/categorical} (strip-plot selection-to-use cols-to-draw facet-column)
       ;; Default case: no plot -- empty vega-lite spec.
       {})))
