@@ -31,6 +31,9 @@
 
 (def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
 
+(def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
+(def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
+
 (def ^:private default-vega-embed-options {:renderer "svg"
                                            :mode "vega-lite"
                                            :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
@@ -114,8 +117,7 @@
                :labels false
                :ticks false}
        y-scale {:nice false}]
-   {:$schema
-    "https://vega.github.io/schema/vega-lite/v3.json"
+   {:$schema default-vega-lite-schema
     :data {:name "data"}
     :autosize {:resize true}
     :layer (cond-> [{:mark {:type "bar" :color (color-for-table t-clicked)}
@@ -185,8 +187,7 @@
 
                          (= t-clicked :virtual-table)
                          [virtual-layer])]
-    {:$schema
-     "https://vega.github.io/schema/vega-lite/v3.json"
+    {:$schema default-vega-lite-schema
      :encoding {:x {:bin col-binning
                     :field col-to-draw
                     :type col-type}}
@@ -204,7 +205,7 @@
                :type (condp = (stattype map-column)
                        dist/gaussian "quantitative"
                        dist/categorical "nominal")}]
-    {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+    {:$schema v3-vega-lite-schema
      :width vega-map-width
      :height vega-map-height
      :data {:values js/topojson
@@ -223,7 +224,7 @@
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
   [data cols-to-draw facet-column]
-  (let [spec {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+  (let [spec {:$schema default-vega-lite-schema
               :data {:values data}
               :mark "circle"
               :encoding {:x {:field (first cols-to-draw)
@@ -238,7 +239,7 @@
   "Generates vega-lite spec for a heatmap plot.
   Useful for comparing nominal-nominal data."
   [data cols-to-draw facet-column]
-  (let [spec {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+  (let [spec {:$schema v3-vega-lite-schema
               :data {:values data}
               :mark "rect"
               :encoding {:x {:field (first cols-to-draw)
@@ -261,7 +262,7 @@
         col-2-type (condp = (stattype (second cols-to-draw))
                      dist/gaussian "quantitative"
                      dist/categorical "nominal")
-        spec {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+        spec {:$schema v3-vega-lite-schema
               :data {:values data}
               :mark {:type "boxplot"
                      :extent "min-max"}
@@ -289,7 +290,7 @@
   (let [[x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
         [width height] (map strip-plot-size-helper cols-to-draw)
-        spec {:$schema "https://vega.github.io/schema/vega-lite/v4.0.0-beta.json"
+        spec {:$schema default-vega-lite-schema
               :width width
               :height height
               :data {:values data}
@@ -309,7 +310,7 @@
   Useful for comparing nominal-nominal data."
   [data cols-to-draw facet-column]
   (let [[x-field y-field] cols-to-draw
-        spec {:$schema "https://vega.github.io/schema/vega-lite/v4.0.0-beta.json"
+        spec {:$schema default-vega-lite-schema
               :autosize {:type "pad"}
               :data {:values data}
               :mark {:type "circle"}
