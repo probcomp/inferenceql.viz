@@ -67,10 +67,10 @@
     (map #(score-cells-in-row row-gen %) rows)))
 
 ;;; These functions are for imputing data in empty cells and
-;;; also returning a likelihoods for the imputed values.
+;;; also returning a score for the imputed values.
 
 (defn impute-and-score-cell
-  "Returns an imputed value of `key-to-impute` along with its likelihood"
+  "Returns an imputed value of `key-to-impute` along with its score"
   [row-gen row key-to-impute]
   (let [constraints (mmix/with-row-values {} row)
         gen-fn #(-> (mp/infer-and-score :procedure row-gen
@@ -83,53 +83,37 @@
 
         total-sample-count (count samples)
         top-sample-prob (/ top-sample-count total-sample-count)]
-    [top-sample top-sample-prob]))
+    {:value top-sample :score top-sample-prob}))
 
 (defn impute-missing-cells-in-row
-  "Returns a map of imputed values and likelihoods for all missing values in `row`"
+  "Returns a map of imputed values and scores for all missing values in `row`"
   [row-generator headers row]
   (let [clean-row (util/filter-nil-kvs row)
         available-keys (keys clean-row)
         missing-keys (set/difference (set headers) (set available-keys))
-        values-scores (map #(impute-and-score-cell row-generator clean-row %) missing-keys)
+        values-scores (map #(impute-and-score-cell row-generator clean-row %) missing-keys)]
+    (zipmap missing-keys values-scores)))
 
-        values (map first values-scores)
-        values-map (zipmap missing-keys values)
-        scores (map second values-scores)
-        scores-map (zipmap missing-keys scores)
-
-        ret-val {:values values-map :scores scores-map}]
-    ret-val))
-
-(defn normalize-missing-cells-likelihoods
-  "Normalizes likelihoods across a whole seq of maps (`likelihood-maps`)
-  each containing likelihoods for missing cells in a row."
-  [likelihood-maps]
-  (let [all-likelihoods (mapcat vals likelihood-maps)
-        normalizer (min-max-normalizer-fn all-likelihoods)
-
-        ;; Normalizes every value in a map of likelihoods for
-        ;; missing cells in a row.
-        normalize-row-fn #(medley/map-vals normalizer %)]
-    (map normalize-row-fn likelihood-maps)))
+(defn normalize-missing-cells-scores
+  "Normalizes scores within each map in `values-and-scores-by-row`"
+  [values-and-scores-by-row all-scores]
+  (let [normalizer (min-max-normalizer-fn all-scores)
+        norm-scores (fn [row-vals-scores]
+                      (medley/map-vals (fn [val-score-map] (update val-score-map :score normalizer))
+                                       row-vals-scores))]
+    (map norm-scores values-and-scores-by-row)))
 
 (defn impute-missing-cells
-  "Returns imputed values and normalized likelihoods for
-  all missing values in `rows`"
+  "Returns imputed values and normalized scores for all missing values in `rows`"
   [spec headers rows]
   (let [row-gen (search/optimized-row-generator spec)
-        values-and-scores (map #(impute-missing-cells-in-row row-gen headers %) rows)
-        values (map :values values-and-scores)
-        scores (map :scores values-and-scores)
+        values-and-scores-by-row (map #(impute-missing-cells-in-row row-gen headers %) rows)
 
-        all-scores (mapcat vals scores)
-        distinct-scores-present (> (count (distinct all-scores)) 1)
+        all-scores (mapcat (fn [row] (map :score (vals row)))
+                           values-and-scores-by-row)
+        distinct-scores-present (> (count (distinct all-scores)) 1)]
 
-        norm-scores (if distinct-scores-present
-                      (normalize-missing-cells-likelihoods scores)
-
-                      ;; Just return the raw likelihoods when we can't normalize.
-                      scores)]
-
-    ;; Returns imputed values with normalized likelihoods for each row
-    (map #(assoc {} :values %1 :scores %2) values norm-scores)))
+    (if distinct-scores-present
+      (normalize-missing-cells-scores values-and-scores-by-row all-scores)
+      ;; Just return the raw likelihoods when we can't normalize.
+      values-and-scores-by-row)))
