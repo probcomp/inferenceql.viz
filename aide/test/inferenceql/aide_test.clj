@@ -39,12 +39,3 @@
           100 1
           100 20))
        [1 2 3 5]))
-
-;; Create an observation trace specifying we saw 7 heads and 3 tails
-(def seven-heads
-  (into {} (map-indexed
-            (fn [i x] [i {:value x}])
-            (concat (repeat 7 true) (repeat 3 false)))))
-
-(deftest test-seven-heads
-  (is (clojure.core/apply >= (aide-demo 10 seven-heads))))
