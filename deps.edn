@@ -34,8 +34,7 @@
                                cheshire {:mvn/version "5.8.1"}}}
            :figwheel {:extra-paths ["figwheel" "target"]
                       :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.3"}
-                                   com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
-                                   me.raynes/fs {:mvn/version "1.4.6"}}
+                                   com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}}
                       :main-opts ["-m" "figwheel.main"
                                   "-co" "spreadsheets/build.edn:figwheel/figwheel_build_support.edn"
                                   "-d" "target/public/out"
