@@ -54,7 +54,7 @@ publish: $(output-to)
 
 ### Compilation with Figwheel
 
-figwheel-build-dir := $(current-dir)/../target/public
+figwheel-build-dir := $(current-dir)/figwheel-target/public
 figwheel-resource-dir := $(figwheel-build-dir)/resources
 figwheel-index-file := $(figwheel-build-dir)/index.html
 
