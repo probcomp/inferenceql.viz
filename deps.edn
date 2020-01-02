@@ -32,11 +32,11 @@
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
                                cheshire {:mvn/version "5.8.1"}}}
-           :figwheel {:extra-paths ["figwheel" "target"]
+           :figwheel {:extra-paths ["target"]
                       :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.3"}
                                    com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}}
                       :main-opts ["-m" "figwheel.main"
-                                  "-co" "spreadsheets/build.edn:figwheel/figwheel_build_support.edn"
+                                  "-co" "spreadsheets/build.edn:spreadsheets/figwheel/figwheel_build_support.edn"
                                   "-d" "target/public/out"
                                   "-o" "target/public/out/main.js"
                                   "-c" "inferenceql.spreadsheets.core"
@@ -46,7 +46,7 @@
                              ;; This is the only line that differs from :figwheel :main-opts.
                              ;; There is the addition of an extra .edn file for build options related
                              ;; to reframe-10x.
-                             "-co" "spreadsheets/build.edn:figwheel/figwheel_build_support.edn:figwheel/reframe_10x_support.edn"
+                             "-co" "spreadsheets/build.edn:spreadsheets/figwheel/figwheel_build_support.edn:spreadsheets/figwheel/reframe_10x_support.edn"
                              "-d" "target/public/out"
                              "-o" "target/public/out/main.js"
                              "-c" "inferenceql.spreadsheets.core"
