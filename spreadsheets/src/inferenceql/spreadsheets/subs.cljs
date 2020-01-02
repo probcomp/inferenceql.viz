@@ -246,6 +246,13 @@
                  (count (first selections))
                  (count (keys (first selections))))))
 
+(rf/reg-sub :vega-lite-log-level
+            :<- [:one-cell-selected]
+            (fn [one-cell-selected]
+              (if one-cell-selected
+                (.-Error js/vega)
+                (.-Warn js/vega))))
+
 (rf/reg-sub :generator
             (fn [_ _]
               {:selection-info (rf/subscribe [:table-state-active])

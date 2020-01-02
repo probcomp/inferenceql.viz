@@ -100,6 +100,7 @@
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
         virtual-hot-props @(rf/subscribe [:virtual-hot-props])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
+        vega-lite-log-level @(rf/subscribe [:vega-lite-log-level])
         generator      @(rf/subscribe [:generator])]
     [:div
      [search-form]
@@ -109,5 +110,5 @@
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div#viz-container
       (when vega-lite-spec
-        [vega/vega-lite vega-lite-spec {:actions false} generator])]
+        [vega/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]
      [modal/modal]]))
