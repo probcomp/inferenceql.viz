@@ -10,6 +10,12 @@ output-to	 := $(output-dir)/main.js
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/handsontable.full.css
 
+### Definitions for Figwheel.
+
+figwheel-build-dir := $(current-dir)/figwheel-target/public
+figwheel-resource-dir := $(figwheel-build-dir)/resources
+figwheel-index-file := $(figwheel-build-dir)/index.html
+
 all: js
 
 js: $(output-to)
@@ -20,6 +26,7 @@ watch: $(hot-css-resource)
 
 clean:
 	rm -Rf $(output-dir)
+	rm -Rf $(figwheel-build-dir)
 
 ### Compilation
 
@@ -53,10 +60,6 @@ publish: $(output-to)
 	cd ..; bin/publish $(current-dir) $(surge-domain)
 
 ### Compilation with Figwheel
-
-figwheel-build-dir := $(current-dir)/figwheel-target/public
-figwheel-resource-dir := $(figwheel-build-dir)/resources
-figwheel-index-file := $(figwheel-build-dir)/index.html
 
 $(figwheel-build-dir):
 	mkdir -p $(figwheel-build-dir)
