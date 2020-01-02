@@ -25,10 +25,10 @@
           (set! (.-background td-style) "#CEC"))))))
 
 (defn missing-cell-wise-likelihood-threshold-renderer
-  "Color missing-cells that have a likelihood greater than or equal to `conf-thresh`.
-  `missing-vals-and-scores` is a row-wise collection of missing values and scores. It has already
-  been filtered for missing cells with scores that are >= our `_conf-thresh`."
-  [renderer-args missing-vals-and-scores computed-headers _conf-thresh]
+  "Color missing-cells based on whether they meet the set confidence threshold or not.
+  `missing-vals-and-scores` is a row-wise collection maps. The map for each row has keys of column
+  names and vals of maps of this form. {:score _ :value _ :meets-threshold _ }."
+  [renderer-args missing-vals-and-scores computed-headers]
   (let [renderer-args-js (clj->js renderer-args)
         [hot td row col _prop _value _cell-properties] renderer-args
 
@@ -47,12 +47,11 @@
     (this-as this
       (.apply text-render-fn this renderer-args-js))
 
-    ;; Color cells when we have missing-cells information loaded.
-    (when (seq missing-vals-and-scores)
-      (let [vals-and-scores-for-row (nth missing-vals-and-scores row)
-            val-and-score-map-for-cell (get vals-and-scores-for-row prop-name-of-cell)]
-        ;; When we are coloring a missing cell that beat our confidence threshold.
-        (when val-and-score-map-for-cell
-          (if (:meets-threshold val-and-score-map-for-cell)
-            (set! (.-background td-style) color-above-thresh)
-            (set! (.-background td-style) color-below-thresh)))))))
+    ;; Perform coloring when we have missing-cells information loaded.
+    (when-let [mvs (not-empty missing-vals-and-scores)]
+      ;; When current cell being colored has missing cell info.
+      (when-let [cell-info (get-in mvs [row prop-name-of-cell])]
+        (let [color (if (:meets-threshold cell-info)
+                        color-above-thresh
+                        color-below-thresh)]
+          (set! (.-background td-style) color))))))

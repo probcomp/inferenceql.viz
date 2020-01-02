@@ -358,11 +358,13 @@
  (fn [[missing-cells confidence-threshold] _]
    ;; validate output using spec
    {:post [(s/valid? ::db/missing-cells %)]}
-   (for [row missing-cells]
-     (let [add-threshold-flags (fn [val-and-score-map]
-                                 (let [meets-threshold (>= (:score val-and-score-map) confidence-threshold)]
-                                   (assoc val-and-score-map :meets-threshold meets-threshold)))]
-       (medley/map-vals add-threshold-flags row)))))
+   (let [add-threshold-flags (fn [val-and-score-map]
+                               (let [meets-threshold (>= (:score val-and-score-map) confidence-threshold)]
+                                 (assoc val-and-score-map :meets-threshold meets-threshold)))
+         ;; Missing cell info with :meets-threshold flags added.
+         with-flags (map (fn [row] (medley/map-vals add-threshold-flags row))
+                         missing-cells)]
+     (vec with-flags))))
 
 (rf/reg-sub
  :missing-cells-vals-above-thresh
@@ -374,8 +376,8 @@
    {:post [(s/valid? :ms/missing-cells-values %)]}
    (for [row missing-cells-flagged]
      (->> row
-          (medley/filter-vals #(:meets-threshold %))
-          (medley/map-vals #(:value %))))))
+          (medley/filter-vals :meets-threshold)
+          (medley/map-vals :value)))))
 
 (rf/reg-sub
  :cells-style-fn
@@ -413,4 +415,4 @@
 
      :cells-missing
      (fn [& args]
-       (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-flagged computed-headers conf-thresh)))))
+       (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-flagged computed-headers)))))

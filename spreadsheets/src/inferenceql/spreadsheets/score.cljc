@@ -8,28 +8,23 @@
             [clojure.set :as set]
             [clojure.spec.alpha :as s]))
 
-;; General specs for scoring functions.
+;;; General specs for scoring functions.
 
 (s/def ::score number?)
 
-;; Specs for row-wise scoring functions.
+;;; Specs for row-wise scoring functions.
 
 (s/def ::row-likelihoods (s/coll-of ::score))
-(s/fdef row-likelihoods :ret ::row-likelihoods)
 
-;; Specs for cell-wise scoring functions.
+;;; Specs for cell-wise scoring functions.
 
 (s/def ::value any?)
 (s/def ::value-score-map (s/keys :req-un [::value ::score]))
-(s/fdef impute-and-score-cell :ret ::value-score-map)
 
 (s/def ::column-name string?)
 (s/def ::map-for-row (s/map-of ::column-name ::value-score-map))
-(s/fdef impute-missing-cells-in-row :ret ::map-for-row)
 
 (s/def ::missing-vals-and-scores (s/coll-of :ms/map-for-row))
-(s/fdef normalize-missing-cells-scores :ret ::missing-vals-and-scores)
-(s/fdef impute-missing-cells :ret ::missing-vals-and-scores)
 
 (def ^:private imputation-sample-size
   "The number of imputed values used to determine the value a missing cell."
@@ -57,6 +52,7 @@
         constraints {}]
     (Math/exp (bq/logpdf row-generator target constraints))))
 
+(s/fdef row-likelihoods :ret ::row-likelihoods)
 (defn row-likelihoods
   "Returns a sequence of normalized likelihoods for `rows`"
   [spec rows]
@@ -93,6 +89,7 @@
 ;;; These functions are for imputing data in empty cells and
 ;;; also returning a score for the imputed values.
 
+(s/fdef impute-and-score-cell :ret ::value-score-map)
 (defn impute-and-score-cell
   "Returns an imputed value of `key-to-impute` along with its score"
   [row-gen row key-to-impute]
@@ -109,6 +106,7 @@
         top-sample-prob (/ top-sample-count total-sample-count)]
     {:value top-sample :score top-sample-prob}))
 
+(s/fdef impute-missing-cells-in-row :ret ::map-for-row)
 (defn impute-missing-cells-in-row
   "Returns a map of imputed values and scores for all missing values in `row`"
   [row-generator headers row]
@@ -118,6 +116,7 @@
         values-scores (map #(impute-and-score-cell row-generator clean-row %) missing-keys)]
     (zipmap missing-keys values-scores)))
 
+(s/fdef normalize-missing-cells-scores :ret ::missing-vals-and-scores)
 (defn normalize-missing-cells-scores
   "Normalizes scores within each map in `values-and-scores-by-row`"
   [values-and-scores-by-row all-scores]
@@ -127,17 +126,20 @@
                                        row-vals-scores))]
     (map norm-scores values-and-scores-by-row)))
 
+(s/fdef impute-missing-cells :ret ::missing-vals-and-scores)
 (defn impute-missing-cells
   "Returns imputed values and normalized scores for all missing values in `rows`"
   [spec headers rows]
   (let [row-gen (search/optimized-row-generator spec)
         values-and-scores-by-row (map #(impute-missing-cells-in-row row-gen headers %) rows)
 
-        all-scores (mapcat (fn [row] (map :score (vals row)))
-                           values-and-scores-by-row)
-        distinct-scores-present (> (count (distinct all-scores)) 1)]
+        all-scores (->> values-and-scores-by-row
+                        (map vals) ;; Produces sequence of {:score _ :value _ } maps for each row.
+                        (apply concat)  ;; Flattened sequence of {:score _ :value _ } maps.
+                        (map :score))] ;; Sequence of score values.
 
-    (if distinct-scores-present
+    ;; Only normalize if distinct scores present.
+    (if (> (count (distinct all-scores)) 1)
       (normalize-missing-cells-scores values-and-scores-by-row all-scores)
-      ;; Just return the raw likelihoods when we can't normalize.
+      ;; Just return the raw likelihoods otherwise.
       values-and-scores-by-row)))
