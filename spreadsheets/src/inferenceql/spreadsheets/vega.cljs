@@ -13,13 +13,6 @@
   "Header text for the column that shows scores."
   "probability")
 
-(def vega-width
-  "Width setting for the specs produced by the :vega-lite-spec sub"
-  400)
-(def vega-height
-  "Height setting for the specs produced by the :vega-lite-spec sub"
-  400)
-
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
   500)
@@ -27,9 +20,29 @@
   "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
   300)
 
+(def vega-strip-plot-quant-size
+  "Size of the strip plot for the quantitative dimension"
+  350)
+(def vega-strip-plot-step-size
+  "Width of each band in the strip plot in the categorical dimension"
+  30)
+
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
 (def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
+
+(def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
+(def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
+
+(def ^:private default-vega-embed-options
+  {:renderer "svg"
+   :mode "vega-lite"
+   :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
+            :legend {:labelFontSize 12 :titleFontSize 12}
+            :header {:labelFontSize 14}
+            :mark {:tooltip true}
+            ;; Remove title from faceted plots.
+            :headerFacet {:title nil}}})
 
 (defn vega-lite
   "vega-lite reagent component"
@@ -38,8 +51,7 @@
         embed (fn [this spec opt generator]
                 (when spec
                   (let [spec (clj->js spec)
-                        opt (clj->js (merge {:renderer "canvas"
-                                             :mode "vega-lite"}
+                        opt (clj->js (merge default-vega-embed-options
                                             opt))]
                     (cond-> (js/vegaEmbed (r/dom-node this)
                                           spec
@@ -92,6 +104,13 @@
       :gaussian dist/gaussian
       :categorical dist/categorical)))
 
+(defn- vega-type
+  "Return a vega-lite type given `col-name` a column name from the table"
+  [col-name]
+  (condp = (stattype col-name)
+    dist/gaussian "quantitative"
+    dist/categorical "nominal"))
+
 (defn gen-simulate-plot [selected-columns row-at-selection-start t-clicked]
  (let [selected-column-kw (keyword (first selected-columns))
        y-axis {:title "distribution of probable values"
@@ -99,10 +118,7 @@
                :labels false
                :ticks false}
        y-scale {:nice false}]
-   {:$schema
-    "https://vega.github.io/schema/vega-lite/v3.json"
-    :width vega-width
-    :height vega-height
+   {:$schema default-vega-lite-schema
     :data {:name "data"}
     :autosize {:resize true}
     :layer (cond-> [{:mark {:type "bar" :color (color-for-table t-clicked)}
@@ -172,10 +188,7 @@
 
                          (= t-clicked :virtual-table)
                          [virtual-layer])]
-    {:$schema
-     "https://vega.github.io/schema/vega-lite/v3.json"
-     :width vega-width
-     :height vega-height
+    {:$schema default-vega-lite-schema
      :encoding {:x {:bin col-binning
                     :field col-to-draw
                     :type col-type}}
@@ -193,7 +206,7 @@
                :type (condp = (stattype map-column)
                        dist/gaussian "quantitative"
                        dist/categorical "nominal")}]
-    {:$schema "https://vega.github.io/schema/vega-lite/v3.json"
+    {:$schema v3-vega-lite-schema
      :width vega-map-width
      :height vega-map-height
      :data {:values js/topojson
@@ -208,6 +221,110 @@
      :encoding {:tooltip [name color]
                 :color color}}))
 
+(defn- scatter-plot
+  "Generates vega-lite spec for a scatter plot.
+  Useful for comparing quatitative-quantitative data."
+  [data cols-to-draw facet-column]
+  (let [spec {:$schema default-vega-lite-schema
+              :data {:values data}
+              :mark "circle"
+              :encoding {:x {:field (first cols-to-draw)
+                             :type "quantitative"}
+                         :y {:field (second cols-to-draw)
+                             :type "quantitative"}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
+
+(defn- heatmap-plot
+  "Generates vega-lite spec for a heatmap plot.
+  Useful for comparing nominal-nominal data."
+  [data cols-to-draw facet-column]
+  (let [spec {:$schema v3-vega-lite-schema
+              :data {:values data}
+              :mark "rect"
+              :encoding {:x {:field (first cols-to-draw)
+                             :type "nominal"}
+                         :y {:field (second cols-to-draw)
+                             :type "nominal"}
+                         :color {:aggregate "count"
+                                 :type "quantitative"}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
+
+(defn- box-and-line-plot
+  "Generates vega-lite spec for a box-and-line plot.
+  Useful for comparing quantitative-nominal data."
+  [data cols-to-draw facet-column]
+  (let [col-1-type (condp = (stattype (first cols-to-draw))
+                     dist/gaussian "quantitative"
+                     dist/categorical "nominal")
+        col-2-type (condp = (stattype (second cols-to-draw))
+                     dist/gaussian "quantitative"
+                     dist/categorical "nominal")
+        spec {:$schema v3-vega-lite-schema
+              :data {:values data}
+              :mark {:type "boxplot"
+                     :extent "min-max"}
+              :encoding {:x {:field (first cols-to-draw)
+                             :type col-1-type}
+                         :y {:field (second cols-to-draw)
+                             :type col-2-type}
+                         :color {:aggregate "count"
+                                 :type "quantitative"}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
+
+(defn- strip-plot-size-helper
+  "Return a vega-lite height/width size setting given `col-name` a column name from the table"
+  [col-name]
+  (condp = (stattype col-name)
+    dist/gaussian vega-strip-plot-quant-size
+    dist/categorical {:step vega-strip-plot-step-size}))
+
+(defn- strip-plot
+  "Generates vega-lite spec for a strip plot.
+  Useful for comparing quantitative-nominal data."
+  [data cols-to-draw facet-column]
+  (let [[x-field y-field] cols-to-draw
+        [x-type y-type] (map vega-type cols-to-draw)
+        [width height] (map strip-plot-size-helper cols-to-draw)
+        spec {:$schema default-vega-lite-schema
+              :width width
+              :height height
+              :data {:values data}
+              :mark {:type "tick"}
+              :encoding {:x {:field x-field
+                             :type x-type
+                             :axis {:grid true :gridDash [2 2]}}
+                         :y {:field y-field
+                             :type y-type
+                             :axis {:grid true :gridDash [2 2]}}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
+
+(defn- table-bubble-plot
+  "Generates vega-lite spec for a table-bubble plot.
+  Useful for comparing nominal-nominal data."
+  [data cols-to-draw facet-column]
+  (let [[x-field y-field] cols-to-draw
+        spec {:$schema default-vega-lite-schema
+              :autosize {:type "pad"}
+              :data {:values data}
+              :mark {:type "circle"}
+              :encoding {:x {:field x-field
+                             :type "nominal"}
+                         :y {:field y-field
+                             :type "nominal"}
+                         :size {:aggregate "count"
+                                :type "quantitative"}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
+
 (defn gen-comparison-plot [table-states t-clicked]
   (let [selection-real (->> (first (get-in table-states [:real-table :selections]))
                             (map #(assoc % :table "Real Data")))
@@ -217,62 +334,23 @@
 
         cols-real (take 2 (get-in table-states [:real-table :selected-columns]))
         cols-virtual (take 2 (get-in table-states [:virtual-table :selected-columns]))
+
+        ;; Checks if the user has selected the same columns in both the real and virtual tables.
         make-faceted (= cols-real cols-virtual)
 
         cols-to-draw (take 2 (get-in table-states [t-clicked :selected-columns]))
         cols-types (set (doall (map stattype cols-to-draw)))
 
+        ;; This is the selection from the last-clicked-on table.
         selection-not-faceted (first (get-in table-states [t-clicked :selections]))
+        ;; This is the selections from both the real and virtual tables combined.
         selection-faceted (concat selection-real selection-virtual)
-        selection-to-use (if make-faceted selection-faceted selection-not-faceted)
 
-        facet-section {:field "table" :type "nominal"}
-        facet-section-to-use (if make-faceted facet-section {})]
+        selection-to-use (if make-faceted selection-faceted selection-not-faceted)
+        facet-column (when make-faceted "table")]
     (condp = cols-types
-      ;; Scatterplot
-      #{dist/gaussian} {:$schema
-                        "https://vega.github.io/schema/vega-lite/v3.json"
-                        :width vega-width
-                        :height vega-height
-                        :data {:values selection-to-use}
-                        :mark "circle"
-                        :encoding {:x {:field (first cols-to-draw)
-                                       :type "quantitative"}
-                                   :y {:field (second cols-to-draw)
-                                       :type "quantitative"}
-                                   :facet facet-section-to-use}}
-      ;; Heatmap
-      #{dist/categorical} {:$schema
-                           "https://vega.github.io/schema/vega-lite/v3.json"
-                           :width vega-width
-                           :height vega-height
-                           :data {:values selection-to-use}
-                           :mark "rect"
-                           :encoding {:x {:field (first cols-to-draw)
-                                          :type "nominal"}
-                                      :y {:field (second cols-to-draw)
-                                          :type "nominal"}
-                                      :color {:aggregate "count"
-                                              :type "quantitative"}
-                                      :facet facet-section-to-use}}
-      ;; Bot-and-line
-      #{dist/gaussian
-        dist/categorical} {:$schema
-                           "https://vega.github.io/schema/vega-lite/v3.json"
-                           :width vega-width
-                           :height vega-height
-                           :data {:values selection-to-use}
-                           :mark {:type "boxplot"
-                                  :extent "min-max"}
-                           :encoding {:x {:field (first cols-to-draw)
-                                          :type (condp = (stattype (first cols-to-draw))
-                                                  dist/gaussian "quantitative"
-                                                  dist/categorical "nominal")}
-                                      :y {:field (second cols-to-draw)
-                                          :type (condp = (stattype (second cols-to-draw))
-                                                  dist/gaussian "quantitative"
-                                                  dist/categorical "nominal")}
-                                      :color {:aggregate "count"
-                                              :type "quantitative"}
-                                      :facet facet-section-to-use}}
+      #{dist/gaussian} (scatter-plot selection-to-use cols-to-draw facet-column)
+      #{dist/categorical} (table-bubble-plot selection-to-use cols-to-draw facet-column)
+      #{dist/gaussian dist/categorical} (strip-plot selection-to-use cols-to-draw facet-column)
+      ;; Default case: no plot -- empty vega-lite spec.
       {})))
