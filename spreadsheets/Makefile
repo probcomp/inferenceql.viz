@@ -24,7 +24,6 @@ clean:
 ### Compilation
 
 compile-opts := $(current-dir)/build.edn
-output-to	   := $(output-dir)/main.js
 main-ns      := inferenceql.spreadsheets.core
 
 cljs-main-opts := \
