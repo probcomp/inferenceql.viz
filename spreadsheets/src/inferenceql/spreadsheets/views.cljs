@@ -80,20 +80,21 @@
   []
   (let [input-text (rf/subscribe [:query-string])]
     (fn []
-      [:div#search-form
-       [:input#search-input {:type "search"
-                             :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
-                             :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                                     (rf/dispatch [:parse-query @input-text])))
-                             :value @input-text}]
-       [:button {:on-click #(rf/dispatch [:parse-query @input-text])
-                 :style {:float "right"}}
-        "Run InferenceQL"]
-       [:button {:on-click #(rf/dispatch [:clear-virtual-data])
-                 :style {:float "right"}}
-        "Delete virtual data"]
-       [confidence-slider]
-       [confidence-mode]])))
+      [:div#toolbar
+       [:div#search-section
+         [:input#search-input {:type "search"
+                               :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
+                               :on-key-press (fn [e] (if (= (.-key e) "Enter")
+                                                       (rf/dispatch [:parse-query @input-text])))
+                               :placeholder "Enter a query..."
+                               :value @input-text}]
+         [:div#search-buttons
+           [:button.toolbar-button {:on-click #(rf/dispatch [:parse-query @input-text])} "Run InferenceQL"]
+           [:button.toolbar-button {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
+       [:div.flex-box-space-filler]
+       [:div#conf-controls
+        [confidence-slider]
+        [confidence-mode]]])))
 
 (defn app
   []
