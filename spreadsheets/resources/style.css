@@ -2,7 +2,7 @@
 
 body {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
-  font-size: 1.125em;
+  font-size: 1em;
   -webkit-font-smoothing: antialiased;
   color: #333;
   margin: 0px
@@ -10,6 +10,13 @@ body {
 
 div {
   margin: 0px
+}
+
+/* --------------- utility classes --------------- */
+
+.flex-box-space-filler {
+  flex: auto;
+  min-width: 40px;
 }
 
 /* --------------- styling for table titles --------------- */
@@ -28,40 +35,81 @@ div {
   padding-right: 5px;
 }
 
-/* --------------- styling for search input --------------- */
+/* --------------- styling for the toolbar --------------- */
 
-/* allows search input to be styled */
-input[type=search]{
-   -moz-appearance: none;/* older firefox */
-   -webkit-appearance: none; /* safari, chrome, edge and ie mobile */
-   appearance: none; /* rest */
-}
-
-input { font-size: 16px; }
-button { font-size: 16px; }
-
-#search-form {
+#toolbar {
   display: flex;
   margin-top: 5px;
   margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+/* --------------- styling for search input --------------- */
+
+#search-section {
+  width: 60%;
+  min-width: 350px;
+}
+
+#search-buttons {
+  margin-top: 5px;
+  margin-right: 5px;
+  float: right;
+
 }
 
 #search-input {
-  width: 40%;
+  width: 100%;
+  height: 85px;
 }
+
+input[type=search]{
+  /* allows search input to be styled */
+  -moz-appearance: none;/* older firefox */
+  -webkit-appearance: none; /* safari, chrome, edge and ie mobile */
+  appearance: none; /* rest */
+
+  font-size: 1em;
+  color: #333;
+
+  border-radius: 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: lightgray;
+  outline-width: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.toolbar-button {
+  align-self: center;
+  font-size: 12px;
+  margin-left: 6px;
+  padding: .3em .8em
+}
+
 
 /* --------------- styling for confidence settings --------------- */
 
+#conf-controls {
+  flex-shrink: 0;
+  width: 185px;
+  margin-top: 5px;
+}
+
 #conf-slider {
-  margin-left: 40px;
+  font-size: 12px;
+  line-height: 20px;
 }
 
 #conf-mode {
-  margin-left: 20px;
+  font-size: 12px;
+  line-height: 20px;
 }
 
 select {
-   font-size: 16px;
+  font-size: 1em;
+  color: #333;
 }
 
 /* --------------- styling for vega-vizualization --------------- */
