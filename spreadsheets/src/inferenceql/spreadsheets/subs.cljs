@@ -1,5 +1,6 @@
 (ns inferenceql.spreadsheets.subs
   (:require [clojure.string :as str]
+            [clojure.spec.alpha :as s]
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
             [inferenceql.spreadsheets.db :as db]
@@ -13,6 +14,11 @@
             [inferenceql.spreadsheets.renderers :as rends]
             [medley.core :as medley])
   (:require-macros [reagent.ratom :refer [reaction]]))
+
+;;; Specs related to subscriptions for missing cell values
+
+(s/def :ms/values-map-for-row (s/map-of ::db/column-name :ms/value))
+(s/def :ms/missing-cells-values (s/coll-of :ms/values-map-for-row))
 
 (rf/reg-sub :scores
             (fn [db _]
@@ -68,7 +74,7 @@
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
                :labels (rf/subscribe [:labels])
-               :imputed-values (rf/subscribe [:missing-cells-values-above-conf-threshold])
+               :imputed-values (rf/subscribe [:missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:confidence-option [:mode]])})
             (fn [{:keys [rows scores labels imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
@@ -346,27 +352,40 @@
     (get db ::db/row-likelihoods)))
 
 (rf/reg-sub
- :missing-cells-values
- (fn [db _]
-   (map :values (get db ::db/missing-cells))))
-
-(rf/reg-sub
-  :missing-cells-likelihoods-normed
+  ;; Returns values and scores of missing-cells.
+  :missing-cells
   (fn [db _]
-    (map :scores (get db ::db/missing-cells))))
+    (get db ::db/missing-cells)))
 
 (rf/reg-sub
- :missing-cells-values-above-conf-threshold
- (fn [_ _]
-   {:values (rf/subscribe [:missing-cells-values])
-    :likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
-    :conf-threshold (rf/subscribe [:confidence-threshold])})
- (fn [{:keys [values likelihoods conf-threshold]}]
-   (for [[row-values row-likelihoods] (map vector values likelihoods)]
-     (let [above-threshold? (fn [col-name]
-                             (let [lh (get row-likelihoods col-name)]
-                               (>= lh conf-threshold)))]
-       (medley/filter-keys above-threshold? row-values)))))
+ :missing-cells-flagged
+ ;; This is like the :missing-cells sub, but it includes an extra flag for whether the
+ ;; imputed value for each cell meets the set confidence threshold.
+ :<- [:missing-cells]
+ :<- [:confidence-threshold]
+ (fn [[missing-cells confidence-threshold] _]
+   ;; validate output using spec
+   {:post [(s/valid? ::db/missing-cells %)]}
+   (let [add-threshold-flags (fn [val-and-score-map]
+                               (let [meets-threshold (>= (:score val-and-score-map) confidence-threshold)]
+                                 (assoc val-and-score-map :meets-threshold meets-threshold)))
+         ;; Missing cell info with :meets-threshold flags added.
+         with-flags (map (fn [row] (medley/map-vals add-threshold-flags row))
+                         missing-cells)]
+     (vec with-flags))))
+
+(rf/reg-sub
+ :missing-cells-vals-above-thresh
+ ;; This is like the :missing-cells sub, but it only includes cells that have meet the confidence
+ ;; threshold. And it only has missing cells values, no score info.
+ :<- [:missing-cells-flagged]
+ (fn [missing-cells-flagged _]
+   ;; validate output using spec
+   {:post [(s/valid? :ms/missing-cells-values %)]}
+   (for [row missing-cells-flagged]
+     (->> row
+          (medley/filter-vals :meets-threshold)
+          (medley/map-vals :value)))))
 
 (rf/reg-sub
  :cells-style-fn
@@ -381,12 +400,12 @@
  :cell-renderer-fn
  (fn [_ _]
    {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
-    :missing-cells-likelihoods (rf/subscribe [:missing-cells-likelihoods-normed])
+    :missing-cells-flagged (rf/subscribe [:missing-cells-flagged])
     :conf-thresh (rf/subscribe [:confidence-threshold])
     :conf-mode (rf/subscribe [:confidence-option [:mode]])
     :computed-headers (rf/subscribe [:computed-headers])})
  ;; Returns a cell renderer function used by Handsontable.
- (fn [{:keys [row-likelihoods missing-cells-likelihoods conf-thresh conf-mode computed-headers]}]
+ (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode
      :none
      js/Handsontable.renderers.TextRenderer
@@ -404,4 +423,4 @@
 
      :cells-missing
      (fn [& args]
-       (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-likelihoods computed-headers conf-thresh)))))
+       (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-flagged computed-headers)))))

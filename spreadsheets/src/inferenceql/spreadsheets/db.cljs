@@ -59,14 +59,19 @@
 (s/def ::modal (s/keys :opt-un [::child
                                 ::size]))
 
-;;; Specs related to computed likelihoods and missing cells
+;;; Specs related to computed scores of existing rows.
 
 (s/def ::row-likelihoods (s/coll-of ::score))
 
-(s/def :ms/scores (s/map-of ::column-name ::score))
-(s/def :ms/values (s/map-of ::column-name any?))
-(s/def :ms/map-for-row (s/keys :req-un [:ms/scores
-                                        :ms/values]))
+;;; Specs related to computed scores of missing cells.
+
+(s/def :ms/value any?)
+(s/def :ms/score ::score)
+(s/def :ms/meets-threshold boolean?)
+(s/def :ms/value-score-map (s/keys :req-un [:ms/value
+                                            :ms/score]
+                                   :opt-un [:ms/meets-threshold]))
+(s/def :ms/map-for-row (s/map-of ::column-name :ms/value-score-map))
 (s/def ::missing-cells (s/coll-of :ms/map-for-row))
 
 ;;; Primary DB spec.
