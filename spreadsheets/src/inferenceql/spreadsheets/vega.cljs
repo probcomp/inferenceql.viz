@@ -34,14 +34,15 @@
 (def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
 
-(def ^:private default-vega-embed-options {:renderer "svg"
-                                           :mode "vega-lite"
-                                           :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
-                                                    :legend {:labelFontSize 12 :titleFontSize 12}
-                                                    :header {:labelFontSize 14}
-                                                    :mark {:tooltip true}
-                                                    ;; Remove title from faceted plots.
-                                                    :headerFacet {:title nil}}})
+(def ^:private default-vega-embed-options
+  {:renderer "svg"
+   :mode "vega-lite"
+   :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
+            :legend {:labelFontSize 12 :titleFontSize 12}
+            :header {:labelFontSize 14}
+            :mark {:tooltip true}
+            ;; Remove title from faceted plots.
+            :headerFacet {:title nil}}})
 
 (defn vega-lite
   "vega-lite reagent component"
@@ -346,7 +347,7 @@
         selection-faceted (concat selection-real selection-virtual)
 
         selection-to-use (if make-faceted selection-faceted selection-not-faceted)
-        facet-column (if make-faceted "table" nil)]
+        facet-column (when make-faceted "table")]
     (condp = cols-types
       #{dist/gaussian} (scatter-plot selection-to-use cols-to-draw facet-column)
       #{dist/categorical} (table-bubble-plot selection-to-use cols-to-draw facet-column)
