@@ -10,6 +10,12 @@ output-to	 := $(output-dir)/main.js
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/handsontable.full.css
 
+### Definitions for Figwheel.
+
+figwheel-build-dir := $(current-dir)/figwheel-target/public
+figwheel-resource-dir := $(figwheel-build-dir)/resources
+figwheel-index-file := $(figwheel-build-dir)/index.html
+
 all: js
 
 js: $(output-to)
@@ -20,6 +26,7 @@ watch: $(hot-css-resource)
 
 clean:
 	rm -Rf $(output-dir)
+	rm -Rf $(figwheel-build-dir)
 
 ### Compilation
 
@@ -50,3 +57,30 @@ surge-domain = inferenceql-spreadsheet.surge.sh
 .PHONY: publish
 publish: $(output-to)
 	cd ..; bin/publish $(current-dir) $(surge-domain)
+
+### Compilation with Figwheel
+
+$(figwheel-build-dir):
+	mkdir -p $(figwheel-build-dir)
+
+$(figwheel-index-file): $(figwheel-build-dir)
+	## Copy static index.html file.
+	cp $(current-dir)/index.html $(figwheel-index-file)
+
+$(figwheel-resource-dir): $(figwheel-build-dir) $(hot-css-resource)
+	## Copy static resource files.
+	cp -r $(resource-dir) $(figwheel-resource-dir)
+
+.PHONY: figwheel-clean
+figwheel-clean:
+	rm -Rf $(figwheel-build-dir)
+
+.PHONY: figwheel
+## Starts the spreadsheets app using Figwheel.
+figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
+	cd .. && clojure -A:figwheel
+
+.PHONY: figwheel-10x
+## Starts the spreadsheets app using Figwheel and Re-frame-10x.
+figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
+	cd .. && clojure -A:figwheel:10x
