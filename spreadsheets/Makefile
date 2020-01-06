@@ -79,9 +79,9 @@ figwheel-clean:
 .PHONY: figwheel
 ## Starts the spreadsheets app using Figwheel.
 figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	cd ..; clojure -A:figwheel
+	cd .. && clojure -A:figwheel
 
 .PHONY: figwheel-10x
 ## Starts the spreadsheets app using Figwheel and Re-frame-10x.
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	cd ..; clojure -A:figwheel:10x
+	cd .. && clojure -A:figwheel:10x
