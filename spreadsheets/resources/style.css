@@ -1,8 +1,15 @@
+/* --------------- global settings --------------- */
+
 body {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
   font-size: 1.125em;
   -webkit-font-smoothing: antialiased;
   color: #333;
+  margin: 0px
+}
+
+div {
+  margin: 0px
 }
 
 /* --------------- styling for table titles --------------- */
