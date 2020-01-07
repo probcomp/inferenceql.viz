@@ -1,8 +1,11 @@
 /* --------------- global settings --------------- */
 
+html {
+  font-size: 16px;
+}
+
 body {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
-  font-size: 1em;
   -webkit-font-smoothing: antialiased;
   color: #333;
   margin: 0px
@@ -51,13 +54,13 @@ div {
   min-width: 350px;
   max-width: 800px;
   margin-top: 8px;
+  font-size: .875rem;
 }
 
 #search-buttons {
   margin-top: 5px;
   margin-right: 1px;
   float: right;
-
 }
 
 #search-input {
@@ -71,7 +74,7 @@ input[type=search]{
   -webkit-appearance: none; /* safari, chrome, edge and ie mobile */
   appearance: none; /* rest */
 
-  font-size: 1em;
+  font-size: 1rem;
   color: #333;
 
   border-radius: 4px;
@@ -85,7 +88,6 @@ input[type=search]{
 
 .toolbar-button {
   align-self: center;
-  font-size: 12px;
   margin-left: 6px;
   padding: .3em .8em
 }
@@ -97,20 +99,19 @@ input[type=search]{
   flex-shrink: 0;
   width: 185px;
   margin-top: 5px;
+  font-size: .875rem;
 }
 
 #conf-slider {
-  font-size: 12px;
   line-height: 20px;
 }
 
 #conf-mode {
-  font-size: 12px;
   line-height: 20px;
 }
 
 select {
-  font-size: 1em;
+  font-size: .875rem;
   color: #333;
 }
 
@@ -127,11 +128,11 @@ select {
 /* --------------- styling for handsontables --------------- */
 
 .ht_master tr td {
-  font-size: 14px;
+  font-size: .875rem;
 }
 
 .handsontable th {
-  font-size: 14px;
+  font-size: .875rem;
 }
 .virtual-hot .ht_master tr td {
   background-color: #FAFCE4;
@@ -147,7 +148,7 @@ select {
 }
 
 .code-editor {
-  font-size: 14px;
+  font-size: .875rem;
   width: 100%;
   height: 400px;
 }
