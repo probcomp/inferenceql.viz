@@ -12,9 +12,10 @@ hot-css-resource := $(resource-dir)/handsontable.full.css
 
 ### Definitions for Figwheel.
 
-figwheel-build-dir := $(current-dir)/figwheel-target/public
-figwheel-resource-dir := $(figwheel-build-dir)/resources
-figwheel-index-file := $(figwheel-build-dir)/index.html
+figwheel-build-dir := $(current-dir)/figwheel-target
+figwheel-public-dir := $(current-dir)/figwheel-target/public
+figwheel-resource-dir := $(figwheel-public-dir)/resources
+figwheel-index-file := $(figwheel-public-dir)/index.html
 
 all: js
 
@@ -60,27 +61,42 @@ publish: $(output-to)
 
 ### Compilation with Figwheel
 
-$(figwheel-build-dir):
-	mkdir -p $(figwheel-build-dir)
+$(figwheel-public-dir):
+	mkdir -p $(figwheel-public-dir)
 
-$(figwheel-index-file): $(figwheel-build-dir)
+$(figwheel-index-file): $(figwheel-public-dir)
 	## Copy static index.html file.
 	cp $(current-dir)/index.html $(figwheel-index-file)
 
-$(figwheel-resource-dir): $(figwheel-build-dir) $(hot-css-resource)
+$(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource)
 	## Copy static resource files.
 	cp -r $(resource-dir) $(figwheel-resource-dir)
 
+# Deletes the entire figwheel build directory.
 .PHONY: figwheel-clean
 figwheel-clean:
 	rm -Rf $(figwheel-build-dir)
 
-.PHONY: figwheel
+# Deletes the static files in the figwheel build directory.
+.PHONY: figwheel-clean-static
+figwheel-clean-static:
+	rm -Rf $(figwheel-resource-dir)
+	rm -Rf $(figwheel-index-file)
+
+# Deletes the static files in the figwheel build directory and
+# copies them over again. This is useful for updating static files
+# that have changed while an instance of figwheel is running.
+# The mostly likely files to have changed are CSS files that have
+# recently edited.
+.PHONY: figwheel-static
+figwheel-static: figwheel-clean-static $(figwheel-public-dir) $(figwheel-resource-dir) $(figwheel-index-file)
+
 ## Starts the spreadsheets app using Figwheel.
+.PHONY: figwheel
 figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel
 
-.PHONY: figwheel-10x
 ## Starts the spreadsheets app using Figwheel and Re-frame-10x.
+.PHONY: figwheel-10x
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel:10x
