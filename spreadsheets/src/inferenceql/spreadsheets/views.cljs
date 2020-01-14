@@ -87,6 +87,9 @@
                                :on-key-press (fn [e] (if (= (.-key e) "Enter")
                                                        (rf/dispatch [:parse-query @input-text])))
                                :placeholder "Enter a query..."
+                               ;; This random attribute value for autoComplete is needed to turn
+                               ;; autoComplete off in Chrome. "off" and "false" do not work.
+                               :autoComplete "my-search-field"
                                :value @input-text}]
          [:div#search-buttons
            [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:parse-query @input-text])} "Run InferenceQL"]
