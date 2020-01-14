@@ -9,6 +9,7 @@
         camel-snake-kebab {:mvn/version "0.4.0"}
         expound {:mvn/version "0.7.2"}
         instaparse {:mvn/version "1.4.10"}
+        io.replikativ/datahike {:mvn/version "0.2.0"}
         kixi/stats {:mvn/version "0.5.2"}
         medley {:mvn/version "1.2.0"}
         reagent {:mvn/version "0.8.1"}
