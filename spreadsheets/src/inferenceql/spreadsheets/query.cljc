@@ -12,9 +12,9 @@
 (def ^:private row-generator (mmix/row-generator model/spec))
 
 (defn- transform-from
-  ([limit]
-   (transform-from {} limit))
-  ([obs limit]
+  ([model limit]
+   (transform-from {} model limit))
+  ([obs model limit]
    [:generate obs limit]))
 
 (defn- transform-select
@@ -25,16 +25,16 @@
      :conditions obs
      :num-rows limit}
 
-    [[:probability [:prob-column column] [:prob-given]] [:star]]
+    [[:probability [:prob-column column] [:prob-given] [:using [:model model]]] [:star]]
     {:type :anomaly-search
      :column column
      :given true}
 
-    [[:probability [:prob-column column]] [:star]]
+    [[:probability [:prob-column column] [:using [:model model]]] [:star]]
     {:type :anomaly-search
      :column column}
 
-    [[:probability [:prob-binding label value] [:prob-given]] [:star]]
+    [[:probability [:prob-binding label value] [:prob-given] [:using [:model model]]] [:star]]
     {:type :search-by-labeled
      :given true
      :binding {label value}}
@@ -57,7 +57,8 @@
    :symbol edn/read-string
    :nat edn/read-string
    :float edn/read-string
-   :int edn/read-string})
+   :int edn/read-string
+   :string edn/read-string})
 
 (defn parse
   "Parses a string containing an InferenceQL query and produces a map representing
