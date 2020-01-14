@@ -36,12 +36,13 @@
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
 
-(def real-hot-settings (assoc default-hot-settings
-                              :hooks events/real-hot-hooks
-                              :name "real-table"))
-(def virtual-hot-settings (assoc default-hot-settings
-                                 :hooks events/virtual-hot-hooks
-                                 :name "virtual-table"))
+(def real-hot-settings (-> default-hot-settings
+                           (assoc-in [:hooks] events/real-hot-hooks)
+                           (assoc-in [:name] "real-table")))
+(def virtual-hot-settings (-> default-hot-settings
+                              (assoc-in [:hooks] events/virtual-hot-hooks)
+                              (assoc-in [:name] "virtual-table")
+                              (assoc-in [:settings :height] "20vh")))
 
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:confidence-threshold])]
