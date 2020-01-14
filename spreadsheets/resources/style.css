@@ -79,7 +79,7 @@ input[type=search]{
   border-radius: 10px;
   border-width: 1px;
   border-style: solid;
-  border-color: lightgray;
+  border-color: #bbbbbb;
   outline-width: 0;
   padding-left: 10px;
   padding-right: 10px;
