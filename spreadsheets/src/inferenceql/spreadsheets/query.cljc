@@ -25,16 +25,24 @@
      :conditions obs
      :num-rows limit}
 
-    [[:probability [:prob-column column] [:prob-given] [:using [:model model]]] [:star]]
+    ;; Given whole row.
+    [[:probability [:prob-column column] [:prob-given [:given-target [:star]]] [:using [:model model]]] [:star]]
     {:type :anomaly-search
      :column column
-     :given true}
+     :given :row}
 
+    ;; Given another column.
+    [[:probability [:prob-column column] [:prob-given [:given-target given-col]] [:using [:model model]]] [:star]]
+    {:type :anomaly-search
+     :column column
+     :given given-col}
+
+    ;; No given clause.
     [[:probability [:prob-column column] [:using [:model model]]] [:star]]
     {:type :anomaly-search
      :column column}
 
-    [[:probability [:prob-binding label value] [:prob-given] [:using [:model model]]] [:star]]
+    [[:probability [:prob-binding label value] [:prob-given [:given-target [:star]]] [:using [:model model]]] [:star]]
     {:type :search-by-labeled
      :given true
      :binding {label value}}
