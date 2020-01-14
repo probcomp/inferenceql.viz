@@ -89,8 +89,8 @@
                                :placeholder "Enter a query..."
                                :value @input-text}]
          [:div#search-buttons
-           [:button.toolbar-button {:on-click #(rf/dispatch [:parse-query @input-text])} "Run InferenceQL"]
-           [:button.toolbar-button {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
+           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:parse-query @input-text])} "Run InferenceQL"]
+           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
        [:div.flex-box-space-filler]
        [:div#conf-controls
         [confidence-slider]
