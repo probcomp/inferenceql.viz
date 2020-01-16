@@ -4,14 +4,13 @@
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.metrics :as metrics]
             [inferenceql.multimixture.specification :as spec]
-            [clojure.data.json :as json]
-            [zane.vega.repl :refer [vega]]))
+            [clojure.data.json :as json]))
 
 (defmacro with-out-str-data-time-map
   "Returns time and data of an expression of the form `(time expression)`
-  Returns a map with keys `:result` and `:time`. 
+  Returns a map with keys `:result` and `:time`.
   Returns `:time` in milliseconds.
-  If the expression results in a lazy sequence, you must pass 
+  If the expression results in a lazy sequence, you must pass
   `(time (doall expression))` instead."
   [& body]
   `(let [s# (new java.io.StringWriter)]
@@ -143,11 +142,13 @@
                                    :legend nil}}}]}))
 
 
+#_
 (defn generate-metrics-viz
   ([metric dist n-range title]
    (let [spec (generate-metrics-spec metric dist n-range title)]
      (vega spec))))
 
+#_
 (defn generate-aggregate-metrics-viz
   [dist-1 dist-2 n-range title]
   (let [spec (generate-aggregate-spec dist-1 dist-2 n-range title)]

@@ -12,9 +12,11 @@
         io.replikativ/datahike {:mvn/version "0.2.0"}
         kixi/stats {:mvn/version "0.5.2"}
         medley {:mvn/version "1.2.0"}
+        metosin/jsonista {:mvn/version "0.2.5"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.7"}
         reagent-forms {:mvn/version "0.5.43"}
+        semantic-csv {:mvn/version "0.2.1-alpha1"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"

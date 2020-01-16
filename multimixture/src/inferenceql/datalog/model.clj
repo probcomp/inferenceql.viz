@@ -1,8 +1,7 @@
 (ns inferenceql.datalog.model
   "Functions for storing models and information about them in a Datahike
   database."
-  (:require [inferenceql.multimixture.search :as search]
-            [inferenceql.multimixture.specification :as spec]))
+  (:require [inferenceql.multimixture.specification :as spec]))
 
 (def schema
   "Datahike schema for storing models and metadata about those models."
@@ -43,21 +42,50 @@
     :db/cardinality :db.cardinality/many
     :db/doc         "Categories for the given categorical variable."}])
 
-(def ^:private stattype-idents
-  "Keys are the strings from model JSON used to reprsent statistical types. Values
-  are the ident `schema` uses to represent the same statistical type."
-  {"gaussian"    :iql.stattype/gaussian
-   "categorical" :iql.stattype/categorical})
+(defn ^:private category-facts
+  "Returns facts about the categories for the categorical variables in the
+  provided multimixture."
+  [mmix]
+  (->> (spec/variables mmix)
+       (filter #(spec/nominal? mmix %))
+       (mapv (fn [variable]
+               {:iql.variable/categories (spec/categories mmix variable)}))))
+
+(defn ^:private variable-facts
+  "Returns facts about the variables defined in the provided multimixutre."
+  [mmix]
+  (mapv (fn [variable]
+          (merge {:db/ident              variable
+                  :iql/type              :iql.type/variable
+                  :iql.variable/stattype (spec/stattype mmix variable)}
+                 (when (spec/nominal? mmix variable)
+                   {:iql.variable/categories (spec/categories mmix variable)})))
+        (spec/variables mmix)))
 
 (defn model-facts
-  "Takes model JSON where the column names are keywords/idents and produces
-  facts about those columns that satisfy `iqldl.model/schema`."
-  [{variables "columns" :as model-json}]
-  (let [generative-function (-> model-json spec/from-json search/optimized-row-generator)
-        variable-facts (mapv (fn [[column stattype]]
-                               {:iql/type :iql.type/variable
-                                :iql.variable/column column
-                                :iql.variable/stattype (get stattype-idents stattype)})
-                             variables)]
-    {:iql.model/generative-function generative-function
-     :iql.model/variables variable-facts}))
+  "Takes a multimixture specification and produces facts about those columns that
+  satisfy `iqldl.model/schema`."
+  [mmix row-generator]
+  {:pre [(every? keyword? (spec/variables mmix))]}
+  [{:iql/type                      :iql.type/model
+    :iql.model/generative-function (row-generator mmix)
+    :iql.model/variables           (variable-facts mmix)}])
+
+(def rules
+  '[[(model? ?e)
+     [?e :iql/type :iql.type/model]]
+    [(variable? ?e)
+     [?e :iql/type :iql.type/variable]]
+    [(gfn? ?e)
+     [_ :iql.model/generative-function ?e]]
+    [(model-variable ?m ?v)
+     [?m :iql.model/variables ?v]
+     [?m :iql/type :iql.type/model]
+     [?v :iql/type :iql.type/variable]]
+    [(variable-categories ?v ?c)
+     [?v :iql.variable/categories ?c]]
+    [(variable-stattype ?v ?s-ident)
+     [?v :iql.variable/stattype ?s]
+     [?s :db/ident ?s-ident]]
+    [(categorical? ?v)
+     [?v :iql.variable/stattype :iql.stattype/categorical]]])

@@ -1,5 +1,6 @@
 (ns inferenceql.multimixture.specification
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.set]
+            [clojure.spec.alpha :as s]))
 
 (s/def ::alpha pos?)
 
@@ -45,7 +46,7 @@
 
 (s/def ::parameters (s/map-of ::column ::distribution-paremeters))
 
-(def distribution? #{:binary :gaussian :categorical})
+(def distribution? #{:iql.stattype/binary :iql.stattype/gaussian :iql.stattype/categorical})
 
 (s/def ::distribution distribution?)
 
@@ -70,7 +71,7 @@
 (defn from-json
   [{:strs [columns views]}]
   (let [vars (reduce-kv (fn [m k v]
-                          (assoc m k (keyword v)))
+                          (assoc m k (keyword "iql.stattype" v)))
                         {}
                         columns)
         views (mapv (fn [view]
@@ -82,8 +83,8 @@
                                                             (assoc m
                                                                    column
                                                                    (case stattype
-                                                                     :gaussian (zipmap [:mu :sigma] parameters)
-                                                                     :categorical parameters))))
+                                                                     :iql.stattype/gaussian (zipmap [:mu :sigma] parameters)
+                                                                     :iql.stattype/categorical parameters))))
                                                         {}
                                                         column-parameters)}))
                             view))
@@ -151,12 +152,13 @@
 (defn nominal?
   "Returns true if `variable` is a nominal variable in `mmix`."
   [mmix variable]
-  (= :categorical (stattype mmix variable)))
+  (= :iql.stattype/categorical (stattype mmix variable)))
+
 
 (defn numerical?
   "Returns true if `variable` is a numerical variable in `multimixture`."
   [mmix variable]
-  (= :gaussian (stattype mmix variable)))
+  (= :iql.stattype/gaussian (stattype mmix variable)))
 
 (defn parameters
   "Returns the parameters of a variable for a cluster."
@@ -177,6 +179,13 @@
 (defn cluster-probability
   [mmix view-idx cluster-idx]
   (get-in mmix [:views view-idx cluster-idx :probability]))
+
+(defn categories
+  [mmix variable]
+  (-> (view-for-variable mmix variable)
+      (get-in [0 :parameters variable])
+      keys
+      set))
 
 (s/fdef categorical-probabilities
   :args (s/cat :mmix ::multi-mixture
@@ -201,3 +210,17 @@
                             {}
                             (get parameters variable))))
           (apply merge-with +)))))
+
+(defn rename-columns
+  "Returns the multimixture with the column name keys in kmap renamed to the
+  vals in kmap."
+  [mmix kmap]
+  (let [rename #(clojure.set/rename-keys % kmap)]
+    (-> mmix
+        (update :vars rename)
+        (update :views (fn [views]
+                         (mapv (fn [view]
+                                 (mapv (fn [cluster]
+                                         (update cluster :parameters rename))
+                                       view))
+                               views))))))

@@ -121,7 +121,7 @@
                    x))))
 
 (comment
-  (require '[zane.vega.repl :as vega])
+
   (let [alpha 0.01
         beta 0.01
         n-samples 10000

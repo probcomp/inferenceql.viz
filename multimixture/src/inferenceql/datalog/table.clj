@@ -29,18 +29,20 @@
     :db/doc         "A column's statistical type."}])
 
 (defn column-fact
-  "Takes a row expressed as a map and returns a map form suitable for
-  transacting, including row metadata."
-  [name ident value-type]
+  [variable value-type]
+  {:db/ident       variable
+   :db/valueType   value-type
+   :db/cardinality :db.cardinality/one
+   :iql/type       :iql.type/column})
+
+(defn column-name-fact
+  [ident name]
   {:db/ident        ident
-   :db/valueType    value-type
-   :db/cardinality  :db.cardinality/one
-   :iql/type        :iql.type/column
    :iql.column/name name})
 
 (defn row-fact
-  "When applied to a row a Datahike fact that, when transacted, will store that
-  row in a database that uses `schema`."
+  "When applied to a row returns a Datahike fact that, when transacted, will store
+  that row in a database that uses `schema`."
   [row]
   (assoc row :iql/type :iql.type/row))
 
