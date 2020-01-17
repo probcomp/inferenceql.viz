@@ -27,7 +27,7 @@
 
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
-(def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
+(def default-table-color "SteelBlue")
 
 (def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
@@ -64,7 +64,7 @@
    {:$schema default-vega-lite-schema
     :data {:name "data"}
     :autosize {:resize true}
-    :layer (cond-> [{:mark {:type "bar" :color (color-for-table t-clicked)}
+    :layer (cond-> [{:mark {:type "bar" :color default-table-color}
                      :encoding (condp = (stattype (first selected-columns))
                                  dist/gaussian {:x {:bin true
                                                     :field selected-column-kw
@@ -125,7 +125,7 @@
 
         spec {:$schema default-vega-lite-schema
               :data {:values selection-to-use}
-              :mark {:type "bar" :color (color-for-table :real-table)}
+              :mark {:type "bar" :color default-table-color}
               :encoding {:x {:bin col-binning
                              :field col-to-draw
                              :type col-type}
