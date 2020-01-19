@@ -22,10 +22,6 @@
                    (symbol (str sym s)))
                  (s/gen string?)))))
 
-(defn variable?
-  [x]
-  (s/valid? ::variable x))
-
 (s/def ::constant (s/or :string string? :number number? :keyword keyword?))
 
 (s/def ::src-var
@@ -92,10 +88,10 @@
   [binding]
   (let [var? (some-fn variable? src-var?)]
     (m/search binding
-      (m/pred var? ?v) ?v ; scalar
-      (m/scan (m/pred var? ?v)) ?v ; collection
-      [(m/pred var? ?v) '...] ?v ; tuple
-      [(m/scan (m/pred var? ?v))] ?v)))
+              (m/pred var? ?v) ?v ; scalar
+              (m/scan (m/pred var? ?v)) ?v ; collection
+              [(m/pred var? ?v) '...] ?v ; tuple
+              [(m/scan (m/pred var? ?v))] ?v)))
 
 (defn clause-variables
   [clause]
@@ -124,23 +120,6 @@
   [:d {}]
   :e)
 
-(s/conform ::where-clause '[?a ?b ?c])
-(clause-variables '[?a ?b ?c])
-
-(s/conform ::where-clause '[?a _ ?b])
-(clause-variables '[?a _ ?c])
-
-(s/conform ::where-clause '[(even? ?a)])
-(clause-variables '[(even? ?a)])
-
-(s/conform ::where-clause '[(inc? ?a ?b) ?c])
-(clause-variables '[(inc? ?a ?b) ?c])
-
-(m/match (s/conform ::where-clause '[(inc? ?a ?b) ?c])
-  [:fn-expr
-   {:fn-call {}}]
-  true)
-
 ;; (data-pattern | pred-expr | fn-expr | rule-expr)
 ;; (not-clause | not-join-clause | or-clause | or-join-clause | expression-clause)
 
@@ -153,12 +132,12 @@
 (defn variable?
   [s]
   (and (symbol? s)
-       (string/starts-with? (name s) "?")))
+       (-> (name s) (string/starts-with? "?"))))
 
 (defn src-var?
   [s]
   (and (symbol? s)
-       (string/starts-with? (name s) "$")))
+       (-> (name s) (string/starts-with? "$"))))
 
 (defn in-clause
   [query]
@@ -181,8 +160,6 @@
       :where
       [?e :cat/name "Henry"]
       [?e :cat/hungriness 9]
-      [?e :cat/softness 3]
-      [special]
       [?e :cat/color ?c]])
 
   (in-clause test-query)
@@ -213,6 +190,25 @@
     (s/explain ::query query)
     #_(s/unform ::query (s/conform ::query query))
     #_(s/conform ::query query))
+
+
+  (->> '[:find [(pull ?e [:satellite/period :satellite/apogee :satellite/perigee]) ...]
+         :in $ $models %
+         :where
+         (row ?e)
+
+         [$models _ :iql.model/generative-function ?gfn]
+
+         [(d/pull $ [:satellite/period] ?e) ?target]
+         [(d/pull $ [:satellite/apogee :satellite/perigee] ?e) ?constraints]
+         [(ground {}) ?no-constraints]
+
+         [(iqldl.examples/marginal-logpdf ?gfn ?target ?no-constraints) ?nc-pdf]
+         [(iqldl.examples/conditional-logpdf ?gfn ?target ?constraints) ?c-pdf]
+
+         [(> ?nc-pdf ?c-pdf)]]
+       (partition-by (complement #{:find :in :where}))
+       (partition 2))
 
   (let [query '[:find ?e
                 :where
