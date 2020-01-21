@@ -32,7 +32,7 @@
   [override-map]
   (fn [row]
     (reduce-kv (fn [row oride-col oride-fn]
-                 (let [func-deps (js/getArgs oride-fn)
+                 (let [func-deps (get-args oride-fn)
                        dep-vals (map #(get row %) func-deps)
                        new-col-val (apply oride-fn dep-vals)]
                    (assoc row oride-col new-col-val)))
