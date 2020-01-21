@@ -142,8 +142,11 @@
        {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
        {:dispatch [:generate-virtual-row c num-rows]}
 
-       {:type :anomaly-search :column column :given true}
+       {:type :anomaly-search :column column :given :row}
        {:dispatch [:anomaly-search column ["ROW"]]}
+
+       {:type :anomaly-search :column column :given given-col}
+       {:dispatch [:anomaly-search column [given-col]]}
 
        {:type :anomaly-search :column column}
        {:dispatch [:anomaly-search column []]}
