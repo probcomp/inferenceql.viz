@@ -320,31 +320,6 @@
              :where ~@where])
          where free seen in needed find))
 
-(d/q '[:find ?name ?color
-       :in $
-       :where
-       [_ :cat/name ?name]
-       [_ :cat/color ?color]]
-     [[0 :cat/name "Henry"]
-      [0 :cat/color :oranage]
-      [0 :cat/name "Zelda"]
-      [0 :cat/color :black]
-      [2 :cat/name "Disco"]
-      [2 :cat/color :brown]])
-
-#_(let [db
-        query '[:find ?name ?color ?mood
-                :in $
-                :where
-                [_ :cat/name ?name]
-                [_ :cat/color ?color]
-                [_ :cat/mood ?mood]]]
-    (let [result (d/q query db)]
-      (= result (d/q '[:find ?name ?color ?mood
-                       :with :name
-                       :in [[?name ?color ?mood]]]
-                     result))))
-
 (defn free-variables
   [form]
   (->> (tree-seq sequential? seq form)
@@ -361,20 +336,37 @@
                (free-variables (in-form query))
                (map free-variables (where-form query)))))
 
+#_(available-variables '[:find ?e ?color
+                         :in ?waffles
+                         :where
+                         [?e :cat/name ?name]
+                         [?e :cat/color ?color]
+                         [?e :cat/mood ?mood]
+                         [?e :cat/name "Henry"]])
+
 (defn needed-variables
   "Variables that are needed in later clause groups."
   [query]
-  (->> (where-form query)
-       (reverse)
-       (map free-variables)
-       (reductions into (free-variables (find-form query)))
-       (reverse)))
+  (let [find-variables (free-variables (find-form query))]
+    (->> (where-form query)
+         (map free-variables)
+         (reverse)
+         (concat [find-variables])
+         (butlast)
+         (reductions into #{})
+         (reverse))))
 
-#_(find-variables query)
+#_(needed-variables query)
+
+#_(where-form query)
+
+#_(map vector
+       (where-form query)
+       (needed-variables query))
 
 (def db
   [[0 :cat/name "Henry"]
-   [0 :cat/color :oranage]
+   [0 :cat/color :orange]
    [0 :cat/mood :hungry]
    [1 :cat/name "Zelda"]
    [1 :cat/color :black]
@@ -384,7 +376,7 @@
    [2 :cat/mood :purring]])
 
 (def query
-  '[:find ?name ?color ?mood
+  '[:find ?e ?color
     :in $
     :where
     [?e :cat/name ?name]
@@ -393,7 +385,7 @@
     [?e :cat/name "Henry"]])
 
 (defn query-plan
-  [find-form clauses]
+  [clauses]
   (map (fn [clauses available-variables needed-variables]
          (let [clause-variables (into #{}
                                       (filter variable?)
@@ -409,7 +401,11 @@
        (available-variables query)
        (needed-variables query)))
 
-#_(query-plan (find-form query)
-              #_
+#_(query-plan #_
               (partition-all 2 (where-form query))
               (map vector (where-form query)))
+
+'([:find ?e ?name :where [?e :cat/name ?name]]
+  [:find ?color ?e :in [[?e]] :where [?e :cat/color ?color]]
+  [:find ?mood ?e :in [[?e]] :where [?e :cat/mood ?mood]]
+  [:find ?e :in [[?e]] :where [?e :cat/name "Henry"]])
