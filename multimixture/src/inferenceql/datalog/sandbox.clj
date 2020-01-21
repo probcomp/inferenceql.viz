@@ -376,7 +376,7 @@
    [2 :cat/mood :purring]])
 
 (def query
-  '[:find ?e ?color
+  '[:find (pull ?e [*])
     :in $
     :where
     [?e :cat/name ?name]
@@ -385,25 +385,27 @@
     [?e :cat/name "Henry"]])
 
 (defn query-plan
-  [clauses]
-  (map (fn [clauses available-variables needed-variables]
-         (let [clause-variables (into #{}
-                                      (filter variable?)
-                                      (free-variables clauses))
-               find-variables (set/intersection clause-variables needed-variables)
-               in-variables (set/intersection available-variables clause-variables)
-               in-clause (when (seq in-variables) `[:in [[~@in-variables]]])]
-           `[:find ~@find-variables
-             ~@in-clause
-             :where
-             ~@clauses]))
-       clauses
-       (available-variables query)
-       (needed-variables query)))
+  [query]
+  (let [clauses (map vector (where-form query))]
+    (-> (map (fn [clauses available-variables needed-variables]
+               (let [clause-variables (into #{}
+                                            (filter variable?)
+                                            (free-variables clauses))
+                     find-variables (set/intersection clause-variables needed-variables)
+                     in-variables (set/intersection available-variables clause-variables)
+                     in-clause (when (seq in-variables) `[:in [[~@in-variables]]])]
+                 `[:find ~@find-variables
+                   ~@in-clause
+                   :where
+                   ~@clauses]))
+             clauses
+             (available-variables query)
+             (needed-variables query))
+        (vec)
+        (conj `[:find ~@(find-form query)
+                :in [[~@(free-variables (find-form query))]]]))))
 
-#_(query-plan #_
-              (partition-all 2 (where-form query))
-              (map vector (where-form query)))
+#_(query-plan query)
 
 '([:find ?e ?name :where [?e :cat/name ?name]]
   [:find ?color ?e :in [[?e]] :where [?e :cat/color ?color]]
