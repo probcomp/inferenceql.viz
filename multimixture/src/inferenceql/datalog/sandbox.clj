@@ -46,6 +46,8 @@
        (drop-while (complement #{:where}))
        (rest)))
 
+(s/def ::constant (complement (some-fn variable? symbol? list?)))
+
 (s/def ::fn-arg
   (s/or :variable variable?
         :underscore #{'_}
@@ -112,8 +114,6 @@
                                                 :constant ::constant
                                                 :underscore #{'_})))))
 
-#_(s/conform ::expression-clause '[?e :cat/name "Henry"])
-;; => [:data-pattern {:components [[:variable ?e] [:constant :cat/name] [:constant "Henry"]]}]
 (s/conform ::expression-clause '[(even? ?e)])
 (s/conform ::expression-clause '[(inc ?x) ?y])
 (s/conform ::expression-clause '(row ?x _ ?z))
@@ -182,9 +182,6 @@
 (s/conform ::where-clause '(or-join [?x ?y ?z] clause (and clause clause)))
 (s/conform ::where-clause '(or [?e :cat/name "Henry"]
                                [?e :cat/color :orange]))
-
-(s/def ::constant (complement (some-fn variable? symbol? list?)))
-
 
 ;; (not-clause | not-join-clause | or-clause | or-join-clause | expression-clause)
 
@@ -404,6 +401,14 @@
         (vec)
         (conj `[:find ~@(find-form query)
                 :in [[~@(free-variables (find-form query))]]]))))
+
+(defn execute
+  [query-plan & inputs]
+  (reduce (fn [acc query]
+            (assert (nil? (in-form query)))
+            (let [inputs]
+              (apply d/q query inputs)))
+          {:environment {}}))
 
 #_(query-plan query)
 
