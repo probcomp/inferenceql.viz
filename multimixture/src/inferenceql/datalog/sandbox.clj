@@ -374,7 +374,7 @@
 
 (def query
   '[:find (pull ?e [*])
-    :in $
+    :in ?mood ?name
     :where
     [?e :cat/name ?name]
     [?e :cat/color ?color]
@@ -402,17 +402,24 @@
         (conj `[:find ~@(find-form query)
                 :in [[~@(free-variables (find-form query))]]]))))
 
-(defn execute
-  [query-plan & inputs]
-  (reduce (fn [acc query]
-            (assert (nil? (in-form query)))
-            (let [inputs]
-              (apply d/q query inputs)))
-          {:environment {}}))
-
+#_(available-variables query)
 #_(query-plan query)
 
-'([:find ?e ?name :where [?e :cat/name ?name]]
-  [:find ?color ?e :in [[?e]] :where [?e :cat/color ?color]]
-  [:find ?mood ?e :in [[?e]] :where [?e :cat/mood ?mood]]
-  [:find ?e :in [[?e]] :where [?e :cat/name "Henry"]])
+(defn execute
+  [query & inputs]
+  (let [query-plan (query-plan query)]
+    (let [relation-syms (filter variable? (free-variables (in-form query)))
+          initial-relation (apply d/q `[:find ~@relation-syms
+                                        :in ~@(in-form query)]
+                                  inputs)]
+      #p relation-syms
+      (reduce (fn [acc next-query]
+                #p acc
+                #p next-query
+                acc)
+              #p initial-relation
+              query-plan))))
+
+#_(require 'hashp.core)
+
+(execute query db :hungry)
