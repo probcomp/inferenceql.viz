@@ -36,12 +36,13 @@
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
 
-(def real-hot-settings (assoc default-hot-settings
-                              :hooks events/real-hot-hooks
-                              :name "real-table"))
-(def virtual-hot-settings (assoc default-hot-settings
-                                 :hooks events/virtual-hot-hooks
-                                 :name "virtual-table"))
+(def real-hot-settings (-> default-hot-settings
+                           (assoc-in [:hooks] events/real-hot-hooks)
+                           (assoc-in [:name] "real-table")))
+(def virtual-hot-settings (-> default-hot-settings
+                              (assoc-in [:hooks] events/virtual-hot-hooks)
+                              (assoc-in [:name] "virtual-table")
+                              (assoc-in [:settings :height] "20vh")))
 
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:confidence-threshold])]
@@ -80,26 +81,31 @@
   []
   (let [input-text (rf/subscribe [:query-string])]
     (fn []
-      [:div#search-form
-       [:input#search-input {:type "search"
-                             :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
-                             :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                                     (rf/dispatch [:parse-query @input-text])))
-                             :value @input-text}]
-       [:button {:on-click #(rf/dispatch [:parse-query @input-text])
-                 :style {:float "right"}}
-        "Run InferenceQL"]
-       [:button {:on-click #(rf/dispatch [:clear-virtual-data])
-                 :style {:float "right"}}
-        "Delete virtual data"]
-       [confidence-slider]
-       [confidence-mode]])))
+      [:div#toolbar
+       [:div#search-section
+         [:input#search-input {:type "search"
+                               :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
+                               :on-key-press (fn [e] (if (= (.-key e) "Enter")
+                                                       (rf/dispatch [:parse-query @input-text])))
+                               :placeholder "Enter a query..."
+                               ;; This random attribute value for autoComplete is needed to turn
+                               ;; autoComplete off in Chrome. "off" and "false" do not work.
+                               :autoComplete "my-search-field"
+                               :value @input-text}]
+         [:div#search-buttons
+           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:parse-query @input-text])} "Run InferenceQL"]
+           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
+       [:div.flex-box-space-filler]
+       [:div#conf-controls
+        [confidence-slider]
+        [confidence-mode]]])))
 
 (defn app
   []
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
         virtual-hot-props @(rf/subscribe [:virtual-hot-props])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
+        vega-lite-log-level @(rf/subscribe [:vega-lite-log-level])
         generator      @(rf/subscribe [:generator])]
     [:div
      [search-form]
@@ -109,5 +115,5 @@
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div#viz-container
       (when vega-lite-spec
-        [vega/vega-lite vega-lite-spec {:actions false} generator])]
+        [vega/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]
      [modal/modal]]))

@@ -4,7 +4,8 @@
             [reagent.core :as reagent]
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
-            [inferenceql.spreadsheets.views :as views]))
+            [inferenceql.spreadsheets.views :as views]
+            [inferenceql.user]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
