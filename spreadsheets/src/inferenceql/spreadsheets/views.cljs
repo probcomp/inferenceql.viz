@@ -1,7 +1,5 @@
 (ns inferenceql.spreadsheets.views
   (:require [re-frame.core :as rf]
-            [reagent-forms.core :as forms]
-            [inferenceql.spreadsheets.events :as events]
             [inferenceql.spreadsheets.modal :as modal]
             [inferenceql.spreadsheets.panels.control.views :as control]
             [inferenceql.spreadsheets.panels.viz.views :as viz]
