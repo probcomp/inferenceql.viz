@@ -7,6 +7,8 @@
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.override.views :as modal]))
 
+;;; Subs related to entries in the user-editable labels column within the real-data table.
+
 (rf/reg-sub :labels
             (fn [db _]
               (db/labels db)))
@@ -64,6 +66,8 @@
               {:labels (rf/subscribe [:labels])})
             row-ids-unlabeled)
 
+;;; Subs related to selections within tables.
+
 (rf/reg-sub :one-cell-selected
             (fn [_ _]
               (rf/subscribe [:table-state-active]))
@@ -72,11 +76,6 @@
                  (count selections)
                  (count (first selections))
                  (count (keys (first selections))))))
-
-(defn table-headers
-  [db _]
-  (db/table-headers db))
-(rf/reg-sub :table-headers table-headers)
 
 (rf/reg-sub :table-last-clicked
             (fn [db _]
@@ -103,6 +102,13 @@
                :table-states (rf/subscribe [:both-table-states])})
             (fn [{:keys [table-id table-states]}]
               (get table-states table-id)))
+
+;;; Subs related to populating tables with data.
+
+(defn table-headers
+  [db _]
+  (db/table-headers db))
+(rf/reg-sub :table-headers table-headers)
 
 (rf/reg-sub :computed-headers
             (fn [_ _]
@@ -165,6 +171,8 @@
                      (map #(get row %))
                      headers)))
         rows))
+
+;;; Subs related to settings and overall state of tables.
 
 (defn real-hot-props
   [{:keys [headers rows cells-style-fn context-menu]} _]
