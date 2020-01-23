@@ -23,6 +23,18 @@
    (db/default-db)))
 
 (rf/reg-event-db
+ :search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-scores db result)))
+
+(rf/reg-event-db
+ :virtual-search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-virtual-scores db result)))
+
+(rf/reg-event-db
  :clear-virtual-data
  event-interceptors
  (fn [db [event-name]]
@@ -146,19 +158,6 @@
      (rf/dispatch [:clear-virtual-scores])
      (rf/dispatch [:search-result all-scores]))
    db))
-
-(rf/reg-event-db
- :search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-scores db result)))
-
-(rf/reg-event-db
- :virtual-search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-virtual-scores db result)))
-
 
 (rf/reg-event-db
  :compute-row-likelihoods
