@@ -14,6 +14,9 @@
             ;; Table Panel
             [inferenceql.spreadsheets.panels.table.events]
             [inferenceql.spreadsheets.panels.table.subs]
+            ;; Override Panel
+            [inferenceql.spreadsheets.panels.override.events]
+            [inferenceql.spreadsheets.panels.override.subs]
             ;; Library functions for user-defined JS functions.
             [inferenceql.user]))
 
