@@ -1,8 +1,6 @@
-(ns inferenceql.spreadsheets.vega
-  "Code related to displaying and generating vega-lite specs"
-  (:require [yarn.vega-embed]
-            [reagent.core :as r]
-            [clojure.walk :as walk]
+(ns inferenceql.spreadsheets.panels.viz.vega
+  "Code related to generating vega-lite specs"
+  (:require [clojure.walk :as walk]
             [metaprob.distributions :as dist]
             [inferenceql.spreadsheets.model :as model]))
 
@@ -33,61 +31,6 @@
 
 (def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
-
-(def ^:private default-vega-embed-options
-  {:renderer "svg"
-   :mode "vega-lite"
-   :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
-            :legend {:labelFontSize 12 :titleFontSize 12}
-            :header {:labelFontSize 14}
-            :mark {:tooltip true}
-            ;; Remove title from faceted plots.
-            :headerFacet {:title nil}}})
-
-(defn vega-lite
-  "vega-lite reagent component"
-  [spec opt generator]
-  (let [run (atom 0)
-        embed (fn [this spec opt generator]
-                (when spec
-                  (let [spec (clj->js spec)
-                        opt (clj->js (merge default-vega-embed-options
-                                            opt))]
-                    (cond-> (js/vegaEmbed (r/dom-node this)
-                                          spec
-                                          opt)
-                      generator (.then (fn [res]
-                                         (let [current-run (swap! run inc)]
-                                           (js/requestAnimationFrame
-                                            (fn send []
-                                              (when (= current-run @run)
-                                                (let [datum (generator)
-                                                      changeset (.. js/vega
-                                                                    (changeset)
-                                                                    (insert (clj->js datum)))]
-                                                  (.run (.change (.-view res) "data" changeset)))
-                                                (js/requestAnimationFrame send)))))))
-                      true (.catch (fn [err]
-                                     (js/console.error err)))))))]
-    (r/create-class
-     {:display-name "vega-lite"
-
-      :component-did-mount
-      (fn [this]
-        (embed this spec opt generator))
-
-      :component-will-update
-      (fn [this [_ new-spec new-opt new-generator]]
-        (embed this new-spec new-opt new-generator))
-
-      :component-will-unmount
-      (fn [this]
-        (swap! run inc))
-
-      :reagent-render
-      (fn [spec]
-        [:div#vis])})))
-
 
 (defn- left-pad
   [s n c]

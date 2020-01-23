@@ -3,9 +3,9 @@
             [reagent-forms.core :as forms]
             [inferenceql.spreadsheets.events :as events]
             [inferenceql.spreadsheets.handsontable :as hot]
-            [inferenceql.spreadsheets.vega :as vega]
             [inferenceql.spreadsheets.modal :as modal]
-            [inferenceql.spreadsheets.panels.control.views :as control]))
+            [inferenceql.spreadsheets.panels.control.views :as control]
+            [inferenceql.spreadsheets.panels.viz.views :as viz]))
 
 (def default-hot-settings
   {:settings {:data                []
@@ -60,5 +60,5 @@
      [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div#viz-container
       (when vega-lite-spec
-        [vega/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]
+        [viz/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]
      [modal/modal]]))
