@@ -11,6 +11,9 @@
             [inferenceql.spreadsheets.panels.control.subs]
             ;; Viz Panel
             [inferenceql.spreadsheets.panels.viz.subs]
+            ;; Table Panel
+            [inferenceql.spreadsheets.panels.table.events]
+            [inferenceql.spreadsheets.panels.table.subs]
             ;; Library functions for user-defined JS functions.
             [inferenceql.user]))
 

@@ -4,11 +4,11 @@
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
             [inferenceql.spreadsheets.db :as db]
-            [inferenceql.spreadsheets.views :as views]
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.search :as search]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
+            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.modal :as modal]
             [inferenceql.spreadsheets.column-overrides :as co]
             [inferenceql.spreadsheets.renderers :as rends]
@@ -134,7 +134,7 @@
         rem-column-settings (repeat (dec num-columns) {})
 
         all-column-settings (cons initial-column-setting rem-column-settings)]
-    (-> views/real-hot-settings
+    (-> hot/real-hot-settings
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] all-column-settings)
@@ -153,7 +153,7 @@
   (let [data (cell-vector headers rows)
         num-columns (count headers)
         column-settings (repeat num-columns {})]
-    (-> views/virtual-hot-settings
+    (-> hot/virtual-hot-settings
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] column-settings))))

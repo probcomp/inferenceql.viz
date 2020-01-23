@@ -12,9 +12,6 @@
             [inferenceql.spreadsheets.column-overrides :as co]
             [inferenceql.spreadsheets.score :as score]))
 
-(def real-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :before-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
-
 (def ^:private search-column "new property")
 (def ^:private n-models 10)
 (def ^:private beta-params {:alpha 0.001, :beta 0.001})
