@@ -5,6 +5,8 @@
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
             [inferenceql.spreadsheets.views :as views]
+            [inferenceql.spreadsheets.panels.control.events]
+            [inferenceql.spreadsheets.panels.control.subs]
             [inferenceql.user]))
 
 (enable-console-print!)

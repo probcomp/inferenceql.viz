@@ -4,7 +4,8 @@
             [inferenceql.spreadsheets.events :as events]
             [inferenceql.spreadsheets.handsontable :as hot]
             [inferenceql.spreadsheets.vega :as vega]
-            [inferenceql.spreadsheets.modal :as modal]))
+            [inferenceql.spreadsheets.modal :as modal]
+            [inferenceql.spreadsheets.panels.control.views :as control]))
 
 (def default-hot-settings
   {:settings {:data                []
@@ -44,62 +45,6 @@
                               (assoc-in [:name] "virtual-table")
                               (assoc-in [:settings :height] "20vh")))
 
-(defn confidence-slider []
-  (let [cur-val @(rf/subscribe [:confidence-threshold])]
-    [:div#conf-slider
-      [:span "Confidence Threshold: "]
-      [:br]
-      [:input {:type :range :name :confidence-threshold
-               :min 0 :max 1 :step 0.01
-                       :value cur-val
-                       :on-change (fn [e]
-                                    (let [new-val (js/parseFloat (-> e .-target .-value))]
-                                      (rf/dispatch [:set-confidence-threshold new-val])))}]
-      [:label cur-val]]))
-
-(defn confidence-mode []
-  (let [template [:div#conf-mode
-                  [:label "Mode:"]
-                  [:br]
-                  [:select.form-control {:field :list :id :mode}
-                   [:option {:key :none} "none"]
-                   [:option {:key :row} "row-wise"]
-                   [:option {:key :cells-existing} "cell-wise (existing)"]
-                   [:option {:key :cells-missing} "cell-wise (missing)"]]]
-
-        ;; Function map that allows `template` reagent-forms template to
-        ;; communicate with the reframe db.
-        events {:get (fn [path] @(rf/subscribe [:confidence-option path]))
-                :save! (fn [path value] (rf/dispatch [:set-confidence-options path value]))
-                :update! (fn [path save-fn value]
-                           ;; save-fn should accept two arguments: old-value, new-value
-                           (rf/dispatch [:update-confidence-options save-fn path value]))
-                :doc (fn [] @(rf/subscribe [:confidence-options]))}]
-    [forms/bind-fields template events]))
-
-(defn search-form
-  []
-  (let [input-text (rf/subscribe [:query-string])]
-    (fn []
-      [:div#toolbar
-       [:div#search-section
-         [:input#search-input {:type "search"
-                               :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
-                               :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                                       (rf/dispatch [:parse-query @input-text])))
-                               :placeholder "Enter a query..."
-                               ;; This random attribute value for autoComplete is needed to turn
-                               ;; autoComplete off in Chrome. "off" and "false" do not work.
-                               :autoComplete "my-search-field"
-                               :value @input-text}]
-         [:div#search-buttons
-           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:parse-query @input-text])} "Run InferenceQL"]
-           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
-       [:div.flex-box-space-filler]
-       [:div#conf-controls
-        [confidence-slider]
-        [confidence-mode]]])))
-
 (defn app
   []
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
@@ -108,7 +53,7 @@
         vega-lite-log-level @(rf/subscribe [:vega-lite-log-level])
         generator      @(rf/subscribe [:generator])]
     [:div
-     [search-form]
+     [control/panel]
      [:div.table-title [:span "Real Data"]]
      [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
      [:div.table-title [:span "Virtual Data"]]

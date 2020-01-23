@@ -6,7 +6,7 @@
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.search :as search]
             [inferenceql.spreadsheets.db :as db]
-            [inferenceql.spreadsheets.events.interceptors :as interceptors]
+            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.query :as query]
             [inferenceql.spreadsheets.column-overrides :as co]
@@ -14,9 +14,6 @@
 
 (def real-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :before-change])
 (def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
-
-(def event-interceptors
-  [rf/debug interceptors/check-spec])
 
 (def ^:private search-column "new property")
 (def ^:private n-models 10)
@@ -250,65 +247,11 @@
  (fn [db [_ result]]
    (db/with-scores db result)))
 
-(defn query-for-conf-options [type threshold]
-  (case type
-    :none ""
-    :row (str "COLOR ROWS WITH CONFIDENCE OVER " threshold)
-    :cells-existing (str "COLOR CELLS EXISTING WITH CONFIDENCE OVER " threshold)
-    :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))
-
 (rf/reg-event-db
  :virtual-search-result
  event-interceptors
  (fn [db [_ result]]
    (db/with-virtual-scores db result)))
-
-(rf/reg-event-fx
- :set-confidence-threshold
- event-interceptors
- (fn [{:keys [db]} [_ value]]
-   (let [conf-mode (get-in db [::db/confidence-options :mode])
-         new-query-string (query-for-conf-options conf-mode value)]
-     {:db (assoc db ::db/confidence-threshold value)
-      :dispatch [:set-query-string new-query-string]})))
-
-(rf/reg-event-fx
- :set-confidence-options
- event-interceptors
- (fn [{:keys [db]} [_ path value]]
-   (let [conf-threshold (get db ::db/confidence-threshold)
-         new-query-string (query-for-conf-options value conf-threshold)
-
-         ;; Determine if a load event needs to take place.
-         load-event (when (= path [:mode])
-                      (cond
-                        (and (= value :row)
-                             (nil? (get db ::db/row-likelihoods)))
-                        [:compute-row-likelihoods]
-
-                        (and (= value :cells-missing)
-                             (nil? (get db ::db/missing-cells)))
-                        [:compute-missing-cells]
-
-                        ;; Default case: no event
-                        :else
-                        nil))
-         query-string-event [:set-query-string new-query-string]
-         event-list [query-string-event load-event]]
-    {:db (assoc-in db (into [::db/confidence-options] path) value)
-     :dispatch-n event-list})))
-
-(rf/reg-event-db
- :update-confidence-options
- event-interceptors
- (fn [db [_ f path value]]
-   (update-in db (into [::db/confidence-options] path) f value)))
-
-(rf/reg-event-db
- :set-query-string
- event-interceptors
- (fn [db [_ new-val]]
-   (assoc-in db [::db/query-string] new-val)))
 
 (rf/reg-event-db
  :set-modal
