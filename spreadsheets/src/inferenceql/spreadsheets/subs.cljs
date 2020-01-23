@@ -17,19 +17,6 @@
             (fn [db _]
               (db/virtual-scores db)))
 
-
-(rf/reg-sub :modal
-            (fn [db _]
-              (::db/modal db)))
-
-(rf/reg-sub :column-override-fns
-            (fn [db _]
-              (get db ::db/column-override-fns)))
-
-(rf/reg-sub :column-overrides
-            (fn [db _]
-              (get db ::db/column-overrides)))
-
 (rf/reg-sub
   :row-likelihoods-normed
   (fn [db _]
