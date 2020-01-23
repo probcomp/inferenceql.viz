@@ -1,16 +1,8 @@
 (ns inferenceql.spreadsheets.subs
-  (:require [clojure.string :as str]
-            [clojure.spec.alpha :as s]
+  (:require [clojure.spec.alpha :as s]
             [re-frame.core :as rf]
-            [metaprob.prelude :as mp]
             [inferenceql.spreadsheets.db :as db]
-            [inferenceql.multimixture :as mmix]
-            [inferenceql.multimixture.search :as search]
-            [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.modal :as modal]
-            [inferenceql.spreadsheets.column-overrides :as co]
-            [medley.core :as medley])
-  (:require-macros [reagent.ratom :refer [reaction]]))
+            [medley.core :as medley]))
 
 ;;; Specs related to subscriptions for missing cell values
 
