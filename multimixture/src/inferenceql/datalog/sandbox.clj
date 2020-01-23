@@ -317,50 +317,6 @@
              :where ~@where])
          where free seen in needed find))
 
-(defn free-variables
-  [form]
-  (->> (tree-seq sequential? seq form)
-       (filter (some-fn src-var? rules-var? variable?))
-       (set)))
-
-#_(free-variables query)
-
-(defn available-variables
-  "Variables that are available from previous clause groups in the query."
-  [query]
-  (butlast
-   (reductions into
-               (free-variables (in-form query))
-               (map free-variables (where-form query)))))
-
-#_(available-variables '[:find ?e ?color
-                         :in ?waffles
-                         :where
-                         [?e :cat/name ?name]
-                         [?e :cat/color ?color]
-                         [?e :cat/mood ?mood]
-                         [?e :cat/name "Henry"]])
-
-(defn needed-variables
-  "Variables that are needed in later clause groups."
-  [query]
-  (let [find-variables (free-variables (find-form query))]
-    (->> (where-form query)
-         (map free-variables)
-         (reverse)
-         (concat [find-variables])
-         (butlast)
-         (reductions into #{})
-         (reverse))))
-
-#_(needed-variables query)
-
-#_(where-form query)
-
-#_(map vector
-       (where-form query)
-       (needed-variables query))
-
 (def db
   [[0 :cat/name "Henry"]
    [0 :cat/color :orange]
@@ -373,53 +329,103 @@
    [2 :cat/mood :purring]])
 
 (def query
-  '[:find (pull ?e [*])
-    :in ?mood ?name
+  '[:find ?name
+    :in $ ?mood ?name
     :where
     [?e :cat/name ?name]
     [?e :cat/color ?color]
     [?e :cat/mood ?mood]
     [?e :cat/name "Henry"]])
 
+(defn free-symbols
+  [form]
+  (->> (tree-seq sequential? seq form)
+       (filter symbol?)
+       (distinct)))
+
+(defn free-variables
+  [form]
+  (filter variable? (free-symbols form)))
+
+(defn free-src-vars
+  [form]
+  (filter src-var? (free-symbols form)))
+
+(defn group-where
+  [where-form]
+  (map vector where-form))
+
+#_(-> (reduce (fn [{:keys [seen-vars] :as acc} clauses]
+                (let [where-vars (filter variable? (free-variables clauses))
+                      new-seen-vars (->> (free-variables clauses)
+                                         (filter variable?)
+                                         (concat seen-vars)
+                                         (distinct))
+                      next-query `[:find ~@new-seen-vars
+                                   :in ~@src-vars [[~@seen-vars]]
+                                   :where ~@clauses]]
+                  (-> acc
+                      (assoc :seen-vars new-seen-vars)
+                      (update :plan conj next-query))))
+              {:plan `[[:find ~@in-variables
+                        :in ~@(in-form query)]]
+               :seen-vars in-variables}
+              clause-groups)
+      (:plan)
+      (conj `[:find ~@(find-form query)
+              :in [[~@(free-variables (find-form query))]]]))
+
 (defn query-plan
   [query]
-  (let [clauses (map vector (where-form query))]
-    (-> (map (fn [clauses available-variables needed-variables]
-               (let [clause-variables (into #{}
-                                            (filter variable?)
-                                            (free-variables clauses))
-                     find-variables (set/intersection clause-variables needed-variables)
-                     in-variables (set/intersection available-variables clause-variables)
-                     in-clause (when (seq in-variables) `[:in [[~@in-variables]]])]
-                 `[:find ~@find-variables
-                   ~@in-clause
-                   :where
-                   ~@clauses]))
-             clauses
-             (available-variables query)
-             (needed-variables query))
-        (vec)
-        (conj `[:find ~@(find-form query)
-                :in [[~@(free-variables (find-form query))]]]))))
+  (let [src-vars (free-src-vars (in-form query))
+        clause-groups (group-where (where-form query))
+        seen-vars (reductions (comp distinct concat)
+                              (free-variables (in-form query))
+                              (map free-variables clause-groups))]
+    (map (fn [seen-vars clauses]
+           `[:find ~@(distinct (concat seen-vars (free-variables clauses)))
+             :in ~@src-vars [[~@seen-vars]]
+             :where ~@clauses])
+         seen-vars
+         clause-groups)))
 
-#_(available-variables query)
 #_(query-plan query)
+
+(defn sources
+  [query & inputs]
+  (->> (zipmap (or (seq (in-form query))
+                   ['$]) inputs)
+       (filter (comp src-var? key))
+       (map val)))
 
 (defn execute
   [query & inputs]
-  (let [query-plan (query-plan query)]
-    (let [relation-syms (filter variable? (free-variables (in-form query)))
-          initial-relation (apply d/q `[:find ~@relation-syms
-                                        :in ~@(in-form query)]
-                                  inputs)]
-      #p relation-syms
-      (reduce (fn [acc next-query]
-                #p acc
-                #p next-query
-                acc)
-              #p initial-relation
-              query-plan))))
+  (let [sources (apply sources query inputs)
+        src-vars (free-src-vars (in-form query))
+        query-plan (query-plan query)
+        initial-relation (apply d/q `[:find ~@(free-variables (in-form query))
+                                      :in ~@(in-form query)]
+                                inputs)
+        final-relation (reduce (fn [relation query]
+                                 (apply d/q
+                                        query
+                                        (conj (vec sources)
+                                              relation)))
+                               initial-relation
+                               query-plan)
+        final-query `[:find ~@(find-form query)
+                      :in ~@src-vars [[~@(find-form (last query-plan))]]]]
+    (apply d/q final-query (conj (vec sources) final-relation))))
 
 #_(require 'hashp.core)
 
-(execute query db :hungry)
+#_(query-plan query)
+
+#_(execute '[:find [?name ...]
+             :in $ ?color
+             :where
+             [?e :cat/name ?name]
+             #_
+             [?e :cat/color ?color]]
+           db
+           :brown)
