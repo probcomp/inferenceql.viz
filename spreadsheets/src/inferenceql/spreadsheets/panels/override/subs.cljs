@@ -1,15 +1,14 @@
 (ns inferenceql.spreadsheets.panels.override.subs
-  (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.db :as db]))
+  (:require [re-frame.core :as rf]))
 
 (rf/reg-sub :modal
             (fn [db _]
-              (::db/modal db)))
+              (get-in db [:override-panel :modal])))
 
 (rf/reg-sub :column-override-fns
             (fn [db _]
-              (get db ::db/column-override-fns)))
+              (get-in db [:override-panel :column-override-fns])))
 
 (rf/reg-sub :column-overrides
             (fn [db _]
-              (get db ::db/column-overrides)))
+              (get-in db [:override-panel :column-overrides])))

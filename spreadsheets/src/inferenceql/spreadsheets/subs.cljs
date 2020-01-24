@@ -6,7 +6,7 @@
 
 ;;; Specs related to subscriptions for missing cell values
 
-(s/def :ms/values-map-for-row (s/map-of ::db/column-name :ms/value))
+(s/def :ms/values-map-for-row (s/map-of :ms/column-name :ms/value))
 (s/def :ms/missing-cells-values (s/coll-of :ms/values-map-for-row))
 
 (rf/reg-sub :scores

@@ -1,7 +1,8 @@
 (ns inferenceql.spreadsheets.db
   (:require [clojure.spec.alpha :as s]
             [inferenceql.spreadsheets.data :refer [nyt-data]]
-            [inferenceql.spreadsheets.panels.control.db :as control-panel]))
+            [inferenceql.spreadsheets.panels.control.db :as control-panel]
+            [inferenceql.spreadsheets.panels.override.db :as override-panel]))
 
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
@@ -42,37 +43,20 @@
 
 (s/def ::table-last-clicked ::table-id)
 
-;;; Specs related to foreign function overrides on columns.
-
-(s/def ::column-name ::header)
-(s/def ::function-text string?)
-(s/def ::function-obj fn?)
-(s/def ::column-overrides (s/map-of ::column-name ::function-text))
-(s/def ::column-override-fns (s/map-of ::column-name ::function-obj))
-
-;;; Specs related to modal for entering foreign functions.
-
-(s/def ::reagent-comp fn?)
-(s/def ::child (s/nilable (s/tuple ::reagent-comp
-                                   ::column-name
-                                   (s/nilable ::function-text))))
-(s/def ::size #{:extra-small :small :large :extra-large})
-(s/def ::modal (s/keys :opt-un [::child
-                                ::size]))
-
 ;;; Specs related to computed scores of existing rows.
 
 (s/def ::row-likelihoods (s/coll-of ::score))
 
 ;;; Specs related to computed scores of missing cells.
 
+(s/def :ms/column-name string?)
 (s/def :ms/value any?)
 (s/def :ms/score ::score)
 (s/def :ms/meets-threshold boolean?)
 (s/def :ms/value-score-map (s/keys :req-un [:ms/value
                                             :ms/score]
                                    :opt-un [:ms/meets-threshold]))
-(s/def :ms/map-for-row (s/map-of ::column-name :ms/value-score-map))
+(s/def :ms/map-for-row (s/map-of :ms/column-name :ms/value-score-map))
 (s/def ::missing-cells (s/coll-of :ms/map-for-row))
 
 ;;; Primary DB spec.
@@ -86,12 +70,10 @@
                           ::labels
                           ::topojson
                           ::table-last-clicked
-                          ::column-overrides
-                          ::column-override-fns
-                          ::modal
                           ::row-likelihoods
                           ::missing-cells]
-                    :req-un [::control-panel/control-panel]))
+                    :req-un [::control-panel/control-panel
+                             ::override-panel/override-panel]))
 
 (defn table-headers
   [db]
@@ -156,5 +138,6 @@
   and panel specific dbs all merged together."
   []
   (let [dbs [default-general-db
-             control-panel/default-db]]
+             control-panel/default-db
+             override-panel/default-db]]
     (apply merge dbs)))

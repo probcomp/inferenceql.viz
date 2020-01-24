@@ -112,7 +112,7 @@
                          :observation-trace constraint-addrs-vals))
          has-negative-vals? #(some (every-pred number? neg?) (vals %))
 
-         overrides-map (get db ::db/column-override-fns)
+         overrides-map (get-in db [:override-panel :column-override-fns])
          overrides-insert-fn (co/gen-insert-fn overrides-map)
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
