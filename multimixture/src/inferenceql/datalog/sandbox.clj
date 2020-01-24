@@ -89,6 +89,10 @@
         :bind-coll (s/cat :variable variable? :ellipsis #{'...})
         :bind-rel (s/tuple (s/+ (s/or :variable variable? :underscore #{'_}) ))))
 
+(defn binding?
+  [x]
+  (s/valid? ::binding x))
+
 (defn input-variables
   [form]
   (if (s/valid? ::binding form)
@@ -330,12 +334,10 @@
 
 (def query
   '[:find ?name
-    :in $ ?mood ?name
+    :in $ ?color
     :where
     [?e :cat/name ?name]
-    [?e :cat/color ?color]
-    [?e :cat/mood ?mood]
-    [?e :cat/name "Henry"]])
+    [?e :cat/color ?color]])
 
 (defn free-symbols
   [form]
@@ -375,6 +377,7 @@
       (conj `[:find ~@(find-form query)
               :in [[~@(free-variables (find-form query))]]]))
 
+#_
 (defn query-plan
   [query]
   (let [src-vars (free-src-vars (in-form query))
@@ -398,34 +401,65 @@
        (filter (comp src-var? key))
        (map val)))
 
-(defn execute
+(defn in-relation
+  [in-form inputs]
+  (let [variables (free-variables in-form)]
+    {:variables ~@variables
+     :relation (apply d/q `[:find ~@variables
+                            :in ~@in-form]
+                      inputs)}))
+
+(defn datalog?
+  [x]
+  true)
+
+(defn filter-keys
+  [m f]
+  (->> m
+       (filter (comp f key))
+       (into (empty m))))
+
+(defn query-plan
   [query & inputs]
-  (let [sources (apply sources query inputs)
-        src-vars (free-src-vars (in-form query))
-        query-plan (query-plan query)
-        initial-relation (apply d/q `[:find ~@(free-variables (in-form query))
-                                      :in ~@(in-form query)]
-                                inputs)
-        final-relation (reduce (fn [relation query]
-                                 (apply d/q
-                                        query
-                                        (conj (vec sources)
-                                              relation)))
-                               initial-relation
-                               query-plan)
-        final-query `[:find ~@(find-form query)
-                      :in ~@src-vars [[~@(find-form (last query-plan))]]]]
-    (apply d/q final-query (conj (vec sources) final-relation))))
+  (let [in-form (in-form query)
+        where-form (where-form query)
+        relation-syms (reductions (comp distinct concat)
+                                  (vec (free-variables in-form))
+                                  (map free-variables where-form))
+
+        {bindings true non-bindings false} (->> (map vector in-form inputs)
+                                                (group-by (comp binding? first)))
+        binding-forms (map first bindings)
+        non-binding-forms (mapv first non-bindings)
+        non-binding-inputs (mapv second non-bindings)
+
+        middle-steps (map (fn [where-form in-form find-form]
+                            `[:find ~@find-form
+                              :in ~@non-binding-forms [[~@in-form]]
+                              :where ~@where-form])
+                          [where-form]
+                          relation-syms
+                          (rest relation-syms))
+        last-step `[:find ~@(find-form query)
+                    :in ~@non-binding-forms [[~@(last relation-syms)]]]
+        first-relation (apply d/q
+                              `[:find ~@(free-variables binding-forms)
+                                :in ~@in-form]
+                              inputs)
+        last-relation (reduce (fn [relation step]
+                                (apply d/q step (conj non-binding-inputs relation)))
+                              first-relation
+                              middle-steps)]
+    (apply d/q last-step (conj non-binding-inputs last-relation))))
+
+#_(query-plan '[:find ?name .
+                :in $ [?color ...]
+                :where
+                [?e :cat/name ?name]
+                [?e :cat/color ?color]]
+              db
+              [:orange])
 
 #_(require 'hashp.core)
 
 #_(query-plan query)
-
-#_(execute '[:find [?name ...]
-             :in $ ?color
-             :where
-             [?e :cat/name ?name]
-             #_
-             [?e :cat/color ?color]]
-           db
-           :brown)
