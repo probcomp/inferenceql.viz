@@ -5,7 +5,7 @@
             [inferenceql.multimixture.search :as search]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
-            [inferenceql.spreadsheets.column-overrides :as co]))
+            [inferenceql.spreadsheets.panels.override.helpers :as co]))
 
 (defn vega-lite-spec
   [{:keys [table-states t-clicked]}]

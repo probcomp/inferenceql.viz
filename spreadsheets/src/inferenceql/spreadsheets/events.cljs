@@ -9,7 +9,7 @@
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.query :as query]
-            [inferenceql.spreadsheets.column-overrides :as co]
+            [inferenceql.spreadsheets.panels.override.helpers :as co]
             [inferenceql.spreadsheets.score :as score]))
 
 (def ^:private search-column "new property")

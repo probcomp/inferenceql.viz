@@ -5,7 +5,7 @@
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
-            [inferenceql.spreadsheets.modal :as modal]))
+            [inferenceql.spreadsheets.panels.override.views :as modal]))
 
 (rf/reg-sub :labels
             (fn [db _]

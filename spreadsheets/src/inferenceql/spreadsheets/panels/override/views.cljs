@@ -1,10 +1,9 @@
 ;;;; Taken from this project on github and then modified
 ;;;; https://github.com/benhowell/re-frame-modal
 
-(ns inferenceql.spreadsheets.modal
-  (:require
-   [reagent.core :as r]
-   [re-frame.core :as rf]))
+(ns inferenceql.spreadsheets.panels.override.views
+  (:require [reagent.core :as r]
+            [re-frame.core :as rf]))
 
 (defn- modal-panel
   "Reagent component that renders a modal backdrop and the modal contents.
