@@ -1,6 +1,7 @@
 (ns inferenceql.spreadsheets.db
   (:require [clojure.spec.alpha :as s]
-            [inferenceql.spreadsheets.data :refer [nyt-data]]))
+            [inferenceql.spreadsheets.data :refer [nyt-data]]
+            [inferenceql.spreadsheets.panels.control.db :as control-panel]))
 
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
@@ -79,10 +80,7 @@
 (s/def ::db (s/keys :req [::headers
                           ::rows
                           ::virtual-rows
-                          ::hot-state
-                          ::confidence-threshold
-                          ::confidence-options
-                          ::query-string]
+                          ::hot-state]
                     :opt [::scores
                           ::virtual-scores
                           ::labels
@@ -92,7 +90,8 @@
                           ::column-override-fns
                           ::modal
                           ::row-likelihoods
-                          ::missing-cells]))
+                          ::missing-cells]
+                    :req-un [::control-panel/control-panel]))
 
 (defn table-headers
   [db]
@@ -146,10 +145,8 @@
 (defn default-db
   "When the application starts, this will be the value put in `app-db`."
   []
-  {::headers (into [] (keys (first nyt-data)))
-   ::rows nyt-data
-   ::virtual-rows []
-   ::hot-state {:real-table nil :virtual-table nil}
-   ::confidence-threshold 0.9
-   ::confidence-options {:mode :none}
-   ::query-string ""})
+  (-> {::headers (into [] (keys (first nyt-data)))
+       ::rows nyt-data
+       ::virtual-rows []
+       ::hot-state {:real-table nil :virtual-table nil}}
+      (merge control-panel/default-db)))
