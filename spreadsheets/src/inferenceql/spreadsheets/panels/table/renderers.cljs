@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.renderers
+(ns inferenceql.spreadsheets.panels.table.renderers 
   "A cell renderer functions for use in handsontable properties")
 
 (defn row-wise-likelihood-threshold-renderer

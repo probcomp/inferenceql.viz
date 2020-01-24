@@ -3,7 +3,7 @@
             [re-frame.core :as rf]
             [inferenceql.spreadsheets.db :as db]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
-            [inferenceql.spreadsheets.renderers :as rends]
+            [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.modal :as modal]))
 
