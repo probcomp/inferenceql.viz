@@ -187,140 +187,6 @@
 (s/conform ::where-clause '(or [?e :cat/name "Henry"]
                                [?e :cat/color :orange]))
 
-;; (not-clause | not-join-clause | or-clause | or-join-clause | expression-clause)
-
-(comment
-
-  (def test-query
-    '[:find ?e ?c
-      :in $
-      :where
-      [?e :cat/name "Henry"]
-      [?e :cat/hungriness 9]
-      [?e :cat/color ?c]])
-
-  (def big-query
-    '[:find [(pull ?e [:satellite/period :satellite/apogee :satellite/perigee]) ...]
-      :in $ $models %
-      :where
-      (row ?e)
-
-      [$models _ :iql.model/generative-function ?gfn]
-
-      [(d/pull $ [:satellite/period] ?e) ?target]
-      [(d/pull $ [:satellite/apogee :satellite/perigee] ?e) ?constraints]
-      [(ground {}) ?no-constraints]
-
-      [(iqldl.examples/marginal-logpdf ?gfn ?target ?no-constraints) ?nc-pdf]
-      [(iqldl.examples/conditional-logpdf ?gfn ?target ?constraints) ?c-pdf]
-
-      [(> ?nc-pdf ?c-pdf)]])
-
-  (find-clause big-query)
-  (in-clause big-query)
-  (where-form big-query)
-
-  (require '[clojure.walk :as walk])
-
-  (defn special?
-    [form]
-    (and (list? form)
-         (some? (namespace (first form)))))
-
-  (special? '(not [?e :cat/name "Henry"]))
-  (special? '(my/not '[?e :cat/name "Henry"]))
-
-  #_(def query '[:find [(pull ?e [:satellite/period :satellite/apogee :satellite/perigee]) ...]
-                 :in $ $models %
-                 :where
-                 (row ?e)
-
-                 [$models _ :iql.model/generative-function ?gfn]
-
-                 [(d/pull $ [:satellite/period] ?e) ?target]
-                 [(d/pull $ [:satellite/apogee :satellite/perigee] ?e) ?constraints]
-                 [(ground {}) ?no-constraints]
-
-                 [(iqldl.examples/marginal-logpdf ?gfn ?target ?no-constraints) ?nc-pdf]
-                 [(iqldl.examples/conditional-logpdf ?gfn ?target ?constraints) ?c-pdf]
-
-                 [(> ?nc-pdf ?c-pdf)]])
-
-  (let [query query]
-    (->> (concat [[]] (map vector (where-form query)) [nil])
-         (map (juxt identity free-variables))
-         (map #(zipmap [:clauses :variables] %))
-         (partition-all 3 1)
-         (map #(zipmap [:prev-step :current-step :next-step] %))
-         (fn [{:keys [prev-step current-step next-step]}]
-           `[:find ~@(or (free-variables current-step))
-             :in (free-variables )])))
-
-  (let [query query
-        clause-groups (map vector (where-form query))
-        free-variables (map free-variables clause-groups)
-        providable (reductions into #{} free-variables)]
-    (map #(apply zipmap [:clauses ] %)
-         clause-groups))
-
-  )
-
-
-#_(let [query  query
-        where  (map vector (where-form query))
-        free   (mapv free-variables where)
-        seen   (rest (reductions into (set (in-clause query)) free))
-        in     (mapv (comp #(conj % '$) set/intersection)
-                     seen
-                     free
-                     (repeat (free-variables (in-clause query))))
-        needed (into [#{}]
-                     (vec (reverse (reductions into
-                                               (free-variables (find-clause query))
-                                               free))))
-        find   (mapv set/intersection needed free)]
-    (map (fn [where free seen in needed find]
-           {:where where
-            :free free
-            :seen seen
-            :in in
-            :needed needed
-            :find find}
-           `[:find ~@find
-             :in ~@in
-             :where ~@where])
-         where free seen in needed find))
-
-#_(let [query  query
-        where  (map vector (where-form query))
-        free   (mapv (comp  free-variables) where)
-        seen   (rest (reductions into
-                                 (set (in-clause query))
-                                 free))
-        in     (mapv set/intersection
-                     seen
-                     free)
-        needed (reverse (reductions into
-                                    (free-variables (find-clause query))
-                                    (reverse free)))
-        find   (mapv (comp set
-                           (partial filter variable?)
-                           set/intersection)
-                     needed free)]
-    (map (fn [where free seen in needed find]
-           {:where  where
-            :free   free
-            ;; :seen   seen
-            ;; :in     in
-            :needed needed
-            :find   find
-            }
-           {:w where :n needed}
-           `[:find ~@find
-             :in ~@in
-             :where ~@where])
-         where free seen in needed find))
-
 (def db
   [[0 :cat/name "Henry"]
    [0 :cat/color :orange]
@@ -413,13 +279,37 @@
   [x]
   true)
 
+(defn not-datalog?
+  [x]
+  (not (datalog? x)))
+
 (defn filter-keys
   [m f]
   (->> m
        (filter (comp f key))
        (into (empty m))))
 
-(defn query-plan
+(defn partition-when
+  "Partitions the items in coll into a sequences of items for which (pred item)
+  returns logical true and individual items for which (pred item) does not
+  return logical true. Returns a stateful transducer when no collection is
+  provided."
+  ([pred]
+   (comp (partition-by pred)
+         (mapcat #(if (pred (first %))
+                    (list %)
+                    %))))
+  ([pred coll]
+   (sequence (partition-when pred) coll)))
+
+
+(set! *print-length* 10)
+
+(partition-when even? [1 1 1 2 2 3 3 3])
+(into [] (partition-when even?) [1 1 1 2 2 3 3 3])
+(partition-when odd? [1 1 1 2 2 3 3 3])
+
+(defn execute
   [query & inputs]
   (let [in-form (in-form query)
         where-form (where-form query)
@@ -433,13 +323,17 @@
         non-binding-forms (mapv first non-bindings)
         non-binding-inputs (mapv second non-bindings)
 
-        middle-steps (map (fn [where-form in-form find-form]
-                            `[:find ~@find-form
-                              :in ~@non-binding-forms [[~@in-form]]
-                              :where ~@where-form])
-                          [where-form]
-                          relation-syms
-                          (rest relation-syms))
+        middle-steps (loop [relation-syms (free-variables in-form)
+                            form-or-forms (partition-when datalog? where-form)]
+                       (if (not-datalog? form-or-forms)
+                         (ex-info "Not implemented." {'x x})
+                         (when-let [form-or-forms (first items)]
+                           (let [relation-syms-after (distinct (concat relation-syms (free-variables form-or-forms)))]
+                             (lazy-seq (cons `[:datalog [:find ~@relation-syms-after
+                                                         :in ~@non-binding-forms [[~@relation-syms]]
+                                                         :where ~@form-or-forms]]
+                                             (recur relation-syms-after
+                                                    (rest items))))))))
         last-step `[:find ~@(find-form query)
                     :in ~@non-binding-forms [[~@(last relation-syms)]]]
         first-relation (apply d/q
@@ -447,18 +341,20 @@
                                 :in ~@in-form]
                               inputs)
         last-relation (reduce (fn [relation step]
-                                (apply d/q step (conj non-binding-inputs relation)))
+                                (match/match step
+                                  [:datalog query] (let [inputs (conj non-binding-inputs relation)]
+                                                     (apply d/q query inputs))))
                               first-relation
                               middle-steps)]
     (apply d/q last-step (conj non-binding-inputs last-relation))))
 
-#_(query-plan '[:find ?name .
-                :in $ [?color ...]
-                :where
-                [?e :cat/name ?name]
-                [?e :cat/color ?color]]
-              db
-              [:orange])
+#_(execute '[:find ?name .
+             :in $ [?color ...]
+             :where
+             [?e :cat/name ?name]
+             [?e :cat/color ?color]]
+           db
+           [:brown])
 
 #_(require 'hashp.core)
 
