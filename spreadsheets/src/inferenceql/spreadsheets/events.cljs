@@ -1,5 +1,6 @@
 (ns inferenceql.spreadsheets.events
   (:require [clojure.core.match :refer [match]]
+            [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
             [inferenceql.multimixture :as mmix]
@@ -135,13 +136,17 @@
  :parse-query
  event-interceptors
  (fn [{:keys [db]} [_ text]]
-   (let [command (query/parse text)]
+   (let [command (->> (str/trim text)
+                      (query/parse))]
      (match command
        {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
        {:dispatch [:generate-virtual-row c num-rows]}
 
-       {:type :anomaly-search :column column :given true}
+       {:type :anomaly-search :column column :given :row}
        {:dispatch [:anomaly-search column ["ROW"]]}
+
+       {:type :anomaly-search :column column :given given-col}
+       {:dispatch [:anomaly-search column [given-col]]}
 
        {:type :anomaly-search :column column}
        {:dispatch [:anomaly-search column []]}

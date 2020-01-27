@@ -89,6 +89,10 @@
         :bind-coll (s/cat :variable variable? :ellipsis #{'...})
         :bind-rel (s/tuple (s/+ (s/or :variable variable? :underscore #{'_}) ))))
 
+(defn binding?
+  [x]
+  (s/valid? ::binding x))
+
 (defn input-variables
   [form]
   (if (s/valid? ::binding form)
@@ -114,8 +118,6 @@
                                                 :constant ::constant
                                                 :underscore #{'_})))))
 
-#_(s/conform ::expression-clause '[?e :cat/name "Henry"])
-;; => [:data-pattern {:components [[:variable ?e] [:constant :cat/name] [:constant "Henry"]]}]
 (s/conform ::expression-clause '[(even? ?e)])
 (s/conform ::expression-clause '[(inc ?x) ?y])
 (s/conform ::expression-clause '(row ?x _ ?z))
@@ -185,184 +187,6 @@
 (s/conform ::where-clause '(or [?e :cat/name "Henry"]
                                [?e :cat/color :orange]))
 
-;; (not-clause | not-join-clause | or-clause | or-join-clause | expression-clause)
-
-(comment
-
-  (def test-query
-    '[:find ?e ?c
-      :in $
-      :where
-      [?e :cat/name "Henry"]
-      [?e :cat/hungriness 9]
-      [?e :cat/color ?c]])
-
-  (def big-query
-    '[:find [(pull ?e [:satellite/period :satellite/apogee :satellite/perigee]) ...]
-      :in $ $models %
-      :where
-      (row ?e)
-
-      [$models _ :iql.model/generative-function ?gfn]
-
-      [(d/pull $ [:satellite/period] ?e) ?target]
-      [(d/pull $ [:satellite/apogee :satellite/perigee] ?e) ?constraints]
-      [(ground {}) ?no-constraints]
-
-      [(iqldl.examples/marginal-logpdf ?gfn ?target ?no-constraints) ?nc-pdf]
-      [(iqldl.examples/conditional-logpdf ?gfn ?target ?constraints) ?c-pdf]
-
-      [(> ?nc-pdf ?c-pdf)]])
-
-  (find-clause big-query)
-  (in-clause big-query)
-  (where-form big-query)
-
-  (require '[clojure.walk :as walk])
-
-  (defn special?
-    [form]
-    (and (list? form)
-         (some? (namespace (first form)))))
-
-  (special? '(not [?e :cat/name "Henry"]))
-  (special? '(my/not '[?e :cat/name "Henry"]))
-
-  #_(def query '[:find [(pull ?e [:satellite/period :satellite/apogee :satellite/perigee]) ...]
-                 :in $ $models %
-                 :where
-                 (row ?e)
-
-                 [$models _ :iql.model/generative-function ?gfn]
-
-                 [(d/pull $ [:satellite/period] ?e) ?target]
-                 [(d/pull $ [:satellite/apogee :satellite/perigee] ?e) ?constraints]
-                 [(ground {}) ?no-constraints]
-
-                 [(iqldl.examples/marginal-logpdf ?gfn ?target ?no-constraints) ?nc-pdf]
-                 [(iqldl.examples/conditional-logpdf ?gfn ?target ?constraints) ?c-pdf]
-
-                 [(> ?nc-pdf ?c-pdf)]])
-
-  (let [query query]
-    (->> (concat [[]] (map vector (where-form query)) [nil])
-         (map (juxt identity free-variables))
-         (map #(zipmap [:clauses :variables] %))
-         (partition-all 3 1)
-         (map #(zipmap [:prev-step :current-step :next-step] %))
-         (fn [{:keys [prev-step current-step next-step]}]
-           `[:find ~@(or (free-variables current-step))
-             :in (free-variables )])))
-
-  (let [query query
-        clause-groups (map vector (where-form query))
-        free-variables (map free-variables clause-groups)
-        providable (reductions into #{} free-variables)]
-    (map #(apply zipmap [:clauses ] %)
-         clause-groups))
-
-  )
-
-
-#_(let [query  query
-        where  (map vector (where-form query))
-        free   (mapv free-variables where)
-        seen   (rest (reductions into (set (in-clause query)) free))
-        in     (mapv (comp #(conj % '$) set/intersection)
-                     seen
-                     free
-                     (repeat (free-variables (in-clause query))))
-        needed (into [#{}]
-                     (vec (reverse (reductions into
-                                               (free-variables (find-clause query))
-                                               free))))
-        find   (mapv set/intersection needed free)]
-    (map (fn [where free seen in needed find]
-           {:where where
-            :free free
-            :seen seen
-            :in in
-            :needed needed
-            :find find}
-           `[:find ~@find
-             :in ~@in
-             :where ~@where])
-         where free seen in needed find))
-
-#_(let [query  query
-        where  (map vector (where-form query))
-        free   (mapv (comp  free-variables) where)
-        seen   (rest (reductions into
-                                 (set (in-clause query))
-                                 free))
-        in     (mapv set/intersection
-                     seen
-                     free)
-        needed (reverse (reductions into
-                                    (free-variables (find-clause query))
-                                    (reverse free)))
-        find   (mapv (comp set
-                           (partial filter variable?)
-                           set/intersection)
-                     needed free)]
-    (map (fn [where free seen in needed find]
-           {:where  where
-            :free   free
-            ;; :seen   seen
-            ;; :in     in
-            :needed needed
-            :find   find
-            }
-           {:w where :n needed}
-           `[:find ~@find
-             :in ~@in
-             :where ~@where])
-         where free seen in needed find))
-
-(defn free-variables
-  [form]
-  (->> (tree-seq sequential? seq form)
-       (filter (some-fn src-var? rules-var? variable?))
-       (set)))
-
-#_(free-variables query)
-
-(defn available-variables
-  "Variables that are available from previous clause groups in the query."
-  [query]
-  (butlast
-   (reductions into
-               (free-variables (in-form query))
-               (map free-variables (where-form query)))))
-
-#_(available-variables '[:find ?e ?color
-                         :in ?waffles
-                         :where
-                         [?e :cat/name ?name]
-                         [?e :cat/color ?color]
-                         [?e :cat/mood ?mood]
-                         [?e :cat/name "Henry"]])
-
-(defn needed-variables
-  "Variables that are needed in later clause groups."
-  [query]
-  (let [find-variables (free-variables (find-form query))]
-    (->> (where-form query)
-         (map free-variables)
-         (reverse)
-         (concat [find-variables])
-         (butlast)
-         (reductions into #{})
-         (reverse))))
-
-#_(needed-variables query)
-
-#_(where-form query)
-
-#_(map vector
-       (where-form query)
-       (needed-variables query))
-
 (def db
   [[0 :cat/name "Henry"]
    [0 :cat/color :orange]
@@ -375,38 +199,163 @@
    [2 :cat/mood :purring]])
 
 (def query
-  '[:find (pull ?e [*])
-    :in $
+  '[:find ?name
+    :in $ ?color
     :where
     [?e :cat/name ?name]
-    [?e :cat/color ?color]
-    [?e :cat/mood ?mood]
-    [?e :cat/name "Henry"]])
+    [?e :cat/color ?color]])
 
+(defn free-symbols
+  [form]
+  (->> (tree-seq sequential? seq form)
+       (filter symbol?)
+       (distinct)))
+
+(defn free-variables
+  [form]
+  (filter variable? (free-symbols form)))
+
+(defn free-src-vars
+  [form]
+  (filter src-var? (free-symbols form)))
+
+(defn group-where
+  [where-form]
+  (map vector where-form))
+
+#_(-> (reduce (fn [{:keys [seen-vars] :as acc} clauses]
+                (let [where-vars (filter variable? (free-variables clauses))
+                      new-seen-vars (->> (free-variables clauses)
+                                         (filter variable?)
+                                         (concat seen-vars)
+                                         (distinct))
+                      next-query `[:find ~@new-seen-vars
+                                   :in ~@src-vars [[~@seen-vars]]
+                                   :where ~@clauses]]
+                  (-> acc
+                      (assoc :seen-vars new-seen-vars)
+                      (update :plan conj next-query))))
+              {:plan `[[:find ~@in-variables
+                        :in ~@(in-form query)]]
+               :seen-vars in-variables}
+              clause-groups)
+      (:plan)
+      (conj `[:find ~@(find-form query)
+              :in [[~@(free-variables (find-form query))]]]))
+
+#_
 (defn query-plan
   [query]
-  (let [clauses (map vector (where-form query))]
-    (-> (map (fn [clauses available-variables needed-variables]
-               (let [clause-variables (into #{}
-                                            (filter variable?)
-                                            (free-variables clauses))
-                     find-variables (set/intersection clause-variables needed-variables)
-                     in-variables (set/intersection available-variables clause-variables)
-                     in-clause (when (seq in-variables) `[:in [[~@in-variables]]])]
-                 `[:find ~@find-variables
-                   ~@in-clause
-                   :where
-                   ~@clauses]))
-             clauses
-             (available-variables query)
-             (needed-variables query))
-        (vec)
-        (conj `[:find ~@(find-form query)
-                :in [[~@(free-variables (find-form query))]]]))))
+  (let [src-vars (free-src-vars (in-form query))
+        clause-groups (group-where (where-form query))
+        seen-vars (reductions (comp distinct concat)
+                              (free-variables (in-form query))
+                              (map free-variables clause-groups))]
+    (map (fn [seen-vars clauses]
+           `[:find ~@(distinct (concat seen-vars (free-variables clauses)))
+             :in ~@src-vars [[~@seen-vars]]
+             :where ~@clauses])
+         seen-vars
+         clause-groups)))
 
 #_(query-plan query)
 
-'([:find ?e ?name :where [?e :cat/name ?name]]
-  [:find ?color ?e :in [[?e]] :where [?e :cat/color ?color]]
-  [:find ?mood ?e :in [[?e]] :where [?e :cat/mood ?mood]]
-  [:find ?e :in [[?e]] :where [?e :cat/name "Henry"]])
+(defn sources
+  [query & inputs]
+  (->> (zipmap (or (seq (in-form query))
+                   ['$]) inputs)
+       (filter (comp src-var? key))
+       (map val)))
+
+(defn in-relation
+  [in-form inputs]
+  (let [variables (free-variables in-form)]
+    {:variables ~@variables
+     :relation (apply d/q `[:find ~@variables
+                            :in ~@in-form]
+                      inputs)}))
+
+(defn datalog?
+  [x]
+  true)
+
+(defn not-datalog?
+  [x]
+  (not (datalog? x)))
+
+(defn filter-keys
+  [m f]
+  (->> m
+       (filter (comp f key))
+       (into (empty m))))
+
+(defn partition-when
+  "Partitions the items in coll into a sequences of items for which (pred item)
+  returns logical true and individual items for which (pred item) does not
+  return logical true. Returns a stateful transducer when no collection is
+  provided."
+  ([pred]
+   (comp (partition-by pred)
+         (mapcat #(if (pred (first %))
+                    (list %)
+                    %))))
+  ([pred coll]
+   (sequence (partition-when pred) coll)))
+
+
+(set! *print-length* 10)
+
+(partition-when even? [1 1 1 2 2 3 3 3])
+(into [] (partition-when even?) [1 1 1 2 2 3 3 3])
+(partition-when odd? [1 1 1 2 2 3 3 3])
+
+(defn execute
+  [query & inputs]
+  (let [in-form (in-form query)
+        where-form (where-form query)
+        relation-syms (reductions (comp distinct concat)
+                                  (vec (free-variables in-form))
+                                  (map free-variables where-form))
+
+        {bindings true non-bindings false} (->> (map vector in-form inputs)
+                                                (group-by (comp binding? first)))
+        binding-forms (map first bindings)
+        non-binding-forms (mapv first non-bindings)
+        non-binding-inputs (mapv second non-bindings)
+
+        middle-steps (loop [relation-syms (free-variables in-form)
+                            form-or-forms (partition-when datalog? where-form)]
+                       (if (not-datalog? form-or-forms)
+                         (ex-info "Not implemented." {'x x})
+                         (when-let [form-or-forms (first items)]
+                           (let [relation-syms-after (distinct (concat relation-syms (free-variables form-or-forms)))]
+                             (lazy-seq (cons `[:datalog [:find ~@relation-syms-after
+                                                         :in ~@non-binding-forms [[~@relation-syms]]
+                                                         :where ~@form-or-forms]]
+                                             (recur relation-syms-after
+                                                    (rest items))))))))
+        last-step `[:find ~@(find-form query)
+                    :in ~@non-binding-forms [[~@(last relation-syms)]]]
+        first-relation (apply d/q
+                              `[:find ~@(free-variables binding-forms)
+                                :in ~@in-form]
+                              inputs)
+        last-relation (reduce (fn [relation step]
+                                (match/match step
+                                  [:datalog query] (let [inputs (conj non-binding-inputs relation)]
+                                                     (apply d/q query inputs))))
+                              first-relation
+                              middle-steps)]
+    (apply d/q last-step (conj non-binding-inputs last-relation))))
+
+#_(execute '[:find ?name .
+             :in $ [?color ...]
+             :where
+             [?e :cat/name ?name]
+             [?e :cat/color ?color]]
+           db
+           [:brown])
+
+#_(require 'hashp.core)
+
+#_(query-plan query)
