@@ -58,7 +58,7 @@
  :search-by-example
  event-interceptors
  (fn [db [_ example-row]]
-   (let [table-rows @(rf/subscribe [:table-rows])
+   (let [table-rows (table-db/table-rows db)
          search-row (merge example-row {search-column true})
          result (search/search model/spec search-column [search-row] table-rows n-models beta-params)]
      (rf/dispatch [:search-result result]))
@@ -67,10 +67,10 @@
 (rf/reg-event-db
  :anomaly-search
  event-interceptors
- (fn [db [_ target-col conditional-cols]]
-   (let [table-rows @(rf/subscribe [:table-rows])
+ (fn [db [_ target-col conditional-cols table-rows]]
+   (let [table-rows (table-db/table-rows db)
          result (search/anomaly-search model/spec target-col conditional-cols table-rows)
-         virtual-rows @(rf/subscribe [:virtual-rows])
+         virtual-rows (table-db/virtual-rows db)
          virtual-result (search/anomaly-search model/spec target-col conditional-cols virtual-rows)]
      (rf/dispatch [:search-result result])
      (rf/dispatch [:virtual-search-result virtual-result]))
@@ -113,7 +113,7 @@
  :search-by-labeled
  event-interceptors
  (fn [db [_ pos-ids neg-ids unlabeled-ids]]
-   (let [rows @(rf/subscribe [:table-rows])
+   (let [rows (table-db/table-rows db)
 
          pos-rows (map rows pos-ids)
          neg-rows (map rows neg-ids)
@@ -137,7 +137,7 @@
  :compute-row-likelihoods
  event-interceptors
  (fn [db [_]]
-   (let [table-rows (get-in db [:table-panel :rows])
+   (let [table-rows (table-db/table-rows db)
          likelihoods (score/row-likelihoods model/spec table-rows)]
      (assoc db ::db/row-likelihoods likelihoods))))
 
@@ -145,7 +145,7 @@
  :compute-missing-cells
  event-interceptors
  (fn [db [_]]
-   (let [table-rows (get-in db [:table-panel :rows])
-         headers (get-in db [:table-panel :headers])
+   (let [table-rows (table-db/table-rows db)
+         headers (table-db/table-headers db)
          missing-cells (score/impute-missing-cells model/spec headers table-rows)]
      (assoc db ::db/missing-cells missing-cells))))
