@@ -1,16 +1,17 @@
 (ns inferenceql.datalog.model-test
   (:require [clojure.test :as test :refer [deftest is testing]]
             [datahike.api :as d]
+            [datahike.db :as db]
             [inferenceql.datalog.model :as model]
             [inferenceql.datalog.test :refer [with-empty-conn]]
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.specification :as spec]))
 
 (def mmix
-  {:vars {:x :iql.stattype/gaussian
-          :y :iql.stattype/categorical
-          :a :iql.stattype/gaussian
-          :b :iql.stattype/categorical}
+  {:vars {:x :gaussian
+          :y :categorical
+          :a :gaussian
+          :b :categorical}
    :views [[{:probability 1
              :parameters {:x {:mu 2 :sigma 3}
                           :y {"0" 0.1 "1" 0.2 "2" 0.3 "3" 0.4}}}]
@@ -27,6 +28,11 @@
         "Model schema can be transacted")
     (is (some? (d/transact conn (model/model-facts mmix mmix/row-generator)))
         "Model facts can be transacted")))
+
+(def db
+  (-> (db/empty-db)
+      (d/db-with model/schema)
+      (d/db-with (model/model-facts mmix mmix/row-generator))))
 
 (deftest rules-smoke
   (with-empty-conn conn
@@ -45,7 +51,14 @@
                     (gfn? ?gfn)]
                   (d/db conn)
                   model/rules))
-        "Generative function was transacted")))
+        "Generative function was transacted")
+    (is (= (count (:vars mmix))
+           (d/q '[:find (count ?variable) .
+                  :in $ %
+                  :where
+                  (variable? ?variable)]
+                (d/db conn)
+                model/rules)))))
 
 (deftest model-metadata
   (with-empty-conn conn
@@ -55,7 +68,7 @@
     (testing "statistical type of variable "
       (doseq [variable (spec/variables mmix)]
         (testing variable
-          (is (= (spec/stattype mmix variable)
+          (is (= (keyword "iql.stattype" (name (spec/stattype mmix variable)))
                  (d/q '[:find ?s .
                         :in $ % ?ident
                         :where

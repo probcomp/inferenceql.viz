@@ -57,7 +57,9 @@
   (mapv (fn [variable]
           (merge {:db/ident              variable
                   :iql/type              :iql.type/variable
-                  :iql.variable/stattype (spec/stattype mmix variable)}
+                  :iql.variable/stattype (case (spec/stattype mmix variable)
+                                           :gaussian    :iql.stattype/gaussian
+                                           :categorical :iql.stattype/categorical)}
                  (when (spec/nominal? mmix variable)
                    {:iql.variable/categories (spec/categories mmix variable)})))
         (spec/variables mmix)))

@@ -46,6 +46,8 @@
        (drop-while (complement #{:where}))
        (rest)))
 
+(s/def ::constant (complement (some-fn variable? symbol? list?)))
+
 (s/def ::fn-arg
   (s/or :variable variable?
         :underscore #{'_}
@@ -182,9 +184,6 @@
 (s/conform ::where-clause '(or-join [?x ?y ?z] clause (and clause clause)))
 (s/conform ::where-clause '(or [?e :cat/name "Henry"]
                                [?e :cat/color :orange]))
-
-(s/def ::constant (complement (some-fn variable? symbol? list?)))
-
 
 ;; (not-clause | not-join-clause | or-clause | or-join-clause | expression-clause)
 
