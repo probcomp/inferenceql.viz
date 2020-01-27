@@ -26,9 +26,10 @@
 (rf/reg-event-fx
  :parse-query
  event-interceptors
- (fn [{:keys [db]} [_ text]]
+ (fn [{:keys [db]} [_ text label-info]]
    (let [command (->> (str/trim text)
-                      (query/parse))]
+                      (query/parse))
+         {:keys [pos-ids neg-ids unlabeled-ids]} label-info]
      (match command
        {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
        {:dispatch [:generate-virtual-row c num-rows]}
@@ -43,10 +44,7 @@
        {:dispatch [:anomaly-search column []]}
 
        {:type :search-by-labeled :binding {"label" "True"} :given true}
-       (let [pos-ids @(rf/subscribe [:row-ids-labeled-pos])
-             neg-ids @(rf/subscribe [:row-ids-labeled-neg])
-             unlabeled-ids @(rf/subscribe [:row-ids-unlabeled])]
-         {:dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]})
+       {:dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]}
 
        :else
        (let [logged-msg (str "Unimplemented command: " (pr-str command))
