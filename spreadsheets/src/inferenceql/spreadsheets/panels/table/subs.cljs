@@ -78,17 +78,6 @@
             (fn [db _]
               (get-in db [:table-panel :table-last-clicked])))
 
-(rf/reg-sub :other-table
-            (fn [db [_sub-name table-picked]]
-              (let [[table-1-id table-2-id] (keys (get-in db [:table-panel :hot-state]))]
-                (condp = table-picked
-                  table-1-id table-2-id
-                  table-2-id table-1-id))))
-
-(rf/reg-sub :table-state
-            (fn [db [_sub-name table-id]]
-              (get-in db [:table-panel :hot-state table-id])))
-
 (rf/reg-sub :both-table-states
             (fn [db [_sub-name]]
               (get-in db [:table-panel :hot-state])))
