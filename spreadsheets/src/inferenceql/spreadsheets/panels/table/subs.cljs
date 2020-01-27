@@ -1,10 +1,10 @@
 (ns inferenceql.spreadsheets.panels.table.subs
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
-            [inferenceql.spreadsheets.db :as db]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
+            [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.panels.override.views :as modal]))
 
 ;;; Subs related to entries in the user-editable labels column within the real-data table.
@@ -79,22 +79,22 @@
 
 (rf/reg-sub :table-last-clicked
             (fn [db _]
-              (get db ::db/table-last-clicked)))
+              (get-in db [:table-panel :table-last-clicked])))
 
 (rf/reg-sub :other-table
             (fn [db [_sub-name table-picked]]
-              (let [[table-1-id table-2-id] (keys (get db ::db/hot-state))]
+              (let [[table-1-id table-2-id] (keys (get-in db [:table-panel :hot-state]))]
                 (condp = table-picked
                   table-1-id table-2-id
                   table-2-id table-1-id))))
 
 (rf/reg-sub :table-state
             (fn [db [_sub-name table-id]]
-              (get-in db [::db/hot-state table-id])))
+              (get-in db [:table-panel :hot-state table-id])))
 
 (rf/reg-sub :both-table-states
             (fn [db [_sub-name]]
-              (get db ::db/hot-state)))
+              (get-in db [:table-panel :hot-state])))
 
 (rf/reg-sub :table-state-active
             (fn [_ _]
@@ -102,6 +102,16 @@
                :table-states (rf/subscribe [:both-table-states])})
             (fn [{:keys [table-id table-states]}]
               (get table-states table-id)))
+
+;;; Subs related to scores computed on rows in the tables.
+
+(rf/reg-sub :scores
+            (fn [db _]
+              (db/scores db)))
+
+(rf/reg-sub :virtual-scores
+            (fn [db _]
+              (db/virtual-scores db)))
 
 ;;; Subs related to populating tables with data.
 

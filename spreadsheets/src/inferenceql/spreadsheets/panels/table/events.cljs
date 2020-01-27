@@ -1,7 +1,9 @@
 (ns inferenceql.spreadsheets.panels.table.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.db :as db]
+            [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+
+;;; Events that correspond to hooks in the Handsontable API
 
 ;; Used to detect changes in the :real-data handsontable
 (rf/reg-event-db
@@ -60,10 +62,10 @@
                              (.getSelected hot))
          selected-columns (if (<= col col2) selected-headers (reverse selected-headers))]
      (-> db
-         (assoc-in [::db/hot-state id :selected-columns] selected-columns)
-         (assoc-in [::db/hot-state id :selections] selected-maps)
-         (assoc-in [::db/hot-state id :selected-row-index] row-index)
-         (assoc-in [::db/hot-state id :row-at-selection-start] row)))))
+         (assoc-in [:table-panel :hot-state id :selected-columns] selected-columns)
+         (assoc-in [:table-panel :hot-state id :selections] selected-maps)
+         (assoc-in [:table-panel :hot-state id :selected-row-index] row-index)
+         (assoc-in [:table-panel :hot-state id :row-at-selection-start] row)))))
 
 (rf/reg-event-db
  :after-on-cell-mouse-down
@@ -84,12 +86,39 @@
        (.deselectCell hot))
 
      (-> db
-         (assoc-in [::db/hot-state id :header-clicked] header-clicked-flag)
-         (assoc ::db/table-last-clicked new-table-clicked-id)))))
+         (assoc-in [:table-panel :hot-state id :header-clicked] header-clicked-flag)
+         (assoc-in [:table-panel :table-last-clicked] new-table-clicked-id)))))
 
 (rf/reg-event-db
  :after-deselect
  event-interceptors
  (fn [db [_ hot id]]
    ;; clears selections associated with table
-   (update-in db [::db/hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
+   (update-in db [:table-panel :hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
+
+;;; Events that do not correspond to hooks in the Handsontable api.
+
+(rf/reg-event-db
+ :search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-scores db result)))
+
+(rf/reg-event-db
+ :virtual-search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-virtual-scores db result)))
+
+(rf/reg-event-db
+ :clear-virtual-data
+ event-interceptors
+ (fn [db [event-name]]
+   (-> (db/clear-virtual-rows db)
+       (db/clear-virtual-scores))))
+
+(rf/reg-event-db
+ :clear-virtual-scores
+ event-interceptors
+ (fn [db [event-name]]
+   (db/clear-virtual-scores db)))
