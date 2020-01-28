@@ -31,11 +31,11 @@
                       (cond
                         (and (= value :row)
                              (nil? (get db ::db/row-likelihoods)))
-                        [:compute-row-likelihoods]
+                        [:highlight/compute-row-likelihoods]
 
                         (and (= value :cells-missing)
                              (nil? (get db ::db/missing-cells)))
-                        [:compute-missing-cells]
+                        [:highlight/compute-missing-cells]
 
                         ;; Default case: no event
                         :else
