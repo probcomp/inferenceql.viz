@@ -3,7 +3,7 @@
             [reagent-forms.core :as forms]))
 
 (defn confidence-slider []
-  (let [cur-val @(rf/subscribe [:confidence-threshold])]
+  (let [cur-val @(rf/subscribe [:control/confidence-threshold])]
     [:div#conf-slider
       [:span "Confidence Threshold: "]
       [:br]
@@ -27,18 +27,18 @@
 
         ;; Function map that allows `template` reagent-forms template to
         ;; communicate with the reframe db.
-        events {:get (fn [path] @(rf/subscribe [:confidence-option path]))
+        events {:get (fn [path] @(rf/subscribe [:control/confidence-option path]))
                 :save! (fn [path value] (rf/dispatch [:control/set-confidence-options path value]))
                 :update! (fn [path save-fn value]
                            ;; save-fn should accept two arguments: old-value, new-value
                            (rf/dispatch [:control/update-confidence-options save-fn path value]))
-                :doc (fn [] @(rf/subscribe [:confidence-options]))}]
+                :doc (fn [] @(rf/subscribe [:control/confidence-options]))}]
     [forms/bind-fields template events]))
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
-  (let [input-text (rf/subscribe [:query-string])
+  (let [input-text (rf/subscribe [:control/query-string])
         label-info (rf/subscribe [:rows-label-info])]
     [:div#toolbar
      [:div#search-section

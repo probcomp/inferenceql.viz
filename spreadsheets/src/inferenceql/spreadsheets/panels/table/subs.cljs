@@ -118,7 +118,7 @@
                :scores (rf/subscribe [:scores])
                :labels (rf/subscribe [:labels])
                :imputed-values (rf/subscribe [:missing-cells-vals-above-thresh])
-               :conf-mode (rf/subscribe [:confidence-option [:mode]])})
+               :conf-mode (rf/subscribe [:control/confidence-option [:mode]])})
             (fn [{:keys [rows scores labels imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
                                        (seq imputed-values))]
@@ -262,8 +262,8 @@
  (fn [_ _]
    {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
     :missing-cells-flagged (rf/subscribe [:missing-cells-flagged])
-    :conf-thresh (rf/subscribe [:confidence-threshold])
-    :conf-mode (rf/subscribe [:confidence-option [:mode]])
+    :conf-thresh (rf/subscribe [:control/confidence-threshold])
+    :conf-mode (rf/subscribe [:control/confidence-option [:mode]])
     :computed-headers (rf/subscribe [:computed-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]

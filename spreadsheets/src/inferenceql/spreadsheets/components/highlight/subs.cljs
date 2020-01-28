@@ -25,7 +25,7 @@
  ;; This is like the :missing-cells sub, but it includes an extra flag for whether the
  ;; imputed value for each cell meets the set confidence threshold.
  :<- [:missing-cells]
- :<- [:confidence-threshold]
+ :<- [:control/confidence-threshold]
  (fn [[missing-cells confidence-threshold] _]
    ;; validate output using spec
    {:post [(s/valid? ::db/missing-cells %)]}
