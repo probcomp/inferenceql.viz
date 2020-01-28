@@ -178,6 +178,13 @@
   [mmix view-idx cluster-idx]
   (get-in mmix [:views view-idx cluster-idx :probability]))
 
+(defn categories
+  [mmix variable]
+  (-> (view-for-variable mmix variable)
+      (get-in [0 :parameters variable])
+      keys
+      set))
+
 (s/fdef categorical-probabilities
   :args (s/cat :mmix ::multi-mixture
                :variable ::variable

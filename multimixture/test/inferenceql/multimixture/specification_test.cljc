@@ -73,6 +73,10 @@
                          :parameters {"x" {"0" 0.6 "y" 0.4}}}]}]]
   (spec/categorical-probabilities mmix :x 0 1))
 
+(deftest categories-test
+  (is (= #{"0" "1" "2" "3"}     (spec/categories mmix "y")))
+  (is (= #{"0" "1" "2" "3" "4"} (spec/categories mmix "b"))))
+
 (deftest categorical-probabilities-test
   (is (= {"0" 0.1 "1" 0.2 "2" 0.3 "3" 0.4} (spec/categorical-probabilities mmix "y" 0)))
   (is (= {"0" 0.5 "1" 0.5}
