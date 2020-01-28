@@ -7,7 +7,7 @@
 
 ;; Used to detect changes in the :real-data handsontable
 (rf/reg-event-db
- :before-change
+ :hot/before-change
  event-interceptors
  (fn [db [_ hot id changes source]]
    ;; Checks if a specific change is to a cell in column 0.
@@ -24,7 +24,7 @@
 
 ;; Used to detect changes in the :virtual-data handsontable
 (rf/reg-event-fx
- :after-change
+ :hot/after-change
  event-interceptors
  (fn [{:keys [db]} [_ hot id changes source]]
 
@@ -43,7 +43,7 @@
    {}))
 
 (rf/reg-event-db
- :after-selection-end
+ :hot/after-selection-end
  event-interceptors
  (fn [db [_ hot id row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
    (let [selected-headers (map #(.getColHeader hot %)
@@ -68,7 +68,7 @@
          (assoc-in [:table-panel :hot-state id :row-at-selection-start] row)))))
 
 (rf/reg-event-db
- :after-on-cell-mouse-down
+ :hot/after-on-cell-mouse-down
  event-interceptors
  (fn [db [_ hot id mouse-event coords _TD]]
    (let [other-table-id (db/other-table-id id)
@@ -90,7 +90,7 @@
          (assoc-in [:table-panel :table-last-clicked] new-table-clicked-id)))))
 
 (rf/reg-event-db
- :after-deselect
+ :hot/after-deselect
  event-interceptors
  (fn [db [_ hot id]]
    ;; clears selections associated with table
