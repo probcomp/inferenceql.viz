@@ -17,6 +17,8 @@
             ;; Override Panel
             [inferenceql.spreadsheets.panels.override.events]
             [inferenceql.spreadsheets.panels.override.subs]
+            ;; Query Component
+            [inferenceql.spreadsheets.components.query.events]
             ;; Library functions for user-defined JS functions.
             [inferenceql.user]))
 
