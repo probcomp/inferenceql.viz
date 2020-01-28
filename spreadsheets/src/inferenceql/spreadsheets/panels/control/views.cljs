@@ -12,7 +12,7 @@
                        :value cur-val
                        :on-change (fn [e]
                                     (let [new-val (js/parseFloat (-> e .-target .-value))]
-                                      (rf/dispatch [:set-confidence-threshold new-val])))}]
+                                      (rf/dispatch [:control/set-confidence-threshold new-val])))}]
       [:label cur-val]]))
 
 (defn confidence-mode []
@@ -28,10 +28,10 @@
         ;; Function map that allows `template` reagent-forms template to
         ;; communicate with the reframe db.
         events {:get (fn [path] @(rf/subscribe [:confidence-option path]))
-                :save! (fn [path value] (rf/dispatch [:set-confidence-options path value]))
+                :save! (fn [path value] (rf/dispatch [:control/set-confidence-options path value]))
                 :update! (fn [path save-fn value]
                            ;; save-fn should accept two arguments: old-value, new-value
-                           (rf/dispatch [:update-confidence-options save-fn path value]))
+                           (rf/dispatch [:control/update-confidence-options save-fn path value]))
                 :doc (fn [] @(rf/subscribe [:confidence-options]))}]
     [forms/bind-fields template events]))
 
@@ -43,7 +43,7 @@
     [:div#toolbar
      [:div#search-section
        [:input#search-input {:type "search"
-                             :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
+                             :on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
                              :on-key-press (fn [e] (if (= (.-key e) "Enter")
                                                      (rf/dispatch [:parse-query @input-text @label-info])))
 
