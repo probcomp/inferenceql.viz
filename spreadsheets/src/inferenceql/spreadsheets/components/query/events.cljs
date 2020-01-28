@@ -54,7 +54,7 @@
    (let [table-rows (table-db/table-rows db)
          search-row (merge example-row {search-column true})
          result (search/search model/spec search-column [search-row] table-rows n-models beta-params)]
-     (rf/dispatch [:search-result result]))
+     (rf/dispatch [:table/search-result result]))
    db))
 
 (rf/reg-event-db
@@ -65,8 +65,8 @@
          result (search/anomaly-search model/spec target-col conditional-cols table-rows)
          virtual-rows (table-db/virtual-rows db)
          virtual-result (search/anomaly-search model/spec target-col conditional-cols virtual-rows)]
-     (rf/dispatch [:search-result result])
-     (rf/dispatch [:virtual-search-result virtual-result]))
+     (rf/dispatch [:table/search-result result])
+     (rf/dispatch [:table/virtual-search-result virtual-result]))
    db))
 
 (rf/reg-event-db
@@ -122,6 +122,6 @@
          all-scores (->> (merge scores-ids-map scores-ids-map-lab)
                          (sort-by key)
                          (map second))]
-     (rf/dispatch [:clear-virtual-scores])
-     (rf/dispatch [:search-result all-scores]))
+     (rf/dispatch [:table/clear-virtual-scores])
+     (rf/dispatch [:table/search-result all-scores]))
    db))

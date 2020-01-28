@@ -99,26 +99,26 @@
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
 (rf/reg-event-db
- :search-result
+ :table/search-result
  event-interceptors
  (fn [db [_ result]]
    (db/with-scores db result)))
 
 (rf/reg-event-db
- :virtual-search-result
+ :table/virtual-search-result
  event-interceptors
  (fn [db [_ result]]
    (db/with-virtual-scores db result)))
 
 (rf/reg-event-db
- :clear-virtual-data
+ :table/clear-virtual-data
  event-interceptors
  (fn [db [event-name]]
    (-> (db/clear-virtual-rows db)
        (db/clear-virtual-scores))))
 
 (rf/reg-event-db
- :clear-virtual-scores
+ :table/clear-virtual-scores
  event-interceptors
  (fn [db [event-name]]
    (db/clear-virtual-scores db)))
