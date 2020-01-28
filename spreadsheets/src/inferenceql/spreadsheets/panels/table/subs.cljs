@@ -211,7 +211,7 @@
 (rf/reg-sub
  :context-menu
  (fn [_ _]
-   {:col-overrides (rf/subscribe [:column-overrides])
+   {:col-overrides (rf/subscribe [:override/column-overrides])
     :col-names (rf/subscribe [:computed-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]

@@ -28,7 +28,7 @@
 (defn modal
   "Reagent component for rendering modal contents."
   []
-  (let [modal (rf/subscribe [:modal])]
+  (let [modal (rf/subscribe [:override/modal])]
     (fn []
       [:div
        (when (:child @modal)

@@ -47,7 +47,7 @@
             (fn [_ _]
               {:selection-info (rf/subscribe [:table-state-active])
                :one-cell-selected (rf/subscribe [:one-cell-selected])
-               :override-fns (rf/subscribe [:column-override-fns])})
+               :override-fns (rf/subscribe [:override/column-override-fns])})
             (fn [{:keys [selection-info one-cell-selected override-fns]}]
               (let [row (:row-at-selection-start selection-info)
                     columns (:selected-columns selection-info)
