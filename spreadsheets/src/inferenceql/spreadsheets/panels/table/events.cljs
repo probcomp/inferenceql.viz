@@ -3,6 +3,33 @@
             [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
 
+;;; Events that do not correspond to hooks in the Handsontable api.
+
+(rf/reg-event-db
+ :table/search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-scores db result)))
+
+(rf/reg-event-db
+ :table/virtual-search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-virtual-scores db result)))
+
+(rf/reg-event-db
+ :table/clear-virtual-data
+ event-interceptors
+ (fn [db [event-name]]
+   (-> (db/clear-virtual-rows db)
+       (db/clear-virtual-scores))))
+
+(rf/reg-event-db
+ :table/clear-virtual-scores
+ event-interceptors
+ (fn [db [event-name]]
+   (db/clear-virtual-scores db)))
+
 ;;; Events that correspond to hooks in the Handsontable API
 
 ;; Used to detect changes in the :real-data handsontable
@@ -95,30 +122,3 @@
  (fn [db [_ hot id]]
    ;; clears selections associated with table
    (update-in db [:table-panel :hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
-
-;;; Events that do not correspond to hooks in the Handsontable api.
-
-(rf/reg-event-db
- :table/search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-scores db result)))
-
-(rf/reg-event-db
- :table/virtual-search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-virtual-scores db result)))
-
-(rf/reg-event-db
- :table/clear-virtual-data
- event-interceptors
- (fn [db [event-name]]
-   (-> (db/clear-virtual-rows db)
-       (db/clear-virtual-scores))))
-
-(rf/reg-event-db
- :table/clear-virtual-scores
- event-interceptors
- (fn [db [event-name]]
-   (db/clear-virtual-scores db)))
