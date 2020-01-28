@@ -3,19 +3,19 @@
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
 
 (rf/reg-event-db
- :set-modal
+ :override/set-modal
  event-interceptors
  (fn [db [_ data]]
    (assoc-in db [:override-panel :modal] data)))
 
 (rf/reg-event-db
- :clear-modal
+ :override/clear-modal
  event-interceptors
  (fn [db [_]]
    (assoc-in db [:override-panel :modal] {:child nil})))
 
 (rf/reg-event-db
- :set-column-function
+ :override/set-column-function
  event-interceptors
  (fn [db [_ col-name source-text]]
    (try (if-let [evaled-fn (js/eval (str "(" source-text ")"))]
@@ -30,7 +30,7 @@
           db))))
 
 (rf/reg-event-db
- :clear-column-function
+ :override/clear-column-function
  event-interceptors
  (fn [db [_ col-name]]
    (if (and (get-in db [:override-panel :column-overrides col-name])

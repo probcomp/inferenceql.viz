@@ -222,14 +222,14 @@
                                    fn-text (get col-overrides col-name)
 
                                    modal-child [modal/js-function-entry-modal col-name fn-text]]
-                               (rf/dispatch [:set-modal {:child modal-child}]))))
+                               (rf/dispatch [:override/set-modal {:child modal-child}]))))
 
          clear-function-fn (fn [key selection click-event]
                              (this-as hot
                                (let [last-col-num (.. (first selection) -start -col)
                                      last-col-num-phys (.toPhysicalColumn hot last-col-num)
                                      col-name (nth col-names last-col-num-phys)]
-                                 (rf/dispatch [:clear-column-function col-name]))))
+                                 (rf/dispatch [:override/clear-column-function col-name]))))
 
          disable-fn (fn []
                      (this-as hot
