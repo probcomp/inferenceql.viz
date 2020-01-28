@@ -39,7 +39,7 @@
   "A reagant component. Acts as control and input panel for the app."
   []
   (let [input-text (rf/subscribe [:control/query-string])
-        label-info (rf/subscribe [:rows-label-info])]
+        label-info (rf/subscribe [:table/rows-label-info])]
     [:div#toolbar
      [:div#search-section
        [:input#search-input {:type "search"

@@ -9,8 +9,8 @@
 
 (defn app
   []
-  (let [real-hot-props      @(rf/subscribe [:real-hot-props])
-        virtual-hot-props @(rf/subscribe [:virtual-hot-props])
+  (let [real-hot-props      @(rf/subscribe [:table/real-hot-props])
+        virtual-hot-props @(rf/subscribe [:table/virtual-hot-props])
         real-table-in-viz @(rf/subscribe [:viz/real-table-in-viz])
         virtual-table-in-viz @(rf/subscribe [:viz/virtual-table-in-viz])
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])

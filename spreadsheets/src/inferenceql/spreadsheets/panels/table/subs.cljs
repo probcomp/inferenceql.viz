@@ -51,13 +51,13 @@
     ids))
 
 (rf/reg-sub
-  :labels
-  (fn [db _]
-    (db/labels db)))
+ :table/labels
+ (fn [db _]
+   (db/labels db)))
 
 (rf/reg-sub
- :rows-label-info
- :<- [:labels]
+ :table/rows-label-info
+ :<- [:table/labels]
  (fn [labels _]
    {:pos-ids (row-ids-labeled-pos labels)
     :neg-ids (row-ids-labeled-neg labels)
@@ -65,37 +65,37 @@
 
 ;;; Subs related to selections within tables.
 
-(rf/reg-sub :one-cell-selected
+(rf/reg-sub :table/one-cell-selected
             (fn [_ _]
-              (rf/subscribe [:table-state-active]))
+              (rf/subscribe [:table/table-state-active]))
             (fn [{:keys [selections]}]
               (= 1
                  (count selections)
                  (count (first selections))
                  (count (keys (first selections))))))
 
-(rf/reg-sub :table-last-clicked
+(rf/reg-sub :table/table-last-clicked
             (fn [db _]
               (get-in db [:table-panel :table-last-clicked])))
 
-(rf/reg-sub :both-table-states
+(rf/reg-sub :table/both-table-states
             (fn [db [_sub-name]]
               (get-in db [:table-panel :hot-state])))
 
-(rf/reg-sub :table-state-active
+(rf/reg-sub :table/table-state-active
             (fn [_ _]
-              {:table-id (rf/subscribe [:table-last-clicked])
-               :table-states (rf/subscribe [:both-table-states])})
+              {:table-id (rf/subscribe [:table/table-last-clicked])
+               :table-states (rf/subscribe [:table/both-table-states])})
             (fn [{:keys [table-id table-states]}]
               (get table-states table-id)))
 
 ;;; Subs related to scores computed on rows in the tables.
 
-(rf/reg-sub :scores
+(rf/reg-sub :table/scores
             (fn [db _]
               (db/scores db)))
 
-(rf/reg-sub :virtual-scores
+(rf/reg-sub :table/virtual-scores
             (fn [db _]
               (db/virtual-scores db)))
 
@@ -104,19 +104,19 @@
 (defn table-headers
   [db _]
   (db/table-headers db))
-(rf/reg-sub :table-headers table-headers)
+(rf/reg-sub :table/table-headers table-headers)
 
-(rf/reg-sub :computed-headers
+(rf/reg-sub :table/computed-headers
             (fn [_ _]
-              (rf/subscribe [:table-headers]))
+              (rf/subscribe [:table/table-headers]))
             (fn [headers]
               (into [vega/label-col-header vega/score-col-header] headers)))
 
-(rf/reg-sub :computed-rows
+(rf/reg-sub :table/computed-rows
             (fn [_ _]
-              {:rows (rf/subscribe [:table-rows])
-               :scores (rf/subscribe [:scores])
-               :labels (rf/subscribe [:labels])
+              {:rows (rf/subscribe [:table/table-rows])
+               :scores (rf/subscribe [:table/scores])
+               :labels (rf/subscribe [:table/labels])
                :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:control/confidence-option [:mode]])})
             (fn [{:keys [rows scores labels imputed-values conf-mode]}]
@@ -133,10 +133,10 @@
                                  (assoc row vega/label-col-header label))
                                labels)))))
 
-(rf/reg-sub :virtual-computed-rows
+(rf/reg-sub :table/virtual-computed-rows
   (fn [_ _]
-    {:rows (rf/subscribe [:virtual-rows])
-     :scores (rf/subscribe [:virtual-scores])})
+    {:rows (rf/subscribe [:table/virtual-rows])
+     :scores (rf/subscribe [:table/virtual-scores])})
   (fn [{:keys [rows scores]}]
     (let [num-missing-scores (- (count rows) (count scores))
           dummy-scores (repeat num-missing-scores nil)
@@ -150,12 +150,12 @@
 (defn table-rows
   [db _]
   (db/table-rows db))
-(rf/reg-sub :table-rows table-rows)
+(rf/reg-sub :table/table-rows table-rows)
 
 (defn virtual-rows
   [db _]
   (db/virtual-rows db))
-(rf/reg-sub :virtual-rows virtual-rows)
+(rf/reg-sub :table/virtual-rows virtual-rows)
 
 (defn- cell-vector
   "Takes tabular data represented as a sequence of maps and reshapes the data as a
@@ -185,12 +185,12 @@
         (assoc-in [:settings :columns] all-column-settings)
         (assoc-in [:settings :cells] cells-style-fn)
         (assoc-in [:settings :contextMenu] context-menu))))
-(rf/reg-sub :real-hot-props
+(rf/reg-sub :table/real-hot-props
             (fn [_ _]
-              {:headers (rf/subscribe [:computed-headers])
-               :rows    (rf/subscribe [:computed-rows])
-               :cells-style-fn (rf/subscribe [:cells-style-fn])
-               :context-menu (rf/subscribe [:context-menu])})
+              {:headers (rf/subscribe [:table/computed-headers])
+               :rows    (rf/subscribe [:table/computed-rows])
+               :cells-style-fn (rf/subscribe [:table/cells-style-fn])
+               :context-menu (rf/subscribe [:table/context-menu])})
             real-hot-props)
 
 (defn virtual-hot-props
@@ -202,17 +202,17 @@
         (assoc-in [:settings :data] data)
         (assoc-in [:settings :colHeaders] headers)
         (assoc-in [:settings :columns] column-settings))))
-(rf/reg-sub :virtual-hot-props
+(rf/reg-sub :table/virtual-hot-props
             (fn [_ _]
-              {:headers (rf/subscribe [:computed-headers])
-               :rows    (rf/subscribe [:virtual-computed-rows])})
+              {:headers (rf/subscribe [:table/computed-headers])
+               :rows    (rf/subscribe [:table/virtual-computed-rows])})
             virtual-hot-props)
 
 (rf/reg-sub
- :context-menu
+ :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:computed-headers])})
+    :col-names (rf/subscribe [:table/computed-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -249,22 +249,22 @@
                                 :callback clear-function-fn}}})))
 
 (rf/reg-sub
- :cells-style-fn
+ :table/cells-style-fn
  (fn [_ _]
-   {:cell-renderer-fn (rf/subscribe [:cell-renderer-fn])})
+   {:cell-renderer-fn (rf/subscribe [:table/cell-renderer-fn])})
  (fn [{:keys [cell-renderer-fn]}]
    ;; Returns a function used by the :cells property in Handsontable's options.
    (fn [row col]
      (clj->js {:renderer cell-renderer-fn}))))
 
 (rf/reg-sub
- :cell-renderer-fn
+ :table/cell-renderer-fn
  (fn [_ _]
    {:row-likelihoods (rf/subscribe [:highlight/row-likelihoods-normed])
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/confidence-option [:mode]])
-    :computed-headers (rf/subscribe [:computed-headers])})
+    :computed-headers (rf/subscribe [:table/computed-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode
