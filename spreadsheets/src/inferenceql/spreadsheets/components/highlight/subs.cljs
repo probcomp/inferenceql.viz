@@ -6,8 +6,8 @@
 
 ;;; Specs related to subscriptions for missing cell values
 
-(s/def :ms/values-map-for-row (s/map-of :ms/column-name :ms/value))
-(s/def :ms/missing-cells-values (s/coll-of :ms/values-map-for-row))
+(s/def ::values-map-for-row (s/map-of ::db/column-name ::db/value))
+(s/def ::missing-cells-values (s/coll-of ::values-map-for-row))
 
 (rf/reg-sub
   :row-likelihoods-normed
@@ -44,7 +44,7 @@
  :<- [:missing-cells-flagged]
  (fn [missing-cells-flagged _]
    ;; validate output using spec
-   {:post [(s/valid? :ms/missing-cells-values %)]}
+   {:post [(s/valid? ::missing-cells-values %)]}
    (for [row missing-cells-flagged]
      (->> row
           (medley/filter-vals :meets-threshold)

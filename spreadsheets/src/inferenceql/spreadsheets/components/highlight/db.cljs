@@ -15,12 +15,12 @@
 
 ;;; Specs related to computed scores of missing cells.
 
-(s/def :ms/column-name string?)
-(s/def :ms/value any?)
-(s/def :ms/score ::score)
-(s/def :ms/meets-threshold boolean?)
-(s/def :ms/value-score-map (s/keys :req-un [:ms/value
-                                            :ms/score]
-                                   :opt-un [:ms/meets-threshold]))
-(s/def :ms/map-for-row (s/map-of :ms/column-name :ms/value-score-map))
-(s/def ::missing-cells (s/coll-of :ms/map-for-row))
+(s/def ::column-name string?)
+(s/def ::value any?)
+(s/def ::meets-threshold boolean?)
+(s/def ::value-score-map (s/keys :req-un [::value
+                                          ::score]
+                                 :opt-un [::meets-threshold]))
+
+(s/def ::map-for-row (s/map-of ::column-name ::value-score-map))
+(s/def ::missing-cells (s/coll-of ::map-for-row))
