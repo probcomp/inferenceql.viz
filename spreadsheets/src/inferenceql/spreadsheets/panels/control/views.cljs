@@ -45,7 +45,7 @@
        [:input#search-input {:type "search"
                              :on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
                              :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                                     (rf/dispatch [:parse-query @input-text @label-info])))
+                                                     (rf/dispatch [:query/parse-query @input-text @label-info])))
 
                              :placeholder "Enter a query..."
                              ;; This random attribute value for autoComplete is needed to turn
@@ -54,7 +54,7 @@
                              :value @input-text}]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
-          {:on-click #(rf/dispatch [:parse-query @input-text @label-info])} "Run InferenceQL"]
+          {:on-click #(rf/dispatch [:query/parse-query @input-text @label-info])} "Run InferenceQL"]
          [:button.toolbar-button.pure-button
           {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
      [:div.flex-box-space-filler]

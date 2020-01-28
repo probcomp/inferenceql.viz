@@ -17,7 +17,7 @@
 (def ^:private beta-params {:alpha 0.001, :beta 0.001})
 
 (rf/reg-event-fx
- :parse-query
+ :query/parse-query
  event-interceptors
  (fn [{:keys [db]} [_ text label-info]]
    (let [command (->> (str/trim text)
@@ -25,19 +25,19 @@
          {:keys [pos-ids neg-ids unlabeled-ids]} label-info]
      (match command
        {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
-       {:dispatch [:generate-virtual-row c num-rows]}
+       {:dispatch [:query/generate-virtual-row c num-rows]}
 
        {:type :anomaly-search :column column :given :row}
-       {:dispatch [:anomaly-search column ["ROW"]]}
+       {:dispatch [:query/anomaly-search column ["ROW"]]}
 
        {:type :anomaly-search :column column :given given-col}
-       {:dispatch [:anomaly-search column [given-col]]}
+       {:dispatch [:query/anomaly-search column [given-col]]}
 
        {:type :anomaly-search :column column}
-       {:dispatch [:anomaly-search column []]}
+       {:dispatch [:query/anomaly-search column []]}
 
        {:type :search-by-labeled :binding {"label" "True"} :given true}
-       {:dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]}
+       {:dispatch [:query/search-by-labeled pos-ids neg-ids unlabeled-ids]}
 
        :else
        (let [logged-msg (str "Unimplemented command: " (pr-str command))
@@ -48,7 +48,7 @@
          {})))))
 
 (rf/reg-event-db
- :search-by-example
+ :query/search-by-example
  event-interceptors
  (fn [db [_ example-row]]
    (let [table-rows (table-db/table-rows db)
@@ -58,7 +58,7 @@
    db))
 
 (rf/reg-event-db
- :anomaly-search
+ :query/anomaly-search
  event-interceptors
  (fn [db [_ target-col conditional-cols table-rows]]
    (let [table-rows (table-db/table-rows db)
@@ -70,7 +70,7 @@
    db))
 
 (rf/reg-event-db
- :generate-virtual-row
+ :query/generate-virtual-row
  event-interceptors
  (fn [db [_ conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
@@ -103,7 +103,7 @@
     (merge pos-ids-map neg-ids-map)))
 
 (rf/reg-event-db
- :search-by-labeled
+ :query/search-by-labeled
  event-interceptors
  (fn [db [_ pos-ids neg-ids unlabeled-ids]]
    (let [rows (table-db/table-rows db)
