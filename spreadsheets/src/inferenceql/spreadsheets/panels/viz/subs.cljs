@@ -29,21 +29,21 @@
 
              :else
              (vega/gen-comparison-plot table-states t-clicked))))))
-(rf/reg-sub :vega-lite-spec
+(rf/reg-sub :viz/vega-lite-spec
             (fn [_ _]
               {:table-states (rf/subscribe [:both-table-states])
                :t-clicked (rf/subscribe [:table-last-clicked])})
             (fn [data-for-spec]
               (vega-lite-spec data-for-spec)))
 
-(rf/reg-sub :vega-lite-log-level
+(rf/reg-sub :viz/vega-lite-log-level
             :<- [:one-cell-selected]
             (fn [one-cell-selected]
               (if one-cell-selected
                 (.-Error js/vega)
                 (.-Warn js/vega))))
 
-(rf/reg-sub :generator
+(rf/reg-sub :viz/generator
             (fn [_ _]
               {:selection-info (rf/subscribe [:table-state-active])
                :one-cell-selected (rf/subscribe [:one-cell-selected])
@@ -67,7 +67,7 @@
                     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
                     #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn)))))))))
 
-(rf/reg-sub :tables-visualized
+(rf/reg-sub :viz/tables-visualized
             :<- [:both-table-states]
             :<- [:table-last-clicked]
             :<- [:one-cell-selected]
@@ -97,12 +97,12 @@
                       :else
                       nil))))
 
-(rf/reg-sub :real-table-in-viz
-            :<- [:tables-visualized]
+(rf/reg-sub :viz/real-table-in-viz
+            :<- [:viz/tables-visualized]
             (fn [tables-visualized]
               (some #{:real-table} tables-visualized)))
 
-(rf/reg-sub :virtual-table-in-viz
-            :<- [:tables-visualized]
+(rf/reg-sub :viz/virtual-table-in-viz
+            :<- [:viz/tables-visualized]
             (fn [tables-visualized]
               (some #{:virtual-table} tables-visualized)))
