@@ -117,7 +117,7 @@
               {:rows (rf/subscribe [:table-rows])
                :scores (rf/subscribe [:scores])
                :labels (rf/subscribe [:labels])
-               :imputed-values (rf/subscribe [:missing-cells-vals-above-thresh])
+               :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:control/confidence-option [:mode]])})
             (fn [{:keys [rows scores labels imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
@@ -260,8 +260,8 @@
 (rf/reg-sub
  :cell-renderer-fn
  (fn [_ _]
-   {:row-likelihoods (rf/subscribe [:row-likelihoods-normed])
-    :missing-cells-flagged (rf/subscribe [:missing-cells-flagged])
+   {:row-likelihoods (rf/subscribe [:highlight/row-likelihoods-normed])
+    :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/confidence-option [:mode]])
     :computed-headers (rf/subscribe [:computed-headers])})

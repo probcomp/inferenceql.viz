@@ -10,21 +10,21 @@
 (s/def ::missing-cells-values (s/coll-of ::values-map-for-row))
 
 (rf/reg-sub
-  :row-likelihoods-normed
+  :highlight/row-likelihoods-normed
   (fn [db _]
     (get-in db [:highlight-component :row-likelihoods])))
 
 (rf/reg-sub
   ;; Returns values and scores of missing-cells.
-  :missing-cells
+  :highlight/missing-cells
   (fn [db _]
     (get-in db [:highlight-component :missing-cells])))
 
 (rf/reg-sub
- :missing-cells-flagged
+ :highlight/missing-cells-flagged
  ;; This is like the :missing-cells sub, but it includes an extra flag for whether the
  ;; imputed value for each cell meets the set confidence threshold.
- :<- [:missing-cells]
+ :<- [:highlight/missing-cells]
  :<- [:control/confidence-threshold]
  (fn [[missing-cells confidence-threshold] _]
    ;; validate output using spec
@@ -38,10 +38,10 @@
      (vec with-flags))))
 
 (rf/reg-sub
- :missing-cells-vals-above-thresh
+ :highlight/missing-cells-vals-above-thresh
  ;; This is like the :missing-cells sub, but it only includes cells that have meet the confidence
  ;; threshold. And it only has missing cells values, no score info.
- :<- [:missing-cells-flagged]
+ :<- [:highlight/missing-cells-flagged]
  (fn [missing-cells-flagged _]
    ;; validate output using spec
    {:post [(s/valid? ::missing-cells-values %)]}
