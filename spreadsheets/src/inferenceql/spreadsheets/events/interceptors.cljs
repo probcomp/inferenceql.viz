@@ -13,3 +13,7 @@
                     (s/explain-data a-spec db)))))
 
 (def check-spec (rf/after #(check-and-throw % ::db/db)))
+
+(def event-interceptors
+  "A default set of event interceptors to use within events across the app."
+  [rf/debug check-spec])

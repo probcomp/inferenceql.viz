@@ -1,104 +1,9 @@
 (ns inferenceql.spreadsheets.views
   (:require [re-frame.core :as rf]
-            [reagent-forms.core :as forms]
-            [inferenceql.spreadsheets.events :as events]
-            [inferenceql.spreadsheets.handsontable :as hot]
-            [inferenceql.spreadsheets.vega :as vega]
-            [inferenceql.spreadsheets.modal :as modal]))
-
-(def default-hot-settings
-  {:settings {:data                []
-              :colHeaders          []
-              :columns             []
-              :rowHeaders          true
-              :multiColumnSorting  true
-              :manualColumnMove    true
-              :beforeColumnMove    hot/freeze-col-1-2-fn
-              :manualColumnResize  true
-              :autoWrapCol         false
-              :autoWrapRow         false
-              :filters             true
-              ;; TODO: investigate more closely what each of
-              ;; these options adds. And if they can be put
-              ;; in the context-menu instead.
-              :dropdownMenu        ["filter_by_condition"
-                                    "filter_operators"
-                                    "filter_by_condition2"
-                                    "filter_by_value"
-                                    "filter_action_bar"]
-              :bindRowsWithHeaders true
-              :selectionMode       :range
-              :outsideClickDeselects false
-              :readOnly            true
-              :height              "32vh"
-              :width               "100vw"
-              :stretchH            "all"
-              :licenseKey          "non-commercial-and-evaluation"}
-   :hooks []})
-
-(def real-hot-settings (-> default-hot-settings
-                           (assoc-in [:hooks] events/real-hot-hooks)
-                           (assoc-in [:name] "real-table")))
-(def virtual-hot-settings (-> default-hot-settings
-                              (assoc-in [:hooks] events/virtual-hot-hooks)
-                              (assoc-in [:name] "virtual-table")
-                              (assoc-in [:settings :height] "20vh")))
-
-(defn confidence-slider []
-  (let [cur-val @(rf/subscribe [:confidence-threshold])]
-    [:div#conf-slider
-      [:span "Confidence Threshold: "]
-      [:br]
-      [:input {:type :range :name :confidence-threshold
-               :min 0 :max 1 :step 0.01
-                       :value cur-val
-                       :on-change (fn [e]
-                                    (let [new-val (js/parseFloat (-> e .-target .-value))]
-                                      (rf/dispatch [:set-confidence-threshold new-val])))}]
-      [:label cur-val]]))
-
-(defn confidence-mode []
-  (let [template [:div#conf-mode
-                  [:label "Mode:"]
-                  [:br]
-                  [:select.form-control {:field :list :id :mode}
-                   [:option {:key :none} "none"]
-                   [:option {:key :row} "row-wise"]
-                   [:option {:key :cells-existing} "cell-wise (existing)"]
-                   [:option {:key :cells-missing} "cell-wise (missing)"]]]
-
-        ;; Function map that allows `template` reagent-forms template to
-        ;; communicate with the reframe db.
-        events {:get (fn [path] @(rf/subscribe [:confidence-option path]))
-                :save! (fn [path value] (rf/dispatch [:set-confidence-options path value]))
-                :update! (fn [path save-fn value]
-                           ;; save-fn should accept two arguments: old-value, new-value
-                           (rf/dispatch [:update-confidence-options save-fn path value]))
-                :doc (fn [] @(rf/subscribe [:confidence-options]))}]
-    [forms/bind-fields template events]))
-
-(defn search-form
-  []
-  (let [input-text (rf/subscribe [:query-string])]
-    (fn []
-      [:div#toolbar
-       [:div#search-section
-         [:input#search-input {:type "search"
-                               :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
-                               :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                                       (rf/dispatch [:parse-query @input-text])))
-                               :placeholder "Enter a query..."
-                               ;; This random attribute value for autoComplete is needed to turn
-                               ;; autoComplete off in Chrome. "off" and "false" do not work.
-                               :autoComplete "my-search-field"
-                               :value @input-text}]
-         [:div#search-buttons
-           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:parse-query @input-text])} "Run InferenceQL"]
-           [:button.toolbar-button.pure-button {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
-       [:div.flex-box-space-filler]
-       [:div#conf-controls
-        [confidence-slider]
-        [confidence-mode]]])))
+            [inferenceql.spreadsheets.panels.override.views :as modal]
+            [inferenceql.spreadsheets.panels.control.views :as control]
+            [inferenceql.spreadsheets.panels.viz.views :as viz]
+            [inferenceql.spreadsheets.panels.table.views :as table]))
 
 (defn app
   []
@@ -108,12 +13,12 @@
         vega-lite-log-level @(rf/subscribe [:vega-lite-log-level])
         generator      @(rf/subscribe [:generator])]
     [:div
-     [search-form]
+     [control/panel]
      [:div.table-title [:span "Real Data"]]
-     [hot/handsontable {:style {:overflow "hidden"}}  real-hot-props]
+     [table/handsontable {:style {:overflow "hidden"}}  real-hot-props]
      [:div.table-title [:span "Virtual Data"]]
-     [hot/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
+     [table/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div#viz-container
       (when vega-lite-spec
-        [vega/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]
+        [viz/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]
      [modal/modal]]))

@@ -1,29 +1,14 @@
-(ns inferenceql.spreadsheets.handsontable
-  "A Handsontable Reagent component."
+(ns inferenceql.spreadsheets.panels.table.views
   (:require [yarn.handsontable]
             [camel-snake-kebab.core :as csk]
-            [cljsjs.react]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]))
 
-(defn- random-id
-  []
-  (-> (Math/random)
-      (.toString 36)
-      (.substring 5)))
-
 (defn- update-hot!
+  "A helper function for updating the settings in a handsontable."
   [hot-instance new-settings]
   (.updateSettings hot-instance new-settings false))
-
-(defn freeze-col-1-2-fn [columns-moving target]
-  "Prevents the movement of the first two columns in the table.
-  Also prevents other columns from moving into those frist two spots."
-  (let [first-unfrozen-index 2
-        first-col-moving (first (js->clj columns-moving))]
-    (not (or (< first-col-moving first-unfrozen-index)
-             (< target first-unfrozen-index)))))
 
 (defn handsontable
   ([props]

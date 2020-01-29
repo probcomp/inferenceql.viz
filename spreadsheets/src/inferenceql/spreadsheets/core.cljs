@@ -2,9 +2,22 @@
   (:require [goog.dom :as dom]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
+            ;; Core
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
             [inferenceql.spreadsheets.views :as views]
+            ;; Control Panel
+            [inferenceql.spreadsheets.panels.control.events]
+            [inferenceql.spreadsheets.panels.control.subs]
+            ;; Viz Panel
+            [inferenceql.spreadsheets.panels.viz.subs]
+            ;; Table Panel
+            [inferenceql.spreadsheets.panels.table.events]
+            [inferenceql.spreadsheets.panels.table.subs]
+            ;; Override Panel
+            [inferenceql.spreadsheets.panels.override.events]
+            [inferenceql.spreadsheets.panels.override.subs]
+            ;; Library functions for user-defined JS functions.
             [inferenceql.user]))
 
 (enable-console-print!)

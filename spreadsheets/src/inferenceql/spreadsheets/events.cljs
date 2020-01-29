@@ -6,17 +6,11 @@
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.search :as search]
             [inferenceql.spreadsheets.db :as db]
-            [inferenceql.spreadsheets.events.interceptors :as interceptors]
+            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.query :as query]
-            [inferenceql.spreadsheets.column-overrides :as co]
+            [inferenceql.spreadsheets.panels.override.helpers :as co]
             [inferenceql.spreadsheets.score :as score]))
-
-(def real-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :before-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
-
-(def event-interceptors
-  [rf/debug interceptors/check-spec])
 
 (def ^:private search-column "new property")
 (def ^:private n-models 10)
@@ -27,6 +21,18 @@
  event-interceptors
  (fn [_ _]
    (db/default-db)))
+
+(rf/reg-event-db
+ :search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-scores db result)))
+
+(rf/reg-event-db
+ :virtual-search-result
+ event-interceptors
+ (fn [db [_ result]]
+   (db/with-virtual-scores db result)))
 
 (rf/reg-event-db
  :clear-virtual-data
@@ -40,97 +46,6 @@
  event-interceptors
  (fn [db [event-name]]
    (db/clear-virtual-scores db)))
-
-;; Used to detect changes in the :real-data handsontable
-(rf/reg-event-db
- :before-change
- event-interceptors
- (fn [db [_ hot id changes source]]
-   ;; Checks if a specific change is to a cell in column 0.
-   (let [change-to-col-0? (fn [change]
-                            (let [[_row col _prev-val _new-val] change]
-                              (= col 0)))]
-     ;; Changes should only be happening in the first column (the label column).
-     (assert (every? change-to-col-0? changes))
-     ;; Changes should only be the result of user edits.
-     (assert (= source "edit")))
-
-   (let [labels-col (.getSourceDataAtCol hot 0)]
-     (db/with-labels db (js->clj labels-col)))))
-
-;; Used to detect changes in the :virtual-data handsontable
-(rf/reg-event-fx
- :after-change
- event-interceptors
- (fn [{:keys [db]} [_ hot id changes source]]
-
-   ;; `changes` should be null when source of changes is loadData (see docs for why).
-   (assert (= nil changes))
-   ;; Setting the table's data via the `virtual-hot-props` sub should be the only way it is changing.
-   (assert (= source "loadData"))
-
-   (let [table-state @(rf/subscribe [:table-state id])]
-     (if-let [header-clicked (:header-clicked table-state)]
-       (let [current-selection (.getSelectedLast hot)
-             [_row1 col1 _row2 col2] (js->clj current-selection)]
-         ;; Take the current selection and expand it so the whole columns
-         ;; are selected.
-         (.selectColumns hot col1 col2))))
-   {}))
-
-(rf/reg-event-db
- :after-selection-end
- event-interceptors
- (fn [db [_ hot id row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
-   (let [selected-headers (map #(.getColHeader hot %)
-                               (range (min col col2) (inc (max col col2))))
-         row (js->clj (zipmap (.getColHeader hot)
-                              (.getDataAtRow hot row-index)))
-         selected-maps (into []
-                             (comp (map (fn [[row col row2 col2]]
-                                          (.getData hot row col row2 col2)))
-                                   (map js->clj)
-                                   (map (fn [rows]
-                                          (into []
-                                                (map (fn [row]
-                                                       (zipmap selected-headers row)))
-                                                rows))))
-                             (.getSelected hot))
-         selected-columns (if (<= col col2) selected-headers (reverse selected-headers))]
-     (-> db
-         (assoc-in [::db/hot-state id :selected-columns] selected-columns)
-         (assoc-in [::db/hot-state id :selections] selected-maps)
-         (assoc-in [::db/hot-state id :selected-row-index] row-index)
-         (assoc-in [::db/hot-state id :row-at-selection-start] row)))))
-
-(rf/reg-event-db
- :after-on-cell-mouse-down
- event-interceptors
- (fn [db [_ hot id mouse-event coords _TD]]
-   (let [other-table-id @(rf/subscribe [:other-table id])
-
-         ;; Stores whether the user clicked on one of the column headers.
-         header-clicked-flag (= -1 (.-row coords))
-
-         ;; Stores whether the user held alt during the click.
-         alt-key-pressed (.-altKey mouse-event)
-         ; Switch the last clicked on table-id to the other table on alt-click.
-         new-table-clicked-id (if alt-key-pressed other-table-id id)]
-
-     ; Deselect all cells on alt-click.
-     (when alt-key-pressed
-       (.deselectCell hot))
-
-     (-> db
-         (assoc-in [::db/hot-state id :header-clicked] header-clicked-flag)
-         (assoc ::db/table-last-clicked new-table-clicked-id)))))
-
-(rf/reg-event-db
- :after-deselect
- event-interceptors
- (fn [db [_ hot id]]
-   ;; clears selections associated with table
-   (update-in db [::db/hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
 
 (rf/reg-event-fx
  :parse-query
@@ -243,110 +158,6 @@
      (rf/dispatch [:clear-virtual-scores])
      (rf/dispatch [:search-result all-scores]))
    db))
-
-(rf/reg-event-db
- :search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-scores db result)))
-
-(defn query-for-conf-options [type threshold]
-  (case type
-    :none ""
-    :row (str "COLOR ROWS WITH CONFIDENCE OVER " threshold)
-    :cells-existing (str "COLOR CELLS EXISTING WITH CONFIDENCE OVER " threshold)
-    :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))
-
-(rf/reg-event-db
- :virtual-search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-virtual-scores db result)))
-
-(rf/reg-event-fx
- :set-confidence-threshold
- event-interceptors
- (fn [{:keys [db]} [_ value]]
-   (let [conf-mode (get-in db [::db/confidence-options :mode])
-         new-query-string (query-for-conf-options conf-mode value)]
-     {:db (assoc db ::db/confidence-threshold value)
-      :dispatch [:set-query-string new-query-string]})))
-
-(rf/reg-event-fx
- :set-confidence-options
- event-interceptors
- (fn [{:keys [db]} [_ path value]]
-   (let [conf-threshold (get db ::db/confidence-threshold)
-         new-query-string (query-for-conf-options value conf-threshold)
-
-         ;; Determine if a load event needs to take place.
-         load-event (when (= path [:mode])
-                      (cond
-                        (and (= value :row)
-                             (nil? (get db ::db/row-likelihoods)))
-                        [:compute-row-likelihoods]
-
-                        (and (= value :cells-missing)
-                             (nil? (get db ::db/missing-cells)))
-                        [:compute-missing-cells]
-
-                        ;; Default case: no event
-                        :else
-                        nil))
-         query-string-event [:set-query-string new-query-string]
-         event-list [query-string-event load-event]]
-    {:db (assoc-in db (into [::db/confidence-options] path) value)
-     :dispatch-n event-list})))
-
-(rf/reg-event-db
- :update-confidence-options
- event-interceptors
- (fn [db [_ f path value]]
-   (update-in db (into [::db/confidence-options] path) f value)))
-
-(rf/reg-event-db
- :set-query-string
- event-interceptors
- (fn [db [_ new-val]]
-   (assoc-in db [::db/query-string] new-val)))
-
-(rf/reg-event-db
- :set-modal
- event-interceptors
- (fn [db [_ data]]
-   (assoc-in db [::db/modal] data)))
-
-(rf/reg-event-db
- :clear-modal
- event-interceptors
- (fn [db [_]]
-   (assoc-in db [::db/modal] {:child nil})))
-
-(rf/reg-event-db
- :set-column-function
- event-interceptors
- (fn [db [_ col-name source-text]]
-   (try (if-let [evaled-fn (js/eval (str "(" source-text ")"))]
-          (-> db
-              (assoc-in [::db/column-overrides col-name] source-text)
-              (assoc-in [::db/column-override-fns col-name] evaled-fn))
-          db)
-        (catch :default e
-          (js/alert (str "There was an error evaluating your Javascript function.\n"
-                         "See the browser console for more information."))
-          (.error js/console e)
-          db))))
-
-(rf/reg-event-db
- :clear-column-function
- event-interceptors
- (fn [db [_ col-name]]
-   (if (and (get-in db [::db/column-overrides col-name])
-            (get-in db [::db/column-override-fns col-name]))
-     (-> db
-         (update-in [::db/column-overrides] dissoc col-name)
-         (update-in [::db/column-override-fns] dissoc col-name))
-     db)))
 
 (rf/reg-event-db
  :compute-row-likelihoods
