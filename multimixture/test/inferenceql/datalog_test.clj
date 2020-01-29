@@ -1,21 +1,9 @@
 (ns inferenceql.datalog-test
   (:require [clojure.test :as test :refer [deftest is testing]]
-            [datahike.api :as d]
-            [datahike.db :as db]
+            [datascript.core :as d]
             [inferenceql.datalog :as datalog]
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.specification :as spec]))
-
-(defmacro with-empty-conn
-  "Executes body with sym bound to an empty in-memory Datahike collection. Cleans
-  up the connection when all the expressions in body are evaluated."
-  [sym & body]
-  `(let [uri# (str "datahike:mem://" (gensym))]
-     (d/create-database uri# :schema-on-read true)
-     (let [~sym (d/connect uri#)
-           result# (do ~@body)]
-       (d/release ~sym)
-       result#)))
 
 (def mmix
   "Multimixture specification for use in tests."
@@ -48,11 +36,8 @@
    "b" :db.type/string})
 
 (deftest transaction-smoke
-  (with-empty-conn conn
-    (is (some? (d/transact conn datalog/schema))
-        "Model schema can be transacted")
-    (is (some? (d/transact conn (datalog/model-facts mmix mmix/row-generator)))
-        "Model facts can be transacted")))
+  (is (some? (doto (d/create-conn datalog/schema)
+               (d/transact! (datalog/model-facts mmix mmix/row-generator))))))
 
 (def rows
   [{"x" 1.5, "y" "3", "a" 3.5, "b" "0"}
@@ -68,11 +53,11 @@
   (let [model-facts       (datalog/model-facts mmix mmix/row-generator)
         table-facts       (datalog/table-facts column-idents column-types rows)
         model-table-facts (map #(apply datalog/model-table-fact %) variable-column-map)]
-    (-> (db/empty-db)
-        (d/db-with datalog/schema)
-        (d/db-with model-facts)
-        (d/db-with table-facts)
-        (d/db-with model-table-facts))))
+    (-> (doto (d/create-conn datalog/schema)
+          (d/transact! model-facts)
+          (d/transact! table-facts)
+          (d/transact! model-table-facts))
+        (d/db))))
 
 (deftest rules-smoke
   (is (= 1 (d/q '[:find (count ?model) .
@@ -101,7 +86,7 @@
   (testing "statistical type of variable"
     (doseq [variable (spec/variables mmix)]
       (testing variable
-        (is (= (keyword "iql.stattype" (name (spec/stattype mmix variable)))
+        (is (= (spec/stattype mmix variable)
                (d/q '[:find ?s .
                       :in $ % ?v
                       :where

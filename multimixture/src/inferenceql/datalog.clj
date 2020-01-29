@@ -1,70 +1,52 @@
 (ns inferenceql.datalog
   "Functions for storing tables, models, and information about them in a Datahike
   database."
-  (:require [datahike.api :as d]
+  (:require [datascript.core :as d]
             [inferenceql.multimixture.specification :as spec]))
 
 (def schema
   "Datahike schema for storing models and metadata about those models."
-  [{:db/ident       :iql/type
-    :db/valueType   :db.type/ref
-    :db/cardinality :db.cardinality/one
+  {:iql/type
+   {:db/cardinality :db.cardinality/one
     :db/doc         "InferenceQL type. One of #{:iql.type/model :iql.type/variable :iql.type/column :iql.type/row}."}
 
-   {:db/ident :iql.type/model}
-   {:db/ident :iql.type/variable}
-   {:db/ident :iql.type/column}
-   {:db/ident :iql.type/row}
-
-   {:db/ident       :iql.model/generative-function
-    ;; :db/valueType <generative function>
-    :db/cardinality :db.cardinality/one
+   :iql.model/generative-function
+   {:db/cardinality :db.cardinality/one
     :db/doc         "Generative function for the model."}
 
-   {:db/ident       :iql.model/variables
-    :db/valueType   :db.type/ref
+   :iql.model/variables
+   {:db/valueType   :db.type/ref
     :db/cardinality :db.cardinality/many
     :db/doc         "Variables that comprise the model."}
 
-   {:db/ident       :iql.variable/name
-    :db/valueType   :db.type/string
-    :db/cardinality :db.cardinality/one
+   :iql.variable/name
+   {:db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity
     :db/doc         "Human-readable name for a variable."}
 
-   {:db/ident       :iql.variable/column
-    :db/valueType   :db.type/ref
+   :iql.variable/column
+   {:db/valueType   :db.type/ref
     :db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity
     :db/doc         ":db/ident for the column attribute in the table database."}
 
-   {:db/ident       :iql.variable/stattype
-    :db/valueType   :db.type/ref
-    :db/cardinality :db.cardinality/one
+   :iql.variable/stattype
+   {:db/cardinality :db.cardinality/one
     :db/doc         "Statistical type. One of #:iql.stattype{:gaussian :categorical}"}
 
-   {:db/ident :iql.stattype/gaussian}
-   {:db/ident :iql.stattype/categorical}
-
-   {:db/ident       :iql.variable/categories
-    :db/valueType   :db.type/string
-    :db/cardinality :db.cardinality/many
+   :iql.variable/categories
+   {:db/cardinality :db.cardinality/many
     :db/doc         "Categories for the given categorical variable."}
 
-   {:db/ident       :iql.column/name
-    :db/valueType   :db.type/string
-    :db/cardinality :db.cardinality/one
+   :iql.column/name
+   {:db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity
-    :db/doc         "Human-readable name for a column."}])
+    :db/doc         "Human-readable name for a column."}
 
-(defn ^:private category-facts
-  "Returns facts about the categories for the categorical variables in the
-  provided multimixture."
-  [mmix]
-  (->> (spec/variables mmix)
-       (filter #(spec/nominal? mmix %))
-       (mapv (fn [variable]
-               {:iql.variable/categories (spec/categories mmix variable)}))))
+   :iql.column/attribute
+   {:db/cardinality :db.cardinality/one
+    :db/unique      :db.unique/identity
+    :db/doc         "Attribute that stores values for the column."}})
 
 (defn ^:private variable-facts
   "Returns facts about the variables defined in the provided multimixutre."
@@ -72,9 +54,7 @@
   (mapv (fn [variable]
           (merge {:iql/type              :iql.type/variable
                   :iql.variable/name     variable
-                  :iql.variable/stattype (case (spec/stattype mmix variable)
-                                           :gaussian    :iql.stattype/gaussian
-                                           :categorical :iql.stattype/categorical)}
+                  :iql.variable/stattype (spec/stattype mmix variable)}
                  (when (spec/nominal? mmix variable)
                    {:iql.variable/categories (spec/categories mmix variable)})))
         (spec/variables mmix)))
@@ -89,11 +69,11 @@
 
 (defn column-fact
   [name ident value-type]
-  {:db/ident        ident
-   :db/valueType    value-type
-   :db/cardinality  :db.cardinality/one
-   :iql/type        :iql.type/column
-   :iql.column/name name})
+  {:iql.column/attribute ident
+   :db/valueType     value-type
+   :db/cardinality   :db.cardinality/one
+   :iql/type         :iql.type/column
+   :iql.column/name  name})
 
 (defn row-fact
   "When applied to a row returns a Datahike fact that, when transacted, will store
@@ -135,17 +115,16 @@
     [(variable-categories ?v ?c)
      [?ve :iql.variable/name ?v]
      [?ve :iql.variable/categories ?c]]
-    [(variable-stattype ?v ?s-ident)
+    [(variable-stattype ?v ?s)
      [?e :iql.variable/name ?v]
-     [?e :iql.variable/stattype ?s]
-     [?s :db/ident ?s-ident]]
+     [?e :iql.variable/stattype ?s]]
     [(categorical? ?v)
      [?v :iql.variable/stattype :iql.stattype/categorical]]
     [(row ?e)
      [?e :iql/type :iql.type/row]]
     [(column ?a)
      [?e :iql/type :iql.type/column]
-     [?e :db/ident ?a]]])
+     [?e :iql.column/attribute ?a]]])
 
 (defn pull-row
   "Like `datahike.api/pull`, only always returns every known fact about the row."
@@ -154,7 +133,7 @@
                                       :in $ %
                                       :where
                                       (column ?c)
-                                      [?e :db/ident ?c]
+                                      [?e :iql.column/attribute ?c]
                                       [?e :iql.column/name ?name]]
                                     db
                                     rules))]
