@@ -5,7 +5,6 @@
             [inferenceql.spreadsheets.panels.table.db :as table-panel]))
 
 (s/def ::score number?)
-(s/def ::topojson any?)
 
 ;;; Specs related to computed scores of existing rows.
 
@@ -25,8 +24,7 @@
 
 ;;; Primary DB spec.
 
-(s/def ::db (s/keys :opt [::topojson
-                          ::row-likelihoods
+(s/def ::db (s/keys :opt [::row-likelihoods
                           ::missing-cells]
                     :req-un [::control-panel/control-panel
                              ::override-panel/override-panel
