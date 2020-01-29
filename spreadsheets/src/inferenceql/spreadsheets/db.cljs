@@ -30,7 +30,6 @@
                              ::override-panel/override-panel
                              ::table-panel/table-panel]))
 
-
 (def default-general-db
   "This db map is meant to contain keys and values not specific to
   any application panel."
