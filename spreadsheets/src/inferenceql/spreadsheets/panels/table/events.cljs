@@ -1,6 +1,7 @@
 (ns inferenceql.spreadsheets.panels.table.events
   (:require [re-frame.core :as rf]
             [inferenceql.spreadsheets.panels.table.db :as db]
+            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
@@ -37,17 +38,19 @@
  :hot/before-change
  event-interceptors
  (fn [db [_ hot id changes source]]
-   ;; Checks if a specific change is to a cell in column 0.
-   (let [change-to-col-0? (fn [change]
-                            (let [[_row col _prev-val _new-val] change]
-                              (= col 0)))]
-     ;; Changes should only be happening in the first column (the label column).
-     (assert (every? change-to-col-0? changes))
-     ;; Changes should only be the result of user edits.
-     (assert (= source "edit")))
+   (let [label-col hot/label-col-header]
 
-   (let [labels-col (.getSourceDataAtCol hot 0)]
-     (db/with-labels db (js->clj labels-col)))))
+     ;; Checks if a specific change is to a cell in the label column.
+     (let [change-to-label-col? (fn [change]
+                                  (let [[_row col _prev-val _new-val] change]
+                                    (= col label-col)))]
+       ;; Changes should only be happening in the label column.
+       (assert (every? change-to-label-col? changes))
+       ;; Changes should only be the result of user edits.
+       (assert (= source "edit")))
+
+     (let [labels (.getDataAtProp hot label-col)]
+       (db/with-labels db (js->clj labels))))))
 
 ;; Used to detect changes in the :virtual-data handsontable
 (rf/reg-event-fx

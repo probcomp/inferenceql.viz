@@ -156,34 +156,26 @@
   (db/virtual-rows db))
 (rf/reg-sub :table/virtual-rows virtual-rows)
 
-(defn- cell-vector
-  "Takes tabular data represented as a sequence of maps and reshapes the data as a
-  2D vector of cells and a vector of headers."
-  [headers rows]
-  (into []
-        (map (fn [row]
-               (into []
-                     (map #(get row %))
-                     headers)))
-        rows))
+(defn- column-settings [headers]
+  "Returns an array of objects that define settings for each column
+  in the table including which attribute from the underlying map for the row
+  is presented."
+  (let [settings-map (fn [attr]
+                       (if (= attr hot/label-col-header)
+                         {:data attr :readOnly false} ; Make the score column user-editable.
+                         {:data attr}))]
+    (map settings-map headers)))
 
 ;;; Subs related to settings and overall state of tables.
 
 (defn real-hot-props
   [{:keys [headers rows cells-style-fn context-menu]} _]
-  (let [data (cell-vector headers rows)
-
-        num-columns (count headers)
-        initial-column-setting {:readOnly false}
-        rem-column-settings (repeat (dec num-columns) {})
-
-        all-column-settings (cons initial-column-setting rem-column-settings)]
-    (-> hot/real-hot-settings
-        (assoc-in [:settings :data] data)
-        (assoc-in [:settings :colHeaders] headers)
-        (assoc-in [:settings :columns] all-column-settings)
-        (assoc-in [:settings :cells] cells-style-fn)
-        (assoc-in [:settings :contextMenu] context-menu))))
+  (-> hot/real-hot-settings
+      (assoc-in [:settings :data] rows)
+      (assoc-in [:settings :colHeaders] headers)
+      (assoc-in [:settings :columns] (column-settings headers))
+      (assoc-in [:settings :cells] cells-style-fn)
+      (assoc-in [:settings :contextMenu] context-menu)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
@@ -194,13 +186,10 @@
 
 (defn virtual-hot-props
   [{:keys [headers rows]} _]
-  (let [data (cell-vector headers rows)
-        num-columns (count headers)
-        column-settings (repeat num-columns {})]
-    (-> hot/virtual-hot-settings
-        (assoc-in [:settings :data] data)
-        (assoc-in [:settings :colHeaders] headers)
-        (assoc-in [:settings :columns] column-settings))))
+  (-> hot/virtual-hot-settings
+      (assoc-in [:settings :data] rows)
+      (assoc-in [:settings :colHeaders] headers)
+      (assoc-in [:settings :columns] (column-settings headers))))
 (rf/reg-sub :table/virtual-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
