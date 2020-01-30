@@ -1,7 +1,6 @@
 (ns inferenceql.spreadsheets.panels.table.subs
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
-            [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.table.db :as db]
@@ -110,7 +109,7 @@
             (fn [_ _]
               (rf/subscribe [:table/table-headers]))
             (fn [headers]
-              (into [vega/label-col-header vega/score-col-header] headers)))
+              (into [hot/label-col-header hot/score-col-header] headers)))
 
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
@@ -127,10 +126,10 @@
                                         (merge row imputed-values-in-row))
                                       imputed-values)
                   scores (mapv (fn [score row]
-                                 (assoc row vega/score-col-header score))
+                                 (assoc row hot/score-col-header score))
                                scores)
                   labels (mapv (fn [label row]
-                                 (assoc row vega/label-col-header label))
+                                 (assoc row hot/label-col-header label))
                                labels)))))
 
 (rf/reg-sub :table/virtual-computed-rows
@@ -144,7 +143,7 @@
 
       ;; Creation of dummy scores allows correct attaching of old scores to
       ;; rows even when new rows are generated after a scoring event.
-      (mapv (fn [score row] (assoc row vega/score-col-header score))
+      (mapv (fn [score row] (assoc row hot/score-col-header score))
             scores rows))))
 
 (defn table-rows
