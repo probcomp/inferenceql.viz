@@ -48,40 +48,50 @@
     dist/gaussian "quantitative"
     dist/categorical "nominal"))
 
-(defn gen-simulate-plot [selected-columns row-at-selection-start t-clicked]
- (let [selected-column-kw (keyword (first selected-columns))
-       y-axis {:title "distribution of probable values"
-               :grid false
-               :labels false
-               :ticks false}
-       y-scale {:nice false}]
-   {:$schema default-vega-lite-schema
-    :data {:name "data"}
-    :autosize {:resize true}
-    :layer (cond-> [{:mark {:type "bar" :color default-table-color}
-                     :encoding (condp = (stattype (first selected-columns))
-                                 dist/gaussian {:x {:bin true
-                                                    :field selected-column-kw
-                                                    :type "quantitative"}
-                                                :y {:aggregate "count"
-                                                    :type "quantitative"
-                                                    :axis y-axis
-                                                    :scale y-scale}}
-                                 dist/categorical {:x {:field selected-column-kw
-                                                       :type "nominal"}
-                                                   :y {:aggregate "count"
-                                                       :type "quantitative"
-                                                       :axis y-axis
-                                                       :scale y-scale}})}]
-             (get row-at-selection-start (first selected-columns))
-             (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
-                                     :label "Selected row"}]}
-                    :mark {:type "rule"
-                           :color "red"}
-                    :encoding {:x {:field selected-column-kw
-                                   :type (condp = (stattype (first selected-columns))
-                                           dist/gaussian "quantitative"
-                                           dist/categorical "nominal")}}}))}))
+(defn gen-simulate-plot
+  "Generates a vega-lite spec for a histogram of simulated values for a cell.
+  `col-name` is the column that the cell is in. And `row` is map of
+  data representing the row our cell is in.
+  This spec itself does not perform the simulation. An other function must update
+  the `data` dataset via the vega-lite API."
+  [col-name row]
+  (let [col-kw (keyword col-name)
+        col-val (get row col-name)
+        y-axis {:title "Distribution of Probable Values"
+                :grid false
+                :labels false
+                :ticks false}
+        y-scale {:nice false}
+        simulations-layer {:mark {:type "bar" :color default-table-color}
+                           :encoding (condp = (stattype col-name)
+                                       dist/gaussian {:x {:bin true
+                                                          :field col-kw
+                                                          :type "quantitative"}
+                                                      :y {:aggregate "count"
+                                                          :type "quantitative"
+                                                          :axis y-axis
+                                                          :scale y-scale}}
+                                       dist/categorical {:x {:field col-kw
+                                                             :type "nominal"}
+                                                         :y {:aggregate "count"
+                                                             :type "quantitative"
+                                                             :axis y-axis
+                                                             :scale y-scale}})}
+        ;; This layer draws a red line on the histogram bin that contains
+        ;; the observed value.
+        observed-layer {:data {:values [{col-kw col-val}]}
+                        :mark {:type "rule"
+                               :color "red"}
+                        :encoding {:x {:field col-kw
+                                       :type (condp = (stattype col-name)
+                                               dist/gaussian "quantitative"
+                                               dist/categorical "nominal")}}}
+        layers (cond-> [simulations-layer]
+                 col-val (conj observed-layer))]
+    {:$schema default-vega-lite-schema
+     :data {:name "data"}
+     :autosize {:resize true}
+     :layer layers}))
 
 (defn get-col-type [col-name]
   (condp = (stattype col-name)

@@ -20,7 +20,7 @@
        (cond (and (= 1 (count cols))
                   (= 1 (count (first selections)))
                   (not (invalid-for-sim (first cols))))
-             (vega/gen-simulate-plot cols row t-clicked)
+             (vega/gen-simulate-plot (first cols) row)
 
              (= 1 (count cols))
              (vega/gen-histogram table-states t-clicked)
