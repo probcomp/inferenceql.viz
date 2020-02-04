@@ -11,14 +11,18 @@
   []
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
         virtual-hot-props @(rf/subscribe [:virtual-hot-props])
+        real-table-in-viz @(rf/subscribe [:real-table-in-viz])
+        virtual-table-in-viz @(rf/subscribe [:virtual-table-in-viz])
         vega-lite-spec @(rf/subscribe [:vega-lite-spec])
         vega-lite-log-level @(rf/subscribe [:vega-lite-log-level])
         generator      @(rf/subscribe [:generator])]
     [:div
      [control/panel]
-     [:div.table-title [:span "Real Data"]]
+     [:div {:class ["table-title" (when real-table-in-viz "table-title-selected")]}
+      [:span "Real Data"]]
      [table/handsontable {:style {:overflow "hidden"}}  real-hot-props]
-     [:div.table-title [:span "Virtual Data"]]
+     [:div {:class ["table-title" (when virtual-table-in-viz "table-title-selected")]}
+      [:span "Virtual Data"]]
      [table/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
      [:div#viz-container
       (when vega-lite-spec

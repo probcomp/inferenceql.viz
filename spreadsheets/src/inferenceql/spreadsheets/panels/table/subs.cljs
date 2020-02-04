@@ -289,3 +289,43 @@
      :cells-missing
      (fn [& args]
        (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-flagged computed-headers)))))
+
+(rf/reg-sub :tables-visualized
+            :<- [:both-table-states]
+            :<- [:table-last-clicked]
+            :<- [:one-cell-selected]
+            (fn [[table-states t-clicked one-cell-selected]]
+              (let [cols-real (take 2 (get-in table-states [:real-table :selected-columns]))
+                    cols-virtual (take 2 (get-in table-states [:virtual-table :selected-columns]))
+                    cols-last-selected (take 2 (get-in table-states [t-clicked :selected-columns]))]
+
+                ;; This first case is when we have data from the same columns selected in both
+                ;; the real-data table and the virtual-data table and more than a
+                ;; single cell is selected in both plots.
+                (cond (and (= cols-real cols-virtual)
+                           (< 0 (count cols-real))
+                           (< 0 (count cols-virtual))
+                           (not one-cell-selected))
+                      ;; Return the names of both tables.
+                      (keys table-states)
+
+                      ;; This case is when we have at least one column selected
+                      ;; in the last clicked on table.
+                      (< 0 (count cols-last-selected))
+                      ;; Return the name of just the last-clicked-on table.
+                      [t-clicked]
+
+                      ;; This case is when we have no selections in either table. This would result
+                      ;; when the user uses alt-click to deselect all in both tables.
+                      :else
+                      nil))))
+
+(rf/reg-sub :real-table-in-viz
+            :<- [:tables-visualized]
+            (fn [tables-visualized]
+              (some #{:real-table} tables-visualized)))
+
+(rf/reg-sub :virtual-table-in-viz
+            :<- [:tables-visualized]
+            (fn [tables-visualized]
+              (some #{:virtual-table} tables-visualized)))
