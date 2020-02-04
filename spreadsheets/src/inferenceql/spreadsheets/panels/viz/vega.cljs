@@ -130,7 +130,8 @@
                              :field col-to-draw
                              :type col-type}
                          :y {:aggregate "count"
-                             :type "quantitative"}}}]
+                             :type "quantitative"}}
+              :resolve {:scale {:y "independent"}}}]
     (if facet-column
       (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
       spec)))
