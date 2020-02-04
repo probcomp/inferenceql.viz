@@ -27,7 +27,7 @@
 
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
-(def color-for-table {:real-table "SteelBlue" :virtual-table "DarkKhaki"})
+(def default-table-color "SteelBlue")
 
 (def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
@@ -64,7 +64,7 @@
    {:$schema default-vega-lite-schema
     :data {:name "data"}
     :autosize {:resize true}
-    :layer (cond-> [{:mark {:type "bar" :color (color-for-table t-clicked)}
+    :layer (cond-> [{:mark {:type "bar" :color default-table-color}
                      :encoding (condp = (stattype (first selected-columns))
                                  dist/gaussian {:x {:bin true
                                                     :field selected-column-kw
@@ -100,42 +100,41 @@
     dist/categorical false))
 
 (defn gen-histogram [table-states t-clicked]
-  (let [selection-real (first (get-in table-states [:real-table :selections]))
-        selection-virtual (first (get-in table-states [:virtual-table :selections]))
+  (let [selection-real (->> (first (get-in table-states [:real-table :selections]))
+                            (map #(assoc % :table "Real Data")))
+
+        selection-virtual (->> (first (get-in table-states [:virtual-table :selections]))
+                               (map #(assoc % :table "Virtual Data")))
 
         col-real (first (get-in table-states [:real-table :selected-columns]))
         col-virtual (first (get-in table-states [:virtual-table :selected-columns]))
-        make-layered-hist (= col-real col-virtual)
-
+        ;; Checks if the user has selected the same column in both the real and virtual tables.
+        make-faceted (= col-real col-virtual)
 
         col-to-draw (first (get-in table-states [t-clicked :selected-columns]))
         col-type (get-col-type col-to-draw)
         col-binning (get-col-should-bin col-to-draw)
 
-        virtual-layer-opacity (if make-layered-hist 0.5 1.0)
+        ;; This is the selection from the last-clicked-on table.
+        selection-not-faceted (first (get-in table-states [t-clicked :selections]))
+        ;; This is the selections from both the real and virtual tables combined.
+        selection-faceted (concat selection-real selection-virtual)
 
-        real-layer {:data {:values selection-real}
-                    :mark {:type "bar" :color (color-for-table :real-table) :opacity 1}
-                    :encoding {:y {:aggregate "count"
-                                   :type "quantitative"}}}
-        virtual-layer {:data {:values selection-virtual}
-                       :mark {:type "bar" :color (color-for-table :virtual-table) :opacity virtual-layer-opacity}
-                       :encoding {:y {:aggregate "count"
-                                      :type "quantitative"}}}
-        layers-to-draw (cond
-                         make-layered-hist
-                         [real-layer virtual-layer]
+        selection-to-use (if make-faceted selection-faceted selection-not-faceted)
+        facet-column (when make-faceted "table")
 
-                         (= t-clicked :real-table)
-                         [real-layer]
-
-                         (= t-clicked :virtual-table)
-                         [virtual-layer])]
-    {:$schema default-vega-lite-schema
-     :encoding {:x {:bin col-binning
-                    :field col-to-draw
-                    :type col-type}}
-     :layer layers-to-draw}))
+        spec {:$schema default-vega-lite-schema
+              :data {:values selection-to-use}
+              :mark {:type "bar" :color default-table-color}
+              :encoding {:x {:bin col-binning
+                             :field col-to-draw
+                             :type col-type}
+                         :y {:aggregate "count"
+                             :type "quantitative"}}
+              :resolve {:scale {:y "independent"}}}]
+    (if facet-column
+      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+      spec)))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
