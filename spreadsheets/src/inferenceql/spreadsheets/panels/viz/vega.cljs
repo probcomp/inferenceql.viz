@@ -299,4 +299,4 @@
       #{dist/categorical} (table-bubble-plot selection-to-use cols-to-draw facet-column)
       #{dist/gaussian dist/categorical} (strip-plot selection-to-use cols-to-draw facet-column)
       ;; Default case: no plot -- empty vega-lite spec.
-      {})))
+      nil)))

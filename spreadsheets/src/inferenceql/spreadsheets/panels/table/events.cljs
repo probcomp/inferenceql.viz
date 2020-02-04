@@ -72,29 +72,73 @@
          (.selectColumns hot col1 col2))))
    {}))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :hot/after-selection-end
  event-interceptors
- (fn [db [_ hot id row-index col _row2 col2 _prevent-scrolling _selection-layer-level]]
-   (let [selected-headers (map #(.getColHeader hot %)
-                               (range (min col col2) (inc (max col col2))))
-         row (js->clj (zipmap (.getColHeader hot)
-                              (.getDataAtRow hot row-index)))
-         selected-maps (into []
-                             (comp (map (fn [[row col row2 col2]]
-                                          (.getData hot row col row2 col2)))
-                                   (map js->clj)
-                                   (map (fn [rows]
-                                          (into []
-                                                (map (fn [row]
-                                                       (zipmap selected-headers row)))
-                                                rows))))
-                             (.getSelected hot))
-         selected-columns (if (<= col col2) selected-headers (reverse selected-headers))]
-     (-> db
-         (assoc-in [:table-panel :hot-state id :selected-columns] selected-columns)
-         (assoc-in [:table-panel :hot-state id :selections] selected-maps)
-         (assoc-in [:table-panel :hot-state id :row-at-selection-start] row)))))
+ (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
+   (let [selection-layers (.getSelected hot)
+
+         ;; Takes a selection vector and returns true if that selection represents
+         ;; the selection of a single column.
+         column-selected (fn [[row-start col-start row-end col-end]]
+                           (let [last-row-index (- (.countRows hot) 1)]
+                             (and (= row-start 0)
+                                  (= row-end last-row-index)
+                                  (= col-start col-end))))]
+
+     (cond
+       ;;; These next two cond sections sometimes deselect all cells in order to enforce our constraints
+       ;;; on what sorts of multiple selections are allowed.
+       ;;; When we do deselect all cells, we fire the the :hot/deselect-all effect to do it which will
+       ;;; eventually cause Handsontable to trigger the :hot/after-deselect event.
+
+       ;; Deselect all if the current two selections are not both single column selections.
+       (and (= (count selection-layers) 2)
+            (not-every? column-selected selection-layers))
+       {:hot/deselect-all hot}
+
+       ;; Deselect all there are more than two selections.
+       (> (count selection-layers) 2)
+       {:hot/deselect-all hot}
+
+       ;; This cond section only executes when our current selection is permissible. We calculate
+       ;; new selection-information for our current selection and store it in the db.
+       :else
+       (let [header-for-selection (fn [[_ col-start _ col-end]]
+                                    (map #(.getColHeader hot %)
+                                         (range (min col-start col-end) (inc (max col-start col-end)))))
+
+             data-by-layer (for [layer selection-layers]
+                             (let [headers (header-for-selection layer)
+                                   [r1 c1 r2 c2] layer]
+                               (->> (.getData hot r1 c1 r2 c2)
+                                    (js->clj)
+                                    (map (fn [row] (zipmap headers row))))))
+             ;; Merging the row-wise data for each selection layer.
+             ;; TODO: remove the need for this to be a nested vector.
+             selected-data [(apply mapv merge data-by-layer)]
+
+             ;; Column headers from all the selection layers.
+             selected-headers (mapcat header-for-selection selection-layers)
+
+             ;; When the user selects two columns in a single selection layer, they can
+             ;; do so in any order. (e.g. A higher indexed column first and then a lower indexed one.)
+             ;; If they did so, we want to reflect this in the order of the columns saved in the db.
+             ;; This only hapens when we have a single selection layer because code earlier in this
+             ;; event enforces this.
+             select-order-headers (let [[_ col-start _ col-end] (last selection-layers)]
+                                    (if (and (= (count selection-layers) 1)
+                                             (> col-start col-end))
+                                      (reverse selected-headers)
+                                      selected-headers))
+
+             ;; This is the row at the start point of the most recent selection.
+             row (js->clj (zipmap (.getColHeader hot)
+                                  (.getDataAtRow hot row-index)))]
+         {:db (-> db
+                  (assoc-in [:table-panel :hot-state id :selected-columns] select-order-headers)
+                  (assoc-in [:table-panel :hot-state id :selections] selected-data)
+                  (assoc-in [:table-panel :hot-state id :row-at-selection-start] row))})))))
 
 (rf/reg-event-db
  :hot/after-on-cell-mouse-down

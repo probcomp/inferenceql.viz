@@ -36,7 +36,7 @@
                                     "filter_by_value"
                                     "filter_action_bar"]
               :bindRowsWithHeaders true
-              :selectionMode       :range
+              :selectionMode       :multiple
               :outsideClickDeselects false
               :readOnly            true
               :height              "32vh"
