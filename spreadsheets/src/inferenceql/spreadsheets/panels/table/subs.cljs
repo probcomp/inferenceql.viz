@@ -88,6 +88,21 @@
             (fn [{:keys [table-id table-states]}]
               (get table-states table-id)))
 
+(rf/reg-sub :table/selections
+            :<- [:table/table-state-active]
+            (fn [table-state]
+              (get table-state :selections)))
+
+(rf/reg-sub :table/selected-columns
+            :<- [:table/table-state-active]
+            (fn [table-state]
+              (get table-state :selected-columns)))
+
+(rf/reg-sub :table/row-at-selection-start
+            :<- [:table/table-state-active]
+            (fn [table-state]
+              (get table-state :row-at-selection-start)))
+
 ;;; Subs related to scores computed on rows in the tables.
 
 (rf/reg-sub :table/scores
