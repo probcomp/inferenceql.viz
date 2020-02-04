@@ -5,6 +5,8 @@
             [inferenceql.spreadsheets.panels.viz.views :as viz]
             [inferenceql.spreadsheets.panels.table.views :as table]))
 
+;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
+
 (defn app
   []
   (let [real-hot-props      @(rf/subscribe [:real-hot-props])
