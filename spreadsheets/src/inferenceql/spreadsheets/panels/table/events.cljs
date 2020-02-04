@@ -94,7 +94,6 @@
      (-> db
          (assoc-in [:table-panel :hot-state id :selected-columns] selected-columns)
          (assoc-in [:table-panel :hot-state id :selections] selected-maps)
-         (assoc-in [:table-panel :hot-state id :selected-row-index] row-index)
          (assoc-in [:table-panel :hot-state id :row-at-selection-start] row)))))
 
 (rf/reg-event-db
@@ -124,4 +123,4 @@
  event-interceptors
  (fn [db [_ hot id]]
    ;; clears selections associated with table
-   (update-in db [:table-panel :hot-state id] dissoc :selected-columns :selections :selected-row-index :row-at-selection-start)))
+   (update-in db [:table-panel :hot-state id] dissoc :selected-columns :selections :row-at-selection-start)))
