@@ -8,34 +8,46 @@
             [inferenceql.spreadsheets.panels.override.helpers :as co]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]))
 
-(defn vega-lite-spec
-  [{:keys [table-states t-clicked]}]
-  (let [{selections :selections cols :selected-columns row :row-at-selection-start} (table-states t-clicked)
-        ;; These are column names that cannot be simulated
-        ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
-        ;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
-        invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header}]
-    (when (first selections)
-      (clj->js
-       (cond (and (= 1 (count cols))
-                  (= 1 (count (first selections)))
-                  (not (invalid-for-sim (first cols))))
-             (vega/gen-simulate-plot (first cols) row)
+;; These are column names that cannot be simulated.
+;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
+;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
+(def cols-invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header})
 
-             (= 1 (count cols))
-             (vega/gen-histogram table-states t-clicked)
+(rf/reg-sub :viz/column-to-simulate
+            :<- [:table/selected-columns]
+            (fn [columns]
+              (first columns)))
 
-             (some #{"geo_fips"} cols)
-             (vega/gen-choropleth selections cols)
+(rf/reg-sub :viz/selection-simulatable
+            :<- [:table/one-cell-selected]
+            :<- [:viz/column-to-simulate]
+            (fn [[one-cell-selected col]]
+              (and one-cell-selected
+                   (not (contains? cols-invalid-for-sim col)))))
 
-             :else
-             (vega/gen-comparison-plot table-states t-clicked))))))
 (rf/reg-sub :viz/vega-lite-spec
-            (fn [_ _]
-              {:table-states (rf/subscribe [:table/both-table-states])
-               :t-clicked (rf/subscribe [:table/table-last-clicked])})
-            (fn [data-for-spec]
-              (vega-lite-spec data-for-spec)))
+            :<- [:table/both-table-states]
+            :<- [:table/table-last-clicked]
+            :<- [:viz/selection-simulatable]
+            :<- [:viz/column-to-simulate]
+
+            :<- [:table/selections]
+            :<- [:table/selected-columns]
+            :<- [:table/row-at-selection-start]
+            (fn [[both-table-states last-clicked selection-simulatable sim-col selections cols row]]
+              (when (first selections) ; At least one selection layer.
+                (clj->js
+                  (cond selection-simulatable ; One cell selected.
+                        (vega/gen-simulate-plot sim-col row)
+
+                        (= 1 (count cols)) ; One column selected.
+                        (vega/gen-histogram both-table-states last-clicked)
+
+                        (some #{"geo_fips"} cols)
+                        (vega/gen-choropleth selections cols)
+
+                        :else ; Two or more columns selected.
+                        (vega/gen-comparison-plot both-table-states last-clicked))))))
 
 (rf/reg-sub :viz/vega-lite-log-level
             :<- [:table/one-cell-selected]
@@ -45,28 +57,23 @@
                 (.-Warn js/vega))))
 
 (rf/reg-sub :viz/generator
-            (fn [_ _]
-              {:selection-info (rf/subscribe [:table/table-state-active])
-               :one-cell-selected (rf/subscribe [:table/one-cell-selected])
-               :override-fns (rf/subscribe [:override/column-override-fns])})
-            (fn [{:keys [selection-info one-cell-selected override-fns]}]
-              (let [row (:row-at-selection-start selection-info)
-                    columns (:selected-columns selection-info)
-                    col-to-sample (first columns)
-                    override-map (select-keys override-fns [col-to-sample])
-                    override-insert-fn (co/gen-insert-fn override-map)]
-                (when (and one-cell-selected
-                           ;; TODO clean up this check
-                           (not (contains? #{"geo_fips" "NAME" hot/score-col-header hot/label-col-header} col-to-sample)))
-                  (let [constraints (mmix/with-row-values {} (-> row
-                                                                 (select-keys (keys (:vars model/spec)))
-                                                                 (dissoc col-to-sample)))
-                        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                                           :observation-trace constraints))
-                        has-negative-vals? #(some (every-pred number? neg?) (vals %))]
-                    ;; returns the first result of gen-fn that doesn't have a negative salary
-                    ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
-                    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn)))))))))
+            :<- [:viz/selection-simulatable]
+            :<- [:viz/column-to-simulate]
+            :<- [:table/row-at-selection-start]
+            :<- [:override/column-override-fns]
+            (fn [[simulatable col-to-sim row override-fns]]
+              (when simulatable
+                (let [override-map (select-keys override-fns [col-to-sim])
+                      override-insert-fn (co/gen-insert-fn override-map)
+                      constraints (mmix/with-row-values {} (-> row
+                                                               (select-keys (keys (:vars model/spec)))
+                                                               (dissoc col-to-sim)))
+                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                                         :observation-trace constraints))
+                      has-negative-vals? #(some (every-pred number? neg?) (vals %))]
+                  ;; returns the first result of gen-fn that doesn't have a negative salary
+                  ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
+                  #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))))
 
 (rf/reg-sub :viz/tables-visualized
             :<- [:table/both-table-states]
