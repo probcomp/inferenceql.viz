@@ -1,6 +1,6 @@
 (ns inferenceql.spreadsheets.panels.control.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.db :as db]
+            [inferenceql.spreadsheets.panels.control.db :as db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
 
 (defn query-for-conf-options [type threshold]
@@ -14,16 +14,16 @@
  :set-confidence-threshold
  event-interceptors
  (fn [{:keys [db]} [_ value]]
-   (let [conf-mode (get-in db [::db/confidence-options :mode])
+   (let [conf-mode (get-in db [:control-panel :confidence-options :mode])
          new-query-string (query-for-conf-options conf-mode value)]
-     {:db (assoc db ::db/confidence-threshold value)
+     {:db (assoc-in db [:control-panel :confidence-threshold] value)
       :dispatch [:set-query-string new-query-string]})))
 
 (rf/reg-event-fx
  :set-confidence-options
  event-interceptors
  (fn [{:keys [db]} [_ path value]]
-   (let [conf-threshold (get db ::db/confidence-threshold)
+   (let [conf-threshold (get-in db [:control-panel :confidence-threshold])
          new-query-string (query-for-conf-options value conf-threshold)
 
          ;; Determine if a load event needs to take place.
@@ -42,17 +42,17 @@
                         nil))
          query-string-event [:set-query-string new-query-string]
          event-list [query-string-event load-event]]
-    {:db (assoc-in db (into [::db/confidence-options] path) value)
+    {:db (assoc-in db (into [:control-panel :confidence-options] path) value)
      :dispatch-n event-list})))
 
 (rf/reg-event-db
  :update-confidence-options
  event-interceptors
  (fn [db [_ f path value]]
-   (update-in db (into [::db/confidence-options] path) f value)))
+   (update-in db (into [:control-panel :confidence-options] path) f value)))
 
 (rf/reg-event-db
  :set-query-string
  event-interceptors
  (fn [db [_ new-val]]
-   (assoc-in db [::db/query-string] new-val)))
+   (assoc-in db [:control-panel :query-string] new-val)))

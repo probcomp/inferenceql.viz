@@ -6,6 +6,7 @@
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.search :as search]
             [inferenceql.spreadsheets.db :as db]
+            [inferenceql.spreadsheets.panels.table.db :as table-db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.query :as query]
@@ -21,31 +22,6 @@
  event-interceptors
  (fn [_ _]
    (db/default-db)))
-
-(rf/reg-event-db
- :search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-scores db result)))
-
-(rf/reg-event-db
- :virtual-search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-virtual-scores db result)))
-
-(rf/reg-event-db
- :clear-virtual-data
- event-interceptors
- (fn [db [event-name]]
-   (-> (db/clear-virtual-rows db)
-       (db/clear-virtual-scores))))
-
-(rf/reg-event-db
- :clear-virtual-scores
- event-interceptors
- (fn [db [event-name]]
-   (db/clear-virtual-scores db)))
 
 (rf/reg-event-fx
  :parse-query
@@ -112,12 +88,12 @@
                          :observation-trace constraint-addrs-vals))
          has-negative-vals? #(some (every-pred number? neg?) (vals %))
 
-         overrides-map (get db ::db/column-override-fns)
+         overrides-map (get-in db [:override-panel :column-override-fns])
          overrides-insert-fn (co/gen-insert-fn overrides-map)
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
          new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
-     (db/with-virtual-rows db new-rows))))
+     (table-db/with-virtual-rows db new-rows))))
 
 (defn- create-search-examples [pos-rows neg-rows]
   (let [remove-nil-key-vals #(into {} (remove (comp nil? second) %))
@@ -163,7 +139,7 @@
  :compute-row-likelihoods
  event-interceptors
  (fn [db [_]]
-   (let [table-rows (get db ::db/rows)
+   (let [table-rows (get-in db [:table-panel :rows])
          likelihoods (score/row-likelihoods model/spec table-rows)]
      (assoc db ::db/row-likelihoods likelihoods))))
 
@@ -171,7 +147,7 @@
  :compute-missing-cells
  event-interceptors
  (fn [db [_]]
-   (let [table-rows (get db ::db/rows)
-         headers (get db ::db/headers)
+   (let [table-rows (get-in db [:table-panel :rows])
+         headers (get-in db [:table-panel :headers])
          missing-cells (score/impute-missing-cells model/spec headers table-rows)]
      (assoc db ::db/missing-cells missing-cells))))
