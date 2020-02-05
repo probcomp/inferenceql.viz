@@ -25,29 +25,52 @@
               (and one-cell-selected
                    (not (contains? cols-invalid-for-sim col)))))
 
-(rf/reg-sub :viz/vega-lite-spec
+(rf/reg-sub :viz/selection-facetable
+            :<- [:table/selected-columns]
+            :<- [:table/selected-columns-inactive]
+            (fn [[col-1 col-2]]
+              ;; Checks if the user has selected the same column in both the real and virtual tables.
+              (= col-1 col-2)))
+
+(rf/reg-sub :viz/selections-faceted
             :<- [:table/both-table-states]
-            :<- [:table/table-last-clicked]
+            :<- [:viz/selection-facetable]
+            (fn [[table-states selection-facetable]]
+              (when selection-facetable
+                (let [facet-attr :table
+                      selection-real (->> (first (get-in table-states [:real-table :selections]))
+                                          (map #(assoc % facet-attr "Real Data")))
+
+                      selection-virtual (->> (first (get-in table-states [:virtual-table :selections]))
+                                             (map #(assoc % facet-attr "Virtual Data")))]
+                  ;; This are the selections from both the real and virtual tables combined.
+                  (concat selection-real selection-virtual)))))
+
+(rf/reg-sub :viz/vega-lite-spec
+            ;; Subs related to simulations.
             :<- [:viz/selection-simulatable]
             :<- [:viz/column-to-simulate]
-
+            ;; Subs related to selection state in the last-clicked-on table.
             :<- [:table/selections]
             :<- [:table/selected-columns]
             :<- [:table/row-at-selection-start]
-            (fn [[both-table-states last-clicked selection-simulatable sim-col selections cols row]]
+            ;; Subs related to selection data merged between the :real-table and :virtual-table.
+            :<- [:viz/selection-facetable]
+            :<- [:viz/selections-faceted]
+            (fn [[selection-simulatable sim-col selections cols row facetable selections-faceted]]
               (when (first selections) ; At least one selection layer.
-                (clj->js
-                  (cond selection-simulatable ; One cell selected.
-                        (vega/gen-simulate-plot sim-col row)
+                (let [selections-to-use (if facetable selections-faceted (first selections))
+                ;; When we have a faceted selection use that over the regular selection.
+                      facet-attr (when facetable (name :table))]
+                  (clj->js
+                    (cond selection-simulatable ; One cell selected.
+                          (vega/gen-simulate-plot sim-col row)
 
-                        (= 1 (count cols)) ; One column selected.
-                        (vega/gen-histogram both-table-states last-clicked)
+                          (= 1 (count cols)) ; One column selected.
+                          (vega/gen-histogram (first cols) selections-to-use facet-attr)
 
-                        (some #{"geo_fips"} cols)
-                        (vega/gen-choropleth selections cols)
-
-                        :else ; Two or more columns selected.
-                        (vega/gen-comparison-plot both-table-states last-clicked))))))
+                          :else ; Two or more columns selected.
+                          (vega/gen-comparison-plot (take 2 cols) selections-to-use facet-attr)))))))
 
 (rf/reg-sub :viz/vega-lite-log-level
             :<- [:table/one-cell-selected]
