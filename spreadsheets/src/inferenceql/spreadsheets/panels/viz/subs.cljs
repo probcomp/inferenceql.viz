@@ -57,13 +57,13 @@
             ;; Subs related to selection data merged between the :real-table and :virtual-table.
             :<- [:viz/selection-facetable]
             :<- [:viz/selections-faceted]
-            (fn [[selection-simulatable sim-col selections cols row facetable selections-faceted]]
+            (fn [[simulatable sim-col selections cols row facetable selections-faceted]]
               (when selections
                 ;; When we have a faceted selection use that over the regular selection.
                 (let [selections-to-use (if facetable selections-faceted selections)
                       facet-attr (when facetable (name :table))]
                   (clj->js
-                    (cond selection-simulatable ; One cell selected.
+                    (cond simulatable ; One cell selected.
                           (vega/gen-simulate-plot sim-col row)
 
                           (= 1 (count cols)) ; One column selected.
