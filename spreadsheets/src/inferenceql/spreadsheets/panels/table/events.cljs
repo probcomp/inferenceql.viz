@@ -33,7 +33,7 @@
    ;; Setting the table's data via the `virtual-hot-props` sub should be the only way it is changing.
    (assert (= source "loadData"))
 
-   (let [table-state @(rf/subscribe [:table-state id])]
+   (let [table-state (db/table-selection-state db id)]
      (if-let [header-clicked (:header-clicked table-state)]
        (let [current-selection (.getSelectedLast hot)
              [_row1 col1 _row2 col2] (js->clj current-selection)]
@@ -71,7 +71,7 @@
  :after-on-cell-mouse-down
  event-interceptors
  (fn [db [_ hot id mouse-event coords _TD]]
-   (let [other-table-id @(rf/subscribe [:other-table id])
+   (let [other-table-id (db/other-table-id id)
 
          ;; Stores whether the user clicked on one of the column headers.
          header-clicked-flag (= -1 (.-row coords))

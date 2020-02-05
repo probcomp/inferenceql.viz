@@ -9,10 +9,6 @@
 
 ;;; Subs related to entries in the user-editable labels column within the real-data table.
 
-(rf/reg-sub :labels
-            (fn [db _]
-              (db/labels db)))
-
 (def clean-label
   "Prepares the user-typed label for checking."
   (fnil (comp str/upper-case str/trim) ""))
@@ -34,37 +30,38 @@
        (not (neg-label? label-str))))
 
 (defn row-ids-labeled-pos
-  [{:keys [labels]} _]
+  [labels]
   (let [labels-with-ids (map vector labels (range))
         ids (->> (filter #(pos-label? (first %)) labels-with-ids)
                  (map second))]
     ids))
-(rf/reg-sub :row-ids-labeled-pos
-            (fn [_ _]
-              {:labels (rf/subscribe [:labels])})
-            row-ids-labeled-pos)
 
 (defn row-ids-labeled-neg
-  [{:keys [labels]} _]
+  [labels]
   (let [labels-with-ids (map vector labels (range))
         ids (->> (filter #(neg-label? (first %)) labels-with-ids)
                  (map second))]
     ids))
-(rf/reg-sub :row-ids-labeled-neg
-            (fn [_ _]
-              {:labels (rf/subscribe [:labels])})
-            row-ids-labeled-neg)
 
 (defn row-ids-unlabeled
-  [{:keys [labels]} _]
+  [labels]
   (let [labels-with-ids (map vector labels (range))
         ids (->> (filter #(unlabeled? (first %)) labels-with-ids)
                  (map second))]
     ids))
-(rf/reg-sub :row-ids-unlabeled
-            (fn [_ _]
-              {:labels (rf/subscribe [:labels])})
-            row-ids-unlabeled)
+
+(rf/reg-sub
+  :labels
+  (fn [db _]
+    (db/labels db)))
+
+(rf/reg-sub
+ :rows-label-info
+ :<- [:labels]
+ (fn [labels _]
+   {:pos-ids (row-ids-labeled-pos labels)
+    :neg-ids (row-ids-labeled-neg labels)
+    :unlabeled-ids (row-ids-unlabeled labels)}))
 
 ;;; Subs related to selections within tables.
 
@@ -80,17 +77,6 @@
 (rf/reg-sub :table-last-clicked
             (fn [db _]
               (get-in db [:table-panel :table-last-clicked])))
-
-(rf/reg-sub :other-table
-            (fn [db [_sub-name table-picked]]
-              (let [[table-1-id table-2-id] (keys (get-in db [:table-panel :hot-state]))]
-                (condp = table-picked
-                  table-1-id table-2-id
-                  table-2-id table-1-id))))
-
-(rf/reg-sub :table-state
-            (fn [db [_sub-name table-id]]
-              (get-in db [:table-panel :hot-state table-id])))
 
 (rf/reg-sub :both-table-states
             (fn [db [_sub-name]]

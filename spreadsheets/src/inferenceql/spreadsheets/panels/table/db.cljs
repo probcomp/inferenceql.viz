@@ -112,3 +112,17 @@
 (defn clear-virtual-scores
   [db]
   (update-in db [:table-panel] dissoc :virtual-scores))
+
+;;; Helper functions for accessing data related to table selection state.
+
+(defn other-table-id
+  "Returns the key corresponding to the `table-id` not given."
+  [table-id]
+  (condp = table-id
+    :real-table :virtual-table
+    :virtual-table :real-table))
+
+(defn table-selection-state [db table-id]
+  "Returns the table selection state corresponding to the `table-id` given."
+  (fn [db table-id]
+    (get-in db [:table-panel :hot-state table-id])))
