@@ -38,10 +38,10 @@
             (fn [[table-states selection-facetable]]
               (when selection-facetable
                 (let [facet-attr :table
-                      selection-real (->> (first (get-in table-states [:real-table :selections]))
+                      selection-real (->> (get-in table-states [:real-table :selections])
                                           (map #(assoc % facet-attr "Real Data")))
 
-                      selection-virtual (->> (first (get-in table-states [:virtual-table :selections]))
+                      selection-virtual (->> (get-in table-states [:virtual-table :selections])
                                              (map #(assoc % facet-attr "Virtual Data")))]
                   ;; This are the selections from both the real and virtual tables combined.
                   (concat selection-real selection-virtual)))))
@@ -58,9 +58,9 @@
             :<- [:viz/selection-facetable]
             :<- [:viz/selections-faceted]
             (fn [[selection-simulatable sim-col selections cols row facetable selections-faceted]]
-              (when (first selections) ; At least one selection layer.
-                (let [selections-to-use (if facetable selections-faceted (first selections))
+              (when selections
                 ;; When we have a faceted selection use that over the regular selection.
+                (let [selections-to-use (if facetable selections-faceted selections)
                       facet-attr (when facetable (name :table))]
                   (clj->js
                     (cond selection-simulatable ; One cell selected.

@@ -115,8 +115,7 @@
                                     (js->clj)
                                     (map (fn [row] (zipmap headers row))))))
              ;; Merging the row-wise data for each selection layer.
-             ;; TODO: remove the need for this to be a nested vector.
-             selected-data [(apply mapv merge data-by-layer)]
+             selected-data (apply mapv merge data-by-layer)
 
              ;; Column headers from all the selection layers.
              selected-headers (mapcat header-for-selection selection-layers)
