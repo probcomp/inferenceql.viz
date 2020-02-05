@@ -81,6 +81,8 @@
             (fn [db [_sub-name]]
               (get-in db [:table-panel :hot-state])))
 
+;;; Subs related to selections within the active table.
+
 (rf/reg-sub :table/table-state-active
             (fn [_ _]
               {:table-id (rf/subscribe [:table/table-last-clicked])
@@ -102,6 +104,22 @@
             :<- [:table/table-state-active]
             (fn [table-state]
               (get table-state :row-at-selection-start)))
+
+;;; Subs related to selections within the inactive table.
+
+(rf/reg-sub :table/table-state-inactive
+            (fn [_ _]
+              {:table-id (rf/subscribe [:table/table-last-clicked])
+               :table-states (rf/subscribe [:table/both-table-states])})
+            (fn [{:keys [table-id table-states]}]
+              (when table-id
+                (let [inactive-id (db/other-table-id table-id)]
+                  (get table-states inactive-id)))))
+
+(rf/reg-sub :table/selected-columns-inactive
+            :<- [:table/table-state-inactive]
+            (fn [table-state]
+              (get table-state :selected-columns)))
 
 ;;; Subs related to scores computed on rows in the tables.
 
