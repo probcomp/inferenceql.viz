@@ -15,21 +15,14 @@
 (defn selection-color-selector
   "A reagant component for selecting the table selection color."
   []
-  (let [template [:div.list-group {:field :single-select :id :color}
+  (let [template [:div.list-group {:field :single-select :id :selection-color}
                   [:div.list-group-item {:key :blue} "Blue"]
                   [:div.list-group-item {:key :green} "Green"]
-                  [:div.list-group-item {:key :red} "Red"]]
-
-        ;; Function map that allows `template` reagent-forms template to
-        ;; communicate with the reframe db.
-        events {:get (fn [path] nil)
-                :save! (fn [path value] nil)
-                :update! (fn [path save-fn value] nil)
-                :doc (fn [] nil)}]
+                  [:div.list-group-item {:key :red} "Red"]]]
     [:div#color-selector
       [:span "Selection color:"]
       [:br]
-      [forms/bind-fields template events]]))
+      [forms/bind-fields template reagent-forms-function-map]]))
 
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:control/confidence-threshold])]

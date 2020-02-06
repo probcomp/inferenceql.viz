@@ -42,7 +42,10 @@
                                          :else
                                          nil)
                             query-string-event [:control/set-query-string new-query-string]]
-                        [query-string-event load-event]))]
+                        [query-string-event load-event])
+
+                      ;; Default case is empty event list.
+                      [])]
      {:db (assoc-in db (into [:control-panel :reagent-forms] path) value)
       :dispatch-n event-list})))
 
