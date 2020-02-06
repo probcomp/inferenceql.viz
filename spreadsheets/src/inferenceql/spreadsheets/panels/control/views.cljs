@@ -2,6 +2,16 @@
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]))
 
+(def reagent-forms-function-map
+  "Function map that allows a reagent-forms template
+  to communicate with the reframe db."
+  {:get (fn [path] @(rf/subscribe [:control/reagent-form path]))
+   :save! (fn [path value] (rf/dispatch [:control/set-reagent-forms path value]))
+   :update! (fn [path save-fn value]
+              ;; save-fn should accept two arguments: old-value, new-value
+              (rf/dispatch [:control/update-reagent-forms save-fn path value]))
+   :doc (fn [] @(rf/subscribe [:control/reagent-forms]))})
+
 (defn selection-color-selector
   "A reagant component for selecting the table selection color."
   []
@@ -42,17 +52,8 @@
                    [:option {:key :none} "none"]
                    [:option {:key :row} "row-wise"]
                    [:option {:key :cells-existing} "cell-wise (existing)"]
-                   [:option {:key :cells-missing} "cell-wise (missing)"]]]
-
-        ;; Function map that allows `template` reagent-forms template to
-        ;; communicate with the reframe db.
-        events {:get (fn [path] @(rf/subscribe [:control/reagent-form path]))
-                :save! (fn [path value] (rf/dispatch [:control/set-reagent-forms path value]))
-                :update! (fn [path save-fn value]
-                           ;; save-fn should accept two arguments: old-value, new-value
-                           (rf/dispatch [:control/update-reagent-forms save-fn path value]))
-                :doc (fn [] @(rf/subscribe [:control/reagent-forms]))}]
-    [forms/bind-fields template events]))
+                   [:option {:key :cells-missing} "cell-wise (missing)"]]]]
+    [forms/bind-fields template reagent-forms-function-map]))
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
