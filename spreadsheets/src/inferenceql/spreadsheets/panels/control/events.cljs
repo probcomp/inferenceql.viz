@@ -14,42 +14,44 @@
  :control/set-confidence-threshold
  event-interceptors
  (fn [{:keys [db]} [_ value]]
-   (let [conf-mode (get-in db [:control-panel :confidence-options :mode])
+   (let [conf-mode (get-in db [:control-panel :reagent-forms :confidence-mode])
          new-query-string (query-for-conf-options conf-mode value)]
      {:db (assoc-in db [:control-panel :confidence-threshold] value)
       :dispatch [:control/set-query-string new-query-string]})))
 
 (rf/reg-event-fx
- :control/set-confidence-options
+ :control/set-reagent-forms
  event-interceptors
  (fn [{:keys [db]} [_ path value]]
-   (let [conf-threshold (get-in db [:control-panel :confidence-threshold])
-         new-query-string (query-for-conf-options value conf-threshold)
+   (let [event-list (case path
+                      [:confidence-mode]
+                      (let [conf-threshold (get-in db [:control-panel :confidence-threshold])
+                            new-query-string (query-for-conf-options value conf-threshold)
 
-         ;; Determine if a load event needs to take place.
-         load-event (when (= path [:mode])
-                      (cond
-                        (and (= value :row)
-                             (nil? (get db ::db/row-likelihoods)))
-                        [:highlight/compute-row-likelihoods]
+                            ;; Determine if a load event needs to take place.
+                            load-event (cond
+                                         (and (= value :row)
+                                              (nil? (get db ::db/row-likelihoods)))
+                                         [:highlight/compute-row-likelihoods]
 
-                        (and (= value :cells-missing)
-                             (nil? (get db ::db/missing-cells)))
-                        [:highlight/compute-missing-cells]
+                                         (and (= value :cells-missing)
+                                              (nil? (get db ::db/missing-cells)))
+                                         [:highlight/compute-missing-cells]
 
-                        ;; Default case: no event
-                        :else
-                        nil))
-         query-string-event [:control/set-query-string new-query-string]
-         event-list [query-string-event load-event]]
-    {:db (assoc-in db (into [:control-panel :confidence-options] path) value)
-     :dispatch-n event-list})))
+                                         ;; Default case: no event
+                                         :else
+                                         nil)
+                            query-string-event [:control/set-query-string new-query-string]]
+                        [query-string-event load-event]))]
+     {:db (assoc-in db (into [:control-panel :reagent-forms] path) value)
+      :dispatch-n event-list})))
+
 
 (rf/reg-event-db
- :control/update-confidence-options
+ :control/update-reagent-forms
  event-interceptors
  (fn [db [_ f path value]]
-   (update-in db (into [:control-panel :confidence-options] path) f value)))
+   (update-in db (into [:control-panel :reagent-forms] path) f value)))
 
 (rf/reg-event-db
  :control/set-query-string

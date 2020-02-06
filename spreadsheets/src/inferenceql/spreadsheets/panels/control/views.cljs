@@ -38,7 +38,7 @@
   (let [template [:div#conf-mode
                   [:label "Mode:"]
                   [:br]
-                  [:select.form-control {:field :list :id :mode}
+                  [:select.form-control {:field :list :id :confidence-mode}
                    [:option {:key :none} "none"]
                    [:option {:key :row} "row-wise"]
                    [:option {:key :cells-existing} "cell-wise (existing)"]
@@ -46,12 +46,12 @@
 
         ;; Function map that allows `template` reagent-forms template to
         ;; communicate with the reframe db.
-        events {:get (fn [path] @(rf/subscribe [:control/confidence-option path]))
-                :save! (fn [path value] (rf/dispatch [:control/set-confidence-options path value]))
+        events {:get (fn [path] @(rf/subscribe [:control/reagent-form path]))
+                :save! (fn [path value] (rf/dispatch [:control/set-reagent-forms path value]))
                 :update! (fn [path save-fn value]
                            ;; save-fn should accept two arguments: old-value, new-value
-                           (rf/dispatch [:control/update-confidence-options save-fn path value]))
-                :doc (fn [] @(rf/subscribe [:control/confidence-options]))}]
+                           (rf/dispatch [:control/update-reagent-forms save-fn path value]))
+                :doc (fn [] @(rf/subscribe [:control/reagent-forms]))}]
     [forms/bind-fields template events]))
 
 (defn panel
