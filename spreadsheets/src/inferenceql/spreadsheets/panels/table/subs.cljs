@@ -62,6 +62,12 @@
     :neg-ids (row-ids-labeled-neg labels)
     :unlabeled-ids (row-ids-unlabeled labels)}))
 
+;;; Subs related selection layer color.
+
+(rf/reg-sub :table/highlight-class
+            (fn []
+              "blue-highlight"))
+
 ;;; Subs related to selections within tables.
 
 (rf/reg-sub :table/one-cell-selected

@@ -119,6 +119,18 @@ select {
   font-size: .875rem;
 }
 
+.red-highlight .handsontable td.area:before {
+    background-color: #FF0000;
+}
+
+.green-highlight .handsontable td.area:before {
+    background-color: #00FF00;
+}
+
+.blue-highlight .handsontable td.area:before {
+    background-color: #0000FF;
+}
+
 /* --------------- styling for js-function entry modal popup --------------- */
 
 .js-function-entry-modal {
