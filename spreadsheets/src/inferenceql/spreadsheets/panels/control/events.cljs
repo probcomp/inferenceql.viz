@@ -1,7 +1,8 @@
 (ns inferenceql.spreadsheets.panels.control.events
   (:require [re-frame.core :as rf]
             [inferenceql.spreadsheets.panels.control.db :as db]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
+            [inferenceql.spreadsheets.components.highlight.db :as highlight-db]))
 
 (defn query-for-conf-options [type threshold]
   (case type
@@ -23,32 +24,52 @@
  :control/set-reagent-forms
  event-interceptors
  (fn [{:keys [db]} [_ path value]]
-   (let [event-list (case path
-                      [:confidence-mode]
-                      (let [conf-threshold (get-in db [:control-panel :confidence-threshold])
-                            new-query-string (query-for-conf-options value conf-threshold)
+   (let [full-path (into [:control-panel :reagent-forms] path)]
+     (case path
+       [:selection-color]
+       {:dispatch [:control/set-selection-color full-path value]}
 
-                            ;; Determine if a load event needs to take place.
-                            load-event (cond
-                                         (and (= value :row)
-                                              (nil? (get db ::db/row-likelihoods)))
-                                         [:highlight/compute-row-likelihoods]
+       [:confidence-mode]
+       {:dispatch [:control/set-confidence-mode full-path value]}
 
-                                         (and (= value :cells-missing)
-                                              (nil? (get db ::db/missing-cells)))
-                                         [:highlight/compute-missing-cells]
+       ;; Default case is to write the value into the db.
+       {:db (assoc-in db full-path value)}))))
 
-                                         ;; Default case: no event
-                                         :else
-                                         nil)
-                            query-string-event [:control/set-query-string new-query-string]]
-                        [query-string-event load-event])
+(rf/reg-event-db
+ :control/set-selection-color
+ event-interceptors
+ (fn [db [_ path value]]
+   ;; Here we only allow setting :selection-color to a non-nil value. The UI selection-color
+   ;; selector tries to set a nil value when the same option is clicked twice.
+   ;; TODO: fix the above issue.
+   (if (some? value)
+     (assoc-in db path value)
+     db)))
 
-                      ;; Default case is empty event list.
-                      [])]
-     {:db (assoc-in db (into [:control-panel :reagent-forms] path) value)
+(rf/reg-event-fx
+ :control/set-confidence-mode
+ event-interceptors
+ (fn [{:keys [db]} [_ path value]]
+   (let [conf-threshold (get-in db [:control-panel :confidence-threshold])
+         new-query-string (query-for-conf-options value conf-threshold)
+         query-string-event [:control/set-query-string new-query-string]
+
+         ;; Determine if a load event needs to take place.
+         load-event (cond
+                      (and (= value :row)
+                           (nil? (highlight-db/row-likelihoods db)))
+                      [:highlight/compute-row-likelihoods]
+
+                      (and (= value :cells-missing)
+                           (nil? (highlight-db/missing-cells db)))
+                      [:highlight/compute-missing-cells]
+
+                      ;; Default case: no event
+                      :else
+                      nil)
+         event-list [query-string-event load-event]]
+     {:db (assoc-in db path value)
       :dispatch-n event-list})))
-
 
 (rf/reg-event-db
  :control/update-reagent-forms

@@ -24,3 +24,11 @@
 
 (s/def ::map-for-row (s/map-of ::column-name ::value-score-map))
 (s/def ::missing-cells (s/coll-of ::map-for-row))
+
+;;; Accessor functions to parts of the highlight component db.
+
+(defn row-likelihoods [db]
+  (get-in db [:highlight-component :row-likelihoods]))
+
+(defn missing-cells [db]
+  (get-in db [:highlight-component :missing-cells]))
