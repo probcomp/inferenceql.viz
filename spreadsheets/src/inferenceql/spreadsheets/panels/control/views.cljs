@@ -2,6 +2,25 @@
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]))
 
+(defn selection-color-selector
+  "A reagant component for selecting the table selection color."
+  []
+  (let [template [:div.list-group {:field :single-select :id :color}
+                  [:div.list-group-item {:key :blue} "Blue"]
+                  [:div.list-group-item {:key :green} "Green"]
+                  [:div.list-group-item {:key :red} "Red"]]
+
+        ;; Function map that allows `template` reagent-forms template to
+        ;; communicate with the reframe db.
+        events {:get (fn [path] nil)
+                :save! (fn [path value] nil)
+                :update! (fn [path save-fn value] nil)
+                :doc (fn [] nil)}]
+    [:div#color-selector
+      [:span "Selection color:"]
+      [:br]
+      [forms/bind-fields template events]]))
+
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:control/confidence-threshold])]
     [:div#conf-slider
@@ -59,6 +78,7 @@
           ;; This button performs a no-op currently.
           {:on-click #(do)} "Delete virtual data"]]]
      [:div.flex-box-space-filler]
+     [selection-color-selector]
      [:div#conf-controls
       [confidence-slider]
       [confidence-mode]]]))

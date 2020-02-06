@@ -99,6 +99,26 @@ select {
   color: #333;
 }
 
+/* --------------- styling for selection color selector --------------- */
+
+#color-selector {
+  flex-shrink: 0;
+  width: 105px;
+  margin-top: 5px;
+  font-size: .875rem;
+  margin-right: 25px;
+  line-height: 12px;
+}
+
+#color-selector .list-group {
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+
+#color-selector .list-group-item {
+  padding: 5px 15px;
+}
+
 /* --------------- styling for vega-vizualization --------------- */
 
 #viz-container {
