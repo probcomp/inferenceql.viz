@@ -142,9 +142,6 @@ select {
 .handsontable th {
   font-size: .875rem;
 }
-.virtual-hot .ht_master tr td {
-  background-color: #FAFCE4;
-}
 
 /* --------------- styling for js-function entry modal popup --------------- */
 
