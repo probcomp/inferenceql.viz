@@ -18,8 +18,6 @@
         generator      @(rf/subscribe [:viz/generator])]
     [:div
      [control/panel]
-     [:div {:class ["table-title" (when real-table-in-viz "table-title-selected")]}
-      [:span "Real Data"]]
      [table/handsontable {} real-hot-props]
      [:div#viz-container
       (when vega-lite-spec

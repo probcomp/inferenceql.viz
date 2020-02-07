@@ -22,30 +22,6 @@ div {
   min-width: 40px;
 }
 
-/* --------------- styling for table titles --------------- */
-
-.table-title {
-  float: left;
-  background-color: #f0f0f0;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #cccccc;
-  border-bottom: none;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  margin-left: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-
-  height: 24px;
-  box-sizing: border-box; 
-}
-
-.table-title-selected {
-  border-width: 3px;
-  border-color: #4b89ff;
-}
-
 /* --------------- styling for the toolbar --------------- */
 
 #toolbar {
