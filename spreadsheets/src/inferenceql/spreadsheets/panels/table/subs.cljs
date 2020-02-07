@@ -65,8 +65,12 @@
 ;;; Subs related selection layer color.
 
 (rf/reg-sub :table/highlight-class
-            (fn []
-              "blue-highlight"))
+            :<- [:control/selection-color]
+            (fn [color]
+              (case color
+                :red "red-highlight"
+                :green "green-highlight"
+                :blue "blue-highlight")))
 
 ;;; Subs related to selections within tables.
 
