@@ -98,7 +98,8 @@
          {:db (-> db
                   (assoc-in [:table-panel :hot-state id :selected-columns] select-order-headers)
                   (assoc-in [:table-panel :hot-state id :selections] selected-data)
-                  (assoc-in [:table-panel :hot-state id :row-at-selection-start] row))})))))
+                  (assoc-in [:table-panel :hot-state id :row-at-selection-start] row)
+                  (assoc-in [:table-panel :hot-state id :coords] (js->clj selection-layers)))})))))
 
 (rf/reg-event-db
  :hot/after-on-cell-mouse-down
@@ -122,4 +123,5 @@
  event-interceptors
  (fn [db [_ hot id]]
    ;; clears selections associated with table
-   (update-in db [:table-panel :hot-state id] dissoc :selected-columns :selections :row-at-selection-start)))
+   (update-in db [:table-panel :hot-state id]
+              dissoc :selected-columns :selections :row-at-selection-start :coords)))

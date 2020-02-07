@@ -41,6 +41,8 @@
 
 (s/def ::row-at-selection-start ::row)
 (s/def ::header-clicked boolean?)
+(s/def ::coords (s/coll-of ::selection-layer-coords))
+(s/def ::selection-layer-coords (s/coll-of number? :kind vector? :count 4))
 
 ;;; Specs related to storing the selection state of both handsontables
 
@@ -48,7 +50,8 @@
 (s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
                                                  ::selections
                                                  ::selected-columns
-                                                 ::header-clicked])))
+                                                 ::header-clicked
+                                                 ::coords])))
 (s/def ::hot-state (s/map-of ::table-id ::table-state))
 
 ;;; Accessor functions to portions of the table-panel db.
