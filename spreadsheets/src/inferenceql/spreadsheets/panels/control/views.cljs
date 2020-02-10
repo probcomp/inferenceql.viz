@@ -3,7 +3,7 @@
             [reagent-forms.core :as forms]))
 
 (defn confidence-slider []
-  (let [cur-val @(rf/subscribe [:confidence-threshold])]
+  (let [cur-val @(rf/subscribe [:control/confidence-threshold])]
     [:div#conf-slider
       [:span "Confidence Threshold: "]
       [:br]
@@ -12,7 +12,7 @@
                        :value cur-val
                        :on-change (fn [e]
                                     (let [new-val (js/parseFloat (-> e .-target .-value))]
-                                      (rf/dispatch [:set-confidence-threshold new-val])))}]
+                                      (rf/dispatch [:control/set-confidence-threshold new-val])))}]
       [:label cur-val]]))
 
 (defn confidence-mode []
@@ -27,25 +27,25 @@
 
         ;; Function map that allows `template` reagent-forms template to
         ;; communicate with the reframe db.
-        events {:get (fn [path] @(rf/subscribe [:confidence-option path]))
-                :save! (fn [path value] (rf/dispatch [:set-confidence-options path value]))
+        events {:get (fn [path] @(rf/subscribe [:control/confidence-option path]))
+                :save! (fn [path value] (rf/dispatch [:control/set-confidence-options path value]))
                 :update! (fn [path save-fn value]
                            ;; save-fn should accept two arguments: old-value, new-value
-                           (rf/dispatch [:update-confidence-options save-fn path value]))
-                :doc (fn [] @(rf/subscribe [:confidence-options]))}]
+                           (rf/dispatch [:control/update-confidence-options save-fn path value]))
+                :doc (fn [] @(rf/subscribe [:control/confidence-options]))}]
     [forms/bind-fields template events]))
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
-  (let [input-text (rf/subscribe [:query-string])
-        label-info (rf/subscribe [:rows-label-info])]
+  (let [input-text (rf/subscribe [:control/query-string])
+        label-info (rf/subscribe [:table/rows-label-info])]
     [:div#toolbar
      [:div#search-section
        [:input#search-input {:type "search"
-                             :on-change #(rf/dispatch [:set-query-string (-> % .-target .-value)])
+                             :on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
                              :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                                     (rf/dispatch [:parse-query @input-text @label-info])))
+                                                     (rf/dispatch [:query/parse-query @input-text @label-info])))
 
                              :placeholder "Enter a query..."
                              ;; This random attribute value for autoComplete is needed to turn
@@ -54,9 +54,9 @@
                              :value @input-text}]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
-          {:on-click #(rf/dispatch [:parse-query @input-text @label-info])} "Run InferenceQL"]
+          {:on-click #(rf/dispatch [:query/parse-query @input-text @label-info])} "Run InferenceQL"]
          [:button.toolbar-button.pure-button
-          {:on-click #(rf/dispatch [:clear-virtual-data])} "Delete virtual data"]]]
+          {:on-click #(rf/dispatch [:table/clear-virtual-data])} "Delete virtual data"]]]
      [:div.flex-box-space-filler]
      [:div#conf-controls
       [confidence-slider]

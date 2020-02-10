@@ -11,16 +11,16 @@
     :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))
 
 (rf/reg-event-fx
- :set-confidence-threshold
+ :control/set-confidence-threshold
  event-interceptors
  (fn [{:keys [db]} [_ value]]
    (let [conf-mode (get-in db [:control-panel :confidence-options :mode])
          new-query-string (query-for-conf-options conf-mode value)]
      {:db (assoc-in db [:control-panel :confidence-threshold] value)
-      :dispatch [:set-query-string new-query-string]})))
+      :dispatch [:control/set-query-string new-query-string]})))
 
 (rf/reg-event-fx
- :set-confidence-options
+ :control/set-confidence-options
  event-interceptors
  (fn [{:keys [db]} [_ path value]]
    (let [conf-threshold (get-in db [:control-panel :confidence-threshold])
@@ -31,28 +31,28 @@
                       (cond
                         (and (= value :row)
                              (nil? (get db ::db/row-likelihoods)))
-                        [:compute-row-likelihoods]
+                        [:highlight/compute-row-likelihoods]
 
                         (and (= value :cells-missing)
                              (nil? (get db ::db/missing-cells)))
-                        [:compute-missing-cells]
+                        [:highlight/compute-missing-cells]
 
                         ;; Default case: no event
                         :else
                         nil))
-         query-string-event [:set-query-string new-query-string]
+         query-string-event [:control/set-query-string new-query-string]
          event-list [query-string-event load-event]]
     {:db (assoc-in db (into [:control-panel :confidence-options] path) value)
      :dispatch-n event-list})))
 
 (rf/reg-event-db
- :update-confidence-options
+ :control/update-confidence-options
  event-interceptors
  (fn [db [_ f path value]]
    (update-in db (into [:control-panel :confidence-options] path) f value)))
 
 (rf/reg-event-db
- :set-query-string
+ :control/set-query-string
  event-interceptors
  (fn [db [_ new-val]]
    (assoc-in db [:control-panel :query-string] new-val)))

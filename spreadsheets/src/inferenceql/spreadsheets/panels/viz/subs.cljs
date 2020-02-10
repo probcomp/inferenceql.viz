@@ -29,25 +29,25 @@
 
              :else
              (vega/gen-comparison-plot table-states t-clicked))))))
-(rf/reg-sub :vega-lite-spec
+(rf/reg-sub :viz/vega-lite-spec
             (fn [_ _]
-              {:table-states (rf/subscribe [:both-table-states])
-               :t-clicked (rf/subscribe [:table-last-clicked])})
+              {:table-states (rf/subscribe [:table/both-table-states])
+               :t-clicked (rf/subscribe [:table/table-last-clicked])})
             (fn [data-for-spec]
               (vega-lite-spec data-for-spec)))
 
-(rf/reg-sub :vega-lite-log-level
-            :<- [:one-cell-selected]
+(rf/reg-sub :viz/vega-lite-log-level
+            :<- [:table/one-cell-selected]
             (fn [one-cell-selected]
               (if one-cell-selected
                 (.-Error js/vega)
                 (.-Warn js/vega))))
 
-(rf/reg-sub :generator
+(rf/reg-sub :viz/generator
             (fn [_ _]
-              {:selection-info (rf/subscribe [:table-state-active])
-               :one-cell-selected (rf/subscribe [:one-cell-selected])
-               :override-fns (rf/subscribe [:column-override-fns])})
+              {:selection-info (rf/subscribe [:table/table-state-active])
+               :one-cell-selected (rf/subscribe [:table/one-cell-selected])
+               :override-fns (rf/subscribe [:override/column-override-fns])})
             (fn [{:keys [selection-info one-cell-selected override-fns]}]
               (let [row (:row-at-selection-start selection-info)
                     columns (:selected-columns selection-info)
@@ -67,10 +67,10 @@
                     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
                     #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn)))))))))
 
-(rf/reg-sub :tables-visualized
-            :<- [:both-table-states]
-            :<- [:table-last-clicked]
-            :<- [:one-cell-selected]
+(rf/reg-sub :viz/tables-visualized
+            :<- [:table/both-table-states]
+            :<- [:table/table-last-clicked]
+            :<- [:table/one-cell-selected]
             (fn [[table-states t-clicked one-cell-selected]]
               (let [cols-real (take 2 (get-in table-states [:real-table :selected-columns]))
                     cols-virtual (take 2 (get-in table-states [:virtual-table :selected-columns]))
@@ -97,12 +97,12 @@
                       :else
                       nil))))
 
-(rf/reg-sub :real-table-in-viz
-            :<- [:tables-visualized]
+(rf/reg-sub :viz/real-table-in-viz
+            :<- [:viz/tables-visualized]
             (fn [tables-visualized]
               (some #{:real-table} tables-visualized)))
 
-(rf/reg-sub :virtual-table-in-viz
-            :<- [:tables-visualized]
+(rf/reg-sub :viz/virtual-table-in-viz
+            :<- [:viz/tables-visualized]
             (fn [tables-visualized]
               (some #{:virtual-table} tables-visualized)))

@@ -7,7 +7,7 @@
             [inferenceql.spreadsheets.score :as score]))
 
 (rf/reg-event-db
- :compute-row-likelihoods
+ :highlight/compute-row-likelihoods
  event-interceptors
  (fn [db [_]]
    (let [table-rows (table-db/table-rows db)
@@ -15,7 +15,7 @@
      (assoc-in db [:highlight-component :row-likelihoods] likelihoods))))
 
 (rf/reg-event-db
- :compute-missing-cells
+ :highlight/compute-missing-cells
  event-interceptors
  (fn [db [_]]
    (let [table-rows (table-db/table-rows db)

@@ -9,13 +9,13 @@
 
 (defn app
   []
-  (let [real-hot-props      @(rf/subscribe [:real-hot-props])
-        virtual-hot-props @(rf/subscribe [:virtual-hot-props])
-        real-table-in-viz @(rf/subscribe [:real-table-in-viz])
-        virtual-table-in-viz @(rf/subscribe [:virtual-table-in-viz])
-        vega-lite-spec @(rf/subscribe [:vega-lite-spec])
-        vega-lite-log-level @(rf/subscribe [:vega-lite-log-level])
-        generator      @(rf/subscribe [:generator])]
+  (let [real-hot-props      @(rf/subscribe [:table/real-hot-props])
+        virtual-hot-props @(rf/subscribe [:table/virtual-hot-props])
+        real-table-in-viz @(rf/subscribe [:viz/real-table-in-viz])
+        virtual-table-in-viz @(rf/subscribe [:viz/virtual-table-in-viz])
+        vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
+        vega-lite-log-level @(rf/subscribe [:viz/vega-lite-log-level])
+        generator      @(rf/subscribe [:viz/generator])]
     [:div
      [control/panel]
      [:div {:class ["table-title" (when real-table-in-viz "table-title-selected")]}
