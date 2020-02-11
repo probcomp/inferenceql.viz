@@ -47,12 +47,7 @@
 
 ;; These keywords refer to events in inferenceql.spreadsheets.panels.table.events.
 (def real-hot-hooks [:hot/after-deselect :hot/after-selection-end :hot/after-on-cell-mouse-down :hot/before-change])
-(def virtual-hot-hooks [:hot/after-deselect :hot/after-selection-end :hot/after-on-cell-mouse-down :hot/after-change])
 
 (def real-hot-settings (-> default-hot-settings
                            (assoc-in [:hooks] real-hot-hooks)
                            (assoc-in [:name] "real-table")))
-(def virtual-hot-settings (-> default-hot-settings
-                              (assoc-in [:hooks] virtual-hot-hooks)
-                              (assoc-in [:name] "virtual-table")
-                              (assoc-in [:settings :height] "20vh")))

@@ -12,25 +12,6 @@
  (fn [db [_ result]]
    (db/with-scores db result)))
 
-(rf/reg-event-db
- :table/virtual-search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-virtual-scores db result)))
-
-(rf/reg-event-db
- :table/clear-virtual-data
- event-interceptors
- (fn [db [event-name]]
-   (-> (db/clear-virtual-rows db)
-       (db/clear-virtual-scores))))
-
-(rf/reg-event-db
- :table/clear-virtual-scores
- event-interceptors
- (fn [db [event-name]]
-   (db/clear-virtual-scores db)))
-
 ;;; Events that correspond to hooks in the Handsontable API
 
 ;; Used to detect changes in the :real-data handsontable
@@ -143,15 +124,13 @@
  :hot/after-on-cell-mouse-down
  event-interceptors
  (fn [db [_ hot id mouse-event coords _TD]]
-   (let [other-table-id (db/other-table-id id)
-
-         ;; Stores whether the user clicked on one of the column headers.
+   (let [;; Stores whether the user clicked on one of the column headers.
          header-clicked-flag (= -1 (.-row coords))
 
          ;; Stores whether the user held alt during the click.
          alt-key-pressed (.-altKey mouse-event)
-         ; Switch the last clicked on table-id to the other table on alt-click.
-         new-table-clicked-id (if alt-key-pressed other-table-id id)]
+
+         new-table-clicked-id (if alt-key-pressed nil id)]
 
      ; Deselect all cells on alt-click.
      (when alt-key-pressed
