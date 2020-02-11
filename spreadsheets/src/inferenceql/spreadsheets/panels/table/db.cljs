@@ -5,22 +5,18 @@
 (def default-db
   {:table-panel {:headers (into [] (keys (first nyt-data)))
                  :rows nyt-data
-                 :virtual-rows []
-                 :hot-state {:real-table nil :virtual-table nil}}})
+                 :hot-state {:real-table nil}}})
 
 (s/def ::table-panel (s/keys :req-un [::headers
                                       ::rows
-                                      ::virtual-rows
                                       ::hot-state]
                              :opt-un [::scores
-                                      ::virtual-scores
                                       ::labels]))
 
 ;;; Specs related to scores computed on rows.
 
 (s/def ::score number?)
 (s/def ::scores (s/coll-of ::score))
-(s/def ::virtual-scores (s/coll-of ::score))
 
 ;;; Specs related to user-set labels on rows.
 
@@ -32,7 +28,6 @@
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/cat :row (s/* ::row)))
-(s/def ::virtual-rows ::rows)
 (s/def ::headers (s/cat :header (s/* ::header)))
 
 ;;; Specs related to selections within handsontable instances.
@@ -49,7 +44,7 @@
 
 ;;; Specs related to storing the selection state of both handsontables
 
-(s/def ::table-id #{:real-table :virtual-table})
+(s/def ::table-id #{:real-table})
 (s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
                                                  ::selections
                                                  ::selected-columns
@@ -66,19 +61,6 @@
   [db]
   (get-in db [:table-panel :rows]))
 
-(defn virtual-rows
-  [db]
-  (get-in db [:table-panel :virtual-rows]))
-
-(defn with-virtual-rows
-  [db new-v-rows]
-  (let [cur-v-rows (virtual-rows db)]
-    (assoc-in db [:table-panel :virtual-rows] (concat new-v-rows cur-v-rows))))
-
-(defn clear-virtual-rows
-  [db]
-  (assoc-in db [:table-panel :virtual-rows] []))
-
 (defn with-labels
   [db labels]
   (assoc-in db [:table-panel :labels] labels))
@@ -94,18 +76,6 @@
 (defn with-scores
   [db scores]
   (assoc-in db [:table-panel :scores] scores))
-
-(defn with-virtual-scores
-  [db scores]
-  (assoc-in db [:table-panel :virtual-scores] scores))
-
-(defn virtual-scores
-  [db]
-  (get-in db [:table-panel :virtual-scores]))
-
-(defn clear-virtual-scores
-  [db]
-  (update-in db [:table-panel] dissoc :virtual-scores))
 
 ;;; Helper functions for accessing data related to table selection state.
 

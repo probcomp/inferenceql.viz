@@ -80,8 +80,9 @@
          overrides-insert-fn (co/gen-insert-fn overrides-map)
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
+         ;; NOTE: This event currently does nothing with the newly generated rows. 
          new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
-     (table-db/with-virtual-rows db new-rows))))
+     db)))
 
 (defn- create-search-examples [pos-rows neg-rows]
   (let [remove-nil-key-vals #(into {} (remove (comp nil? second) %))
