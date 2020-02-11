@@ -27,10 +27,8 @@
 
 (rf/reg-sub :viz/selection-facetable
             :<- [:table/selected-columns]
-            :<- [:table/selected-columns-inactive]
-            (fn [[col-1 col-2]]
-              ;; Checks if the user has selected the same column in both the real and virtual tables.
-              (= col-1 col-2)))
+            (fn [cols]
+              false))
 
 (rf/reg-sub :viz/selections-faceted
             :<- [:table/both-table-states]
