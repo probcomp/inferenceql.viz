@@ -76,10 +76,3 @@
 (defn with-scores
   [db scores]
   (assoc-in db [:table-panel :scores] scores))
-
-;;; Helper functions for accessing data related to table selection state.
-
-(defn table-selection-state [db table-id]
-  "Returns the table selection state corresponding to the `table-id` given."
-  (fn [db table-id]
-    (get-in db [:table-panel :hot-state table-id])))

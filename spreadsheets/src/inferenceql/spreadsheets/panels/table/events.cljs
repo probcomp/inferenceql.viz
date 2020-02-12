@@ -33,26 +33,6 @@
      (let [labels (.getDataAtProp hot label-col)]
        (db/with-labels db (js->clj labels))))))
 
-;; Used to detect changes in the :virtual-data handsontable
-(rf/reg-event-fx
- :hot/after-change
- event-interceptors
- (fn [{:keys [db]} [_ hot id changes source]]
-
-   ;; `changes` should be null when source of changes is loadData (see docs for why).
-   (assert (= nil changes))
-   ;; Setting the table's data via the `virtual-hot-props` sub should be the only way it is changing.
-   (assert (= source "loadData"))
-
-   (let [table-state (db/table-selection-state db id)]
-     (if-let [header-clicked (:header-clicked table-state)]
-       (let [current-selection (.getSelectedLast hot)
-             [_row1 col1 _row2 col2] (js->clj current-selection)]
-         ;; Take the current selection and expand it so the whole columns
-         ;; are selected.
-         (.selectColumns hot col1 col2))))
-   {}))
-
 (rf/reg-event-fx
  :hot/after-selection-end
  event-interceptors
