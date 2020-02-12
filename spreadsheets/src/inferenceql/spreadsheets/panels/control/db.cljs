@@ -17,3 +17,8 @@
 (s/def ::confidence-mode keyword?)
 (s/def ::selection-color keyword?)
 (s/def ::query-string string?)
+
+;; Accessor functions for indexing into parts of the control-panel's db.
+
+(defn selection-color [db]
+  (get-in db [:control-panel :reagent-forms :selection-color]))
