@@ -109,6 +109,11 @@
             (fn [table-state]
               (get table-state :row-at-selection-start)))
 
+(rf/reg-sub :table/selections-coords
+            :<- [:table/selection-layer-active]
+            (fn [table-state]
+              (get table-state :coords)))
+
 ;;; Subs related to scores computed on rows in the tables.
 
 (rf/reg-sub :table/scores
@@ -167,19 +172,23 @@
 ;;; Subs related to settings and overall state of tables.
 
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn context-menu]} _]
+  [{:keys [headers rows cells-style-fn context-menu selections-coords selection-color]} _]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
       (assoc-in [:settings :columns] (column-settings headers))
       (assoc-in [:settings :cells] cells-style-fn)
-      (assoc-in [:settings :contextMenu] context-menu)))
+      (assoc-in [:settings :contextMenu] context-menu)
+      (assoc-in [:selections-coords] selections-coords)
+      (assoc-in [:selection-color] selection-color)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
                :rows    (rf/subscribe [:table/computed-rows])
                :cells-style-fn (rf/subscribe [:table/cells-style-fn])
-               :context-menu (rf/subscribe [:table/context-menu])})
+               :context-menu (rf/subscribe [:table/context-menu])
+               :selections-coords (rf/subscribe [:table/selections-coords])
+               :selection-color (rf/subscribe [:control/selection-color])})
             real-hot-props)
 
 (rf/reg-sub

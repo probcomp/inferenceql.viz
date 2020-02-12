@@ -52,7 +52,12 @@
                    sort-config (.getSortConfig sorting-plugin)]
                (update-hot! @hot-instance (clj->js (:settings new-props)))
                ;; Maintain the same sort order as before the update
-               (.sort sorting-plugin sort-config)))))
+               (.sort sorting-plugin sort-config)))
+
+           (when (not= (:selection-color old-props) (:selection-color new-props))
+             (if-let [coords (clj->js (:selections-coords new-props))]
+               (.selectCells @hot-instance coords false)
+               (.deselectCell @hot-instance)))))
 
        :component-will-unmount
        (fn [this]
