@@ -96,23 +96,23 @@
 
 (rf/reg-sub :table/selections
             :<- [:table/selection-layer-active]
-            (fn [table-state]
-              (get table-state :selections)))
+            (fn [selection-state]
+              (get selection-state :selections)))
 
 (rf/reg-sub :table/selected-columns
             :<- [:table/selection-layer-active]
-            (fn [table-state]
-              (get table-state :selected-columns)))
+            (fn [selection-state]
+              (get selection-state :selected-columns)))
 
 (rf/reg-sub :table/row-at-selection-start
             :<- [:table/selection-layer-active]
-            (fn [table-state]
-              (get table-state :row-at-selection-start)))
+            (fn [selection-state]
+              (get selection-state :row-at-selection-start)))
 
 (rf/reg-sub :table/selections-coords
             :<- [:table/selection-layer-active]
-            (fn [table-state]
-              (get table-state :coords)))
+            (fn [selection-state]
+              (get selection-state :coords)))
 
 ;;; Subs related to scores computed on rows in the tables.
 
