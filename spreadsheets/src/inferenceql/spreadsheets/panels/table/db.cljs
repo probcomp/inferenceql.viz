@@ -47,12 +47,12 @@
 ;;; Specs related to storing the selection state of both handsontables
 
 (s/def ::selection-color #{:blue :red :green})
-(s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
-                                                 ::selections
-                                                 ::selected-columns
-                                                 ::header-clicked
-                                                 ::coords])))
-(s/def ::selection-layers (s/map-of ::selection-color ::table-state))
+(s/def ::selection-state (s/nilable (s/keys :opt-un [::row-at-selection-start
+                                                     ::selections
+                                                     ::selected-columns
+                                                     ::header-clicked
+                                                     ::coords])))
+(s/def ::selection-layers (s/map-of ::selection-color ::selection-state))
 
 ;;; Accessor functions to portions of the table-panel db.
 
