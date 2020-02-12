@@ -127,6 +127,5 @@
  event-interceptors
  (fn [db [_ hot id]]
    (let [color (control-db/selection-color db)]
-     ;; clears selections associated with table
-     (update-in db [:table-panel :selection-layers color]
-                dissoc :selected-columns :selections :row-at-selection-start :coords))))
+     ;; Clears selection information for the current selection layer.
+     (update-in db [:table-panel :selection-layers] dissoc color))))
