@@ -31,8 +31,9 @@
               false))
 
 (rf/reg-sub :viz/selections-faceted
-            :<- [:table/both-table-states]
+            :<- [:table/selection-layers]
             :<- [:viz/selection-facetable]
+            ;; TODO: modify to use selection layers.
             (fn [[table-states selection-facetable]]
               (when selection-facetable
                 (let [facet-attr :table

@@ -76,36 +76,36 @@
 
 (rf/reg-sub :table/one-cell-selected
             (fn [_ _]
-              (rf/subscribe [:table/table-state-active]))
+              (rf/subscribe [:table/selection-layer-active]))
             (fn [{:keys [selections]}]
               (= 1
                  (count selections) ; One row selected.
                  (count (keys (first selections)))))) ; One column selected.
 
-(rf/reg-sub :table/both-table-states
+(rf/reg-sub :table/selection-layers
             (fn [db [_sub-name]]
-              (get-in db [:table-panel :hot-state])))
+              (get-in db [:table-panel :selection-layers])))
 
-;;; Subs related to selections within the active table.
+;;; Subs related to selections within the active selection layer.
 
-(rf/reg-sub :table/table-state-active
-            (fn [_ _]
-               {:table-states (rf/subscribe [:table/both-table-states])})
-            (fn [{:keys [table-states]}]
-              (get table-states :real-table)))
+(rf/reg-sub :table/selection-layer-active
+            :<- [:control/selection-color]
+            :<- [:table/selection-layers]
+            (fn [[color selection-layers]]
+              (get selection-layers color)))
 
 (rf/reg-sub :table/selections
-            :<- [:table/table-state-active]
+            :<- [:table/selection-layer-active]
             (fn [table-state]
               (get table-state :selections)))
 
 (rf/reg-sub :table/selected-columns
-            :<- [:table/table-state-active]
+            :<- [:table/selection-layer-active]
             (fn [table-state]
               (get table-state :selected-columns)))
 
 (rf/reg-sub :table/row-at-selection-start
-            :<- [:table/table-state-active]
+            :<- [:table/selection-layer-active]
             (fn [table-state]
               (get table-state :row-at-selection-start)))
 

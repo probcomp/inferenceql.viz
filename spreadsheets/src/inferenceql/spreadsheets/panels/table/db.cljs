@@ -5,11 +5,11 @@
 (def default-db
   {:table-panel {:headers (into [] (keys (first nyt-data)))
                  :rows nyt-data
-                 :hot-state {:real-table nil}}})
+                 :selection-layers {:blue nil}}})
 
 (s/def ::table-panel (s/keys :req-un [::headers
                                       ::rows
-                                      ::hot-state]
+                                      ::selection-layers]
                              :opt-un [::scores
                                       ::labels]))
 
@@ -46,13 +46,13 @@
 
 ;;; Specs related to storing the selection state of both handsontables
 
-(s/def ::table-id #{:real-table})
+(s/def ::selection-color #{:blue :red :green})
 (s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
                                                  ::selections
                                                  ::selected-columns
                                                  ::header-clicked
                                                  ::coords])))
-(s/def ::hot-state (s/map-of ::table-id ::table-state))
+(s/def ::selection-layers (s/map-of ::selection-color ::table-state))
 
 ;;; Accessor functions to portions of the table-panel db.
 

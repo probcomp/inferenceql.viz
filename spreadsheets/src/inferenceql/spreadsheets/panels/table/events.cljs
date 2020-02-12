@@ -2,7 +2,8 @@
   (:require [re-frame.core :as rf]
             [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
+            [inferenceql.spreadsheets.panels.control.db :as control-db]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
@@ -94,12 +95,14 @@
 
              ;; This is the row at the start point of the most recent selection.
              row (js->clj (zipmap (.getColHeader hot)
-                                  (.getDataAtRow hot row-index)))]
+                                  (.getDataAtRow hot row-index)))
+
+             color (control-db/selection-color db)]
          {:db (-> db
-                  (assoc-in [:table-panel :hot-state id :selected-columns] select-order-headers)
-                  (assoc-in [:table-panel :hot-state id :selections] selected-data)
-                  (assoc-in [:table-panel :hot-state id :row-at-selection-start] row)
-                  (assoc-in [:table-panel :hot-state id :coords] (js->clj selection-layers)))})))))
+                  (assoc-in [:table-panel :selection-layers color :selected-columns] select-order-headers)
+                  (assoc-in [:table-panel :selection-layers color :selections] selected-data)
+                  (assoc-in [:table-panel :selection-layers color :row-at-selection-start] row)
+                  (assoc-in [:table-panel :selection-layers color :coords] (js->clj selection-layers)))})))))
 
 (rf/reg-event-db
  :hot/after-on-cell-mouse-down
@@ -109,19 +112,21 @@
          header-clicked-flag (= -1 (.-row coords))
 
          ;; Stores whether the user held alt during the click.
-         alt-key-pressed (.-altKey mouse-event)]
+         alt-key-pressed (.-altKey mouse-event)
+         color (control-db/selection-color db)]
 
      ; Deselect all cells on alt-click.
      (when alt-key-pressed
        (.deselectCell hot))
 
      (-> db
-         (assoc-in [:table-panel :hot-state id :header-clicked] header-clicked-flag)))))
+         (assoc-in [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
 
 (rf/reg-event-db
  :hot/after-deselect
  event-interceptors
  (fn [db [_ hot id]]
-   ;; clears selections associated with table
-   (update-in db [:table-panel :hot-state id]
-              dissoc :selected-columns :selections :row-at-selection-start :coords)))
+   (let [color (control-db/selection-color db)]
+     ;; clears selections associated with table
+     (update-in db [:table-panel :selection-layers color]
+                dissoc :selected-columns :selections :row-at-selection-start :coords))))
