@@ -3,7 +3,19 @@
   (:require [clojure.walk :as walk]
             [metaprob.distributions :as dist]
             [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.panels.table.handsontable :as hot]))
+            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
+            [inferenceql.spreadsheets.panels.table.db :as table-db]))
+
+;; These are column names that cannot be simulated.
+;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
+;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
+(def cols-invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header})
+
+(defn simulatable?
+  "Checks if `selection` is valid for simulation"
+  [selection col]
+  (and (table-db/one-cell-selected? selection)
+       (not (contains? cols-invalid-for-sim col))))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -240,3 +252,23 @@
       #{dist/gaussian dist/categorical} (strip-plot selections cols)
       ;; Default case: no plot -- empty vega-lite spec.
       nil)))
+
+(defn- spec-for-selection-layer [selection-layer]
+  (let [{layer-name :id
+         selections :selections
+         cols :selected-columns
+         row :row-at-selection-start} selection-layer]
+    (cond (simulatable? selections (first cols))
+          (gen-simulate-plot (first cols) row)
+
+          (= 1 (count cols)) ; One column selected.
+          (gen-histogram (first cols) selections)
+
+          :else ; Two or more columns selected.
+          (gen-comparison-plot (take 2 cols) selections))))
+
+(defn generate-spec [selection-layers]
+  (let [spec-layers (remove nil? (mapv spec-for-selection-layer selection-layers))]
+    (when (not-empty spec-layers)
+      {:$schema default-vega-lite-schema
+       :hconcat spec-layers})))
