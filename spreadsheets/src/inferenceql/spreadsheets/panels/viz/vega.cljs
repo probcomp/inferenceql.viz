@@ -104,17 +104,15 @@
 
 (defn gen-histogram [col selections]
   (let [col-type (get-col-type col)
-        col-binning (get-col-should-bin col)
-
-        spec {:data {:values selections}
-              :mark {:type "bar" :color default-table-color}
-              :encoding {:x {:bin col-binning
-                             :field col
-                             :type col-type}
-                         :y {:aggregate "count"
-                             :type "quantitative"}}
-              :resolve {:scale {:y "independent"}}}]
-    spec))
+        col-binning (get-col-should-bin col)]
+    {:data {:values selections}
+     :mark {:type "bar" :color default-table-color}
+     :encoding {:x {:bin col-binning
+                    :field col
+                    :type col-type}
+                :y {:aggregate "count"
+                    :type "quantitative"}}
+     :resolve {:scale {:y "independent"}}}))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
@@ -147,13 +145,12 @@
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
   [data cols-to-draw]
-  (let [spec {:data {:values data}
-              :mark "circle"
-              :encoding {:x {:field (first cols-to-draw)
-                             :type "quantitative"}
-                         :y {:field (second cols-to-draw)
-                             :type "quantitative"}}}]
-    spec))
+  {:data {:values data}
+   :mark "circle"
+   :encoding {:x {:field (first cols-to-draw)
+                  :type "quantitative"}
+              :y {:field (second cols-to-draw)
+                  :type "quantitative"}}})
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -209,33 +206,31 @@
   [data cols-to-draw]
   (let [[x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
-        [width height] (map strip-plot-size-helper cols-to-draw)
-        spec {:width width
-              :height height
-              :data {:values data}
-              :mark {:type "tick"}
-              :encoding {:x {:field x-field
-                             :type x-type
-                             :axis {:grid true :gridDash [2 2]}}
-                         :y {:field y-field
-                             :type y-type
-                             :axis {:grid true :gridDash [2 2]}}}}]
-    spec))
+        [width height] (map strip-plot-size-helper cols-to-draw)]
+    {:width width
+     :height height
+     :data {:values data}
+     :mark {:type "tick"}
+     :encoding {:x {:field x-field
+                    :type x-type
+                    :axis {:grid true :gridDash [2 2]}}
+                :y {:field y-field
+                    :type y-type
+                    :axis {:grid true :gridDash [2 2]}}}}))
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.
   Useful for comparing nominal-nominal data."
   [data cols-to-draw]
-  (let [[x-field y-field] cols-to-draw
-        spec {:data {:values data}
-              :mark {:type "circle"}
-              :encoding {:x {:field x-field
-                             :type "nominal"}
-                         :y {:field y-field
-                             :type "nominal"}
-                         :size {:aggregate "count"
-                                :type "quantitative"}}}]
-    spec))
+  (let [[x-field y-field] cols-to-draw]
+    {:data {:values data}
+     :mark {:type "circle"}
+     :encoding {:x {:field x-field
+                    :type "nominal"}
+                :y {:field y-field
+                    :type "nominal"}
+                :size {:aggregate "count"
+                       :type "quantitative"}}}))
 
 (defn gen-comparison-plot [cols selections]
   (let [cols-types (set (doall (map stattype cols)))]
