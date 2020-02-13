@@ -58,18 +58,15 @@
             :<- [:viz/selections-faceted]
             (fn [[simulatable sim-col selections cols row facetable selections-faceted]]
               (when selections
-                ;; When we have a faceted selection use that over the regular selection.
-                (let [selections-to-use (if facetable selections-faceted selections)
-                      facet-attr (when facetable (name :table))]
-                  (clj->js
-                    (cond simulatable ; One cell selected.
-                          (vega/gen-simulate-plot sim-col row)
+                (clj->js
+                  (cond simulatable ; One cell selected.
+                        (vega/gen-simulate-plot sim-col row)
 
-                          (= 1 (count cols)) ; One column selected.
-                          (vega/gen-histogram (first cols) selections-to-use facet-attr)
+                        (= 1 (count cols)) ; One column selected.
+                        (vega/gen-histogram (first cols) selections)
 
-                          :else ; Two or more columns selected.
-                          (vega/gen-comparison-plot (take 2 cols) selections-to-use facet-attr)))))))
+                        :else ; Two or more columns selected.
+                        (vega/gen-comparison-plot (take 2 cols) selections))))))
 
 (rf/reg-sub :viz/vega-lite-log-level
             :<- [:table/one-cell-selected]
