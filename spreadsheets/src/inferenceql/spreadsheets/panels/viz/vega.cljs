@@ -253,15 +253,17 @@
   (let [{layer-name :id
          selections :selections
          cols :selected-columns
-         row :row-at-selection-start} selection-layer]
-    (cond (simulatable? selections (first cols))
-          (gen-simulate-plot (first cols) row)
+         row :row-at-selection-start} selection-layer
+         spec (cond (simulatable? selections (first cols))
+                    (gen-simulate-plot (first cols) row)
 
-          (= 1 (count cols)) ; One column selected.
-          (gen-histogram (first cols) selections)
+                    (= 1 (count cols)) ; One column selected.
+                    (gen-histogram (first cols) selections)
 
-          :else ; Two or more columns selected.
-          (gen-comparison-plot (take 2 cols) selections))))
+                    :else ; Two or more columns selected.
+                    (gen-comparison-plot (take 2 cols) selections))
+          title (str (name layer-name) " " "selection")]
+    (assoc spec :title title)))
 
 (defn generate-spec [selection-layers]
   (let [spec-layers (mapv spec-for-selection-layer selection-layers)]
