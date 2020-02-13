@@ -26,17 +26,6 @@
                     (cond-> (js/vegaEmbed (r/dom-node this)
                                           spec
                                           opt)
-                      generator (.then (fn [res]
-                                         (let [current-run (swap! run inc)]
-                                           (js/requestAnimationFrame
-                                            (fn send []
-                                              (when (= current-run @run)
-                                                (let [datum (generator)
-                                                      changeset (.. js/vega
-                                                                    (changeset)
-                                                                    (insert (clj->js datum)))]
-                                                  (.run (.change (.-view res) "data" changeset)))
-                                                (js/requestAnimationFrame send)))))))
                       true (.catch (fn [err]
                                      (js/console.error err)))))))]
     (r/create-class
