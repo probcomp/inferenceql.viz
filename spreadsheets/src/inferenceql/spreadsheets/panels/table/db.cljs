@@ -79,3 +79,12 @@
 (defn with-scores
   [db scores]
   (assoc-in db [:table-panel :scores] scores))
+
+;;; Helper functions for selection information.
+
+(defn one-cell-selected?
+  "Determines if only a single cell is selected within `selections`."
+  [selections]
+  (= 1
+     (count selections) ; One row selected.
+     (count (keys (first selections))))) ; One column selected.
