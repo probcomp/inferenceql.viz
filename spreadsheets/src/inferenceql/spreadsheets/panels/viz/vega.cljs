@@ -270,4 +270,5 @@
     (when (not-empty spec-layers)
       {:$schema default-vega-lite-schema
        :hconcat spec-layers
-       :autosize {:resize true}})))
+       :autosize {:resize true}
+       :resolve {:legend {:size "independent"}}})))
