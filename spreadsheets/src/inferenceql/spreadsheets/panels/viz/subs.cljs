@@ -25,26 +25,6 @@
               (and one-cell-selected
                    (not (contains? cols-invalid-for-sim col)))))
 
-(rf/reg-sub :viz/selection-facetable
-            :<- [:table/selected-columns]
-            (fn [cols]
-              false))
-
-(rf/reg-sub :viz/selections-faceted
-            :<- [:table/selection-layers]
-            :<- [:viz/selection-facetable]
-            ;; TODO: modify to use selection layers.
-            (fn [[table-states selection-facetable]]
-              (when selection-facetable
-                (let [facet-attr :table
-                      selection-real (->> (get-in table-states [:real-table :selections])
-                                          (map #(assoc % facet-attr "Real Data")))
-
-                      selection-virtual (->> (get-in table-states [:virtual-table :selections])
-                                             (map #(assoc % facet-attr "Virtual Data")))]
-                  ;; This are the selections from both the real and virtual tables combined.
-                  (concat selection-real selection-virtual)))))
-
 (rf/reg-sub :viz/vega-lite-spec
             ;; Subs related to simulations.
             :<- [:viz/selection-simulatable]
@@ -53,10 +33,7 @@
             :<- [:table/selections]
             :<- [:table/selected-columns]
             :<- [:table/row-at-selection-start]
-            ;; Subs related to selection data merged between the :real-table and :virtual-table.
-            :<- [:viz/selection-facetable]
-            :<- [:viz/selections-faceted]
-            (fn [[simulatable sim-col selections cols row facetable selections-faceted]]
+            (fn [[simulatable sim-col selections cols row]]
               (when selections
                 (clj->js
                   (cond simulatable ; One cell selected.
