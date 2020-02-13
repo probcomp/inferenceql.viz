@@ -102,7 +102,7 @@
     dist/gaussian true
     dist/categorical false))
 
-(defn gen-histogram [col selections facet-attr]
+(defn gen-histogram [col selections]
   (let [col-type (get-col-type col)
         col-binning (get-col-should-bin col)
 
@@ -114,9 +114,7 @@
                          :y {:aggregate "count"
                              :type "quantitative"}}
               :resolve {:scale {:y "independent"}}}]
-    (if facet-attr
-      (assoc-in spec [:encoding :facet] {:field facet-attr :type "nominal"})
-      spec)))
+    spec))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
@@ -148,16 +146,14 @@
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
-  [data cols-to-draw facet-column]
+  [data cols-to-draw]
   (let [spec {:data {:values data}
               :mark "circle"
               :encoding {:x {:field (first cols-to-draw)
                              :type "quantitative"}
                          :y {:field (second cols-to-draw)
                              :type "quantitative"}}}]
-    (if facet-column
-      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
-      spec)))
+    spec))
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -210,7 +206,7 @@
 (defn- strip-plot
   "Generates vega-lite spec for a strip plot.
   Useful for comparing quantitative-nominal data."
-  [data cols-to-draw facet-column]
+  [data cols-to-draw]
   (let [[x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
         [width height] (map strip-plot-size-helper cols-to-draw)
@@ -224,14 +220,12 @@
                          :y {:field y-field
                              :type y-type
                              :axis {:grid true :gridDash [2 2]}}}}]
-    (if facet-column
-      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
-      spec)))
+    spec))
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.
   Useful for comparing nominal-nominal data."
-  [data cols-to-draw facet-column]
+  [data cols-to-draw]
   (let [[x-field y-field] cols-to-draw
         spec {:data {:values data}
               :mark {:type "circle"}
@@ -241,15 +235,13 @@
                              :type "nominal"}
                          :size {:aggregate "count"
                                 :type "quantitative"}}}]
-    (if facet-column
-      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
-      spec)))
+    spec))
 
-(defn gen-comparison-plot [cols selections facet-attr]
+(defn gen-comparison-plot [cols selections]
   (let [cols-types (set (doall (map stattype cols)))]
     (condp = cols-types
-      #{dist/gaussian} (scatter-plot selections cols facet-attr)
-      #{dist/categorical} (table-bubble-plot selections cols facet-attr)
-      #{dist/gaussian dist/categorical} (strip-plot selections cols facet-attr)
+      #{dist/gaussian} (scatter-plot selections cols)
+      #{dist/categorical} (table-bubble-plot selections cols)
+      #{dist/gaussian dist/categorical} (strip-plot selections cols)
       ;; Default case: no plot -- empty vega-lite spec.
       nil)))
