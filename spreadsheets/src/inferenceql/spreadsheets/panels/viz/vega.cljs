@@ -88,8 +88,7 @@
                                                dist/categorical "nominal")}}}
         layers (cond-> [simulations-layer]
                  col-val (conj observed-layer))]
-    {:$schema default-vega-lite-schema
-     :data {:name "data"}
+    {:data {:name "data"}
      :autosize {:resize true}
      :layer layers}))
 
@@ -107,8 +106,7 @@
   (let [col-type (get-col-type col)
         col-binning (get-col-should-bin col)
 
-        spec {:$schema default-vega-lite-schema
-              :data {:values selections}
+        spec {:data {:values selections}
               :mark {:type "bar" :color default-table-color}
               :encoding {:x {:bin col-binning
                              :field col
@@ -151,8 +149,7 @@
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
   [data cols-to-draw facet-column]
-  (let [spec {:$schema default-vega-lite-schema
-              :data {:values data}
+  (let [spec {:data {:values data}
               :mark "circle"
               :encoding {:x {:field (first cols-to-draw)
                              :type "quantitative"}
@@ -217,8 +214,7 @@
   (let [[x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
         [width height] (map strip-plot-size-helper cols-to-draw)
-        spec {:$schema default-vega-lite-schema
-              :width width
+        spec {:width width
               :height height
               :data {:values data}
               :mark {:type "tick"}
@@ -237,8 +233,7 @@
   Useful for comparing nominal-nominal data."
   [data cols-to-draw facet-column]
   (let [[x-field y-field] cols-to-draw
-        spec {:$schema default-vega-lite-schema
-              :data {:values data}
+        spec {:data {:values data}
               :mark {:type "circle"}
               :encoding {:x {:field x-field
                              :type "nominal"}
