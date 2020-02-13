@@ -101,7 +101,6 @@
         layers (cond-> [simulations-layer]
                  col-val (conj observed-layer))]
     {:data {:name "data"}
-     :autosize {:resize true}
      :layer layers}))
 
 (defn get-col-type [col-name]
@@ -268,4 +267,5 @@
   (let [spec-layers (mapv spec-for-selection-layer selection-layers)]
     (when (not-empty spec-layers)
       {:$schema default-vega-lite-schema
-       :hconcat spec-layers})))
+       :hconcat spec-layers
+       :autosize {:resize true}})))
