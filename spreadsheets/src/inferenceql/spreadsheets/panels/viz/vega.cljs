@@ -123,8 +123,7 @@
                     :field col
                     :type col-type}
                 :y {:aggregate "count"
-                    :type "quantitative"}}
-     :resolve {:scale {:y "independent"}}}))
+                    :type "quantitative"}}}))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
