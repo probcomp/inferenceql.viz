@@ -53,20 +53,5 @@
                 (.-Warn js/vega))))
 
 (rf/reg-sub :viz/generator
-            :<- [:viz/selection-simulatable]
-            :<- [:viz/column-to-simulate]
-            :<- [:table/row-at-selection-start]
-            :<- [:override/column-override-fns]
-            (fn [[simulatable col-to-sim row override-fns]]
-              (when simulatable
-                (let [override-map (select-keys override-fns [col-to-sim])
-                      override-insert-fn (co/gen-insert-fn override-map)
-                      constraints (mmix/with-row-values {} (-> row
-                                                               (select-keys (keys (:vars model/spec)))
-                                                               (dissoc col-to-sim)))
-                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                                         :observation-trace constraints))
-                      has-negative-vals? #(some (every-pred number? neg?) (vals %))]
-                  ;; returns the first result of gen-fn that doesn't have a negative salary
-                  ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
-                  #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))))
+            (fn []
+              nil))
