@@ -66,7 +66,7 @@
   data representing the row our cell is in.
   This spec itself does not perform the simulation. An other function must update
   the `data` dataset via the vega-lite API."
-  [col-name row]
+  [col-name row dataset-name]
   (let [col-kw (keyword col-name)
         col-val (get row col-name)
         y-axis {:title "Distribution of Probable Values"
@@ -100,7 +100,7 @@
                                                dist/categorical "nominal")}}}
         layers (cond-> [simulations-layer]
                  col-val (conj observed-layer))]
-    {:data {:name "data"}
+    {:data {:name dataset-name}
      :layer layers}))
 
 (defn get-col-type [col-name]
@@ -255,7 +255,7 @@
          cols :selected-columns
          row :row-at-selection-start} selection-layer
          spec (cond (simulatable? selections (first cols))
-                    (gen-simulate-plot (first cols) row)
+                    (gen-simulate-plot (first cols) row (name layer-name))
 
                     (= 1 (count cols)) ; One column selected.
                     (gen-histogram (first cols) selections)
