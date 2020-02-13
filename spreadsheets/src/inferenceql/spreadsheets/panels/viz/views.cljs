@@ -11,7 +11,8 @@
             :header {:labelFontSize 14}
             :mark {:tooltip true}
             ;; Remove title from faceted plots.
-            :headerFacet {:title nil}}})
+            :headerFacet {:title nil}
+            :concat {:spacing 50}}})
 
 (defn vega-lite
   "vega-lite reagent component"
