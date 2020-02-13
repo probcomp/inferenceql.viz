@@ -249,9 +249,7 @@
     (condp = cols-types
       #{dist/gaussian} (scatter-plot selections cols)
       #{dist/categorical} (table-bubble-plot selections cols)
-      #{dist/gaussian dist/categorical} (strip-plot selections cols)
-      ;; Default case: no plot -- empty vega-lite spec.
-      nil)))
+      #{dist/gaussian dist/categorical} (strip-plot selections cols))))
 
 (defn- spec-for-selection-layer [selection-layer]
   (let [{layer-name :id
@@ -268,7 +266,7 @@
           (gen-comparison-plot (take 2 cols) selections))))
 
 (defn generate-spec [selection-layers]
-  (let [spec-layers (remove nil? (mapv spec-for-selection-layer selection-layers))]
+  (let [spec-layers (mapv spec-for-selection-layer selection-layers)]
     (when (not-empty spec-layers)
       {:$schema default-vega-lite-schema
        :hconcat spec-layers})))
