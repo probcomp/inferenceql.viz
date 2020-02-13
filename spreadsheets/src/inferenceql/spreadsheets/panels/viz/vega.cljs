@@ -238,7 +238,6 @@
   [data cols-to-draw facet-column]
   (let [[x-field y-field] cols-to-draw
         spec {:$schema default-vega-lite-schema
-              :autosize {:type "pad"}
               :data {:values data}
               :mark {:type "circle"}
               :encoding {:x {:field x-field
