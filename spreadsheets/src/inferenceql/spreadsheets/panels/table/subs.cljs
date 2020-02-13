@@ -74,6 +74,10 @@
 
 ;;; Subs related to selections within tables.
 
+(def ^:private selection-layer-order
+  "This is the order in which selection layers will be returned in certain subscriptions."
+  [:blue :green :red])
+
 (rf/reg-sub :table/one-cell-selected
             (fn [_ _]
               (rf/subscribe [:table/selection-layer-active]))
@@ -85,6 +89,21 @@
 (rf/reg-sub :table/selection-layers
             (fn [db [_sub-name]]
               (get-in db [:table-panel :selection-layers])))
+
+(rf/reg-sub :table/selection-layers-list
+            :<- [:table/selection-layers]
+            (fn [selection-layers]
+              (let [layers-list (for [layer-name selection-layer-order]
+                                  (let [layer (get selection-layers layer-name)]
+                                    ;; Only add the selection layer to the list if there is
+                                    ;; a valid selection in it.
+                                    (when (some? (get layer :selections))
+                                      ;; Add in the name of the selection layer into the selection
+                                      ;; layer map itself because the layers will be embedded in a
+                                      ;; list, and no longer have keys (their names) associated with
+                                      ;; them.
+                                      (assoc layer :id layer-name))))]
+                (remove nil? layers-list))))
 
 ;;; Subs related to selections within the active selection layer.
 
