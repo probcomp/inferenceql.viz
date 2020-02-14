@@ -15,13 +15,6 @@
               (clj->js
                 (vega/generate-spec selection-layers))))
 
-(rf/reg-sub :viz/vega-lite-log-level
-            :<- [:table/one-cell-selected]
-            (fn [one-cell-selected]
-              (if one-cell-selected
-                (.-Error js/vega)
-                (.-Warn js/vega))))
-
 (defn make-simulate-fn
   [col-to-sim row override-fns]
   (let [override-map (select-keys override-fns [col-to-sim])

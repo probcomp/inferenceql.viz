@@ -3,9 +3,16 @@
   (:require [yarn.vega-embed]
             [reagent.core :as r]))
 
+(def ^:private log-level-default
+  (.-Error js/vega))
+
+(def ^:private log-level-debug
+  (.-Warn js/vega))
+
 (def ^:private default-vega-embed-options
   {:renderer "svg"
    :mode "vega-lite"
+   :logLevel log-level-default
    :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
             :legend {:labelFontSize 12 :titleFontSize 12}
             :header {:labelFontSize 14}
