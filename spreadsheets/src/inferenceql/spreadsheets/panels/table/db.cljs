@@ -46,7 +46,6 @@
 (s/def ::selections (s/coll-of ::selection))
 (s/def ::selected-columns (s/coll-of ::header))
 
-(s/def ::selected-row-index ::row-index)
 (s/def ::row-at-selection-start ::row)
 (s/def ::header-clicked boolean?)
 
@@ -54,7 +53,6 @@
 
 (s/def ::table-id #{:real-table :virtual-table})
 (s/def ::table-state (s/nilable (s/keys :opt-un [::row-at-selection-start
-                                                 ::selected-row-index
                                                  ::selections
                                                  ::selected-columns
                                                  ::header-clicked])))

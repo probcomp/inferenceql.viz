@@ -20,10 +20,10 @@
      [control/panel]
      [:div {:class ["table-title" (when real-table-in-viz "table-title-selected")]}
       [:span "Real Data"]]
-     [table/handsontable {:style {:overflow "hidden"}}  real-hot-props]
+     [table/handsontable {} real-hot-props]
      [:div {:class ["table-title" (when virtual-table-in-viz "table-title-selected")]}
       [:span "Virtual Data"]]
-     [table/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
+     [table/handsontable {:class "virtual-hot"} virtual-hot-props]
      [:div#viz-container
       (when vega-lite-spec
         [viz/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]

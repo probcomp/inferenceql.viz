@@ -5,15 +5,16 @@
             [inferenceql.multimixture.search :as search]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
-            [inferenceql.spreadsheets.panels.override.helpers :as co]))
+            [inferenceql.spreadsheets.panels.override.helpers :as co]
+            [inferenceql.spreadsheets.panels.table.handsontable :as hot]))
 
 (defn vega-lite-spec
   [{:keys [table-states t-clicked]}]
   (let [{selections :selections cols :selected-columns row :row-at-selection-start} (table-states t-clicked)
         ;; These are column names that cannot be simulated
-        ;; `vega/label-col-header` and `vega/score-col-header` are not part of any dataset.
+        ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
         ;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
-        invalid-for-sim #{"geo_fips" "NAME" vega/label-col-header vega/score-col-header}]
+        invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header}]
     (when (first selections)
       (clj->js
        (cond (and (= 1 (count cols))
@@ -56,7 +57,7 @@
                     override-insert-fn (co/gen-insert-fn override-map)]
                 (when (and one-cell-selected
                            ;; TODO clean up this check
-                           (not (contains? #{"geo_fips" "NAME" vega/score-col-header vega/label-col-header} col-to-sample)))
+                           (not (contains? #{"geo_fips" "NAME" hot/score-col-header hot/label-col-header} col-to-sample)))
                   (let [constraints (mmix/with-row-values {} (-> row
                                                                  (select-keys (keys (:vars model/spec)))
                                                                  (dissoc col-to-sample)))

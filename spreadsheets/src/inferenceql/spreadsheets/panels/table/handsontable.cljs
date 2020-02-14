@@ -1,5 +1,12 @@
 (ns inferenceql.spreadsheets.panels.table.handsontable)
 
+(def label-col-header
+  "Header text for the column used for labeling rows as examples."
+  "🏷")
+(def score-col-header
+  "Header text for the column that shows scores."
+  "probability")
+
 (defn freeze-col-1-2-fn [columns-moving target]
   "Prevents the movement of the first two columns in the table.
   Also prevents other columns from moving into those frist two spots."

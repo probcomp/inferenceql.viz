@@ -2,14 +2,8 @@
   "Code related to generating vega-lite specs"
   (:require [clojure.walk :as walk]
             [metaprob.distributions :as dist]
-            [inferenceql.spreadsheets.model :as model]))
-
-(def label-col-header
-  "Header text for the column used for labeling rows as examples."
-  "🏷")
-(def score-col-header
-  "Header text for the column that shows scores."
-  "probability")
+            [inferenceql.spreadsheets.model :as model]
+            [inferenceql.spreadsheets.panels.table.handsontable :as hot]))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -40,7 +34,7 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (if (contains? #{score-col-header label-col-header} column)
+  (let [stattype-kw (if (contains? #{hot/score-col-header hot/label-col-header} column)
                       :gaussian
                       (get-in model/spec [:vars column]))]
     (case stattype-kw

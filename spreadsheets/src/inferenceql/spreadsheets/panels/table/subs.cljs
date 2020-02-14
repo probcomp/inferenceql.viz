@@ -1,7 +1,6 @@
 (ns inferenceql.spreadsheets.panels.table.subs
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
-            [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.table.db :as db]
@@ -82,12 +81,45 @@
             (fn [db [_sub-name]]
               (get-in db [:table-panel :hot-state])))
 
+;;; Subs related to selections within the active table.
+
 (rf/reg-sub :table/table-state-active
             (fn [_ _]
               {:table-id (rf/subscribe [:table/table-last-clicked])
                :table-states (rf/subscribe [:table/both-table-states])})
             (fn [{:keys [table-id table-states]}]
               (get table-states table-id)))
+
+(rf/reg-sub :table/selections
+            :<- [:table/table-state-active]
+            (fn [table-state]
+              (get table-state :selections)))
+
+(rf/reg-sub :table/selected-columns
+            :<- [:table/table-state-active]
+            (fn [table-state]
+              (get table-state :selected-columns)))
+
+(rf/reg-sub :table/row-at-selection-start
+            :<- [:table/table-state-active]
+            (fn [table-state]
+              (get table-state :row-at-selection-start)))
+
+;;; Subs related to selections within the inactive table.
+
+(rf/reg-sub :table/table-state-inactive
+            (fn [_ _]
+              {:table-id (rf/subscribe [:table/table-last-clicked])
+               :table-states (rf/subscribe [:table/both-table-states])})
+            (fn [{:keys [table-id table-states]}]
+              (when table-id
+                (let [inactive-id (db/other-table-id table-id)]
+                  (get table-states inactive-id)))))
+
+(rf/reg-sub :table/selected-columns-inactive
+            :<- [:table/table-state-inactive]
+            (fn [table-state]
+              (get table-state :selected-columns)))
 
 ;;; Subs related to scores computed on rows in the tables.
 
@@ -110,7 +142,7 @@
             (fn [_ _]
               (rf/subscribe [:table/table-headers]))
             (fn [headers]
-              (into [vega/label-col-header vega/score-col-header] headers)))
+              (into [hot/label-col-header hot/score-col-header] headers)))
 
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
@@ -127,10 +159,10 @@
                                         (merge row imputed-values-in-row))
                                       imputed-values)
                   scores (mapv (fn [score row]
-                                 (assoc row vega/score-col-header score))
+                                 (assoc row hot/score-col-header score))
                                scores)
                   labels (mapv (fn [label row]
-                                 (assoc row vega/label-col-header label))
+                                 (assoc row hot/label-col-header label))
                                labels)))))
 
 (rf/reg-sub :table/virtual-computed-rows
@@ -144,7 +176,7 @@
 
       ;; Creation of dummy scores allows correct attaching of old scores to
       ;; rows even when new rows are generated after a scoring event.
-      (mapv (fn [score row] (assoc row vega/score-col-header score))
+      (mapv (fn [score row] (assoc row hot/score-col-header score))
             scores rows))))
 
 (defn table-rows
@@ -157,34 +189,26 @@
   (db/virtual-rows db))
 (rf/reg-sub :table/virtual-rows virtual-rows)
 
-(defn- cell-vector
-  "Takes tabular data represented as a sequence of maps and reshapes the data as a
-  2D vector of cells and a vector of headers."
-  [headers rows]
-  (into []
-        (map (fn [row]
-               (into []
-                     (map #(get row %))
-                     headers)))
-        rows))
+(defn- column-settings [headers]
+  "Returns an array of objects that define settings for each column
+  in the table including which attribute from the underlying map for the row
+  is presented."
+  (let [settings-map (fn [attr]
+                       (if (= attr hot/label-col-header)
+                         {:data attr :readOnly false} ; Make the score column user-editable.
+                         {:data attr}))]
+    (map settings-map headers)))
 
 ;;; Subs related to settings and overall state of tables.
 
 (defn real-hot-props
   [{:keys [headers rows cells-style-fn context-menu]} _]
-  (let [data (cell-vector headers rows)
-
-        num-columns (count headers)
-        initial-column-setting {:readOnly false}
-        rem-column-settings (repeat (dec num-columns) {})
-
-        all-column-settings (cons initial-column-setting rem-column-settings)]
-    (-> hot/real-hot-settings
-        (assoc-in [:settings :data] data)
-        (assoc-in [:settings :colHeaders] headers)
-        (assoc-in [:settings :columns] all-column-settings)
-        (assoc-in [:settings :cells] cells-style-fn)
-        (assoc-in [:settings :contextMenu] context-menu))))
+  (-> hot/real-hot-settings
+      (assoc-in [:settings :data] rows)
+      (assoc-in [:settings :colHeaders] headers)
+      (assoc-in [:settings :columns] (column-settings headers))
+      (assoc-in [:settings :cells] cells-style-fn)
+      (assoc-in [:settings :contextMenu] context-menu)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
@@ -195,13 +219,10 @@
 
 (defn virtual-hot-props
   [{:keys [headers rows]} _]
-  (let [data (cell-vector headers rows)
-        num-columns (count headers)
-        column-settings (repeat num-columns {})]
-    (-> hot/virtual-hot-settings
-        (assoc-in [:settings :data] data)
-        (assoc-in [:settings :colHeaders] headers)
-        (assoc-in [:settings :columns] column-settings))))
+  (-> hot/virtual-hot-settings
+      (assoc-in [:settings :data] rows)
+      (assoc-in [:settings :colHeaders] headers)
+      (assoc-in [:settings :columns] (column-settings headers))))
 (rf/reg-sub :table/virtual-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
