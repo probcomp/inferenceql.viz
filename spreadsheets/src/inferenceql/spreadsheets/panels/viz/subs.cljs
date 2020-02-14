@@ -29,7 +29,7 @@
     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
     #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))
 
-(rf/reg-sub :viz/generator
+(rf/reg-sub :viz/generators
             :<- [:table/selection-layers]
             :<- [:override/column-override-fns]
             (fn [[layers override-fns]]

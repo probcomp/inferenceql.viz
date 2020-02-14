@@ -11,7 +11,7 @@
   []
   (let [real-hot-props      @(rf/subscribe [:table/real-hot-props])
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
-        generator      @(rf/subscribe [:viz/generator])
+        generators      @(rf/subscribe [:viz/generators])
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
@@ -19,5 +19,5 @@
        [table/handsontable {} real-hot-props]]
      [:div#viz-container
       (when vega-lite-spec
-        [viz/vega-lite vega-lite-spec {:actions false} generator])]
+        [viz/vega-lite vega-lite-spec {:actions false} generators])]
      [modal/modal]]))

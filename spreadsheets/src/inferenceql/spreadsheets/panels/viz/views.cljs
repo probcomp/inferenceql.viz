@@ -23,7 +23,7 @@
 
 (defn vega-lite
   "vega-lite reagent component"
-  [spec opt generator]
+  [spec opt generators]
   (let [run (atom 0)
         ;; Uses generator functions in map `generators` to generate new rows and
         ;; insert them into `vega-instance`.
@@ -34,7 +34,7 @@
                                                       (changeset)
                                                       (insert (clj->js datum)))]
                                     (.run (.change (.-view vega-instance) (name dataset-name) changeset))))))
-        embed (fn [this spec opt generator]
+        embed (fn [this spec opt generators]
                 (when spec
                   (let [spec (clj->js spec)
                         opt (clj->js (merge default-vega-embed-options
@@ -42,12 +42,12 @@
                     (cond-> (js/vegaEmbed (r/dom-node this)
                                           spec
                                           opt)
-                      (seq generator) (.then (fn [res]
+                      (seq generators) (.then (fn [res]
                                                (let [current-run (swap! run inc)]
                                                  (js/requestAnimationFrame
                                                   (fn send []
                                                     (when (= current-run @run)
-                                                      (gen-and-insert generator res)
+                                                      (gen-and-insert generators res)
                                                       (js/requestAnimationFrame send)))))))
                       true (.catch (fn [err]
                                      (js/console.error err)))))))]
@@ -56,11 +56,11 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt generator))
+        (embed this spec opt generators))
 
       :component-will-update
-      (fn [this [_ new-spec new-opt new-generator]]
-        (embed this new-spec new-opt new-generator))
+      (fn [this [_ new-spec new-opt new-generators]]
+        (embed this new-spec new-opt new-generators))
 
       :component-will-unmount
       (fn [this]
