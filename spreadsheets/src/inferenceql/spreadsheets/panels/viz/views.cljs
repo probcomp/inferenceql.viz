@@ -25,6 +25,15 @@
   "vega-lite reagent component"
   [spec opt generator]
   (let [run (atom 0)
+        ;; Uses generator functions in map `generators` to generate new rows and
+        ;; insert them into `vega-instance`.
+        gen-and-insert (fn [generators vega-instance]
+                         (doall (for [[dataset-name gen-fn] (seq generators)]
+                                  (let [datum (gen-fn)
+                                        changeset (.. js/vega
+                                                      (changeset)
+                                                      (insert (clj->js datum)))]
+                                    (.run (.change (.-view vega-instance) (name dataset-name) changeset))))))
         embed (fn [this spec opt generator]
                 (when spec
                   (let [spec (clj->js spec)
@@ -33,6 +42,13 @@
                     (cond-> (js/vegaEmbed (r/dom-node this)
                                           spec
                                           opt)
+                      (seq generator) (.then (fn [res]
+                                               (let [current-run (swap! run inc)]
+                                                 (js/requestAnimationFrame
+                                                  (fn send []
+                                                    (when (= current-run @run)
+                                                      (gen-and-insert generator res)
+                                                      (js/requestAnimationFrame send)))))))
                       true (.catch (fn [err]
                                      (js/console.error err)))))))]
     (r/create-class
