@@ -78,14 +78,6 @@
   "This is the order in which selection layers will be returned in certain subscriptions."
   [:blue :green :red])
 
-(rf/reg-sub :table/one-cell-selected
-            (fn [_ _]
-              (rf/subscribe [:table/selection-layer-active]))
-            (fn [{:keys [selections]}]
-              (= 1
-                 (count selections) ; One row selected.
-                 (count (keys (first selections)))))) ; One column selected.
-
 (rf/reg-sub :table/selection-layers
             (fn [db [_sub-name]]
               (get-in db [:table-panel :selection-layers])))
