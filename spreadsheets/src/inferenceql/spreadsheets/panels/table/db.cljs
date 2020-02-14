@@ -42,8 +42,7 @@
 (s/def ::row-index ::index)
 (s/def ::column-index ::index)
 
-(s/def ::selection (s/coll-of ::row))
-(s/def ::selections (s/coll-of ::selection))
+(s/def ::selections (s/coll-of ::row))
 (s/def ::selected-columns (s/coll-of ::header))
 
 (s/def ::row-at-selection-start ::row)

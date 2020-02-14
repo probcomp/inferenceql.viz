@@ -69,9 +69,8 @@
               (rf/subscribe [:table/table-state-active]))
             (fn [{:keys [selections]}]
               (= 1
-                 (count selections)
-                 (count (first selections))
-                 (count (keys (first selections))))))
+                 (count selections) ; One row selected.
+                 (count (keys (first selections)))))) ; One column selected.
 
 (rf/reg-sub :table/table-last-clicked
             (fn [db _]

@@ -8,34 +8,69 @@
             [inferenceql.spreadsheets.panels.override.helpers :as co]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]))
 
-(defn vega-lite-spec
-  [{:keys [table-states t-clicked]}]
-  (let [{selections :selections cols :selected-columns row :row-at-selection-start} (table-states t-clicked)
-        ;; These are column names that cannot be simulated
-        ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
-        ;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
-        invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header}]
-    (when (first selections)
-      (clj->js
-       (cond (and (= 1 (count cols))
-                  (= 1 (count (first selections)))
-                  (not (invalid-for-sim (first cols))))
-             (vega/gen-simulate-plot cols row t-clicked)
+;; These are column names that cannot be simulated.
+;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
+;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
+(def cols-invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header})
 
-             (= 1 (count cols))
-             (vega/gen-histogram table-states t-clicked)
+(rf/reg-sub :viz/column-to-simulate
+            :<- [:table/selected-columns]
+            (fn [columns]
+              (first columns)))
 
-             (some #{"geo_fips"} cols)
-             (vega/gen-choropleth selections cols)
+(rf/reg-sub :viz/selection-simulatable
+            :<- [:table/one-cell-selected]
+            :<- [:viz/column-to-simulate]
+            (fn [[one-cell-selected col]]
+              (and one-cell-selected
+                   (not (contains? cols-invalid-for-sim col)))))
 
-             :else
-             (vega/gen-comparison-plot table-states t-clicked))))))
+(rf/reg-sub :viz/selection-facetable
+            :<- [:table/selected-columns]
+            :<- [:table/selected-columns-inactive]
+            (fn [[col-1 col-2]]
+              ;; Checks if the user has selected the same column in both the real and virtual tables.
+              (= col-1 col-2)))
+
+(rf/reg-sub :viz/selections-faceted
+            :<- [:table/both-table-states]
+            :<- [:viz/selection-facetable]
+            (fn [[table-states selection-facetable]]
+              (when selection-facetable
+                (let [facet-attr :table
+                      selection-real (->> (get-in table-states [:real-table :selections])
+                                          (map #(assoc % facet-attr "Real Data")))
+
+                      selection-virtual (->> (get-in table-states [:virtual-table :selections])
+                                             (map #(assoc % facet-attr "Virtual Data")))]
+                  ;; This are the selections from both the real and virtual tables combined.
+                  (concat selection-real selection-virtual)))))
+
 (rf/reg-sub :viz/vega-lite-spec
-            (fn [_ _]
-              {:table-states (rf/subscribe [:table/both-table-states])
-               :t-clicked (rf/subscribe [:table/table-last-clicked])})
-            (fn [data-for-spec]
-              (vega-lite-spec data-for-spec)))
+            ;; Subs related to simulations.
+            :<- [:viz/selection-simulatable]
+            :<- [:viz/column-to-simulate]
+            ;; Subs related to selection state in the last-clicked-on table.
+            :<- [:table/selections]
+            :<- [:table/selected-columns]
+            :<- [:table/row-at-selection-start]
+            ;; Subs related to selection data merged between the :real-table and :virtual-table.
+            :<- [:viz/selection-facetable]
+            :<- [:viz/selections-faceted]
+            (fn [[simulatable sim-col selections cols row facetable selections-faceted]]
+              (when selections
+                ;; When we have a faceted selection use that over the regular selection.
+                (let [selections-to-use (if facetable selections-faceted selections)
+                      facet-attr (when facetable (name :table))]
+                  (clj->js
+                    (cond simulatable ; One cell selected.
+                          (vega/gen-simulate-plot sim-col row)
+
+                          (= 1 (count cols)) ; One column selected.
+                          (vega/gen-histogram (first cols) selections-to-use facet-attr)
+
+                          :else ; Two or more columns selected.
+                          (vega/gen-comparison-plot (take 2 cols) selections-to-use facet-attr)))))))
 
 (rf/reg-sub :viz/vega-lite-log-level
             :<- [:table/one-cell-selected]
@@ -45,28 +80,23 @@
                 (.-Warn js/vega))))
 
 (rf/reg-sub :viz/generator
-            (fn [_ _]
-              {:selection-info (rf/subscribe [:table/table-state-active])
-               :one-cell-selected (rf/subscribe [:table/one-cell-selected])
-               :override-fns (rf/subscribe [:override/column-override-fns])})
-            (fn [{:keys [selection-info one-cell-selected override-fns]}]
-              (let [row (:row-at-selection-start selection-info)
-                    columns (:selected-columns selection-info)
-                    col-to-sample (first columns)
-                    override-map (select-keys override-fns [col-to-sample])
-                    override-insert-fn (co/gen-insert-fn override-map)]
-                (when (and one-cell-selected
-                           ;; TODO clean up this check
-                           (not (contains? #{"geo_fips" "NAME" hot/score-col-header hot/label-col-header} col-to-sample)))
-                  (let [constraints (mmix/with-row-values {} (-> row
-                                                                 (select-keys (keys (:vars model/spec)))
-                                                                 (dissoc col-to-sample)))
-                        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                                           :observation-trace constraints))
-                        has-negative-vals? #(some (every-pred number? neg?) (vals %))]
-                    ;; returns the first result of gen-fn that doesn't have a negative salary
-                    ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
-                    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn)))))))))
+            :<- [:viz/selection-simulatable]
+            :<- [:viz/column-to-simulate]
+            :<- [:table/row-at-selection-start]
+            :<- [:override/column-override-fns]
+            (fn [[simulatable col-to-sim row override-fns]]
+              (when simulatable
+                (let [override-map (select-keys override-fns [col-to-sim])
+                      override-insert-fn (co/gen-insert-fn override-map)
+                      constraints (mmix/with-row-values {} (-> row
+                                                               (select-keys (keys (:vars model/spec)))
+                                                               (dissoc col-to-sim)))
+                      gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+                                                         :observation-trace constraints))
+                      has-negative-vals? #(some (every-pred number? neg?) (vals %))]
+                  ;; returns the first result of gen-fn that doesn't have a negative salary
+                  ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
+                  #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))))
 
 (rf/reg-sub :viz/tables-visualized
             :<- [:table/both-table-states]

@@ -48,40 +48,50 @@
     dist/gaussian "quantitative"
     dist/categorical "nominal"))
 
-(defn gen-simulate-plot [selected-columns row-at-selection-start t-clicked]
- (let [selected-column-kw (keyword (first selected-columns))
-       y-axis {:title "distribution of probable values"
-               :grid false
-               :labels false
-               :ticks false}
-       y-scale {:nice false}]
-   {:$schema default-vega-lite-schema
-    :data {:name "data"}
-    :autosize {:resize true}
-    :layer (cond-> [{:mark {:type "bar" :color default-table-color}
-                     :encoding (condp = (stattype (first selected-columns))
-                                 dist/gaussian {:x {:bin true
-                                                    :field selected-column-kw
-                                                    :type "quantitative"}
-                                                :y {:aggregate "count"
-                                                    :type "quantitative"
-                                                    :axis y-axis
-                                                    :scale y-scale}}
-                                 dist/categorical {:x {:field selected-column-kw
-                                                       :type "nominal"}
-                                                   :y {:aggregate "count"
-                                                       :type "quantitative"
-                                                       :axis y-axis
-                                                       :scale y-scale}})}]
-             (get row-at-selection-start (first selected-columns))
-             (conj {:data {:values [{selected-column-kw (-> row-at-selection-start (get (first selected-columns)))
-                                     :label "Selected row"}]}
-                    :mark {:type "rule"
-                           :color "red"}
-                    :encoding {:x {:field selected-column-kw
-                                   :type (condp = (stattype (first selected-columns))
-                                           dist/gaussian "quantitative"
-                                           dist/categorical "nominal")}}}))}))
+(defn gen-simulate-plot
+  "Generates a vega-lite spec for a histogram of simulated values for a cell.
+  `col-name` is the column that the cell is in. And `row` is map of
+  data representing the row our cell is in.
+  This spec itself does not perform the simulation. An other function must update
+  the `data` dataset via the vega-lite API."
+  [col-name row]
+  (let [col-kw (keyword col-name)
+        col-val (get row col-name)
+        y-axis {:title "Distribution of Probable Values"
+                :grid false
+                :labels false
+                :ticks false}
+        y-scale {:nice false}
+        simulations-layer {:mark {:type "bar" :color default-table-color}
+                           :encoding (condp = (stattype col-name)
+                                       dist/gaussian {:x {:bin true
+                                                          :field col-kw
+                                                          :type "quantitative"}
+                                                      :y {:aggregate "count"
+                                                          :type "quantitative"
+                                                          :axis y-axis
+                                                          :scale y-scale}}
+                                       dist/categorical {:x {:field col-kw
+                                                             :type "nominal"}
+                                                         :y {:aggregate "count"
+                                                             :type "quantitative"
+                                                             :axis y-axis
+                                                             :scale y-scale}})}
+        ;; This layer draws a red line on the histogram bin that contains
+        ;; the observed value.
+        observed-layer {:data {:values [{col-kw col-val}]}
+                        :mark {:type "rule"
+                               :color "red"}
+                        :encoding {:x {:field col-kw
+                                       :type (condp = (stattype col-name)
+                                               dist/gaussian "quantitative"
+                                               dist/categorical "nominal")}}}
+        layers (cond-> [simulations-layer]
+                 col-val (conj observed-layer))]
+    {:$schema default-vega-lite-schema
+     :data {:name "data"}
+     :autosize {:resize true}
+     :layer layers}))
 
 (defn get-col-type [col-name]
   (condp = (stattype col-name)
@@ -93,41 +103,21 @@
     dist/gaussian true
     dist/categorical false))
 
-(defn gen-histogram [table-states t-clicked]
-  (let [selection-real (->> (first (get-in table-states [:real-table :selections]))
-                            (map #(assoc % :table "Real Data")))
-
-        selection-virtual (->> (first (get-in table-states [:virtual-table :selections]))
-                               (map #(assoc % :table "Virtual Data")))
-
-        col-real (first (get-in table-states [:real-table :selected-columns]))
-        col-virtual (first (get-in table-states [:virtual-table :selected-columns]))
-        ;; Checks if the user has selected the same column in both the real and virtual tables.
-        make-faceted (= col-real col-virtual)
-
-        col-to-draw (first (get-in table-states [t-clicked :selected-columns]))
-        col-type (get-col-type col-to-draw)
-        col-binning (get-col-should-bin col-to-draw)
-
-        ;; This is the selection from the last-clicked-on table.
-        selection-not-faceted (first (get-in table-states [t-clicked :selections]))
-        ;; This is the selections from both the real and virtual tables combined.
-        selection-faceted (concat selection-real selection-virtual)
-
-        selection-to-use (if make-faceted selection-faceted selection-not-faceted)
-        facet-column (when make-faceted "table")
+(defn gen-histogram [col selections facet-attr]
+  (let [col-type (get-col-type col)
+        col-binning (get-col-should-bin col)
 
         spec {:$schema default-vega-lite-schema
-              :data {:values selection-to-use}
+              :data {:values selections}
               :mark {:type "bar" :color default-table-color}
               :encoding {:x {:bin col-binning
-                             :field col-to-draw
+                             :field col
                              :type col-type}
                          :y {:aggregate "count"
                              :type "quantitative"}}
               :resolve {:scale {:y "independent"}}}]
-    (if facet-column
-      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
+    (if facet-attr
+      (assoc-in spec [:encoding :facet] {:field facet-attr :type "nominal"})
       spec)))
 
 (defn gen-choropleth [selections selected-columns]
@@ -261,32 +251,11 @@
       (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
       spec)))
 
-(defn gen-comparison-plot [table-states t-clicked]
-  (let [selection-real (->> (first (get-in table-states [:real-table :selections]))
-                            (map #(assoc % :table "Real Data")))
-
-        selection-virtual (->> (first (get-in table-states [:virtual-table :selections]))
-                               (map #(assoc % :table "Virtual Data")))
-
-        cols-real (take 2 (get-in table-states [:real-table :selected-columns]))
-        cols-virtual (take 2 (get-in table-states [:virtual-table :selected-columns]))
-
-        ;; Checks if the user has selected the same columns in both the real and virtual tables.
-        make-faceted (= cols-real cols-virtual)
-
-        cols-to-draw (take 2 (get-in table-states [t-clicked :selected-columns]))
-        cols-types (set (doall (map stattype cols-to-draw)))
-
-        ;; This is the selection from the last-clicked-on table.
-        selection-not-faceted (first (get-in table-states [t-clicked :selections]))
-        ;; This is the selections from both the real and virtual tables combined.
-        selection-faceted (concat selection-real selection-virtual)
-
-        selection-to-use (if make-faceted selection-faceted selection-not-faceted)
-        facet-column (when make-faceted "table")]
+(defn gen-comparison-plot [cols selections facet-attr]
+  (let [cols-types (set (doall (map stattype cols)))]
     (condp = cols-types
-      #{dist/gaussian} (scatter-plot selection-to-use cols-to-draw facet-column)
-      #{dist/categorical} (table-bubble-plot selection-to-use cols-to-draw facet-column)
-      #{dist/gaussian dist/categorical} (strip-plot selection-to-use cols-to-draw facet-column)
+      #{dist/gaussian} (scatter-plot selections cols facet-attr)
+      #{dist/categorical} (table-bubble-plot selections cols facet-attr)
+      #{dist/gaussian dist/categorical} (strip-plot selections cols facet-attr)
       ;; Default case: no plot -- empty vega-lite spec.
-      {})))
+      nil)))
