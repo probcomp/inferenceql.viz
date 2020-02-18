@@ -56,7 +56,8 @@
          [:button.toolbar-button.pure-button
           {:on-click #(rf/dispatch [:query/parse-query @input-text @label-info])} "Run InferenceQL"]
          [:button.toolbar-button.pure-button
-          {:on-click #(rf/dispatch [:table/clear-virtual-data])} "Delete virtual data"]]]
+          ;; This button performs a no-op currently.
+          {:on-click #(do)} "Delete virtual data"]]]
      [:div.flex-box-space-filler]
      [:div#conf-controls
       [confidence-slider]

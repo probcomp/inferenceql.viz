@@ -12,25 +12,6 @@
  (fn [db [_ result]]
    (db/with-scores db result)))
 
-(rf/reg-event-db
- :table/virtual-search-result
- event-interceptors
- (fn [db [_ result]]
-   (db/with-virtual-scores db result)))
-
-(rf/reg-event-db
- :table/clear-virtual-data
- event-interceptors
- (fn [db [event-name]]
-   (-> (db/clear-virtual-rows db)
-       (db/clear-virtual-scores))))
-
-(rf/reg-event-db
- :table/clear-virtual-scores
- event-interceptors
- (fn [db [event-name]]
-   (db/clear-virtual-scores db)))
-
 ;;; Events that correspond to hooks in the Handsontable API
 
 ;; Used to detect changes in the :real-data handsontable
@@ -51,26 +32,6 @@
 
      (let [labels (.getDataAtProp hot label-col)]
        (db/with-labels db (js->clj labels))))))
-
-;; Used to detect changes in the :virtual-data handsontable
-(rf/reg-event-fx
- :hot/after-change
- event-interceptors
- (fn [{:keys [db]} [_ hot id changes source]]
-
-   ;; `changes` should be null when source of changes is loadData (see docs for why).
-   (assert (= nil changes))
-   ;; Setting the table's data via the `virtual-hot-props` sub should be the only way it is changing.
-   (assert (= source "loadData"))
-
-   (let [table-state (db/table-selection-state db id)]
-     (if-let [header-clicked (:header-clicked table-state)]
-       (let [current-selection (.getSelectedLast hot)
-             [_row1 col1 _row2 col2] (js->clj current-selection)]
-         ;; Take the current selection and expand it so the whole columns
-         ;; are selected.
-         (.selectColumns hot col1 col2))))
-   {}))
 
 (rf/reg-event-fx
  :hot/after-selection-end
@@ -143,23 +104,18 @@
  :hot/after-on-cell-mouse-down
  event-interceptors
  (fn [db [_ hot id mouse-event coords _TD]]
-   (let [other-table-id (db/other-table-id id)
-
-         ;; Stores whether the user clicked on one of the column headers.
+   (let [;; Stores whether the user clicked on one of the column headers.
          header-clicked-flag (= -1 (.-row coords))
 
          ;; Stores whether the user held alt during the click.
-         alt-key-pressed (.-altKey mouse-event)
-         ; Switch the last clicked on table-id to the other table on alt-click.
-         new-table-clicked-id (if alt-key-pressed other-table-id id)]
+         alt-key-pressed (.-altKey mouse-event)]
 
      ; Deselect all cells on alt-click.
      (when alt-key-pressed
        (.deselectCell hot))
 
      (-> db
-         (assoc-in [:table-panel :hot-state id :header-clicked] header-clicked-flag)
-         (assoc-in [:table-panel :table-last-clicked] new-table-clicked-id)))))
+         (assoc-in [:table-panel :hot-state id :header-clicked] header-clicked-flag)))))
 
 (rf/reg-event-db
  :hot/after-deselect

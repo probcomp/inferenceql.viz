@@ -27,10 +27,8 @@
 
 (rf/reg-sub :viz/selection-facetable
             :<- [:table/selected-columns]
-            :<- [:table/selected-columns-inactive]
-            (fn [[col-1 col-2]]
-              ;; Checks if the user has selected the same column in both the real and virtual tables.
-              (= col-1 col-2)))
+            (fn [cols]
+              false))
 
 (rf/reg-sub :viz/selections-faceted
             :<- [:table/both-table-states]
@@ -97,43 +95,3 @@
                   ;; returns the first result of gen-fn that doesn't have a negative salary
                   ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
                   #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))))
-
-(rf/reg-sub :viz/tables-visualized
-            :<- [:table/both-table-states]
-            :<- [:table/table-last-clicked]
-            :<- [:table/one-cell-selected]
-            (fn [[table-states t-clicked one-cell-selected]]
-              (let [cols-real (take 2 (get-in table-states [:real-table :selected-columns]))
-                    cols-virtual (take 2 (get-in table-states [:virtual-table :selected-columns]))
-                    cols-last-selected (take 2 (get-in table-states [t-clicked :selected-columns]))]
-
-                ;; This first case is when we have data from the same columns selected in both
-                ;; the real-data table and the virtual-data table and more than a
-                ;; single cell is selected in both plots.
-                (cond (and (= cols-real cols-virtual)
-                           (< 0 (count cols-real))
-                           (< 0 (count cols-virtual))
-                           (not one-cell-selected))
-                      ;; Return the names of both tables.
-                      (keys table-states)
-
-                      ;; This case is when we have at least one column selected
-                      ;; in the last clicked on table.
-                      (< 0 (count cols-last-selected))
-                      ;; Return the name of just the last-clicked-on table.
-                      [t-clicked]
-
-                      ;; This case is when we have no selections in either table. This would result
-                      ;; when the user uses alt-click to deselect all in both tables.
-                      :else
-                      nil))))
-
-(rf/reg-sub :viz/real-table-in-viz
-            :<- [:viz/tables-visualized]
-            (fn [tables-visualized]
-              (some #{:real-table} tables-visualized)))
-
-(rf/reg-sub :viz/virtual-table-in-viz
-            :<- [:viz/tables-visualized]
-            (fn [tables-visualized]
-              (some #{:virtual-table} tables-visualized)))

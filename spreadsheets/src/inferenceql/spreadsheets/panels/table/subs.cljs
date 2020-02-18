@@ -72,10 +72,6 @@
                  (count selections) ; One row selected.
                  (count (keys (first selections)))))) ; One column selected.
 
-(rf/reg-sub :table/table-last-clicked
-            (fn [db _]
-              (get-in db [:table-panel :table-last-clicked])))
-
 (rf/reg-sub :table/both-table-states
             (fn [db [_sub-name]]
               (get-in db [:table-panel :hot-state])))
@@ -84,10 +80,9 @@
 
 (rf/reg-sub :table/table-state-active
             (fn [_ _]
-              {:table-id (rf/subscribe [:table/table-last-clicked])
-               :table-states (rf/subscribe [:table/both-table-states])})
-            (fn [{:keys [table-id table-states]}]
-              (get table-states table-id)))
+               {:table-states (rf/subscribe [:table/both-table-states])})
+            (fn [{:keys [table-states]}]
+              (get table-states :real-table)))
 
 (rf/reg-sub :table/selections
             :<- [:table/table-state-active]
@@ -104,31 +99,11 @@
             (fn [table-state]
               (get table-state :row-at-selection-start)))
 
-;;; Subs related to selections within the inactive table.
-
-(rf/reg-sub :table/table-state-inactive
-            (fn [_ _]
-              {:table-id (rf/subscribe [:table/table-last-clicked])
-               :table-states (rf/subscribe [:table/both-table-states])})
-            (fn [{:keys [table-id table-states]}]
-              (when table-id
-                (let [inactive-id (db/other-table-id table-id)]
-                  (get table-states inactive-id)))))
-
-(rf/reg-sub :table/selected-columns-inactive
-            :<- [:table/table-state-inactive]
-            (fn [table-state]
-              (get table-state :selected-columns)))
-
 ;;; Subs related to scores computed on rows in the tables.
 
 (rf/reg-sub :table/scores
             (fn [db _]
               (db/scores db)))
-
-(rf/reg-sub :table/virtual-scores
-            (fn [db _]
-              (db/virtual-scores db)))
 
 ;;; Subs related to populating tables with data.
 
@@ -164,29 +139,10 @@
                                  (assoc row hot/label-col-header label))
                                labels)))))
 
-(rf/reg-sub :table/virtual-computed-rows
-  (fn [_ _]
-    {:rows (rf/subscribe [:table/virtual-rows])
-     :scores (rf/subscribe [:table/virtual-scores])})
-  (fn [{:keys [rows scores]}]
-    (let [num-missing-scores (- (count rows) (count scores))
-          dummy-scores (repeat num-missing-scores nil)
-          scores (concat dummy-scores scores)]
-
-      ;; Creation of dummy scores allows correct attaching of old scores to
-      ;; rows even when new rows are generated after a scoring event.
-      (mapv (fn [score row] (assoc row hot/score-col-header score))
-            scores rows))))
-
 (defn table-rows
   [db _]
   (db/table-rows db))
 (rf/reg-sub :table/table-rows table-rows)
-
-(defn virtual-rows
-  [db _]
-  (db/virtual-rows db))
-(rf/reg-sub :table/virtual-rows virtual-rows)
 
 (defn- column-settings [headers]
   "Returns an array of objects that define settings for each column
@@ -215,18 +171,6 @@
                :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])})
             real-hot-props)
-
-(defn virtual-hot-props
-  [{:keys [headers rows]} _]
-  (-> hot/virtual-hot-settings
-      (assoc-in [:settings :data] rows)
-      (assoc-in [:settings :colHeaders] headers)
-      (assoc-in [:settings :columns] (column-settings headers))))
-(rf/reg-sub :table/virtual-hot-props
-            (fn [_ _]
-              {:headers (rf/subscribe [:table/computed-headers])
-               :rows    (rf/subscribe [:table/virtual-computed-rows])})
-            virtual-hot-props)
 
 (rf/reg-sub
  :table/context-menu

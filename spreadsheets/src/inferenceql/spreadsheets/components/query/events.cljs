@@ -62,11 +62,8 @@
  event-interceptors
  (fn [db [_ target-col conditional-cols table-rows]]
    (let [table-rows (table-db/table-rows db)
-         result (search/anomaly-search model/spec target-col conditional-cols table-rows)
-         virtual-rows (table-db/virtual-rows db)
-         virtual-result (search/anomaly-search model/spec target-col conditional-cols virtual-rows)]
-     (rf/dispatch [:table/search-result result])
-     (rf/dispatch [:table/virtual-search-result virtual-result]))
+         result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
+     (rf/dispatch [:table/search-result result]))
    db))
 
 (rf/reg-event-db
@@ -83,8 +80,9 @@
          overrides-insert-fn (co/gen-insert-fn overrides-map)
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
+         ;; NOTE: This event currently does nothing with the newly generated rows. 
          new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
-     (table-db/with-virtual-rows db new-rows))))
+     db)))
 
 (defn- create-search-examples [pos-rows neg-rows]
   (let [remove-nil-key-vals #(into {} (remove (comp nil? second) %))
@@ -122,6 +120,5 @@
          all-scores (->> (merge scores-ids-map scores-ids-map-lab)
                          (sort-by key)
                          (map second))]
-     (rf/dispatch [:table/clear-virtual-scores])
      (rf/dispatch [:table/search-result all-scores]))
    db))
