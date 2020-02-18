@@ -151,9 +151,9 @@
 (def normal
   (gen [m r s nu]
     (let [rho (mpdist/gamma (/ nu 2.0) (/ 2.0 s))
-          sigma (Math/exp (* rho r) -0.5)
-          mu (mpdist/gaussian m (Math/exp (* rho r) -0.5))]
-      (mpdist/gaussian mu (Math/exp rho -0.5)))))
+          sigma (Math/pow (* rho r) -0.5)
+          mu (mpdist/gaussian m (Math/pow (* rho r) -0.5))]
+      (mpdist/gaussian mu (Math/pow rho -0.5)))))
 
 ;; I'm putting the following as a comment about the categorical
 ;; distributions that Crosscat needs, for lack of a better home (was
