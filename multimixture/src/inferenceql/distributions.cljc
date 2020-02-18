@@ -1,6 +1,7 @@
 (ns inferenceql.distributions
   (:require [clojure.spec.alpha :as s]
             [metaprob.prelude :as mp]
+            [metaprob.distributions :as mpd]
             #?(:clj [incanter.distributions :as distributions])
             [inferenceql.multimixture.specification :as spec]))
 
@@ -119,6 +120,47 @@
           (mp/log (distributions/pdf
                    (distributions/beta-distribution alpha beta)
                    x))))
+
+;; Chinese restaurant process.
+;; A typical counts vector for alpha=2: [5 65 25 2 1 2]
+
+(def crp
+  (gen [counts alpha]
+    (mpd/categorical (concat counts [alpha]))))
+
+(defn crp-incorporate [counts new-seating]
+  (if (>= new-seating (count counts))
+    (vec (concat counts
+                 (repeat (- new-seating (count counts)) 0)
+                 [1]))
+    (assoc counts
+           new-seating
+           (+ (counts new-seating) 1))))
+
+;; Normal distribution formulated as member of conjugate prior family.
+;; Cribbed from cgpm/src/primitives/normal.py.  This version relies on
+;; metaprob to compute the score but I strongly suspect that the
+;; answer won't be correct and we'll need a custom scoring formula.
+;; However I tried to extract one from normal.py and was not happy
+;; with how that went - it's buried inside of complexity we don't need.
+;; -JAR
+
+;; Currently untested.
+
+(def generate
+  (gen [m r s nu]
+    (let [rho (mpd/gamma (/ nu 2.0) (/ 2.0 s))
+          sigma (Math/exp (* rho r) -0.5)
+          mu (mpd/gaussian m (Math/exp (* rho r) -0.5))]
+      (mpd/gaussian mu (Math/exp rho -0.5)))))
+
+;; I'm putting the following as a comment about the categorical
+;; distributions that Crosscat needs, for lack of a better home (was
+;; sitting in slack chat with Ulli): -JAR
+;;
+;; (categorical (map (fn [weight] (+ weight alpha)) weights))
+
+
 
 (comment
   (require '[zane.vega.repl :as vega])
