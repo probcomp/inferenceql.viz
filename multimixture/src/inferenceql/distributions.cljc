@@ -1,7 +1,7 @@
 (ns inferenceql.distributions
   (:require [clojure.spec.alpha :as s]
             [metaprob.prelude :as mp]
-            [metaprob.distributions :as mpd]
+            [metaprob.distributions :as mpdist]
             #?(:clj [incanter.distributions :as distributions])
             [inferenceql.multimixture.specification :as spec]))
 
@@ -126,7 +126,7 @@
 
 (def crp
   (gen [counts alpha]
-    (mpd/categorical (concat counts [alpha]))))
+    (mpdist/categorical (concat counts [alpha]))))
 
 (defn crp-incorporate [counts new-seating]
   (if (>= new-seating (count counts))
@@ -147,18 +147,18 @@
 
 ;; Currently untested.
 
-(def generate
+(def normal
   (gen [m r s nu]
-    (let [rho (mpd/gamma (/ nu 2.0) (/ 2.0 s))
+    (let [rho (mpdist/gamma (/ nu 2.0) (/ 2.0 s))
           sigma (Math/exp (* rho r) -0.5)
-          mu (mpd/gaussian m (Math/exp (* rho r) -0.5))]
-      (mpd/gaussian mu (Math/exp rho -0.5)))))
+          mu (mpdist/gaussian m (Math/exp (* rho r) -0.5))]
+      (mpdist/gaussian mu (Math/exp rho -0.5)))))
 
 ;; I'm putting the following as a comment about the categorical
 ;; distributions that Crosscat needs, for lack of a better home (was
 ;; sitting in slack chat with Ulli): -JAR
 ;;
-;; (categorical (map (fn [weight] (+ weight alpha)) weights))
+;; (mpdist/categorical (map (fn [weight] (+ weight alpha)) weights))
 
 
 
