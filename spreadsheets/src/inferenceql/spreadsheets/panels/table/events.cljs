@@ -128,17 +128,14 @@
          header-clicked-flag (= -1 (.-row coords))
 
          ;; Stores whether the user held alt during the click.
-         alt-key-pressed (.-altKey mouse-event)
-
-         new-table-clicked-id (if alt-key-pressed nil id)]
+         alt-key-pressed (.-altKey mouse-event)]
 
      ; Deselect all cells on alt-click.
      (when alt-key-pressed
        (.deselectCell hot))
 
      (-> db
-         (assoc-in [:table-panel :hot-state id :header-clicked] header-clicked-flag)
-         (assoc-in [:table-panel :table-last-clicked] new-table-clicked-id)))))
+         (assoc-in [:table-panel :hot-state id :header-clicked] header-clicked-flag)))))
 
 (rf/reg-event-db
  :hot/after-deselect

@@ -72,10 +72,6 @@
                  (count selections) ; One row selected.
                  (count (keys (first selections)))))) ; One column selected.
 
-(rf/reg-sub :table/table-last-clicked
-            (fn [db _]
-              (get-in db [:table-panel :table-last-clicked])))
-
 (rf/reg-sub :table/both-table-states
             (fn [db [_sub-name]]
               (get-in db [:table-panel :hot-state])))
@@ -84,10 +80,9 @@
 
 (rf/reg-sub :table/table-state-active
             (fn [_ _]
-              {:table-id (rf/subscribe [:table/table-last-clicked])
-               :table-states (rf/subscribe [:table/both-table-states])})
-            (fn [{:keys [table-id table-states]}]
-              (get table-states table-id)))
+               {:table-states (rf/subscribe [:table/both-table-states])})
+            (fn [{:keys [table-states]}]
+              (get table-states :real-table)))
 
 (rf/reg-sub :table/selections
             :<- [:table/table-state-active]
@@ -108,12 +103,9 @@
 
 (rf/reg-sub :table/table-state-inactive
             (fn [_ _]
-              {:table-id (rf/subscribe [:table/table-last-clicked])
-               :table-states (rf/subscribe [:table/both-table-states])})
-            (fn [{:keys [table-id table-states]}]
-              (when table-id
-                (let [inactive-id (db/other-table-id table-id)]
-                  (get table-states inactive-id)))))
+              {:table-states (rf/subscribe [:table/both-table-states])})
+            (fn [{:keys [table-states]}]
+              nil))
 
 (rf/reg-sub :table/selected-columns-inactive
             :<- [:table/table-state-inactive]

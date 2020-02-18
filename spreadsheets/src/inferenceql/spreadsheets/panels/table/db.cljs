@@ -14,7 +14,6 @@
                                       ::hot-state]
                              :opt-un [::scores
                                       ::virtual-scores
-                                      ::table-last-clicked
                                       ::labels]))
 
 ;;; Specs related to scores computed on rows.
@@ -56,8 +55,6 @@
                                                  ::selected-columns
                                                  ::header-clicked])))
 (s/def ::hot-state (s/map-of ::table-id ::table-state))
-
-(s/def ::table-last-clicked ::table-id)
 
 ;;; Accessor functions to portions of the table-panel db.
 
