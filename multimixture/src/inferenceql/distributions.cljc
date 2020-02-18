@@ -1,6 +1,7 @@
 (ns inferenceql.distributions
   (:require [clojure.spec.alpha :as s]
             [metaprob.prelude :as mp]
+            [metaprob.generative-functions :refer [gen]]
             [metaprob.distributions :as mpdist]
             #?(:clj [incanter.distributions :as distributions])
             [inferenceql.multimixture.specification :as spec]))
