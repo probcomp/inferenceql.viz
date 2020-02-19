@@ -35,6 +35,14 @@
 
 (def default-table-color "SteelBlue")
 
+(defn- title-color [layer-name]
+  "Maps the name of a selection layer, `layer-name`, to a color for its plot title."
+  (case layer-name
+        :blue "blue"
+        :green "green"
+        :red "red"
+        "black"))
+
 (def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
 
@@ -262,8 +270,10 @@
 
                     :else ; Two or more columns selected.
                     (gen-comparison-plot (take 2 cols) selections))
-          title (str (name layer-name) " " "selection")]
-    (assoc spec :title title)))
+          title {:title {:text (str (name layer-name) " " "selection")
+                         :color (title-color layer-name)
+                         :fontWeight 500}}]
+       (merge spec title)))
 
 (defn generate-spec [selection-layers]
   (let [spec-layers (mapv spec-for-selection-layer selection-layers)]
