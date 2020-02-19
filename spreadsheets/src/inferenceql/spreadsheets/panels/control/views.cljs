@@ -58,7 +58,4 @@
          [:button.toolbar-button.pure-button
           ;; This button performs a no-op currently.
           {:on-click #(do)} "Delete virtual data"]]]
-     [:div.flex-box-space-filler]
-     [:div#conf-controls
-      [confidence-slider]
-      [confidence-mode]]]))
+     [:div.flex-box-space-filler]]))
