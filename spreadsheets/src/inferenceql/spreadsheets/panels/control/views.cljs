@@ -12,18 +12,6 @@
               (rf/dispatch [:control/update-reagent-forms save-fn path value]))
    :doc (fn [] @(rf/subscribe [:control/reagent-forms]))})
 
-(defn selection-color-selector
-  "A reagant component for selecting the table selection color."
-  []
-  (let [template [:div.list-group {:field :single-select :id :selection-color}
-                  [:div.list-group-item {:key :blue} "Blue"]
-                  [:div.list-group-item {:key :green} "Green"]
-                  [:div.list-group-item {:key :red} "Red"]]]
-    [:div#color-selector
-      [:span "Selection color:"]
-      [:br]
-      [forms/bind-fields template reagent-forms-function-map]]))
-
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
@@ -47,5 +35,4 @@
          [:button.toolbar-button.pure-button
           ;; This button performs a no-op currently.
           {:on-click #(do)} "Clear results"]]]
-     [:div.flex-box-space-filler]
-     [selection-color-selector]]))
+     [:div.flex-box-space-filler]]))
