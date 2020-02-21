@@ -26,25 +26,11 @@
  (fn [{:keys [db]} [_ path value]]
    (let [full-path (into [:control-panel :reagent-forms] path)]
      (case path
-       [:selection-color]
-       {:dispatch [:control/set-selection-color full-path value]}
-
        [:confidence-mode]
        {:dispatch [:control/set-confidence-mode full-path value]}
 
        ;; Default case is to write the value into the db.
        {:db (assoc-in db full-path value)}))))
-
-(rf/reg-event-db
- :control/set-selection-color
- event-interceptors
- (fn [db [_ path value]]
-   ;; Here we only allow setting :selection-color to a non-nil value. The UI selection-color
-   ;; selector tries to set a nil value when the same option is clicked twice.
-   ;; TODO: fix the above issue.
-   (if (some? value)
-     (assoc-in db path value)
-     db)))
 
 (rf/reg-event-fx
  :control/set-confidence-mode
@@ -82,3 +68,9 @@
  event-interceptors
  (fn [db [_ new-val]]
    (assoc-in db [:control-panel :query-string] new-val)))
+
+(rf/reg-event-db
+ :control/set-selection-color
+ event-interceptors
+ (fn [db [_ value]]
+   (assoc-in db [:control-panel :selection-color] value)))

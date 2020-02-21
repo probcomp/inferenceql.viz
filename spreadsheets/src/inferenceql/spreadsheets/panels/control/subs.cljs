@@ -17,9 +17,6 @@
             (fn [db _]
               (get-in db [:control-panel :query-string])))
 
-;; Helper sub for accessing selection-color.
-;; Intended to be used from non-control-panel namespaces.
 (rf/reg-sub :control/selection-color
-            :<- [:control/reagent-form [:selection-color]]
-            (fn [selection-color]
-              selection-color))
+            (fn [db _]
+              (get-in db [:control-panel :selection-color])))
