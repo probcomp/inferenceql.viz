@@ -96,6 +96,21 @@ input[type=search]{
   padding: 5px 15px;
 }
 
+#color-selector .list-group-item.active.blue {
+  background-color: #419be8;
+  border-color: #419be8;
+}
+
+#color-selector .list-group-item.active.green {
+  background-color: mediumseagreen;
+  border-color: mediumseagreen;
+}
+
+#color-selector .list-group-item.active.red {
+  background-color: tomato;
+  border-color: tomato;
+}
+
 /* --------------- styling for vega-vizualization --------------- */
 
 #viz-container {
