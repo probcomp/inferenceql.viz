@@ -107,16 +107,19 @@ select {
   margin-top: 5px;
   font-size: .875rem;
   margin-right: 25px;
-  line-height: 12px;
+  line-height: 16px;
 }
 
 #color-selector .list-group {
-  margin-top: 5px;
+  margin-left: 10px;
+  margin-top: 6px;
   margin-bottom: 0px;
+  width: 84px;
 }
 
 #color-selector .list-group-item {
   padding: 5px 15px;
+  line-height: 12px;
 }
 
 #color-selector .list-group-item.active.blue {
