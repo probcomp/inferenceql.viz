@@ -28,7 +28,7 @@
   []
   (let [cur-val @(rf/subscribe [:control/selection-color])]
     [:div#color-selector
-      [:span "Selection color:"]
+      [:span "Selection layers"]
       [:br]
       [:div.list-group
        [selection-color cur-val :blue "Blue"]
