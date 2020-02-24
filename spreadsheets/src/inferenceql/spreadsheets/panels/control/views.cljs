@@ -83,7 +83,4 @@
           ;; This button performs a no-op currently.
           {:on-click #(do)} "Clear results"]]]
      [:div.flex-box-space-filler]
-     [selection-color-selector]
-     [:div#conf-controls
-      [confidence-slider]
-      [confidence-mode]]]))
+     [selection-color-selector]]))
