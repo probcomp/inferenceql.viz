@@ -17,7 +17,9 @@
   [current-selection id text]
   [:div.list-group-item
    {:key id
-    :class (when (= current-selection id) "active")
+    ;; A css class gets attached that is the string portion of the `id` keyword.
+    ;; For example: ":red" will become the ".red" css class.
+    :class [(name id) (when (= current-selection id) "active")]
     :on-click #(rf/dispatch [:control/set-selection-color id])}
    text])
 
