@@ -46,15 +46,18 @@
        :component-did-update
        (fn [this old-argv]
          (let [[_ old-attributes old-props] old-argv
-               [_ new-attributes new-props] (reagent/argv this)
-               {old-settings :settings, old-hooks :hooks} old-props
-               {new-settings :settings, new-hooks :hooks} new-props]
-           (if (not= old-settings new-settings)
+               [_ new-attributes new-props] (reagent/argv this)]
+           (when (not= (:settings old-props) (:settings new-props))
              (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
                    sort-config (.getSortConfig sorting-plugin)]
-               (update-hot! @hot-instance (clj->js new-settings))
+               (update-hot! @hot-instance (clj->js (:settings new-props)))
                ;; Maintain the same sort order as before the update
-               (.sort sorting-plugin sort-config)))))
+               (.sort sorting-plugin sort-config)))
+
+           (when (not= (:selection-color old-props) (:selection-color new-props))
+             (if-let [coords (clj->js (:selections-coords new-props))]
+               (.selectCells @hot-instance coords false)
+               (.deselectCell @hot-instance)))))
 
        :component-will-unmount
        (fn [this]

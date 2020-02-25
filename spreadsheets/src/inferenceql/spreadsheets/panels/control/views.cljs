@@ -2,6 +2,28 @@
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]))
 
+(def reagent-forms-function-map
+  "Function map that allows a reagent-forms template
+  to communicate with the reframe db."
+  {:get (fn [path] @(rf/subscribe [:control/reagent-form path]))
+   :save! (fn [path value] (rf/dispatch [:control/set-reagent-forms path value]))
+   :update! (fn [path save-fn value]
+              ;; save-fn should accept two arguments: old-value, new-value
+              (rf/dispatch [:control/update-reagent-forms save-fn path value]))
+   :doc (fn [] @(rf/subscribe [:control/reagent-forms]))})
+
+(defn selection-color-selector
+  "A reagant component for selecting the table selection color."
+  []
+  (let [template [:div.list-group {:field :single-select :id :selection-color}
+                  [:div.list-group-item {:key :blue} "Blue"]
+                  [:div.list-group-item {:key :green} "Green"]
+                  [:div.list-group-item {:key :red} "Red"]]]
+    [:div#color-selector
+      [:span "Selection color:"]
+      [:br]
+      [forms/bind-fields template reagent-forms-function-map]]))
+
 (defn confidence-slider []
   (let [cur-val @(rf/subscribe [:control/confidence-threshold])]
     [:div#conf-slider
@@ -19,21 +41,12 @@
   (let [template [:div#conf-mode
                   [:label "Mode:"]
                   [:br]
-                  [:select.form-control {:field :list :id :mode}
+                  [:select.form-control {:field :list :id :confidence-mode}
                    [:option {:key :none} "none"]
                    [:option {:key :row} "row-wise"]
                    [:option {:key :cells-existing} "cell-wise (existing)"]
-                   [:option {:key :cells-missing} "cell-wise (missing)"]]]
-
-        ;; Function map that allows `template` reagent-forms template to
-        ;; communicate with the reframe db.
-        events {:get (fn [path] @(rf/subscribe [:control/confidence-option path]))
-                :save! (fn [path value] (rf/dispatch [:control/set-confidence-options path value]))
-                :update! (fn [path save-fn value]
-                           ;; save-fn should accept two arguments: old-value, new-value
-                           (rf/dispatch [:control/update-confidence-options save-fn path value]))
-                :doc (fn [] @(rf/subscribe [:control/confidence-options]))}]
-    [forms/bind-fields template events]))
+                   [:option {:key :cells-missing} "cell-wise (missing)"]]]]
+    [forms/bind-fields template reagent-forms-function-map]))
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
@@ -59,6 +72,7 @@
           ;; This button performs a no-op currently.
           {:on-click #(do)} "Clear results"]]]
      [:div.flex-box-space-filler]
+     [selection-color-selector]
      [:div#conf-controls
       [confidence-slider]
       [confidence-mode]]]))

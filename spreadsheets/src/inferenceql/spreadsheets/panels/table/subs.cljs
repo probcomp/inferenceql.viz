@@ -62,42 +62,57 @@
     :neg-ids (row-ids-labeled-neg labels)
     :unlabeled-ids (row-ids-unlabeled labels)}))
 
+;;; Subs related selection layer color.
+
+(rf/reg-sub :table/highlight-class
+            :<- [:control/selection-color]
+            (fn [color]
+              (case color
+                :red "red-highlight"
+                :green "green-highlight"
+                :blue "blue-highlight")))
+
 ;;; Subs related to selections within tables.
 
 (rf/reg-sub :table/one-cell-selected
             (fn [_ _]
-              (rf/subscribe [:table/table-state-active]))
+              (rf/subscribe [:table/selection-layer-active]))
             (fn [{:keys [selections]}]
               (= 1
                  (count selections) ; One row selected.
                  (count (keys (first selections)))))) ; One column selected.
 
-(rf/reg-sub :table/both-table-states
+(rf/reg-sub :table/selection-layers
             (fn [db [_sub-name]]
-              (get-in db [:table-panel :hot-state])))
+              (get-in db [:table-panel :selection-layers])))
 
-;;; Subs related to selections within the active table.
+;;; Subs related to selections within the active selection layer.
 
-(rf/reg-sub :table/table-state-active
-            (fn [_ _]
-               {:table-states (rf/subscribe [:table/both-table-states])})
-            (fn [{:keys [table-states]}]
-              (get table-states :real-table)))
+(rf/reg-sub :table/selection-layer-active
+            :<- [:control/selection-color]
+            :<- [:table/selection-layers]
+            (fn [[color selection-layers]]
+              (get selection-layers color)))
 
 (rf/reg-sub :table/selections
-            :<- [:table/table-state-active]
-            (fn [table-state]
-              (get table-state :selections)))
+            :<- [:table/selection-layer-active]
+            (fn [selection-state]
+              (get selection-state :selections)))
 
 (rf/reg-sub :table/selected-columns
-            :<- [:table/table-state-active]
-            (fn [table-state]
-              (get table-state :selected-columns)))
+            :<- [:table/selection-layer-active]
+            (fn [selection-state]
+              (get selection-state :selected-columns)))
 
 (rf/reg-sub :table/row-at-selection-start
-            :<- [:table/table-state-active]
-            (fn [table-state]
-              (get table-state :row-at-selection-start)))
+            :<- [:table/selection-layer-active]
+            (fn [selection-state]
+              (get selection-state :row-at-selection-start)))
+
+(rf/reg-sub :table/selections-coords
+            :<- [:table/selection-layer-active]
+            (fn [selection-state]
+              (get selection-state :coords)))
 
 ;;; Subs related to scores computed on rows in the tables.
 
@@ -124,7 +139,7 @@
                :scores (rf/subscribe [:table/scores])
                :labels (rf/subscribe [:table/labels])
                :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
-               :conf-mode (rf/subscribe [:control/confidence-option [:mode]])})
+               :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])})
             (fn [{:keys [rows scores labels imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
                                        (seq imputed-values))]
@@ -157,19 +172,23 @@
 ;;; Subs related to settings and overall state of tables.
 
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn context-menu]} _]
+  [{:keys [headers rows cells-style-fn context-menu selections-coords selection-color]} _]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
       (assoc-in [:settings :columns] (column-settings headers))
       (assoc-in [:settings :cells] cells-style-fn)
-      (assoc-in [:settings :contextMenu] context-menu)))
+      (assoc-in [:settings :contextMenu] context-menu)
+      (assoc-in [:selections-coords] selections-coords)
+      (assoc-in [:selection-color] selection-color)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
                :rows    (rf/subscribe [:table/computed-rows])
                :cells-style-fn (rf/subscribe [:table/cells-style-fn])
-               :context-menu (rf/subscribe [:table/context-menu])})
+               :context-menu (rf/subscribe [:table/context-menu])
+               :selections-coords (rf/subscribe [:table/selections-coords])
+               :selection-color (rf/subscribe [:control/selection-color])})
             real-hot-props)
 
 (rf/reg-sub
@@ -227,7 +246,7 @@
    {:row-likelihoods (rf/subscribe [:highlight/row-likelihoods-normed])
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
-    :conf-mode (rf/subscribe [:control/confidence-option [:mode]])
+    :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
     :computed-headers (rf/subscribe [:table/computed-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]

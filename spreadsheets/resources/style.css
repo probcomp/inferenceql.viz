@@ -99,6 +99,26 @@ select {
   color: #333;
 }
 
+/* --------------- styling for selection color selector --------------- */
+
+#color-selector {
+  flex-shrink: 0;
+  width: 105px;
+  margin-top: 5px;
+  font-size: .875rem;
+  margin-right: 25px;
+  line-height: 12px;
+}
+
+#color-selector .list-group {
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+
+#color-selector .list-group-item {
+  padding: 5px 15px;
+}
+
 /* --------------- styling for vega-vizualization --------------- */
 
 #viz-container {
@@ -117,6 +137,50 @@ select {
 
 .handsontable th {
   font-size: .875rem;
+}
+
+/* These are selectors for coloring the background of single-cell selections
+and multiple cell selections. The td.area:before selector applies to multiple cell selections,
+while td.current:before applies to single cell selections. */
+
+.red-highlight .handsontable td.area:before,
+.red-highlight .handsontable td.current:before {
+    background-color: #FF0000;
+}
+
+.green-highlight .handsontable td.area:before,
+.green-highlight .handsontable td.current:before {
+    background-color: #00FF00;
+}
+
+.blue-highlight .handsontable td.area:before,
+.blue-highlight .handsontable td.current:before {
+    background-color: #005EFF;
+}
+
+/* These css selector definitions enable cell background highlighting for single
+cell selections. Handsontable by default does not highlight single cell selections.
+These selector definitions were mostly taken from Handsontable's method of highlighting multiple
+cell selections.
+
+A special not about the use of :not(.area). Handsontable applies the .area and .current classes
+to the first cell in a mutliple cell selection. To avoid having styles applied from Handsontable's
+css classes for .area and our styles for .current, these following selectors have the :not(.area)
+psuedo-class applied. */
+
+.handsontable td.current:not(.area) {
+  position: relative;
+}
+
+.handsontable td.current:not(.area):before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  bottom: -100%\9; /* Fix for IE9 to spread the ":before" pseudo element to 100% height of the parent element */
+  opacity: 0.1;
 }
 
 /* --------------- styling for js-function entry modal popup --------------- */

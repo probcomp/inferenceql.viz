@@ -5,14 +5,21 @@
             (fn [db _]
               (get-in db [:control-panel :confidence-threshold])))
 
-(rf/reg-sub :control/confidence-options
+(rf/reg-sub :control/reagent-forms
             (fn [db _]
-              (get-in db [:control-panel :confidence-options])))
+              (get-in db [:control-panel :reagent-forms])))
 
-(rf/reg-sub :control/confidence-option
+(rf/reg-sub :control/reagent-form
             (fn [db [_sub-name path]]
-              (get-in db (into [:control-panel :confidence-options] path))))
+              (get-in db (into [:control-panel :reagent-forms] path))))
 
 (rf/reg-sub :control/query-string
             (fn [db _]
               (get-in db [:control-panel :query-string])))
+
+;; Helper sub for accessing selection-color.
+;; Intended to be used from non-control-panel namespaces.
+(rf/reg-sub :control/selection-color
+            :<- [:control/reagent-form [:selection-color]]
+            (fn [selection-color]
+              selection-color))
