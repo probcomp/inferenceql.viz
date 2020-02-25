@@ -24,30 +24,6 @@
       [:br]
       [forms/bind-fields template reagent-forms-function-map]]))
 
-(defn confidence-slider []
-  (let [cur-val @(rf/subscribe [:control/confidence-threshold])]
-    [:div#conf-slider
-      [:span "Confidence Threshold: "]
-      [:br]
-      [:input {:type :range :name :confidence-threshold
-               :min 0 :max 1 :step 0.01
-                       :value cur-val
-                       :on-change (fn [e]
-                                    (let [new-val (js/parseFloat (-> e .-target .-value))]
-                                      (rf/dispatch [:control/set-confidence-threshold new-val])))}]
-      [:label cur-val]]))
-
-(defn confidence-mode []
-  (let [template [:div#conf-mode
-                  [:label "Mode:"]
-                  [:br]
-                  [:select.form-control {:field :list :id :confidence-mode}
-                   [:option {:key :none} "none"]
-                   [:option {:key :row} "row-wise"]
-                   [:option {:key :cells-existing} "cell-wise (existing)"]
-                   [:option {:key :cells-missing} "cell-wise (missing)"]]]]
-    [forms/bind-fields template reagent-forms-function-map]))
-
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
@@ -72,7 +48,4 @@
           ;; This button performs a no-op currently.
           {:on-click #(do)} "Clear results"]]]
      [:div.flex-box-space-filler]
-     [selection-color-selector]
-     [:div#conf-controls
-      [confidence-slider]
-      [confidence-mode]]]))
+     [selection-color-selector]]))

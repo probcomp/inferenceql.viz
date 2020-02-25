@@ -76,29 +76,6 @@ input[type=search]{
   padding: .3em .8em
 }
 
-
-/* --------------- styling for confidence settings --------------- */
-
-#conf-controls {
-  flex-shrink: 0;
-  width: 185px;
-  margin-top: 5px;
-  font-size: .875rem;
-}
-
-#conf-slider {
-  line-height: 20px;
-}
-
-#conf-mode {
-  line-height: 20px;
-}
-
-select {
-  font-size: .875rem;
-  color: #333;
-}
-
 /* --------------- styling for selection color selector --------------- */
 
 #color-selector {
