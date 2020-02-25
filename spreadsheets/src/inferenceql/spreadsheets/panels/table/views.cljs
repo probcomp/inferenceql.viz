@@ -61,5 +61,5 @@
          (.destroy @hot-instance))
 
        :reagent-render
-       (fn [this]
+       (fn [attributes props]
          [:div attributes])}))))
