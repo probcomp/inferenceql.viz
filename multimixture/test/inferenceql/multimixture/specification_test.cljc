@@ -66,14 +66,6 @@
 (deftest parameters-test
   (is (= {:mu 2 :sigma 3} (spec/parameters mmix "x" 0))))
 
-#_
-(let [mmix [{:vars {"x" :categorical}
-             :clusters [{:probability 0.6
-                         :parameters {"x" {"0" 0.4 "y" 0.6}}}
-                        {:probability 0.4
-                         :parameters {"x" {"0" 0.6 "y" 0.4}}}]}]]
-  (spec/categorical-probabilities mmix :x 0 1))
-
 (deftest categories-test
   (is (= #{"0" "1" "2" "3"}     (spec/categories mmix "y")))
   (is (= #{"0" "1" "2" "3" "4"} (spec/categories mmix "b"))))
