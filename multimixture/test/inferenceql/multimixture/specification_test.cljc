@@ -85,10 +85,45 @@
     (slurp
       "multimixture/test/inferenceql/multimixture/test_models.json")))
 
+(def json-models (json/read-str
+                   (slurp
+                     "multimixture/test/inferenceql/multimixture/test_models.json")))
+
 (deftest nonparametric-json-spec-has-fields-smoke-test
-  (let [json-models (json/read-str
-                    (slurp
-                     "multimixture/test/inferenceql/multimixture/test_models.json"))]
     (is (contains? json-models "models"))
     (is (contains? json-models "categories"))
-    (is (contains? json-models "column-statistical-types"))))
+    (is (contains? json-models "column-statistical-types")))
+
+(deftest nonparametric-json-models-smoke-test
+  (let [json-model (first (get json-models "models"))]
+    (is (contains? json-model "clusters"))
+    (is (contains? json-model "cluster-crp-hyperparameters"))
+    (is (contains? json-model "column-partition"))
+    (is (contains? json-model "column-hypers"))))
+
+(deftest generate-specs-from-json-test
+  (let [specs (generate-specs-from-json json-models)]
+    (is (= 2 (count specs)))))
+
+(deftest get-col-partition-test
+  (is (= [["height" "gender"] ["age"]] (get-col-partition (first json-models)))))
+
+
+(deftest get-col-categories-test
+  (is (= {"0.0" "male", "1.0" "female"} (get-col-categories json-models "gender" )
+
+(deftest get-col-types-test
+  (is (= "categorical" (get-col-types "gender"))))
+
+(deftest get-col-hypers-test
+  (is (= {"alpha" 1.0} (get-col-hypers json-models "gender"))))
+
+(defn get-view-crp-params [json-model view-idx] (raise-not-implemented-error))
+(defn get-view-cluster-assignemt [json-model view-idx] (raise-not-implemented-error))
+(defn get-col-cluster-assignemt [json-model col] (raise-not-implemented-error))
+
+
+
+
+
+(generate-specs-from-json-test)
