@@ -13,13 +13,8 @@
     (reagent/create-class
       {:display-name "app"
 
-       :component-did-mount
-       (fn [this]
-         (comment
-           (js/Split (clj->js ["#foo" "#bar"])
-                     (clj->js {:sizes [50 50]
-                               :direction 'vertical'
-                               :gutterSize 20}))))
+       ;; Run this in browser console after pagel load.
+       ;; Split(["#table-container", "#viz-container"], {"direction": "vertical"})
 
        :reagent-render
        (fn []
