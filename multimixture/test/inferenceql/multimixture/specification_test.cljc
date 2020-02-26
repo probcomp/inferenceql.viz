@@ -2,6 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.test :as test :refer [deftest testing is]]
             [expound.alpha :as expound]
+            [clojure.data.json :as json]
             [inferenceql.multimixture.specification :as spec]))
 
 (def mmix
@@ -86,3 +87,16 @@
                               {:probability 0.5
                                :parameters {"x" {"0" 0.6 "1" 0.4}}}]]}]
            (spec/categorical-probabilities mmix "x" 0 1)))))
+
+(deftest nonparametric-json-spec-exists-smoke-test
+  (json/read-str
+    (slurp
+      "multimixture/test/inferenceql/multimixture/test_models.json")))
+
+(deftest nonparametric-json-spec-has-fields-smoke-test
+  (let [json-models (json/read-str
+                    (slurp
+                     "multimixture/test/inferenceql/multimixture/test_models.json"))]
+    (is (contains? json-models "models"))
+    (is (contains? json-models "categories"))
+    (is (contains? json-models "column-statistical-types"))))
