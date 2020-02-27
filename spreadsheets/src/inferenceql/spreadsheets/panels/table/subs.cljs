@@ -279,3 +279,33 @@
      :cells-missing
      (fn [& args]
        (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-flagged computed-headers)))))
+
+(rf/reg-sub :table/selection-layer-blue
+            :<- [:table/selection-layers]
+            (fn [layers]
+              (select-keys layers [:blue])))
+
+(rf/reg-sub :table/selection-layer-green
+            :<- [:table/selection-layers]
+            (fn [layers]
+              (select-keys layers [:green])))
+
+(rf/reg-sub :table/selection-layer-red
+            :<- [:table/selection-layers]
+            (fn [layers]
+              (select-keys layers [:red])))
+
+(rf/reg-sub :table/selection-layers-list-blue
+            :<- [:table/selection-layers-list]
+            (fn [selection-layers]
+              (filter #(= (get % :id) :blue) selection-layers)))
+
+(rf/reg-sub :table/selection-layers-list-green
+            :<- [:table/selection-layers-list]
+            (fn [selection-layers]
+              (filter #(= (get % :id) :green) selection-layers)))
+
+(rf/reg-sub :table/selection-layers-list-red
+            :<- [:table/selection-layers-list]
+            (fn [selection-layers]
+              (filter #(= (get % :id) :red) selection-layers)))

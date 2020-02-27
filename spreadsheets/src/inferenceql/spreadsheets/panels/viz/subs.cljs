@@ -9,8 +9,20 @@
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [medley.core :as medley]))
 
-(rf/reg-sub :viz/vega-lite-spec
-            :<- [:table/selection-layers-list]
+(rf/reg-sub :viz/vega-lite-spec-blue
+            :<- [:table/selection-layers-list-blue]
+            (fn [selection-layers]
+              (clj->js
+                (vega/generate-spec selection-layers))))
+
+(rf/reg-sub :viz/vega-lite-spec-green
+            :<- [:table/selection-layers-list-green]
+            (fn [selection-layers]
+              (clj->js
+                (vega/generate-spec selection-layers))))
+
+(rf/reg-sub :viz/vega-lite-spec-red
+            :<- [:table/selection-layers-list-red]
             (fn [selection-layers]
               (clj->js
                 (vega/generate-spec selection-layers))))
@@ -29,8 +41,34 @@
     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
     #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))
 
-(rf/reg-sub :viz/generators
-            :<- [:table/selection-layers]
+(rf/reg-sub :viz/generator-blue
+            :<- [:table/selection-layer-blue]
+            :<- [:override/column-override-fns]
+            (fn [[layers override-fns]]
+              (->> layers
+                   (medley/map-vals (fn [layer]
+                                      (let [{selections :selections
+                                             cols :selected-columns
+                                             row :row-at-selection-start} layer]
+                                        (when (vega/simulatable? selections (first cols))
+                                          (make-simulate-fn (first cols) row override-fns)))))
+                   (medley/remove-vals nil?))))
+
+(rf/reg-sub :viz/generator-green
+            :<- [:table/selection-layer-green]
+            :<- [:override/column-override-fns]
+            (fn [[layers override-fns]]
+              (->> layers
+                   (medley/map-vals (fn [layer]
+                                      (let [{selections :selections
+                                             cols :selected-columns
+                                             row :row-at-selection-start} layer]
+                                        (when (vega/simulatable? selections (first cols))
+                                          (make-simulate-fn (first cols) row override-fns)))))
+                   (medley/remove-vals nil?))))
+
+(rf/reg-sub :viz/generator-red
+            :<- [:table/selection-layer-red]
             :<- [:override/column-override-fns]
             (fn [[layers override-fns]]
               (->> layers
