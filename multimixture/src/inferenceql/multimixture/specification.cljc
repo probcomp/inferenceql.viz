@@ -67,6 +67,7 @@
   :args (s/cat :json (s/map-of string? any?))
   :ret ::multi-mixture)
 
+;; Old from-json.
 (defn from-json
   [{:strs [columns views]}]
   (let [vars (reduce-kv (fn [m k v]
@@ -91,9 +92,102 @@
     {:vars vars
      :views views}))
 
+#_(from-json (json/read-str (slurp "/home/ulli/git_repos/inferenceql/spreadsheets/resources/model.json")))
 
-#_(from-json (json/read-str (slurp "/Users/zane/projects/inferenceql/model.json")))
-#_(stest/instrument)
+(require '[clojure.data.json :as json])
+
+(defn raise-not-implemented-error
+  []
+  (let [msg "Not implemented yet"]
+  (println msg)
+  (ex-info msg {})))
+
+
+#_(defn from-json2
+  [models]
+  (nth (get models "models") 0))
+
+(def jms (json/read-str (slurp "/home/ulli/git_repos/inferenceql/multimixture/test/inferenceql/multimixture/test_models.json")))
+
+(defn infql-type
+  [stattype]
+  (case
+    "nominal"   :categorical
+    "numerical" :gaussian))
+
+(defn get-col-types
+  [json-models]
+  {:vars
+   (reduce-kv
+     (fn [m k v] (assoc m k (infql-type v)))
+     {}
+     (get json-models "column-statistical-types"))})
+
+(defn generate-spec-from-json
+  [json-model stattypes]
+    0)
+
+
+(defn generate-view-from-json
+  [json-model view-idx stattypes categories]
+    1)
+
+
+;TODO: get the counts.
+(defn cluster-probabilities
+  [cluster-assignemts alpha]
+   (concat counts [alpha]))
+; XXX
+(concat [10] [0.5])
+
+;; operating ing model assemble.
+#_(defn generate-specs-from-json
+  [json-models]
+  (let [stat-types (get-col-types json-models)]
+    ;; get the col stattypes. Need to do this here because they live outside the
+    ;; n models.
+     (merge stat-types
+            {:views (into [] ;; is `into []` really the clojury way to type convert here???
+                          (map #(generate-spec-from-json % stat-types)
+                               (get json-models "models")))})))
+;; operating ing model assemble.
+(defn generate-specs-from-json
+  [json-models]
+        ;; get the col stattypes. Need to do this here because they live
+        ;; outside the individual models in the ensemble.
+  (let [stat-types (get-col-types json-models)
+        ;; Same for categories.
+        categories  (get json-models "categories")
+        ;; A function for getting each view in a given model.
+        get-views (fn [json-model] ;; XXX: What's the right way to not use fn here? %({ sseesm to not do the right thing
+                    {:views
+                     (into []
+                           (map-indexed (fn [view-idx cols-in-view ] (generate-view-from-json json-model view-idx stat-types categories))
+                                        (get json-model "column-partition")))})] ;; TODO: this last line is wrong. I really want an index here -- so that I can get the right params
+    ;; n models.
+    (map #(merge stat-types (get-views %))
+         (get json-models "models"))))
+
+
+(first (generate-specs-from-json jms))
+(second (generate-specs-from-json jms))
+
+
+(get (first (get jms  "models")) "column-partition")
+;; TODO: remove old from-json and rename stuff accordingly.
+(defn get-col-categories [json-models col] (raise-not-implemented-error))
+(defn get-col-type [json-models col] (raise-not-implemented-error))
+(defn get-col-partition [json-model] (raise-not-implemented-error))
+(defn get-col-hypers     [json-model col] (raise-not-implemented-error))
+(defn get-view-crp-params [json-model view-idx] (raise-not-implemented-error))
+(defn get-view-cluster-assignment [json-model view-idx] (raise-not-implemented-error))
+
+(defn get-col-cluster-assignemt
+  [json-model col]
+  )
+
+
+
 
 (s/fdef cluster-variables
   :args (s/cat :cluster ::cluster)
