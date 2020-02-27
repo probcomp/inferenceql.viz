@@ -16,6 +16,9 @@
         generator-blue      @(rf/subscribe [:viz/generator-blue])
         generator-green      @(rf/subscribe [:viz/generator-green])
         generator-red      @(rf/subscribe [:viz/generator-red])
+        vega-mode-blue      @(rf/subscribe [:viz/vega-mode-blue])
+        vega-mode-green      @(rf/subscribe [:viz/vega-mode-green])
+        vega-mode-red      @(rf/subscribe [:viz/vega-mode-red])
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
@@ -23,9 +26,9 @@
        [table/handsontable {} real-hot-props]]
      [:div#viz-container
       (when vega-lite-spec-blue
-        [viz/vega-lite vega-lite-spec-blue {:actions false} generator-blue])
+        [viz/vega-lite vega-lite-spec-blue {:actions false :mode vega-mode-blue} generator-blue])
       (when vega-lite-spec-green
-        [viz/vega-lite vega-lite-spec-green {:actions false} generator-green])
+        [viz/vega-lite vega-lite-spec-green {:actions false :mode vega-mode-green} generator-green])
       (when vega-lite-spec-red
-        [viz/vega-lite vega-lite-spec-red {:actions false} generator-red])]
+        [viz/vega-lite vega-lite-spec-red {:actions false :mode vega-mode-red} generator-red])]
      [modal/modal]]))

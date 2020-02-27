@@ -278,7 +278,6 @@
 (defn generate-spec [selection-layers]
   (let [spec-layers (mapv spec-for-selection-layer selection-layers)]
     (when (not-empty spec-layers)
-      {:$schema default-vega-lite-schema
-       :hconcat spec-layers
+      {:hconcat spec-layers
        :autosize {:resize true}
        :resolve {:legend {:size "independent"}}})))

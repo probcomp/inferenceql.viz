@@ -79,3 +79,33 @@
                                         (when (vega/simulatable? selections (first cols))
                                           (make-simulate-fn (first cols) row override-fns)))))
                    (medley/remove-vals nil?))))
+
+(rf/reg-sub :viz/vega-mode-blue
+            :<- [:table/selection-layer-blue]
+            (fn [selection-layers]
+              (let [{selections :selections
+                     cols :selected-columns} (:blue selection-layers)
+                     sim (vega/simulatable? selections (first cols))]
+                (if (and (not sim) (= 1 (count cols)))
+                  "vega"
+                  "vega-lite"))))
+
+(rf/reg-sub :viz/vega-mode-green
+            :<- [:table/selection-layer-green]
+            (fn [selection-layers]
+              (let [{selections :selections
+                     cols :selected-columns} (:green selection-layers)
+                     sim (vega/simulatable? selections (first cols))]
+                (if (and (not sim) (= 1 (count cols)))
+                  "vega"
+                  "vega-lite"))))
+
+(rf/reg-sub :viz/vega-mode-red
+            :<- [:table/selection-layer-red]
+            (fn [selection-layers]
+              (let [{selections :selections
+                     cols :selected-columns} (:red selection-layers)
+                     sim (vega/simulatable? selections (first cols))]
+                (if (and (not sim) (= 1 (count cols)))
+                  "vega"
+                  "vega-lite"))))
