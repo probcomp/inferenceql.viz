@@ -102,28 +102,32 @@
     (is (contains? json-model "column-hypers"))))
 
 (deftest generate-specs-from-json-test
-  (let [specs (generate-specs-from-json json-models)]
+  (let [specs (spec/generate-specs-from-json json-models)]
     (is (= 2 (count specs)))))
 
 (deftest get-col-partition-test
-  (is (= [["height" "gender"] ["age"]] (get-col-partition (first json-models)))))
-
+  (is (= [["height" "gender"] ["age"]] (spec/get-col-partition (first json-models)))))
 
 (deftest get-col-categories-test
-  (is (= {"0.0" "male", "1.0" "female"} (get-col-categories json-models "gender" )
+  (is (= {"0.0" "male", "1.0" "female"} (spec/get-col-categories json-models "gender"))))
 
 (deftest get-col-types-test
-  (is (= "categorical" (get-col-types "gender"))))
+  (is (= :categorical (spec/get-col-type json-models "gender"))
+  (is (= :gaussian (spec/get-col-type json-models "age"))))
+
 
 (deftest get-col-hypers-test
-  (is (= {"alpha" 1.0} (get-col-hypers json-models "gender"))))
+  (is (= {"alpha" 1.0} (spec/get-col-hypers json-models "gender"))))
 
-(defn get-view-crp-params [json-model view-idx] (raise-not-implemented-error))
-(defn get-view-cluster-assignemt [json-model view-idx] (raise-not-implemented-error))
-(defn get-col-cluster-assignemt [json-model col] (raise-not-implemented-error))
-
-
+(deftest get-view-crp-params-test
+  (is (= [0.5780460185910702, 0.00720546027496876]
+         (spec/get-view-cluster-assignment (first json-models) 0))))
 
 
+(deftest get-view-cluster-assignemt-test
+    (is (= 200
+           (count (spec/get-view-cluster-assignemt (first json-models) 0)))))
 
-(generate-specs-from-json-test)
+(deftest get-col-cluster-assignemt-test
+    (is (= 200
+           (count (spec/get-col-cluster-assignemt (first json-models) "age")))))
