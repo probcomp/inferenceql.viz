@@ -115,61 +115,62 @@
 
 (defn gen-simulate-plot
   [col row dataset-name]
-  {:$schema "https://vega.github.io/schema/vega/v5.json",
-   :width 200,
-   :height 200,
-   :autosize "pad",
+  (let [domain-vals (get-in model/spec [:categories col])]
+    {:$schema "https://vega.github.io/schema/vega/v5.json",
+     :width 200,
+     :height 200,
+     :autosize "pad",
 
-   :signals
-   [{:name "padAngle", :value 0}
-    {:name "innerRadius", :value 0}
-    {:name "cornerRadius", :value 0}
-    {:name "sort" :value false}]
+     :signals
+     [{:name "padAngle", :value 0}
+      {:name "innerRadius", :value 0}
+      {:name "cornerRadius", :value 0}
+      {:name "sort" :value false}]
 
-   :data
-   [{:name dataset-name,
-     :transform
-     [{:type "aggregate"
-       :groupby [col]}
-      {:type "pie",
-        :field "count",
-        :startAngle 0,
-        :endAngle 6.29,}]}]
+     :data
+     [{:name dataset-name,
+       :transform
+       [{:type "aggregate"
+         :groupby [col]}
+        {:type "pie",
+          :field "count",
+          :startAngle 0,
+          :endAngle 6.29,}]}]
 
-   :scales
-   [{:name "color",
-     :type "ordinal",
-     :domain {:data dataset-name, :field col},
-     :range {:scheme "category20"}}],
+     :scales
+     [{:name "color",
+       :type "ordinal",
+       :domain domain-vals
+       :range {:scheme "category20"},}]
 
-   :legends
-   [{:fill "color",
-     :title "Possible values",
-     :orient "right",
-     :encode
-     {:symbols
-      {:enter {:fillOpacity {:value 1.0}}},
-      :labels
-      {:update {:text {:field "value"}}}}}],
+     :legends
+     [{:fill "color",
+       :title "Possible values",
+       :orient "right",
+       :encode
+       {:symbols
+        {:enter {:fillOpacity {:value 1.0}}},
+        :labels
+        {:update {:text {:field "value"}}}}}],
 
-   :marks
-   [{:type "arc",
-     :from {:data dataset-name},
-     :encode
-     {:enter
-      {:fill {:scale "color", :field col},
-       :x {:signal "width / 2"},
-       :y {:signal "height / 2"},
-       :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}}
-      :update
-      {:startAngle {:field "startAngle"},
-       :endAngle {:field "endAngle"},
-       :padAngle {:signal "padAngle"},
-       :innerRadius {:signal "innerRadius"},
-       :outerRadius {:signal "width / 2"},
-       :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}
-       :cornerRadius
-       {:signal "cornerRadius"}}}}],})
+     :marks
+     [{:type "arc",
+       :from {:data dataset-name},
+       :encode
+       {:enter
+        {:fill {:scale "color", :field col},
+         :x {:signal "width / 2"},
+         :y {:signal "height / 2"},
+         :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}}
+        :update
+        {:startAngle {:field "startAngle"},
+         :endAngle {:field "endAngle"},
+         :padAngle {:signal "padAngle"},
+         :innerRadius {:signal "innerRadius"},
+         :outerRadius {:signal "width / 2"},
+         :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}
+         :cornerRadius
+         {:signal "cornerRadius"}}}}],}))
 
 (defn get-col-type [col-name]
   (condp = (stattype col-name)
@@ -194,7 +195,8 @@
 
 (defn gen-histogram [col selections]
   (let [col-type (get-col-type col)
-        col-binning (get-col-should-bin col)]
+        col-binning (get-col-should-bin col)
+        domain-vals (conj (vec (get-in model/spec [:categories col])) nil)]
     {:$schema "https://vega.github.io/schema/vega/v5.json",
      :width 200,
      :height 200,
@@ -223,7 +225,7 @@
      :scales
      [{:name "color",
        :type "ordinal",
-       :domain {:data "table", :field col},
+       :domain domain-vals
        :range {:scheme "category20"},}]
 
      :legends

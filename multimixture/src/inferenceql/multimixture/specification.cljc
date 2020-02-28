@@ -1,5 +1,6 @@
 (ns inferenceql.multimixture.specification
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [medley.core :as medley]))
 
 (s/def ::alpha pos?)
 
@@ -68,11 +69,18 @@
   :ret ::multi-mixture)
 
 (defn from-json
-  [{:strs [columns views]}]
+  [{:strs [columns categories views]}]
   (let [vars (reduce-kv (fn [m k v]
                           (assoc m k (keyword v)))
                         {}
                         columns)
+
+        categories (medley/map-kv
+                    (fn [k v]
+                      (let [distinct-vals (reverse (sort (distinct (vals v))))]
+                        [k distinct-vals]))
+                    categories)
+
         views (mapv (fn [view]
                       (mapv (fn [cluster]
                               (let [column-parameters (dissoc cluster "p")]
@@ -89,6 +97,7 @@
                             view))
                     views)]
     {:vars vars
+     :categories categories
      :views views}))
 
 
