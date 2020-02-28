@@ -68,4 +68,4 @@
 
       :reagent-render
       (fn [spec]
-        [:div#vis])})))
+        [:div])})))
