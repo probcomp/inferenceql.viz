@@ -69,7 +69,7 @@
     dist/gaussian "quantitative"
     dist/categorical "nominal"))
 
-(defn gen-simulate-plot
+(defn gen-simulate-plot-vega-lite
   "Generates a vega-lite spec for a histogram of simulated values for a cell.
   `col-name` is the column that the cell is in. And `row` is map of
   data representing the row our cell is in.
@@ -112,6 +112,65 @@
     {:data {:name dataset-name}
      :layer layers
      :autosize {:resize true}}))
+
+(defn gen-simulate-plot
+  [col row dataset-name]
+  {:$schema "https://vega.github.io/schema/vega/v5.json",
+   :width 200,
+   :height 200,
+   :autosize "pad",
+
+   :signals
+   [{:name "padAngle", :value 0}
+    {:name "innerRadius", :value 0}
+    {:name "cornerRadius", :value 0}
+    {:name "sort" :value false}]
+
+   :data
+   [{:name dataset-name,
+     :transform
+     [{:type "aggregate"
+       :groupby [col]}
+      {:type "pie",
+        :field "count",
+        :startAngle 0,
+        :endAngle 6.29,
+        :sort {:signal "sort"}}]}]
+
+   :scales
+   [{:name "color",
+     :type "ordinal",
+     :domain {:data dataset-name, :field col},
+     :range {:scheme "category10"}}],
+
+   :legends
+   [{:fill "color",
+     :title "Possible values",
+     :orient "right",
+     :encode
+     {:symbols
+      {:enter {:fillOpacity {:value 1.0}}},
+      :labels
+      {:update {:text {:field "value"}}}}}],
+
+   :marks
+   [{:type "arc",
+     :from {:data dataset-name},
+     :encode
+     {:enter
+      {:fill {:scale "color", :field col},
+       :x {:signal "width / 2"},
+       :y {:signal "height / 2"},
+       :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}}
+      :update
+      {:startAngle {:field "startAngle"},
+       :endAngle {:field "endAngle"},
+       :padAngle {:signal "padAngle"},
+       :innerRadius {:signal "innerRadius"},
+       :outerRadius {:signal "width / 2"},
+       :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}
+       :cornerRadius
+       {:signal "cornerRadius"}}}}],})
 
 (defn get-col-type [col-name]
   (condp = (stattype col-name)

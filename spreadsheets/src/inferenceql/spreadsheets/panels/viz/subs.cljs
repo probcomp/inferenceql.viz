@@ -86,7 +86,7 @@
               (let [{selections :selections
                      cols :selected-columns} (:blue selection-layers)
                      sim (vega/simulatable? selections (first cols))]
-                (if (and (not sim) (= 1 (count cols)))
+                (if (= 1 (count cols))
                   "vega"
                   "vega-lite"))))
 
@@ -96,7 +96,7 @@
               (let [{selections :selections
                      cols :selected-columns} (:green selection-layers)
                      sim (vega/simulatable? selections (first cols))]
-                (if (and (not sim) (= 1 (count cols)))
+                (if (= 1 (count cols))
                   "vega"
                   "vega-lite"))))
 
@@ -106,6 +106,6 @@
               (let [{selections :selections
                      cols :selected-columns} (:red selection-layers)
                      sim (vega/simulatable? selections (first cols))]
-                (if (and (not sim) (= 1 (count cols)))
+                (if (= 1 (count cols))
                   "vega"
                   "vega-lite"))))
