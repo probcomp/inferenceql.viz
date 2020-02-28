@@ -1,5 +1,9 @@
 (ns inferenceql.multimixture.specification
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [clojure.java.io :as io]
+            [clojure.data.csv :as csv]
+            [inferenceql.spreadsheets.data :as data]
+            [metaprob.distributions :as mpdist]))
 
 (s/def ::alpha pos?)
 
@@ -128,31 +132,75 @@
     0)
 
 
-(defn generate-view-from-json
-  [json-model view-idx stattypes categories]
-    1)
+(def dp "/home/ulli/git_repos/inferenceql/multimixture/test/inferenceql/multimixture/synthetic-data.csv")
+(def d (->> dp
+     (slurp)
+     (csv/read-csv)
+     (mapv data/fix-row)
+     (data/csv-data->maps)))
 
 
-;TODO: get the counts.
+
+;; XXX: this has the probability for the empty table.
 (defn cluster-probabilities
   [cluster-assignemts alpha]
-   (concat counts [alpha]))
-; XXX
-(concat [10] [0.5])
+    (mpdist/normalize-numbers (concat (map count
+                                           cluster-assignemts)
+                                      [alpha])))
+
+(defn get-view-cluster-assignments
+  [json-model view-idx]
+  (nth (get json-model "clusters") view-idx))
+
+(defn get-view-crp-params
+  [json-model view-idx]
+  (nth (get json-model "cluster-crp-hyperparameters") view-idx))
+
+(defn col-subset
+  [data col rowids]
+    (map #(get % col)
+         (map #(nth data %) rowids)))
+
+;; XXX: I am SURE that that's not idiomatic... or efficient.. calling assoc
+;; recursively to get null counts in...
+;; XXX: number 2: can use this recursive definition within a let.
+(defn rec-assoc
+  [m cats]
+  (if (empty? cats)
+    m
+    (if (contains? m (first cats))
+      (rec-assoc  m                          (rest cats))
+      (rec-assoc (assoc m (first cats) 0) (rest cats)))))
+(defn get-cat-counts
+  [col-vec col-cats]
+  ; take a column vector, i.e. a subvec of a columm and return a count for
+  ; categories.
+  (rec-assoc (frequencies col-vec) col-cats))
+
+(get-cat-counts ["a" "b" "a"] ["a" "b" "c" "d"])
+
+
+(assoc {:a 2} :b 0)
+(reduce #(assoc {} )
+
+
+(def vector-of-maps [{:a 1 :b 2} {:a 3 :b 4}])
+
+(defn update-map [m f]
+  (reduce-kv (fn [m k v]
+    (assoc m k (f v))) {} m))
+(map #(update-map % inc) vector-of-maps)
+
+
+(defn generate-view-from-json
+  [json-model data view-idx stattypes categories]
+  (let [clustering (get-view-cluster-assignments json-model view-idx)
+        p-clusters (cluster-probabilities clustering (get-view-crp-params json-model view-idx))]
+    (map (fn [p] {:probability p}) p-clusters)))
 
 ;; operating ing model assemble.
-#_(defn generate-specs-from-json
-  [json-models]
-  (let [stat-types (get-col-types json-models)]
-    ;; get the col stattypes. Need to do this here because they live outside the
-    ;; n models.
-     (merge stat-types
-            {:views (into [] ;; is `into []` really the clojury way to type convert here???
-                          (map #(generate-spec-from-json % stat-types)
-                               (get json-models "models")))})))
-;; operating ing model assemble.
 (defn generate-specs-from-json
-  [json-models]
+  [json-models data]
         ;; get the col stattypes. Need to do this here because they live
         ;; outside the individual models in the ensemble.
   (let [stat-types (get-col-types json-models)
@@ -162,15 +210,15 @@
         get-views (fn [json-model] ;; XXX: What's the right way to not use fn here? %({ sseesm to not do the right thing
                     {:views
                      (into []
-                           (map-indexed (fn [view-idx cols-in-view ] (generate-view-from-json json-model view-idx stat-types categories))
+                           (map-indexed (fn [view-idx cols-in-view ] (generate-view-from-json json-model data view-idx stat-types categories))
                                         (get json-model "column-partition")))})] ;; TODO: this last line is wrong. I really want an index here -- so that I can get the right params
     ;; n models.
     (map #(merge stat-types (get-views %))
          (get json-models "models"))))
 
 
-(first (generate-specs-from-json jms))
-(second (generate-specs-from-json jms))
+(first  (generate-specs-from-json jms d))
+(second (generate-specs-from-json jms d))
 
 
 (get (first (get jms  "models")) "column-partition")
@@ -179,12 +227,6 @@
 (defn get-col-type [json-models col] (raise-not-implemented-error))
 (defn get-col-partition [json-model] (raise-not-implemented-error))
 (defn get-col-hypers     [json-model col] (raise-not-implemented-error))
-(defn get-view-crp-params [json-model view-idx] (raise-not-implemented-error))
-(defn get-view-cluster-assignment [json-model view-idx] (raise-not-implemented-error))
-
-(defn get-col-cluster-assignemt
-  [json-model col]
-  )
 
 
 
