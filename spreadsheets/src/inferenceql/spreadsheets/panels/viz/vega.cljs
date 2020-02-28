@@ -109,7 +109,8 @@
         layers (cond-> [simulations-layer]
                  col-val (conj observed-layer))]
     {:data {:name dataset-name}
-     :layer layers}))
+     :layer layers
+     :autosize {:resize true}}))
 
 (defn get-col-type [col-name]
   (condp = (stattype col-name)
@@ -121,7 +122,7 @@
     dist/gaussian true
     dist/categorical false))
 
-(defn gen-histogram [col selections]
+(defn gen-histogram-vega-lite [col selections]
   (let [col-type (get-col-type col)
         col-binning (get-col-should-bin col)]
     {:data {:values selections}
@@ -131,6 +132,66 @@
                     :type col-type}
                 :y {:aggregate "count"
                     :type "quantitative"}}}))
+
+(defn gen-histogram [col selections]
+ {:$schema "https://vega.github.io/schema/vega/v5.json",
+  :width 200,
+  :height 200,
+  :autosize "pad",
+
+  :signals
+  [{:name "padAngle", :value 0}
+   {:name "innerRadius", :value 0}
+   {:name "cornerRadius", :value 0}
+   {:name "sort" :value true}]
+
+  :data
+  [{:name "table",
+    :values
+    [{:id "beans", :field 4}
+     {:id "foo", :field 6}
+     {:id "blah", :field 10}
+     {:id "some", :field 3}]
+    :transform
+    [{:type "pie",
+      :field "field",
+      :startAngle 0,
+      :endAngle 6.29,
+      :sort {:signal "sort"}}]}]
+
+  :scales
+  [{:name "color",
+    :type "ordinal",
+    :domain {:data "table", :field "id"},
+    :range {:scheme "category10"}}],
+
+  :legends
+  [{:fill "color",
+    :title "Possible values",
+    :orient "right",
+    :encode
+    {:symbols
+     {:enter {:fillOpacity {:value 1.0}}},
+     :labels
+     {:update {:text {:field "value"}}}}}],
+
+  :marks
+  [{:type "arc",
+    :from {:data "table"},
+    :encode
+    {:enter
+     {:fill {:scale "color", :field "id"},
+      :x {:signal "width / 2"},
+      :y {:signal "height / 2"},
+      :tooltip {:signal "{'value': datum.id, 'count': datum.field}"}}
+     :update
+     {:startAngle {:field "startAngle"},
+      :endAngle {:field "endAngle"},
+      :padAngle {:signal "padAngle"},
+      :innerRadius {:signal "innerRadius"},
+      :outerRadius {:signal "width / 2"},
+      :cornerRadius
+      {:signal "cornerRadius"}}}}],})
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
@@ -252,10 +313,11 @@
 
 (defn gen-comparison-plot [cols selections]
   (let [cols-types (set (doall (map stattype cols)))]
-    (condp = cols-types
-      #{dist/gaussian} (scatter-plot selections cols)
-      #{dist/categorical} (table-bubble-plot selections cols)
-      #{dist/gaussian dist/categorical} (strip-plot selections cols))))
+    (merge (condp = cols-types
+             #{dist/gaussian} (scatter-plot selections cols)
+             #{dist/categorical} (table-bubble-plot selections cols)
+             #{dist/gaussian dist/categorical} (strip-plot selections cols))
+           {:autosize {:resize true}})))
 
 (defn- spec-for-selection-layer [selection-layer]
   (let [{layer-name :id
@@ -273,11 +335,9 @@
           title {:title {:text (str (name layer-name) " " "selection")
                          :color (title-color layer-name)
                          :fontWeight 500}}]
-       (merge spec title)))
+    (merge spec title)))
+
 
 (defn generate-spec [selection-layers]
-  (let [spec-layers (mapv spec-for-selection-layer selection-layers)]
-    (when (not-empty spec-layers)
-      {:hconcat spec-layers
-       :autosize {:resize true}
-       :resolve {:legend {:size "independent"}}})))
+  (when-let [layer (first selection-layers)]
+    (spec-for-selection-layer layer)))
