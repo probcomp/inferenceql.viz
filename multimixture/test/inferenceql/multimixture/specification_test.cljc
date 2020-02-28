@@ -128,9 +128,9 @@
          (spec/get-view-cluster-assignment (first json-models) 0))))
 
 
-(deftest get-view-cluster-assignemt-test
+(deftest get-view-cluster-assignments-test
     (is (= 200
-           (count (spec/get-view-cluster-assignemt (first json-models) 0)))))
+           (count (spec/get-view-cluster-assignments (first json-models) 0)))))
 
 (deftest get-col-cluster-assignemt-test
     (is (= 200
