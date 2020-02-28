@@ -134,14 +134,13 @@
       {:type "pie",
         :field "count",
         :startAngle 0,
-        :endAngle 6.29,
-        :sort {:signal "sort"}}]}]
+        :endAngle 6.29,}]}]
 
    :scales
    [{:name "color",
      :type "ordinal",
      :domain {:data dataset-name, :field col},
-     :range {:scheme "category10"}}],
+     :range {:scheme "category20"}}],
 
    :legends
    [{:fill "color",
@@ -205,7 +204,7 @@
      [{:name "padAngle", :value 0}
       {:name "innerRadius", :value 0}
       {:name "cornerRadius", :value 0}
-      {:name "sort" :value true}]
+      {:name "sort" :value false}]
 
      :data
      [{:name "table",
@@ -213,6 +212,8 @@
        :transform
        [{:type "aggregate"
          :groupby [col]}
+        {:type "collect"
+         :sort {:field col :order "descending"}}
         {:type "pie",
           :field "count",
           :startAngle 0,
@@ -223,7 +224,7 @@
      [{:name "color",
        :type "ordinal",
        :domain {:data "table", :field col},
-       :range {:scheme "category10"}}],
+       :range {:scheme "category20"},}]
 
      :legends
      [{:fill "color",

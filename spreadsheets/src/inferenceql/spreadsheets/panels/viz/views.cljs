@@ -12,7 +12,7 @@
 (def ^:private default-vega-embed-options
   {:renderer "svg"
    :mode "vega-lite"
-   :logLevel log-level-default
+   :logLevel log-level-debug
    :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
             :legend {:labelFontSize 12 :titleFontSize 12}
             :header {:labelFontSize 14}
