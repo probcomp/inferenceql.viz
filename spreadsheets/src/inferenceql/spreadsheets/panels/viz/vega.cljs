@@ -406,11 +406,20 @@
          selections :selections
          cols :selected-columns
          row :row-at-selection-start} selection-layer
-         spec (cond (simulatable? selections (first cols))
+
+         first-col-nominal (= "nominal" (get-col-type (first cols)))
+
+         spec (cond (and first-col-nominal (simulatable? selections (first cols)))
                     (gen-simulate-plot (first cols) row (name layer-name))
 
-                    (= 1 (count cols)) ; One column selected.
+                    (simulatable? selections (first cols))
+                    (gen-simulate-plot-vega-lite (first cols) row (name layer-name))
+
+                    (and first-col-nominal (= 1 (count cols))) ; One column selected.
                     (gen-histogram (first cols) selections)
+
+                    (= 1 (count cols)) ; One column selected.
+                    (gen-histogram-vega-lite (first cols) selections)
 
                     :else ; Two or more columns selected.
                     (gen-comparison-plot (take 2 cols) selections))

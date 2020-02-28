@@ -85,8 +85,10 @@
             (fn [selection-layers]
               (let [{selections :selections
                      cols :selected-columns} (:blue selection-layers)
-                     sim (vega/simulatable? selections (first cols))]
-                (if (= 1 (count cols))
+                    sim (vega/simulatable? selections (first cols))
+                    c (first cols)
+                    first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
+                (if (and first-col-nominal (= 1 (count cols)))
                   "vega"
                   "vega-lite"))))
 
@@ -95,8 +97,10 @@
             (fn [selection-layers]
               (let [{selections :selections
                      cols :selected-columns} (:green selection-layers)
-                     sim (vega/simulatable? selections (first cols))]
-                (if (= 1 (count cols))
+                    sim (vega/simulatable? selections (first cols))
+                    c (first cols)
+                    first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
+                (if (and first-col-nominal (= 1 (count cols)))
                   "vega"
                   "vega-lite"))))
 
@@ -105,7 +109,9 @@
             (fn [selection-layers]
               (let [{selections :selections
                      cols :selected-columns} (:red selection-layers)
-                     sim (vega/simulatable? selections (first cols))]
-                (if (= 1 (count cols))
+                    sim (vega/simulatable? selections (first cols))
+                    c (first cols)
+                    first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
+                (if (and first-col-nominal (= 1 (count cols)))
                   "vega"
                   "vega-lite"))))
