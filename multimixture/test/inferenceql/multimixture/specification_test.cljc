@@ -112,7 +112,11 @@
   (is (= {"0.0" "male", "1.0" "female"} (spec/get-col-categories json-models "gender"))))
 
 (deftest get-col-types-test
-  (is (= :categorical (spec/get-col-type json-models "gender"))
+  (is (= {:vars {"age" :gaussian, "height" :gaussian "gender" :categorical}}
+         (spec/get-col-types json-models))))
+
+(deftest get-col-type-test
+  (is (= :categorical (spec/get-col-type json-models "gender")))
   (is (= :gaussian (spec/get-col-type json-models "age"))))
 
 
