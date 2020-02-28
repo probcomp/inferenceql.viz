@@ -170,7 +170,7 @@
          :outerRadius {:signal "width / 2"},
          :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}
          :cornerRadius
-         {:signal "cornerRadius"}}}}],}))
+         {:signal "cornerRadius"}}}}]}))
 
 (defn get-col-type [col-name]
   (condp = (stattype col-name)
@@ -256,7 +256,24 @@
          :innerRadius {:signal "innerRadius"},
          :outerRadius {:signal "width / 2"},
          :cornerRadius
-         {:signal "cornerRadius"}}}}],}))
+         {:signal "cornerRadius"}}}}
+      {:type "text",
+       :from {:data "table"},
+       :encode
+       {:enter
+        {:x {:signal "width / 2"},
+         :y {:signal "height / 2"},
+         :theta
+         {:signal
+          "(datum['startAngle'] + datum['endAngle'])/2"},
+         :radius
+         {:signal "(width / 2) + 10"}
+         :baseline {:value "middle"},
+         :align {:value "center"},
+         :fill {:value "black"},
+         :fontSize {:value 12},
+         :text {:signal "datum.count"}
+         :tooltip ""}}}]}))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
