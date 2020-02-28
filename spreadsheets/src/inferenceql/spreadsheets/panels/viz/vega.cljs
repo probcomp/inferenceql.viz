@@ -4,7 +4,8 @@
             [metaprob.distributions :as dist]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
-            [inferenceql.spreadsheets.panels.table.db :as table-db]))
+            [inferenceql.spreadsheets.panels.table.db :as table-db]
+            [goog.string :as gstring]))
 
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
@@ -134,64 +135,64 @@
                     :type "quantitative"}}}))
 
 (defn gen-histogram [col selections]
- {:$schema "https://vega.github.io/schema/vega/v5.json",
-  :width 200,
-  :height 200,
-  :autosize "pad",
+  (let [col-type (get-col-type col)
+        col-binning (get-col-should-bin col)]
+    {:$schema "https://vega.github.io/schema/vega/v5.json",
+     :width 200,
+     :height 200,
+     :autosize "pad",
 
-  :signals
-  [{:name "padAngle", :value 0}
-   {:name "innerRadius", :value 0}
-   {:name "cornerRadius", :value 0}
-   {:name "sort" :value true}]
+     :signals
+     [{:name "padAngle", :value 0}
+      {:name "innerRadius", :value 0}
+      {:name "cornerRadius", :value 0}
+      {:name "sort" :value true}]
 
-  :data
-  [{:name "table",
-    :values
-    [{:id "beans", :field 4}
-     {:id "foo", :field 6}
-     {:id "blah", :field 10}
-     {:id "some", :field 3}]
-    :transform
-    [{:type "pie",
-      :field "field",
-      :startAngle 0,
-      :endAngle 6.29,
-      :sort {:signal "sort"}}]}]
+     :data
+     [{:name "table",
+       :values selections
+       :transform
+       [{:type "aggregate"
+         :groupby [col]}
+        {:type "pie",
+          :field "count",
+          :startAngle 0,
+          :endAngle 6.29,
+          :sort {:signal "sort"}}]}]
 
-  :scales
-  [{:name "color",
-    :type "ordinal",
-    :domain {:data "table", :field "id"},
-    :range {:scheme "category10"}}],
+     :scales
+     [{:name "color",
+       :type "ordinal",
+       :domain {:data "table", :field col},
+       :range {:scheme "category10"}}],
 
-  :legends
-  [{:fill "color",
-    :title "Possible values",
-    :orient "right",
-    :encode
-    {:symbols
-     {:enter {:fillOpacity {:value 1.0}}},
-     :labels
-     {:update {:text {:field "value"}}}}}],
+     :legends
+     [{:fill "color",
+       :title "Possible values",
+       :orient "right",
+       :encode
+       {:symbols
+        {:enter {:fillOpacity {:value 1.0}}},
+        :labels
+        {:update {:text {:field "value"}}}}}],
 
-  :marks
-  [{:type "arc",
-    :from {:data "table"},
-    :encode
-    {:enter
-     {:fill {:scale "color", :field "id"},
-      :x {:signal "width / 2"},
-      :y {:signal "height / 2"},
-      :tooltip {:signal "{'value': datum.id, 'count': datum.field}"}}
-     :update
-     {:startAngle {:field "startAngle"},
-      :endAngle {:field "endAngle"},
-      :padAngle {:signal "padAngle"},
-      :innerRadius {:signal "innerRadius"},
-      :outerRadius {:signal "width / 2"},
-      :cornerRadius
-      {:signal "cornerRadius"}}}}],})
+     :marks
+     [{:type "arc",
+       :from {:data "table"},
+       :encode
+       {:enter
+        {:fill {:scale "color", :field col},
+         :x {:signal "width / 2"},
+         :y {:signal "height / 2"},
+         :tooltip {:signal (gstring/format "{'value': datum['%s'], 'count': datum.count}" col)}}
+        :update
+        {:startAngle {:field "startAngle"},
+         :endAngle {:field "endAngle"},
+         :padAngle {:signal "padAngle"},
+         :innerRadius {:signal "innerRadius"},
+         :outerRadius {:signal "width / 2"},
+         :cornerRadius
+         {:signal "cornerRadius"}}}}],}))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
