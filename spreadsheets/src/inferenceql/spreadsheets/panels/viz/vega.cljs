@@ -145,7 +145,7 @@
 
      :legends
      [{:fill "color",
-       :title "Possible values",
+       :title (str "Simulations: " col)
        :orient "right",
        :encode
        {:symbols
@@ -232,7 +232,7 @@
 
      :legends
      [{:fill "color",
-       :title "Possible values",
+       :title col,
        :orient "right",
        :encode
        {:symbols
