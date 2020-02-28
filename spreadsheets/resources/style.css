@@ -192,3 +192,7 @@ psuedo-class applied. */
   width: 100%;
   height: 400px;
 }
+
+.vega-embed {
+  margin-right: 30px;
+}
