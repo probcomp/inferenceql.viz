@@ -290,11 +290,6 @@
   (let [transformed-selection (mapv (fn [row]
                                       (update row "geo_fips" #(left-pad (str %) 4 \0)))
                                     selections)
-        map-column (first (filter #(not= "geo_fips" %) selected-columns))
-        map-column-type (when map-column
-                          (condp = (stattype map-column)
-                                 dist/gaussian "quantitative"
-                                 dist/categorical "nominal"))
         map-names-col "district_name"
 
         spec {:$schema default-vega-lite-schema
@@ -311,18 +306,22 @@
               :mark "geoshape"
               :encoding {:tooltip [{:field map-names-col
                                     :type "nominal"}]}}
-          color-spec {:field map-column
-                      :type map-column-type}]
+
+        ;; If we have a second column selected, color the chorolpeth according
+        ;; to the values in that column.
+        map-column (first (filter #(not= "geo_fips" %) selected-columns))
+        map-column-type (when map-column
+                          (condp = (stattype map-column)
+                                 dist/gaussian "quantitative"
+                                 dist/categorical "nominal"))
+        color-spec {:field map-column
+                    :type map-column-type}]
       (if map-column
-        (let [foo (-> spec
-                      (assoc-in [:encoding :color] color-spec)
-                      (update-in [:encoding :tooltip] conj color-spec)
-                      (update-in [:transform 0 :from :fields] conj map-column))]
-          (.log js/console "foo: " foo)
-          spec)
+        (-> spec
+            (assoc-in [:encoding :color] color-spec)
+            (update-in [:encoding :tooltip] conj color-spec)
+            (update-in [:transform 0 :from :fields] conj map-column))
         spec)))
-
-
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
