@@ -91,7 +91,7 @@
                     sim (vega/simulatable? selections (first cols))
                     c (first cols)
                     first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
-                (if (and first-col-nominal (= 1 (count cols)))
+                (if (and first-col-nominal (= 1 (count cols)) (not-any? #{"geo_fips"} cols))
                   "vega"
                   "vega-lite"))))
 
@@ -103,7 +103,7 @@
                     sim (vega/simulatable? selections (first cols))
                     c (first cols)
                     first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
-                (if (and first-col-nominal (= 1 (count cols)))
+                (if (and first-col-nominal (= 1 (count cols)) (not-any? #{"geo_fips"} cols))
                   "vega"
                   "vega-lite"))))
 
@@ -115,6 +115,6 @@
                     sim (vega/simulatable? selections (first cols))
                     c (first cols)
                     first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
-                (if (and first-col-nominal (= 1 (count cols)))
+                (if (and first-col-nominal (= 1 (count cols)) (not-any? #{"geo_fips"} cols))
                   "vega"
                   "vega-lite"))))

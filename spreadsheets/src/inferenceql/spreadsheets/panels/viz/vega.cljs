@@ -287,40 +287,42 @@
          :tooltip ""}}}]}))
 
 (defn gen-choropleth [selections selected-columns]
-  (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
-        transformed-selection (mapv (fn [row]
+  (let [transformed-selection (mapv (fn [row]
                                       (update row "geo_fips" #(left-pad (str %) 4 \0)))
                                     selections)
-
+        map-column (first (filter #(not= "geo_fips" %) selected-columns))
         map-column-type (when map-column
                           (condp = (stattype map-column)
                                  dist/gaussian "quantitative"
                                  dist/categorical "nominal"))
+        map-names-col "district_name"
 
-        ;; TODO: Push these into the actual spec.
-        ;; TODO: Make this a def in a let;
-        name {:field "district_name"
-              :type "nominal"}
-        color {:field map-column
-               :type map-column-type}]
-    (let [foo
-          {;; TODO: update this.
-           ;:$schema v3-vega-lite-schema
-           :width vega-map-width
-           :height vega-map-height
-           :data {:values js/topojson
-                  :format {:type "topojson"
-                           :feature topojson-feature}}
-           :transform [{:lookup "properties.GEOID"
-                        :from {:data {:values transformed-selection}
-                               :key "geo_fips"
-                               "fields" [(:field name) (:field color)]}}]
-           :projection {:type "albersUsa"}
-           :mark "geoshape"
-           :encoding {:tooltip [name color]
-                      :color color}}]
-      (.log js/console "spec: " foo)
-      foo)))
+        spec {:$schema default-vega-lite-schema
+              :width vega-map-width
+              :height vega-map-height
+              :data {:values js/topojson
+                     :format {:type "topojson"
+                              :feature topojson-feature}}
+              :transform [{:lookup "properties.GEOID"
+                           :from {:data {:values transformed-selection}
+                                  :key "geo_fips"
+                                  :fields [map-names-col]}}]
+              :projection {:type "albersUsa"}
+              :mark "geoshape"
+              :encoding {:tooltip [{:field map-names-col
+                                    :type "nominal"}]}}
+          color-spec {:field map-column
+                      :type map-column-type}]
+      (if map-column
+        (let [foo (-> spec
+                      (assoc-in [:encoding :color] color-spec)
+                      (update-in [:encoding :tooltip] conj color-spec)
+                      (update-in [:transform 0 :from :fields] conj map-column))]
+          (.log js/console "foo: " foo)
+          spec)
+        spec)))
+
+
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
