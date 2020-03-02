@@ -147,7 +147,7 @@
                                           (get-view-crp-params json-model
                                                                view-idx))]
 
-    (map (fn [[rowids p]]
+    (into [] (map (fn [[rowids p]]
                           {:probability p
                            :parameters (get-params json-model
                                                    data
@@ -155,7 +155,7 @@
                                                    (select-keys (:vars stat-types)
                                                                 cols-in-view)
                                                    categories)})
-         (zipmap (conj clustering []) p-clusters ))))
+         (zipmap (conj clustering []) p-clusters )))))
 
 ;; operating ing model assemble.
 (defn generate-specs-from-json
@@ -197,7 +197,6 @@
 ;;(bq/simulate row-generator {"age" 30} 3)
 ;;(bq/logpdf row-generator {"height" 176} {"gender" "male"})
 ;;(bq/logpdf row-generator {"height" 176} {"gender" "female"})
-
 
 (with-open [w (clojure.java.io/writer outmodel-path)]
   (binding [*print-length* false
