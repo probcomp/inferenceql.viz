@@ -55,9 +55,15 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (if (contains? #{hot/score-col-header hot/label-col-header} column)
-                      :gaussian
-                      (get-in model/spec [:vars column]))]
+  (let [stattype-kw (cond (contains? #{hot/score-col-header hot/label-col-header "percent_black"
+                                       "percent_married_children" "percap" "percent_college"} column)
+                          :gaussian
+
+                          (contains? #{"geo_fips" "NAME"} column)
+                          :categorical
+
+                          :else
+                          (get-in model/spec [:vars column]))]
     (case stattype-kw
       :gaussian dist/gaussian
       :categorical dist/categorical)))
@@ -281,31 +287,40 @@
          :tooltip ""}}}]}))
 
 (defn gen-choropleth [selections selected-columns]
-  (let [selection (first selections)
-        map-column (first (filter #(not= "geo_fips" %) selected-columns))
+  (let [map-column (first (filter #(not= "geo_fips" %) selected-columns))
         transformed-selection (mapv (fn [row]
                                       (update row "geo_fips" #(left-pad (str %) 4 \0)))
-                                    selection)
-        name {:field "NAME"
+                                    selections)
+
+        map-column-type (when map-column
+                          (condp = (stattype map-column)
+                                 dist/gaussian "quantitative"
+                                 dist/categorical "nominal"))
+
+        ;; TODO: Push these into the actual spec.
+        ;; TODO: Make this a def in a let;
+        name {:field "district_name"
               :type "nominal"}
         color {:field map-column
-               :type (condp = (stattype map-column)
-                       dist/gaussian "quantitative"
-                       dist/categorical "nominal")}]
-    {:$schema v3-vega-lite-schema
-     :width vega-map-width
-     :height vega-map-height
-     :data {:values js/topojson
-            :format {:type "topojson"
-                     :feature topojson-feature}}
-     :transform [{:lookup "properties.GEOID"
-                  :from {:data {:values transformed-selection}
-                         :key "geo_fips"
-                         "fields" [(:field name) (:field color)]}}]
-     :projection {:type "albersUsa"}
-     :mark "geoshape"
-     :encoding {:tooltip [name color]
-                :color color}}))
+               :type map-column-type}]
+    (let [foo
+          {;; TODO: update this.
+           ;:$schema v3-vega-lite-schema
+           :width vega-map-width
+           :height vega-map-height
+           :data {:values js/topojson
+                  :format {:type "topojson"
+                           :feature topojson-feature}}
+           :transform [{:lookup "properties.GEOID"
+                        :from {:data {:values transformed-selection}
+                               :key "geo_fips"
+                               "fields" [(:field name) (:field color)]}}]
+           :projection {:type "albersUsa"}
+           :mark "geoshape"
+           :encoding {:tooltip [name color]
+                      :color color}}]
+      (.log js/console "spec: " foo)
+      foo)))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
@@ -414,7 +429,10 @@
 
          first-col-nominal (= "nominal" (get-col-type (first cols)))
 
-         spec (cond (and first-col-nominal (simulatable? selections (first cols)))
+         spec (cond (some #{"geo_fips"} cols)
+                    (gen-choropleth selections cols)
+
+                    (and first-col-nominal (simulatable? selections (first cols)))
                     (gen-simulate-plot (first cols) row (name layer-name))
 
                     (simulatable? selections (first cols))
