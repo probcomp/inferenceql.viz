@@ -421,7 +421,7 @@
              #{dist/gaussian dist/categorical} (strip-plot selections cols))
            {:autosize {:resize true}})))
 
-(defn- spec-for-selection-layer [selection-layer]
+(defn- spec-for-selection-layer [selection-layer table-rows]
   (let [{layer-name :id
          selections :selections
          cols :selected-columns
@@ -430,7 +430,7 @@
          first-col-nominal (= "nominal" (get-col-type (first cols)))
 
          spec (cond (some #{"geo_fips"} cols)
-                    (gen-choropleth selections cols)
+                    (gen-choropleth table-rows cols)
 
                     (and first-col-nominal (simulatable? selections (first cols)))
                     (gen-simulate-plot (first cols) row (name layer-name))
@@ -452,6 +452,6 @@
     (merge spec title)))
 
 
-(defn generate-spec [selection-layers]
+(defn generate-spec [selection-layers table-rows]
   (when-let [layer (first selection-layers)]
-    (spec-for-selection-layer layer)))
+    (spec-for-selection-layer layer table-rows)))

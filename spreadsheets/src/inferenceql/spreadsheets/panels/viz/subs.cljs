@@ -11,21 +11,24 @@
 
 (rf/reg-sub :viz/vega-lite-spec-blue
             :<- [:table/selection-layers-list-blue]
-            (fn [selection-layers]
+            :<- [:table/computed-rows]
+            (fn [[selection-layers table-rows]]
               (clj->js
-                (vega/generate-spec selection-layers))))
+                (vega/generate-spec selection-layers table-rows))))
 
 (rf/reg-sub :viz/vega-lite-spec-green
             :<- [:table/selection-layers-list-green]
-            (fn [selection-layers]
+            :<- [:table/computed-rows]
+            (fn [[selection-layers table-rows]]
               (clj->js
-                (vega/generate-spec selection-layers))))
+                (vega/generate-spec selection-layers table-rows))))
 
 (rf/reg-sub :viz/vega-lite-spec-red
             :<- [:table/selection-layers-list-red]
-            (fn [selection-layers]
+            :<- [:table/computed-rows]
+            (fn [[selection-layers table-rows]]
               (clj->js
-                (vega/generate-spec selection-layers))))
+                (vega/generate-spec selection-layers table-rows))))
 
 (defn make-simulate-fn
   [col-to-sim row override-fns]
