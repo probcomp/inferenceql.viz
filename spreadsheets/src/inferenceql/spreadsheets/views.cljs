@@ -25,10 +25,12 @@
      [:div {:class highlight-class}
        [table/handsontable {} real-hot-props]]
      [:div#viz-container
+      [:div.flex-box-space-filler]
       (when vega-lite-spec-blue
         [viz/vega-lite vega-lite-spec-blue {:actions false :mode vega-mode-blue} generator-blue])
       (when vega-lite-spec-green
         [viz/vega-lite vega-lite-spec-green {:actions false :mode vega-mode-green} generator-green])
       (when vega-lite-spec-red
-        [viz/vega-lite vega-lite-spec-red {:actions false :mode vega-mode-red} generator-red])]
+        [viz/vega-lite vega-lite-spec-red {:actions false :mode vega-mode-red} generator-red])
+      [:div.flex-box-space-filler]]
      [modal/modal]]))

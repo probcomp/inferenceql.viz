@@ -307,7 +307,7 @@
               :encoding {:tooltip [{:field map-names-col
                                     :type "nominal"}]}}
 
-        ;; If we have a second column selected, color the chorolpeth according
+        ;; If we have a second column selected, color the choropleth according
         ;; to the values in that column.
         map-column (first (filter #(not= "geo_fips" %) selected-columns))
         map-column-type (when map-column

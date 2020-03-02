@@ -19,7 +19,7 @@ div {
 
 .flex-box-space-filler {
   flex: auto;
-  min-width: 40px;
+  min-width: 10px;
 }
 
 /* --------------- styling for the toolbar --------------- */
@@ -118,7 +118,7 @@ input[type=search]{
 
 #viz-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   border-top: solid;
   border-width: 1px;
   border-color: #cccccc;
@@ -194,5 +194,5 @@ psuedo-class applied. */
 }
 
 .vega-embed {
-  margin-right: 30px;
+  margin-right: 10px;
 }
