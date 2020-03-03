@@ -88,10 +88,13 @@
             (fn [selection-layers]
               (let [{selections :selections
                      cols :selected-columns} (:blue selection-layers)
-                    sim (vega/simulatable? selections (first cols))
-                    c (first cols)
-                    first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
-                (if (and first-col-nominal (= 1 (count cols)) (not-any? #{"geo_fips"} cols))
+
+                    ;; Only get the column type when we are not dealing with a special column.
+                    first-col-nominal (when (seq cols)
+                                        (when-not (vega/cols-invalid-for-sim (first cols))
+                                          (let [type (vega/get-col-type (first cols))]
+                                            (= type "nominal"))))]
+                (if (and first-col-nominal (= 1 (count cols)))
                   "vega"
                   "vega-lite"))))
 
@@ -100,10 +103,13 @@
             (fn [selection-layers]
               (let [{selections :selections
                      cols :selected-columns} (:green selection-layers)
-                    sim (vega/simulatable? selections (first cols))
-                    c (first cols)
-                    first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
-                (if (and first-col-nominal (= 1 (count cols)) (not-any? #{"geo_fips"} cols))
+
+                    ;; Only get the column type when we are not dealing with a special column.
+                    first-col-nominal (when (seq cols)
+                                        (when-not (vega/cols-invalid-for-sim (first cols))
+                                          (let [type (vega/get-col-type (first cols))]
+                                            (= type "nominal"))))]
+                (if (and first-col-nominal (= 1 (count cols)))
                   "vega"
                   "vega-lite"))))
 
@@ -112,9 +118,12 @@
             (fn [selection-layers]
               (let [{selections :selections
                      cols :selected-columns} (:red selection-layers)
-                    sim (vega/simulatable? selections (first cols))
-                    c (first cols)
-                    first-col-nominal (= "nominal" (when c (vega/get-col-type c)))]
-                (if (and first-col-nominal (= 1 (count cols)) (not-any? #{"geo_fips"} cols))
+
+                    ;; Only get the column type when we are not dealing with a special column.
+                    first-col-nominal (when (seq cols)
+                                        (when-not (vega/cols-invalid-for-sim (first cols))
+                                          (let [type (vega/get-col-type (first cols))]
+                                            (= type "nominal"))))]
+                (if (and first-col-nominal (= 1 (count cols)))
                   "vega"
                   "vega-lite"))))

@@ -7,10 +7,13 @@
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [goog.string :as gstring]))
 
+(def fips-col "geo_fips")
+(def map-names-col "district_name")
+
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
 ;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
-(def cols-invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header})
+(def cols-invalid-for-sim #{fips-col map-names-col hot/label-col-header hot/score-col-header})
 
 (defn simulatable?
   "Checks if `selection` is valid for simulation"
@@ -55,12 +58,8 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (cond (contains? #{hot/score-col-header hot/label-col-header "percent_black"
-                                       "percent_married_children" "percap" "percent_college"} column)
+  (let [stattype-kw (cond (contains? #{hot/score-col-header hot/label-col-header} column)
                           :gaussian
-
-                          (contains? #{"geo_fips" "NAME"} column)
-                          :categorical
 
                           :else
                           (get-in model/spec [:vars column]))]
@@ -428,7 +427,10 @@
          cols :selected-columns
          row :row-at-selection-start} selection-layer
 
-         first-col-nominal (= "nominal" (get-col-type (first cols)))
+         ;; Only get the column type when we are not dealing with a special column.
+         first-col-nominal (when-not (cols-invalid-for-sim (first cols))
+                             (let [type (get-col-type (first cols))]
+                               (= type "nominal")))
 
          spec (cond (some #{"geo_fips"} cols)
                     (gen-choropleth table-rows cols)
