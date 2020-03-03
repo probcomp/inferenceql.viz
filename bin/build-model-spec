@@ -83,11 +83,14 @@
   (into {} (map (fn [[k  v]] [k, (/ (+ v alpha) denom)])
                 (seq counts)))))
 
-(defn suff-stats-num [col-vec]
+(defn suff-stats-num [col-vec-in]
   "Get sufficient statistics for a numerical data vector."
-  {:n (count col-vec)
-   :sum_x (reduce + col-vec)
-   :sum_x_squared (reduce + (map #(square %) col-vec))})
+  (let [col-vec (filter some? col-vec-in)]
+  (if (empty? col-vec)
+    {:n 0 :sum_x 0 :sum_x_squared 0}
+    {:n (count col-vec)
+     :sum_x (reduce + col-vec)
+     :sum_x_squared (reduce + (map #(square %) col-vec))})))
 
 (defn posterior-hypers
   [{n :n sum_x :sum_x sum_x_squared :sum_x_squared } ;; sufficient stats
