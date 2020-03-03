@@ -3,15 +3,17 @@
             [inferenceql.spreadsheets.data :refer [nyt-data]]))
 
 (def default-db
-  {:table-panel {:headers (into [] (keys (first nyt-data)))
-                 :rows nyt-data
+  {:table-panel {:dataset-headers (into [] (keys (first nyt-data)))
+                 :dataset-rows nyt-data
                  :selection-layers {}}})
 
-(s/def ::table-panel (s/keys :req-un [::headers
-                                      ::rows
+(s/def ::table-panel (s/keys :req-un [::dataset-headers
+                                      ::dataset-rows
                                       ::selection-layers]
                              :opt-un [::scores
-                                      ::labels]))
+                                      ::labels
+                                      ::headers
+                                      ::rows]))
 
 ;;; Specs related to scores computed on rows.
 
@@ -29,6 +31,8 @@
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/cat :row (s/* ::row)))
 (s/def ::headers (s/cat :header (s/* ::header)))
+(s/def ::dataset-rows (s/cat :row (s/* ::row)))
+(s/def ::dataset-headers (s/cat :header (s/* ::header)))
 
 ;;; Specs related to selections within handsontable instances.
 
