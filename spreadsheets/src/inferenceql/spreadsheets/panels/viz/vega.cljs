@@ -9,6 +9,7 @@
 
 (def fips-col "geo_fips")
 (def map-names-col "district_name")
+(def topojson-prop "properties.GEOID")
 
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
@@ -287,9 +288,9 @@
 
 (defn gen-choropleth [selections selected-columns]
   (let [transformed-selection (mapv (fn [row]
-                                      (update row "geo_fips" #(left-pad (str %) 4 \0)))
+                                      (update row fips-col #(left-pad (str %) 4 \0)))
                                     selections)
-        map-names-col "district_name"
+
 
         spec {:$schema default-vega-lite-schema
               :width vega-map-width
@@ -297,9 +298,9 @@
               :data {:values js/topojson
                      :format {:type "topojson"
                               :feature topojson-feature}}
-              :transform [{:lookup "properties.GEOID"
+              :transform [{:lookup topojson-prop
                            :from {:data {:values transformed-selection}
-                                  :key "geo_fips"
+                                  :key fips-col
                                   :fields [map-names-col]}}]
               :projection {:type "albersUsa"}
               :mark "geoshape"
@@ -308,7 +309,7 @@
 
         ;; If we have a second column selected, color the choropleth according
         ;; to the values in that column.
-        map-column (first (filter #(not= "geo_fips" %) selected-columns))
+        map-column (first (filter #(not= fips-col %) selected-columns))
         map-column-type (when map-column
                           (condp = (stattype map-column)
                                  dist/gaussian "quantitative"
@@ -432,7 +433,7 @@
                              (let [type (get-col-type (first cols))]
                                (= type "nominal")))
 
-         spec (cond (some #{"geo_fips"} cols)
+         spec (cond (some #{fips-col} cols)
                     (gen-choropleth table-rows cols)
 
                     (and first-col-nominal (simulatable? selections (first cols)))
