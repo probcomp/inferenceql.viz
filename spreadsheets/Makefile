@@ -17,7 +17,12 @@ figwheel-public-dir := $(current-dir)/figwheel-target/public
 figwheel-resource-dir := $(figwheel-public-dir)/resources
 figwheel-index-file := $(figwheel-public-dir)/index.html
 
-all: js
+# Ulli's hack to demo.
+all: bdb js
+
+.PHONY: bdb
+bdb:
+	cd .. && ./bin/build-model-spec && cd spreadsheets/
 
 js: $(output-to)
 
