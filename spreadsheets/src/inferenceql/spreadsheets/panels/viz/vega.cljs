@@ -196,9 +196,14 @@
 (defn gen-histogram [col selections]
   (let [col-type (get-col-type col)
         col-binning (get-col-should-bin col)
-        attach-nil? (some nil? (map #(get % col) selections))
+        attach-null? (some nil? (map #(get % col) selections))
+
         domain-vals (cond-> (vec (get-in model/spec [:categories col]))
-                            attach-nil? (conj nil))]
+                            attach-null? (conj "Null"))
+        selections (map (fn [row] (if (nil? (get row col))
+                                    (assoc row col "Null")
+                                    row))
+                        selections)]
     {:$schema "https://vega.github.io/schema/vega/v5.json",
      :width 200,
      :height 200,
