@@ -7,9 +7,10 @@
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [goog.string :as gstring]))
 
-(def fips-col "geo_fips")
-(def map-names-col "district_name")
-(def topojson-prop "properties.GEOID")
+(def fips-col "country")
+(def map-names-col "country")
+(def topojson-prop "properties.geounit")
+(def ^:private topojson-feature "countries")
 
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
@@ -35,8 +36,6 @@
 (def vega-strip-plot-step-size
   "Width of each band in the strip plot in the categorical dimension"
   30)
-
-(def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
 (def default-table-color "SteelBlue")
 
@@ -287,10 +286,11 @@
          :tooltip ""}}}]}))
 
 (defn gen-choropleth [selections selected-columns]
-  (let [transformed-selection (mapv (fn [row]
-                                      (update row fips-col #(left-pad (str %) 4 \0)))
-                                    selections)
-
+  (let [correct-names {"Congo DR" "Democratic Republic of the Congo"
+                       "Tanzania, United Republic of" "Tanzania"
+                       "Cote d'Ivoire" "Ivory Coast"}
+        update-fn (fn [v] (get correct-names v v))
+        transformed-selection (mapv (fn [row] (update row fips-col update-fn)) selections)
 
         spec {:$schema default-vega-lite-schema
               :width vega-map-width
@@ -302,7 +302,7 @@
                            :from {:data {:values transformed-selection}
                                   :key fips-col
                                   :fields [map-names-col]}}]
-              :projection {:type "albersUsa"}
+              :projection {:type "identity"}
               :mark "geoshape"
               :encoding {:tooltip [{:field map-names-col
                                     :type "nominal"}]}}
