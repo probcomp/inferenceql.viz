@@ -1,436 +1,101 @@
-geo_fips,district_name,percent_black,percent_married_children,percap,percent_college
-101,"CD 1, Alabama",0.2724,0.1699,25695.0,0.2404
-102,"CD 2, Alabama",0.3206,0.1738,24161.0,0.2179
-103,"CD 3, Alabama",0.2596,0.1998,24132.0,0.2277
-104,"CD 4, Alabama",0.0692,0.2034,22320.0,0.1703
-105,"CD 5, Alabama",0.1777,0.1824,29758.0,0.3027
-106,"CD 6, Alabama",0.1485,0.2219,33383.0,0.3674
-107,"CD 7, Alabama",0.6329,0.1138,20732.0,0.1935
-200,"CD (at Large), Alaska",0.0293,0.2305,34187.0,0.2956
-401,"CD 1, Arizona",0.0209,0.1753,22491.0,0.2453
-402,"CD 2, Arizona",0.0368,0.1414,28577.0,0.3396
-403,"CD 3, Arizona",0.0427,0.234,19232.0,0.1646
-404,"CD 4, Arizona",0.0158,0.1486,26523.0,0.1917
-405,"CD 5, Arizona",0.0332,0.2735,32918.0,0.3602
-406,"CD 6, Arizona",0.0207,0.1835,42779.0,0.454
-407,"CD 7, Arizona",0.0948,0.2173,16959.0,0.1402
-408,"CD 8, Arizona",0.0378,0.2129,30432.0,0.2935
-409,"CD 9, Arizona",0.0622,0.1541,32415.0,0.3755
-501,"CD 1, Arkansas",0.1771,0.1688,21907.0,0.1646
-502,"CD 2, Arkansas",0.2224,0.1877,27592.0,0.2997
-503,"CD 3, Arkansas",0.0301,0.2427,25991.0,0.2688
-504,"CD 4, Arkansas",0.1988,0.1749,21182.0,0.1581
-601,"CD 1, California",0.0129,0.1495,26949.0,0.2366
-602,"CD 2, California",0.0128,0.1789,44818.0,0.4076
-603,"CD 3, California",0.0603,0.2304,29224.0,0.2508
-604,"CD 4, California",0.0126,0.2153,38757.0,0.3328
-605,"CD 5, California",0.059,0.1964,35209.0,0.3121
-606,"CD 6, California",0.1249,0.1958,26642.0,0.2752
-607,"CD 7, California",0.0676,0.2319,34031.0,0.3291
-608,"CD 8, California",0.0866,0.2423,21809.0,0.1709
-609,"CD 9, California",0.0895,0.2567,26494.0,0.1914
-610,"CD 10, California",0.0306,0.2877,25293.0,0.1656
-611,"CD 11, California",0.0745,0.2419,44515.0,0.436
-612,"CD 12, California",0.0495,0.1324,64839.0,0.5948
-613,"CD 13, California",0.1683,0.1766,41397.0,0.4715
-614,"CD 14, California",0.025,0.2447,50487.0,0.4753
-615,"CD 15, California",0.049,0.3153,44491.0,0.4499
-616,"CD 16, California",0.0604,0.2339,18362.0,0.1216
-617,"CD 17, California",0.027,0.339,49171.0,0.5702
-618,"CD 18, California",0.019,0.2697,66772.0,0.6153
-619,"CD 19, California",0.0256,0.2856,36864.0,0.3553
-620,"CD 20, California",0.0178,0.2387,29672.0,0.2786
-621,"CD 21, California",0.0358,0.3503,15153.0,0.0786
-622,"CD 22, California",0.022,0.2601,25763.0,0.2411
-623,"CD 23, California",0.0606,0.2309,25392.0,0.2083
-624,"CD 24, California",0.0174,0.2072,32445.0,0.3403
-625,"CD 25, California",0.0685,0.2711,31565.0,0.2779
-626,"CD 26, California",0.0163,0.2414,34606.0,0.3412
-627,"CD 27, California",0.0474,0.2208,35241.0,0.4052
-628,"CD 28, California",0.0304,0.1428,41930.0,0.4622
-629,"CD 29, California",0.0303,0.2481,21309.0,0.1924
-630,"CD 30, California",0.0566,0.1989,41473.0,0.4245
-631,"CD 31, California",0.097,0.2482,23514.0,0.2266
-632,"CD 32, California",0.0293,0.259,23237.0,0.2136
-633,"CD 33, California",0.0308,0.1776,69375.0,0.6538
-634,"CD 34, California",0.0429,0.1589,21540.0,0.254
-635,"CD 35, California",0.0588,0.305,19394.0,0.1606
-636,"CD 36, California",0.0429,0.177,25180.0,0.2062
-637,"CD 37, California",0.2135,0.1471,33653.0,0.3689
-638,"CD 38, California",0.0437,0.265,25489.0,0.2349
-639,"CD 39, California",0.0228,0.2833,35092.0,0.4162
-640,"CD 40, California",0.0409,0.289,15885.0,0.0981
-641,"CD 41, California",0.091,0.2965,21233.0,0.1827
-642,"CD 42, California",0.0474,0.3072,29264.0,0.2505
-643,"CD 43, California",0.2125,0.2044,26562.0,0.2654
-644,"CD 44, California",0.1475,0.2633,19009.0,0.1234
-645,"CD 45, California",0.0143,0.2687,48000.0,0.5595
-646,"CD 46, California",0.0156,0.3013,21018.0,0.1869
-647,"CD 47, California",0.0734,0.2174,30348.0,0.32
-648,"CD 48, California",0.0128,0.2144,47277.0,0.4456
-649,"CD 49, California",0.0214,0.2621,42826.0,0.4402
-650,"CD 50, California",0.0328,0.2695,30315.0,0.2816
-651,"CD 51, California",0.0646,0.2532,18206.0,0.1412
-652,"CD 52, California",0.0264,0.2192,46537.0,0.5741
-653,"CD 53, California",0.0761,0.2051,33570.0,0.3784
-801,"CD 1, Colorado",0.0811,0.1711,39756.0,0.4764
-802,"CD 2, Colorado",0.0088,0.2054,39981.0,0.5425
-803,"CD 3, Colorado",0.008,0.1854,27411.0,0.2924
-804,"CD 4, Colorado",0.0131,0.2833,33787.0,0.3494
-805,"CD 5, Colorado",0.0562,0.2256,30613.0,0.37
-806,"CD 6, Colorado",0.0915,0.2717,37219.0,0.4183
-807,"CD 7, Colorado",0.0161,0.2023,32226.0,0.3247
-901,"CD 1, Connecticut",0.1475,0.194,36544.0,0.3678
-902,"CD 2, Connecticut",0.0373,0.176,37675.0,0.3512
-903,"CD 3, Connecticut",0.1319,0.16,36056.0,0.3615
-904,"CD 4, Connecticut",0.1154,0.2508,56020.0,0.4885
-905,"CD 5, Connecticut",0.059,0.1742,38709.0,0.363
-1000,"CD (at Large), Delaware",0.2135,0.1691,31712.0,0.3095
-1201,"CD 1, Florida",0.1362,0.1782,28149.0,0.2789
-1202,"CD 2, Florida",0.1263,0.1649,25110.0,0.2339
-1203,"CD 3, Florida",0.1493,0.1652,24072.0,0.2586
-1204,"CD 4, Florida",0.0862,0.1997,36749.0,0.3922
-1205,"CD 5, Florida",0.4718,0.1449,20606.0,0.2141
-1206,"CD 6, Florida",0.0974,0.1384,26083.0,0.2389
-1207,"CD 7, Florida",0.0921,0.186,30651.0,0.3775
-1208,"CD 8, Florida",0.0911,0.1381,29605.0,0.2898
-1209,"CD 9, Florida",0.1236,0.2179,22124.0,0.2465
-1210,"CD 10, Florida",0.2723,0.1866,27055.0,0.3033
-1211,"CD 11, Florida",0.0783,0.0971,25513.0,0.2056
-1212,"CD 12, Florida",0.0452,0.1614,29214.0,0.2689
-1213,"CD 13, Florida",0.1199,0.1163,30900.0,0.2779
-1214,"CD 14, Florida",0.1826,0.1636,31648.0,0.3526
-1215,"CD 15, Florida",0.1307,0.2019,25401.0,0.2575
-1216,"CD 16, Florida",0.0746,0.1457,31916.0,0.3072
-1217,"CD 17, Florida",0.0723,0.1289,26354.0,0.2126
-1218,"CD 18, Florida",0.1212,0.1502,34411.0,0.3049
-1219,"CD 19, Florida",0.0782,0.1201,35227.0,0.3232
-1220,"CD 20, Florida",0.52,0.1766,20374.0,0.197
-1221,"CD 21, Florida",0.1581,0.1604,34037.0,0.3427
-1222,"CD 22, Florida",0.1547,0.1533,40187.0,0.3787
-1223,"CD 23, Florida",0.1239,0.2008,34835.0,0.3858
-1224,"CD 24, Florida",0.4684,0.1447,19669.0,0.1936
-1225,"CD 25, Florida",0.0337,0.2115,22975.0,0.2274
-1226,"CD 26, Florida",0.1024,0.2311,22747.0,0.2722
-1227,"CD 27, Florida",0.0376,0.1681,37681.0,0.3747
-1301,"CD 1, Georgia",0.2931,0.1926,26644.0,0.25
-1302,"CD 2, Georgia",0.5157,0.1508,19804.0,0.1763
-1303,"CD 3, Georgia",0.244,0.2211,28475.0,0.2647
-1304,"CD 4, Georgia",0.5853,0.184,25426.0,0.2985
-1305,"CD 5, Georgia",0.5718,0.1,33008.0,0.4202
-1306,"CD 6, Georgia",0.1468,0.2694,46304.0,0.6059
-1307,"CD 7, Georgia",0.202,0.3222,31614.0,0.3964
-1308,"CD 8, Georgia",0.3067,0.1984,22991.0,0.2178
-1309,"CD 9, Georgia",0.0717,0.215,23963.0,0.2158
-1310,"CD 10, Georgia",0.2484,0.2133,25544.0,0.2666
-1311,"CD 11, Georgia",0.1602,0.2464,36404.0,0.4098
-1312,"CD 12, Georgia",0.3517,0.1927,22374.0,0.2088
-1313,"CD 13, Georgia",0.5812,0.2074,25950.0,0.2962
-1314,"CD 14, Georgia",0.0888,0.2394,23855.0,0.1811
-1501,"CD 1, Hawaii",0.02,0.2251,34669.0,0.3602
-1502,"CD 2, Hawaii",0.0142,0.2201,30643.0,0.278
-1601,"CD 1, Idaho",0.0034,0.2056,25361.0,0.2542
-1602,"CD 2, Idaho",0.0088,0.2379,26014.0,0.3008
-1701,"CD 1, Illinois",0.4983,0.1512,28130.0,0.2892
-1702,"CD 2, Illinois",0.5662,0.1319,24297.0,0.2334
-1703,"CD 3, Illinois",0.0516,0.2475,29713.0,0.2693
-1704,"CD 4, Illinois",0.0328,0.2273,23939.0,0.245
-1705,"CD 5, Illinois",0.0236,0.1878,48869.0,0.5469
-1706,"CD 6, Illinois",0.0252,0.2697,46654.0,0.5219
-1707,"CD 7, Illinois",0.4683,0.1015,37667.0,0.4068
-1708,"CD 8, Illinois",0.0449,0.2375,30276.0,0.3258
-1709,"CD 9, Illinois",0.0989,0.1963,41955.0,0.5317
-1710,"CD 10, Illinois",0.0665,0.2736,40667.0,0.4406
-1711,"CD 11, Illinois",0.104,0.2591,32678.0,0.3601
-1712,"CD 12, Illinois",0.1694,0.1654,26882.0,0.2395
-1713,"CD 13, Illinois",0.1098,0.1568,27673.0,0.3024
-1714,"CD 14, Illinois",0.0343,0.3157,37982.0,0.421
-1715,"CD 15, Illinois",0.0443,0.1948,25860.0,0.202
-1716,"CD 16, Illinois",0.0333,0.1958,28866.0,0.2218
-1717,"CD 17, Illinois",0.113,0.1523,24700.0,0.1868
-1718,"CD 18, Illinois",0.0402,0.2072,32668.0,0.3168
-1801,"CD 1, Indiana",0.1853,0.1851,28232.0,0.2261
-1802,"CD 2, Indiana",0.0689,0.2059,24293.0,0.2077
-1803,"CD 3, Indiana",0.0624,0.2002,25709.0,0.2288
-1804,"CD 4, Indiana",0.0418,0.2146,27319.0,0.2598
-1805,"CD 5, Indiana",0.0726,0.2271,38140.0,0.4496
-1806,"CD 6, Indiana",0.0261,0.1953,25803.0,0.2072
-1807,"CD 7, Indiana",0.3033,0.1488,23208.0,0.2346
-1808,"CD 8, Indiana",0.0385,0.1903,25987.0,0.2128
-1809,"CD 9, Indiana",0.0256,0.2018,28010.0,0.2635
-1901,"CD 1, Iowa",0.0379,0.2068,30633.0,0.2708
-1902,"CD 2, Iowa",0.0441,0.1899,27917.0,0.2846
-1903,"CD 3, Iowa",0.0412,0.2257,33074.0,0.331
-1904,"CD 4, Iowa",0.0144,0.1944,28357.0,0.2465
-2001,"CD 1, Kansas",0.0282,0.2015,24350.0,0.2389
-2002,"CD 2, Kansas",0.0483,0.1907,26783.0,0.2921
-2003,"CD 3, Kansas",0.0806,0.2399,37433.0,0.4736
-2004,"CD 4, Kansas",0.0625,0.2007,26686.0,0.2947
-2101,"CD 1, Kentucky",0.0759,0.1861,22856.0,0.1568
-2102,"CD 2, Kentucky",0.0563,0.2057,25750.0,0.2088
-2103,"CD 3, Kentucky",0.2169,0.1509,30288.0,0.309
-2104,"CD 4, Kentucky",0.034,0.2269,30526.0,0.2829
-2105,"CD 5, Kentucky",0.0147,0.1873,18575.0,0.1243
-2106,"CD 6, Kentucky",0.0872,0.1866,27670.0,0.3166
-2201,"CD 1, Louisiana",0.1385,0.2039,31238.0,0.3033
-2202,"CD 2, Louisiana",0.6114,0.1286,23818.0,0.2344
-2203,"CD 3, Louisiana",0.2505,0.1815,24365.0,0.2101
-2204,"CD 4, Louisiana",0.347,0.1711,22832.0,0.1988
-2205,"CD 5, Louisiana",0.344,0.1636,20613.0,0.1677
-2206,"CD 6, Louisiana",0.2398,0.2032,30571.0,0.2793
-2301,"CD 1, Maine",0.0177,0.167,33540.0,0.3694
-2302,"CD 2, Maine",0.0092,0.147,25544.0,0.2302
-2401,"CD 1, Maryland",0.1191,0.2085,34345.0,0.3056
-2402,"CD 2, Maryland",0.3362,0.1974,32194.0,0.3338
-2403,"CD 3, Maryland",0.2175,0.1894,43726.0,0.4716
-2404,"CD 4, Maryland",0.5151,0.1893,35970.0,0.34
-2405,"CD 5, Maryland",0.3816,0.234,38916.0,0.337
-2406,"CD 6, Maryland",0.1386,0.2375,37910.0,0.4148
-2407,"CD 7, Maryland",0.5252,0.1468,35078.0,0.3782
-2408,"CD 8, Maryland",0.1208,0.253,50881.0,0.556
-2501,"CD 1, Massachusetts",0.0561,0.1494,29632.0,0.2973
-2502,"CD 2, Massachusetts",0.0482,0.1927,33892.0,0.3839
-2503,"CD 3, Massachusetts",0.0284,0.2186,37598.0,0.3742
-2504,"CD 4, Massachusetts",0.0324,0.2603,49383.0,0.5102
-2505,"CD 5, Massachusetts",0.047,0.2245,48695.0,0.5736
-2506,"CD 6, Massachusetts",0.034,0.2243,42372.0,0.4398
-2507,"CD 7, Massachusetts",0.2348,0.1199,35107.0,0.4291
-2508,"CD 8, Massachusetts",0.0925,0.1914,43213.0,0.4683
-2509,"CD 9, Massachusetts",0.0234,0.1629,37633.0,0.3588
-2601,"CD 1, Michigan",0.0134,0.1425,25936.0,0.2459
-2602,"CD 2, Michigan",0.062,0.2071,25522.0,0.2383
-2603,"CD 3, Michigan",0.0779,0.2178,29188.0,0.3141
-2604,"CD 4, Michigan",0.0162,0.1755,25919.0,0.2185
-2605,"CD 5, Michigan",0.1714,0.1584,24002.0,0.1896
-2606,"CD 6, Michigan",0.0787,0.194,27912.0,0.2795
-2607,"CD 7, Michigan",0.043,0.1937,29282.0,0.2465
-2608,"CD 8, Michigan",0.0545,0.2094,34603.0,0.4061
-2609,"CD 9, Michigan",0.1404,0.1597,33233.0,0.3032
-2610,"CD 10, Michigan",0.0244,0.1978,31019.0,0.23
-2611,"CD 11, Michigan",0.0501,0.2363,41789.0,0.4665
-2612,"CD 12, Michigan",0.1078,0.1733,30640.0,0.3396
-2613,"CD 13, Michigan",0.5442,0.1133,19190.0,0.1473
-2614,"CD 14, Michigan",0.5585,0.13,28051.0,0.3083
-2701,"CD 1, Minnesota",0.0302,0.2095,30641.0,0.2795
-2702,"CD 2, Minnesota",0.0441,0.2636,37188.0,0.3845
-2703,"CD 3, Minnesota",0.0821,0.2381,46703.0,0.4901
-2704,"CD 4, Minnesota",0.0958,0.1986,34911.0,0.4223
-2705,"CD 5, Minnesota",0.162,0.1535,35517.0,0.4448
-2706,"CD 6, Minnesota",0.0289,0.2693,33682.0,0.2945
-2707,"CD 7, Minnesota",0.0105,0.1852,27908.0,0.2183
-2708,"CD 8, Minnesota",0.0101,0.165,28609.0,0.2299
-2801,"CD 1, Mississippi",0.2797,0.1993,22852.0,0.2073
-2802,"CD 2, Mississippi",0.664,0.1421,19401.0,0.1927
-2803,"CD 3, Mississippi",0.3574,0.194,24646.0,0.2589
-2804,"CD 4, Mississippi",0.2352,0.183,23654.0,0.2109
-2901,"CD 1, Missouri",0.4891,0.1141,28507.0,0.3179
-2902,"CD 2, Missouri",0.0409,0.2344,43011.0,0.4919
-2903,"CD 3, Missouri",0.0336,0.2439,28940.0,0.264
-2904,"CD 4, Missouri",0.0465,0.2086,24131.0,0.2393
-2905,"CD 5, Missouri",0.2202,0.1504,28028.0,0.2821
-2906,"CD 6, Missouri",0.0382,0.2172,28593.0,0.2865
-2907,"CD 7, Missouri",0.0185,0.1914,24057.0,0.2316
-2908,"CD 8, Missouri",0.0463,0.1872,21846.0,0.1504
-3000,"CD (at Large), Montana",0.0033,0.1906,28933.0,0.3096
-3101,"CD 1, Nebraska",0.0279,0.2173,29693.0,0.3247
-3102,"CD 2, Nebraska",0.0951,0.2251,32626.0,0.3917
-3103,"CD 3, Nebraska",0.0105,0.2004,27180.0,0.222
-3201,"CD 1, Nevada",0.1092,0.1507,20869.0,0.1523
-3202,"CD 2, Nevada",0.0163,0.184,31102.0,0.2547
-3203,"CD 3, Nevada",0.0647,0.1965,34371.0,0.3148
-3204,"CD 4, Nevada",0.15,0.1995,25669.0,0.2043
-3301,"CD 1, New Hampshire",0.0121,0.1864,36520.0,0.3724
-3302,"CD 2, New Hampshire",0.0116,0.1925,36118.0,0.3593
-3401,"CD 1, New Jersey",0.1629,0.203,33460.0,0.3043
-3402,"CD 2, New Jersey",0.1162,0.168,30426.0,0.258
-3403,"CD 3, New Jersey",0.1039,0.1932,37886.0,0.3385
-3404,"CD 4, New Jersey",0.0647,0.2349,40874.0,0.3956
-3405,"CD 5, New Jersey",0.0485,0.2792,47162.0,0.4775
-3406,"CD 6, New Jersey",0.094,0.2495,34454.0,0.3887
-3407,"CD 7, New Jersey",0.048,0.2886,55442.0,0.5132
-3408,"CD 8, New Jersey",0.0903,0.186,33034.0,0.3311
-3409,"CD 9, New Jersey",0.0903,0.2199,33248.0,0.3363
-3410,"CD 10, New Jersey",0.4978,0.1792,27692.0,0.2828
-3411,"CD 11, New Jersey",0.0303,0.27,52661.0,0.544
-3412,"CD 12, New Jersey",0.1613,0.2425,41372.0,0.4548
-3501,"CD 1, New Mexico",0.0245,0.158,28106.0,0.329
-3502,"CD 2, New Mexico",0.0179,0.1932,21727.0,0.2099
-3503,"CD 3, New Mexico",0.0119,0.1731,25561.0,0.272
-3601,"CD 1, New York",0.053,0.2479,40163.0,0.3414
-3602,"CD 2, New York",0.0947,0.2608,36835.0,0.3121
-3603,"CD 3, New York",0.0262,0.2678,53684.0,0.5165
-3604,"CD 4, New York",0.1408,0.267,42094.0,0.4249
-3605,"CD 5, New York",0.4697,0.2074,26356.0,0.2554
-3606,"CD 6, New York",0.0357,0.2098,30194.0,0.3586
-3607,"CD 7, New York",0.085,0.1996,30310.0,0.3369
-3608,"CD 8, New York",0.5054,0.1346,29320.0,0.337
-3609,"CD 9, New York",0.4681,0.1685,30897.0,0.375
-3610,"CD 10, New York",0.0309,0.1767,69523.0,0.6026
-3611,"CD 11, New York",0.0676,0.2633,32625.0,0.3445
-3612,"CD 12, New York",0.0419,0.1144,83122.0,0.7217
-3613,"CD 13, New York",0.2431,0.1172,24876.0,0.3098
-3614,"CD 14, New York",0.0937,0.1886,25661.0,0.256
-3615,"CD 15, New York",0.2665,0.1399,14846.0,0.1243
-3616,"CD 16, New York",0.3186,0.1885,41543.0,0.4063
-3617,"CD 17, New York",0.102,0.2604,44547.0,0.4446
-3618,"CD 18, New York",0.0855,0.2454,38305.0,0.3572
-3619,"CD 19, New York",0.0411,0.1663,31677.0,0.2917
-3620,"CD 20, New York",0.0848,0.1609,34756.0,0.3874
-3621,"CD 21, New York",0.0275,0.1732,27243.0,0.2321
-3622,"CD 22, New York",0.0371,0.1659,27133.0,0.2604
-3623,"CD 23, New York",0.0285,0.1651,25547.0,0.2609
-3624,"CD 24, New York",0.0801,0.1675,29784.0,0.3028
-3625,"CD 25, New York",0.1504,0.1546,30921.0,0.373
-3626,"CD 26, New York",0.173,0.1341,28141.0,0.3082
-3627,"CD 27, New York",0.0239,0.1881,33051.0,0.3069
-3701,"CD 1, North Carolina",0.4461,0.1436,24035.0,0.2775
-3702,"CD 2, North Carolina",0.1971,0.2857,31315.0,0.3623
-3703,"CD 3, North Carolina",0.1908,0.2017,24808.0,0.228
-3704,"CD 4, North Carolina",0.2152,0.2186,37872.0,0.5445
-3705,"CD 5, North Carolina",0.1438,0.1852,26338.0,0.2633
-3706,"CD 6, North Carolina",0.1984,0.184,26311.0,0.2463
-3707,"CD 7, North Carolina",0.188,0.1636,26259.0,0.2488
-3708,"CD 8, North Carolina",0.2283,0.2083,25695.0,0.2651
-3709,"CD 9, North Carolina",0.1915,0.2486,32597.0,0.3383
-3710,"CD 10, North Carolina",0.1158,0.1756,25925.0,0.2462
-3711,"CD 11, North Carolina",0.0339,0.1586,25237.0,0.2398
-3712,"CD 12, North Carolina",0.3674,0.1924,30913.0,0.3978
-3713,"CD 13, North Carolina",0.2139,0.1796,26904.0,0.2695
-3800,"CD (at Large), North Dakota",0.0248,0.1955,33339.0,0.2956
-3901,"CD 1, Ohio",0.2175,0.1982,31423.0,0.3383
-3902,"CD 2, Ohio",0.0837,0.1921,32935.0,0.3234
-3903,"CD 3, Ohio",0.3281,0.1513,24115.0,0.278
-3904,"CD 4, Ohio",0.0526,0.1738,26004.0,0.1787
-3905,"CD 5, Ohio",0.0258,0.1895,30424.0,0.2616
-3906,"CD 6, Ohio",0.0252,0.1734,24818.0,0.1593
-3907,"CD 7, Ohio",0.0389,0.2142,26745.0,0.2085
-3908,"CD 8, Ohio",0.0592,0.199,28539.0,0.2385
-3909,"CD 9, Ohio",0.164,0.1283,25452.0,0.2164
-3910,"CD 10, Ohio",0.1681,0.1634,28999.0,0.2794
-3911,"CD 11, Ohio",0.5227,0.0988,26140.0,0.2683
-3912,"CD 12, Ohio",0.0473,0.2323,36847.0,0.41
-3913,"CD 13, Ohio",0.1152,0.1383,24583.0,0.2373
-3914,"CD 14, Ohio",0.0433,0.2033,35365.0,0.3408
-3915,"CD 15, Ohio",0.0429,0.2054,30410.0,0.3144
-3916,"CD 16, Ohio",0.0237,0.2042,33452.0,0.3327
-4001,"CD 1, Oklahoma",0.0842,0.2005,29587.0,0.3015
-4002,"CD 2, Oklahoma",0.0333,0.1978,20913.0,0.17
-4003,"CD 3, Oklahoma",0.0351,0.216,24016.0,0.2288
-4004,"CD 4, Oklahoma",0.0679,0.2187,26796.0,0.2551
-4005,"CD 5, Oklahoma",0.1341,0.1893,27725.0,0.301
-4101,"CD 1, Oregon",0.0142,0.2335,36229.0,0.4106
-4102,"CD 2, Oregon",0.0073,0.1748,26409.0,0.2382
-4103,"CD 3, Oregon",0.0521,0.1874,33839.0,0.4119
-4104,"CD 4, Oregon",0.0073,0.1497,26405.0,0.2674
-4105,"CD 5, Oregon",0.0103,0.2,30917.0,0.2997
-4401,"CD 1, Rhode Island",0.0791,0.1673,32302.0,0.342
-4402,"CD 2, Rhode Island",0.0309,0.1566,33739.0,0.3399
-4501,"CD 1, South Carolina",0.179,0.192,35549.0,0.3986
-4502,"CD 2, South Carolina",0.2328,0.2116,29799.0,0.3346
-4503,"CD 3, South Carolina",0.1777,0.1723,24185.0,0.2199
-4504,"CD 4, South Carolina",0.1879,0.1822,28564.0,0.3068
-4505,"CD 5, South Carolina",0.2645,0.1795,25936.0,0.2304
-4506,"CD 6, South Carolina",0.568,0.1243,20001.0,0.196
-4507,"CD 7, South Carolina",0.28,0.1557,24069.0,0.2015
-4600,"CD (at Large), South Dakota",0.0166,0.2004,28585.0,0.2885
-4701,"CD 1, Tennessee",0.0185,0.1718,23487.0,0.1942
-4702,"CD 2, Tennessee",0.0625,0.1875,28119.0,0.3097
-4703,"CD 3, Tennessee",0.1068,0.1596,26075.0,0.2274
-4704,"CD 4, Tennessee",0.0917,0.219,25460.0,0.2255
-4705,"CD 5, Tennessee",0.2483,0.1533,32051.0,0.375
-4706,"CD 6, Tennessee",0.0446,0.2177,26712.0,0.2192
-4707,"CD 7, Tennessee",0.095,0.2592,29219.0,0.2807
-4708,"CD 8, Tennessee",0.194,0.2149,30049.0,0.2757
-4709,"CD 9, Tennessee",0.6603,0.1077,22217.0,0.2411
-4801,"CD 1, Texas",0.178,0.2092,22948.0,0.2087
-4802,"CD 2, Texas",0.1238,0.2283,39593.0,0.4081
-4803,"CD 3, Texas",0.0963,0.3178,41962.0,0.5352
-4804,"CD 4, Texas",0.1041,0.2334,26686.0,0.2213
-4805,"CD 5, Texas",0.1477,0.241,24307.0,0.2105
-4806,"CD 6, Texas",0.2007,0.2524,29087.0,0.2875
-4807,"CD 7, Texas",0.1246,0.2463,45900.0,0.5068
-4808,"CD 8, Texas",0.0861,0.265,32984.0,0.3015
-4809,"CD 9, Texas",0.3652,0.2015,20788.0,0.2382
-4810,"CD 10, Texas",0.1062,0.266,36517.0,0.3871
-4811,"CD 11, Texas",0.037,0.2037,27915.0,0.2035
-4812,"CD 12, Texas",0.0844,0.2332,31952.0,0.2994
-4813,"CD 13, Texas",0.049,0.2305,25315.0,0.2036
-4814,"CD 14, Texas",0.1976,0.2081,29325.0,0.2272
-4815,"CD 15, Texas",0.0145,0.2972,18423.0,0.1975
-4816,"CD 16, Texas",0.0357,0.2345,20563.0,0.239
-4817,"CD 17, Texas",0.1294,0.2055,26713.0,0.2938
-4818,"CD 18, Texas",0.3544,0.1889,24132.0,0.2242
-4819,"CD 19, Texas",0.0586,0.212,23579.0,0.2242
-4820,"CD 20, Texas",0.0497,0.2166,22507.0,0.2472
-4821,"CD 21, Texas",0.0341,0.1888,38034.0,0.4506
-4822,"CD 22, Texas",0.132,0.358,38041.0,0.4507
-4823,"CD 23, Texas",0.0355,0.2714,23280.0,0.2166
-4824,"CD 24, Texas",0.1145,0.2234,40379.0,0.4475
-4825,"CD 25, Texas",0.0684,0.2538,36139.0,0.3715
-4826,"CD 26, Texas",0.0692,0.3229,38097.0,0.4425
-4827,"CD 27, Texas",0.0529,0.2096,26761.0,0.2025
-4828,"CD 28, Texas",0.0355,0.2845,18843.0,0.1769
-4829,"CD 29, Texas",0.1031,0.2731,17512.0,0.1036
-4830,"CD 30, Texas",0.4304,0.166,21974.0,0.2053
-4831,"CD 31, Texas",0.1048,0.2681,31588.0,0.3432
-4832,"CD 32, Texas",0.1418,0.2256,42307.0,0.4339
-4833,"CD 33, Texas",0.1528,0.2513,15556.0,0.0932
-4834,"CD 34, Texas",0.0121,0.265,16944.0,0.1509
-4835,"CD 35, Texas",0.0974,0.2081,21480.0,0.2036
-4836,"CD 36, Texas",0.0889,0.2308,28675.0,0.1944
-4901,"CD 1, Utah",0.0099,0.3426,26194.0,0.289
-4902,"CD 2, Utah",0.0136,0.2633,26807.0,0.3251
-4903,"CD 3, Utah",0.0046,0.3458,28770.0,0.4161
-4904,"CD 4, Utah",0.0123,0.3397,26246.0,0.282
-5000,"CD (at Large), Vermont",0.0117,0.1644,31836.0,0.3637
-5101,"CD 1, Virginia",0.1537,0.2617,37264.0,0.3749
-5102,"CD 2, Virginia",0.1972,0.2035,33688.0,0.3444
-5103,"CD 3, Virginia",0.4495,0.1411,27901.0,0.2618
-5104,"CD 4, Virginia",0.408,0.1592,29971.0,0.3013
-5105,"CD 5, Virginia",0.1966,0.1745,28754.0,0.2794
-5106,"CD 6, Virginia",0.1111,0.1688,27250.0,0.2664
-5107,"CD 7, Virginia",0.1693,0.2436,35846.0,0.3896
-5108,"CD 8, Virginia",0.1375,0.2126,54612.0,0.6176
-5109,"CD 9, Virginia",0.0536,0.1685,24290.0,0.2036
-5110,"CD 10, Virginia",0.0655,0.3503,49981.0,0.5433
-5111,"CD 11, Virginia",0.1313,0.2842,45038.0,0.5548
-5301,"CD 1, Washington",0.0127,0.2663,42593.0,0.4335
-5302,"CD 2, Washington",0.0328,0.1933,32802.0,0.3029
-5303,"CD 3, Washington",0.0121,0.2157,29968.0,0.2543
-5304,"CD 4, Washington",0.0096,0.2388,23991.0,0.2012
-5305,"CD 5, Washington",0.0152,0.1879,27495.0,0.3037
-5306,"CD 6, Washington",0.0363,0.1744,32637.0,0.2972
-5307,"CD 7, Washington",0.0393,0.1593,54859.0,0.6101
-5308,"CD 8, Washington",0.0272,0.2691,36598.0,0.3452
-5309,"CD 9, Washington",0.1056,0.2099,40171.0,0.4177
-5310,"CD 10, Washington",0.0566,0.2187,29976.0,0.2866
-5401,"CD 1, West Virginia",0.028,0.1641,26172.0,0.2346
-5402,"CD 2, West Virginia",0.0486,0.182,26713.0,0.2146
-5403,"CD 3, West Virginia",0.0359,0.171,21256.0,0.174
-5501,"CD 1, Wisconsin",0.0525,0.2064,32083.0,0.2819
-5502,"CD 2, Wisconsin",0.042,0.1944,34919.0,0.4261
-5503,"CD 3, Wisconsin",0.0119,0.1793,27175.0,0.2543
-5504,"CD 4, Wisconsin",0.3331,0.1292,24156.0,0.2741
-5505,"CD 5, Wisconsin",0.0193,0.2099,37330.0,0.3688
-5506,"CD 6, Wisconsin",0.0159,0.1921,31307.0,0.2639
-5507,"CD 7, Wisconsin",0.0072,0.1727,29417.0,0.231
-5508,"CD 8, Wisconsin",0.0133,0.1973,30536.0,0.2543
-5600,"CD (at Large), Wyoming",0.0092,0.1975,30042.0,0.271
-4201,"CD 1, Pennsylvania",0.0391,0.2403,38726.5950469,0.389
-4202,"CD 2, Pennsylvania",0.2609,0.145,18689.9445908,0.1905
-4203,"CD 3, Pennsylvania",0.5711,0.0798,25533.7195473,0.3494
-4204,"CD 4, Pennsylvania",0.0869,0.24,41976.8517614,0.4636
-4205,"CD 5, Pennsylvania",0.2356,0.1975,33561.3035031,0.3593
-4206,"CD 6, Pennsylvania",0.0563,0.2432,37818.5437747,0.4272
-4207,"CD 7, Pennsylvania",0.054,0.2039,29041.0201897,0.2831
-4208,"CD 8, Pennsylvania",0.0507,0.1669,24963.4558286,0.2339
-4209,"CD 9, Pennsylvania",0.023,0.1891,26334.3703736,0.1999
-4210,"CD 10, Pennsylvania",0.1024,0.189,29923.4689981,0.2974
-4211,"CD 11, Pennsylvania",0.0318,0.2235,28031.3244511,0.2456
-4212,"CD 12, Pennsylvania",0.0228,0.181,24275.6896192,0.2139
-4213,"CD 13, Pennsylvania",0.0252,0.1872,25089.7085724,0.1913
-4214,"CD 14, Pennsylvania",0.0302,0.175,28392.8720931,0.2487
-4215,"CD 15, Pennsylvania",0.0194,0.1758,23668.332722,0.1862
-4216,"CD 16, Pennsylvania",0.0441,0.1816,26376.716264,0.2618
-4217,"CD 17, Pennsylvania",0.0568,0.1966,36053.01941,0.3936
-4218,"CD 18, Pennsylvania",0.1822,0.1371,29340.6200601,0.3568
+salary_usd,job_satisfaction,years_coding_professionally,linux,c++,javascript,java,python,bash_shell,opinion_on_ai
+72000.0,Moderately satisfied,,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+95000.0,Moderately satisfied,,True,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+43060.0,Slightly dissatisfied,0-2 years,False,True,False,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+46702.0,Moderately satisfied,,False,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+55075.0,Moderately satisfied,3-5 years,True,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+63030.0,Moderately satisfied,15-17 years,False,True,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+55075.0,Moderately satisfied,0-2 years,True,False,True,True,True,False,"I don't care about it, or I haven't thought about it."
+61194.0,,18-20 years,False,False,False,False,False,False,
+111963.0,,,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+119910.0,Moderately satisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+86544.0,Moderately dissatisfied,6-8 years,True,False,True,True,True,False,"I don't care about it, or I haven't thought about it."
+75000.0,Moderately satisfied,3-5 years,True,True,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+45838.0,Slightly dissatisfied,3-5 years,True,False,False,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+61194.0,Moderately satisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+80000.0,Moderately satisfied,6-8 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+115000.0,,,False,False,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+52000.0,Moderately dissatisfied,3-5 years,True,True,True,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+72469.0,,0-2 years,False,False,False,False,False,False,"I don't care about it, or I haven't thought about it."
+79174.0,Extremely satisfied,9-11 years,False,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+47000.0,Moderately dissatisfied,0-2 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+195000.0,,3-5 years,False,True,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+105000.0,Moderately satisfied,3-5 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+62122.0,,0-2 years,False,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+66674.0,Moderately satisfied,9-11 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+120000.0,Moderately satisfied,,True,True,False,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+122930.0,Extremely satisfied,6-8 years,True,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+97910.0,Slightly satisfied,24-26 years,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+85671.0,Moderately satisfied,9-11 years,True,True,False,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+100000.0,Neither satisfied nor dissatisfied,0-2 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+97000.0,Moderately satisfied,,True,False,False,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+55562.0,Moderately satisfied,3-5 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+110149.0,,27-29 years,False,False,False,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+60000.0,Extremely satisfied,,False,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+96538.0,Moderately satisfied,15-17 years,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+66089.0,Moderately satisfied,18-20 years,True,False,False,True,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+63896.0,Slightly dissatisfied,,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+95000.0,Moderately satisfied,0-2 years,True,False,False,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+108000.0,Moderately satisfied,27-29 years,True,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+160000.0,,18-20 years,False,False,False,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+36716.0,Neither satisfied nor dissatisfied,,False,False,False,False,False,False,
+76495.0,Slightly satisfied,,True,True,False,False,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+38000.0,Slightly satisfied,0-2 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+50000.0,Moderately satisfied,,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+43060.0,Slightly dissatisfied,6-8 years,False,True,True,True,False,True,"I don't care about it, or I haven't thought about it."
+22000.0,Slightly dissatisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+130000.0,Extremely satisfied,,True,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+80000.0,,6-8 years,True,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+76492.0,Moderately dissatisfied,12-14 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+150000.0,Extremely satisfied,,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+95000.0,Slightly dissatisfied,9-11 years,False,False,True,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+75636.0,Extremely satisfied,3-5 years,False,False,True,True,True,True,
+46507.0,,,False,False,False,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+56526.0,Neither satisfied nor dissatisfied,6-8 years,False,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+70000.0,Moderately satisfied,,False,False,True,True,False,False,"I don't care about it, or I haven't thought about it."
+78000.0,Moderately satisfied,18-20 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+110000.0,,6-8 years,False,False,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+141000.0,Extremely satisfied,,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+99967.0,Extremely satisfied,,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+160000.0,Extremely satisfied,3-5 years,False,False,False,False,False,False,"I don't care about it, or I haven't thought about it."
+100000.0,Slightly dissatisfied,,True,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+40388.0,,9-11 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+48955.0,Moderately satisfied,3-5 years,True,False,False,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+56000.0,Moderately satisfied,,False,False,True,True,False,False,"I don't care about it, or I haven't thought about it."
+80000.0,Moderately satisfied,6-8 years,True,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+90000.0,Extremely satisfied,3-5 years,False,False,False,False,True,True,I'm excited about the possibilities more than worried about the dangers.
+65190.0,Moderately dissatisfied,,True,False,False,False,True,True,I'm excited about the possibilities more than worried about the dangers.
+55562.0,Moderately dissatisfied,6-8 years,True,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+125000.0,Extremely satisfied,6-8 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+57200.0,Moderately satisfied,3-5 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+170000.0,Slightly satisfied,6-8 years,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+87800.0,Moderately satisfied,3-5 years,False,False,True,True,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+106000.0,Extremely satisfied,0-2 years,False,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+85671.0,Slightly satisfied,3-5 years,True,False,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+100000.0,,3-5 years,False,False,True,True,True,True,I'm worried about the dangers more than I'm excited about the possibilities.
+85671.0,Moderately satisfied,12-14 years,False,True,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+80000.0,,15-17 years,False,False,True,True,False,True,I'm worried about the dangers more than I'm excited about the possibilities.
+110000.0,Moderately satisfied,12-14 years,False,False,True,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+28178.0,,0-2 years,True,False,False,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+260000.0,Moderately satisfied,,True,True,False,False,True,False,I'm excited about the possibilities more than worried about the dangers.
+195000.0,Neither satisfied nor dissatisfied,24-26 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
+18785.0,Slightly satisfied,6-8 years,False,True,False,False,False,False,I'm excited about the possibilities more than worried about the dangers.
+62507.0,Moderately dissatisfied,,True,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+76272.0,Moderately satisfied,6-8 years,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+148000.0,,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+141000.0,Slightly dissatisfied,,False,False,False,False,False,False,
+79000.0,Extremely satisfied,0-2 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+67313.0,Moderately dissatisfied,,True,True,False,True,True,False,I'm excited about the possibilities more than worried about the dangers.
+300000.0,Extremely satisfied,6-8 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+68879.0,,9-11 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+98000.0,Slightly dissatisfied,18-20 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+15500.0,Slightly satisfied,12-14 years,False,True,True,True,True,False,I'm worried about the dangers more than I'm excited about the possibilities.
+140000.0,Moderately satisfied,,False,False,True,True,False,False,I'm excited about the possibilities more than worried about the dangers.
+160000.0,Moderately dissatisfied,18-20 years,False,False,True,True,True,True,"I don't care about it, or I haven't thought about it."
+3757.0,Moderately satisfied,0-2 years,False,False,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+275000.0,Extremely satisfied,9-11 years,False,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+45144.0,Moderately satisfied,,True,False,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+66000.0,Neither satisfied nor dissatisfied,3-5 years,False,False,True,True,False,False,"I don't care about it, or I haven't thought about it."
+91791.0,Moderately dissatisfied,27-29 years,True,True,True,True,False,True,I'm excited about the possibilities more than worried about the dangers.
+45283.0,Moderately satisfied,3-5 years,True,True,True,True,False,False,I'm worried about the dangers more than I'm excited about the possibilities.
+88573.0,Moderately dissatisfied,3-5 years,True,False,True,True,True,True,I'm excited about the possibilities more than worried about the dangers.
