@@ -24,6 +24,9 @@
                       (query/parse))
          {:keys [pos-ids neg-ids unlabeled-ids]} label-info]
      (match command
+       {:type :display-dataset}
+       {:dispatch [:query/display-dataset]}
+
        {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
        {:dispatch [:query/generate-virtual-row c num-rows]}
 
@@ -48,10 +51,20 @@
          {})))))
 
 (rf/reg-event-db
+ :query/display-dataset
+ event-interceptors
+ (fn [db [_]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)]
+     (-> db
+         (assoc-in [:table-panel :rows] rows)
+         (assoc-in [:table-panel :headers] headers)))))
+
+(rf/reg-event-db
  :query/search-by-example
  event-interceptors
  (fn [db [_ example-row]]
-   (let [table-rows (table-db/table-rows db)
+   (let [table-rows (table-db/dataset-rows db)
          search-row (merge example-row {search-column true})
          result (search/search model/spec search-column [search-row] table-rows n-models beta-params)]
      (rf/dispatch [:table/search-result result]))
@@ -61,7 +74,7 @@
  :query/anomaly-search
  event-interceptors
  (fn [db [_ target-col conditional-cols table-rows]]
-   (let [table-rows (table-db/table-rows db)
+   (let [table-rows (table-db/dataset-rows db)
          result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
      (rf/dispatch [:table/search-result result]))
    db))
@@ -80,7 +93,7 @@
          overrides-insert-fn (co/gen-insert-fn overrides-map)
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
-         ;; NOTE: This event currently does nothing with the newly generated rows. 
+         ;; NOTE: This event currently does nothing with the newly generated rows.
          new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
      db)))
 
@@ -104,7 +117,7 @@
  :query/search-by-labeled
  event-interceptors
  (fn [db [_ pos-ids neg-ids unlabeled-ids]]
-   (let [rows (table-db/table-rows db)
+   (let [rows (table-db/dataset-rows db)
 
          pos-rows (map rows pos-ids)
          neg-rows (map rows neg-ids)

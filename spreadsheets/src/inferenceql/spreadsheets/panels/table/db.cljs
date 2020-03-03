@@ -60,13 +60,13 @@
 
 ;;; Accessor functions to portions of the table-panel db.
 
-(defn table-headers
+(defn dataset-headers
   [db]
-  (get-in db [:table-panel :headers]))
+  (get-in db [:table-panel :dataset-headers]))
 
-(defn table-rows
+(defn dataset-rows
   [db]
-  (get-in db [:table-panel :rows]))
+  (get-in db [:table-panel :dataset-rows]))
 
 (defn with-labels
   [db labels]

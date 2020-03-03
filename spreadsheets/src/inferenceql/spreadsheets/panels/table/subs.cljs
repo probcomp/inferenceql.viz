@@ -133,10 +133,9 @@
 
 ;;; Subs related to populating tables with data.
 
-(defn table-headers
-  [db _]
-  (db/table-headers db))
-(rf/reg-sub :table/table-headers table-headers)
+(rf/reg-sub :table/table-headers
+            (fn [db _]
+              (get-in db [:table-panel :headers] [])))
 
 (rf/reg-sub :table/computed-headers
             (fn [_ _]
@@ -166,10 +165,9 @@
                                  (assoc row hot/label-col-header label))
                                labels)))))
 
-(defn table-rows
-  [db _]
-  (db/table-rows db))
-(rf/reg-sub :table/table-rows table-rows)
+(rf/reg-sub :table/table-rows
+            (fn [db _]
+              (get-in db [:table-panel :rows] [])))
 
 (defn- column-settings [headers]
   "Returns an array of objects that define settings for each column
