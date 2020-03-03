@@ -22,7 +22,7 @@
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
-     [:div {:class highlight-class}
+     [:div#table-container {:class highlight-class}
        [table/handsontable {} real-hot-props]]
      [:div#viz-container
       [:div.flex-box-space-filler]
