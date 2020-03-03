@@ -13,6 +13,14 @@
  (fn [db [_ result]]
    (db/with-scores db result)))
 
+(rf/reg-event-db
+ :table/clear
+ event-interceptors
+ (fn [db [_]]
+   (-> db
+       (update-in [:table-panel] dissoc :rows :headers :labels :scores)
+       (assoc-in [:table-panel :selection-layers] {}))))
+
 ;;; Events that correspond to hooks in the Handsontable API
 
 ;; Used to detect changes in the :real-data handsontable

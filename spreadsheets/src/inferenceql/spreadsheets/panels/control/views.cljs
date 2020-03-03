@@ -56,7 +56,6 @@
          [:button.toolbar-button.pure-button
           {:on-click #(rf/dispatch [:query/parse-query @input-text @label-info])} "Run InferenceQL"]
          [:button.toolbar-button.pure-button
-          ;; This button performs a no-op currently.
-          {:on-click #(do)} "Clear results"]]]
+          {:on-click #(rf/dispatch [:table/clear])} "Clear results"]]]
      [:div.flex-box-space-filler]
      [selection-color-selector]]))
