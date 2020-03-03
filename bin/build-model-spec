@@ -7,7 +7,8 @@
 (require '[metaprob.distributions :as mpdist])
 (require '[inferenceql.multimixture.basic-queries :as bq])
 
-(def bdb-models-path  "spreadsheets/resources/test_models.json")
+(def model-number 2)
+(def bdb-models-path  "spreadsheets/resources/data_models.json")
 (def data-path "spreadsheets/resources/data.csv")
 (def outmodel-path "spreadsheets/resources/model.edn")
 
@@ -190,7 +191,11 @@
      (data/csv-data->maps)))
 
 
-(def multi-mixture (second (generate-specs-from-json bdb-models d)))
+(def all-specs (generate-specs-from-json bdb-models d))
+(def current-model-number (if (< model-number (count all-specs))
+                            model-number
+                            0))
+(def multi-mixture (nth all-specs current-model-number))
 
 ;;(def row-generator (search/optimized-row-generator multi-mixture))
 ;;(bq/simulate row-generator {} 3)
