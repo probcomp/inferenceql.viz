@@ -14,10 +14,10 @@
           var1 :categorical
           var2 :categorical
           var3 :categorical}
-   :views [[{:probability 0.3
+   :views [[{:probability 0.5
              :parameters {var0 {"yes" 0.8   "no" 0.2}
-                          var1 {"yes" 0.1  "no" 0.9}}}
-            {:probability 0.7
+                          var1 {"yes" 0.9  "no" 0.1}}}
+            {:probability 0.5
              :parameters {var0 {"yes" 0.2  "no" 0.8}
                           var1 {"yes" 0.1  "no" 0.9}}}]
            [{:probability 1.
