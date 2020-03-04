@@ -8,10 +8,17 @@
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
 (rf/reg-event-db
- :table/search-result
+ :table/set
  event-interceptors
- (fn [db [_ result]]
-   (db/with-scores db result)))
+ (fn [db [_ rows headers scores labels]]
+   (cond-> db
+           true (assoc-in [:table-panel :rows] rows)
+           true (assoc-in [:table-panel :headers] headers)
+
+           scores (assoc-in [:table-panel :scores] scores)
+           (nil? scores) (update-in [:table-panel] dissoc :scores)
+           labels (assoc-in [:table-panel :labels] labels)
+           (nil? labels) (update-in [:table-panel] dissoc :labels))))
 
 (rf/reg-event-db
  :table/clear
