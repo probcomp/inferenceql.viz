@@ -50,39 +50,37 @@
          (js/alert alerted-msg)
          {})))))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :query/display-dataset
  event-interceptors
- (fn [db [_]]
+ (fn [{:keys [db]} [_]]
    (let [rows (table-db/dataset-rows db)
          headers (table-db/dataset-headers db)]
-     (-> db
-         (assoc-in [:table-panel :rows] rows)
-         (assoc-in [:table-panel :headers] headers)))))
+     {:dispatch [:table/set rows headers]})))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :query/search-by-example
  event-interceptors
- (fn [db [_ example-row]]
-   (let [table-rows (table-db/dataset-rows db)
+ (fn [{:keys [db]} [_ example-row]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)
          search-row (merge example-row {search-column true})
-         result (search/search model/spec search-column [search-row] table-rows n-models beta-params)]
-     (rf/dispatch [:table/search-result result]))
-   db))
+         result (search/search model/spec search-column [search-row] rows n-models beta-params)]
+     {:dispatch [:table/set rows headers result]})))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :query/anomaly-search
  event-interceptors
- (fn [db [_ target-col conditional-cols table-rows]]
-   (let [table-rows (table-db/dataset-rows db)
-         result (search/anomaly-search model/spec target-col conditional-cols table-rows)]
-     (rf/dispatch [:table/search-result result]))
-   db))
+ (fn [{:keys [db]} [_ target-col conditional-cols]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)
+         result (search/anomaly-search model/spec target-col conditional-cols rows)]
+     {:dispatch [:table/set rows headers result]})))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :query/generate-virtual-row
  event-interceptors
- (fn [db [_ conditions num-rows]]
+ (fn [{:keys [db]} [_ conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
          gen-fn #(first (mp/infer-and-score
                          :procedure (search/optimized-row-generator model/spec)
@@ -93,9 +91,9 @@
          overrides-insert-fn (co/gen-insert-fn overrides-map)
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
-         ;; NOTE: This event currently does nothing with the newly generated rows.
-         new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
-     db)))
+         new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))
+         headers (table-db/dataset-headers db)]
+     {:dispatch [:table/set new-rows headers]})))
 
 (defn- create-search-examples [pos-rows neg-rows]
   (let [remove-nil-key-vals #(into {} (remove (comp nil? second) %))
@@ -113,11 +111,13 @@
         neg-ids-map (zipmap neg-ids (repeat 0))]
     (merge pos-ids-map neg-ids-map)))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :query/search-by-labeled
  event-interceptors
- (fn [db [_ pos-ids neg-ids unlabeled-ids]]
+ (fn [{:keys [db]} [_ pos-ids neg-ids unlabeled-ids]]
    (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)
+         raw-labels (table-db/labels db)
 
          pos-rows (map rows pos-ids)
          neg-rows (map rows neg-ids)
@@ -133,5 +133,4 @@
          all-scores (->> (merge scores-ids-map scores-ids-map-lab)
                          (sort-by key)
                          (map second))]
-     (rf/dispatch [:table/search-result all-scores]))
-   db))
+     {:dispatch [:table/set rows headers all-scores raw-labels]})))
