@@ -1,0 +1,49 @@
+#!/usr/bin/env clojure
+;; rows are observations on a given day
+;; columns are
+;; Alan: change those variables
+
+(def var0 "elephant") ;; saw elephant on a give
+(def var1 "rain") ;; seeing elephant depends on rain.
+(def var2 "teacher_sick") ;; teacher sick that day, true/fals
+(def var3 "student_happy") ;; student is happy is indenpent of everything else.
+(def columns [var0 var1 var2 var3])
+
+(def model
+  {:vars {var0 :categorical
+          var1 :categorical
+          var2 :categorical
+          var3 :categorical}
+   :views [[{:probability 0.3
+             :parameters {var0 {"yes" 0.8   "no" 0.2}
+                          var1 {"yes" 0.1  "no" 0.9}}}
+            {:probability 0.7
+             :parameters {var0 {"yes" 0.2  "no" 0.8}
+                          var1 {"yes" 0.1  "no" 0.9}}}]
+           [{:probability 1.
+             :parameters {var2 {"yes" 0.01  "no" 0.99}}}]
+           [{:probability 1.
+             :parameters {var3 {"yes" 0.8   "no" 0.2}}}]]})
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require '[inferenceql.multimixture.search :as search])
+(require '[clojure.data.csv :as csv])
+(require '[clojure.java.io :as io])
+(def outmodel-path "spreadsheets/resources/model.edn")
+(def outdata-path "spreadsheets/resources/data.csv")
+
+(with-open [w (clojure.java.io/writer outmodel-path)]
+  (binding [*print-length* false
+            *out* w]
+    (pr model)))
+
+
+(def row-generator (search/optimized-row-generator model))
+
+(defn write-csv [path row-data]
+  (let [headers (map name columns)
+        rows (mapv #(mapv % columns) row-data)]
+    (with-open [file (io/writer path)]
+      (csv/write-csv file (cons headers rows)))))
+
+(write-csv outdata-path (repeatedly 50 row-generator))

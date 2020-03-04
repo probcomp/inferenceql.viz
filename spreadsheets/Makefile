@@ -19,6 +19,7 @@ figwheel-index-file := $(figwheel-public-dir)/index.html
 
 # Ulli's hack to demo.
 all: bdb js
+syn: syn-data js
 
 .PHONY: bdb
 bdb:
@@ -105,3 +106,8 @@ figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 .PHONY: figwheel-10x
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel:10x
+
+# Ulli's hack to demo.
+.PHONY: syn-data
+syn-data:
+	cd .. && ./bin/syn-data
