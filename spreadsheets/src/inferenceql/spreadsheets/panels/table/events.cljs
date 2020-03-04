@@ -14,6 +14,7 @@
    (cond-> db
            true (assoc-in [:table-panel :rows] rows)
            true (assoc-in [:table-panel :headers] headers)
+           true (assoc-in [:table-panel :selection-layers] {})
 
            scores (assoc-in [:table-panel :scores] scores)
            (nil? scores) (update-in [:table-panel] dissoc :scores)
