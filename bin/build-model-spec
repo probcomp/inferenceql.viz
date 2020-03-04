@@ -7,7 +7,7 @@
 (require '[metaprob.distributions :as mpdist])
 (require '[inferenceql.multimixture.basic-queries :as bq])
 
-(def model-number 2)
+(def model-number 0)
 (def bdb-models-path  "spreadsheets/resources/data_models.json")
 (def data-path "spreadsheets/resources/data.csv")
 (def outmodel-path "spreadsheets/resources/model.edn")
