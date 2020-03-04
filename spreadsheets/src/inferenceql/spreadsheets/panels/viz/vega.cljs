@@ -5,7 +5,8 @@
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.table.db :as table-db]
-            [goog.string :as gstring]))
+            [goog.string :as gstring]
+            [medley.core :as medley]))
 
 (def fips-col "country")
 (def map-names-col "country")
@@ -118,9 +119,18 @@
      :layer layers
      :autosize {:resize true}}))
 
+
+(defn get-categories [col-name]
+  (let [categories (->> (:views model/spec)
+                        (map first)
+                        (map :parameters)
+                        (apply merge)
+                        (medley/map-vals keys))]
+    (get categories col-name)))
+
 (defn gen-simulate-plot
   [col row dataset-name]
-  (let [domain-vals (get-in model/spec [:categories col])]
+  (let [domain-vals (get-categories col)]
     {:$schema "https://vega.github.io/schema/vega/v5.json",
      :width 200,
      :height 200,
@@ -203,7 +213,7 @@
         col-binning (get-col-should-bin col)
         attach-null? (some nil? (map #(get % col) selections))
 
-        domain-vals (cond-> (vec (get-in model/spec [:categories col]))
+        domain-vals (cond-> (get-categories col)
                             attach-null? (conj "Null"))
         selections (map (fn [row] (if (nil? (get row col))
                                     (assoc row col "Null")
