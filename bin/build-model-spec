@@ -2,16 +2,49 @@
 
 (require '[clojure.data.json :as json])
 (require '[clojure.data.csv :as csv])
-(require '[inferenceql.spreadsheets.data :as data])
 (require '[inferenceql.multimixture.search :as search])
 (require '[metaprob.distributions :as mpdist])
 (require '[inferenceql.multimixture.basic-queries :as bq])
+(require '[clojure.string :as str])
 
 (def model-number 2)
 (def bdb-models-path  "spreadsheets/resources/data_models.json")
 (def data-path "spreadsheets/resources/data.csv")
 (def outmodel-path "spreadsheets/resources/model.edn")
 
+(defn- float-string?
+  "Returns true if `s` is a string containing only a number with a decimal, false
+  otherwise."
+  [s]
+  (some? (re-matches #"\d+\.\d+" s)))
+
+(defn parse-float
+  "Returns `s` as a float if it can be parsed, otherwise `nil`."
+  [s]
+  (try (Float/parseFloat s)
+       (catch NumberFormatException _
+         nil)))
+
+(defn- clean-items [v]
+  (cond
+    ;; real vals
+    (float-string? v)
+    (parse-float v)
+
+    ;; empty strings
+    (str/blank? v) nil
+
+    ;; anything else is identity
+    :else v))
+
+(defn fix-row [r]
+  (mapv clean-items r))
+
+(defn csv-data->maps
+  [csv-data]
+  (mapv #(zipmap (map str (first csv-data))
+                 %)
+        (rest csv-data)))
 
 (defn infql-type
   [stattype]
@@ -190,8 +223,8 @@
 (def d (->> data-path
      (slurp)
      (csv/read-csv)
-     (mapv data/fix-row)
-     (data/csv-data->maps)))
+     (mapv fix-row)
+     (csv-data->maps)))
 
 
 (def all-specs (generate-specs-from-json bdb-models d))
