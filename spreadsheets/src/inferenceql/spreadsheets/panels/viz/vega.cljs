@@ -296,11 +296,24 @@
          :tooltip ""}}}]}))
 
 (defn gen-choropleth [selections selected-columns]
-  (let [correct-names {"Congo DR" "Democratic Republic of the Congo"
+  (let [;; If we have a second column selected, color the choropleth according
+        ;; to the values in that column.
+        map-column (first (filter #(not= fips-col %) selected-columns))
+        map-column-type (when map-column
+                          (condp = (stattype map-column)
+                                 dist/gaussian "quantitative"
+                                 dist/categorical "nominal"))
+        color-spec {:field map-column
+                    :type map-column-type}
+
+        correct-names {"Congo DR" "Democratic Republic of the Congo"
                        "Tanzania, United Republic of" "Tanzania"
                        "Cote d'Ivoire" "Ivory Coast"}
         update-fn (fn [v] (get correct-names v v))
         transformed-selection (mapv (fn [row] (update row fips-col update-fn)) selections)
+
+        update-fn (fn [v] (if (and (= map-column "probability") (= v 1.0)) nil v))
+        transformed-selection (mapv (fn [row] (update row map-column update-fn)) transformed-selection)
 
         spec {:$schema default-vega-lite-schema
               :width vega-map-width
@@ -315,17 +328,8 @@
               :projection {:type "identity"}
               :mark "geoshape"
               :encoding {:tooltip [{:field map-names-col
-                                    :type "nominal"}]}}
+                                    :type "nominal"}]}}]
 
-        ;; If we have a second column selected, color the choropleth according
-        ;; to the values in that column.
-        map-column (first (filter #(not= fips-col %) selected-columns))
-        map-column-type (when map-column
-                          (condp = (stattype map-column)
-                                 dist/gaussian "quantitative"
-                                 dist/categorical "nominal"))
-        color-spec {:field map-column
-                    :type map-column-type}]
       (if map-column
         (-> spec
             (assoc-in [:encoding :color] color-spec)
