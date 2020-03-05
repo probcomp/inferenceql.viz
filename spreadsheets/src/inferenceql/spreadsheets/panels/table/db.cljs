@@ -68,6 +68,14 @@
   [db]
   (get-in db [:table-panel :rows]))
 
+(defn dataset-headers
+  [db]
+  (get-in db [:table-panel :dataset-headers]))
+
+(defn dataset-rows
+  [db]
+  (get-in db [:table-panel :dataset-rows]))
+
 (defn with-labels
   [db labels]
   (assoc-in db [:table-panel :labels] labels))
