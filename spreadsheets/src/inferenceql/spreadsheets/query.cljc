@@ -20,6 +20,9 @@
 (defn- transform-select
   [& args]
   (match (vec args)
+    [[:star]]
+    {:type :display-dataset}
+
     [[:star] [:generate obs limit]]
     {:type :generate-virtual-row
      :conditions obs

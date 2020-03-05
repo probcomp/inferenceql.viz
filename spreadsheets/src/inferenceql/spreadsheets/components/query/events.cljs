@@ -24,6 +24,9 @@
                       (query/parse))
          {:keys [pos-ids neg-ids unlabeled-ids]} label-info]
      (match command
+       {:type :display-dataset}
+       {:dispatch [:query/display-dataset]}
+
        {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
        {:dispatch [:query/generate-virtual-row c num-rows]}
 
@@ -46,6 +49,16 @@
          (js/console.error logged-msg)
          (js/alert alerted-msg)
          {})))))
+
+(rf/reg-event-db
+ :query/display-dataset
+ event-interceptors
+ (fn [db [_]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)]
+     (-> db
+         (assoc-in [:table-panel :rows] rows)
+         (assoc-in [:table-panel :headers] headers)))))
 
 (rf/reg-event-db
  :query/search-by-example
