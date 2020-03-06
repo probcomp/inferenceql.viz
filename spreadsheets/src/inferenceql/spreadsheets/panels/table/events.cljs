@@ -12,8 +12,9 @@
  :table/set
  event-interceptors
  ;; `rows` and `headers` are required arguments essentially, and
- ;; `scores` and `labels` are optional.
- (fn [db [_ rows headers scores labels]]
+ ;; `scores`, 'labels` are optional, and they are meant
+ ;; to be passed in a map.
+ (fn [db [_ rows headers {:keys [scores labels]}]]
    (-> db
        (assoc-in [:table-panel :rows] rows)
        (assoc-in [:table-panel :headers] headers)
