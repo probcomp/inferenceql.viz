@@ -1,16 +1,21 @@
 query               ::= <'SELECT'> <ws> selection (<ws> <'FROM'> <ws> source (<ws> <'WHERE'> <ws> conditions)?)?
+selection           ::= star | column-name (<','> <ws> column-name)*
+star                ::= <'*'>
+column-name         ::= symbol | <'"'> symbol <'"'>
 conditions          ::= condition (<ws> <'AND'> <ws> condition)*
-<condition>         ::= or-condition | presence-condition | absence-condition | equality-condition | predicate-condition
-or-condition        ::= and-condition <ws> <'OR'> <ws> and-condition
+<condition>         ::= or-condition
+                      | presence-condition
+                      | absence-condition
+                      | equality-condition
+                      | predicate-condition
+<subcondition>      ::= condition | and-condition
+or-condition        ::= subcondition <ws> <'OR'> <ws> subcondition
 and-condition       ::= condition (<ws> <'AND'> <ws> condition)+
 presence-condition  ::= column-name <ws> <'IS NOT NULL'>
 absence-condition   ::= column-name <ws> <'IS NULL'>
 equality-condition  ::= column-name <ws>? <'='> <ws>? value
 predicate-condition ::= column-name <ws>? predicate <ws>? value
 predicate           ::= (#"<" | #">" | #"<=" | #">=")
-selection           ::= star | column-name (<','> <ws> column-name)*
-column-name         ::= symbol | <'"'> symbol <'"'>
-star                ::= <'*'>
 source              ::= <'data'> | <'('> query <')'>
 
 value  ::= float | int | string
