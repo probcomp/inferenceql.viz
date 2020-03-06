@@ -13,7 +13,8 @@
                              :opt-un [::scores
                                       ::labels
                                       ::headers
-                                      ::rows]))
+                                      ::rows
+                                      ::virtual]))
 
 ;;; Specs related to scores computed on rows.
 
@@ -33,6 +34,7 @@
 (s/def ::headers (s/cat :header (s/* ::header)))
 (s/def ::dataset-rows (s/cat :row (s/* ::row)))
 (s/def ::dataset-headers (s/cat :header (s/* ::header)))
+(s/def ::virtual boolean?)
 
 ;;; Specs related to selections within handsontable instances.
 
