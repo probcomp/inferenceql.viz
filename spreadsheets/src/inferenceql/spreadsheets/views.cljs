@@ -12,10 +12,11 @@
   (let [real-hot-props      @(rf/subscribe [:table/real-hot-props])
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         generators      @(rf/subscribe [:viz/generators])
+        virtual @(rf/subscribe [:table/virtual])
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
-     [:div#table-container {:class highlight-class}
+     [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
      [:div#viz-container
       (when vega-lite-spec
