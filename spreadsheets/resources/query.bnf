@@ -1,26 +1,42 @@
-select = <'SELECT'> <ws> what (<ws> from)?
-<what> = paren-selectable (<','> <ws> paren-selectable)*
-<paren-selectable> = selectable | <'('> selectable <')'>
-<selectable> = probability | star
-<generate> = <'GENERATE *'> (<ws> gen-given)? <ws> using
-probability = <'PROBABILITY OF'> <ws> (prob-column | prob-binding) (<ws> prob-given)? <ws> using
-using = <'USING'> <ws> model
-model = symbol
-prob-column = column
-prob-binding = binding
-star = <'*'>
-from = <'FROM'> <ws> <'('> generate <')'> <ws> limit
-gen-given = <'GIVEN'> <ws> bindings
-prob-given = <'GIVEN'> <ws> given-target
-given-target = star | column
-<bindings> = binding (<ws> <'AND'> <ws> binding)*
-<binding> = column <'='> value
-<column> = #'[a-zA-Z_]+'
-<value> = string | nat | float | int
-<limit> = <'LIMIT'> <ws> nat
-symbol = #'[a-zA-Z]\w*'
-string = #'\"([^\"]+)\"'
-nat = #'\d+'
-float = #'-?\d+\.\d+(E-?\d+)?'
-int = #'-?\d+'
-ws = #'\s+'
+query               ::= <'SELECT'> <ws> selection (<ws> <'FROM'> <ws> source (<ws> <'WHERE'> <ws> conditions)?)?
+conditions          ::= condition (<ws> <'AND'> <ws> condition)*
+<condition>         ::= or-condition | presence-condition | absence-condition | equality-condition | predicate-condition
+or-condition        ::= and-condition <ws> <'OR'> <ws> and-condition
+and-condition       ::= condition (<ws> <'AND'> <ws> condition)+
+presence-condition  ::= column-name <ws> <'IS NOT NULL'>
+absence-condition   ::= column-name <ws> <'IS NULL'>
+equality-condition  ::= column-name <ws>? <'='> <ws>? value
+predicate-condition ::= column-name <ws>? predicate <ws>? value
+predicate           ::= (#"<" | #">" | #"<=" | #">=")
+selection           ::= star | column-name (<','> <ws> column-name)*
+column-name         ::= symbol | <'"'> symbol <'"'>
+star                ::= <'*'>
+source              ::= <'data'> | <'('> query <')'>
+
+value  ::= float | int | string
+float  ::= #'-?\d+\.\d+(E-?\d+)?'
+int    ::= #'-?\d+'
+nat    ::= #'\d+'
+string ::= #'\"([^\"]+)\"'
+symbol ::= #'[a-zA-Z]\w*'
+ws     ::= #'\s+'
+
+; <what> = paren-selectable (<','> <ws> paren-selectable)*
+; <paren-selectable> = selectable | <'('> selectable <')'>
+; <selectable> = probability | star
+; <generate> = <'GENERATE *'> (<ws> gen-given)? <ws> using
+; probability = <'PROBABILITY OF'> <ws> (prob-column | prob-binding) (<ws> prob-given)? <ws> using
+; using = <'USING'> <ws> model
+; model = symbol
+; prob-column = column
+; prob-binding = binding
+; star = <'*'>
+; from = <'FROM'> <ws> <'('> generate <')'> <ws> limit
+; gen-given = <'GIVEN'> <ws> bindings
+; prob-given = <'GIVEN'> <ws> given-target
+; given-target = star | column
+; <bindings> = binding (<ws> <'AND'> <ws> binding)*
+; <binding> = column <'='> value
+; <column> = #'[a-zA-Z_]+'
+; <value> = string | nat | float | int
+; <limit> = <'LIMIT'> <ws> nat
