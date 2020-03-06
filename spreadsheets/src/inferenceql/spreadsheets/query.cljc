@@ -62,12 +62,6 @@
 (defn execute
   [ast rows]
   (let [selector (selector ast)
-        columns (if (some #{'*} selector)
-                  (into []
-                        (comp (mapcat keys)
-                              (distinct))
-                        rows)
-                  (vec selector))
         db (iql-db (if-let [subquery (subquery ast)]
                      (execute subquery rows)
                      rows))
@@ -76,6 +70,12 @@
                    :where (into [['?e :iql/type  :iql.type/row]]
                                 (conditions ast))}
         eids (d/q eid-query db)
+        columns (if (some #{'*} selector)
+                  (into []
+                        (comp (mapcat keys)
+                              (distinct))
+                        rows)
+                  (vec selector))
         metadata {:iql/columns columns}
         rows (->> (d/pull-many db (conj selector :db/id) eids)
                   (sort-by :db/id)
@@ -94,10 +94,10 @@
   (let [rows (apply q args)
         columns (:iql/columns (meta rows))]
     (pprint/print-table
-     (map (comp symbol name) columns)
+     (map name columns)
      (for [row rows]
        (reduce-kv (fn [m k v]
-                    (assoc m (symbol (name k)) v))
+                    (assoc m (name k) v))
                   {}
                   row)))))
 
