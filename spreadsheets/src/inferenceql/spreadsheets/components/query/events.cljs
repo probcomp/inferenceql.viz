@@ -66,7 +66,7 @@
          headers (table-db/dataset-headers db)
          search-row (merge example-row {search-column true})
          result (search/search model/spec search-column [search-row] rows n-models beta-params)]
-     {:dispatch [:table/set rows headers result]})))
+     {:dispatch [:table/set rows headers {:scores result}]})))
 
 (rf/reg-event-fx
  :query/anomaly-search
@@ -75,7 +75,7 @@
    (let [rows (table-db/dataset-rows db)
          headers (table-db/dataset-headers db)
          result (search/anomaly-search model/spec target-col conditional-cols rows)]
-     {:dispatch [:table/set rows headers result]})))
+     {:dispatch [:table/set rows headers {:scores result}]})))
 
 (rf/reg-event-fx
  :query/generate-virtual-row
@@ -133,4 +133,4 @@
          all-scores (->> (merge scores-ids-map scores-ids-map-lab)
                          (sort-by key)
                          (map second))]
-     {:dispatch [:table/set rows headers all-scores raw-labels]})))
+     {:dispatch [:table/set rows headers {:scores all-scores :labels raw-labels}]})))
