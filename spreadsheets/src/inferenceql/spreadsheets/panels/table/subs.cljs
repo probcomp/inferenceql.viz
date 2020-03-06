@@ -131,6 +131,12 @@
             (fn [db _]
               (db/scores db)))
 
+;;; Subs related to the type of data in the table.
+
+(rf/reg-sub :table/virtual
+            (fn [db _]
+              (get-in db [:table-panel :virtual])))
+
 ;;; Subs related to populating tables with data.
 
 (defn table-headers
