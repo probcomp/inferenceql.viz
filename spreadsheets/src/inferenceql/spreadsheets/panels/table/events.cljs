@@ -12,14 +12,15 @@
  :table/set
  event-interceptors
  ;; `rows` and `headers` are required arguments essentially, and
- ;; `scores`, 'labels` are optional, and they are meant
+ ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
  ;; to be passed in a map.
- (fn [db [_ rows headers {:keys [scores labels]}]]
+ (fn [db [_ rows headers {:keys [scores labels virtual]}]]
    (-> db
        (assoc-in [:table-panel :rows] rows)
        (assoc-in [:table-panel :headers] headers)
        (util/assoc-or-dissoc-in [:table-panel :scores] scores)
-       (util/assoc-or-dissoc-in [:table-panel :labels] labels))))
+       (util/assoc-or-dissoc-in [:table-panel :labels] labels)
+       (util/assoc-or-dissoc-in [:table-panel :virtual] virtual))))
 
 (rf/reg-event-db
  :table/clear
