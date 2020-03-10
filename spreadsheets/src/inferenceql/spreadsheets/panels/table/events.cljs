@@ -103,12 +103,23 @@
  event-interceptors
  (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-layers (.getSelected hot)
-         header-for-selection (fn [[_ col-start _ col-end]]
-                                (map #(.getColHeader hot %)
-                                     (range (min col-start col-end) (inc (max col-start col-end)))))
+         ;; When the user selects two columns in a single selection layer, they can
+         ;; do so in any order. (e.g. A higher indexed column first and then a lower indexed one.)
+         ;; If they did so, we want to reflect this in the order of the column headers returned
+         ;; here unless :ascending true in which case the headers are always returned in
+         ;; ascending order.
+         header-for-selection (fn [[_ col-start _ col-end] & {:keys [ascending]
+                                                              :or {ascending false}}]
+                                (let [col-indicies (range (min col-start col-end)
+                                                          (inc (max col-start col-end)))
+                                      headers (map #(.getColHeader hot %)
+                                                   col-indicies)]
+                                  (if (or ascending (< col-start col-end))
+                                    headers
+                                    (reverse headers))))
 
          data-by-layer (for [layer selection-layers]
-                         (let [headers (header-for-selection layer)
+                         (let [headers (header-for-selection layer :ascending true)
                                [r1 c1 r2 c2] layer]
                            (->> (.getData hot r1 c1 r2 c2)
                                 (js->clj)
@@ -119,22 +130,13 @@
          ;; Column headers from all the selection layers.
          selected-headers (mapcat header-for-selection selection-layers)
 
-         ;; When the user selects two columns in a single selection layer, they can
-         ;; do so in any order. (e.g. A higher indexed column first and then a lower indexed one.)
-         ;; If they did so, we want to reflect this in the order of the columns saved in the db.
-         select-order-headers (let [[_ col-start _ col-end] (last selection-layers)]
-                                (if (and (= (count selection-layers) 1)
-                                         (> col-start col-end))
-                                  (reverse selected-headers)
-                                  selected-headers))
-
          ;; This is the row at the start point of the most recent selection.
          row (js->clj (zipmap (.getColHeader hot)
                               (.getDataAtRow hot row-index)))
 
          color (control-db/selection-color db)]
      {:db (-> db
-              (assoc-in [:table-panel :selection-layers color :selected-columns] select-order-headers)
+              (assoc-in [:table-panel :selection-layers color :selected-columns] selected-headers)
               (assoc-in [:table-panel :selection-layers color :selections] selected-data)
               (assoc-in [:table-panel :selection-layers color :row-at-selection-start] row)
               (assoc-in [:table-panel :selection-layers color :coords] (js->clj selection-layers)))
