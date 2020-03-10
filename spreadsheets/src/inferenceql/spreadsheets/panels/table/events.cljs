@@ -146,11 +146,3 @@
 
      (-> db
          (assoc-in [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
-
-(rf/reg-event-db
- :hot/after-deselect
- event-interceptors
- (fn [db [_ hot id]]
-   (let [color (control-db/selection-color db)]
-     ;; Clears selection information for the current selection layer.
-     (update-in db [:table-panel :selection-layers] dissoc color))))
