@@ -1,4 +1,4 @@
-Timepoint,Arabinose,IPTG,Part_KanR,Part_AraC,Part_LacI,Part_AmeRv2,Part_BM3R1,Part_PhlF,Part_PsrA,Part_YFP,rluC,ycbJ,ydiS,rsmH,bdcA
+timepoint,arabinose,iptg,part_kanr,part_arac,part_laci,part_amerv2,part_bm3r1,part_phlf,part_psra,part_yfp,rluc,ycbj,ydis,rsmh,bdca
 5.0,0.0,7.98e-05,3658.878831,0.0,0.0,0.0,0.0,0.0,0.0,855.6878419,1.085118674,7.504623878,0.153815272,5.832060331,0.243163849
 5.0,0.0,0.0,0.0,0.0,1.85272571,0.0,0.0,0.0,53.08694088,0.0,1.282565163,4.590837273,0.172334337,6.698747986,0.263458764
 18.0,0.012500225,7.98e-05,0.0,0.0,0.0,0.0,0.0,0.0,0.0,198.4958288,0.506941674,2.016631919,0.18862946,4.391341889,0.418255927
