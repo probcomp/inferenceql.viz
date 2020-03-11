@@ -1,0 +1,250 @@
+#!/usr/bin/env clojure
+
+(require '[clojure.data.json :as json])
+(require '[clojure.data.csv :as csv])
+(require '[inferenceql.multimixture.search :as search])
+(require '[metaprob.distributions :as mpdist])
+(require '[inferenceql.multimixture.basic-queries :as bq])
+(require '[clojure.string :as str])
+
+(def model-number 0)
+(def bdb-models-path  "spreadsheets/resources/data_models.json")
+(def data-path "spreadsheets/resources/data.csv")
+(def outmodel-path "spreadsheets/resources/model.edn")
+
+(defn- float-string?
+  "Returns true if `s` is a string containing only a number with a decimal, false
+  otherwise."
+  [s]
+  (some? (re-matches #"\d+\.\d+" s)))
+
+(defn parse-float
+  "Returns `s` as a float if it can be parsed, otherwise `nil`."
+  [s]
+  (try (Float/parseFloat s)
+       (catch NumberFormatException _
+         nil)))
+
+(defn- clean-items [v]
+  (cond
+    ;; real vals
+    (float-string? v)
+    (parse-float v)
+
+    ;; empty strings
+    (str/blank? v) nil
+
+    ;; anything else is identity
+    :else v))
+
+(defn fix-row [r]
+  (mapv clean-items r))
+
+(defn csv-data->maps
+  [csv-data]
+  (mapv #(zipmap (map str (first csv-data))
+                 %)
+        (rest csv-data)))
+
+(defn infql-type
+  [stattype]
+  (case stattype
+    "nominal"   :categorical
+    "numerical" :gaussian))
+
+
+; TODO: remove all verbalized names (like get- prefixes...)
+(defn get-col-types
+  [json-models]
+  {:vars
+   (reduce-kv
+     (fn [m k v] (assoc m k (infql-type v)))
+     {}
+     (get json-models "column-statistical-types"))})
+
+;; XXX: this has the probability for the empty table.
+(defn cluster-probabilities
+  [cluster-assignemts alpha]
+    (mpdist/normalize-numbers (concat (map count
+                                           cluster-assignemts)
+                                      [alpha])))
+
+(defn get-view-cluster-assignments
+  [json-model view-idx]
+  (nth (get json-model "clusters") view-idx))
+
+(defn get-view-crp-params
+  [json-model view-idx]
+  (nth (get json-model "cluster-crp-hyperparameters") view-idx))
+
+(defn col-subset
+  [data col rowids]
+  (map #(get (nth data %) col) rowids))
+;; XXX: I am SURE that that's not idiomatic... or efficient.. calling assoc
+;; recursively to get null counts in...
+;; XXX: number 2: can use this recursive definition within a let.
+(defn rec-assoc
+  [m cats]
+  (if (empty? cats)
+    m
+    (if (contains? m (first cats))
+      (rec-assoc  m                          (rest cats))
+      (rec-assoc (assoc m (first cats) 0) (rest cats)))))
+
+;; XXX: the next three functions are copy-pasta from multimix/test/utils.clj
+(defn square [x] (* x x))
+
+(defn average [column]
+  (/ (reduce + column) (count column)))
+
+(defn std [a]
+  (Math/sqrt (/ (reduce + (map square (map - a (repeat (average a)))))
+                (- (count a) 1 ))))
+(defn suff-stats-cat
+  "Get sufficient statistics for a nominal data vector."
+  [col-vec col-cats]
+  ; take a column vector, i.e. a subvec of a columm and return a count for
+  ; categories.
+  (rec-assoc (frequencies col-vec) col-cats))
+
+;XXX: double check that categories and counts are in the correct order.
+(defn cat-params
+  [counts alpha]
+  ;;
+  (let [denom (+ (reduce + (vals counts)) (* alpha (count counts)))]
+  ;; XXX: should be in log space.
+  (into {} (map (fn [[k  v]] [k, (/ (+ v alpha) denom)])
+                (seq counts)))))
+
+(defn suff-stats-num [col-vec-in]
+  "Get sufficient statistics for a numerical data vector."
+  (let [col-vec (filter some? col-vec-in)]
+  (if (empty? col-vec)
+    {:n 0 :sum_x 0 :sum_x_squared 0}
+    {:n (count col-vec)
+     :sum_x (reduce + col-vec)
+     :sum_x_squared (reduce + (map #(square %) col-vec))})))
+
+(defn posterior-hypers
+  [{n :n sum_x :sum_x sum_x_squared :sum_x_squared } ;; sufficient stats
+   {m "m" r "r" s "s" nu "nu"}] ;; colum hyper parameters from BdB.
+  (if (= n 0)
+    {:m m :r r :s s :nu nu} ;; no data is observed, return the prior.
+    (let [rn  (+ r n)
+          nun (+ nu n)
+          mn  (/ (+ (* r m) sum_x) rn)
+          sn  (- (+ s sum_x_squared (* r m m )) (* rn mn mn))]
+      {:m mn :r rn :s (if (= sn 0.) s sn) :nu nun})))
+
+(defn nig-normal-sampler
+  [{m :m r :r s :s nu :nu}]
+    (let [rho (mpdist/gamma (/ nu 2.0) (/ 2.0 s))
+          sigma (Math/pow (* rho r) -0.5)
+          mu (mpdist/gaussian m (Math/pow (* rho r) -0.5))]
+      (mpdist/gaussian mu (Math/pow rho -0.5))))
+
+
+(defn num-params
+  [suff-stats hypers]
+  (let [n-samples 1000 ;; Number of samples used to estimate parameters for components.
+        samples (repeatedly n-samples
+                            #(nig-normal-sampler (posterior-hypers suff-stats
+                                                                   hypers)))]
+  {:mu (average samples) :sigma (std samples)}))
+
+;(def jm1 (first (get jms "models")))
+;(def col "age")
+;(posterior-hypers (suff-stats-num [0 1 -1 -2]) (get-in jm1 ["column-hypers" "age"]))
+
+
+;(clojure.pprint/pprint (get-in jm1 ["column-hypers" "age"]))
+
+(defn get-params
+  [json-model data rowids stat-types categories]
+  (zipmap
+    ;; XXX is the order preserved here??? i.e. I am using (keys statypes and
+    ;; stat-types.
+    (keys stat-types)
+    (map (fn [[k v]]
+           (let [col-vec  (col-subset data k rowids)]
+             (case v
+               :gaussian (num-params (suff-stats-num col-vec)
+                                     (get-in json-model ["column-hypers" k]))
+               :categorical (cat-params
+                                      (suff-stats-cat col-vec (categories k))
+                                      (get-in json-model
+                                              ["column-hypers" k "alpha"])))))
+         stat-types)))
+
+
+(defn generate-view-from-json
+  [json-model data view-idx stat-types categories cols-in-view]
+  (let [clustering (get-view-cluster-assignments json-model view-idx)
+        p-clusters (cluster-probabilities clustering
+                                          (get-view-crp-params json-model
+                                                               view-idx))]
+
+    (into [] (map (fn [[rowids p]]
+                          {:probability p
+                           :parameters (get-params json-model
+                                                   data
+                                                   rowids
+                                                   (select-keys (:vars stat-types)
+                                                                cols-in-view)
+                                                   categories)})
+         (zipmap (conj clustering []) p-clusters )))))
+
+;; operating ing model assemble.
+(defn generate-specs-from-json
+  [json-models data]
+        ;; get the col stattypes. Need to do this here because they live
+        ;; outside the individual models in the ensemble.
+  (let [stat-types (get-col-types json-models)
+        ;; Same for categories.
+        categories  (get json-models "categories")
+        ;; A function for getting each view in a given model.
+        get-views (fn [json-model] ;; XXX: What's the right way to not use fn here? %({ sseesm to not do the right thing
+                    {:views
+                     (into []
+                           (map-indexed (fn [view-idx cols-in-view ]
+                                          (generate-view-from-json json-model
+                                                                   data
+                                                                   view-idx
+                                                                   stat-types
+                                                                   categories
+                                                                   cols-in-view))
+                                        (get json-model "column-partition")))})] ;; TODO: this last line is wrong. I really want an index here -- so that I can get the right params
+    ;; n models.
+    (map #(merge stat-types (get-views %))
+         (get json-models "models"))))
+
+
+(def bdb-models (json/read-str (slurp bdb-models-path)))
+(def d (->> data-path
+     (slurp)
+     (csv/read-csv)
+     (mapv fix-row)
+     (csv-data->maps)))
+
+
+(def all-specs (generate-specs-from-json bdb-models d))
+(def current-model-number (if (< model-number (count all-specs))
+                            model-number
+                            0))
+(def multi-mixture (nth all-specs current-model-number))
+
+;;(def row-generator (search/optimized-row-generator multi-mixture))
+;;(bq/simulate row-generator {} 3)
+;;(bq/simulate row-generator {"age" 30} 3)
+;;(bq/logpdf row-generator {"height" 176} {"gender" "male"})
+;;(bq/logpdf row-generator {"height" 176} {"gender" "female"})
+
+(with-open [w (clojure.java.io/writer outmodel-path)]
+  (binding [*print-length* false
+            *out* w]
+    (pr multi-mixture)))
+
+; XXX: this the following doesn't wor.
+;;(def mm (clojure.edn/read "model.end"))
+;;(def row-generator (search/optimized-row-generator mm))
+;;(bq/simulate row-generator {} 3)
