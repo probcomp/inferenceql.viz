@@ -23,8 +23,6 @@ syn: syn-data js
 
 .PHONY: bdb
 bdb:
-	cp ~/git_repos/crosscat-to-metaprob/data_models.json ~/git_repos/inferenceql/spreadsheets/resources/
-	cp ~/git_repos/crosscat-to-metaprob/data.csv ~/git_repos/inferenceql/spreadsheets/resources/
 	cd .. && ./bin/build-model-spec && cd spreadsheets/
 
 js: $(output-to)
