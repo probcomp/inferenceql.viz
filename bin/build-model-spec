@@ -105,7 +105,7 @@
   [col-vec col-cats]
   ; take a column vector, i.e. a subvec of a columm and return a count for
   ; categories.
-  (rec-assoc (frequencies col-vec) col-cats))
+  (rec-assoc (frequencies (map str col-vec)) col-cats))
 
 ;XXX: double check that categories and counts are in the correct order.
 (defn cat-params
