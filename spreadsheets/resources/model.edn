@@ -16,87 +16,19 @@
   "part_bm3r1" :gaussian,
   "rluc" :gaussian},
  :views
- [[{:probability 0.9320480655357716,
+ [[{:probability 1.0,
     :parameters
-    {"part_kanr" {:mu -0.5981903949897059, :sigma 46.575944208935915}}}
-   {:probability 0.009915404952508209,
-    :parameters
-    {"part_kanr" {:mu 2411.5613371941104, :sigma 92.04310126920872}}}
-   {:probability 0.009915404952508209,
-    :parameters
-    {"part_kanr" {:mu 3157.2589203107395, :sigma 91.70510284058194}}}
-   {:probability 0.019830809905016417,
-    :parameters
-    {"part_kanr" {:mu 3580.578823095529, :sigma 79.06626141120418}}}
-   {:probability 0.019830809905016417,
-    :parameters
-    {"part_kanr" {:mu 611.6856965748899, :sigma 80.23818916660106}}}
-   {:probability 0.008459504749179104,
-    :parameters
-    {"part_kanr" {:mu 1923.0135604347506, :sigma 651.442411532925}}}]
+    {"part_kanr" {:mu -0.5981903949897059, :sigma 46.575944208935915}}}]
   [{:probability 1.0,
     :parameters
     {"part_yfp" {:mu 2601.6350188205192, :sigma 89.29881267443349}}}]
-  [{:probability 0.9098716706735254,
-    :parameters
-    {"part_amerv2"
-     {:mu 2.3355154534521074, :sigma 13.556941690510742}}}
-   {:probability 0.019567132702656462,
-    :parameters
-    {"part_amerv2" {:mu 963.6850515850319, :sigma 24.267925397279633}}}
-   {:probability 0.009783566351328231,
-    :parameters
-    {"part_amerv2" {:mu 88.14964240074659, :sigma 24.228785796323}}}
-   {:probability 0.019567132702656462,
-    :parameters
-    {"part_amerv2" {:mu 747.8178687328299, :sigma 22.016157420695098}}}
-   {:probability 0.009783566351328231,
-    :parameters
-    {"part_amerv2"
-     {:mu 183.64196391791114, :sigma 23.969398881858364}}}
-   {:probability 0.009783566351328231,
-    :parameters
-    {"part_amerv2" {:mu 261.5394419724814, :sigma 24.130401683764436}}}
-   {:probability 0.021643364867177016,
-    :parameters
-    {"part_amerv2" {:mu 310.57850266971, :sigma 178.46030421612747}}}]
-  [{:probability 0.9242601876475499,
+  [{:probability 1.0,
     :parameters
     {"iptg" {"7.98e-05" 0.48464163822525597, "0.0" 0.515358361774744},
-     "part_bm3r1" {:mu 1.280958900893733, :sigma 15.431557221622434}}}
-   {:probability 0.03975312635043225,
+     "part_bm3r1" {:mu 1.280958900893733, :sigma 15.431557221622434}}}]
+  [{:probability 1.0,
     :parameters
-    {"iptg" {"7.98e-05" 0.5098039215686274, "0.0" 0.49019607843137253},
-     "part_bm3r1" {:mu 892.854170401928, :sigma 24.41725161833593}}}
-   {:probability 0.02981484476282419,
-    :parameters
-    {"iptg" {"7.98e-05" 0.5073891625615764, "0.0" 0.49261083743842365},
-     "part_bm3r1" {:mu 721.4147100903912, :sigma 26.26372428430529}}}
-   {:probability 0.006171841239193582,
-    :parameters
-    {"iptg" {"7.98e-05" 0.5, "0.0" 0.5},
-     "part_bm3r1" {:mu 373.8915882495548, :sigma 214.26972196151692}}}]
-  [{:probability 0.9242601876475499,
-    :parameters
-    {"part_phlf" {:mu 1.036229290047747, :sigma 7.431682769011434}}}
-   {:probability 0.009938281587608063,
-    :parameters
-    {"part_phlf" {:mu 467.3457253285625, :sigma 12.622282767665546}}}
-   {:probability 0.009938281587608063,
-    :parameters
-    {"part_phlf" {:mu 177.10713452228754, :sigma 12.309272225976555}}}
-   {:probability 0.009938281587608063,
-    :parameters
-    {"part_phlf" {:mu 656.266004407438, :sigma 14.134923379830083}}}
-   {:probability 0.02981484476282419,
-    :parameters
-    {"part_phlf" {:mu 83.49877206660923, :sigma 11.007887702203965}}}
-   {:probability 0.009938281587608063,
-    :parameters
-    {"part_phlf" {:mu 32.91402673470151, :sigma 12.592889226907344}}}
-   {:probability 0.006171841239193582,
-    :parameters
-    {"part_phlf" {:mu 209.61517178970274, :sigma 89.89652338142129}}}]
+    {"part_phlf" {:mu 1.036229290047747, :sigma 7.431682769011434}}}]
   [{:probability 1.0,
     :parameters
     {"arabinose"
@@ -110,9 +42,6 @@
      "rsmh" {:mu 3.4719885163181488, :sigma 0.6011654168812703},
      "part_arac" {:mu 7.962438456767191, :sigma 6.621981750821572},
      "rluc" {:mu 0.4293267071956498, :sigma 0.14111728333600726}}}]
-  [{:probability 0.9993281159780003,
+  [{:probability 1.0,
     :parameters
-    {"ydis" {:mu 0.16310667451158675, :sigma 0.042404609104002865}}}
-   {:probability 6.718840219996377E-4,
-    :parameters
-    {"ydis" {:mu 0.22516679637235967, :sigma 0.34946452901256314}}}]]}
+    {"ydis" {:mu 0.16310667451158675, :sigma 0.042404609104002865}}}]]}
