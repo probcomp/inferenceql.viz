@@ -5,6 +5,11 @@
             (fn [db _]
               (get-in db [:control-panel :confidence-threshold])))
 
+(rf/reg-sub :control/part
+            ;; TODO: make another sub for just parts.
+            (fn [db [_sub-name part-key]]
+              (get-in db [:control-panel :parts part-key])))
+
 (rf/reg-sub :control/reagent-forms
             (fn [db _]
               (get-in db [:control-panel :reagent-forms])))
