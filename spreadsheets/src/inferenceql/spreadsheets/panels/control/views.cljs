@@ -36,22 +36,35 @@
        [selection-color cur-val :red "Red"]]]))
 
 
-(defn slider []
-  (let [cur-val @(rf/subscribe [:control/confidence-threshold])]
-    [:div#conf-slider
-      [:span "Confidence Threshold: "]
-      [:br]
+(defn slider [part-key min max step]
+  (let [cur-val @(rf/subscribe [:control/part part-key])]
+    [:div.conf-slider
+      [:span (name part-key)]
       [:input {:type :range :name :confidence-threshold
-               :min 0 :max 1 :step 0.01
-                       :value cur-val
-                       :on-change (fn [e]
-                                    (let [new-val (js/parseFloat (-> e .-target .-value))]
-                                      (rf/dispatch [:control/set-confidence-threshold new-val])))}]
+               :min min :max max :step step
+               :value cur-val
+               :on-change (fn [e]
+                            (let [new-val (js/parseFloat (-> e .-target .-value))]
+                              (rf/dispatch [:control/set-part part-key new-val])))}]
       [:label cur-val]]))
 
 (defn rna-seq-values []
-  [:div#rna-seq-values
-   [slider]])
+  (let [data @(rf/subscribe [:table/dataset-rows])
+        part-keys [:part_laci
+                   :part_psra
+                   :part_yfp
+                   :part_phlf
+                   :part_amerv2
+                   :part_arac
+                   :part_kanr
+                   :part_bm3r1]]
+    [:div#rna-seq-values
+     (doall
+      (for [part-key part-keys]
+        (let [vals (map #(get % (name part-key))
+                        data)
+              step 0.01]
+          [slider part-key (apply min vals) (apply max vals) step])))]))
 
 (defn experimental-conditions []
   (let [template [:div
