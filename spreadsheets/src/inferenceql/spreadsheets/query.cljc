@@ -10,11 +10,7 @@
             [instaparse.core :as insta]
             [inferenceql.multimixture.basic-queries]))
 
-(def parser
-  "An instaparse parser for IQL SQL queries. The grammar is inlined at macro
-  expansion time so that it can be used in the ClojureScript context where we
-  don't have access to file resources."
-  (insta/parser (sio/inline-resource "query.bnf")))
+;;; Parsing and transformation
 
 (def ^:dynamic *logpdf-symbol*
   "A dynamic variable storing the symbol of the function to be used for
@@ -27,8 +23,6 @@
    (symbol (str "?" (gensym))))
   ([prefix-string]
    (symbol (str "?" (gensym prefix-string)))))
-
-;;; Transformation functions
 
 (defn transform-selections
   [& selections]
@@ -104,12 +98,20 @@
    :int    edn/read-string
    :string edn/read-string})
 
+(def parser
+  "An instaparse parser for IQL SQL queries. The grammar is inlined at macro
+  expansion time so that it can be used in the ClojureScript context where we
+  don't have access to file resources."
+  (insta/parser (sio/inline-resource "query.bnf")))
+
 (defn parse-and-transform
   "Parses and transforms a string containing an InferenceQL query and produces a
   map representing the query to be performed."
   [& args]
   (let [ast (apply parser args)]
     (insta/transform transform-map ast)))
+
+;;; Hiccup tree manipulation
 
 (defn find-child
   "Returns a node of type `k` from a Hiccup-style Instaparse parse tree."
@@ -140,12 +142,7 @@
           (find-child :conditions)
           (rest)))
 
-(defn iql-db
-  "Converts a vector of maps into a IQL database."
-  [table]
-  (->> table
-       (map #(assoc % :iql/type :iql.type/row))
-       (d/db-with (d/empty-db))))
+;;; Query execution
 
 (defn query-plan
   "Given a query parse tree returns a query plan for the top-most query.
@@ -158,6 +155,13 @@
      :where `[[~'?e :iql/type :iql.type/row]
               ~@find-wheres
               ~@(conditions ast)]}))
+
+(defn iql-db
+  "Converts a vector of maps into Datalog database that can be queried with `q`."
+  [table]
+  (->> table
+       (map #(assoc % :iql/type :iql.type/row))
+       (d/db-with (d/empty-db))))
 
 (defn execute
   "Like `q`, only operates on a query parse tree rather than a query string."
