@@ -1,6 +1,6 @@
 (ns inferenceql.spreadsheets.query
   "This file defines functions for parsing, transforming, and executing IQL SQL
-  queries. The public API for this file is the functions are `q`, `pq`, and
+  queries. The public API for this file are the functions are `q`, `pq`, and
   `query-plan`."
   #?(:clj (:require [inferenceql.spreadsheets.io :as sio])
      :cljs (:require-macros [inferenceql.spreadsheets.io :as sio]))
@@ -10,9 +10,16 @@
             [instaparse.core :as insta]
             [inferenceql.multimixture.basic-queries]))
 
-(def parser (insta/parser (sio/inline-resource "query.bnf")))
+(def parser
+  "An instaparse parser for IQL SQL queries. The grammar is inlined at macro
+  expansion time so that it can be used in the ClojureScript context where we
+  don't have access to file resources."
+  (insta/parser (sio/inline-resource "query.bnf")))
 
-(def logpdf-sym 'inferenceql.multimixture.basic-queries/logpdf)
+(def ^:dynamic *logpdf-symbol*
+  "A dynamic variable storing the symbol of the function to be used for
+  calculating a model's log probability density function.."
+  'inferenceql.multimixture.basic-queries/logpdf)
 
 (defn genvar
   "Generates a fresh variable symbol for use in Datalog queries."
@@ -57,7 +64,7 @@
                       `[[(clojure.core/get ~'?models ~model-name) ~model-sym]
                         ~target-clause
                         ~@conditions-clauses
-                        [(~logpdf-sym ~model-sym ~target-sym ~constraints-sym) ~prob-sym]])}))
+                        [(~*logpdf-symbol* ~model-sym ~target-sym ~constraints-sym) ~prob-sym]])}))
 
 (defn transform-column-selection
   [column]
@@ -97,9 +104,9 @@
    :int    edn/read-string
    :string edn/read-string})
 
-(defn parse
-  "Parses a string containing an InferenceQL query and produces a map representing
-  the query to be performed."
+(defn parse-and-transform
+  "Parses and transforms a string containing an InferenceQL query and produces a
+  map representing the query to be performed."
   [& args]
   (let [ast (apply parser args)]
     (insta/transform transform-map ast)))
@@ -175,7 +182,7 @@
   ([query rows]
    (q query rows {}))
   ([query rows models]
-   (let [parse-tree (parse query)]
+   (let [parse-tree (parse-and-transform query)]
      (if-not (insta/failure? parse-tree)
        (execute parse-tree rows models)
        parse-tree))))
