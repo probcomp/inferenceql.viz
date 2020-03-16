@@ -23,8 +23,8 @@
 
 (deftest parsing-success
   (are [start query] (nil? (insta/get-failure (query/parser query :start start)))
-    :select "SELECT * FROM data"))
+    :query "SELECT * FROM data"))
 
 (deftest parsing-failure
   (are [start query] (some? (insta/get-failure (query/parser query :start start)))
-    :symbol "123abc"))
+    :query "123abc"))
