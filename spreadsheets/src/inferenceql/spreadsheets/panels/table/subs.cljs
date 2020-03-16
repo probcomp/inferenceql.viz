@@ -6,6 +6,13 @@
             [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.panels.override.views :as modal]))
 
+;;; Subs related to the dataset loaded into the spreadsheets app.
+
+(rf/reg-sub
+ :table/dataset-rows
+ (fn [db _]
+   (db/dataset-rows db)))
+
 ;;; Subs related to entries in the user-editable labels column within the real-data table.
 
 (def clean-label
