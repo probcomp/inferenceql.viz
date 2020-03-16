@@ -1,4 +1,7 @@
 (ns inferenceql.spreadsheets.query
+  "This file defines functions for parsing, transforming, and executing IQL SQL
+  queries. The public API for this file is the functions are `q`, `pq`, and
+  `query-plan`."
   #?(:clj (:require [inferenceql.spreadsheets.io :as sio])
      :cljs (:require-macros [inferenceql.spreadsheets.io :as sio]))
   (:require [clojure.edn :as edn]
