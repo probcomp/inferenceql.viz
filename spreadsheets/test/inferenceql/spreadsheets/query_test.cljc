@@ -9,7 +9,7 @@
 (defspec nat-parsing
   (prop/for-all [n gen/nat]
     (let [s (pr-str n)]
-      (is (= n (query/parse-and-ransform s :start :nat))))))
+      (is (= n (query/parse-and-transform s :start :nat))))))
 
 (defspec int-parsing
   (prop/for-all [n gen/int]
