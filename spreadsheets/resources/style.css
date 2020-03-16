@@ -84,13 +84,13 @@ div {
 
 #rna-seq-values {
   flex-shrink: 0;
-  width: 185px;
+  width: 270px;
   margin-top: 5px;
   font-size: .875rem;
 }
 
-#conf-slider {
-  line-height: 20px;
+.conf-slider {
+  line-height: 0px;
 }
 
 select {
