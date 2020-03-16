@@ -22,7 +22,7 @@
   'inferenceql.multimixture.basic-queries/logpdf)
 
 (defn genvar
-  "Generates a fresh variable symbol for use in Datalog queries."
+  "Generates a fresh variable for use in Datalog queries."
   ([]
    (symbol (str "?" (gensym))))
   ([prefix-string]
