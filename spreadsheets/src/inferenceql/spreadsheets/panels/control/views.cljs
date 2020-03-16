@@ -35,6 +35,43 @@
        [selection-color cur-val :green "Green"]
        [selection-color cur-val :red "Red"]]]))
 
+
+(defn slider []
+  (let [cur-val @(rf/subscribe [:control/confidence-threshold])]
+    [:div#conf-slider
+      [:span "Confidence Threshold: "]
+      [:br]
+      [:input {:type :range :name :confidence-threshold
+               :min 0 :max 1 :step 0.01
+                       :value cur-val
+                       :on-change (fn [e]
+                                    (let [new-val (js/parseFloat (-> e .-target .-value))]
+                                      (rf/dispatch [:control/set-confidence-threshold new-val])))}]
+      [:label cur-val]]))
+
+(defn rna-seq-values []
+  [:div#rna-seq-values
+   [slider]])
+
+(defn experimental-conditions []
+  (let [template [:div
+                  [:label "Arabinose:"]
+                  [:select.form-control {:field :list :id :arabinose}
+                   [:option {:key :low} "0.0"]
+                   [:option {:key :high} "0.012500225"]]
+                  [:br]
+                  [:label "Iptg:"]
+                  [:select.form-control {:field :list :id :iptg}
+                   [:option {:key :high} "7.98e-05"]
+                   [:option {:key :low} "0.0"]]
+                  [:br]
+                  [:label "Timepoint:"]
+                  [:select.form-control {:field :list :id :timepoint}
+                   [:option {:key :18h} "18.0"]
+                   [:option {:key :5h} "5.0"]]]]
+    [:div#experimental-conditions
+     [forms/bind-fields template reagent-forms-function-map]]))
+
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
@@ -57,5 +94,7 @@
           {:on-click #(rf/dispatch [:query/parse-query @input-text @label-info])} "Run InferenceQL"]
          [:button.toolbar-button.pure-button
           {:on-click #(rf/dispatch [:table/clear])} "Clear results"]]]
+     [experimental-conditions]
+     [rna-seq-values]
      [:div.flex-box-space-filler]
      [selection-color-selector]]))
