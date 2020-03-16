@@ -58,6 +58,12 @@
       :dispatch-n event-list})))
 
 (rf/reg-event-db
+ :control/set-part
+ event-interceptors
+ (fn [db [_ part-key value]]
+   (assoc-in db [:control-panel :parts part-key] value)))
+
+(rf/reg-event-db
  :control/update-reagent-forms
  event-interceptors
  (fn [db [_ f path value]]
