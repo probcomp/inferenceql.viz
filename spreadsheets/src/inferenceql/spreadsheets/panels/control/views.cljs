@@ -70,18 +70,18 @@
   (let [template [:div
                   [:label "Arabinose:"]
                   [:select.form-control {:field :list :id :arabinose}
-                   [:option {:key :low} "0.0"]
-                   [:option {:key :high} "0.012500225"]]
+                   [:option {:key :0.0} "0.0"]
+                   [:option {:key :0.012500225} "0.012500225"]]
                   [:br]
                   [:label "Iptg:"]
                   [:select.form-control {:field :list :id :iptg}
-                   [:option {:key :high} "7.98e-05"]
-                   [:option {:key :low} "0.0"]]
+                   [:option {:key :7.98e-05} "7.98e-05"]
+                   [:option {:key :0.0} "0.0"]]
                   [:br]
                   [:label "Timepoint:"]
                   [:select.form-control {:field :list :id :timepoint}
-                   [:option {:key :18h} "18.0"]
-                   [:option {:key :5h} "5.0"]]]]
+                   [:option {:key :18.0} "18.0"]
+                   [:option {:key :5.0} "5.0"]]]]
     [:div#experimental-conditions
      [forms/bind-fields template reagent-forms-function-map]]))
 
