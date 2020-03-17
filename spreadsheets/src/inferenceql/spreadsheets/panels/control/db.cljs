@@ -14,7 +14,7 @@
                    :reagent-forms {:confidence-mode :none
                                    :arabinose :0.0
                                    :iptg :7.98e-05
-                                   :timepoint :18.0}
+                                   :timepoint :5.0}
 
                    :query-string "SELECT *"
                    :selection-color :blue}})
