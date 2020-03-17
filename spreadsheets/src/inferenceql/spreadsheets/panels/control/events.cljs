@@ -5,13 +5,16 @@
             [inferenceql.spreadsheets.components.highlight.db :as highlight-db]
             [clojure.string :as string]))
 
-(defn make-query-string [conditions parts]
-  (let [conditions (select-keys conditions [:arabinose :iptg :timepoint])
+(defn make-query-string [conditions parts old-query]
+  (let [limit-cond (or (re-find #"LIMIT\s\d+" old-query)
+                       "LIMIT 1")
+        conditions (select-keys conditions [:arabinose :iptg :timepoint])
         experiment-conds (for [[c v] conditions] (str (name c) "=\"" (name v) "\""))
         part-conds (for [[p v] parts] (str (name p) "=\"" v "\""))
         all-conditions (string/join " AND " (concat experiment-conds part-conds))]
     (str "SELECT ycbj, bdca, ydis, rluc, rsmh FROM \n"
-         "(GENERATE * GIVEN " all-conditions " USING model) LIMIT 10")))
+         "(GENERATE * GIVEN " all-conditions " USING model) "
+         limit-cond)))
 
 (rf/reg-event-fx
  :control/set-reagent-forms
@@ -22,10 +25,11 @@
 
          parts (get-in new-db [:control-panel :parts])
          conditions (get-in new-db [:control-panel :reagent-forms])
-         new-query-string (make-query-string conditions parts)]
+         old-query (get-in new-db [:control-panel :query-string])
+         new-query (make-query-string conditions parts old-query)]
      ;; Doing this for all set-reagent-forms events for now.
      {:db new-db
-      :dispatch [:control/set-query-string new-query-string]})))
+      :dispatch [:control/set-query-string new-query]})))
 
 (rf/reg-event-fx
  :control/set-part
@@ -34,9 +38,10 @@
    (let [new-db (assoc-in db [:control-panel :parts part-key] value)
          parts (get-in new-db [:control-panel :parts])
          conditions (get-in new-db [:control-panel :reagent-forms])
-         new-query-string (make-query-string conditions parts)]
+         old-query (get-in new-db [:control-panel :query-string])
+         new-query (make-query-string conditions parts old-query)]
      {:db new-db
-      :dispatch [:control/set-query-string new-query-string]})))
+      :dispatch [:control/set-query-string new-query]})))
 
 (rf/reg-event-db
  :control/update-reagent-forms
