@@ -92,7 +92,10 @@
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
          new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))
-         headers (table-db/dataset-headers db)]
+         headers (table-db/dataset-headers db)
+
+         ;; Hack for SD2 demo 03-17-20
+         headers ["ycbj" "bdca" "ydis" "rluc" "rsmh"]]
      {:dispatch [:table/set new-rows headers {:virtual true}]})))
 
 (defn- create-search-examples [pos-rows neg-rows]
