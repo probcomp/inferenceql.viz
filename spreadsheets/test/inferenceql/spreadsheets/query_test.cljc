@@ -54,5 +54,4 @@
 (defspec select-star
   (prop/for-all [table gen-table]
     (let [results (query/q "SELECT * FROM data" table)]
-      (is (= (set results)
-             (set table))))))
+      (is (= results table)))))
