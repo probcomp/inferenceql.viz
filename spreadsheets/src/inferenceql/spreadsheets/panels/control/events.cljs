@@ -12,7 +12,7 @@
         experiment-conds (for [[c v] conditions] (str (name c) "=\"" (name v) "\""))
         part-conds (for [[p v] parts] (str (name p) "=\"" v "\""))
         all-conditions (string/join " AND " (concat experiment-conds part-conds))]
-    (str "SELECT * FROM (GENERATE * GIVEN " all-conditions " USING model) LIMIT 10")))
+    (str "SELECT * FROM \n(GENERATE * GIVEN " all-conditions " USING model) LIMIT 10")))
 
 (rf/reg-event-fx
  :control/set-reagent-forms
