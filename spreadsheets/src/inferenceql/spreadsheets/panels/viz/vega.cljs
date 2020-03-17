@@ -165,6 +165,7 @@
   [data cols-to-draw]
   {:data {:values data}
    :mark "circle"
+   :selection {:grid {:type "interval" :bind "scales"}}
    :encoding {:x {:field (first cols-to-draw)
                   :type "quantitative"}
               :y {:field (second cols-to-draw)
@@ -280,5 +281,4 @@
     (when (not-empty spec-layers)
       {:$schema default-vega-lite-schema
        :hconcat spec-layers
-       :autosize {:resize true}
        :resolve {:legend {:size "independent"}}})))
