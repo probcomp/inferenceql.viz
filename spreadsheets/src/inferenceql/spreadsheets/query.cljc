@@ -1,5 +1,5 @@
 (ns inferenceql.spreadsheets.query
-  "This file defines functions for parsing, transforming, and executing IQL SQL
+  "This file defines functions for parsing, transforming, and executing IQL-SQL
   queries. The public API for this file are the functions are `q`, `pq`, and
   `query-plan`."
   #?(:clj (:require [inferenceql.spreadsheets.io :as sio])
@@ -114,7 +114,7 @@
 ;;; Hiccup tree manipulation
 
 (defn find-child
-  "Returns a node of type `k` from a Hiccup-style Instaparse parse tree."
+  "Returns a node of type `k` from a Hiccup-style instaparse parse tree."
   [node k]
   (->> (rest node)
        (filter vector?)
@@ -175,6 +175,7 @@
          query (query-plan ast)
          rows (cond->> (d/q query db models)
                 names (map #(zipmap names (rest %)))
+                true (sort-by :db/id)
                 true (map #(dissoc % :db/id :iql/type)))
          metadata {:iql/columns (or names (into [] (comp (mapcat keys) (distinct)) rows))}]
      (with-meta rows metadata))))
