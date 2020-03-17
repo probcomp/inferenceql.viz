@@ -29,10 +29,11 @@
          "spreadsheets/src"
          "spreadsheets/resources"]
  :aliases {:test {:extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
+                               cheshire {:mvn/version "5.8.1"}
                                lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
-                               cheshire {:mvn/version "5.8.1"}}}
+                               com.gfredericks/test.chuck {:mvn/version "0.2.10"}}}
            :figwheel {:extra-paths ["spreadsheets/figwheel-target"]
                       :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.3"}
                                    com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}}
