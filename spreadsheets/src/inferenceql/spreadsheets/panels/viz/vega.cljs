@@ -163,13 +163,15 @@
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
   [data cols-to-draw]
-  {:data {:values data}
-   :mark "circle"
-   :selection {:grid {:type "interval" :bind "scales"}}
-   :encoding {:x {:field (first cols-to-draw)
-                  :type "quantitative"}
-              :y {:field (second cols-to-draw)
-                  :type "quantitative"}}})
+  ;; This is just a random id for the pan/zoom controls.
+  (let [zoom-control-name (keyword (str "control-" (rand-int 100000000)))]
+    {:data {:values data}
+     :mark "circle"
+     :selection {zoom-control-name {:type "interval" :bind "scales"}}
+     :encoding {:x {:field (first cols-to-draw)
+                    :type "quantitative"}
+                :y {:field (second cols-to-draw)
+                    :type "quantitative"}}}))
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -281,4 +283,8 @@
     (when (not-empty spec-layers)
       {:$schema default-vega-lite-schema
        :hconcat spec-layers
-       :resolve {:legend {:size "independent"}}})))
+       :resolve {:legend {:size "independent"}
+                 :scale {:x "independent"
+                         :y "independent"}
+                 :axis {:x "independent"
+                        :y "independent"}}})))
