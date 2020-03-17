@@ -111,5 +111,4 @@
           {:on-click #(rf/dispatch [:table/clear])} "Clear results"]]]
      [experimental-conditions]
      [rna-seq-values]
-     [:div.flex-box-space-filler]
      [selection-color-selector]]))
