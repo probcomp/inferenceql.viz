@@ -6,8 +6,6 @@
             [clojure.string :as string]))
 
 (defn make-query-string [conditions parts]
-  (.log js/console conditions)
-  (.log js/console parts)
   (let [conditions (select-keys conditions [:arabinose :iptg :timepoint])
         experiment-conds (for [[c v] conditions] (str (name c) "=\"" (name v) "\""))
         part-conds (for [[p v] parts] (str (name p) "=\"" v "\""))
