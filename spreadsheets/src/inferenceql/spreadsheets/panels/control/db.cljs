@@ -3,6 +3,7 @@
 
 (def default-db
   {:control-panel {:confidence-threshold 0.9
+                   ;; Ulli: Remove the part from this map.
                    :parts {:part_laci 0.0
                            :part_psra 0.0
                            :part_yfp 0.0
