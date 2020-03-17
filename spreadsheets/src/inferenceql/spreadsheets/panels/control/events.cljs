@@ -2,66 +2,42 @@
   (:require [re-frame.core :as rf]
             [inferenceql.spreadsheets.panels.control.db :as db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.components.highlight.db :as highlight-db]))
+            [inferenceql.spreadsheets.components.highlight.db :as highlight-db]
+            [clojure.string :as string]))
 
-(defn query-for-conf-options [type threshold]
-  (case type
-    :none ""
-    :row (str "COLOR ROWS WITH CONFIDENCE OVER " threshold)
-    :cells-existing (str "COLOR CELLS EXISTING WITH CONFIDENCE OVER " threshold)
-    :cells-missing (str "IMPUTE CELLS MISSING WITH CONFIDENCE OVER " threshold)))
-
-(rf/reg-event-fx
- :control/set-confidence-threshold
- event-interceptors
- (fn [{:keys [db]} [_ value]]
-   (let [conf-mode (get-in db [:control-panel :reagent-forms :confidence-mode])
-         new-query-string (query-for-conf-options conf-mode value)]
-     {:db (assoc-in db [:control-panel :confidence-threshold] value)
-      :dispatch [:control/set-query-string new-query-string]})))
+(defn make-query-string [conditions parts]
+  (.log js/console conditions)
+  (.log js/console parts)
+  (let [conditions (select-keys conditions [:arabinose :iptg :timepoint])
+        experiment-conds (for [[c v] conditions] (str (name c) "=\"" (name v) "\""))
+        part-conds (for [[p v] parts] (str (name p) "=\"" v "\""))
+        all-conditions (string/join " AND " (concat experiment-conds part-conds))]
+    (str "SELECT * FROM (GENERATE * GIVEN " all-conditions " USING model) LIMIT 10")))
 
 (rf/reg-event-fx
  :control/set-reagent-forms
  event-interceptors
  (fn [{:keys [db]} [_ path value]]
-   (let [full-path (into [:control-panel :reagent-forms] path)]
-     (case path
-       [:confidence-mode]
-       {:dispatch [:control/set-confidence-mode full-path value]}
+   (let [full-path (into [:control-panel :reagent-forms] path)
+         new-db (assoc-in db full-path value)
 
-       ;; Default case is to write the value into the db.
-       {:db (assoc-in db full-path value)}))))
+         parts (get-in new-db [:control-panel :parts])
+         conditions (get-in new-db [:control-panel :reagent-forms])
+         new-query-string (make-query-string conditions parts)]
+     ;; Doing this for all set-reagent-forms events for now.
+     {:db new-db
+      :dispatch [:control/set-query-string new-query-string]})))
 
 (rf/reg-event-fx
- :control/set-confidence-mode
- event-interceptors
- (fn [{:keys [db]} [_ path value]]
-   (let [conf-threshold (get-in db [:control-panel :confidence-threshold])
-         new-query-string (query-for-conf-options value conf-threshold)
-         query-string-event [:control/set-query-string new-query-string]
-
-         ;; Determine if a load event needs to take place.
-         load-event (cond
-                      (and (= value :row)
-                           (nil? (highlight-db/row-likelihoods db)))
-                      [:highlight/compute-row-likelihoods]
-
-                      (and (= value :cells-missing)
-                           (nil? (highlight-db/missing-cells db)))
-                      [:highlight/compute-missing-cells]
-
-                      ;; Default case: no event
-                      :else
-                      nil)
-         event-list [query-string-event load-event]]
-     {:db (assoc-in db path value)
-      :dispatch-n event-list})))
-
-(rf/reg-event-db
  :control/set-part
  event-interceptors
- (fn [db [_ part-key value]]
-   (assoc-in db [:control-panel :parts part-key] value)))
+ (fn [{:keys [db]} [_ part-key value]]
+   (let [new-db (assoc-in db [:control-panel :parts part-key] value)
+         parts (get-in new-db [:control-panel :parts])
+         conditions (get-in new-db [:control-panel :reagent-forms])
+         new-query-string (make-query-string conditions parts)]
+     {:db new-db
+      :dispatch [:control/set-query-string new-query-string]})))
 
 (rf/reg-event-db
  :control/update-reagent-forms

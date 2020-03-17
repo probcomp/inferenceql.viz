@@ -11,7 +11,11 @@
                            :part_arac 0.0
                            :part_kanr 0.0
                            :part_bm3r1 0.0}
-                   :reagent-forms {:confidence-mode :none}
+                   :reagent-forms {:confidence-mode :none
+                                   :arabinose :0.0
+                                   :iptg :7.98e-05
+                                   :timepoint :18.0}
+
                    :query-string "SELECT *"
                    :selection-color :blue}})
 
@@ -23,6 +27,7 @@
                                         ::selection-color]))
 (s/def ::confidence-threshold number?)
 (s/def ::reagent-forms (s/keys :req-un [::confidence-mode]))
+;; TODO add entries for experimental-conditions.
 (s/def ::confidence-mode keyword?)
 (s/def ::selection-color keyword?)
 (s/def ::query-string string?)
