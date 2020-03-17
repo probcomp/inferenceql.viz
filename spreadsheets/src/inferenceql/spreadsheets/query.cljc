@@ -142,6 +142,14 @@
           (find-child :conditions)
           (rest)))
 
+(defn limit
+  "Returns the limit value from a query parse tree."
+  [ast]
+  (some-> ast
+          (find-child :limit)
+          (rest)
+          (first)))
+
 ;;; Query execution
 
 (defn query-plan
@@ -173,10 +181,12 @@
                       (execute subquery rows)
                       rows))
          query (query-plan ast)
+         limit (limit ast)
          rows (cond->> (d/q query db models)
                 names (map #(zipmap names (rest %)))
                 true (sort-by :db/id)
-                true (map #(dissoc % :db/id :iql/type)))
+                true (map #(dissoc % :db/id :iql/type))
+                limit (take limit))
          metadata {:iql/columns (or names (into [] (comp (mapcat keys) (distinct)) rows))}]
      (with-meta rows metadata))))
 
