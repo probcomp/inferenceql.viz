@@ -19,7 +19,6 @@ div {
 
 .flex-box-space-filler {
   flex: auto;
-  min-width: 40px;
 }
 
 /* --------------- styling for the toolbar --------------- */
