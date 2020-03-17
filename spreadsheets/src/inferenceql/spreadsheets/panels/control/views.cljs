@@ -50,6 +50,7 @@
 
 (defn rna-seq-values []
   (let [data @(rf/subscribe [:table/dataset-rows])
+        ;; Ulli: Remove the part from this vector.
         part-keys [:part_laci
                    :part_psra
                    :part_yfp
