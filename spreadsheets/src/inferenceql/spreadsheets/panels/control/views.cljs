@@ -12,17 +12,28 @@
               (rf/dispatch [:control/update-reagent-forms save-fn path value]))
    :doc (fn [] @(rf/subscribe [:control/reagent-forms]))})
 
+(defn selection-color
+  "A reagent component for a single select option in color-selection reagent component"
+  [current-selection id text]
+  [:div.list-group-item
+   {:key id
+    ;; A css class gets attached that is the string portion of the `id` keyword.
+    ;; For example: ":red" will become the ".red" css class.
+    :class [(name id) (when (= current-selection id) "active")]
+    :on-click #(rf/dispatch [:control/set-selection-color id])}
+   text])
+
 (defn selection-color-selector
   "A reagant component for selecting the table selection color."
   []
-  (let [template [:div.list-group {:field :single-select :id :selection-color}
-                  [:div.list-group-item {:key :blue} "Blue"]
-                  [:div.list-group-item {:key :green} "Green"]
-                  [:div.list-group-item {:key :red} "Red"]]]
+  (let [cur-val @(rf/subscribe [:control/selection-color])]
     [:div#color-selector
-      [:span "Selection color:"]
+      [:span "Selection layers"]
       [:br]
-      [forms/bind-fields template reagent-forms-function-map]]))
+      [:div.list-group
+       [selection-color cur-val :blue "Blue"]
+       [selection-color cur-val :green "Green"]
+       [selection-color cur-val :red "Red"]]]))
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."

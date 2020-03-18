@@ -3,17 +3,17 @@
 
 (def default-db
   {:control-panel {:confidence-threshold 0.9
-                   :reagent-forms {:confidence-mode :none
-                                   :selection-color :blue}
-                   :query-string ""}})
+                   :reagent-forms {:confidence-mode :none}
+                   :query-string ""
+                   :selection-color :blue}})
 
 
 (s/def ::control-panel (s/keys :req-un [::confidence-threshold
                                         ::reagent-forms
-                                        ::query-string]))
-(s/def ::confidence-threshold number?)
-(s/def ::reagent-forms (s/keys :req-un [::confidence-mode
+                                        ::query-string
                                         ::selection-color]))
+(s/def ::confidence-threshold number?)
+(s/def ::reagent-forms (s/keys :req-un [::confidence-mode]))
 (s/def ::confidence-mode keyword?)
 (s/def ::selection-color keyword?)
 (s/def ::query-string string?)
@@ -21,4 +21,4 @@
 ;; Accessor functions for indexing into parts of the control-panel's db.
 
 (defn selection-color [db]
-  (get-in db [:control-panel :reagent-forms :selection-color]))
+  (get-in db [:control-panel :selection-color]))
