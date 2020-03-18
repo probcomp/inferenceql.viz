@@ -10,24 +10,21 @@
             [inferenceql.multimixture.search :as search]))
 
 (def cli-options
-  [["-d" "--data DATA" "data CSV path"
-    :parse-fn io/file]
-   ["-m" "--model MODEL" "model EDN path"
-    :parse-fn io/file]
+  [["-d" "--data DATA" "data CSV path"]
+   ["-m" "--model MODEL" "model EDN path"]
    ["-h" "--help"]])
 
 (defn read-model
-  [file]
-  (-> file (slurp) (edn/read-string) (search/optimized-row-generator)))
+  [x]
+  (-> (slurp x) (edn/read-string) (search/optimized-row-generator)))
 
 (defn read-csv
-  [file]
-  (clojure.core/with-open [reader (io/reader file)]
-    (let [data (csv/read-csv reader)
-          headers (map keyword (first data))
-          rows (rest data)]
-      (mapv #(zipmap headers %)
-            rows))))
+  [x]
+  (let [data (csv/read-csv (slurp x))
+        headers (map keyword (first data))
+        rows (rest data)]
+    (mapv #(zipmap headers %)
+          rows)))
 
 (defn p
   [result]
