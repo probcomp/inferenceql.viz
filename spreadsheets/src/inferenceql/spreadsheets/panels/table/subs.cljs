@@ -85,17 +85,17 @@
 (rf/reg-sub :table/selection-layers-list
             :<- [:table/selection-layers]
             (fn [selection-layers]
-              (let [layers-list (for [layer-name selection-layer-order]
-                                  (let [layer (get selection-layers layer-name)]
-                                    ;; Only add the selection layer to the list if there is
-                                    ;; a valid selection in it.
-                                    (when (some? (get layer :selections))
-                                      ;; Add in the name of the selection layer into the selection
-                                      ;; layer map itself because the layers will be embedded in a
-                                      ;; list, and no longer have keys (their names) associated with
-                                      ;; them.
-                                      (assoc layer :id layer-name))))]
-                (remove nil? layers-list))))
+              (keep (fn [layer-name]
+                      (let [layer (get selection-layers layer-name)]
+                        ;; Only add the selection layer to the list if there is
+                        ;; a valid selection in it.
+                        (when (some? (get layer :selections))
+                          ;; Add in the name of the selection layer into the selection
+                          ;; layer map itself because the layers will be embedded in a
+                          ;; list, and no longer have keys (their names) associated with
+                          ;; them.
+                          (assoc layer :id layer-name))))
+                    selection-layer-order)))
 
 ;;; Subs related to selections within the active selection layer.
 
