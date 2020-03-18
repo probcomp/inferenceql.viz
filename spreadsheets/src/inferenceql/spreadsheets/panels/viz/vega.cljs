@@ -3,7 +3,19 @@
   (:require [clojure.walk :as walk]
             [metaprob.distributions :as dist]
             [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.panels.table.handsontable :as hot]))
+            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
+            [inferenceql.spreadsheets.panels.table.db :as table-db]))
+
+;; These are column names that cannot be simulated.
+;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
+;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
+(def cols-invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header})
+
+(defn simulatable?
+  "Checks if `selection` is valid for simulation"
+  [selection col]
+  (and (table-db/one-cell-selected? selection)
+       (not (contains? cols-invalid-for-sim col))))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -22,6 +34,14 @@
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
 (def default-table-color "SteelBlue")
+
+(defn- title-color [layer-name]
+  "Maps the name of a selection layer, `layer-name`, to a color for its plot title."
+  (case layer-name
+        :blue "blue"
+        :green "green"
+        :red "red"
+        "black"))
 
 (def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
@@ -54,7 +74,7 @@
   data representing the row our cell is in.
   This spec itself does not perform the simulation. An other function must update
   the `data` dataset via the vega-lite API."
-  [col-name row]
+  [col-name row dataset-name]
   (let [col-kw (keyword col-name)
         col-val (get row col-name)
         y-axis {:title "Distribution of Probable Values"
@@ -88,9 +108,7 @@
                                                dist/categorical "nominal")}}}
         layers (cond-> [simulations-layer]
                  col-val (conj observed-layer))]
-    {:$schema default-vega-lite-schema
-     :data {:name "data"}
-     :autosize {:resize true}
+    {:data {:name dataset-name}
      :layer layers}))
 
 (defn get-col-type [col-name]
@@ -103,22 +121,16 @@
     dist/gaussian true
     dist/categorical false))
 
-(defn gen-histogram [col selections facet-attr]
+(defn gen-histogram [col selections]
   (let [col-type (get-col-type col)
-        col-binning (get-col-should-bin col)
-
-        spec {:$schema default-vega-lite-schema
-              :data {:values selections}
-              :mark {:type "bar" :color default-table-color}
-              :encoding {:x {:bin col-binning
-                             :field col
-                             :type col-type}
-                         :y {:aggregate "count"
-                             :type "quantitative"}}
-              :resolve {:scale {:y "independent"}}}]
-    (if facet-attr
-      (assoc-in spec [:encoding :facet] {:field facet-attr :type "nominal"})
-      spec)))
+        col-binning (get-col-should-bin col)]
+    {:data {:values selections}
+     :mark {:type "bar" :color default-table-color}
+     :encoding {:x {:bin col-binning
+                    :field col
+                    :type col-type}
+                :y {:aggregate "count"
+                    :type "quantitative"}}}))
 
 (defn gen-choropleth [selections selected-columns]
   (let [selection (first selections)
@@ -150,17 +162,13 @@
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
-  [data cols-to-draw facet-column]
-  (let [spec {:$schema default-vega-lite-schema
-              :data {:values data}
-              :mark "circle"
-              :encoding {:x {:field (first cols-to-draw)
-                             :type "quantitative"}
-                         :y {:field (second cols-to-draw)
-                             :type "quantitative"}}}]
-    (if facet-column
-      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
-      spec)))
+  [data cols-to-draw]
+  {:data {:values data}
+   :mark "circle"
+   :encoding {:x {:field (first cols-to-draw)
+                  :type "quantitative"}
+              :y {:field (second cols-to-draw)
+                  :type "quantitative"}}})
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -213,49 +221,64 @@
 (defn- strip-plot
   "Generates vega-lite spec for a strip plot.
   Useful for comparing quantitative-nominal data."
-  [data cols-to-draw facet-column]
+  [data cols-to-draw]
   (let [[x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
-        [width height] (map strip-plot-size-helper cols-to-draw)
-        spec {:$schema default-vega-lite-schema
-              :width width
-              :height height
-              :data {:values data}
-              :mark {:type "tick"}
-              :encoding {:x {:field x-field
-                             :type x-type
-                             :axis {:grid true :gridDash [2 2]}}
-                         :y {:field y-field
-                             :type y-type
-                             :axis {:grid true :gridDash [2 2]}}}}]
-    (if facet-column
-      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
-      spec)))
+        [width height] (map strip-plot-size-helper cols-to-draw)]
+    {:width width
+     :height height
+     :data {:values data}
+     :mark {:type "tick"}
+     :encoding {:x {:field x-field
+                    :type x-type
+                    :axis {:grid true :gridDash [2 2]}}
+                :y {:field y-field
+                    :type y-type
+                    :axis {:grid true :gridDash [2 2]}}}}))
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.
   Useful for comparing nominal-nominal data."
-  [data cols-to-draw facet-column]
-  (let [[x-field y-field] cols-to-draw
-        spec {:$schema default-vega-lite-schema
-              :autosize {:type "pad"}
-              :data {:values data}
-              :mark {:type "circle"}
-              :encoding {:x {:field x-field
-                             :type "nominal"}
-                         :y {:field y-field
-                             :type "nominal"}
-                         :size {:aggregate "count"
-                                :type "quantitative"}}}]
-    (if facet-column
-      (assoc-in spec [:encoding :facet] {:field facet-column :type "nominal"})
-      spec)))
+  [data cols-to-draw]
+  (let [[x-field y-field] cols-to-draw]
+    {:data {:values data}
+     :mark {:type "circle"}
+     :encoding {:x {:field x-field
+                    :type "nominal"}
+                :y {:field y-field
+                    :type "nominal"}
+                :size {:aggregate "count"
+                       :type "quantitative"}}}))
 
-(defn gen-comparison-plot [cols selections facet-attr]
+(defn gen-comparison-plot [cols selections]
   (let [cols-types (set (doall (map stattype cols)))]
     (condp = cols-types
-      #{dist/gaussian} (scatter-plot selections cols facet-attr)
-      #{dist/categorical} (table-bubble-plot selections cols facet-attr)
-      #{dist/gaussian dist/categorical} (strip-plot selections cols facet-attr)
-      ;; Default case: no plot -- empty vega-lite spec.
-      nil)))
+      #{dist/gaussian} (scatter-plot selections cols)
+      #{dist/categorical} (table-bubble-plot selections cols)
+      #{dist/gaussian dist/categorical} (strip-plot selections cols))))
+
+(defn- spec-for-selection-layer [selection-layer]
+  (let [{layer-name :id
+         selections :selections
+         cols :selected-columns
+         row :row-at-selection-start} selection-layer
+         spec (cond (simulatable? selections (first cols))
+                    (gen-simulate-plot (first cols) row (name layer-name))
+
+                    (= 1 (count cols)) ; One column selected.
+                    (gen-histogram (first cols) selections)
+
+                    :else ; Two or more columns selected.
+                    (gen-comparison-plot (take 2 cols) selections))
+          title {:title {:text (str (name layer-name) " " "selection")
+                         :color (title-color layer-name)
+                         :fontWeight 500}}]
+       (merge spec title)))
+
+(defn generate-spec [selection-layers]
+  (let [spec-layers (mapv spec-for-selection-layer selection-layers)]
+    (when (seq spec-layers)
+      {:$schema default-vega-lite-schema
+       :hconcat spec-layers
+       :autosize {:resize true}
+       :resolve {:legend {:size "independent"}}})))
