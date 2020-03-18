@@ -33,7 +33,10 @@
                                         changeset (.. js/vega
                                                       (changeset)
                                                       (insert (clj->js datum)))]
-                                    (.run (.change (.-view vega-instance) (name dataset-name) changeset))))))
+                                    (.. vega-instance
+                                        -view
+                                        (change (name dataset-name) changeset)
+                                        (run))))))
         embed (fn [this spec opt generators]
                 (when spec
                   (let [spec (clj->js spec)
