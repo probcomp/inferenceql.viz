@@ -8,7 +8,7 @@
             [clojure.pprint :as pprint]
             [datascript.core :as d]
             [instaparse.core :as insta]
-            [inferenceql.multimixture.basic-queries]))
+            [inferenceql.multimixture.basic-queries :as queries]))
 
 ;;; Parsing and transformation
 
@@ -89,7 +89,11 @@
    :selections transform-selections
    :column-selection transform-column-selection
    :probability-of transform-probability-of
+
+   :generated vector
    :constraints vector
+
+   :bindings merge
    :binding hash-map
 
    :symbol edn/read-string
@@ -98,7 +102,7 @@
    :int    edn/read-string
    :string edn/read-string})
 
-(def parser
+(def parse
   "An instaparse parser for IQL SQL queries. The grammar is inlined at macro
   expansion time so that it can be used in the ClojureScript context where we
   don't have access to file resources."
@@ -108,7 +112,7 @@
   "Parses and transforms a string containing an InferenceQL query and produces a
   map representing the query to be performed."
   [& args]
-  (let [ast (apply parser args)]
+  (let [ast (apply parse args)]
     (insta/transform transform-map ast)))
 
 ;;; Hiccup tree manipulation
@@ -121,12 +125,12 @@
        (filter #(= k (first %)))
        (first)))
 
-(defn subquery
-  "Returns the subquery node from a query parse tree."
+(defn source
+  "Returns the source node from a query parse tree."
   [ast]
   (some-> ast
           (find-child :source)
-          (find-child :query)))
+          (second)))
 
 (defn selector
   "Returns the selector node from a query parse tree."
@@ -171,17 +175,33 @@
        (map #(assoc % :iql/type :iql.type/row))
        (d/db-with (d/empty-db))))
 
+(defn generate
+  [ast models limit]
+  (if-not limit
+    (throw (ex-info "Cannot GENERATE without LIMIT" {}))
+    (let [target (second ast)
+          model-name (last ast)
+          constraints (if (= 4 (count ast)) ; constraints are optional
+                        (nth ast 2)
+                        {})]
+      (if-let [model (get models model-name)]
+        (for [row (queries/simulate model constraints limit)]
+          (select-keys row target))
+        (throw (ex-info "Invalid model name" {:name model-name}))))))
+
 (defn execute
   "Like `q`, only operates on a query parse tree rather than a query string."
   ([ast rows]
    (execute ast rows {}))
   ([ast rows models]
-   (let [{names :name} (second ast)
-         db (iql-db (if-let [subquery (subquery ast)]
-                      (execute subquery rows)
+   (let [limit (limit ast)
+         {names :name} (second ast)
+         db (iql-db (if-let [source (source ast)]
+                      (case (first source)
+                        :query (execute source rows)
+                        :generate (generate source models limit))
                       rows))
          query (query-plan ast)
-         limit (limit ast)
          rows (cond->> (d/q query db models)
                 names (map #(zipmap names (rest %)))
                 true (sort-by :db/id)
@@ -202,17 +222,91 @@
        (execute parse-tree rows models)
        parse-tree))))
 
-(defn pq
-  "Like `q`, only pretty-prints the resulting table if any rows are returned."
-  [& args]
-  (let [rows (apply q args)
-        columns (:iql/columns (meta rows))]
-    (if (insta/failure? rows)
-      rows
+(defn p
+  [result]
+  (let [columns (:iql/columns (meta result))]
+    (if (insta/failure? result)
+      (print result)
       (pprint/print-table
        (map name columns)
-       (for [row rows]
+       (for [row result]
          (reduce-kv (fn [m k v]
                       (assoc m (name k) v))
                     {}
                     row))))))
+
+(defn pq
+  "Like `q`, only pretty-prints the resulting table if any rows are returned."
+  [& args]
+  (p (apply q args)))
+
+(comment
+
+  (def db
+    [{:name "cat" :sciname "Felis catus"                   }
+     {:name "dog" :sciname "Canis lupus familiaris" :id 2  }
+     {:name "bird"                                  :id 19}])
+
+  (pq "SELECT name FROM data" db)
+  (pq "SELECT * FROM data" db)
+  (pq "SELECT * FROM data WHERE sciname IS NULL" db)
+  (pq "SELECT * FROM data WHERE sciname IS NOT NULL" db)
+  (pq "SELECT * FROM data WHERE id=19" db)
+  (pq "SELECT sciname FROM data WHERE name=\"cat\"" db)
+  (q "SELECT * FROM (SELECT * FROM data)" db)
+
+  (pq "SELECT name FROM (SELECT name FROM (SELECT name FROM data))" db)
+  (pq "SELECT * FROM (SELECT name, sciname FROM data)" db)
+  (pq "SELECT name FROM (SELECT sciname FROM data)" db)
+
+  (require '[inferenceql.multimixture :as mmix])
+  (require '[inferenceql.multimixture.search :as search])
+  (require '[clojure.walk :as walk])
+  (edn/read-string (clojure.core/slurp "/Users/zane/Downloads/model.edn"))
+  (def spec
+    (walk/postwalk-replace
+     {"elephant" :elephant
+      "rain" :rain
+      "teacher_sick" :teacher_sick
+      "student_happy" :student_happy}
+     (edn/read-string (clojure.core/slurp "/Users/zane/Downloads/model.edn"))))
+  (def model (search/optimized-row-generator spec))
+  (def models {:model model})
+
+  spec
+
+  (pprint/print-table
+   (take 10 (repeatedly model)))
+
+  (require '[clojure.java.io :as io])
+  (require '[clojure.data.csv :as csv])
+  (def db
+    (clojure.core/with-open [reader (io/reader "/Users/zane/Downloads/data.csv")]
+      (let [data (csv/read-csv reader)
+            headers (map keyword (first data))
+            rows (rest data)]
+        (mapv #(zipmap headers %)
+              rows))))
+
+  (parse-and-transform "SELECT * FROM (GENERATE x UNDER model) LIMIT 10")
+
+  (queries/simulate model {:rain "no"} 1)
+
+  (->> (queries/simulate model {:rain "yes"} 1000)
+       (map :elephant)
+       (frequencies))
+
+  (->> (q "SELECT * FROM (GENERATE elephant GIVEN rain=\"no\" UNDER model) LIMIT 1000" db models)
+       (map :elephant)
+       (frequencies))
+
+  (parse-and-transform "SELECT * FROM (SELECT * FROM data) LIMIT 10" db models)
+
+  (parse-and-transform "SELECT * FROM (GENERATE x UNDER model)")
+
+  (pq "SELECT * FROM (SELECT * FROM data) LIMIT 10" db models)
+  (pq "SELECT rain, (PROBABILITY OF elephant GIVEN rain UNDER model) FROM data" db models)
+  (query-plan (parse "SELECT rain, (PROBABILITY OF elephant GIVEN rain=\"no\" UNDER model) FROM data WHERE rain=\"yes\"") )
+  (pq "SELECT rain, (PROBABILITY OF rain=\"no\" GIVEN rain=\"no\" UNDER model) FROM data WHERE rain=\"no\"" db models)
+
+  )

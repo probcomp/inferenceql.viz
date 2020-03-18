@@ -1,4 +1,4 @@
-query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'LIMIT'> <ws> limit)?
+query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'LIMIT'> <ws> limit)? <';'>
 <p-query>           ::= query | <'('> query <')'>
 selections          ::= star | p-column-or-prob (<','> <ws>? p-column-or-prob)*
 <p-column-or-prob>  ::= column-or-prob | <'('> column-or-prob <')'>
@@ -19,7 +19,12 @@ absence-condition   ::= column-name <ws> <'IS NULL'>
 equality-condition  ::= column-name <ws>? <'='> <ws>? value
 predicate-condition ::= column-name <ws>? predicate <ws>? value
 predicate           ::= (#"<" | #">" | #"<=" | #">=")
-source              ::= <'data'> | <'('> query <')'>
+source              ::= <'data'> | <'('> query <')'> | <'('> generate <')'>
+
+generate            ::= <'GENERATE'> <ws> generated (<ws> <'GIVEN'> <ws> bindings)? <ws> <'UNDER'> <ws> model-name
+generated           ::= column-name (<','> <ws> column-name)*
+bindings            ::= binding (<','> <ws> binding)*
+
 limit               ::= nat
 
 probability-of      ::= <'PROBABILITY OF'> <ws> event <ws> <'GIVEN'> <ws> constraints <ws> <'UNDER'> <ws> model-name
