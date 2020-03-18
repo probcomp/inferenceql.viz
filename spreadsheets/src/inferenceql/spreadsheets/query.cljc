@@ -222,25 +222,10 @@
        (execute parse-tree rows models)
        parse-tree))))
 
-(defn p
-  [result]
-  (let [columns (:iql/columns (meta result))]
-    (if (insta/failure? result)
-      (print result)
-      (pprint/print-table
-       (map name columns)
-       (for [row result]
-         (reduce-kv (fn [m k v]
-                      (assoc m (name k) v))
-                    {}
-                    row))))))
 
-(defn pq
-  "Like `q`, only pretty-prints the resulting table if any rows are returned."
-  [& args]
-  (p (apply q args)))
 
 (comment
+  (slurp "https://gist.githubusercontent.com/zane/418ee38a22523e4b5887a29b1a21a350/raw/2c3c7e326bcd16f045950a89b5f8502553642eb1/model.edn")
 
   (def db
     [{:name "cat" :sciname "Felis catus"                   }
