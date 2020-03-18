@@ -1,4 +1,4 @@
-query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'LIMIT'> <ws> limit)? <';'>
+query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'LIMIT'> <ws> limit)? <';'>?
 <p-query>           ::= query | <'('> query <')'>
 selections          ::= star | p-column-or-prob (<','> <ws>? p-column-or-prob)*
 <p-column-or-prob>  ::= column-or-prob | <'('> column-or-prob <')'>
