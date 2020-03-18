@@ -44,11 +44,11 @@
       (is (== n (query/parse-and-transform s :start :float))))))
 
 (deftest parsing-success
-  (are [start query] (nil? (insta/get-failure (query/parser query :start start)))
+  (are [start query] (nil? (insta/get-failure (query/parse query :start start)))
     :query "SELECT * FROM data"))
 
 (deftest parsing-failure
-  (are [start query] (some? (insta/get-failure (query/parser query :start start)))
+  (are [start query] (some? (insta/get-failure (query/parse query :start start)))
     :query "123abc"))
 
 (defspec select-star
