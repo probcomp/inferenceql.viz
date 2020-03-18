@@ -9,10 +9,10 @@
 
 (defn app
   []
-  (let [real-hot-props      @(rf/subscribe [:table/real-hot-props])
+  (let [real-hot-props @(rf/subscribe [:table/real-hot-props])
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         vega-lite-log-level @(rf/subscribe [:viz/vega-lite-log-level])
-        generator      @(rf/subscribe [:viz/generator])
+        generator @(rf/subscribe [:viz/generator])
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
