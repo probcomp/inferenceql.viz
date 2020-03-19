@@ -13,9 +13,8 @@
 (defn handsontable
   ([props]
    (handsontable {} props))
-  ([attributes {:keys [settings hooks name] :as props}]
-   (let [js-settings (clj->js settings)
-         hot-instance (reagent/atom nil)]
+  ([attributes props]
+   (let [hot-instance (reagent/atom nil)]
      (reagent/create-class
       {:display-name "handsontable-reagent"
 
@@ -23,10 +22,10 @@
        (fn [this]
          (let [dom-node (dom/dom-node this)
                hot (js/Handsontable. dom-node (clj->js (:settings props)))
-               unique-id (keyword name)]
+               unique-id (keyword (:name props))]
 
            ;; add callbacks internal to hot object
-           (doseq [key hooks]
+           (doseq [key (:hooks props)]
              (let [camel-key (csk/->camelCase (clj->js key))]
                ;; Our hook functions call the associated re-frame event and then return true.  Some
                ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
