@@ -5,7 +5,6 @@
   #?(:clj (:require [inferenceql.spreadsheets.io :as sio])
      :cljs (:require-macros [inferenceql.spreadsheets.io :as sio]))
   (:require [clojure.edn :as edn]
-            [clojure.pprint :as pprint]
             [datascript.core :as d]
             [instaparse.core :as insta]
             [inferenceql.multimixture.basic-queries :as queries]))
@@ -106,7 +105,8 @@
   "An instaparse parser for IQL SQL queries. The grammar is inlined at macro
   expansion time so that it can be used in the ClojureScript context where we
   don't have access to file resources."
-  (insta/parser (sio/inline-resource "query.bnf")))
+  (insta/parser (sio/inline-resource "query.bnf")
+                :string-ci true))
 
 (defn parse-and-transform
   "Parses and transforms a string containing an InferenceQL query and produces a
