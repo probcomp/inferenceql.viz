@@ -1,7 +1,6 @@
 (ns inferenceql.spreadsheets.query.main
   (:require [clojure.data.csv :as csv]
             [clojure.edn :as edn]
-            [clojure.java.io :as io]
             [clojure.main :as main]
             [clojure.pprint :as pprint]
             [clojure.tools.cli :as cli]
