@@ -49,10 +49,47 @@
                [_ new-attributes new-props] (reagent/argv this)]
            (when (not= (:settings old-props) (:settings new-props))
              (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
-                   sort-config (.getSortConfig sorting-plugin)]
+                   sort-config (.getSortConfig sorting-plugin)
+
+                   dataset-empty (and (empty? (get-in new-props [:settings :data]))
+                                      (empty? (get-in new-props [:settings :colHeaders])))
+                   dataset-size-changed (or (not= (count (get-in new-props [:settings :data]))
+                                                  (count (get-in old-props [:settings :data])))
+                                            (not= (count (get-in new-props [:settings :colHeaders]))
+                                                  (count (get-in old-props [:settings :colHeaders]))))]
+               ;; Whenever we insert new data into the table, we sometimes deselect all cells
+               ;; before updating in order to prevent the following issues.
+
+               ;; 1. When the table data is updated with an empty set of rows and the table previously
+               ;; had rows and a selection in it, there will be a small rectangle element left over
+               ;; in the DOM that is the top-left corner of the table even though the table should
+               ;; be completely gone from the DOM. Clearing all selections before updating prevents
+               ;; this.
+
+               ;; 2. When the table data is updated with fewer rows than previously set and there
+               ;; was a selection on the previously set data that was larger in the number of row and
+               ;; columns that can be accomodated in new data, Handsontable will make a new smaller
+               ;; selection on the new data. Deselecting all cells before updating, prevents this as
+               ;; well.
+
+               ;; We do not always want to perform this deselecting all and restoring behaviour.
+               ;; Doing this for example when updating the labels column can lead to a race condition.
+               ;; Hence the special conditions here. See the large comment below for more info on
+               ;; this case.
+               (when (or dataset-empty dataset-size-changed)
+                 (.deselectCell @hot-instance))
+
                (update-hot! @hot-instance (clj->js (:settings new-props)))
+
                ;; Maintain the same sort order as before the update
-               (.sort sorting-plugin sort-config)))
+               (.sort sorting-plugin sort-config)
+
+               ;; If we cleared selections because of a dataset-size change, apply the latest
+               ;; selection state from props.
+               (when dataset-size-changed
+                 (when-let [coords (clj->js (:selections-coords new-props))]
+                   (.selectCells @hot-instance coords false)))))
+
 
            ;;; This next piece of code updates the selection state in handsontable depending on
            ;;; :selections-coords passed in via new-props to the reagent component. The conditions under
@@ -86,7 +123,7 @@
            ;; state and emit an :after-deselect event (which we are not listenting to).
 
            ;; Both 1 & 2 we avoid by performing a (.deselectCell @hot-instance) before updating.
-           ;; NOTE: This is coming in a subsequent commit.
+           ;; See the large comment block above.
 
            ;; 3. Clicking out of a cell after inserting a new value in it--specifically in the
            ;; labels column. The new cell we clicked on will be the current selection state in the
