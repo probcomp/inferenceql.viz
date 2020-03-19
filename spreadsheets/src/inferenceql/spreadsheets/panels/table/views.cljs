@@ -54,9 +54,51 @@
                ;; Maintain the same sort order as before the update
                (.sort sorting-plugin sort-config)))
 
-           (when (not= (:selection-color old-props) (:selection-color new-props))
+           ;;; This next piece of code updates the selection state in handsontable depending on
+           ;;; :selections-coords passed in via new-props to the reagent component. The conditions under
+           ;;; which we perform the update are tricky. These notes are meant the clarify the reasoning
+           ;;; for the conditions chosen.
+
+           ;; We of course only want to update the selection state in the table if it differs from
+           ;; (:selections-coords new-props) as to prevent unneeded emmissions of the
+           ;; :hot/after-selection-end event.
+
+           ;; However, sometimes the table selection state (.getSelected @hot-instance) will be out
+           ;; of sync with current selection as specified by (:selections-coords new-props) but we
+           ;; do not want to update the selection unless we have explicitly passed in a new
+           ;; selection state, hence the second condition of
+           ;; (not= (:selections-coords new-props) (:selections-coords old-props))
+
+           ;; The reason for the table selection state getting out of sync is that the handsontable
+           ;; instance might at any point change its selection due to a number of  different
+           ;; factors. We don't want to undo that. Eventually an :hot/after-selection-end event will be
+           ;; emitted by handsontable for this change and that will update the value of
+           ;; :selections-coords in the db, and then there will be nothing to update here.
+
+           ;; Here are the reasons table selection state might be out of sync with our current
+           ;; selection as specified by (:selections-coords new-props).
+
+           ;; 1. We inserted new data into the table that is smaller in size that the current selection.
+           ;; Handsontable will simply make a new smaller selection for us in that case and emit an
+           ;; :hot/after-selection-end event.
+
+           ;; 2. We inserted an empty data set into handsontable. Handsontable will clear the selection
+           ;; state and emit an :after-deselect event (which we are not listenting to).
+
+           ;; Both 1 & 2 we avoid by performing a (.deselectCell @hot-instance) before updating.
+           ;; NOTE: This is coming in a subsequent commit.
+
+           ;; 3. Clicking out of a cell after inserting a new value in it--specifically in the
+           ;; labels column. The new cell we clicked on will be the current selection state in the
+           ;; table but the :hot/after-selection-end event for it may not have run yet when we are
+           ;; here performing an update triggered by the :hot/before-change event, which put a new
+           ;; value in the db for the previously selected cell. This is main reason we only update
+           ;; when we have explicitly passed a new value of :selections-coords through props.
+           (when (and (not= (:selections-coords new-props) (js->clj (.getSelected @hot-instance)))
+                      (not= (:selections-coords new-props) (:selections-coords old-props)))
              (if-let [coords (clj->js (:selections-coords new-props))]
                (.selectCells @hot-instance coords false)
+               ;; When coords is nil it means nothing should be selected in the table.
                (.deselectCell @hot-instance)))))
 
        :component-will-unmount
