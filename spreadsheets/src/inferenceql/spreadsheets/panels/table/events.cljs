@@ -98,50 +98,13 @@
             labels-changed (apply assoc labels row-new-vals)]
         (db/with-labels db labels-changed)))))
 
-;; Gets selection information from Handsontable, transforms it, and saves it to the db.
 (rf/reg-event-fx
  :hot/after-selection-end
  event-interceptors
  (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-layers (.getSelected hot)
-
-         visual-headers (get-in db [:table-panel :visual-headers])
-         visual-rows (get-in db [:table-panel :visual-rows])
-
-         ;; When the user selects two columns in a single selection layer, they can
-         ;; do so in any order. (e.g. A higher indexed column first and then a lower indexed one.)
-         ;; If they did so, we want to reflect this in the order of the column headers returned
-         ;; here unless :ascending true in which case the headers are always returned in
-         ;; ascending order.
-         header-for-selection (fn [[_ col-start _ col-end] & {:keys [ascending]
-                                                              :or {ascending false}}]
-                                (let [headers (subvec visual-headers
-                                                      (min col-start col-end)
-                                                      (inc (max col-start col-end)))]
-                                  (if (or ascending (< col-start col-end))
-                                    headers
-                                    (reverse headers))))
-
-         data-by-layer (for [layer selection-layers]
-                         (let [[r1 c1 r2 c2] layer
-                               rows-in-layer (subvec visual-rows (min r1 r2) (inc (max r1 r2)))
-                               headers (header-for-selection layer :ascending true)]
-                           (map #(select-keys % headers) rows-in-layer)))
-         ;; Merging the row-wise data for each selection layer.
-         selected-data (apply mapv merge data-by-layer)
-
-         ;; Column headers from all the selection layers.
-         selected-headers (mapcat header-for-selection selection-layers)
-
-         ;; This is the row at the start point of the most recent selection.
-         row (nth visual-rows row-index)
-
          color (control-db/selection-color db)]
-     {:db (-> db
-              (assoc-in [:table-panel :selection-layers color :selected-columns] selected-headers)
-              (assoc-in [:table-panel :selection-layers color :selections] selected-data)
-              (assoc-in [:table-panel :selection-layers color :row-at-selection-start] row)
-              (assoc-in [:table-panel :selection-layers color :coords] (js->clj selection-layers)))
+     {:db (assoc-in db [:table-panel :selection-layers color :coords] (js->clj selection-layers))
       :dispatch [:table/check-selection]})))
 
 (rf/reg-event-db
