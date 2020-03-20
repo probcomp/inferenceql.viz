@@ -21,23 +21,23 @@
 ;;; Specs related to scores computed on rows.
 
 (s/def ::score number?)
-(s/def ::scores (s/coll-of ::score))
+(s/def ::scores (s/coll-of ::score :kind vector?))
 
 ;;; Specs related to user-set labels on rows.
 
 (s/def ::label (s/nilable string?))
-(s/def ::labels (s/coll-of ::label))
+(s/def ::labels (s/coll-of ::label :kind vector?))
 
 ;;; Specs related to table data.
 
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
-(s/def ::rows (s/cat :row (s/* ::row)))
-(s/def ::headers (s/cat :header (s/* ::header)))
+(s/def ::rows (s/coll-of ::row :kind vector?))
+(s/def ::headers (s/coll-of ::header :kind vector?))
 (s/def ::visual-rows (s/coll-of ::row :kind vector?))
 (s/def ::visual-headers (s/coll-of ::header :kind vector?))
-(s/def ::dataset-rows (s/cat :row (s/* ::row)))
-(s/def ::dataset-headers (s/cat :header (s/* ::header)))
+(s/def ::dataset-rows (s/coll-of ::row :kind vector?))
+(s/def ::dataset-headers (s/coll-of ::header :kind vector?))
 (s/def ::virtual boolean?)
 
 ;;; Specs related to selections within handsontable instances.
