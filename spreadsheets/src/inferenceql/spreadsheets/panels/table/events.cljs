@@ -159,3 +159,25 @@
        (update-in db [:table-panel :selection-layers] dissoc color)
        ;; Otherwise just save whether a header was clicked or not.
        (assoc-in db [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
+
+(rf/reg-event-db
+ :hot/after-column-move
+ event-interceptors
+ (fn [db [_ hot _id _columns _target]]
+   (let [rows (js->clj (.getData hot))
+         headers (js->clj (.getColHeader hot))
+         row-maps (mapv #(zipmap headers %) rows)]
+     (-> db
+         (assoc-in [:table-panel :visual-rows] row-maps)
+         (assoc-in [:table-panel :visual-headers] headers)))))
+
+(rf/reg-event-db
+ :hot/after-column-sort
+ event-interceptors
+ (fn [db [_ hot _id _current-sort-config _destination-sort-configs]]
+   (let [rows (js->clj (.getData hot))
+         headers (js->clj (.getColHeader hot))
+         row-maps (mapv #(zipmap headers %) rows)]
+     (-> db
+         (assoc-in [:table-panel :visual-rows] row-maps)
+         (assoc-in [:table-panel :visual-headers] headers)))))
