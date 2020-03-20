@@ -14,6 +14,8 @@
                                       ::labels
                                       ::headers
                                       ::rows
+                                      ::visual-headers
+                                      ::visual-rows
                                       ::virtual]))
 
 ;;; Specs related to scores computed on rows.
@@ -32,6 +34,8 @@
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/cat :row (s/* ::row)))
 (s/def ::headers (s/cat :header (s/* ::header)))
+(s/def ::visual-rows (s/coll-of ::row :kind vector?))
+(s/def ::visual-headers (s/coll-of ::header :kind vector?))
 (s/def ::dataset-rows (s/cat :row (s/* ::row)))
 (s/def ::dataset-headers (s/cat :header (s/* ::header)))
 (s/def ::virtual boolean?)
