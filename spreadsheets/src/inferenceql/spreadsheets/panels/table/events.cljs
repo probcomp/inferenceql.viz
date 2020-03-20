@@ -104,6 +104,10 @@
  event-interceptors
  (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-layers (.getSelected hot)
+
+         visual-headers (get-in db [:table-panel :visual-headers])
+         visual-rows (get-in db [:table-panel :visual-rows])
+
          ;; When the user selects two columns in a single selection layer, they can
          ;; do so in any order. (e.g. A higher indexed column first and then a lower indexed one.)
          ;; If they did so, we want to reflect this in the order of the column headers returned
@@ -111,20 +115,18 @@
          ;; ascending order.
          header-for-selection (fn [[_ col-start _ col-end] & {:keys [ascending]
                                                               :or {ascending false}}]
-                                (let [col-indicies (range (min col-start col-end)
-                                                          (inc (max col-start col-end)))
-                                      headers (map #(.getColHeader hot %)
-                                                   col-indicies)]
+                                (let [headers (subvec visual-headers
+                                                      (min col-start col-end)
+                                                      (inc (max col-start col-end)))]
                                   (if (or ascending (< col-start col-end))
                                     headers
                                     (reverse headers))))
 
          data-by-layer (for [layer selection-layers]
-                         (let [headers (header-for-selection layer :ascending true)
-                               [r1 c1 r2 c2] layer]
-                           (->> (.getData hot r1 c1 r2 c2)
-                                (js->clj)
-                                (map (fn [row] (zipmap headers row))))))
+                         (let [[r1 c1 r2 c2] layer
+                               rows-in-layer (subvec visual-rows (min r1 r2) (inc (max r1 r2)))
+                               headers (header-for-selection layer :ascending true)]
+                           (map #(select-keys % headers) rows-in-layer)))
          ;; Merging the row-wise data for each selection layer.
          selected-data (apply mapv merge data-by-layer)
 
@@ -132,8 +134,7 @@
          selected-headers (mapcat header-for-selection selection-layers)
 
          ;; This is the row at the start point of the most recent selection.
-         row (js->clj (zipmap (.getColHeader hot)
-                              (.getDataAtRow hot row-index)))
+         row (nth visual-rows row-index)
 
          color (control-db/selection-color db)]
      {:db (-> db
