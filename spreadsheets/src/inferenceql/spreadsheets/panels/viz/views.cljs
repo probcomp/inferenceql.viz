@@ -36,6 +36,7 @@
                                     (.. vega-instance
                                         -view
                                         (change (name dataset-name) changeset)
+                                        (resize)
                                         (run))))))
         embed (fn [this spec opt generators]
                 (when spec
