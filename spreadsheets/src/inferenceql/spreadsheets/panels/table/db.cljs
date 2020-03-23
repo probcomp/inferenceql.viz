@@ -46,10 +46,6 @@
 (s/def ::row-index ::index)
 (s/def ::column-index ::index)
 
-(s/def ::selections (s/coll-of ::row))
-(s/def ::selected-columns (s/coll-of ::header))
-
-(s/def ::row-at-selection-start ::row)
 (s/def ::header-clicked boolean?)
 (s/def ::coords (s/coll-of ::selection-layer-coords))
 (s/def ::selection-layer-coords (s/coll-of number? :kind vector? :count 4))
@@ -57,10 +53,7 @@
 ;;; Specs related to storing the selection state of both handsontables
 
 (s/def ::selection-color #{:blue :red :green})
-(s/def ::selection-state (s/keys :opt-un [::row-at-selection-start
-                                          ::selections
-                                          ::selected-columns
-                                          ::header-clicked
+(s/def ::selection-state (s/keys :opt-un [::header-clicked
                                           ::coords]))
 (s/def ::selection-layers (s/map-of ::selection-color ::selection-state))
 

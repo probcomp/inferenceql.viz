@@ -1,11 +1,23 @@
 (ns inferenceql.spreadsheets.panels.table.subs
   (:require [clojure.string :as str]
+            [clojure.spec.alpha :as s]
             [re-frame.core :as rf]
             [medley.core :as medley]
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.panels.override.views :as modal]))
+
+;;; Specs for validating the output of the :table/selection-layers sub.
+
+(s/def ::selections (s/coll-of ::db/row))
+(s/def ::selected-columns (s/coll-of ::db/header))
+(s/def ::row-at-selection-start ::db/row)
+(s/def ::selection-state-augments (s/keys :opt-un [::row-at-selection-start
+                                                   ::selections
+                                                   ::selected-columns]))
+(s/def ::selection-state (s/merge ::db/selection-state ::selection-state-augments))
+(s/def ::selection-layers (s/map-of ::db/selection-color ::selection-state))
 
 ;;; Subs related to entries in the user-editable labels column within the real-data table.
 
@@ -154,6 +166,7 @@
             :<- [:table/visual-headers]
             :<- [:table/visual-rows]
             (fn [[selection-layers-raw visual-headers visual-rows]]
+              {:post [(s/valid? ::selection-layers %)]}
               (medley/map-vals #(add-selection-data % visual-headers visual-rows)
                                selection-layers-raw)))
 
