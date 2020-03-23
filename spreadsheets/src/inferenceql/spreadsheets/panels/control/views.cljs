@@ -42,16 +42,18 @@
         label-info (rf/subscribe [:table/rows-label-info])]
     [:div#toolbar
      [:div#search-section
-       [:input#search-input {:type "search"
-                             :on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
-                             :on-key-press (fn [e] (if (= (.-key e) "Enter")
-                                                     (rf/dispatch [:query/parse-query @input-text @label-info])))
-
-                             :placeholder "Enter a query..."
-                             ;; This random attribute value for autoComplete is needed to turn
-                             ;; autoComplete off in Chrome. "off" and "false" do not work.
-                             :autoComplete "my-search-field"
-                             :value @input-text}]
+       [:textarea#search-input {:on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
+                                ;; This submits the query when enter is pressed, but allows the user
+                                ;; to enter a linebreak in the textarea with shift-enter.
+                                :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (not (.-shiftKey e)))
+                                                        (do
+                                                          (.preventDefault e)
+                                                          (rf/dispatch [:query/parse-query @input-text @label-info]))))
+                                :placeholder "Enter a query..."
+                                ;; This random attribute value for autoComplete is needed to turn
+                                ;; autoComplete off in Chrome. "off" and "false" do not work.
+                                :autoComplete "my-search-field"
+                                :value @input-text}]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
           {:on-click #(rf/dispatch [:query/parse-query @input-text @label-info])} "Run InferenceQL"]
