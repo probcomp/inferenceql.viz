@@ -14,7 +14,6 @@
             ;; Table Panel
             [inferenceql.spreadsheets.panels.table.events]
             [inferenceql.spreadsheets.panels.table.subs]
-            [inferenceql.spreadsheets.panels.table.effects]
             ;; Override Panel
             [inferenceql.spreadsheets.panels.override.events]
             [inferenceql.spreadsheets.panels.override.subs]

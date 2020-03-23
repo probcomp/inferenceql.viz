@@ -190,23 +190,21 @@
 ;;; Subs related to settings and overall state of tables.
 
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn context-menu selections-coords selection-color]} _]
+  [{:keys [headers rows cells-style-fn context-menu selections-coords]} _]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
       (assoc-in [:settings :columns] (column-settings headers))
       (assoc-in [:settings :cells] cells-style-fn)
       (assoc-in [:settings :contextMenu] context-menu)
-      (assoc-in [:selections-coords] selections-coords)
-      (assoc-in [:selection-color] selection-color)))
+      (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
                :rows    (rf/subscribe [:table/computed-rows])
                :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
-               :selections-coords (rf/subscribe [:table/selections-coords])
-               :selection-color (rf/subscribe [:control/selection-color])})
+               :selections-coords (rf/subscribe [:table/selections-coords])})
             real-hot-props)
 
 (rf/reg-sub
