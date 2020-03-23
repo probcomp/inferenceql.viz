@@ -4,7 +4,7 @@
 (def default-db
   {:control-panel {:confidence-threshold 0.9
                    :reagent-forms {:confidence-mode :none}
-                   :query-string ""
+                   :query-string "SELECT *"
                    :selection-color :blue}})
 
 

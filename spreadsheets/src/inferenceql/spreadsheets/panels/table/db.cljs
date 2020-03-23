@@ -3,15 +3,18 @@
             [inferenceql.spreadsheets.data :refer [nyt-data]]))
 
 (def default-db
-  {:table-panel {:headers (into [] (keys (first nyt-data)))
-                 :rows nyt-data
+  {:table-panel {:dataset-headers (into [] (keys (first nyt-data)))
+                 :dataset-rows nyt-data
                  :selection-layers {}}})
 
-(s/def ::table-panel (s/keys :req-un [::headers
-                                      ::rows
+(s/def ::table-panel (s/keys :req-un [::dataset-headers
+                                      ::dataset-rows
                                       ::selection-layers]
                              :opt-un [::scores
-                                      ::labels]))
+                                      ::labels
+                                      ::headers
+                                      ::rows
+                                      ::virtual]))
 
 ;;; Specs related to scores computed on rows.
 
@@ -29,6 +32,9 @@
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/cat :row (s/* ::row)))
 (s/def ::headers (s/cat :header (s/* ::header)))
+(s/def ::dataset-rows (s/cat :row (s/* ::row)))
+(s/def ::dataset-headers (s/cat :header (s/* ::header)))
+(s/def ::virtual boolean?)
 
 ;;; Specs related to selections within handsontable instances.
 
@@ -58,11 +64,19 @@
 
 (defn table-headers
   [db]
-  (get-in db [:table-panel :headers]))
+  (get-in db [:table-panel :headers] []))
 
 (defn table-rows
   [db]
-  (get-in db [:table-panel :rows]))
+  (get-in db [:table-panel :rows] []))
+
+(defn dataset-headers
+  [db]
+  (get-in db [:table-panel :dataset-headers]))
+
+(defn dataset-rows
+  [db]
+  (get-in db [:table-panel :dataset-rows]))
 
 (defn with-labels
   [db labels]

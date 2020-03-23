@@ -3,15 +3,32 @@
             [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.panels.control.db :as control-db]))
+            [inferenceql.spreadsheets.panels.control.db :as control-db]
+            [inferenceql.spreadsheets.util :as util]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
 (rf/reg-event-db
- :table/search-result
+ :table/set
  event-interceptors
- (fn [db [_ result]]
-   (db/with-scores db result)))
+ ;; `rows` and `headers` are required arguments essentially, and
+ ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
+ ;; to be passed in a map.
+ (fn [db [_ rows headers {:keys [scores labels virtual]}]]
+   (-> db
+       (assoc-in [:table-panel :rows] rows)
+       (assoc-in [:table-panel :headers] headers)
+       (util/assoc-or-dissoc-in [:table-panel :scores] scores)
+       (util/assoc-or-dissoc-in [:table-panel :labels] labels)
+       (util/assoc-or-dissoc-in [:table-panel :virtual] virtual))))
+
+(rf/reg-event-db
+ :table/clear
+ event-interceptors
+ (fn [db [_]]
+   (-> db
+       (update-in [:table-panel] dissoc :rows :headers :labels :scores)
+       (assoc-in [:table-panel :selection-layers] {}))))
 
 ;;; Events that correspond to hooks in the Handsontable API
 
