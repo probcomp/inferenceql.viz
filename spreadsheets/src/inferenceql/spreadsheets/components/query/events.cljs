@@ -65,7 +65,7 @@
    (let [rows (table-db/dataset-rows db)
          headers (table-db/dataset-headers db)
          search-row (merge example-row {search-column true})
-         result (search/search model/spec search-column [search-row] rows n-models beta-params)]
+         result (search/search model/spec search-column [search-row] rows n-models beta-params {})]
      {:dispatch [:table/set rows headers {:scores result}]})))
 
 (rf/reg-event-fx
@@ -125,7 +125,7 @@
 
          example-rows (create-search-examples pos-rows neg-rows)
 
-         scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params)
+         scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params {})
          scores-ids-map (zipmap unlabeled-ids scores)
 
          scores-ids-map-lab (create-scores-map-for-labeled-rows pos-ids neg-ids)

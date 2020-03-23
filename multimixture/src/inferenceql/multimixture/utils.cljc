@@ -3,7 +3,8 @@
 (defn prun [n f]
   "Runs `n` parallel calls to function `f`, that is assumed to have
   no arguments."
-  (apply pcalls (repeat n f)))
+  #?(:clj (apply pcalls (repeat n f))
+     :cljs (repeatedly n f)))
 
 (defn transpose
   "Applies the standard tranpose operation to a collection. Assumes that
