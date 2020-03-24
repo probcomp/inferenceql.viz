@@ -53,6 +53,11 @@
                                 ;; This random attribute value for autoComplete is needed to turn
                                 ;; autoComplete off in Chrome. "off" and "false" do not work.
                                 :autoComplete "my-search-field"
+                                ;; Disables text correction on iOS Safari.
+                                :autocorrect "off"
+                                :autocapitalize "none"
+                                ;; HTML5 attr, browser support limited.
+                                :spellcheck "false"
                                 :value @input-text}]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
