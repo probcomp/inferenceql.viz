@@ -17,7 +17,13 @@ figwheel-public-dir := $(current-dir)/figwheel-target/public
 figwheel-resource-dir := $(figwheel-public-dir)/resources
 figwheel-index-file := $(figwheel-public-dir)/index.html
 
-all: js
+# Ulli's hack to demo.
+all: bdb js
+syn: syn-data js
+
+.PHONY: bdb
+bdb:
+	cd .. && ./bin/build-model-spec && cd spreadsheets/
 
 js: $(output-to)
 
@@ -100,3 +106,8 @@ figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 .PHONY: figwheel-10x
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel:10x
+
+# Ulli's hack to demo.
+.PHONY: syn-data
+syn-data:
+	cd .. && ./bin/syn-data
