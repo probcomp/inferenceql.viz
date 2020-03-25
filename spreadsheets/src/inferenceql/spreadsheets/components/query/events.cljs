@@ -25,9 +25,10 @@
    (let [rows (table-db/dataset-rows db)
          rows (for [row rows]
                 (medley/map-keys #(keyword %) row))
+         models {:model (search/optimized-row-generator model/spec)}
          command (str/trim text)
 
-         result (query/q command rows {:model (search/optimized-row-generator model/spec)})
+         result (query/q command rows models)
          columns (map name (:iql/columns (meta result)))
          result-str (for [r result]
                       (medley/map-keys #(name %) r))]
