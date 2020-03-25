@@ -1,47 +1,47 @@
 {:vars
- {"arabinose" :categorical,
-  "iptg" :categorical,
-  "part_laci" :gaussian,
-  "ycbj" :gaussian,
-  "timepoint" :categorical,
-  "part_psra" :gaussian,
-  "bdca" :gaussian,
-  "part_yfp" :gaussian,
-  "part_phlf" :gaussian,
-  "rsmh" :gaussian,
-  "part_amerv2" :gaussian,
-  "part_arac" :gaussian,
-  "part_kanr" :gaussian,
-  "ydis" :gaussian,
-  "part_bm3r1" :gaussian,
-  "rluc" :gaussian},
+ {:arabinose :categorical,
+  :iptg :categorical,
+  :part_laci :gaussian,
+  :ycbj :gaussian,
+  :timepoint :categorical,
+  :part_psra :gaussian,
+  :bdca :gaussian,
+  :part_yfp :gaussian,
+  :part_phlf :gaussian,
+  :rsmh :gaussian,
+  :part_amerv2 :gaussian,
+  :part_arac :gaussian,
+  :part_kanr :gaussian,
+  :ydis :gaussian,
+  :part_bm3r1 :gaussian,
+  :rluc :gaussian},
  :views
  [[{:probability 1.0,
     :parameters
-    {"part_kanr" {:mu -0.5981903949897059, :sigma 46.575944208935915}}}]
+    {:part_kanr {:mu -0.5981903949897059, :sigma 46.575944208935915}}}]
   [{:probability 1.0,
     :parameters
-    {"part_yfp" {:mu 2601.6350188205192, :sigma 89.29881267443349}}}]
+    {:part_yfp {:mu 2601.6350188205192, :sigma 89.29881267443349}}}]
   [{:probability 1.0,
     :parameters
-    {"iptg" {"7.98e-05" 0.48464163822525597, "0.0" 0.515358361774744},
-     "part_bm3r1" {:mu 1.280958900893733, :sigma 15.431557221622434}}}]
+    {:iptg {"7.98e-05" 0.48464163822525597, "0.0" 0.515358361774744},
+     :part_bm3r1 {:mu 1.280958900893733, :sigma 15.431557221622434}}}]
   [{:probability 1.0,
     :parameters
-    {"part_phlf" {:mu 1.036229290047747, :sigma 7.431682769011434}}}]
+    {:part_phlf {:mu 1.036229290047747, :sigma 7.431682769011434}}}]
   [{:probability 1.0,
     :parameters
-    {"arabinose"
+    {:arabinose
      {"0.012500225" 0.9615384615384616, "0.0" 0.038461538461538464},
-     "part_laci" {:mu 1.4468867648399646, :sigma 0.7929018412044064},
-     "ycbj" {:mu 1.6224592436710887, :sigma 0.7691248218112011},
-     "timepoint"
+     :part_laci {:mu 1.4468867648399646, :sigma 0.7929018412044064},
+     :ycbj {:mu 1.6224592436710887, :sigma 0.7691248218112011},
+     :timepoint
      {"18.0" 0.9615384615384616, "5.0" 0.038461538461538464},
-     "part_psra" {:mu 3.086706809754382, :sigma 15.902956442913549},
-     "bdca" {:mu 0.3150553705535216, :sigma 0.15312265911215484},
-     "rsmh" {:mu 3.4719885163181488, :sigma 0.6011654168812703},
-     "part_arac" {:mu 7.962438456767191, :sigma 6.621981750821572},
-     "rluc" {:mu 0.4293267071956498, :sigma 0.14111728333600726}}}]
+     :part_psra {:mu 3.086706809754382, :sigma 15.902956442913549},
+     :bdca {:mu 0.3150553705535216, :sigma 0.15312265911215484},
+     :rsmh {:mu 3.4719885163181488, :sigma 0.6011654168812703},
+     :part_arac {:mu 7.962438456767191, :sigma 6.621981750821572},
+     :rluc {:mu 0.4293267071956498, :sigma 0.14111728333600726}}}]
   [{:probability 1.0,
     :parameters
-    {"ydis" {:mu 0.16310667451158675, :sigma 0.042404609104002865}}}]]}
+    {:ydis {:mu 0.16310667451158675, :sigma 0.042404609104002865}}}]]}
