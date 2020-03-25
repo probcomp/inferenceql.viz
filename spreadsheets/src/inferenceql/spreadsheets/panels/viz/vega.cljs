@@ -60,14 +60,24 @@
                           c))
        s))
 
+(defn probability-column? [column]
+  "Returns whether a `column` was the result of probability-of statement.
+  `column` is the name of the column."
+  (some? (re-matches #"^prob\d+$" (name column))))
+
 (defn stattype
   [column]
-  (let [stattype-kw (if (contains? #{hot/score-col-header hot/label-col-header map-names-col}
-                                   ;; TODO: Find a better way to disable plots for
-                                   ;; hot/label-col-header and map-names-col.
-                                   column)
-                        :gaussian
-                        (get-in model/spec [:vars column]))]
+  (let [stattype-kw (cond (contains? #{hot/score-col-header hot/label-col-header map-names-col}
+                                     ;; TODO: Find a better way to disable plots for
+                                     ;; hot/label-col-header and map-names-col.
+                                     column)
+                          :gaussian
+
+                          (probability-column? column)
+                          :gaussian
+
+                          :else
+                          (get-in model/spec [:vars column]))]
     (case stattype-kw
       :gaussian dist/gaussian
       :categorical dist/categorical)))
