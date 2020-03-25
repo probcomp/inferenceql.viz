@@ -17,7 +17,7 @@
                                    :iptg :7.98e-05
                                    :timepoint :5.0}
 
-                   :query-string "SELECT *"
+                   :query-string "SELECT * FROM data;"
                    :selection-color :blue}})
 
 

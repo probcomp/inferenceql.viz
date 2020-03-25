@@ -6,14 +6,14 @@
             [clojure.string :as string]))
 
 (defn make-query-string [conditions parts old-query]
-  (let [limit-cond (or (re-find #"LIMIT\s\d+" old-query)
-                       "LIMIT 1")
+  (let [limit-cond (or (re-find #"LIMIT\s\d+;?" old-query)
+                       "LIMIT 1;")
         conditions (select-keys conditions [:arabinose :iptg :timepoint])
         experiment-conds (for [[c v] conditions] (str (name c) "=\"" (name v) "\""))
         part-conds (for [[p v] parts] (str (name p) "=" v))
-        all-conditions (string/join " AND " (concat experiment-conds part-conds))]
-    (str "SELECT ycbj, bdca, ydis, rluc, rsmh FROM \n"
-         "(GENERATE * GIVEN " all-conditions " USING model) "
+        all-conditions (string/join ", " (concat experiment-conds part-conds))]
+    (str "SELECT * FROM \n"
+         "(GENERATE ycbj, bdca, ydis, rluc, rsmh GIVEN " all-conditions " UNDER model)\n"
          limit-cond)))
 
 (rf/reg-event-fx
