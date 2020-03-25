@@ -30,11 +30,12 @@
 
          result (query/q command rows models)
          columns (map name (:iql/columns (meta result)))
+         virtual (:virtual-data (meta result))
+
          result-str (for [r result]
                       (medley/map-keys #(name %) r))]
-
     (if-not (insta/failure? result)
-      {:dispatch [:table/set result-str columns]}
+      {:dispatch [:table/set result-str columns {:virtual virtual}]}
       (let [logged-msg (str "Invalid query syntax: " result)
             alerted-msg "Invalid query syntax."]
         ;; TODO: These could be their own effects!

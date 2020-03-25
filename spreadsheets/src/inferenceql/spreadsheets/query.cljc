@@ -207,7 +207,8 @@
                 true (sort-by :db/id)
                 true (map #(dissoc % :db/id :iql/type))
                 limit (take limit))
-         metadata {:iql/columns (or names (into [] (comp (mapcat keys) (distinct)) rows))}]
+         metadata {:iql/columns (or names (into [] (comp (mapcat keys) (distinct)) rows))
+                   :virtual-data (= :generate (first (source ast)))}]
      (with-meta rows metadata))))
 
 (defn q
