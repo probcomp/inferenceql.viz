@@ -155,8 +155,7 @@
             (fn [_ _]
               (rf/subscribe [:table/table-headers]))
             (fn [headers]
-              (when (seq headers)
-                (into [hot/label-col-header hot/score-col-header] headers))))
+              headers))
 
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
