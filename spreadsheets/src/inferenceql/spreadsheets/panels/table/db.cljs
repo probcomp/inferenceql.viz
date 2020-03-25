@@ -61,7 +61,7 @@
 
 (defn table-headers
   [db]
-  (get-in db [:table-panel :headers] []))
+  (get-in db [:table-panel :headers]))
 
 (defn table-rows
   [db]
