@@ -13,7 +13,7 @@
         part-conds (for [[p v] parts] (str (name p) "=" v))
         all-conditions (string/join ", " (concat experiment-conds part-conds))]
     (str "SELECT * FROM \n"
-         "(GENERATE ycbj, bdca, ydis, rluc, rsmh GIVEN " all-conditions " UNDER model)\n"
+         "(GENERATE wcaf, htpx, yciw, roxa, rrrq GIVEN " all-conditions " UNDER model)\n"
          limit-cond)))
 
 (rf/reg-event-fx
