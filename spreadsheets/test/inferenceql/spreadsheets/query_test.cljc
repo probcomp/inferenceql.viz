@@ -1,5 +1,6 @@
 (ns inferenceql.spreadsheets.query-test
-  (:require [clojure.test :as test :refer [are deftest is]]
+  (:require [clojure.string :as string]
+            [clojure.test :as test :refer [are deftest is]]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
@@ -26,22 +27,29 @@
     (gen/bind (gen/map gen-column (gen/elements value-generators))
               (comp gen/vector gen-row))))
 
-;;; Tests
+;;; Literals
+
+(defn parse-and-transform-literals
+  [& args]
+  (->> (apply query/parse args)
+       (insta/transform query/literal-transformations)))
 
 (defspec nat-parsing
   (prop/for-all [n gen/nat]
     (let [s (pr-str n)]
-      (is (= n (query/parse-and-transform s :start :nat))))))
+      (is (= n (parse-and-transform-literals s :start :nat))))))
 
 (defspec int-parsing
   (prop/for-all [n gen/int]
     (let [s (pr-str n)]
-      (is (= n (query/parse-and-transform s :start :int))))))
+      (is (= n (parse-and-transform-literals s :start :int))))))
 
 (defspec float-parsing
   (prop/for-all [n (gen/double* {:infinite? false :NaN? false})]
     (let [s (pr-str n)]
-      (is (== n (query/parse-and-transform s :start :float))))))
+      (is (== n (parse-and-transform-literals s :start :float))))))
+
+;; Parsing success/failure
 
 (deftest parsing-success
   (are [start query] (nil? (insta/get-failure (query/parse query :start start)))
@@ -51,7 +59,49 @@
   (are [start query] (some? (insta/get-failure (query/parse query :start start)))
     :query "123abc"))
 
+;; Features
+
 (defspec select-star
   (prop/for-all [table gen-table]
     (let [results (query/q "SELECT * FROM data" table)]
       (is (= results table)))))
+
+(def gen-table-limit
+  (gen/bind gen-table
+            #(gen/tuple (gen/return %)
+                        (gen/choose 0 (count %)))))
+
+(defspec select-limit
+  (prop/for-all [[table n] gen-table-limit]
+    (let [results (query/q (str "SELECT * FROM data LIMIT " n) table)]
+      (is (= results (take n table))))))
+
+(def gen-table-col-subset
+  (gen/bind (gen/such-that #(seq (mapcat keys %))
+                           gen-table)
+            #(gen/tuple (gen/return %)
+                        (gen/not-empty
+                         (chuck.gen/subset (mapcat keys %))))))
+
+(defspec select-col
+  (prop/for-all [[table ks] gen-table-col-subset]
+    (let [cols (->> ks (map name) (string/join ", "))
+          results (query/q (str "SELECT " cols " FROM data") table)]
+      (is (= results (map #(select-keys % ks)
+                          table))))))
+
+(def gen-table-col
+  (gen/bind (gen/such-that #(seq (mapcat keys %))
+                           gen-table)
+            #(gen/tuple (gen/return %)
+                        (gen/elements (mapcat keys %)))))
+
+(defspec conditions-not-null
+  (prop/for-all [[table k] gen-table-col]
+    (let [results (query/q (str "SELECT * FROM data WHERE " (name k) " IS NOT NULL") table)]
+      (is (= results (remove (comp nil? k) table))))))
+
+(defspec conditions-null
+  (prop/for-all [[table k] gen-table-col]
+    (let [results (query/q (str "SELECT * FROM data WHERE " (name k) " IS NULL") table)]
+      (is (= results (filter (comp nil? k) table))))))

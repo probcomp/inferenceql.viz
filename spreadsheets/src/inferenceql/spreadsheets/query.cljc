@@ -7,7 +7,55 @@
   (:require [clojure.edn :as edn]
             [datascript.core :as d]
             [instaparse.core :as insta]
+            [metaprob.generative-functions :refer [gen]]
+            [metaprob.prelude :as mp]
+            [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.basic-queries :as queries]))
+
+(def entity-var '?entity)
+
+(defn constrain
+  [gfn target constraints]
+  (gen [& args]
+    (let [trace (mmix/with-row-values {} constraints)]
+      (-> (mp/infer-and-score :procedure gfn
+                              :inputs args
+                              :observation-trace trace)
+          (first)
+          (select-keys target)))))
+
+;;; Hiccup tree manipulation
+
+(defn node-type
+  [node]
+  (first node))
+
+(defn children
+  [node]
+  (rest node))
+
+(defn only-child
+  [node]
+  (assert (= (count node) 2))
+  (second node))
+
+(defn find-children
+  [node k]
+  (filter #(and (vector? %) ; so it works when called directly on a node vs via transform
+                (= k (node-type %)))
+          node))
+
+(defn find-child
+  "Returns a node of type `k` from a Hiccup-style instaparse parse tree."
+  [node k]
+  (first (find-children node k)))
+
+(defn selector
+  "Returns the selector node from a query parse tree."
+  [ast]
+  (some-> ast
+          (find-child :selections)
+          (children)))
 
 ;;; Parsing and transformation
 
@@ -23,83 +71,138 @@
   ([prefix-string]
    (symbol (str "?" (gensym prefix-string)))))
 
-(defn transform-selections
-  [& selections]
-  (if (= '(*) selections)
-    {:find '[[(pull ?e [*]) ...]]
-     :where []}
-    {:name (map :name selections)
-     :find (into '[?e] (map :find-sym) selections)
-     :where (mapcat :where-clauses selections)}))
-
-(defn transform-probability-of
-  [target constraints model-name]
-  (let [prob-gensym (gensym "prob")
-        prob-name (keyword prob-gensym)
-        prob-sym (symbol (str "?" prob-gensym))
-        target-sym (genvar "target")
-        target-clause (if (map? target)
-                        `[(~'ground ~target) ~target-sym]
-                        `[(datascript.core/pull ~'$ [~target] ~'?e) ~target-sym])
-        constraints-sym (genvar "constraints")
-        conditions-clauses (let [row-sym (genvar "row")
-                                 row-clause (if-let [columns (or (some #{'*} constraints)
-                                                                 (seq (filter keyword? constraints)))]
-                                              `[(datascript.core/pull ~'$ ~(vec columns) ~'?e) ~row-sym]
-                                              `[(~'ground {}) ~row-sym])
-                                 event-sym (genvar "events")
-                                 events (reduce merge {} (filter map? constraints))
-                                 event-clause `[(~'ground ~events) ~event-sym]]
-                             [row-clause event-clause `[(merge ~row-sym ~event-sym) ~constraints-sym]])]
-    {:name prob-name
-     :find-sym prob-sym
-     :where-clauses (let [model-sym (genvar "model")]
-                      `[[(clojure.core/get ~'?models ~model-name) ~model-sym]
-                        ~target-clause
-                        ~@conditions-clauses
-                        [(~*logpdf-symbol* ~model-sym ~target-sym ~constraints-sym) ~prob-sym]])}))
-
-(defn transform-column-selection
-  [column]
-  (let [col-sym (symbol (str "?" (name column)))]
-    {:name column
-     :find-sym col-sym
-     :where-clauses `[[~'?e ~column ~col-sym]]}))
-
 (def transform-map
   "A map of transformations to be performed on nodes in the query parse tree. Used
   with `instaparse.core/transform` by `query-plan`. Nodes are transformed by
   `transform` in a depth-first manner."
-  {:star        (constantly '*)
-   :column-name keyword
-   :model-name  keyword
+  {:column-name keyword
    :predicate   symbol
 
-   :presence-condition  (fn [c]     ['?e c '_])
-   :absence-condition   (fn [c]     [(list 'missing? '$ '?e c)])
-   :and-condition       (fn [c1 c2] (list 'and c1 c2))
-   :or-condition        (fn [c1 c2] (list 'or c1 c2))
-   :equality-condition  (fn [c v]   ['?e c v])
-   :predicate-condition (fn [c p v]
-                          (let [sym (genvar)]
-                            [['?e c sym]
-                             [(list p sym v)]]))
+   :generated vector})
 
-   :selections transform-selections
-   :column-selection transform-column-selection
-   :probability-of transform-probability-of
+;; Literals
 
-   :generated vector
-   :constraints vector
-
-   :bindings merge
-   :binding hash-map
-
+(def literal-transformations
+  {:string edn/read-string
    :symbol edn/read-string
    :nat    edn/read-string
    :float  edn/read-string
-   :int    edn/read-string
-   :string edn/read-string})
+   :int    edn/read-string})
+
+(def global-transformations
+  (merge literal-transformations
+         {:column-name keyword
+          :model-name  keyword}))
+
+(defn transform
+  "Navigates a parse tree transforming literal nodes "
+  [ast]
+  (insta/transform global-transformations ast))
+
+;; Selections
+
+(defn transform-column-selection
+  "Returns the `:find` and `:where` clauses for a `:column-selection` parse tree
+  node as a map."
+  [column]
+  (let [col-sym (symbol (str "?" (name column)))]
+    {:name [column]
+     :find [col-sym]
+     :where `[[(~'get-else ~'$ ~entity-var ~column :iql/no-value) ~col-sym]]}))
+
+(defn transform-probability-of
+  [target & more]
+  (let [target (only-child target)
+
+        model-name (or (some-> (find-child more :model)
+                               (only-child))
+                       :model)
+
+        prob-gensym (gensym "prob")
+        prob-name (keyword prob-gensym)
+        prob-sym (symbol (str "?" prob-gensym))
+
+        target-sym (genvar "target")
+        target-clause (if (map? target)
+                        `[(~'ground ~target) ~target-sym]
+                        `[(datascript.core/pull ~'$ [~target] ~entity-var) ~target-sym])
+
+        constraints-sym (genvar "constraints")
+        conditions-clauses (let [constraints (some-> (find-child more :constraints)
+                                                     (children))
+                                 row-sym (genvar "row")
+                                 column-events (mapv only-child (find-children constraints :column-event))
+                                 row-clause (cond (find-child constraints :star)
+                                                  `[(datascript.core/pull ~'$ ~'[*] ~entity-var) ~row-sym]
+
+                                                  column-events
+                                                  `[(datascript.core/pull ~'$ ~column-events ~entity-var) ~row-sym]
+
+                                                  :else
+                                                  `[(~'ground {}) ~row-sym])
+                                 event-sym (genvar "events")
+                                 events (reduce merge {} (filter map? constraints))
+                                 event-clause `[(~'ground ~events) ~event-sym]]
+                             [row-clause event-clause `[(merge ~row-sym ~event-sym) ~constraints-sym]])]
+    {:name [prob-name]
+     :find [prob-sym]
+     :where (let [model-sym (genvar "model")]
+              `[[(clojure.core/get ~'?models ~model-name) ~model-sym]
+                ~target-clause
+                ~@conditions-clauses
+                [(~*logpdf-symbol* ~model-sym ~target-sym ~constraints-sym) ~prob-sym]])}))
+
+#_(-> (parse "probability of x under model" :start :probability-of)
+      (children)
+      (find-child :model))
+
+#_(parse "probability of x under model" :start :probability-of)
+#_(->> (parse "probability of x under model" :start :probability-of)
+       (apply insta/transform probability-of-transformations))
+
+#_(query-plan (parse "select (probability of x under model) from data"))
+
+(def selection-transformations
+  (merge global-transformations
+         {:column-selection transform-column-selection
+          :probability-of transform-probability-of}))
+
+(defn selection-clauses
+  [ast]
+  (if (find-child ast :star)
+    {:find `[[(~'pull ~entity-var [~'*]) ~'...]]}
+    (->> (children ast)
+         (map #(insta/transform selection-transformations %))
+         (apply merge-with into {:find [entity-var] :where [[entity-var :iql/type :iql.type/row]]}))))
+
+#_(-> "select x, (probability of x under model) from data"
+      (parse)
+      (find-child :selections)
+      (selection-clauses))
+
+;; Conditions
+
+(def condition-transformations
+  (merge global-transformations
+         {:presence-condition (fn [c] [entity-var c '_])
+          :absence-condition  (fn [c] `[(~'missing? ~'$ ~entity-var ~c)])
+
+          :and-condition #(list 'and %1 %2)
+          :or-condition  #(list 'or  %1 %2)
+
+          :equality-condition  (fn [c v] [entity-var c v])
+          :predicate-condition (fn [c p v]
+                                 (let [sym (genvar)]
+                                   [[entity-var c sym]
+                                    [(list p sym v)]]))}))
+
+(defn condition-clauses
+  "Given a conditions node, returns a sequence of Datalog clauses."
+  [ast]
+  (map #(insta/transform condition-transformations %)
+       (children ast)))
+
+;; Parsing
 
 (def parse
   "An instaparse parser for IQL SQL queries. The grammar is inlined at macro
@@ -108,52 +211,6 @@
   (insta/parser (sio/inline-resource "query.bnf")
                 :string-ci true))
 
-(defn parse-and-transform
-  "Parses and transforms a string containing an InferenceQL query and produces a
-  map representing the query to be performed."
-  [& args]
-  (let [ast (apply parse args)]
-    (insta/transform transform-map ast)))
-
-;;; Hiccup tree manipulation
-
-(defn find-child
-  "Returns a node of type `k` from a Hiccup-style instaparse parse tree."
-  [node k]
-  (->> (rest node)
-       (filter vector?)
-       (filter #(= k (first %)))
-       (first)))
-
-(defn source
-  "Returns the source node from a query parse tree."
-  [ast]
-  (some-> ast
-          (find-child :source)
-          (second)))
-
-(defn selector
-  "Returns the selector node from a query parse tree."
-  [ast]
-  (some-> ast
-          (find-child :selections)
-          (rest)))
-
-(defn conditions
-  "Returns the conditions node from a query parse tree."
-  [ast]
-  (some-> ast
-          (find-child :conditions)
-          (rest)))
-
-(defn limit
-  "Returns the limit value from a query parse tree."
-  [ast]
-  (some-> ast
-          (find-child :limit)
-          (rest)
-          (first)))
-
 ;;; Query execution
 
 (defn query-plan
@@ -161,12 +218,11 @@
   Subqueries will not be considered and are handled in a different step by the
   interpreter. See `q` for details."
   [ast]
-  (let [{find-syms :find find-wheres :where} (second ast)]
-    {:find find-syms
+  (let [{sel-find :find sel-where :where} (selection-clauses (find-child ast :selections))
+        cond-where                        (condition-clauses (find-child ast :conditions))]
+    {:find sel-find
      :in '[$ ?models]
-     :where `[[~'?e :iql/type :iql.type/row]
-              ~@find-wheres
-              ~@(conditions ast)]}))
+     :where `[~@sel-where ~@cond-where]}))
 
 (defn iql-db
   "Converts a vector of maps into Datalog database that can be queried with `q`."
@@ -194,17 +250,25 @@
   ([ast rows]
    (execute ast rows {}))
   ([ast rows models]
-   (let [limit (limit ast)
-         {names :name} (second ast)
-         db (iql-db (if-let [source (source ast)]
-                      (case (first source)
+   (let [ast (insta/transform global-transformations ast)
+         limit (some-> ast (find-child :limit) (only-child))
+         names (-> ast (find-child :selections) (selection-clauses) (:name))
+         db (iql-db (if-let [source (some-> ast
+                                            (find-child :source)
+                                            (children)
+                                            (first))]
+                      (case (node-type source)
                         :query (execute source rows)
                         :generate (generate source models limit))
                       rows))
          query (query-plan ast)
          rows (cond->> (d/q query db models)
-                names (map #(zipmap names (rest %)))
+                names (map #(zipmap (into [:db/id] names)
+                                    %))
                 true (sort-by :db/id)
+                true (map #(->> %
+                                (remove (comp #{:iql/no-value} val))
+                                (into {})))
                 true (map #(dissoc % :db/id :iql/type))
                 limit (take limit))
          metadata {:iql/columns (or names (into [] (comp (mapcat keys) (distinct)) rows))}]
@@ -217,7 +281,30 @@
   ([query rows]
    (q query rows {}))
   ([query rows models]
-   (let [parse-tree (parse-and-transform query)]
+   (let [parse-tree (parse query)]
      (if-not (insta/failure? parse-tree)
        (execute parse-tree rows models)
        parse-tree))))
+
+(comment
+  (-> (parse "select x from data limit 2")
+      (find-child :limit)
+      (only-child))
+
+  (q "select x from data limit 0"
+     [{:x 1}])
+
+  (-> (parse "SELECT x, (PROBABILITY OF x=4 UNDER (GENERATE x, y GIVEN z=3 UNDER model)) FROM data")
+      (transform)
+      (query-plan))
+
+  (->> (parse "probability of elephant given rain under model" :start :probability-of)
+       (transform)
+       (children)
+       (apply transform-probability-of))
+
+  (-> (parse "select (probability of elephant given rain under model), elephant, rain from data")
+      (transform)
+      (query-plan))
+
+  )
