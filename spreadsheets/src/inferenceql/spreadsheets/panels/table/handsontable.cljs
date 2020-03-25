@@ -41,7 +41,7 @@
               :readOnly            true
               :height              "50vh"
               :width               "100vw"
-              :stretchH            "all"
+              :stretchH            "none"
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
 
