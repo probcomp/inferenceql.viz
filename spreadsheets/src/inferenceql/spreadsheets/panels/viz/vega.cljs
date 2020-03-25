@@ -56,7 +56,7 @@
   [column]
   (let [stattype-kw (if (contains? #{hot/score-col-header hot/label-col-header} column)
                       :gaussian
-                      (get-in model/spec [:vars column]))]
+                      (get-in model/spec [:vars (keyword column)]))]
     (case stattype-kw
       :gaussian dist/gaussian
       :categorical dist/categorical)))
