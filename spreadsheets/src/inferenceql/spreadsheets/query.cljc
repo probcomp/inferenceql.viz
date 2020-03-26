@@ -104,8 +104,11 @@
 (defn transform-probability-of
   [target & more]
   (let [target (only-child target)
-        model-name (or (some-> (find-child more :model)
-                               (only-child))
+        model-name (or (some-> more
+                               (find-child :model)
+                               (find-child :model-lookup)
+                               (only-child)
+                               )
                        :model)
 
         prob-gensym (gensym "prob")
@@ -125,7 +128,7 @@
                                  row-clause (cond (find-child constraints :star)
                                                   `[(datascript.core/pull ~'$ ~'[*] ~entity-var) ~row-sym]
 
-                                                  column-events
+                                                  (seq column-events)
                                                   `[(datascript.core/pull ~'$ ~column-events ~entity-var) ~row-sym]
 
                                                   :else
