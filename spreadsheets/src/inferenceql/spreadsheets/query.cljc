@@ -71,12 +71,6 @@
   ([prefix-string]
    (symbol (str "?" (gensym prefix-string)))))
 
-(def transform-map
-  "A map of transformations to be performed on nodes in the query parse tree. Used
-  with `instaparse.core/transform` by `query-plan`. Nodes are transformed by
-  `transform` in a depth-first manner."
-  {:generated vector})
-
 ;; Literals
 
 (def literal-transformations
@@ -189,23 +183,23 @@
 ;;; Generate
 
 (def generate-transformations
-  {})
+  {:binding hash-map})
 
 (defn generate
   [ast models limit]
   (if-not limit
     (throw (ex-info "Cannot GENERATE without LIMIT" {}))
-    (let [target (-> ast
+    (let [ast (insta/transform generate-transformations ast)
+          target (-> ast
                      (find-child :generated)
                      (children))
           model-name (-> ast
                          (find-child :model)
                          (only-child))
-          constraints (if (= 4 (count ast)) ; constraints are optional
-                        (nth ast 2)
-                        {})]
-      (prn "model-name" model-name)
-      (prn "target" target)
+          constraints (as-> ast $
+                        (find-child $ :bindings)
+                        (children $)
+                        (apply merge $))]
       (if-let [model (get models model-name)]
         (for [row (queries/simulate model constraints limit)]
           (select-keys row target))
