@@ -102,48 +102,78 @@
      :where `[[(~'get-else ~'$ ~entity-var ~column :iql/no-value) ~col-sym]]}))
 
 (defn transform-probability-of
-  [target & more]
-  (let [target (only-child target)
-        model-name (or (some-> more
+  [& more]
+  (let [model-name (or (some-> more
                                (find-child :model)
                                (find-child :model-lookup)
-                               (only-child)
-                               )
+                               (only-child))
                        :model)
+        model-sym (genvar "model")
+        model-clauses `[(clojure.core/get ~'?models ~model-name) ~model-sym]
 
         prob-gensym (gensym "prob")
         prob-name (keyword prob-gensym)
         prob-sym (symbol (str "?" prob-gensym))
 
-        target-sym (genvar "target")
-        target-clause (if (map? target)
-                        `[(~'ground ~target) ~target-sym]
-                        `[(datascript.core/pull ~'$ [~target] ~entity-var) ~target-sym])
+        target-sym (genvar "target-")
+        target-clauses (let [targets (-> more
+                                         (find-child :target)
+                                         (children))
 
-        constraints-sym (genvar "constraints")
-        conditions-clauses (let [constraints (some-> (find-child more :constraints)
+                             row-sym (genvar "target-row-events-")
+                             row-events (->> (find-children targets :column-event)
+                                             (mapv only-child))
+                             row-clause (cond (find-child targets :star)
+                                              `[(datascript.core/pull ~'$ ~'[*] ~entity-var) ~row-sym]
+
+                                              (seq row-events)
+                                              `[(datascript.core/pull ~'$ ~row-events ~entity-var) ~row-sym]
+
+                                              :else
+                                              `[(~'ground {}) ~row-sym])
+
+                             binding-sym (genvar "target-binding-events-")
+                             binding-events (->> (find-children targets :binding-event)
+                                                 (map #(insta/transform {:binding-event identity
+                                                                         :binding hash-map}
+                                                                        %))
+                                                 (apply merge {}))
+
+                             event-clause `[(~'ground ~binding-events) ~binding-sym]]
+                         [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~target-sym]])
+
+        constraints-sym (genvar "constraints-")
+        conditions-clauses (let [constraints (some-> more
+                                                     (find-child :constraints)
                                                      (children))
-                                 row-sym (genvar "row")
-                                 column-events (mapv only-child (find-children constraints :column-event))
+
+                                 row-sym (genvar "constraint-row-events-")
+                                 row-events (->> (find-children constraints :column-event)
+                                                 (mapv only-child))
                                  row-clause (cond (find-child constraints :star)
                                                   `[(datascript.core/pull ~'$ ~'[*] ~entity-var) ~row-sym]
 
-                                                  (seq column-events)
-                                                  `[(datascript.core/pull ~'$ ~column-events ~entity-var) ~row-sym]
+                                                  (seq row-events)
+                                                  `[(datascript.core/pull ~'$ ~row-events ~entity-var) ~row-sym]
 
                                                   :else
                                                   `[(~'ground {}) ~row-sym])
-                                 event-sym (genvar "events")
-                                 events (reduce merge {} (filter map? constraints))
-                                 event-clause `[(~'ground ~events) ~event-sym]]
-                             [row-clause event-clause `[(merge ~row-sym ~event-sym) ~constraints-sym]])]
+
+                                 binding-sym (genvar "constraint-binding-events-")
+                                 binding-events (->> (find-children constraints :binding-event)
+                                                     (map #(insta/transform {:binding-event identity
+                                                                             :binding hash-map}
+                                                                            %))
+                                                     (apply merge {}))
+                                 event-clause `[(~'ground ~binding-events) ~binding-sym]]
+                             [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~constraints-sym]])
+        logpdf-clauses `[[(~*logpdf-symbol* ~model-sym ~target-sym ~constraints-sym) ~prob-sym]]]
     {:name [prob-name]
      :find [prob-sym]
-     :where (let [model-sym (genvar "model")]
-              `[[(clojure.core/get ~'?models ~model-name) ~model-sym]
-                ~target-clause
-                ~@conditions-clauses
-                [(~*logpdf-symbol* ~model-sym ~target-sym ~constraints-sym) ~prob-sym]])}))
+     :where (reduce into [model-clauses
+                          target-clauses
+                          conditions-clauses
+                          logpdf-clauses])}))
 
 (def selection-transformations
   (merge global-transformations
