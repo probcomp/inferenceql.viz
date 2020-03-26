@@ -63,7 +63,9 @@ limit               ::= nat
 
 (* Shared *)
 
-model               ::= model-name | <'('> generate <')'>
+model               ::= model-lookup | model-generate
+model-lookup        ::= model-name
+model-generate      ::= <'('> generate <')'>
 model-name          ::= symbol | <'"'> symbol <'"'>
 column-name         ::= symbol | <'"'> symbol <'"'>
 

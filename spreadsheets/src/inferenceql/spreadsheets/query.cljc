@@ -182,28 +182,51 @@
 
 ;;; Generate
 
-(def generate-transformations
-  {:binding hash-map})
+(defn model-lookup
+  [models model-name]
+  (if-let [model (get models model-name)]
+    model
+    (throw (ex-info "Invalid model name" {:name model-name}))))
+
+(defn generate-target
+  [ast]
+  (-> ast
+      (find-child :generated)
+      (children)))
+
+(defn generate-constraints
+  [ast]
+  (as-> ast $
+    (find-child $ :bindings)
+    (children $)
+    (apply merge $)))
+
+(defn generate-model
+  [ast]
+  (-> ast
+      (find-child :model)
+      (only-child)))
+
+(defn generate-transformations
+  "Returns the instaparse transformation map for the provided model registry (map
+  from mode names to generative functions)."
+  [models]
+  {:model-lookup #(model-lookup models %)
+   :model-generate #(constrain (generate-model %)
+                               (generate-target %)
+                               (generate-constraints %))
+   :binding hash-map})
 
 (defn generate
   [ast models limit]
   (if-not limit
     (throw (ex-info "Cannot GENERATE without LIMIT" {}))
-    (let [ast (insta/transform generate-transformations ast)
-          target (-> ast
-                     (find-child :generated)
-                     (children))
-          model-name (-> ast
-                         (find-child :model)
-                         (only-child))
-          constraints (as-> ast $
-                        (find-child $ :bindings)
-                        (children $)
-                        (apply merge $))]
-      (if-let [model (get models model-name)]
-        (for [row (queries/simulate model constraints limit)]
-          (select-keys row target))
-        (throw (ex-info "Invalid model name" {:name model-name}))))))
+    (let [ast (insta/transform (generate-transformations models) ast)
+          target (generate-target ast)
+          model (generate-model ast)
+          constraints (generate-constraints ast)]
+      (for [row (queries/simulate model constraints limit)]
+        (select-keys row target)))))
 
 ;;; Parsing
 
