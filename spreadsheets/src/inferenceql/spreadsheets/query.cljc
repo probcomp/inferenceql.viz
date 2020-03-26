@@ -148,16 +148,6 @@
                 ~@conditions-clauses
                 [(~*logpdf-symbol* ~model-sym ~target-sym ~constraints-sym) ~prob-sym]])}))
 
-#_(-> (parse "probability of x under model" :start :probability-of)
-      (children)
-      (find-child :model))
-
-#_(parse "probability of x under model" :start :probability-of)
-#_(->> (parse "probability of x under model" :start :probability-of)
-       (apply insta/transform probability-of-transformations))
-
-#_(query-plan (parse "select * from data"))
-
 (def selection-transformations
   (merge global-transformations
          {:column-selection transform-column-selection
@@ -279,35 +269,3 @@
      (if-not (insta/failure? parse-tree)
        (execute parse-tree rows models)
        parse-tree))))
-
-(comment
-  (-> (parse "select x from data limit 2")
-      (find-child :limit)
-      (only-child))
-
-  (q "select x from data limit 0"
-     [{:x 1}])
-
-  (-> (parse "SELECT x, (PROBABILITY OF x=4 UNDER (GENERATE x, y GIVEN z=3 UNDER model)) FROM data")
-      (transform)
-      (query-plan))
-
-  (->> (parse "probability of elephant given rain under model" :start :probability-of)
-       (transform)
-       (children)
-       (apply transform-probability-of))
-
-  (-> (parse "select (probability of elephant given rain under model) from data")
-      (transform)
-      (query-plan))
-
-  (-> (parse "select * from data")
-      (transform)
-      (query-plan))
-
-  (d/q '{:find [?entity [(pull ?entity [*]) ...]],
-         :in [$ ?models],
-         :where [[?entity :iql/type :iql.type/row]]}
-       [{:a 1}])
-
-  )
