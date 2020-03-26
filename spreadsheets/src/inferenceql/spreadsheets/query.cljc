@@ -7,7 +7,7 @@
   (:require [clojure.edn :as edn]
             [datascript.core :as d]
             [instaparse.core :as insta]
-            [metaprob.generative-functions :refer [gen]]
+            [metaprob.generative-functions :as g :refer [gen]]
             [metaprob.prelude :as mp]
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.basic-queries :as queries]))
@@ -16,13 +16,25 @@
 
 (defn constrain
   [gfn target constraints]
-  (gen [& args]
-    (let [trace (mmix/with-row-values {} constraints)]
-      (-> (mp/infer-and-score :procedure gfn
-                              :inputs args
-                              :observation-trace trace)
-          (first)
-          (select-keys target)))))
+  (assert vector? target)
+  (assert map? constraints)
+
+  (let [constraint-trace (mmix/with-row-values {} constraints)]
+    (g/make-generative-function
+     (gen [& args]
+       (-> (mp/infer-and-score :procedure gfn :inputs args :observation-trace constraint-trace)
+           (first)
+           (select-keys target)))
+     (gen [partial-trace]
+       (gen [& args]
+         (let [infer #(mp/infer-and-score :procedure gfn :inputs args :observation-trace %)
+               target-constraint-trace (merge-with merge constraint-trace partial-trace)
+
+               score-denominator (if (empty? constraints) 0 (last (infer constraint-trace)))
+               [val trace score-numerator] (infer target-constraint-trace)
+               score (- score-numerator score-denominator)
+               target-val (select-keys val target)]
+           [target-val trace score]))))))
 
 ;;; Hiccup tree manipulation
 
@@ -90,6 +102,56 @@
   [ast]
   (insta/transform global-transformations ast))
 
+;;; Generate
+
+(defn model-lookup
+  [models model-name]
+  (if-let [model (get models model-name)]
+    model
+    (throw (ex-info "Invalid model name" {:name model-name}))))
+
+(defn generate-target
+  [ast]
+  (-> ast
+      (find-child :generated)
+      (children)
+      (vec)))
+
+(defn generate-constraints
+  [ast]
+  (or (as-> ast $
+        (find-child $ :bindings)
+        (children $)
+        (apply merge $))
+      {}))
+
+(defn generate-model
+  [ast]
+  (-> ast
+      (find-child :model)
+      (only-child)))
+
+(defn generate-transformations
+  "Returns the instaparse transformation map for the provided model registry (map
+  from mode names to generative functions)."
+  [models]
+  {:model-lookup #(model-lookup models %)
+   :model-generate #(constrain (generate-model %)
+                               (generate-target %)
+                               (generate-constraints %))
+   :binding hash-map})
+
+(defn generate
+  [ast models limit]
+  (if-not limit
+    (throw (ex-info "Cannot SELECT from GENERATE without LIMIT" {}))
+    (let [ast (insta/transform (generate-transformations models) ast)
+          target (generate-target ast)
+          model (generate-model ast)
+          constraints (generate-constraints ast)]
+      (for [row (queries/simulate model constraints limit)]
+        (select-keys row target)))))
+
 ;; Selections
 
 (defn transform-column-selection
@@ -103,13 +165,10 @@
 
 (defn transform-probability-of
   [& more]
-  (let [model-name (or (some-> more
-                               (find-child :model)
-                               (find-child :model-lookup)
-                               (only-child))
-                       :model)
-        model-sym (genvar "model")
-        model-clauses `[(clojure.core/get ~'?models ~model-name) ~model-sym]
+  (let [model-var (genvar "model-")
+        model (-> more
+                  (find-child :model)
+                  (only-child))
 
         prob-gensym (gensym "prob")
         prob-name (keyword prob-gensym)
@@ -167,26 +226,29 @@
                                                      (apply merge {}))
                                  event-clause `[(~'ground ~binding-events) ~binding-sym]]
                              [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~constraints-sym]])
-        logpdf-clauses `[[(~*logpdf-symbol* ~model-sym ~target-sym ~constraints-sym) ~prob-sym]]]
+        logpdf-clauses `[[(~*logpdf-symbol* ~model-var ~target-sym ~constraints-sym) ~prob-sym]]]
     {:name [prob-name]
      :find [prob-sym]
-     :where (reduce into [model-clauses
-                          target-clauses
+     :in [model-var]
+     :inputs [model]
+     :where (reduce into [target-clauses
                           conditions-clauses
                           logpdf-clauses])}))
 
-(def selection-transformations
+(defn selection-transformations
+  [models]
   (merge global-transformations
+         (generate-transformations models)
          {:column-selection transform-column-selection
           :probability-of transform-probability-of}))
 
 (defn selection-clauses
-  [ast]
+  [ast models]
   (merge-with into {:where [[entity-var :iql/type :iql.type/row]]}
               (if (find-child ast :star)
                 {:find `[[(~'pull ~entity-var [~'*]) ~'...]]}
                 (->> (children ast)
-                     (map #(insta/transform selection-transformations %))
+                     (map #(insta/transform (selection-transformations models) %))
                      (apply merge-with into {:find [entity-var]})))))
 
 ;; Conditions
@@ -213,54 +275,6 @@
   (map #(insta/transform condition-transformations %)
        (children ast)))
 
-;;; Generate
-
-(defn model-lookup
-  [models model-name]
-  (if-let [model (get models model-name)]
-    model
-    (throw (ex-info "Invalid model name" {:name model-name}))))
-
-(defn generate-target
-  [ast]
-  (-> ast
-      (find-child :generated)
-      (children)))
-
-(defn generate-constraints
-  [ast]
-  (as-> ast $
-    (find-child $ :bindings)
-    (children $)
-    (apply merge $)))
-
-(defn generate-model
-  [ast]
-  (-> ast
-      (find-child :model)
-      (only-child)))
-
-(defn generate-transformations
-  "Returns the instaparse transformation map for the provided model registry (map
-  from mode names to generative functions)."
-  [models]
-  {:model-lookup #(model-lookup models %)
-   :model-generate #(constrain (generate-model %)
-                               (generate-target %)
-                               (generate-constraints %))
-   :binding hash-map})
-
-(defn generate
-  [ast models limit]
-  (if-not limit
-    (throw (ex-info "Cannot GENERATE without LIMIT" {}))
-    (let [ast (insta/transform (generate-transformations models) ast)
-          target (generate-target ast)
-          model (generate-model ast)
-          constraints (generate-constraints ast)]
-      (for [row (queries/simulate model constraints limit)]
-        (select-keys row target)))))
-
 ;;; Parsing
 
 (def parse
@@ -276,12 +290,15 @@
   "Given a query parse tree returns a query plan for the top-most query.
   Subqueries will not be considered and are handled in a different step by the
   interpreter. See `q` for details."
-  [ast]
-  (let [{sel-find :find sel-where :where} (selection-clauses (find-child ast :selections))
-        cond-where                        (condition-clauses (find-child ast :conditions))]
-    {:find sel-find
-     :in '[$ ?models]
-     :where `[~@sel-where ~@cond-where]}))
+  ([ast]
+   (query-plan ast {}))
+  ([ast models]
+   (let [{sel-find :find sel-in :in sel-where :where sel-inputs :inputs} (selection-clauses (find-child ast :selections) models)
+         cond-where (condition-clauses (find-child ast :conditions))]
+     {:query {:find sel-find
+              :in (into '[$] sel-in)
+              :where (into sel-where cond-where)}
+      :inputs sel-inputs})))
 
 (defn iql-db
   "Converts a vector of maps into Datalog database that can be queried with `q`."
@@ -297,7 +314,8 @@
   ([ast rows models]
    (let [ast (insta/transform global-transformations ast)
          limit (some-> ast (find-child :limit) (only-child))
-         names (-> ast (find-child :selections) (selection-clauses) (:name))
+         ;; TODO: fix redundant call to selection-clauses
+         names (-> ast (find-child :selections) (selection-clauses models) (:name))
          db (iql-db (if-let [source (some-> ast
                                             (find-child :source)
                                             (children)
@@ -306,8 +324,8 @@
                         :query (execute source rows)
                         :generate (generate source models limit))
                       rows))
-         query (query-plan ast)
-         rows (cond->> (d/q query db models)
+         {:keys [query inputs]} (query-plan ast models)
+         rows (cond->> (apply d/q query db inputs)
                 names (map #(zipmap (into [:db/id] names)
                                     %))
                 true (sort-by :db/id)

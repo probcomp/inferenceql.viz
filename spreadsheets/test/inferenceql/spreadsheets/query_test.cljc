@@ -6,7 +6,8 @@
             [clojure.test.check.properties :as prop]
             [com.gfredericks.test.chuck.generators :as chuck.gen]
             [instaparse.core :as insta]
-            [inferenceql.spreadsheets.query :as query]))
+            [inferenceql.spreadsheets.query :as query]
+            [inferenceql.multimixture.search :as search]))
 
 ;;; Generators
 
@@ -59,7 +60,7 @@
   (are [start query] (some? (insta/get-failure (query/parse query :start start)))
     :query "123abc"))
 
-;; Features
+;; Basic selection
 
 (defspec select-star
   (prop/for-all [table gen-table]
@@ -90,6 +91,8 @@
       (is (= results (map #(select-keys % ks)
                           table))))))
 
+;; Conditions
+
 (def gen-table-col
   (gen/bind (gen/such-that #(seq (mapcat keys %))
                            gen-table)
@@ -105,3 +108,42 @@
   (prop/for-all [[table k] gen-table-col]
     (let [results (query/q (str "SELECT * FROM data WHERE " (name k) " IS NULL") table)]
       (is (= results (filter (comp nil? k) table))))))
+
+;; Probabilities
+
+(def simple-mmix
+  {:vars {:x :categorical
+          :y :categorical}
+   :views [[{:probability 0.75
+             :parameters  {:x {"yes" 1.0 "no" 0.0}
+                           :y {"yes" 1.0 "no" 0.0}}}
+            {:probability 0.25
+             :parameters  {:x {"yes" 0.0 "no" 1.0}
+                           :y {"yes" 0.0 "no" 1.0}}}]]})
+
+(deftest probability-of-bindings
+  (let [rows [{}]
+        models {:model (search/optimized-row-generator simple-mmix)}
+        q1 (comp first vals first #(query/q % rows models))]
+    (is (= (Math/log 0.25) (q1 "SELECT (PROBABILITY OF x=\"no\"                  UNDER model) FROM data LIMIT 1")))
+    (is (= (Math/log 0.75) (q1 "SELECT (PROBABILITY OF x=\"yes\"                 UNDER model) FROM data LIMIT 1")))
+    (is (= (Math/log 1.0)  (q1 "SELECT (PROBABILITY OF x=\"yes\" GIVEN y=\"yes\" UNDER model) FROM data LIMIT 1")))
+    (is (= (Math/log 1.0)  (q1 "SELECT (PROBABILITY OF x=\"no\"  GIVEN y=\"no\"  UNDER model) FROM data LIMIT 1")))
+    (is (= (Math/log 0.0)  (q1 "SELECT (PROBABILITY OF x=\"yes\" GIVEN y=\"no\"  UNDER model) FROM data LIMIT 1")))))
+
+(deftest probability-of-rows
+  (let [models {:model (search/optimized-row-generator simple-mmix)}
+        q1 (comp first vals first #(query/q %1 %2 models))]
+    (are [expected x] (is (= (Math/log expected)
+                             (q1 "SELECT (PROBABILITY OF x UNDER model) FROM data"
+                                 [{:x x}])))
+      0.25 "no"
+      0.75 "yes")
+
+    (are [expected x y] (= (Math/log expected)
+                           (q1 "SELECT (PROBABILITY OF x GIVEN y UNDER model) FROM data"
+                               [{:x x :y y}]))
+      1.0 "yes" "yes"
+      1.0 "no"  "no"
+      0.0 "yes" "no"
+      0.0 "no"  "yes")))
