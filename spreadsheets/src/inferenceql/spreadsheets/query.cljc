@@ -186,7 +186,32 @@
   (map #(insta/transform condition-transformations %)
        (children ast)))
 
-;; Parsing
+;;; Generate
+
+(def generate-transformations
+  {})
+
+(defn generate
+  [ast models limit]
+  (if-not limit
+    (throw (ex-info "Cannot GENERATE without LIMIT" {}))
+    (let [target (-> ast
+                     (find-child :generated)
+                     (children))
+          model-name (-> ast
+                         (find-child :model)
+                         (only-child))
+          constraints (if (= 4 (count ast)) ; constraints are optional
+                        (nth ast 2)
+                        {})]
+      (prn "model-name" model-name)
+      (prn "target" target)
+      (if-let [model (get models model-name)]
+        (for [row (queries/simulate model constraints limit)]
+          (select-keys row target))
+        (throw (ex-info "Invalid model name" {:name model-name}))))))
+
+;;; Parsing
 
 (def parse
   "An instaparse parser for IQL SQL queries. The grammar is inlined at macro
@@ -214,20 +239,6 @@
   (->> table
        (map #(assoc % :iql/type :iql.type/row))
        (d/db-with (d/empty-db))))
-
-(defn generate
-  [ast models limit]
-  (if-not limit
-    (throw (ex-info "Cannot GENERATE without LIMIT" {}))
-    (let [target (second ast)
-          model-name (last ast)
-          constraints (if (= 4 (count ast)) ; constraints are optional
-                        (nth ast 2)
-                        {})]
-      (if-let [model (get models model-name)]
-        (for [row (queries/simulate model constraints limit)]
-          (select-keys row target))
-        (throw (ex-info "Invalid model name" {:name model-name}))))))
 
 (defn execute
   "Like `q`, only operates on a query parse tree rather than a query string."

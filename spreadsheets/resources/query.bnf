@@ -33,6 +33,8 @@ predicate           ::= (#"<" | #">" | #"<=" | #">=")
 
 (* Generate *)
 
+(* TODO: Make model optional *)
+
 generate            ::= <'GENERATE'> <ws> generated (<ws> <'GIVEN'> <ws> bindings)? <ws> <'UNDER'> <ws> model
 generated           ::= column-name (<','> <ws> column-name)*
 bindings            ::= binding (<','> <ws> binding)*
