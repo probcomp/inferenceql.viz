@@ -113,7 +113,6 @@
 (defn transform-probability-of
   [target & more]
   (let [target (only-child target)
-
         model-name (or (some-> (find-child more :model)
                                (only-child))
                        :model)
@@ -160,7 +159,7 @@
 #_(->> (parse "probability of x under model" :start :probability-of)
        (apply insta/transform probability-of-transformations))
 
-#_(query-plan (parse "select (probability of x under model) from data"))
+#_(query-plan (parse "select * from data"))
 
 (def selection-transformations
   (merge global-transformations
@@ -169,14 +168,16 @@
 
 (defn selection-clauses
   [ast]
-  (if (find-child ast :star)
-    {:find `[[(~'pull ~entity-var [~'*]) ~'...]]}
-    (->> (children ast)
-         (map #(insta/transform selection-transformations %))
-         (apply merge-with into {:find [entity-var] :where [[entity-var :iql/type :iql.type/row]]}))))
+  (merge-with into {:where [[entity-var :iql/type :iql.type/row]]}
+              (if (find-child ast :star)
+                {:find `[[(~'pull ~entity-var [~'*]) ~'...]]}
+                (->> (children ast)
+                     (map #(insta/transform selection-transformations %))
+                     (apply merge-with into {:find [entity-var]})))))
 
-#_(-> "select x, (probability of x under model) from data"
+#_(-> "select * from data"
       (parse)
+      (transform)
       (find-child :selections)
       (selection-clauses))
 
@@ -303,8 +304,17 @@
        (children)
        (apply transform-probability-of))
 
-  (-> (parse "select (probability of elephant given rain under model), elephant, rain from data")
+  (-> (parse "select (probability of elephant given rain under model) from data")
       (transform)
       (query-plan))
+
+  (-> (parse "select * from data")
+      (transform)
+      (query-plan))
+
+  (d/q '{:find [?entity [(pull ?entity [*]) ...]],
+         :in [$ ?models],
+         :where [[?entity :iql/type :iql.type/row]]}
+       [{:a 1}])
 
   )

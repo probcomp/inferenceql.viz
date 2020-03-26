@@ -69,3 +69,20 @@
           (let [data (read-csv data)
                 model (read-model model)]
             (repl data {:model model})))))
+
+(comment
+
+  (let [f (-> (read-model "https://bcomp.pro/elephantmodel")
+              (query/constrain [:elephant :rain] {:rain "yes"})
+              (query/constrain [:elephant :rain] {:elephant "yes"}))]
+    (repeatedly 1 f))
+
+  (query/q "select (probability of elephant given rain=\"yes\" under model), elephant, rain from data limit 10"
+           (read-csv "https://bcomp.pro/elephantdata")
+           {:model (read-model "https://bcomp.pro/elephantmodel")})
+
+  (query/q "select (probability of elephant given rain=\"yes\" under model), elephant, rain from data limit 10"
+           (read-csv "https://bcomp.pro/elephantdata")
+           {:model (read-model "https://bcomp.pro/elephantmodel")})
+
+  )
