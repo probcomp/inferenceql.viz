@@ -5,13 +5,8 @@
   {:control-panel {:confidence-threshold 0.9
                    ;; Ulli: Remove the part from this map.
                    :parts {:part_laci 0.0
-                           :part_psra 0.0
                            :part_yfp 0.0
-                           :part_phlf 0.0
-                           :part_amerv2 0.0
-                           :part_arac 0.0
-                           :part_kanr 0.0
-                           :part_bm3r1 0.0}
+                           :part_arac 0.0}
                    :reagent-forms {:confidence-mode :none
                                    :arabinose :0.0
                                    :iptg :7.98e-05

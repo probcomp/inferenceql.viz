@@ -12,7 +12,7 @@
         experiment-conds (for [[c v] conditions] (str (name c) "=\"" (name v) "\""))
         part-conds (for [[p v] parts] (str (name p) "=" v))
         all-conditions (string/join " AND " (concat experiment-conds part-conds))]
-    (str "SELECT ycbj, bdca, ydis, rluc, rsmh FROM \n"
+    (str "SELECT wcaf, htpx, yciw, roxa, rrrq FROM \n"
          "(GENERATE * GIVEN " all-conditions " USING model) "
          limit-cond)))
 

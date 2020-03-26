@@ -52,13 +52,8 @@
   (let [data @(rf/subscribe [:table/dataset-rows])
         ;; Ulli: Remove the part from this vector.
         part-keys [:part_laci
-                   :part_psra
                    :part_yfp
-                   :part_phlf
-                   :part_amerv2
-                   :part_arac
-                   :part_kanr
-                   :part_bm3r1]]
+                   :part_arac]]
     [:div#rna-seq-values
      (doall
       (for [part-key part-keys]

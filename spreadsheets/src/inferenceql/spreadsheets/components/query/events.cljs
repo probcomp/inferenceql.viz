@@ -94,8 +94,8 @@
          new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))
          headers (table-db/dataset-headers db)
 
-         ;; Hack for SD2 demo 03-17-20
-         headers ["ycbj" "bdca" "ydis" "rluc" "rsmh"]]
+         ;; Hack for SD2 demo 03-26-20
+         headers ["wcaf" "htpx" "yciw" "roxa" "rrrq"]]
      {:dispatch [:table/set new-rows headers {:virtual true}]})))
 
 (defn- create-search-examples [pos-rows neg-rows]
