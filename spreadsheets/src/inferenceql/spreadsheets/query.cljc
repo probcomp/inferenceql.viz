@@ -75,10 +75,7 @@
   "A map of transformations to be performed on nodes in the query parse tree. Used
   with `instaparse.core/transform` by `query-plan`. Nodes are transformed by
   `transform` in a depth-first manner."
-  {:column-name keyword
-   :predicate   symbol
-
-   :generated vector})
+  {:generated vector})
 
 ;; Literals
 
@@ -175,12 +172,6 @@
                      (map #(insta/transform selection-transformations %))
                      (apply merge-with into {:find [entity-var]})))))
 
-#_(-> "select * from data"
-      (parse)
-      (transform)
-      (find-child :selections)
-      (selection-clauses))
-
 ;; Conditions
 
 (def condition-transformations
@@ -192,6 +183,8 @@
           :or-condition  #(list 'or  %1 %2)
 
           :equality-condition  (fn [c v] [entity-var c v])
+
+          :predicate symbol
           :predicate-condition (fn [c p v]
                                  (let [sym (genvar)]
                                    [[entity-var c sym]

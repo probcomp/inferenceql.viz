@@ -1,11 +1,20 @@
+(* Queries *)
+
 query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'LIMIT'> <ws> limit)? <';'>?
 <p-query>           ::= query | <'('> query <')'>
+
+(* Selections *)
 
 selections          ::= star | p-column-or-prob (<','> <ws>? p-column-or-prob)*
 <p-column-or-prob>  ::= column-or-prob | <'('> column-or-prob <')'>
 <column-or-prob>    ::= column-selection | probability-of
 column-selection    ::= column-name
-column-name         ::= symbol | <'"'> symbol <'"'>
+
+(* Sources *)
+
+source              ::= <'data'> | <'('> query <')'> | <'('> generate <')'>
+
+(* Conditions *)
 
 conditions          ::= condition (<ws> <'AND'> <ws> condition)*
 <condition>         ::= or-condition
@@ -22,16 +31,13 @@ equality-condition  ::= column-name <ws>? <'='> <ws>? value
 predicate-condition ::= column-name <ws>? predicate <ws>? value
 predicate           ::= (#"<" | #">" | #"<=" | #">=")
 
-source              ::= <'data'> | <'('> query <')'> | <'('> generate <')'>
-
-model               ::= model-name | <'('> generate <')'>
-model-name          ::= symbol | <'"'> symbol <'"'>
+(* Generate *)
 
 generate            ::= <'GENERATE'> <ws> generated (<ws> <'GIVEN'> <ws> bindings)? <ws> <'UNDER'> <ws> model
 generated           ::= column-name (<','> <ws> column-name)*
 bindings            ::= binding (<','> <ws> binding)*
 
-limit               ::= nat
+(* Probability *)
 
 probability-of      ::= <'PROBABILITY OF'> <ws> event (<ws> <'GIVEN'> <ws> constraints)? <ws> <'UNDER'> <ws> model
 binding             ::= column-name <ws>? <'='> <ws>? value
@@ -40,7 +46,7 @@ constraints         ::= star | event (<','> <ws>? event)*
 binding-event       ::= binding
 column-event        ::= column-name
 
-star                ::= <'*'>
+(* Literals *)
 
 <value>             ::= float | int | string
 float               ::= #'-?\d+\.\d+(E-?\d+)?'
@@ -48,4 +54,17 @@ int                 ::= #'-?\d+'
 nat                 ::= #'\d+'
 string              ::= #'\"([^\"]+)\"'
 symbol              ::= #'[a-zA-Z]\w*'
+
+(* Limit *)
+
+limit               ::= nat
+
+(* Shared *)
+
+model               ::= model-name | <'('> generate <')'>
+model-name          ::= symbol | <'"'> symbol <'"'>
+column-name         ::= symbol | <'"'> symbol <'"'>
+
+star                ::= <'*'>
+
 ws                  ::= #'\s+'
