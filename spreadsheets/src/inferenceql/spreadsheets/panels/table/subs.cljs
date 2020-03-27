@@ -1,6 +1,7 @@
 (ns inferenceql.spreadsheets.panels.table.subs
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
+            [medley.core :as medley]
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.table.db :as db]
@@ -144,9 +145,17 @@
           (assoc :row-at-selection-start (get-row-at-selection-start coords rows)))
       selection-layer)))
 
-(rf/reg-sub :table/selection-layers
+(rf/reg-sub :table/selection-layers-raw
             (fn [db [_sub-name]]
               (get-in db [:table-panel :selection-layers])))
+
+(rf/reg-sub :table/selection-layers
+            :<- [:table/selection-layers-raw]
+            :<- [:table/visual-headers]
+            :<- [:table/visual-rows]
+            (fn [[selection-layers-raw visual-headers visual-rows]]
+              (medley/map-vals #(add-selection-data % visual-headers visual-rows)
+                               selection-layers-raw)))
 
 (rf/reg-sub :table/selection-layers-list
             :<- [:table/selection-layers]
@@ -252,6 +261,17 @@
                          {:data attr :readOnly false} ; Make the score column user-editable.
                          {:data attr}))]
     (map settings-map headers)))
+
+;;; Subs related to data as it appears to the user given column moves and column sorting performed
+;;; by the user in Handsontable.
+
+(rf/reg-sub :table/visual-headers
+            (fn [db _]
+              (get-in db [:table-panel :visual-headers])))
+
+(rf/reg-sub :table/visual-rows
+            (fn [db _]
+              (get-in db [:table-panel :visual-rows])))
 
 ;;; Subs related to settings and overall state of tables.
 
