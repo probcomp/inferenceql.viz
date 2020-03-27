@@ -180,21 +180,6 @@
             (fn [[color selection-layers]]
               (get selection-layers color)))
 
-(rf/reg-sub :table/selections
-            :<- [:table/selection-layer-active]
-            (fn [selection-state]
-              (get selection-state :selections)))
-
-(rf/reg-sub :table/selected-columns
-            :<- [:table/selection-layer-active]
-            (fn [selection-state]
-              (get selection-state :selected-columns)))
-
-(rf/reg-sub :table/row-at-selection-start
-            :<- [:table/selection-layer-active]
-            (fn [selection-state]
-              (get selection-state :row-at-selection-start)))
-
 (rf/reg-sub :table/selections-coords
             :<- [:table/selection-layer-active]
             (fn [selection-state]
