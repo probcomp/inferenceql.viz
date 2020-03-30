@@ -1,6 +1,6 @@
 (* Queries *)
 
-query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'LIMIT'> <ws> limit)? <';'>?
+query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'ORDER BY'> <ws> ordering)? (<ws> <'LIMIT'> <ws> limit)? <';'>?
 <p-query>           ::= query | <'('> query <')'>
 
 (* Selections *)
@@ -58,6 +58,13 @@ int                 ::= #'-?\d+'
 nat                 ::= #'\d+'
 string              ::= #'\"([^\"]+)\"'
 symbol              ::= #'[a-zA-Z]\w*'
+
+(* Order by *)
+
+ordering            ::= column-name (<ws> direction)?
+direction           ::= (ascending | descending)
+ascending           ::= <'ASC'>
+descending          ::= <'DESC'>
 
 (* Limit *)
 

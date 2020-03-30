@@ -315,6 +315,19 @@
    (execute ast rows {}))
   ([ast rows models]
    (let [ast (insta/transform global-transformations ast)
+         keyfn (or (some-> ast
+                           (find-child :ordering)
+                           (children)
+                           (first))
+                   :db/id)
+         cmp (case (some-> ast
+                           (find-child :ordering)
+                           (find-child :direction)
+                           (only-child)
+                           (node-type))
+               :ascending compare
+               :descending #(compare %2 %1)
+               nil compare)
          limit (some-> ast (find-child :limit) (only-child))
          ;; TODO: fix redundant call to selection-clauses
          names (-> ast (find-child :selections) (selection-clauses models) (:name))
@@ -330,7 +343,7 @@
          rows (cond->> (apply d/q query db inputs)
                 names (map #(zipmap (into [:db/id] names)
                                     %))
-                true (sort-by :db/id)
+                true (sort-by keyfn cmp)
                 true (map #(->> %
                                 (remove (comp #{:iql/no-value} val))
                                 (into {})))
