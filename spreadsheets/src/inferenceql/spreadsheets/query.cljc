@@ -30,7 +30,9 @@
          (let [infer #(mp/infer-and-score :procedure gfn :inputs args :observation-trace %)
                target-constraint-trace (merge-with merge constraint-trace partial-trace)
 
-               score-denominator (if (empty? constraints) 0 (last (infer constraint-trace)))
+               score-denominator (if (empty? constraints)
+                                   0
+                                   (last (infer constraint-trace)))
                [val trace score-numerator] (infer target-constraint-trace)
                score (- score-numerator score-denominator)
                target-val (select-keys val target)]
