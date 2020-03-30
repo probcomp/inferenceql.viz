@@ -28,6 +28,13 @@
     (gen/bind (gen/map gen-column (gen/elements value-generators))
               (comp gen/vector gen-row))))
 
+(def gen-table-col
+  "Generator for a 2-tuple of table and a column for that table."
+  (gen/bind (gen/such-that #(seq (mapcat keys %))
+                           gen-table)
+            #(gen/tuple (gen/return %)
+                        (gen/elements (mapcat keys %)))))
+
 ;;; Literals
 
 (defn parse-and-transform-literals
@@ -67,16 +74,6 @@
     (let [results (query/q "SELECT * FROM data" table)]
       (is (= results table)))))
 
-(def gen-table-limit
-  (gen/bind gen-table
-            #(gen/tuple (gen/return %)
-                        (gen/choose 0 (count %)))))
-
-(defspec select-limit
-  (prop/for-all [[table n] gen-table-limit]
-    (let [results (query/q (str "SELECT * FROM data LIMIT " n) table)]
-      (is (= results (take n table))))))
-
 (def gen-table-col-subset
   (gen/bind (gen/such-that #(seq (mapcat keys %))
                            gen-table)
@@ -91,13 +88,53 @@
       (is (= results (map #(select-keys % ks)
                           table))))))
 
-;; Conditions
+;; Order by
 
-(def gen-table-col
-  (gen/bind (gen/such-that #(seq (mapcat keys %))
-                           gen-table)
+(defn ascending?
+  "Returns true if the provided collection is sorted in ascending order."
+  [coll]
+  (->> coll
+       (partition 2 1)
+       (every? #(<= (apply compare %) 0))))
+
+(defn descending?
+  [coll]
+  (->> coll (reverse) (ascending?)))
+
+(defspec select-order-by
+  (prop/for-all [[table col] gen-table-col]
+    (let [query (str "SELECT * FROM data ORDER BY " (name col))]
+      (is (->> (query/q query table)
+               (map col)
+               (ascending?))))))
+
+(defspec select-order-by-asc
+  (prop/for-all [[table col] gen-table-col]
+    (let [query (str "SELECT * FROM data ORDER BY " (name col) " ASC")]
+      (is (->> (query/q query table)
+               (map col)
+               (ascending?))))))
+
+(defspec select-order-by-desc
+  (prop/for-all [[table col] gen-table-col]
+    (let [query (str "SELECT * FROM data ORDER BY " (name col) " DESC") ]
+      (is (->> (query/q query table)
+               (map col)
+               (descending?))))))
+
+;; Limit
+
+(def gen-table-limit
+  (gen/bind gen-table
             #(gen/tuple (gen/return %)
-                        (gen/elements (mapcat keys %)))))
+                        (gen/choose 0 (count %)))))
+
+(defspec select-limit
+  (prop/for-all [[table n] gen-table-limit]
+    (let [results (query/q (str "SELECT * FROM data LIMIT " n) table)]
+      (is (= results (take n table))))))
+
+;; Conditions
 
 (defspec conditions-not-null
   (prop/for-all [[table k] gen-table-col]
