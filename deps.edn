@@ -12,6 +12,7 @@
         instaparse {:mvn/version "1.4.10"}
         kixi/stats {:mvn/version "0.5.2"}
         medley {:mvn/version "1.2.0"}
+        org.apache.commons/commons-math3 {:mvn/version "3.6.1"}
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.7"}
         reagent-forms {:mvn/version "0.5.43"}
