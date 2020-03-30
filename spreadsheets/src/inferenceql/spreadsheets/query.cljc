@@ -13,6 +13,7 @@
             [inferenceql.multimixture.basic-queries :as queries]))
 
 (def entity-var '?entity)
+(def default-model-key :model)
 
 (defn constrain
   [gfn target constraints]
@@ -168,9 +169,10 @@
 (defn transform-probability-of
   [& more]
   (let [model-var (genvar "model-")
-        model (-> more
-                  (find-child :model)
-                  (only-child))
+        model (or (some-> more
+                          (find-child :model)
+                          (only-child))
+                  default-model-key)
 
         prob-sym (or (some-> more
                              (find-child :prob-name)

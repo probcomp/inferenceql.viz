@@ -41,7 +41,7 @@ bindings            ::= binding (<','> <ws> binding)*
 
 (* Probability *)
 
-probability-of      ::= <'PROBABILITY OF'> <ws> target (<ws> <'GIVEN'> <ws> constraints)? <ws> <'UNDER'> <ws> model (<ws> <'AS'> <ws> prob-name)?
+probability-of      ::= <'PROBABILITY OF'> <ws> target (<ws> <'GIVEN'> <ws> constraints)? (<ws> <'UNDER'> <ws> model)? (<ws> <'AS'> <ws> prob-name)?
 target              ::= events
 constraints         ::= events
 binding             ::= column-name <ws>? <'='> <ws>? value
