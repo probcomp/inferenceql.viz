@@ -14,26 +14,30 @@
                                       ::labels
                                       ::headers
                                       ::rows
+                                      ::visual-headers
+                                      ::visual-rows
                                       ::virtual]))
 
 ;;; Specs related to scores computed on rows.
 
 (s/def ::score number?)
-(s/def ::scores (s/coll-of ::score))
+(s/def ::scores (s/coll-of ::score :kind vector?))
 
 ;;; Specs related to user-set labels on rows.
 
 (s/def ::label (s/nilable string?))
-(s/def ::labels (s/coll-of ::label))
+(s/def ::labels (s/coll-of ::label :kind vector?))
 
 ;;; Specs related to table data.
 
 (s/def ::header string?)
 (s/def ::row (s/map-of ::header any?))
-(s/def ::rows (s/cat :row (s/* ::row)))
-(s/def ::headers (s/cat :header (s/* ::header)))
-(s/def ::dataset-rows (s/cat :row (s/* ::row)))
-(s/def ::dataset-headers (s/cat :header (s/* ::header)))
+(s/def ::rows (s/coll-of ::row :kind vector?))
+(s/def ::headers (s/coll-of ::header :kind vector?))
+(s/def ::visual-rows (s/coll-of ::row :kind vector?))
+(s/def ::visual-headers (s/coll-of ::header :kind vector?))
+(s/def ::dataset-rows (s/coll-of ::row :kind vector?))
+(s/def ::dataset-headers (s/coll-of ::header :kind vector?))
 (s/def ::virtual boolean?)
 
 ;;; Specs related to selections within handsontable instances.
@@ -42,10 +46,6 @@
 (s/def ::row-index ::index)
 (s/def ::column-index ::index)
 
-(s/def ::selections (s/coll-of ::row))
-(s/def ::selected-columns (s/coll-of ::header))
-
-(s/def ::row-at-selection-start ::row)
 (s/def ::header-clicked boolean?)
 (s/def ::coords (s/coll-of ::selection-layer-coords))
 (s/def ::selection-layer-coords (s/coll-of number? :kind vector? :count 4))
@@ -53,10 +53,7 @@
 ;;; Specs related to storing the selection state of both handsontables
 
 (s/def ::selection-color #{:blue :red :green})
-(s/def ::selection-state (s/keys :opt-un [::row-at-selection-start
-                                          ::selections
-                                          ::selected-columns
-                                          ::header-clicked
+(s/def ::selection-state (s/keys :opt-un [::header-clicked
                                           ::coords]))
 (s/def ::selection-layers (s/map-of ::selection-color ::selection-state))
 
