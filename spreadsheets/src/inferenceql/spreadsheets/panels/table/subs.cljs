@@ -132,7 +132,7 @@
   (let [[r1 _c1 _r2 _c2] (last coords)]
     (nth rows r1)))
 
-(defn valid-coords
+(defn valid-coords?
   "Checks whether the bounds of the selection rectangles in `coords` fit the data table size."
   [coords table-width table-height]
   (if (seq coords)
@@ -150,7 +150,7 @@
   (let [coords (:coords selection-layer)]
     ;; We don't want to compute derived data if the bounds of the coords are beyond the
     ;; data we currently have.
-    (if (valid-coords coords (count headers) (count rows))
+    (if (valid-coords? coords (count headers) (count rows))
       (-> selection-layer
           (assoc :selected-columns (get-selected-columns coords headers))
           (assoc :selections (get-selections coords headers rows))
