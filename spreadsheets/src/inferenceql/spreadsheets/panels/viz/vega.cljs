@@ -8,10 +8,13 @@
             [goog.string :as gstring]
             [medley.core :as medley]))
 
-(def fips-col "country")
-(def map-names-col "country")
-(def topojson-prop "properties.geounit")
-(def ^:private topojson-feature "countries")
+;; Ulli: This is the name of the column in your dataset that indexes into the the topojson.
+(def fips-col "fips")
+;; Ulli: This is the name of the column in your dataset that is used to label each portion of the choropleth.
+(def map-names-col "state")
+;; Ulli: This is the property in the topojson that is matched with `fips-col`.
+(def topojson-prop "properties.STATEFP")
+(def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
@@ -305,12 +308,6 @@
                                  dist/categorical "nominal"))
         color-spec {:field map-column
                     :type map-column-type}
-
-        correct-names {"Congo DR" "Democratic Republic of the Congo"
-                       "Tanzania, United Republic of" "Tanzania"
-                       "Cote d'Ivoire" "Ivory Coast"}
-        update-fn (fn [v] (get correct-names v v))
-        transformed-selection (mapv (fn [row] (update row fips-col update-fn)) selections)
 
         update-fn (fn [v] (if (and (= map-column "probability") (= v 1.0)) nil v))
         transformed-selection (mapv (fn [row] (update row map-column update-fn)) transformed-selection)
