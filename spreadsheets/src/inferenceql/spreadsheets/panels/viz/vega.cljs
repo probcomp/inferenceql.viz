@@ -11,7 +11,7 @@
 ;; Ulli: This is the name of the column in your dataset that indexes into the the topojson.
 (def fips-col "fips")
 ;; Ulli: This is the name of the column in your dataset that is used to label each portion of the choropleth.
-(def map-names-col "state")
+(def map-names-col "states")
 ;; Ulli: This is the property in the topojson that is matched with `fips-col`.
 (def topojson-prop "properties.STATEFP")
 (def ^:private topojson-feature "cb_2017_us_cd115_20m")
@@ -64,6 +64,9 @@
   [column]
   (let [stattype-kw (cond (contains? #{hot/score-col-header hot/label-col-header} column)
                           :gaussian
+
+                          (contains? #{map-names-col} column)
+                          :categorical
 
                           :else
                           (get-in model/spec [:vars column]))]
@@ -310,7 +313,10 @@
                     :type map-column-type}
 
         update-fn (fn [v] (if (and (= map-column "probability") (= v 1.0)) nil v))
-        transformed-selection (mapv (fn [row] (update row map-column update-fn)) transformed-selection)
+        transformed-selection (mapv (fn [row] (update row map-column update-fn)) selections)
+
+        update-fn (fn [v] (if (= (count v) 1) (str "0" v) v))
+        transformed-selection (mapv (fn [row] (update row fips-col update-fn)) transformed-selection)
 
         spec {:$schema default-vega-lite-schema
               :width vega-map-width
@@ -322,7 +328,7 @@
                            :from {:data {:values transformed-selection}
                                   :key fips-col
                                   :fields [map-names-col]}}]
-              :projection {:type "identity"}
+              :projection {:type "albersUsa"}
               :mark "geoshape"
               :encoding {:tooltip [{:field map-names-col
                                     :type "nominal"}]}}]
