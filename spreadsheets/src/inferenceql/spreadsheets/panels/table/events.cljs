@@ -15,7 +15,7 @@
  ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
  ;; to be passed in a map.
  (fn [db [_ rows headers {:keys [scores labels virtual]}]]
-   (let [vec-maybe #(when % (vec %))] ; Casts a value to a vec if it is not nil.
+   (let [vec-maybe #(some-> % vec)] ; Casts a value to a vec if it is not nil.
      (-> db
          (assoc-in [:table-panel :rows] (vec-maybe rows))
          (assoc-in [:table-panel :headers] (vec-maybe headers))
