@@ -335,6 +335,23 @@
                    (get params-stats :parameters))})
              category)))))
     
+<<<<<<< HEAD
+=======
+(let [view {:hypers {:color  {:ps {:dirichlet {:alpha [1 1 1]}}}
+                     :happy? {:p  {:beta      {:alpha 0.5 :beta 0.5}}}}
+            :categories [{:color  {:parameters {:ps {:green 0.8 :red 0.1 :black 0.1}}
+                                   :suff-stats {:counts {:green 2 :red 0 :black 3}}}             
+                          :happy? {:parameters {:p 0.8}
+                                   :suff-stats {:counts {true 1 false 2}}}}
+                         {:color  {:parameters {:ps {:green 0.2 :red 0.4 :black 0.4}}
+                                   :suff-stats {:counts {:green 1 :red 3 :black 1}}}             
+                          :happy? {:parameters {:p 0.4}
+                                   :suff-stats {:counts {true 1 false 3}}}}]}
+      model-types {:color :categorical :happy? :bernoulli} 
+      latents {:alpha 10 :z [0 1 1 1 0 0 1 0 1 0] :counts [5 5]} ]
+     (view-simulate view model-types latents))
+
+>>>>>>> Added a bunch of primitives, logpdf and simulate for DPMM
 (let [data    {:columns {:color {:type :categorical
                                  :vals [:red :black :red :green :black
                                         :red :black :green :black]}
