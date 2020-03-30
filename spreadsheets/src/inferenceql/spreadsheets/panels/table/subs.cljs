@@ -136,11 +136,12 @@
   "Checks whether the bounds of the selection rectangles in `coords` fit the data table size."
   [coords table-width table-height]
   (if (seq coords)
-    (let [check-fn (fn [[r1 c1 r2 c2]]
-                     (and (< -1 r1 table-height)
-                          (< -1 r2 table-height)
-                          (< -1 c1 table-width)
-                          (< -1 c2 table-width)))]
+    (let [check-fn (fn [[r1 c1 r2 c2 :as coords]]
+                     (and (every? nat-int? coords)
+                          (< r1 table-height)
+                          (< r2 table-height)
+                          (< c1 table-width)
+                          (< c2 table-width)))]
       (every? check-fn coords))
     false))
 
