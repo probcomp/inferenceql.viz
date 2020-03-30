@@ -149,14 +149,13 @@
   "Augments `selection-layer` with derived data computed off the :coords in `selection-layer`."
   [selection-layer headers rows]
   (let [coords (:coords selection-layer)]
-    ;; We don't want to compute derived data if the bounds of the coords are beyond the
-    ;; data we currently have.
-    (if (valid-coords? coords (count headers) (count rows))
-      (-> selection-layer
-          (assoc :selected-columns (get-selected-columns coords headers))
-          (assoc :selections (get-selections coords headers rows))
-          (assoc :row-at-selection-start (get-row-at-selection-start coords rows)))
-      selection-layer)))
+    ;; We don't want to compute and assoc-in derived data if the bounds of the coords
+    ;; are beyond the data we currently have.
+    (cond-> selection-layer
+            (valid-coords? coords (count headers) (count rows))
+            (assoc :selected-columns (get-selected-columns coords headers)
+                   :selections (get-selections coords headers rows)
+                   :row-at-selection-start (get-row-at-selection-start coords rows)))))
 
 (rf/reg-sub :table/selection-layers-raw
             (fn [db [_sub-name]]
