@@ -172,9 +172,12 @@
                   (find-child :model)
                   (only-child))
 
-        prob-gensym (gensym "prob")
-        prob-name (keyword prob-gensym)
-        prob-sym (symbol (str "?" prob-gensym))
+        prob-sym (or (some-> more
+                             (find-child :prob-name)
+                             (only-child))
+                     (gensym "prob"))
+        prob-name (keyword prob-sym)
+        prob-var (symbol (str "?" prob-sym))
 
         target-sym (genvar "target-")
         target-clauses (let [targets (-> more
@@ -228,9 +231,9 @@
                                                      (apply merge {}))
                                  event-clause `[(~'ground ~binding-events) ~binding-sym]]
                              [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~constraints-sym]])
-        logpdf-clauses `[[(~*logpdf-symbol* ~model-var ~target-sym ~constraints-sym) ~prob-sym]]]
+        logpdf-clauses `[[(~*logpdf-symbol* ~model-var ~target-sym ~constraints-sym) ~prob-var]]]
     {:name [prob-name]
-     :find [prob-sym]
+     :find [prob-var]
      :in [model-var]
      :inputs [model]
      :where (reduce into [target-clauses
