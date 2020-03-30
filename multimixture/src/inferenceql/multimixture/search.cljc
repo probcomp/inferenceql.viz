@@ -70,8 +70,8 @@
       new-spec)))
 
 (defn importance-resampling
-  [{:keys [model inputs observation-trace n-particles]
-    :or {inputs [], observation-trace {}, n-particles 1}}]
+  [model {:keys [inputs observation-trace n-particles]
+          :or {inputs [], observation-trace {}, n-particles 1}}]
   (let [particles (mp/replicate n-particles
                                 #(mp/infer-and-score :procedure model
                                                      :inputs inputs
@@ -91,10 +91,10 @@
   [spec rows column-key beta-params {:keys [n-particles] :or {n-particles 100}}]
   (first
    ;; TODO: Setting n-particles to 1 causes IOB errors
-   (importance-resampling :model generate-1col-binary-extension
-                          :inputs [spec (count rows) column-key beta-params]
-                          :observation-trace (mmix/with-rows {} rows)
-                          {:n-particles n-particles})))
+   (importance-resampling generate-1col-binary-extension
+                          {:inputs [spec (count rows) column-key beta-params]
+                           :observation-trace (mmix/with-rows {} rows)
+                           :n-particles n-particles})))
 
 (defn score-rows
   [spec rows new-column-key]
@@ -138,8 +138,10 @@
   will be `n-models` models based on that spec. Otherwise, the number of specs
   in `spec` must equal n-models."
   [spec new-column-key known-rows unknown-rows n-models beta-params {:keys [n-particles] :or {n-particles 100}}]
-  (let [specs (if (= (type spec) clojure.lang.PersistentArrayMap)
-                (mmix-utils/prun n-models #(insert-column spec known-rows new-column-key beta-params :n-particles n-particles))
+  (let [pmap #?(:clj pmap
+                :cljs map)
+        specs (if (seq spec)
+                (mmix-utils/prun n-models #(insert-column spec known-rows new-column-key beta-params {:n-particles n-particles}))
                 (pmap #(insert-column % known-rows new-column-key beta-params {:n-particles n-particles}) spec))
         predictions (mapv #(score-rows % unknown-rows new-column-key)
                           specs)]
