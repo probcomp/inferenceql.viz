@@ -9,12 +9,12 @@
             [medley.core :as medley]))
 
 ;; Ulli: This is the name of the column in your dataset that indexes into the the topojson.
-(def fips-col "fips")
+(def fips-col "geo_fips")
 ;; Ulli: This is the name of the column in your dataset that is used to label each portion of the choropleth.
-(def map-names-col "states")
+(def map-names-col "county")
 ;; Ulli: This is the property in the topojson that is matched with `fips-col`.
-(def topojson-prop "properties.STATEFP")
-(def ^:private topojson-feature "cb_2017_us_cd115_20m")
+(def topojson-prop "id")
+(def ^:private topojson-feature "counties")
 
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
@@ -315,7 +315,9 @@
         update-fn (fn [v] (if (and (= map-column "probability") (= v 1.0)) nil v))
         transformed-selection (mapv (fn [row] (update row map-column update-fn)) selections)
 
-        update-fn (fn [v] (if (= (count v) 1) (str "0" v) v))
+        update-fn (fn [v]
+                    (let [v (str v)]
+                      (if (not= (count v) 5) (str "0" v) v)))
         transformed-selection (mapv (fn [row] (update row fips-col update-fn)) transformed-selection)
 
         spec {:$schema default-vega-lite-schema
