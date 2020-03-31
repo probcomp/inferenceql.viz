@@ -30,11 +30,7 @@
               ;; TODO: investigate more closely what each of
               ;; these options adds. And if they can be put
               ;; in the context-menu instead.
-              :dropdownMenu        ["filter_by_condition"
-                                    "filter_operators"
-                                    "filter_by_condition2"
-                                    "filter_by_value"
-                                    "filter_action_bar"]
+              :dropdownMenu true
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :outsideClickDeselects false

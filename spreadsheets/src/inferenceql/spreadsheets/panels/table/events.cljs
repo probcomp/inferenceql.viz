@@ -87,9 +87,10 @@
                                          (range (min col-start col-end) (inc (max col-start col-end)))))
 
              data-by-layer (for [layer selection-layers]
-                             (let [headers (header-for-selection layer)
-                                   [r1 c1 r2 c2] layer]
-                               (->> (.getData hot r1 c1 r2 c2)
+                             (let [headers (.getColHeader hot)
+                                   num-cols (count headers)
+                                   [r1 _c1 r2 _c2] layer]
+                               (->> (.getData hot r1 0 r2 (dec num-cols))
                                     (js->clj)
                                     (map (fn [row] (zipmap headers row))))))
              ;; Merging the row-wise data for each selection layer.

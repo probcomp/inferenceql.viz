@@ -312,13 +312,19 @@
         color-spec {:field map-column
                     :type map-column-type}
 
+        ;; Removing probability values of 1.
         update-fn (fn [v] (if (and (= map-column "probability") (= v 1.0)) nil v))
-        transformed-selection (mapv (fn [row] (update row map-column update-fn)) selections)
+        transformed-selection (if map-column
+                                (mapv (fn [row] (update row map-column update-fn)) selections)
+                                selections)
 
+        ;; Fixing county fips codes.
         update-fn (fn [v]
                     (let [v (str v)]
                       (if (not= (count v) 5) (str "0" v) v)))
         transformed-selection (mapv (fn [row] (update row fips-col update-fn)) transformed-selection)
+
+        _ (.log js/console "transformed-select: " transformed-selection)
 
         spec {:$schema default-vega-lite-schema
               :width vega-map-width
@@ -329,12 +335,12 @@
               :transform [{:lookup topojson-prop
                            :from {:data {:values transformed-selection}
                                   :key fips-col
-                                  :fields [map-names-col]}}]
+                                  :fields [map-names-col]}}
+                          {:filter (gstring/format "datum['%s']" map-names-col)}]
               :projection {:type "albersUsa"}
               :mark "geoshape"
               :encoding {:tooltip [{:field map-names-col
                                     :type "nominal"}]}}]
-
       (if map-column
         (-> spec
             (assoc-in [:encoding :color] color-spec)
@@ -453,7 +459,7 @@
                                (= type "nominal")))
 
          spec (cond (some #{fips-col} cols)
-                    (gen-choropleth table-rows cols)
+                    (gen-choropleth selections cols)
 
                     (and first-col-nominal (simulatable? selections (first cols)))
                     (gen-simulate-plot (first cols) row (name layer-name))
