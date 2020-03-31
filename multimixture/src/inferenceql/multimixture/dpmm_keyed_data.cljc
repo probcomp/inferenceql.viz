@@ -1,11 +1,26 @@
 (ns inferenceql.multimixture.dpmm-keyed-data
   (:import [org.apache.commons.math3.special Gamma])) 
 
-(defn transpose
-  "Applies the standard tranpose operation to a collection. Assumes that
-  `coll` is an object capable of having a transpose."
-  [coll]
-  (apply map vector coll))
+(defn crp-alpha-counts
+  "Given alphas and counts of customers per table, returns a categorical variable
+  representing the corresponding CRP."
+  [alpha counts]
+  (let [n (apply + counts)]
+    (->> (concat counts [alpha])
+         (map-indexed (fn [idx cnt] {idx (double (/ cnt (+ (- n 1) alpha)))}))
+         (into {}))))
+
+(defn exp-safe
+  "Safe exponentiation function accounting for NaN values."
+  [value]
+  (if (Double/isNaN value)
+    0
+    (Math/exp value)))
+
+(defn dist?
+  "Verifies whether keyword represents a distribution."
+  [value]
+  (contains?  #{:beta :bernoulli :categorical :dirichlet :gamma :gaussian} value))
 
 (defn logsumexp
   "Log-sum-exp operation for summing log probabilities without
@@ -21,6 +36,12 @@
       ##-Inf
       res)))
 
+(defn transpose
+  "Applies the standard tranpose operation to a collection. Assumes that
+  `coll` is an object capable of having a transpose."
+  [coll]
+  (apply map vector coll))
+
 (defn lgamma
   "Returns the log of `x` under a gamma function."
   [x]
@@ -31,7 +52,7 @@
 (defn bernoulli-logpdf
   "Returns log probability of `x` under a bernoulli distribution parameterized
   by `p`."
-  [p x]
+  [x p]
   (if (nil? x)
     0
     (if (boolean? x)
@@ -52,7 +73,7 @@
 (defn gamma-logpdf
   "Returns log probability of `x` under a gamma distribution parameterized
   by shape parameter `k`, with optional scale parameter `theta`."
-  ([k x]
+  ([x k]
     (gamma-logpdf k 1 x))
   ([k theta x]
    (if (nil? x)
@@ -89,7 +110,7 @@
 (defn beta-logpdf
   "Returns log probability of `x` under a beta distribution parameterized by
   `alpha` and `beta`."
-  [alpha beta x]
+  [x {:keys [:alpha :beta]}]
   (assert (and (pos? alpha) (pos? beta))
           (str "alpha and beta must be positive (" alpha ", " beta ")"))
   (if (nil? x)
@@ -100,23 +121,21 @@
           d (- beta 1)]
       (+ k (* c (Math/log x))
          (* d (Math/log (- 1 x)))))))
+(beta-logpdf 0.5 {:alpha 0.5 :beta 0.5})
 
 (defn beta-simulate
   "Generates a sample from a beta distribution with parameters `alpha` and `beta`.
   Generates `n` samples, if specified."
-  ([alpha beta]
+  ([{:keys [:alpha :beta]}]
    (let [X1 (gamma-simulate alpha)
          X2 (gamma-simulate beta)]
      (/ X1 (+ X1 X2))))
-  ([alpha beta n]
-   (repeatedly n (fn [] (beta-simulate alpha beta)))))
+  ([n {:keys [:alpha :beta] :as params}]
+   (repeatedly n (fn [] (beta-simulate params)))))
 
 (defn categorical-logpdf
-  "Log PDF for categorical distribution.
-
-  `ps` must be a vector with one argument as a map, with keywords as variables
-  and values as probabilities (e.g. [{:brown 0.8 :red 0.2}]."
-  [ps x]
+  "Log PDF for categorical distribution."
+  [x ps]
   (if (nil? x)
     0
     (let [prob (get ps x)]
@@ -126,10 +145,7 @@
 
 (defn categorical-simulate
   "Generates a sample from a categorical distribution with parameters `ps`.
-  Generates `n` samples, if specified.
-
-  `ps` must be a vector with one argument as a map, with keywords as variables
-  and values as probabilities (e.g. [{:brown 0.8 :red 0.2}]."
+  Generates `n` samples, if specified."
   ([ps]
     (let [ps-sorted (sort-by last ps)
           cdf       (second (reduce (fn [[total v] [variable p]]
@@ -143,15 +159,13 @@
           candidate (first ps-sorted)
           flip      (rand)]
       (first (first (drop-while #(< (second %) flip) cdf)))))
-  ([ps n]
+  ([n ps]
    (repeatedly n (fn [] (categorical-simulate ps)))))
-
-(categorical-simulate `{:brown 0.5 :red 0.4 :green 0.1})
 
 (defn dirichlet-logpdf
   "Returns log probability of `x` under a dirichlet distribution parameterized by
   a vector `alpha`."
-  [alpha x]
+  [x alpha]
   (assert (= (count alpha) (count x)) "alpha and x must have same length")
   (if (nil? x)
     0
@@ -170,40 +184,40 @@
     (let [y (map gamma-simulate alpha)
           Z (apply + y)]
       (mapv #(/ % Z) y)))
-  ([alpha n]
+  ([n alpha]
    (repeatedly n (fn [] (dirichlet-simulate alpha)))))
 
 (defn gaussian-logpdf
   "Returns log probability of `x` under a gaussian distribution parameterized
   by shape parameter `mu`, with optional scale parameter `sigma`."
-  [mu sigma x]
-  (let [Z-inv (- (* 0.5 (+ (Math/log sigma) (Math/log (* 2 Math/PI)))))
-        px    (* (/ 1 (* 2 sigma)) (Math/pow (- x mu) 2))]
+  [x {:keys [:mu :sigma]}]
+  (let [Z-inv (- (* 0.5 (+ (Math/log sigma) (Math/log 2) (Math/log Math/PI))))
+        px    (* -0.5 (Math/pow (/ (- x mu) sigma) 2))]
     (+ Z-inv px)))
 
 (defn gaussian-simulate
   "Generates a sample from a dirhlet distribution with vector parameter `alpha`.
   Based on a Box-Muller transform.
   Generates `n` samples, if specified."
-  ([mu sigma]
+  ([{:keys [:mu :sigma]}]
    (let [U1 (rand)
          U2 (rand)
          Z0 (* (Math/sqrt (* -2 (Math/log U1))) (Math/cos (* 2 Math/PI U2)))]
      (+ (* Z0 sigma) mu)))
-  ([mu sigma n]
-   (repeatedly n (fn [] (gaussian-simulate mu sigma)))))
+  ([n {:keys [:mu :sigma] :as params}]
+   (repeatedly n (fn [] (gaussian-simulate params)))))
 
 (defn primitive-logpdf
   "Given a primitive, its parameters, returns the log probability of
   `x` under said primitive."
-  ([primitive parameters x]
+  ([x primitive parameters]
    (case primitive
-     :bernoulli   (bernoulli-logpdf   (get parameters :p)  x)
-     :beta        (beta-logpdf        (get parameters :alpha) (get parameters :beta) x)
-     :categorical (categorical-logpdf (get parameters :ps) x)
-     :dirichlet   (dirichlet-logpdf   (get parameters :alpha) x)
-     :gamma       (gamma-logpdf       (get parameters :k) x)
-     :gaussian    (gaussian-logpdf    (get parameters :mu) (get parameters :sigma) x)))
+     :bernoulli   (bernoulli-logpdf   x parameters)
+     :beta        (beta-logpdf        x parameters)
+     :categorical (categorical-logpdf x parameters)
+     :dirichlet   (dirichlet-logpdf   x parameters)
+     :gamma       (gamma-logpdf       x parameters)
+     :gaussian    (gaussian-logpdf    x parameters)))
   ([primitive parameters]
    (partial primitive-logpdf primitive parameters)))
 
@@ -212,74 +226,56 @@
   Generates `n` samples, if specified."
   ([primitive parameters]
    (case primitive
-     :bernoulli   (bernoulli-simulate   (get parameters :p))
-     :beta        (beta-simulate        (get parameters :alpha) (get parameters :beta))
-     :categorical (categorical-simulate (get parameters :ps))
-     :dirichlet   (dirichlet-simulate   (get parameters :alpha))
-     :gamma       (gamma-simulate       (get parameters :k))
-     :gaussian    (gaussian-simulate    (get parameters :mu) (get parameters :sigma))
+     :bernoulli   (bernoulli-simulate   parameters)
+     :beta        (beta-simulate        parameters)
+     :categorical (categorical-simulate parameters)
+     :dirichlet   (dirichlet-simulate   parameters)
+     :gamma       (gamma-simulate       parameters)
+     :gaussian    (gaussian-simulate    parameters)
      (str "Primitive: " primitive " doesn't exist.")))
-  ([primitive parameters n]
+  ([n primitive parameters]
    (repeatedly n (fn [] (primitive-simulate primitive parameters)))))
 
-(defn category-column-logpdf
-  "Given a category and column variable, calculates the log probability
-  of that variable in the given category."
-  [category column]
-  (let [column-name  (get column :name)
-        column-type  (get column :type)
-        column-value (get column :value)
-        parameters   (get-in category [column-name :parameters])]
-    (primitive-logpdf column-type parameters column-value)))  
+(defn category-logpdf
+  "Calculates the log probability of data under a given category.
+  Assumes `x` contains only columns in that category."
+  [x types category] 
+  (let [parameters (:parameters category)]
+    (apply + (mapv (fn [[col value]]
+               (let [col-type   (get types col)
+                     col-params (get parameters col)]
+                 (primitive-logpdf value col-type col-params))) x))))
 
-(defn categories-column-logpdf
-  "Returns the log probability of a given value in the specified category."
-  [categories column]
-  (pmap #(category-column-logpdf % column) categories))
+(defn view-logpdf
+  "Calculates the log probability of data under a given view.
+  Assumes `x` contains only columns in that view"
+  [x types latents view]
+  (let [crp-counts      (:counts latents)
+        n               (apply + crp-counts)
+        crp-counts-norm (map #(Math/log (/ % n)) crp-counts)
+        categories      (:categories view)]
+    (->> categories
+         (map #(category-logpdf x types %))
+         (map (comp #(apply + %) vector) crp-counts-norm)
+         logsumexp)))
 
-(defn separate-datum
-  "Formates datum to be used by logpdf infrastructure."
-  [datum types]
-  (map (fn [[k v]] {:name  k
-                    :value v
-                    :type (get types k)}) datum))
-
-(defn dpmm-logpdf
-  "Returns the log probability of the value under the given DPMM model and latent values.
-  `val` is of the form {:var-0 val-0 ... :var-d val-d}"
-  [model latents value]
-  (let [dpmm              (get-in model [:views 0])
-        vars              (get dpmm :vars)
-        categories        (get dpmm :categories)
-        counts            (get-in latents [:local 0 :counts])
-        n-rows            (apply + counts)
-        n-dims            (count vars)
-        normalized-counts (map #(Math/log (/ % n-rows)) counts)]
-    (let [column-logps  (->> (get model :types)
-                             (separate-datum value)
-                             (pmap (partial categories-column-logpdf categories)))
-          category-logps (->> column-logps
-                              (transpose)
-                              (map #(reduce + %))
-                              (map + normalized-counts))]
-      (logsumexp category-logps))))
+(defn crosscat-logpdf
+  "Calculates the log probability of data under a given CrossCat model."
+  [x model latents]
+  (let [ types            (:types model)
+        view-assignments (get-in latents [:global :z])
+        views            (:views model)]
+    (->> views
+         (map-indexed (fn [view-idx view]
+                        (let [x-view (into {} (filter #(= view-idx
+                                                          (get view-assignments (first %)))
+                                                      x))]
+                          (view-logpdf x-view types (get-in latents [:local view-idx]) view))))
+         (apply +))))
 
 
-(defn crp-alpha-counts
-  "Given alphas and counts of customers per table, returns a categorical variable
-  representing the corresponding CRP."
-  [alpha counts]
-  (let [n (apply + counts)]
-    (->> (concat counts [alpha])
-         (map-indexed (fn [idx cnt] {idx (double (/ cnt (+ (- n 1) alpha)))}))
-         (into {}))))
+ 
 
-(defn exp-safe
-  "Safe exponentiation function accounting for NaN values."
-  [value]
-  (if (Double/isNaN value)
-    0
-    (Math/exp value)))
 
 (defn category-assignment-simulate
   "Simulates a category assignment given a view's concentration parameter
@@ -294,14 +290,39 @@
   (let [[primitive parameters] (first (vec hyperprior))]
     (primitive-simulate primitive parameters)))
 
-(defn column-parameters-simulate
-  "Samples new hyperparameters for a given column."
-  [parameters-hyperpriors]
-  (into {} (map (fn [[parameter hyperprior]]
-                  {parameter (hyperprior-simulate hyperprior)})
-                parameters-hyperpriors)))
+(defn category-simulate
+  "Given a category and statistical types, simulates a value from that category."
+  [types category]
+  (let [parameters (:parameters category)]
+    (into {}
+          (pmap (fn [[col-name col-params]]
+                  (let [col-type (col-name types)]
+                    {col-name (primitive-simulate col-type col-params)}))
+                parameters))))
+
+(defn generate-category
+  "Given a view and statistical types, simulates a category specification
+  from that view."
+  [view types]
+  (let [hypers     (:hypers view)
+        view-types (select-keys types (keys hypers)) ]
+    (->> hypers
+         (pmap (fn [[col-name hyperpriors]]
+                 {col-name (if (> (count (keys hyperpriors)) 1)
+                             (into {} (map (fn [[ hyper-name hyper-dist]]
+                                             {hyper-name
+                                              (hyperprior-simulate hyper-dist)}) hyperpriors))
+                             ;; Need the below hack to get keyword arguments
+                             ;; for categorical variable.
+                            (if (= :categorical (col-name view-types))
+                              (zipmap (keys (get-in view [:categories 0 :parameters col-name]))
+                                      (hyperprior-simulate hyperpriors))
+                              (hyperprior-simulate hyperpriors)))}))
+         (into {})
+         (assoc {} :parameters))))
 
 (defn view-simulate
+<<<<<<< HEAD
   "Simulates a datum from a view, following the correct specification."
   [view model-types latents]
   (let [hypers              (get view :hypers)
@@ -375,3 +396,23 @@
                                       :happy? {:parameters {:p 0.4}
                                                :suff-stats {:counts {true 1 false 3}}}}]}]}]
   (view-simulate (get-in model [:views 0]) (get model :types) (get-in latents [:local 0])))
+=======
+  "Given latents and a view, simulates a sample from that view."
+  [types latents view]
+  (let [alpha         (:alpha latents)
+        counts        (:counts latents)
+        n-categories  (count counts)
+        y             (category-assignment-simulate alpha counts)]
+    (if (= y n-categories)
+      (category-simulate types (generate-category  view types))
+      (category-simulate types (get-in view [:categories y])))))
+
+(defn crosscat-simulate
+  "Given a CrossCat model and latent variables, simulates a sample from
+  that model."
+  [model latents]
+  (let [column-types (:types model)
+        views        (:views model)
+        view-latents (map vector views (:local latents))]
+    (into {} (pmap (fn [[view latent]] (view-simulate column-types latent view)) view-latents))))
+>>>>>>> Refactored to make spec much more similar to existing `multimixture`
