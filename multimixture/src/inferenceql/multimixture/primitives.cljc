@@ -28,24 +28,21 @@
 (defn gamma-logpdf
   "Returns log probability of `x` under a gamma distribution parameterized
   by shape parameter `k`, with optional scale parameter `theta`."
-  ([x k]
-    (gamma-logpdf k 1 x))
-  ([k theta x]
-   (if-not x
-     0
-     (let [Z-inv (- (+ (lgamma k)
-                       (* k (Math/log theta))))
-           px    (- (* (- k 1)
-                       (Math/log x))
-                    (/ x theta))]
-       (+ Z-inv px)))))
+  [x {:keys [:k :theta]}]
+   (let [theta (if-not theta 1 theta)  ; Hack because defaults don't work.
+         Z-inv (- (+ (lgamma k)
+                     (* k (Math/log theta))))
+         px    (- (* (- k 1)
+                     (Math/log x))
+                  (/ x theta))]
+     (+ Z-inv px)))
 
 (defn gamma-simulate
   "Generates a sample from a gamma distribution with shape parameter `k`.
   Based on 'Generating Gamma and Beta Random Variables with Non-Integral Shape Parameters'
   by J Whittaker.
   Generates `n` samples, if specified."
-  ([k]
+  ([{:keys [:k :theta]}]
     (if (< k 1)
       (let [u1 (rand)
             u2 (rand)
@@ -64,8 +61,8 @@
                                         #(Math/log (rand)))))
             gamma-frac-k  (if (zero? frac-k) 0 (gamma-simulate frac-k))]
         (+ gamma-floor-k gamma-frac-k))))
-  ([n k]
-     (repeatedly n #(gamma-simulate k))))
+  ([n {:keys [:k :theta] :as parameters}]
+     (repeatedly n #(gamma-simulate parameters))))
 
 (defn beta-logpdf
   "Returns log probability of `x` under a beta distribution parameterized by
