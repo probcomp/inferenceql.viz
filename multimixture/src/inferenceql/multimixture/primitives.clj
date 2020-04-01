@@ -44,23 +44,26 @@
   Generates `n` samples, if specified."
   ([{:keys [:k :theta]}]
     (if (< k 1)
-      (let [u1 (rand)
-            u2 (rand)
-            u3 (rand)
-            S1 (Math/pow u1 k)
-            S2 (Math/pow u2 (- 1 k))]
+      (let [u1    (rand)
+            u2    (rand)
+            u3    (rand)
+            S1    (Math/pow u1 k)
+            S2    (Math/pow u2 (- 1 k))
+            theta (if-not theta 1 theta)]
         (if (<= (+ S1 S2) 1)
           (let [Y (/ S1
                      (+ S1 S2))]
-            (* (- (- 1  Y))
+            (* theta
+               (- (- 1  Y))
                (Math/log u3)))  ; Had to switch this, contrary to the literature.
-          (gamma-simulate k)))
-      (let [frac-k        (- k (int k))
-            gamma-floor-k (- (apply + (repeatedly
+          (gamma-simulate {:k k :theta theta})))
+      (let [theta         (if-not theta 1 theta)
+            frac-k        (- k (int k))
+            gamma-floor-k (- (reduce + (repeatedly
                                         (int k)
                                         #(Math/log (rand)))))
-            gamma-frac-k  (if (zero? frac-k) 0 (gamma-simulate frac-k))]
-        (+ gamma-floor-k gamma-frac-k))))
+            gamma-frac-k  (if (zero? frac-k) 0 (gamma-simulate {:k frac-k}))]
+        (* theta (+ gamma-floor-k gamma-frac-k)))))
   ([n {:keys [:k :theta] :as parameters}]
      (repeatedly n #(gamma-simulate parameters))))
 
@@ -82,8 +85,8 @@
   "Generates a sample from a beta distribution with parameters `alpha` and `beta`.
   Generates `n` samples, if specified."
   ([{:keys [:alpha :beta]}]
-   (let [X1 (gamma-simulate alpha)
-         X2 (gamma-simulate beta)]
+   (let [X1 (gamma-simulate {:k alpha})
+         X2 (gamma-simulate {:k beta})]
      (/ X1 (+ X1 X2))))
   ([n {:keys [:alpha :beta] :as params}]
    (repeatedly n #(beta-simulate params))))
@@ -135,8 +138,8 @@
   "Generates a sample from a dirhlet distribution with vector parameter `alpha`.
   Generates `n` samples, if specified."
   ([alpha]
-    (let [y (map gamma-simulate alpha)
-          Z (apply + y)]
+    (let [y (map #(gamma-simulate {:k %}) alpha)
+          Z (reduce + y)]
       (mapv #(/ % Z) y)))
   ([n alpha]
    (repeatedly n #(dirichlet-simulate alpha))))
@@ -177,7 +180,7 @@
      :dirichlet   (dirichlet-logpdf   x parameters)
      :gamma       (gamma-logpdf       x parameters)
      :gaussian    (gaussian-logpdf    x parameters)
-     (ex-info "Primitive doesn't exist." {:primitive primitive})))
+     (throw  (ex-info "Primitive doesn't exist." {:primitive primitive}))))
   ([primitive parameters]
    (partial logpdf primitive parameters)))
 
@@ -192,6 +195,6 @@
      :dirichlet   (dirichlet-simulate   parameters)
      :gamma       (gamma-simulate       parameters)
      :gaussian    (gaussian-simulate    parameters)
-     (ex-info "Primitive doesn't exist." {:primitive primitive})))
+     (throw (ex-info "Primitive doesn't exist." {:primitive primitive}))))
   ([n primitive parameters]
    (repeatedly n #(simulate primitive parameters))))
