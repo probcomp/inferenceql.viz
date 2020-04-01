@@ -33,8 +33,11 @@
   ([k theta x]
    (if-not x
      0
-     (let [Z-inv (- (+ (lgamma k) (* k (Math/log theta))))
-           px    (- (* (- k 1) (Math/log x)) (/ x theta))]
+     (let [Z-inv (- (+ (lgamma k)
+                       (* k (Math/log theta))))
+           px    (- (* (- k 1)
+                       (Math/log x))
+                    (/ x theta))]
        (+ Z-inv px)))))
 
 (defn gamma-simulate
@@ -50,9 +53,11 @@
             S1 (Math/pow u1 k)
             S2 (Math/pow u2 (- 1 k))]
         (if (<= (+ S1 S2) 1)
-          (let [Y (/ S1 (+ S1 S2))]
-            (* (- (- 1  Y)) (Math/log u3)))  ; Had to switch this,
-          (gamma-simulate k)))               ; contrary to the literature.
+          (let [Y (/ S1
+                     (+ S1 S2))]
+            (* (- (- 1  Y))
+               (Math/log u3)))  ; Had to switch this, contrary to the literature.
+          (gamma-simulate k)))
       (let [frac-k        (- k (int k))
             gamma-floor-k (- (apply + (repeatedly
                                         (int k)
@@ -69,7 +74,8 @@
   (assert (and (pos? alpha) (pos? beta))
           (str "alpha and beta must be positive (" alpha ", " beta ")"))
   (let [k (- (lgamma (+ alpha beta))
-             (+ (lgamma alpha) (lgamma beta)))
+             (+ (lgamma alpha)
+                (lgamma beta)))
         c (- alpha 1)
         d (- beta 1)]
     (+ k (* c (Math/log x))
@@ -122,7 +128,8 @@
                              (reduce +))
                         (lgamma (reduce + alpha)))
         logDirichlet (apply + (map (fn [alpha-k x-k]
-                                     (* (- alpha-k 1) (Math/log x-k)))
+                                     (* (- alpha-k 1)
+                                        (Math/log x-k)))
                                    alpha
                                    x))]
     (+ Z-inv logDirichlet)))
@@ -141,8 +148,12 @@
   "Returns log probability of `x` under a gaussian distribution parameterized
   by shape parameter `mu`, with optional scale parameter `sigma`."
   [x {:keys [:mu :sigma]}]
-  (let [Z-inv (- (* 0.5 (+ (Math/log sigma) (Math/log 2) (Math/log Math/PI))))
-        px    (* -0.5 (Math/pow (/ (- x mu) sigma) 2))]
+  (let [Z-inv (* -0.5 (+ (Math/log sigma)
+                         (Math/log 2)
+                         (Math/log Math/PI)))
+        px    (* -0.5 (Math/pow (/ (- x mu)
+                                   sigma)
+                                2))]
     (+ Z-inv px)))
 
 (defn gaussian-simulate
@@ -152,7 +163,8 @@
   ([{:keys [:mu :sigma]}]
    (let [U1 (rand)
          U2 (rand)
-         Z0 (* (Math/sqrt (* -2 (Math/log U1))) (Math/cos (* 2 Math/PI U2)))]
+         Z0 (* (Math/sqrt (* -2 (Math/log U1)))
+               (Math/cos (* 2 Math/PI U2)))]
      (+ (* Z0 sigma) mu)))
   ([n {:keys [:mu :sigma] :as params}]
    (repeatedly n #(gaussian-simulate params))))
