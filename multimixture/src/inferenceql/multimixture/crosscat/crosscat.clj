@@ -86,23 +86,25 @@
 (defn generate-category
   "Given a view and statistical types, simulates a category specification
   from that view."
-  [view types]
-  (let [hypers     (:hypers view)
-        view-types (select-keys types (keys hypers)) ]
-    (->> hypers
-         (pmap (fn [[col-name hyperpriors]]
-                 {col-name (if (> (count (keys hyperpriors)) 1)
-                             (into {} (map (fn [[ hyper-name hyper-dist]]
-                                             {hyper-name
-                                              (hyperprior-simulate hyper-dist)}) hyperpriors))
-                             ; Need the below hack to get keyword arguments
-                             ; for categorical variable.
-                            (if (= :categorical (col-name view-types))
-                              (zipmap (keys (get-in view [:categories 0 :parameters col-name]))
-                                      (hyperprior-simulate hyperpriors))
-                              (hyperprior-simulate hyperpriors)))}))
-         (into {})
-         (assoc {} :parameters))))
+  ([view types]
+   (let [hypers     (:hypers view)
+         view-types (select-keys types (keys hypers)) ]
+     (->> hypers
+          (pmap (fn [[col-name hyperpriors]]
+                  {col-name (if (> (count (keys hyperpriors)) 1)
+                              (into {} (map (fn [[ hyper-name hyper-dist]]
+                                              {hyper-name
+                                               (hyperprior-simulate hyper-dist)}) hyperpriors))
+                              ; Need the below hack to get keyword arguments
+                              ; for categorical variable.
+                             (if (= :categorical (col-name view-types))
+                               (zipmap (keys (get-in view [:categories 0 :parameters col-name]))
+                                       (hyperprior-simulate hyperpriors))
+                               (hyperprior-simulate hyperpriors)))}))
+          (into {})
+          (assoc {} :parameters))))
+  ([n view types]
+   (repeatedly n #(generate-category view types))))
 
 (defn view-simulate
   "Given latents and a view, simulates a sample from that view."
