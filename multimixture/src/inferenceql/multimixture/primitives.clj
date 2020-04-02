@@ -1,4 +1,5 @@
 (ns inferenceql.multimixture.primitives
+  (:require [inferenceql.multimixture.utils :as mmix-utils])
   (:import [org.apache.commons.math3.special Gamma]))
 
 (defn lgamma
@@ -118,6 +119,26 @@
   ([n ps]
    (repeatedly n #(categorical-simulate ps))))
 
+(defn log-categorical-simulate
+  "Generates a sample from a categorical distribution with parameters `ps`,
+  which are log probabilities.
+  Generates `n` samples, if specified."
+  ([ps]
+    (let [ps-sorted (sort-by last ps)
+          cdf       (second (reduce (fn [[total v] [variable p]]
+                                      (let [new-p (if (= total 0)
+                                                    p
+                                                    (+ (mmix-utils/logsumexp [total p])))
+                                            new-entry [variable new-p]]
+                                        [new-p (conj v new-entry)]))
+                                    [0 []]
+                                    ps-sorted))
+          candidate (first ps-sorted)
+          flip      (Math/log (rand))]
+      (ffirst (drop-while #(< (second %) flip) cdf))))
+  ([n ps]
+   (repeatedly n #(categorical-simulate ps))))
+
 (defn dirichlet-logpdf
   "Returns log probability of `x` under a dirichlet distribution parameterized by
   a vector `alpha`."
@@ -180,7 +201,7 @@
      :dirichlet   (dirichlet-logpdf   x parameters)
      :gamma       (gamma-logpdf       x parameters)
      :gaussian    (gaussian-logpdf    x parameters)
-     (throw  (ex-info "Primitive doesn't exist." {:primitive primitive}))))
+     (throw  (ex-info (str  "Primitive doesn't exist: " primitive) {:primitive primitive}))))
   ([primitive parameters]
    (partial logpdf primitive parameters)))
 
