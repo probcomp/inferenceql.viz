@@ -1,4 +1,4 @@
-(ns inferenceql.multimixture.crosscat.kernels
+(ns inferenceql.multimixture.crosscat.kernels.category
   (:require [inferenceql.multimixture.crosscat   :as xcat] 
             [inferenceql.multimixture.primitives :as prim]
             [inferenceql.multimixture.utils      :as mmix-utils])) 
@@ -6,9 +6,8 @@
 (defn category-weights
   "Returns the weights of each category in the view, based on
   the number of data in each category.
-  Refer to Algoirthm 8 of
-  the Neal paper for more information."
-  [latents y-current singleton? m]
+  Refer to Algoirthm 8 of the Neal paper for more information."
+  [latents y singleton? m]
  (let [counts          (:counts latents)
        alpha           (:alpha latents)
        weight-aux      (Math/log (/ alpha m))
@@ -16,7 +15,7 @@
        norm            (+ n -1 alpha)
        weights         (map-indexed (fn [idx cnt]
                                       (cond
-                                        (= idx y-current) (if singleton?
+                                        (= idx y) (if singleton?
                                                              weight-aux
                                                              (Math/log (/ (dec cnt)
                                                                           norm)))
@@ -40,7 +39,7 @@
   "Sample a new category assignment based on weighted log scores
   of a datum against all clusters (including auxiliary ones)."
   [weights scores]
- (let [logps (map (comp #(reduce + %) vector) weights scores)
+ (let [logps (pmap (comp #(reduce + %) vector) weights scores)
        Z     (mmix-utils/logsumexp logps)]
     (->> logps
          (map-indexed (fn [idx logp] {idx (- logp Z)}))
@@ -51,21 +50,21 @@
   "Update the view latents data structure.
   If set to delete, we take extra precautions outlined
   in `kernel-row`."
-  [row-id y-current y-new latents delete?]
+  [row-id y y' latents delete?]
   (-> latents
-      (update-in [:counts y-current] dec)
-      (update-in [:counts y-new]     #(if-not %
+      (update-in [:counts y] dec)
+      (update-in [:counts y']     #(if-not %
                                         1   
                                         (inc %)))
-      (assoc-in [:y row-id] y-new)
+      (assoc-in [:y row-id] y')
       ((fn [latents]
         (if delete?
            (-> latents 
                (update :counts (comp vec #(remove #{0} %)))
-               (update :y #(mapv (fn [y] 
-                                  (if (> y y-current)
-                                    (dec y)
-                                    y)) %)))
+               (update :y #(mapv (fn [assignment] 
+                                  (if (> assignment y)
+                                    (dec assignment)
+                                    assignment)) %)))
           latents)))))
 
 (defn kernel-row
@@ -87,25 +86,25 @@
     -- Update latents; the simplest."
   [x row-id m types latents view]
   (let [category-counts     (:counts latents)
-        y                   (:y      latents)
+        ys                  (:y      latents)
         alpha               (:alpha  latents)
-        y-current           (nth y row-id)
+        y                   (nth ys row-id)
         n-clusters          (count (:categories view)) 
-        singleton?          (= 1 (nth category-counts y-current))
-        [new-m weights]     (category-weights latents y-current singleton? m)
+        singleton?          (= 1 (nth category-counts y))
+        [new-m weights]     (category-weights latents y singleton? m)
         [categories scores] (category-scores x view types new-m)
-        y-new               (category-sample weights scores)
-        category-new        (nth categories y-new)
-        category-current    (nth categories y-current)]
-    (if (= y-current y-new)
+        y'               (category-sample weights scores)
+        category-new        (nth categories y')
+        category    (nth categories y)]
+    (if (= y y')
       [latents view]  ; Return latents and view unchanged.
       (if singleton?
-        (if (>= y-new n-clusters)  ; Don't delete, just replace with new parameters.
-          [latents (assoc-in view [:categories y-current] category-new)]
-          [(latents-update row-id y-current y-new latents true)
-           (update view :categories #(mmix-utils/vec-remove y-current %))]) ; Update and delete. 
-        (let [latents-new  (latents-update row-id y-current y-new latents false)]
-          (if (>= y-new n-clusters)
+        (if (>= y' n-clusters)  ; Don't delete, just replace with new parameters.
+          [latents (assoc-in view [:categories y] category-new)]
+          [(latents-update row-id y y' latents true)
+           (update view :categories #(mmix-utils/vec-remove y %))]) ; Update and delete. 
+        (let [latents-new  (latents-update row-id y y' latents false)]
+          (if (>= y' n-clusters)
             [latents-new
              (update view :categories #(conj % category-new))]
             [latents-new
@@ -140,46 +139,9 @@
                                           values)))
                             (mmix-utils/transpose)
                             (mapv #(apply merge %)))
-        types (:types model)]
-    (pmap #(kernel-view data-formatted %1 types %2 m)
-          (:views model)
-          (:local latents))))
-
-;; 1 | green | true  | 6.0
-;; 2 | red   | false | 4.2
-;; 3 | black | false | 3.8
-;; 4 | green |       | 5.7
-;; 5 | red   | false | 3.5
-;; 6 | black | false | 3.0
-;; 7 | green | true  | 6.5
-;; 8 | green |       | 6.4
-;; 9 | black | false | 5.1
-;; 10| red   |       | 3.8
-(let [data    {:color ["red" "black" "red" "green" "black"
-                       "red" "black" "green" "black"]
-               :happy? [true false false false nil
-                        false nil false true nil]}
-      model {:types {:color :categorical :happy? :bernoulli :height :gaussian}  ;; Stat. types of each column.
-             :u     [true true]                               ;; Booleans indicating uncollapsed col.
-             :views [{:hypers {:color  {:dirichlet [1 1 1]}
-                               :happy? {:beta      {:alpha 0.5 :beta 0.5}}}
-                      :categories [{:parameters  {:color {"green" 0.8 "red" 0.1 "black" 0.1}
-                                                  :happy? 0.8}}
-                                   {:parameters  {:color {"green" 0.2 "red" 0.4 "black" 0.4}
-                                                  :happy? 0.4}}]}
-                     {:hypers {:height {:mu    {:beta {:alpha 0.5 :beta 0.5}}
-                                        :sigma {:gamma {:k 0.9}}}}
-                      :categories [{:parameters {:height {:mu 5.5 :sigma 0.5}}}
-                                   {:parameters {:height {:mu 3.4 :sigma 0.2}}}]}]}
-      latents {:global {:alpha 1
-                        :z {:color 0 :happy? 0 :height 1}
-                        :counts [2 1]}
-               :local [{:alpha 1
-                        :y [0 1 1 1 0 0 1 0 1 0]
-                        :counts [5 5]}
-                       {:alpha 1
-                        :y [0 1 1 1 1 1 0 0 1 1]
-                        :counts [3 7]}]}
-      x {:color "black" :happy? false}
-      m 1]
-  (kernel data model latents m))
+        types (:types model)
+        [local-latents views] (mmix-utils/transpose (pmap #(kernel-view data-formatted %1 types %2 m)
+                                (:views model)
+                                (:local latents)))]
+  [(assoc model :views views) 
+   (assoc latents :local local-latents)]))
