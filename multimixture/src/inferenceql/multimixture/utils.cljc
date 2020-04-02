@@ -24,3 +24,8 @@
   `coll` is an object capable of having a transpose."
   [coll]
   (apply map vector coll))
+
+(defn vec-remove
+  "Removes element from coll by index."
+  [idx coll]
+  (vec (concat (subvec coll 0 idx) (subvec coll (inc idx)))))
