@@ -137,15 +137,18 @@
   "Conducts classic search via importance sampling, parallelized. If only one spec is given, there
   will be `n-models` models based on that spec. Otherwise, the number of specs
   in `spec` must equal n-models."
-  [spec new-column-key known-rows unknown-rows n-models beta-params {:keys [n-particles] :or {n-particles 100}}]
-  (let [pmap #?(:clj pmap
-                :cljs map)
-        specs (if (seq spec)
-                (mmix-utils/prun n-models #(insert-column spec known-rows new-column-key beta-params {:n-particles n-particles}))
-                (pmap #(insert-column % known-rows new-column-key beta-params {:n-particles n-particles}) spec))
-        predictions (mapv #(score-rows % unknown-rows new-column-key)
-                          specs)]
-    (into []
-          (map #(/ (reduce + %)
-                   n-models))
-          (transpose predictions))))
+  ;; Additional arity for calling search without an options map.
+  ([spec new-column-key known-rows unknown-rows n-models beta-params]
+   (search spec new-column-key known-rows unknown-rows n-models beta-params {}))
+  ([spec new-column-key known-rows unknown-rows n-models beta-params {:keys [n-particles] :or {n-particles 100}}]
+   (let [pmap #?(:clj pmap
+                 :cljs map)
+         specs (if (seq spec)
+                 (mmix-utils/prun n-models #(insert-column spec known-rows new-column-key beta-params {:n-particles n-particles}))
+                 (pmap #(insert-column % known-rows new-column-key beta-params {:n-particles n-particles}) spec))
+         predictions (mapv #(score-rows % unknown-rows new-column-key)
+                           specs)]
+     (into []
+           (map #(/ (reduce + %)
+                    n-models))
+           (transpose predictions)))))
