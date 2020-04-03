@@ -119,10 +119,11 @@
   the data rows returned may have mismatched data from different rows in `rows`."
   [coords headers rows]
   (let [data-by-layer (for [layer coords]
-                        (let [[r1 c1 r2 c2] layer
-                              rows-in-layer (subvec rows (min r1 r2) (inc (max r1 r2)))
-                              selected-headers (header-for-selection headers layer :ascending true)]
-                          (map #(select-keys % selected-headers) rows-in-layer)))]
+                        (let [[r1 _c1 r2 _c2] layer]
+                          ;; NOTE: This returns full rows corresponding to the rows in the
+                          ;; selection rectangle, but does not subset to the columns selected.
+                          ;; This is done intentionally so that full rows are returns as selections.
+                          (subvec rows (min r1 r2) (inc (max r1 r2)))))]
     ;; Merging the row-wise data for each selection layer.
     (apply mapv merge data-by-layer)))
 
