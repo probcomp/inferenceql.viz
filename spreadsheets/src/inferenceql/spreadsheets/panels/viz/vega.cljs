@@ -6,18 +6,14 @@
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.table.db :as table-db]
+            [inferenceql.spreadsheets.config :as config]
             [goog.string :as gstring]
             [medley.core :as medley]))
 
-;;This is the name of the column in your dataset that indexes into the the topojson.
-(def ^:private fips-col "geo_fips")
-;; This is the name of the column in your dataset that is used to label each portion of the choropleth.
-(def ^:private map-names-col "county")
-
-;; This is the property in the topojson feature that is matched with `fips-col`.
-(def ^:private topojson-prop "id")
-;; This is the key for the collection of objects in the topojson that we will match with rows.
-(def ^:private topojson-feature "counties")
+;; These are defs related to choropleth related columns in the dataset.
+;; See spreadsheets/resources/config.edn for more info.
+(def ^:private fips-col (get-in config/config [:topojson :table-fips-col]))
+(def ^:private map-names-col (get-in config/config [:topojson :table-map-names-col]))
 
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
@@ -148,41 +144,45 @@
                     :type "quantitative"}}}))
 
 (defn gen-choropleth [selections selected-columns]
-  (let [map-column (first (filter #(not= fips-col %) selected-columns))
-        map-column-type (when map-column
-                          (condp = (stattype map-column)
-                                 dist/gaussian "quantitative"
-                                 dist/categorical "nominal"))
-        color-spec {:field map-column
-                    :type map-column-type}
+  ;; TODO: Add a spec for topojson config map.
+  (when-let [topojson-config (get config/config :topojson)]
+    (let [;; The other column selected, if any.
+          map-column (first (filter #(not= fips-col %) selected-columns))
 
-        ;; Removes probability values of 1.
-        clean-probs (fn [v] (if (= v 1.0) nil v))
-        ;; Adding padding to fips codes.
-        clean-fips (fn [v]
-                     (let [fips-code-len 5]
-                       (left-pad v fips-code-len \0)))
-        cleaned-selections (->> selections
-                                (mapv #(medley/update-existing % "probability" clean-probs))
-                                (mapv #(medley/update-existing % fips-col clean-fips)))
+          pad-fips (fn [v] (left-pad v (get topojson-config :fips-code-length) \0))
+          cleaned-selections (cond->> selections
+                                      (= map-column "probability")
+                                      ;; Remove rows with probability values of 1.
+                                      (remove #(= (get % "probability") 1.0))
 
-        spec {:$schema default-vega-lite-schema
-              :width vega-map-width
-              :height vega-map-height
-              :data {:values js/topojson
-                     :format {:type "topojson"
-                              :feature topojson-feature}}
-              :transform [{:lookup topojson-prop
-                           :from {:data {:values cleaned-selections}
-                                  :key fips-col
-                                  :fields [map-names-col]}}
-                          ;; We filter entities in the topojson that did not join on a row
-                          ;; in `cleaned-selections`.
-                          {:filter (gstring/format "datum['%s']" map-names-col)}]
-              :projection {:type "albersUsa"}
-              :mark "geoshape"
-              :encoding {:tooltip [{:field map-names-col
-                                    :type "nominal"}]}}]
+                                      (some? (get topojson-config :fips-code-length))
+                                      ;; Add padding to fips codes.
+                                      (mapv #(medley/update-existing % fips-col pad-fips)))
+
+          spec {:$schema default-vega-lite-schema
+                :width vega-map-width
+                :height vega-map-height
+                :data {:values (get topojson-config :data)
+                       :format {:type "topojson"
+                                :feature (get topojson-config :feature)}}
+                :transform [{:lookup (get topojson-config :prop)
+                             :from {:data {:values cleaned-selections}
+                                    :key fips-col
+                                    :fields [map-names-col]}}
+                            ;; We filter entities in the topojson that did not join on a row
+                            ;; in `cleaned-selections`.
+                            {:filter (gstring/format "datum['%s']" map-names-col)}]
+                :projection {:type (get topojson-config :projection-type)}
+                :mark "geoshape"
+                :encoding {:tooltip [{:field map-names-col
+                                      :type "nominal"}]}}
+
+          map-column-type (when map-column
+                            (condp = (stattype map-column)
+                                   dist/gaussian "quantitative"
+                                   dist/categorical "nominal"))
+          color-spec {:field map-column
+                      :type map-column-type}]
       ;; If we have another column selected besides `fips-col`,
       ;; color the choropleth according to the values in that column, `map-column`.
       (if-not map-column
@@ -190,7 +190,7 @@
         (-> spec
             (assoc-in [:encoding :color] color-spec)
             (update-in [:encoding :tooltip] conj color-spec)
-            (update-in [:transform 0 :from :fields] conj map-column)))))
+            (update-in [:transform 0 :from :fields] conj map-column))))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
@@ -299,7 +299,7 @@
          selections :selections
          cols :selected-columns
          row :row-at-selection-start} selection-layer
-         spec (cond (some #{fips-col} cols)
+         spec (cond (and (some? fips-col) (some #{fips-col} cols))
                     (gen-choropleth selections cols)
 
                     (simulatable? selections cols)
