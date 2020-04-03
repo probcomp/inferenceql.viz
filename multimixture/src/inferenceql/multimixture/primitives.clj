@@ -5,7 +5,7 @@
 (defn lgamma
   "Returns the log of `x` under a gamma function."
   [x]
-  (if-not x  
+  (if-not x
    0
    (Gamma/logGamma x)))
 
@@ -95,6 +95,7 @@
 (defn categorical-logpdf
   "Log PDF for categorical distribution."
   [x ps]
+  (assert (= 1.0 (reduce + (vals ps))) ps)
   (let [prob (get ps x)]
     (if-not prob
       ##-Inf
