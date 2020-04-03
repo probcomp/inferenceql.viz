@@ -144,6 +144,7 @@ where `latents-g` refers to `(:global latents)` and `latents-l` refers to some e
   - `latents` [`latents-l`]: local latents of the current view.
   - `m`             [`int`]: number of auxiliary categories to consider.
 - Out:
+  - [`vec latents-l view`]: updated local latents reflecting potential category assignment changes, updated view reflecting categories being potentially added or deleted.
 - Cases to cover:
   - `data` contains 1 row.
     - This is equivalent to running `kernel-row` after filtering `data` for view-specific columns. If `kernel-rows` tests pass, and this runs, then it can be said to work.
