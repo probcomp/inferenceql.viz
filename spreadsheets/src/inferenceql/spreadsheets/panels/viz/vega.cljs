@@ -25,10 +25,11 @@
 (def cols-invalid-for-sim #{fips-col map-names-col hot/label-col-header hot/score-col-header})
 
 (defn simulatable?
-  "Checks if `selection` is valid for simulation"
-  [selection col]
-  (and (table-db/one-cell-selected? selection)
-       (not (contains? cols-invalid-for-sim col))))
+  "Checks if `selections` and `cols` are valid for simulation"
+  [selections cols]
+  (and (= 1 (count selections)) ; Single row selected.
+       (= 1 (count cols)) ; Single column selected.
+       (not (contains? cols-invalid-for-sim (first cols)))))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -301,7 +302,7 @@
          spec (cond (some #{fips-col} cols)
                     (gen-choropleth selections cols)
 
-                    (simulatable? selections (first cols))
+                    (simulatable? selections cols)
                     (gen-simulate-plot (first cols) row (name layer-name))
 
                     (= 1 (count cols)) ; One column selected.
