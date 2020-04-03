@@ -319,4 +319,6 @@
     (when (seq spec-layers)
       {:$schema default-vega-lite-schema
        :hconcat spec-layers
-       :resolve {:legend {:size "independent"}}})))
+       :resolve {:legend {:size "independent"
+                          :color "independent"}
+                 :scale {:color "independent"}}})))
