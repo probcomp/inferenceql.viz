@@ -13,11 +13,11 @@
    ["-m" "--model MODEL" "model EDN path"]
    ["-h" "--help"]])
 
-(defn read-model
+(defn slurp-model
   [x]
   (-> (slurp x) (edn/read-string) (search/optimized-row-generator)))
 
-(defn read-csv
+(defn slurp-csv
   [x]
   (let [data (csv/read-csv (slurp x))
         headers (map keyword (first data))
@@ -66,6 +66,6 @@
           (errorln summary)
 
           :else
-          (let [data (read-csv data)
-                model (read-model model)]
+          (let [data (slurp-csv data)
+                model (slurp-model model)]
             (repl data {:model model})))))

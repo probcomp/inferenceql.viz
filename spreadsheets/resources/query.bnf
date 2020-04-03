@@ -8,7 +8,9 @@ query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (
 selections          ::= star | p-column-or-prob (<','> <ws>? p-column-or-prob)*
 <p-column-or-prob>  ::= column-or-prob | <'('> column-or-prob <')'>
 <column-or-prob>    ::= column-selection | probability-of
-column-selection    ::= column-name
+column-selection    ::= column-name (<ws> as-clause)?
+as-clause           ::= <'AS'> <ws> selection-name
+selection-name      ::= symbol
 
 (* Sources *)
 
@@ -41,7 +43,7 @@ bindings            ::= binding (<','> <ws> binding)*
 
 (* Probability *)
 
-probability-of      ::= <'PROBABILITY OF'> <ws> target (<ws> <'GIVEN'> <ws> constraints)? <ws> <'UNDER'> <ws> model (<ws> <'AS'> <ws> prob-name)?
+probability-of      ::= <'PROBABILITY OF'> <ws> target (<ws> <'GIVEN'> <ws> constraints)? <ws> <'UNDER'> <ws> model (<ws> as-clause)?
 target              ::= events
 constraints         ::= events
 binding             ::= column-name <ws>? <'='> <ws>? value
@@ -49,7 +51,6 @@ binding             ::= column-name <ws>? <'='> <ws>? value
 <event>             ::= binding-event | column-event
 binding-event       ::= binding
 column-event        ::= column-name
-prob-name           ::= symbol
 
 (* Literals *)
 

@@ -97,8 +97,9 @@
 
 (def global-transformations
   (merge literal-transformations
-         {:column-name keyword
-          :model-name  keyword}))
+         {:selection-name keyword
+          :column-name    keyword
+          :model-name     keyword}))
 
 (defn transform
   "Navigates a parse tree transforming literal nodes "
@@ -160,11 +161,15 @@
 (defn transform-column-selection
   "Returns the `:find` and `:where` clauses for a `:column-selection` parse tree
   node as a map."
-  [column]
-  (let [col-sym (symbol (str "?" (name column)))]
-    {:name [column]
-     :find [col-sym]
-     :where `[[(~'get-else ~'$ ~entity-var ~column :iql/no-value) ~col-sym]]}))
+  ([column]
+   (transform-column-selection column nil))
+  ([column name-node]
+   (let [name (or (some-> name-node only-child)
+                  column)
+         variable (symbol (str "?" name))]
+     {:name [(keyword name)]
+      :find [variable]
+      :where `[[(~'get-else ~'$ ~entity-var ~column :iql/no-value) ~variable]]})))
 
 (defn transform-probability-of
   [& more]
@@ -174,12 +179,11 @@
                           (only-child))
                   default-model-key)
 
-        prob-sym (or (some-> more
-                             (find-child :prob-name)
-                             (only-child))
-                     (gensym "prob"))
-        prob-name (keyword prob-sym)
-        prob-var (symbol (str "?" prob-sym))
+        selection-name (or (some-> more
+                                   (find-child :as-clause)
+                                   (only-child))
+                           (gensym "prob"))
+        prob-var (symbol (str "?" (name selection-name)))
 
         target-sym (genvar "target-")
         target-clauses (let [targets (-> more
@@ -234,7 +238,7 @@
                                  event-clause `[(~'ground ~binding-events) ~binding-sym]]
                              [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~constraints-sym]])
         logpdf-clauses `[[(~*logpdf-symbol* ~model-var ~target-sym ~constraints-sym) ~prob-var]]]
-    {:name [prob-name]
+    {:name [selection-name]
      :find [prob-var]
      :in [model-var]
      :inputs [model]
