@@ -95,7 +95,7 @@
 (defn categorical-logpdf
   "Log PDF for categorical distribution."
   [x ps]
-  (assert (= 1.0 (reduce + (vals ps))) ps)
+  ; (assert (= 1.0 (reduce + (vals ps))) ps)
   (let [prob (get ps x)]
     (if-not prob
       ##-Inf

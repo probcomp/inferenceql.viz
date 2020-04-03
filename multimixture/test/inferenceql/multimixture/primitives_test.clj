@@ -2,7 +2,7 @@
   (:require [clojure.test :as test :refer [deftest is]]
             [inferenceql.multimixture.primitives :as prim]))
 
-;; We check the `simulate` methods of distributions by evaluating 
+;; We check the `simulate` methods of distributions by evaluating
 ;; their empirical mean and comparing that to the mean of the
 ;; distribution given its parameterization.
 (deftest bernoulli-logpdf
@@ -20,13 +20,13 @@
         n       10000
         samples (prim/bernoulli-simulate n p)
         counts  (frequencies samples)
-        error   0.01]
+        error   0.05]
     (is (< (Math/abs (- (/ (get counts true) n)
                         p))
            error))))
 
 (deftest gamma-logpdf
-  (let [x     4 
+  (let [x     4
         k     5
         theta 2
         error 0.0001]
@@ -71,7 +71,7 @@
         samples         (prim/beta-simulate n {:alpha alpha :beta beta})
         mean            (/ (reduce + samples)
                            n)
-        error   0.01]
+        error   0.05]
     (is (< (Math/abs (- mean
                         (/ alpha
                            (+ alpha beta))))
@@ -79,15 +79,15 @@
 
 (deftest categorical-logpdf
   (let [x     "green"
-        ps    {"green" 0.2 "red" 0.4 "blue" 0.2}]
+        ps    {"green" 0.2 "red" 0.4 "blue" 0.4}]
     (is (= 0.2 (Math/exp (prim/categorical-logpdf x ps))))))
 
 (deftest categorical-simulate
-  (let [ps    {"green" 0.2 "red" 0.4 "blue" 0.2}
+  (let [ps    {"green" 0.2 "red" 0.4 "blue" 0.4}
         n               10000
         samples         (prim/categorical-simulate n ps)
         counts          (frequencies samples)
-        error   0.01]
+        error   0.05]
     (mapv #(is (< (Math/abs (- (/ (get counts %)
                                   n)
                                (get ps %)))
@@ -107,7 +107,7 @@
         sum-alpha (reduce + alpha)
         n         10000
         samples   (prim/dirichlet-simulate n alpha)
-        error      0.01]
+        error      0.05]
     (mapv #(is (< (Math/abs (- (/ (reduce + (mapv (fn [sample]
                                                     ( nth sample %))
                                                   samples))
@@ -148,7 +148,7 @@
                         0.39894))
            error))
     (is (thrown? Exception (prim/logpdf x :foobar {:mu mu :sigma sigma})))))
-    
+
 (deftest logpdf-simulate
   (let [dist    :gaussian
         mu      0
