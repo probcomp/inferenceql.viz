@@ -1,15 +1,28 @@
 (ns inferenceql.spreadsheets.panels.viz.vega
   "Code related to generating vega-lite specs"
   (:require [clojure.walk :as walk]
+            [clojure.string :as string]
             [metaprob.distributions :as dist]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
-            [inferenceql.spreadsheets.panels.table.db :as table-db]))
+            [inferenceql.spreadsheets.panels.table.db :as table-db]
+            [goog.string :as gstring]
+            [medley.core :as medley]))
+
+;;This is the name of the column in your dataset that indexes into the the topojson.
+(def ^:private fips-col "geo_fips")
+;; This is the name of the column in your dataset that is used to label each portion of the choropleth.
+(def ^:private map-names-col "county")
+
+;; This is the property in the topojson feature that is matched with `fips-col`.
+(def ^:private topojson-prop "id")
+;; This is the key for the collection of objects in the topojson that we will match with rows.
+(def ^:private topojson-feature "counties")
 
 ;; These are column names that cannot be simulated.
 ;; `hot/label-col-header` and `hot/score-col-header` are not part of any dataset.
 ;; And `geo-fips` and `NAME` are columns from the NYTimes dataset that have been excluded.
-(def cols-invalid-for-sim #{"geo_fips" "NAME" hot/label-col-header hot/score-col-header})
+(def cols-invalid-for-sim #{fips-col map-names-col hot/label-col-header hot/score-col-header})
 
 (defn simulatable?
   "Checks if `selection` is valid for simulation"
@@ -30,8 +43,6 @@
 (def vega-strip-plot-step-size
   "Width of each band in the strip plot in the categorical dimension"
   30)
-
-(def ^:private topojson-feature "cb_2017_us_cd115_20m")
 
 (def default-table-color "SteelBlue")
 
@@ -54,9 +65,12 @@
 
 (defn stattype
   [column]
-  (let [stattype-kw (if (contains? #{hot/score-col-header hot/label-col-header} column)
-                      :gaussian
-                      (get-in model/spec [:vars column]))]
+  (let [stattype-kw (if (contains? #{hot/score-col-header hot/label-col-header map-names-col}
+                                   ;; TODO: Find a better way to disable plots for
+                                   ;; hot/label-col-header and map-names-col.
+                                   column)
+                        :gaussian
+                        (get-in model/spec [:vars column]))]
     (case stattype-kw
       :gaussian dist/gaussian
       :categorical dist/categorical)))
@@ -133,31 +147,49 @@
                     :type "quantitative"}}}))
 
 (defn gen-choropleth [selections selected-columns]
-  (let [selection (first selections)
-        map-column (first (filter #(not= "geo_fips" %) selected-columns))
-        transformed-selection (mapv (fn [row]
-                                      (update row "geo_fips" #(left-pad (str %) 4 \0)))
-                                    selection)
-        name {:field "NAME"
-              :type "nominal"}
-        color {:field map-column
-               :type (condp = (stattype map-column)
-                       dist/gaussian "quantitative"
-                       dist/categorical "nominal")}]
-    {:$schema v3-vega-lite-schema
-     :width vega-map-width
-     :height vega-map-height
-     :data {:values js/topojson
-            :format {:type "topojson"
-                     :feature topojson-feature}}
-     :transform [{:lookup "properties.GEOID"
-                  :from {:data {:values transformed-selection}
-                         :key "geo_fips"
-                         "fields" [(:field name) (:field color)]}}]
-     :projection {:type "albersUsa"}
-     :mark "geoshape"
-     :encoding {:tooltip [name color]
-                :color color}}))
+  (let [map-column (first (filter #(not= fips-col %) selected-columns))
+        map-column-type (when map-column
+                          (condp = (stattype map-column)
+                                 dist/gaussian "quantitative"
+                                 dist/categorical "nominal"))
+        color-spec {:field map-column
+                    :type map-column-type}
+
+        ;; Removes probability values of 1.
+        clean-probs (fn [v] (if (= v 1.0) nil v))
+        ;; Adding padding to fips codes.
+        clean-fips (fn [v]
+                     (let [fips-code-len 5]
+                       (left-pad v fips-code-len \0)))
+        cleaned-selections (->> selections
+                                (mapv #(medley/update-existing % "probability" clean-probs))
+                                (mapv #(medley/update-existing % fips-col clean-fips)))
+
+        spec {:$schema default-vega-lite-schema
+              :width vega-map-width
+              :height vega-map-height
+              :data {:values js/topojson
+                     :format {:type "topojson"
+                              :feature topojson-feature}}
+              :transform [{:lookup topojson-prop
+                           :from {:data {:values cleaned-selections}
+                                  :key fips-col
+                                  :fields [map-names-col]}}
+                          ;; We filter entities in the topojson that did not join on a row
+                          ;; in `cleaned-selections`.
+                          {:filter (gstring/format "datum['%s']" map-names-col)}]
+              :projection {:type "albersUsa"}
+              :mark "geoshape"
+              :encoding {:tooltip [{:field map-names-col
+                                    :type "nominal"}]}}]
+      ;; If we have another column selected besides `fips-col`,
+      ;; color the choropleth according to the values in that column, `map-column`.
+      (if-not map-column
+        spec
+        (-> spec
+            (assoc-in [:encoding :color] color-spec)
+            (update-in [:encoding :tooltip] conj color-spec)
+            (update-in [:transform 0 :from :fields] conj map-column)))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
@@ -266,7 +298,10 @@
          selections :selections
          cols :selected-columns
          row :row-at-selection-start} selection-layer
-         spec (cond (simulatable? selections (first cols))
+         spec (cond (some #{fips-col} cols)
+                    (gen-choropleth selections cols)
+
+                    (simulatable? selections (first cols))
                     (gen-simulate-plot (first cols) row (name layer-name))
 
                     (= 1 (count cols)) ; One column selected.
