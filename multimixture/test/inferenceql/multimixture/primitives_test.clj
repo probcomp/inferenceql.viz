@@ -6,13 +6,13 @@
 ;; their empirical mean and comparing that to the mean of the
 ;; distribution given its parameterization.
 (deftest bernoulli-logpdf
-  (let [x   true
-        x'  false
-        p   0.6
-        p' (- 1 p)]
-    (is (= (Math/log p)
-           (prim/bernoulli-logpdf x p )))
-    (is (= (Math/log p')
+  (let [x  true
+        x' false
+        p  {:p 0.6}
+        p' (- 1 (:p p))]
+    (is (= (Math/log 0.6)
+           (prim/bernoulli-logpdf x p)))
+    (is (= (Math/log 0.4)
            (prim/bernoulli-logpdf x' p)))))
 
 (deftest bernoulli-simulate
@@ -65,11 +65,11 @@
            error))))
 
 (deftest beta-simulate
-  (let [alpha           1.5
-        beta            1.5
-        n               10000
-        samples         (prim/beta-simulate n {:alpha alpha :beta beta})
-        mean            (/ (reduce + samples)
+  (let [alpha   1.5
+        beta    1.5
+        n       10000
+        samples (prim/beta-simulate n {:alpha alpha :beta beta})
+        mean    (/ (reduce + samples)
                            n)
         error   0.05]
     (is (< (Math/abs (- mean
@@ -78,27 +78,27 @@
            error))))
 
 (deftest categorical-logpdf
-  (let [x     "green"
-        ps    {"green" 0.2 "red" 0.4 "blue" 0.4}]
-    (is (= 0.2 (Math/exp (prim/categorical-logpdf x ps))))))
+  (let [x "green"
+        p {:p {"green" 0.2 "red" 0.4 "blue" 0.4}}]
+    (is (= 0.2 (Math/exp (prim/categorical-logpdf x p))))))
 
 (deftest categorical-simulate
-  (let [ps    {"green" 0.2 "red" 0.4 "blue" 0.4}
-        n               10000
-        samples         (prim/categorical-simulate n ps)
-        counts          (frequencies samples)
+  (let [p       {:p {"green" 0.2 "red" 0.4 "blue" 0.4}}
+        n       10000
+        samples (prim/categorical-simulate n p)
+        counts  (frequencies samples)
         error   0.05]
     (mapv #(is (< (Math/abs (- (/ (get counts %)
                                   n)
-                               (get ps %)))
+                               (get (:p p) %)))
                    error))
-          (keys ps))))
+          (keys (:p p)))))
 
 (deftest dirichlet-logpdf
   (let [x     [0.4 0.4 0.2]
         alpha [2 2 1]
         error 0.001]
-    (is (< (Math/abs (- (Math/exp (prim/dirichlet-logpdf x alpha))
+    (is (< (Math/abs (- (Math/exp (prim/dirichlet-logpdf x {:alpha alpha}))
                         0.00667))
            error))))
 
@@ -106,7 +106,7 @@
   (let [alpha     [2 2 1]
         sum-alpha (reduce + alpha)
         n         10000
-        samples   (prim/dirichlet-simulate n alpha)
+        samples   (prim/dirichlet-simulate n {:alpha alpha})
         error      0.05]
     (mapv #(is (< (Math/abs (- (/ (reduce + (mapv (fn [sample]
                                                     ( nth sample %))
