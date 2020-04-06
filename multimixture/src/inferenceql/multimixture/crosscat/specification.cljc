@@ -4,7 +4,8 @@
             [clojure.test.check :as tc]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.generators :as gen]
-            [inferenceql.multimixture.primitives :as prim]))
+            [inferenceql.multimixture.primitives :as prim]
+            [inferenceql.multimixture.utils      :as mmix-utils]))
 
 (defn normalize
   "Normalizes a collection of numbers."
@@ -40,23 +41,17 @@
 
 
 ;; General probability.
-(s/def ::probability (s/with-gen (s/and number? #(<= 0 % 1))
+(s/def ::probability (s/with-gen (s/and number? #(< 0 % 1))
                        prob))
 (s/def ::probability-distribution (s/with-gen (s/and (s/coll-of ::probability)
-                                                     #(== 1 (reduce + %)))
+                                                     #(< (Math/abs (- 1 (reduce + %)))
+                                                         1e-7))
                                      #(->> ::probability
                                           (s/gen)
                                           (gen/vector)
                                           (gen/not-empty)
                                           (gen/fmap normalize))))
 
-;; Distribution types.
-(s/def ::dist-types #{:bernoulli
-                      :beta
-                      :categorical
-                      :dirichlet
-                      :gamma
-                      :gaussian})
 
 ;; Distributions.
 ;; Bernoulli distribution.
@@ -75,11 +70,11 @@
 (s/def :beta/beta :beta-dist/parameters)
 
 ;; Categorical distribution.
-(s/def :categorical/option (s/or :string (s/and string?
-                                                (comp not empty?))
+(s/def :categorical/option (s/or :string  string?
                                  :integer nat-int?))
-(s/def :categorical/p (s/with-gen (s/and (s/map-of :categorical/option ::probability)
-                                                   #(== 1 (reduce + (vals %))))
+(s/def :categorical/p (s/with-gen (s/and (s/map-of :categorical/option ::probability :min-count 2)
+                                                   #(< (Math/abs (- 1 (reduce + (vals %))))
+                                                       1e-7))
                                   #(->> ::probability-distribution
                                         (s/gen)
                                         (gen/fmap (fn [values]
@@ -121,7 +116,6 @@
 (s/def :gaussian/parameters (s/keys :req-un [:gaussian/mu :gaussian/sigma]))
 (s/def :gaussian/parameters-list (s/coll-of #{:mu :sigma} :min-count 2 :distinct true))
 (s/def :gaussian/gaussian :gaussian/parameters)
-(gen-from-spec :gaussian/gaussian)
 
 ;; All together!
 (s/def ::distribution-parameters (s/or :bernoulli   :bernoulli/parameters
@@ -154,21 +148,24 @@
 
 ;; Defining hyper-distributions and priors.
 (s/def :bernoulli-prior/p (s/keys :req-un [:beta/beta]))
-(s/def :bernoulli-prior/bernoulli :bernoulli-prior/p)
+(s/def :bernoulli-prior/bernoulli (s/keys :req-un [:bernoulli-prior/p]))
 
 (s/def :categorical-prior/p (s/keys :req-un [:dirichlet/dirichlet]))
-(s/def :categorical-prior/categorical :categorical-prior/p)
+(s/def :categorical-prior/categorical (s/keys :req-un [:categorical-prior/p]))
 
 (s/def :gaussian-prior/mu       (s/keys :req-un [:beta/beta]))  ; Fake for now.
 (s/def :gaussian-prior/sigma    (s/keys :req-un [:gamma/gamma]))
-(s/def :gaussian-prior/gaussian (s/keys :req-un [:gaussian-prior/mu :gaussian-prior/sigma]))
+(s/def :gaussian-prior/gaussian (s/keys :req-un [:gaussian-prior/mu
+                                                 :gaussian-prior/sigma]))
 
-(s/def ::priors (s/and (s/keys :opt-un [:bernoulli-prior/bernoulli
-                                        :categorical-prior/categorical
-                                        :gaussian-prior/gaussian])
-                       #((comp not empty?) %)))
+(s/def ::prior (s/with-gen (s/keys :opt-un [:bernoulli-prior/bernoulli
+                                            :categorical-prior/categorical
+                                            :gaussian-prior/gaussian])
+                  #(gen/one-of [(s/gen :bernoulli-prior/bernoulli)
+                                (s/gen :categorical-prior/categorical)
+                                (s/gen :gaussian-prior/gaussian)])))
 
-
+(gen-from-spec ::prior)
 ;; CrossCat model
 ;; Latents data structure.
 (s/def ::count (s/and integer? (comp not neg?)))
@@ -179,6 +176,21 @@
                  pos-number))
 
 (defn verify-counts-assignments?
+  "Given counts and assignments, verifies that they make sense.
+
+  e.g. `counts`      = [4 1 2]
+       `assignments` = [0 0 1 2 0 2 0]
+      => true; since we can visualize the input as the CRP:
+                 [1 2 5 7] [3] [4 6]
+
+  e.g. `counts`      = [4 1 1]
+       `assignments` = [0 0 1 2 0 2 0]
+      => false; again we visualize the input as the CRP:
+                 [1 2 5 7] [3] [4 6]
+                                  ^ not allowed in our spec,
+                                    since this table's count
+                                    is supposed to be 1!"
+
   [counts assignments]
   (= (->> assignments
           (frequencies)
@@ -188,15 +200,17 @@
      counts))
 
 (defn crp-simulate-n
-  "Returns log probability of table counts `x` under a Chinese Restaurant Process
-  parameterized by a number `alpha`."
+  "Given a keyword, simulate `n` samples from a CRP with a runtime-simulated
+  concentration parameter alpha. Returns a `latents` structure with the specified
+  assignment key (either :y or :z, representing rows and column assignments,
+  respectively)."
   [assignment-key n]
   (let [alpha (gen/generate (pos-number))
         [counts assignments] (reduce (fn [[counts assignments] i]
                                        (let [probs-tilde  (conj counts alpha)
                                              Z            (reduce + probs-tilde)
-                                             probs        (zipmap (range (+ 1 i))
-                                                                  (map #(/ % Z) probs-tilde))
+                                             probs        {:p (zipmap (range (+ 1 i))
+                                                                  (map #(/ % Z) probs-tilde))}
                                              c-i          (prim/categorical-simulate probs)
                                              assignments' (conj assignments c-i)
                                              counts'      (update counts c-i #(if-not %
@@ -210,15 +224,17 @@
      assignment-key assignments}))
 
 (defn crp-simulate-alpha
-  "Returns log probability of table counts `x` under a Chinese Restaurant Process
-  parameterized by a number `alpha`."
+  "Given a keyword, simulates a CRP with a runtime-simulated with the specified
+  concentration parameter alpha, producing a runtime-generated number of samples.
+  Returns a `latents` structure with the specified assignment key (either :y or
+  :z, representing rows and column assignments, respectively)."
   [assignment-key alpha]
-  (let [n (gen/generate (gen/large-integer* {:min 1 :max 100}))
+  (let [n (gen/generate (gen/large-integer* {:min 1 :max 50}))
         [counts assignments] (reduce (fn [[counts assignments] i]
                                        (let [probs-tilde  (conj counts alpha)
                                              Z            (reduce + probs-tilde)
-                                             probs        (zipmap (range (+ 1 i))
-                                                                  (map #(/ % Z) probs-tilde))
+                                             probs        {:p (zipmap (range (+ 1 i))
+                                                                  (map #(/ % Z) probs-tilde))}
                                              c-i          (prim/categorical-simulate probs)
                                              assignments' (conj assignments c-i)
                                              counts'      (update counts c-i #(if-not %
@@ -232,42 +248,44 @@
      assignment-key assignments}))
 
 (defn latents-simulate
+  "Given a keyword, simulates `k` `latents` objects, one for each of the implied
+  `k` categories. Ensures that each object contains the same number of labels
+  representing the same number of rows."
   [assignment-key k]
-  (let [n (gen/generate (gen/large-integer* {:min 1 :max 500}))]
+  (let [n (gen/generate (gen/large-integer* {:min 1 :max 10}))]
   (into [] (repeatedly k #(crp-simulate-n assignment-key n)))))
 
 (s/def ::latents-local (s/with-gen (s/and (s/keys :req-un [::counts ::y ::alpha])
                                           #(verify-counts-assignments? (:counts %) (:y %)))
+                         ;; Alpha is randomly generated, as opposed to n.
                          #(->> ::alpha
                                (s/gen)
                                (gen/fmap (partial crp-simulate-alpha :y)))))
-
 (s/def ::z ::counts)
 (s/def ::global (s/with-gen (s/and (s/keys :req-un [::alpha ::counts ::z])
                                    #(verify-counts-assignments?
                                      (:counts %)
                                      (:z %)))
+                         ;; Alpha is randomly generated, as opposed to n.
                          #(->> ::alpha
                                (s/gen)
                                (gen/fmap (partial crp-simulate-alpha :z)))))
 
-
 (s/def ::local (s/with-gen (s/and (s/coll-of ::latents-local :into [])
                                   ;; Make sure there are the same number of assignments
-                                  ;; in each category.
+                                  ;; (rows) in each category.
                                   #(->> %
                                        (map (fn [latent] (count (:y latent))))
                                        (distinct)
                                        (count)
                                        (= 1)))
+                 ;; Generator function for full `latents-l` structure.
                  #(->> (gen/large-integer* {:min 1 :max 10})
                        (gen/fmap (partial latents-simulate :y)))))
-
 
 (s/def ::latents (s/with-gen (s/keys :req-un [::local ::global])
                    #(gen/hash-map :local (s/gen ::local)
                                   :global (s/gen ::global))))
-
 
 (defn valid-local-latents?
   "Validator of a `latents-l` structure."
@@ -279,16 +297,19 @@
   [latents]
   (s/valid? ::latents latents))
 
-(defn valid-stat-types?
-  [types]
-  (s/valid? ::types types))
-
-;; model data structure.
+;; Model data structure.
 (s/def ::column string?)
 (s/def ::parameters (s/map-of ::column ::distribution-parameters))
 (s/def ::category (s/keys :req-un [::parameters]))
 
+;; Distribution types (FOR INFERENCE ONLY).
+(s/def ::dist-type #{:bernoulli :categorical :gaussian} )
+(s/def ::dist-map (s/map-of ::column ::dist-type :min-count 1 :max-count 1))
+(s/def :dist/types (s/map-of ::column ::dist-type :min-count 1))
+
 (defn same-parameters-across-categories?
+  "Given a view, confirms that every category contains the same
+  column variables and the same parameters (not necessarily their values)."
   [view]
   (let [categories (:categories view)
         base-params (:parameters (nth categories 0))
@@ -302,11 +323,20 @@
                              params))))
             categories)))
 
-(s/def ::categories (s/coll-of ::category ::into []))
-(s/def ::hypers (s/map-of ::column ::priors))
-(s/def ::view (s/keys :req-un [::hypers ::categories]))
+(s/def ::categories (s/coll-of ::category ::into [] :min-count 1))
+(s/def ::hypers (s/map-of ::column ::prior))
+
+(s/def ::view (s/and (s/keys :req-un [::hypers ::categories])
+                     ;; Verify that the hypers variable set is the same
+                     ;; for each category.
+                     (fn [view]
+                       (every? (fn [category]
+                                 (= (set (keys (:parameters category)))
+                                    (set (keys (:hypers view)))))
+                              (:categories view)))))
 
 (defn no-overlapping-columns?
+  "Given a set of views, confirms that no column variable is shared across views."
   [views]
   (let [num-columns (apply + (map #(count (:hypers %)) views))
         set-columns  (set (apply concat (map #(keys (:hypers %)) views)))]
@@ -314,26 +344,88 @@
        num-columns)))
 
 (s/def ::views (s/and (s/coll-of ::view)
-                      no-overlapping-columns?))
+                      #(no-overlapping-columns? %)))
 
+(defn categorical-options
+  "Generates options for categorical variable value names.
+  Min is 2, max is 10."
+  []
+  (gen/generate (gen/vector (s/gen :categorical/option) 2 10)))
 
-(s/def ::types (s/map-of ::column ::dist-types))
+(defn generate-category
+  "Given a map of column names to column distribution types, as well
+  as pre-generated categorical option map for any potential categorical
+  variables, generates a category. Used for ::xcat model generation."
+  [types categorical-options]
+  (->> types
+       (map (fn [[column-name col-type]]
+              (if (= :categorical col-type)
+                (let [options   (get categorical-options column-name)
+                      n-options (count options)
+                      probs-gen (s/gen ::probability)
+                      probs     (gen/generate (gen/fmap normalize
+                                                        (gen/vector probs-gen n-options)))]
+                  {column-name {:p (zipmap options probs)}})
+                {column-name (gen/generate (s/gen (case col-type
+                                                    :bernoulli :bernoulli/bernoulli
+                                                    :categorical :categorical/categorical
+                                                    :gaussian :gaussian/gaussian)))})))
+       (into {})
+       (assoc {} :parameters)))
+
+(defn generate-hyper
+  "Given a column name and distribution type, generates a hyper distribution for
+  the variable type. Possible hyper distributions are specified in the beginning of
+  this file."
+  [column dist-type]
+  {column (gen/generate (s/gen
+                         (case dist-type
+                           :bernoulli :bernoulli-prior/bernoulli
+                           :categorical :categorical-prior/categorical
+                           :gaussian :gaussian-prior/gaussian) ))})
+
+(defn partition-by-sizes
+  "Given a coll and a tuple of sizes of partitions, returns a seq of elements
+  from the coll, partitioned into the desired sizes, from left to right.
+  The sum of `sizes` must equal the number of elements in the coll."
+  [coll sizes]
+  (->> sizes
+      (reduce (fn [[result left] size]
+                [(conj result (take size left))
+                 (drop size left)])
+              [[] coll])
+       (first)))
+
+(defn generate-xcat-from-latents
+  "Generating function for a `xcat` model, given a valid `latents` structure."
+  [latents]
+  (let [latents-global      (:global latents)
+        types               (into {} (gen/generate (gen/vector
+                                                     (s/gen ::dist-map)
+                                                     (reduce + (:counts latents-global)))))
+        type-partitions     (partition-by-sizes types (:counts latents-global))
+        options             (into {} (map (fn [[col dist-type]]  ; Taking extra care of categoricals.
+                                            (if (= :categorical dist-type)
+                                              {col (categorical-options)}
+                                              {}))
+                                          types))
+        views (mapv (fn [dist-types local-latent]
+                      (let [n-categories (count (:counts local-latent))
+                            categories   (vec (repeatedly n-categories #(generate-category
+                                                                         dist-types
+                                                                         options)))
+                            ;; TODO , make sure Dirichlet prior returns a specified length.
+                            hypers (into {} (map (fn [[col-name dist]]
+                                                   (generate-hyper col-name dist))
+                                                 dist-types))]
+                        {:hypers     hypers
+                         :categories categories}))
+                    type-partitions
+                    (:local latents))]
+    {:types types
+     :views  views }))
+
 (s/def ::u     (s/coll-of boolean?))
-(s/def ::xcat (s/and (s/keys :req-un [::types ::views] :opt-un [::u])
-                     #(= (count (:types %))
-                         (count (:u %)))))
-;; TODO - Also need to check for correct column labels and whatnot.
-
-; (s/valid? ::xcat
-;          {:types {"color" :categorical "happy" :bernoulli "height" :gaussian}  ;; Stat. types of each column.
-;              :u     [true true true]                               ;; Booleans indicating uncollapsed col.
-;              :views [{:hypers {"color"  {:dirichlet {:alpha [1 1 1]}}
-;                                "happy?" {:beta      {:alpha 0.5 :beta 0.5}}}
-;                       :categories [{:parameters  {"color" {:p {"green" 0.8 "red" 0.1 "black" 0.1}}
-;                                                   "happy" {:p 0.8}}}
-;                                    {:parameters  {"color" {:p {"green" 0.2 "red" 0.4 "black" 0.4}}
-;                                                   "happy" {:p 0.4}}}]}
-;                      {:hypers {"height" {:mu    {:beta  {:alpha 0.5 :beta 0.5}}
-;                                          :sigma {:gamma {:k 0.9 :shape 1}}}}
-;                       :categories [{:parameters {"height" {:mu 5.5 :sigma 0.5}}}
-;                                    {:parameters {"height" {:mu 3.4 :sigma 0.2}}}]}]} )
+(s/def ::xcat  (s/with-gen (s/keys :req-un [:dist/types ::views] :opt-un [::u])
+                 #(->> (s/gen ::latents)
+                       (gen/fmap (fn [latents] (generate-xcat-from-latents latents))))))

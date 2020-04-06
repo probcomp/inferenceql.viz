@@ -28,15 +28,15 @@
 
     (is (= 0 m1'))
     (is (= (mapv #(Math/log (/ % norm)) [aux1 4 1]) weights1))
-    (is (= 1.0 (reduce + (map #(Math/exp %) weights1))))
+    (is (== 1.0 (reduce + (map #(Math/exp %) weights1))))
 
     (is (= 1 m2'))
     (is (= (mapv #(Math/log (/ % norm)) [aux2 4 1 aux2]) weights2))
-    (is (= 1.0 (reduce + (map #(Math/exp %) weights2))))
+    (is (== 1.0 (reduce + (map #(Math/exp %) weights2))))
 
     (is (= 2 m3'))
     (is (= (mapv #(Math/log (/ % norm)) [aux3 4 1 aux3 aux3]) weights3))
-    (is (= 1.0 (reduce + (map #(Math/exp %) weights3))))))
+    (is (== 1.0 (reduce + (map #(Math/exp %) weights3))))))
 
 (deftest category-weights-no-singleton
   (let [latents          {:alpha  2
@@ -60,15 +60,15 @@
 
     (is (= 1 m1'))
     (is (= (mapv #(Math/log (/ % norm)) [1 4 1 aux1]) weights1))
-    (is (= 1.0 (reduce + (map #(Math/exp %) weights1))))
+    (is (== 1.0 (reduce + (map #(Math/exp %) weights1))))
 
     (is (= 2 m2'))
     (is (= (mapv #(Math/log (/ % norm)) [1 4 1 aux2 aux2]) weights2))
-    (is (= 1.0 (reduce + (map #(Math/exp %) weights2))))
+    (is (== 1.0 (reduce + (map #(Math/exp %) weights2))))
 
     (is (= 3 m3'))
     (is (= (mapv #(Math/log (/ % norm)) [1 4 1 aux3 aux3 aux3]) weights3))
-    (is (= 1.0 (reduce + (map #(Math/exp %) weights3))))))
+    (is (== 1.0 (reduce + (map #(Math/exp %) weights3))))))
 
 (deftest category-scores
   "Tests `category-scores` by verifying that the first categories returned
