@@ -16,13 +16,13 @@
            (prim/bernoulli-logpdf x' p)))))
 
 (deftest bernoulli-simulate
-  (let [p       0.6
+  (let [p       {:p 0.6}
         n       10000
         samples (prim/bernoulli-simulate n p)
         counts  (frequencies samples)
         error   0.05]
     (is (< (Math/abs (- (/ (get counts true) n)
-                        p))
+                        (:p  p)))
            error))))
 
 (deftest gamma-logpdf
