@@ -43,7 +43,7 @@
    (let [color (control-db/selection-color db)
          selections-coords (get-in db [:table-panel :selection-layers color :coords])
 
-         num-rows (count (db/table-rows db))
+         num-rows (count (db/visual-rows db))
          ;; Takes a selection vector and returns true if that selection represents
          ;; the selection of a single column.
          column-selected (fn [[row-start col-start row-end col-end]]
@@ -139,6 +139,17 @@
  :hot/after-column-sort
  event-interceptors
  (fn [db [_ hot _id _current-sort-config _destination-sort-configs]]
+   (let [rows (js->clj (.getData hot))
+         headers (js->clj (.getColHeader hot))
+         row-maps (mapv #(zipmap headers %) rows)]
+     (-> db
+         (assoc-in [:table-panel :visual-rows] row-maps)
+         (assoc-in [:table-panel :visual-headers] headers)))))
+
+(rf/reg-event-db
+ :hot/after-filter
+ event-interceptors
+ (fn [db [_ hot _id _conditions-stack]]
    (let [rows (js->clj (.getData hot))
          headers (js->clj (.getColHeader hot))
          row-maps (mapv #(zipmap headers %) rows)]

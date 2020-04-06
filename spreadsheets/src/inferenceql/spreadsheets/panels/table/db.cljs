@@ -75,6 +75,14 @@
   [db]
   (get-in db [:table-panel :dataset-rows]))
 
+(defn visual-headers
+  [db]
+  (get-in db [:table-panel :visual-headers]))
+
+(defn visual-rows
+  [db]
+  (get-in db [:table-panel :visual-rows]))
+
 (defn with-labels
   [db labels]
   (assoc-in db [:table-panel :labels] labels))
