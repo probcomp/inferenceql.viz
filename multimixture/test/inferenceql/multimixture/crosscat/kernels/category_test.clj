@@ -1,4 +1,4 @@
-(ns inferenceql.multimixture.crosscat.kernels.category
+(ns inferenceql.multimixture.crosscat.kernels.category-test
   (:require [clojure.test :as test :refer [deftest is]]
             [inferenceql.multimixture.crosscat.kernels.category :as c]
             [inferenceql.multimixture.primitives :as prim]
@@ -77,12 +77,12 @@
              "height" 6}
         types {"color"  :categorical
                "height" :gaussian}
-        view {:hypers {"color" {:dirichlet [1 1 1]}
-                       "height" {:sigma {:beta {:alpha 0.5 :beta 0.5}}
-                                 :mu {:beta {:alpha 0.5 :beta 0.5}}}}
-              :categories [{:parameters {"color" {"red" 0.5 "green" 0.1 "blue" 0.4}
+        view {:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
+                       "height" {:sigma {:beta      {:alpha 0.5 :beta 0.5}}
+                                 :mu    {:beta      {:alpha 0.5 :beta 0.5}}}}
+              :categories [{:parameters {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
                                          "height" {:mu 6 :sigma 1}}}
-                           {:parameters {"color" {"red" 0.3 "green" 0.2 "blue" 0.5}
+                           {:parameters {"color"  {:p {"red" 0.3 "green" 0.2 "blue" 0.5}}
                                          "height" {:mu 5 :sigma 1}}}]}
         score-1 (+ (Math/log 0.5)
                    (prim/logpdf (get x "height")
@@ -187,12 +187,12 @@
         latents {:alpha   1
                  :counts [5 5]
                  :y      [1 0 0 0 0 1 1 1 1 0]}
-        view    {:hypers {"color" {:dirichlet [1 1 1]}
-                          "height" {:sigma {:beta {:alpha 0.5 :beta 0.5}}
-                                    :mu {:beta {:alpha 0.5 :beta 0.5}}}}
-                 :categories [{:parameters {"color" {"red" 0.5 "green" 0.1 "blue" 0.4}
-                                            "height" {:mu 6 :sigma 1}}}
-                              {:parameters {"color" {"red" 0.3 "green" 0.2 "blue" 0.5}
+        view    {:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
+                          "height" {:sigma {:beta      {:alpha 0.5 :beta 0.5}}
+                                    :mu    {:beta      {:alpha 0.5 :beta 0.5}}}}
+                 :categories [{:parameters  {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
+                                             "height" {:mu 6 :sigma 1}}}
+                              {:parameters {"color"  {:p {"red" 0.3 "green" 0.2 "blue" 0.5}}
                                             "height" {:mu 3 :sigma 1}}}]}
         score-1 (+ (Math/log 0.5)
                    (prim/logpdf (get x "height")
@@ -234,12 +234,12 @@
         latents {:alpha   1
                  :counts [5 5]
                  :y      [1 0 0 0 0 1 1 1 1 0]}
-        view    {:hypers {"color" {:dirichlet [1 1 1]}
-                          "height" {:sigma {:beta {:alpha 0.5 :beta 0.5}}
-                                    :mu {:beta {:alpha 0.5 :beta 0.5}}}}
-                 :categories [{:parameters {"color" {"red" 0.5 "green" 0.1 "blue" 0.4}
+        view    {:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
+                          "height" {:sigma {:beta  {:alpha 0.5 :beta 0.5}}
+                                    :mu    {:beta  {:alpha 0.5 :beta 0.5}}}}
+                 :categories [{:parameters {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
                                             "height" {:mu 5 :sigma 2}}}
-                              {:parameters {"color" {"red" 0.5 "green" 0.2 "blue" 0.3}
+                              {:parameters {"color" {:p {"red" 0.5 "green" 0.2 "blue" 0.3}}
                                             "height" {:mu 7 :sigma 2}}}]}
         score-1 (+ (Math/log 0.5)
                    (prim/logpdf (get x "height")

@@ -9,10 +9,21 @@
    0
    (Gamma/logGamma x)))
 
+(defn gamma-int
+  "Applies the gamma function to an integer `x`."
+  [x]
+  (reduce * (range 1 x)))
+
+(defn lgamma-int
+  "Applies the log-gamma function to an integer `x`."
+  [x]
+  (reduce (fn [acc value]
+           (+ acc (Math/log value))) 0 (range 1 x)))
+
 (defn bernoulli-logpdf
   "Returns log probability of `x` under a bernoulli distribution parameterized
   by `p`."
-  [x p]
+  [x {:keys [:p]}]
   (if x
     (Math/log p)
     (Math/log (- 1 p))))
@@ -20,11 +31,11 @@
 (defn bernoulli-simulate
   "Generates a sample from a bernoulli distribution with parameter `p`.
   Generates `n` samples, if specified."
-  ([p]
+  ([{:keys [:p]}]
     (let [flip (rand)]
       (< flip p)))
-  ([n p]
-   (repeatedly n #(bernoulli-simulate p))))
+  ([n {:keys [:p] :as parameters}]
+   (repeatedly n #(bernoulli-simulate parameters))))
 
 (defn gamma-logpdf
   "Returns log probability of `x` under a gamma distribution parameterized
@@ -94,18 +105,17 @@
 
 (defn categorical-logpdf
   "Log PDF for categorical distribution."
-  [x ps]
-  ; (assert (= 1.0 (reduce + (vals ps))) ps)
-  (let [prob (get ps x)]
+  [x {:keys [:p]}]
+  (let [prob (get p x)]
     (if-not prob
       ##-Inf
       (Math/log prob))))
 
 (defn categorical-simulate
-  "Generates a sample from a categorical distribution with parameters `ps`.
+  "Generates a sample from a categorical distribution with vector parameters `p`.
   Generates `n` samples, if specified."
-  ([ps]
-    (let [ps-sorted (sort-by last ps)
+  ([{:keys [:p]}]
+    (let [p-sorted  (sort-by last p)
           cdf       (second (reduce (fn [[total v] [variable p]]
                                       (let [new-p (if (= total 0)
                                                     p
@@ -113,12 +123,12 @@
                                             new-entry [variable new-p]]
                                         [new-p (conj v new-entry)]))
                                     [0 []]
-                                    ps-sorted))
-          candidate (first ps-sorted)
+                                    p-sorted))
+          candidate (first p-sorted)
           flip      (rand)]
       (ffirst (drop-while #(< (second %) flip) cdf))))
-  ([n ps]
-   (repeatedly n #(categorical-simulate ps))))
+  ([n {:keys [:p] :as parameters}]
+   (repeatedly n #(categorical-simulate parameters))))
 
 (defn log-categorical-simulate
   "Generates a sample from a categorical distribution with parameters `ps`,
@@ -138,12 +148,51 @@
           flip      (Math/log (rand))]
       (ffirst (drop-while #(< (second %) flip) cdf))))
   ([n ps]
-   (repeatedly n #(categorical-simulate ps))))
+   (repeatedly n #(log-categorical-simulate ps))))
+
+(defn crp-logpdf
+  "Returns log probability of table counts `x` under a Chinese Restaurant Process
+  parameterized by a number `alpha`."
+  [x alpha]
+  (let [n       (reduce + x)
+        p-tilde (+ (* (count x) (Math/log alpha))
+                   (->> x
+                        (map #(lgamma %))
+                        (reduce +)))
+        Z       (- (lgamma (+ n alpha))
+                   (lgamma alpha))]
+    (- p-tilde Z)))
+
+(defn crp-simulate
+  "Returns log probability of table counts `x` under a Chinese Restaurant Process
+  parameterized by a number `alpha`."
+  [n alpha]
+  (reduce (fn [[counts assignments] i]
+            (let [probs-tilde  (conj counts alpha)
+                  Z            (reduce + probs-tilde)
+                  probs        (zipmap (range (+ 1 alpha))
+                                       (map #(/ % Z) probs-tilde))
+                  c-i          (categorical-simulate probs)
+                  assignments' (conj assignments c-i)
+                  counts'      (update counts c-i #(if-not %
+                                                        1
+                                                        (inc %)))]
+              [counts' assignments']))
+          [[1] [0]]
+          (range 1 n)))
+
+(let [counts [1]
+      alpha 2
+      probs-tilde (conj counts alpha)
+      Z           (reduce + probs-tilde)
+      probs       (zipmap (range (+ 1 alpha))
+                          (map #(/ % Z) probs-tilde))]
+  ( categorical-simulate probs))
 
 (defn dirichlet-logpdf
   "Returns log probability of `x` under a dirichlet distribution parameterized by
   a vector `alpha`."
-  [x alpha]
+  [x {:keys [:alpha]}]
   (assert (= (count alpha) (count x)) "alpha and x must have same length")
   (let [Z-inv        (- (->> alpha
                              (map lgamma)
@@ -159,12 +208,12 @@
 (defn dirichlet-simulate
   "Generates a sample from a dirhlet distribution with vector parameter `alpha`.
   Generates `n` samples, if specified."
-  ([alpha]
+  ([{:keys [:alpha]}]
     (let [y (map #(gamma-simulate {:k %}) alpha)
           Z (reduce + y)]
       (mapv #(/ % Z) y)))
-  ([n alpha]
-   (repeatedly n #(dirichlet-simulate alpha))))
+  ([n {:keys [:alpha] :as parameters}]
+   (repeatedly n #(dirichlet-simulate parameters))))
 
 (defn gaussian-logpdf
   "Returns log probability of `x` under a gaussian distribution parameterized
@@ -217,6 +266,6 @@
      :dirichlet   (dirichlet-simulate   parameters)
      :gamma       (gamma-simulate       parameters)
      :gaussian    (gaussian-simulate    parameters)
-     (throw (ex-info "Primitive doesn't exist." {:primitive primitive}))))
+     (throw (ex-info (str  "Primitive doesn't exist: " primitive) {:primitive primitive}))))
   ([n primitive parameters]
    (repeatedly n #(simulate primitive parameters))))

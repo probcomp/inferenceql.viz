@@ -1,6 +1,6 @@
 (ns inferenceql.multimixture.crosscat
   (:require [inferenceql.multimixture.primitives :as prim]
-            [inferenceql.multimixture.utils      :as mmix-utils])) 
+            [inferenceql.multimixture.utils      :as mmix-utils]))
 
 (defn crp-alpha-counts
   "Given alphas and counts of customers per table, returns a categorical variable
@@ -26,7 +26,7 @@
 (defn category-logpdf
   "Calculates the log probability of data under a given category.
   Assumes `x` contains only columns in that category."
-  [x types category] 
+  [x types category]
   (let [parameters (:parameters category)]
     (apply + (mapv (fn [[col value]]
                (let [col-type   (get types col)
@@ -83,6 +83,10 @@
                     {col-name (prim/simulate col-type col-params)}))
                 parameters))))
 
+(defn categorical-param-names
+  [view col-name]
+  (keys (get-in view [:categories 0 :parameters col-name :p])))
+
 (defn generate-category
   "Given a view and statistical types, simulates a category specification
   from that view."
@@ -90,17 +94,13 @@
    (let [hypers     (:hypers view)
          view-types (select-keys types (keys hypers)) ]
      (->> hypers
-          (pmap (fn [[col-name hyperpriors]]
-                  {col-name (if (> (count (keys hyperpriors)) 1)
-                              (into {} (map (fn [[ hyper-name hyper-dist]]
-                                              {hyper-name
-                                               (hyperprior-simulate hyper-dist)}) hyperpriors))
-                              ; Need the below hack to get keyword arguments
-                              ; for categorical variable.
-                             (if (= :categorical (col-name view-types))
-                               (zipmap (keys (get-in view [:categories 0 :parameters col-name]))
-                                       (hyperprior-simulate hyperpriors))
-                               (hyperprior-simulate hyperpriors)))}))
+          (map (fn [[col-name hyperpriors]]
+                  {col-name (into {} (map (fn [[hyper-name hyper-dist]]
+                                            (if (= :categorical (get view-types col-name))
+                                             {hyper-name (zipmap (categorical-param-names view col-name)
+                                                                 (hyperprior-simulate hyper-dist))}
+                                             {hyper-name (hyperprior-simulate hyper-dist)}))
+                                         hyperpriors))}))
           (into {})
           (assoc {} :parameters))))
   ([n view types]
