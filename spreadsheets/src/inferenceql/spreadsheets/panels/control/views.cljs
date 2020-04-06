@@ -54,10 +54,10 @@
                                 ;; autoComplete off in Chrome. "off" and "false" do not work.
                                 :autoComplete "my-search-field"
                                 ;; Disables text correction on iOS Safari.
-                                :autocorrect "off"
-                                :autocapitalize "none"
+                                :autoCorrect "off"
+                                :autoCapitalize "none"
                                 ;; HTML5 attr, browser support limited.
-                                :spellcheck "false"
+                                :spellCheck "false"
                                 :value @input-text}]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
