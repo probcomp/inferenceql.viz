@@ -61,8 +61,14 @@
                                 :value @input-text}]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
-          {:on-click #(rf/dispatch [:query/parse-query @input-text @label-info])} "Run InferenceQL"]
+          {:on-click (fn [e]
+                       (rf/dispatch [:query/parse-query @input-text @label-info])
+                       (.blur (.-target e)))} ; Clear focus off of button after click.
+          "Run InferenceQL"]
          [:button.toolbar-button.pure-button
-          {:on-click #(rf/dispatch [:table/clear])} "Clear results"]]]
+          {:on-click (fn [e]
+                        (rf/dispatch [:table/clear])
+                        (.blur (.-target e)))} ; Clear focus off of button after click.
+          "Clear results"]]]
      [:div.flex-box-space-filler]
      [selection-color-selector]]))
