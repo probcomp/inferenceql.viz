@@ -30,7 +30,7 @@
 
 ;;; Specs related to table data.
 
-(s/def ::header string?)
+(s/def ::header keyword?)
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/coll-of ::row :kind vector?))
 (s/def ::headers (s/coll-of ::header :kind vector?))
