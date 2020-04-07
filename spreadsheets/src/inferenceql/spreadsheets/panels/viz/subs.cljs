@@ -38,6 +38,6 @@
                                       (let [{selections :selections
                                              cols :selected-columns
                                              row :row-at-selection-start} layer]
-                                        (when (vega/simulatable? selections (first cols))
+                                        (when (vega/simulatable? selections cols)
                                           (make-simulate-fn (first cols) row override-fns)))))
                    (medley/remove-vals nil?))))
