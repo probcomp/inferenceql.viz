@@ -156,6 +156,17 @@
       {:vars stat-types
        :views (view-specs json-model)})))
 
+(defn keywordize-columns
+  "Keywordizes columns names in a multi-mixture spec, `spec`."
+  [spec]
+  (let [keywordize (fn [a-map] (medley/map-keys #(keyword %) a-map))] ; A non-recursive keywordize.
+    (-> spec
+        (update :vars keywordize)
+        (update :views (fn [views]
+                         (vec (for [column-partition views]
+                                (vec (for [cluster column-partition]
+                                       (update cluster :parameters keywordize))))))))))
+
 (def bdb-models (json/read-str (slurp bdb-models-path)))
 (def rows (->> data-path
                (slurp)
@@ -170,4 +181,5 @@
 (with-open [w (clojure.java.io/writer model-edn-path)]
   (binding [*print-length* false
             *out* w]
-    (pprint/pprint spec-to-use)))
+    ;; NOTE: Writing out spec with keyword column names.
+    (pprint/pprint (keywordize-columns spec-to-use))))
