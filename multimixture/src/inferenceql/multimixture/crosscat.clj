@@ -8,20 +8,9 @@
   [alpha counts]
   (let [n (apply + counts)]
     (->> (concat counts [alpha])
-         (map-indexed (fn [idx cnt] {idx (double (/ cnt (+ (- n 1) alpha)))}))
-         (into {}))))
-
-(defn exp-safe
-  "Safe exponentiation function accounting for NaN values."
-  [value]
-  (if (Double/isNaN value)
-    0
-    (Math/exp value)))
-
-(defn dist?
-  "Verifies whether keyword represents a distribution."
-  [value]
-  (contains?  #{:beta :bernoulli :categorical :dirichlet :gamma :gaussian} value))
+         (map-indexed (fn [idx cnt] {idx (double (/ cnt (+ n alpha)))}))
+         (into {})
+         (assoc {} :p))))
 
 (defn category-logpdf
   "Calculates the log probability of data under a given category.
@@ -49,7 +38,7 @@
 (defn logpdf
   "Calculates the log probability of data under a given CrossCat model."
   [x model latents]
-  (let [ types            (:types model)
+  (let [types            (:types model)
         view-assignments (get-in latents [:global :z])
         views            (:views model)]
     (->> views

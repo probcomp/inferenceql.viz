@@ -160,7 +160,11 @@
                                 (s/gen :categorical-prior/categorical)
                                 (s/gen :gaussian-prior/gaussian)])))
 
-(gen-from-spec ::prior)
+(defn valid-dist-params?
+  "Validator for the given distribution parameters."
+  [params]
+  (s/valid? ::distribution-parameters params))
+
 ;; CrossCat model
 ;; Latents data structure.
 (s/def ::count (s/and integer? (comp not neg?)))
@@ -184,15 +188,25 @@
                  [1 2 5 7] [3] [4 6]
                                   ^ not allowed in our spec,
                                     since this table's count
-                                    is supposed to be 1!"
-
+                                    is supposed to be 1!
+  If given assignments are given as a map, applies a call to
+  `vals` before continuing.
+  "
   [counts assignments]
-  (= (->> assignments
-          (frequencies)
-          (sort-by key)
-          (vals)
-          (vec))
-     counts))
+  (if (map? assignments)
+    (= (->> assignments
+            (vals)
+            (frequencies)
+            (sort-by key)
+            (vals)
+            (vec))
+       counts)
+    (= (->> assignments
+            (frequencies)
+            (sort-by key)
+            (vals)
+            (vec))
+       counts)))
 
 (defn crp-simulate-n
   "Given a keyword, simulate `n` samples from a CRP with a runtime-simulated
@@ -256,7 +270,7 @@
                          #(->> ::alpha
                                (s/gen)
                                (gen/fmap (partial crp-simulate-alpha :y)))))
-(s/def ::z ::counts)
+(s/def ::z (s/map-of string? #(and (integer? %) (not (neg? %)))))
 (s/def ::global (s/with-gen (s/and (s/keys :req-un [::alpha ::counts ::z])
                                    #(verify-counts-assignments?
                                      (:counts %)
@@ -442,7 +456,7 @@
      :views  views }))
 
 (s/def ::u     (s/coll-of boolean?))
-(s/def ::xcat  (s/with-gen (s/keys :req-un [:dist/types ::views] :opt-un [::u])
+(s/def ::xcat  (s/with-gen (s/keys :req-un [:dist/types ::views ::latents] :opt-un [::u])
                  #(->> (s/gen ::latents)
                        (gen/fmap (fn [latents] (generate-xcat-from-latents latents))))))
 
