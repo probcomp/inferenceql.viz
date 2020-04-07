@@ -166,8 +166,20 @@
 (def spec-to-use (or (nth all-specs model-number-to-use)
                      (nth all-specs 0)))
 
-(defn -main [])
-  (with-open [w (clojure.java.io/writer model-edn-path)]
-    (binding [*print-length* false
-              *out* w]
-      (pprint/pprint spec-to-use)))
+(defn keywordize-columns
+  "Keywordizes columns names in a multi-mixture spec, `spec`."
+  [spec]
+  (let [keywordize (fn [a-map] (medley/map-keys keyword a-map))] ; A non-recursive keywordize.
+    (-> spec
+        (update :vars keywordize)
+        (update :views (fn [views]
+                         (vec (for [column-partition views]
+                                (vec (for [cluster column-partition]
+                                       (update cluster :parameters keywordize))))))))))
+
+;; Write out the spec.
+(with-open [w (clojure.java.io/writer model-edn-path)]
+  (binding [*print-length* false
+            *out* w]
+    ;; NOTE: Writing out spec with keyword column names.
+    (pprint/pprint (keywordize-columns spec-to-use))))
