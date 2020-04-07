@@ -156,11 +156,14 @@
 (def resources-dir "spreadsheets/resources/")
 (def config (config-reader/read :model-builder))
 
+;; Bayes DB export JSON.
 (def bdb-models (:bayes-db-export config))
+;; A vector of maps representing the dataset.
 (def rows (csv-utils/csv-data->clean-maps (column-types bdb-models)
                                           (:data config)))
 (def model-edn-path (str resources-dir (:model config)))
 
+;; A collection of multi-mixture specs.
 (def all-specs (generate-specs-from-json bdb-models rows))
 ;; This is the multi-mixture spec we will write to a file as model.edn.
 (def spec-to-use (or (nth all-specs model-number-to-use)
