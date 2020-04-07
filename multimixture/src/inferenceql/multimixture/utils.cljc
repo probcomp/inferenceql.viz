@@ -1,5 +1,12 @@
 (ns inferenceql.multimixture.utils)
 
+(defn exp-safe
+  "Safe exponentiation function accounting for NaN values."
+  [value]
+  (if (Double/isNaN value)
+    0
+    (Math/exp value)))
+
 (defn logsumexp
   "Log-sum-exp operation for summing log probabilities without
   leaving the log domain."
