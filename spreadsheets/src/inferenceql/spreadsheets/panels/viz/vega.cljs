@@ -11,7 +11,7 @@
 
 ;; These are defs related to choropleth related columns in the dataset.
 ;; See spreadsheets/resources/config.edn for more info.
-(def ^:private geo-id-col (get-in config/config [:geo :table-geo-id-col]))
+(def ^:private geo-id-col (keyword (get-in config/config [:geo :table-geo-id-col])))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
