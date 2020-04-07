@@ -146,8 +146,8 @@
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
   (when-let [topojson-config (get config/config :topojson)]
-    (let [;; The other column selected, if any.
-          map-column (first (filter #(not= fips-col %) selected-columns))
+    (let [map-column (first (filter #(not= fips-col %) ; The other column selected, if any.
+                                    selected-columns))
 
           pad-fips (fn [v] (left-pad v (get topojson-config :fips-code-length) \0))
           cleaned-selections (cond->> selections
