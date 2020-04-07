@@ -297,6 +297,11 @@
 (s/def ::parameters (s/map-of ::column ::distribution-parameters))
 (s/def ::category (s/keys :req-un [::parameters]))
 
+(defn valid-category?
+  "Validator of a `category` structure."
+  [category]
+  (s/valid? ::category category))
+
 ;; Distribution types (FOR INFERENCE ONLY).
 (s/def ::dist-type #{:bernoulli :categorical :gaussian} )
 (s/def ::dist-map (s/map-of ::column ::dist-type :min-count 1 :max-count 1))
@@ -321,6 +326,11 @@
 (s/def ::categories (s/coll-of ::category ::into [] :min-count 1))
 (s/def ::hypers (s/map-of ::column ::prior))
 
+(defn valid-hypers?
+  "Validator of a `hypers` structure."
+  [hypers]
+  (s/valid? ::hypers hypers))
+
 (s/def ::view (s/and (s/keys :req-un [::hypers ::categories])
                      ;; Verify that the hypers variable set is the same
                      ;; for each category.
@@ -329,6 +339,11 @@
                                  (= (set (keys (:parameters category)))
                                     (set (keys (:hypers view)))))
                               (:categories view)))))
+
+(defn valid-view?
+  "Validator of a `view` structure."
+  [view]
+  (s/valid? ::view view))
 
 (defn no-overlapping-columns?
   "Given a set of views, confirms that no column variable is shared across views."
@@ -340,6 +355,12 @@
 
 (s/def ::views (s/and (s/coll-of ::view)
                       #(no-overlapping-columns? %)))
+
+(defn valid-views?
+  "Validator of a collection of `view` structures.
+  Enforces that no column is shared between views."
+  [views]
+  (s/valid? ::views views))
 
 (defn categorical-options
   "Generates options for categorical variable value names.
@@ -424,3 +445,8 @@
 (s/def ::xcat  (s/with-gen (s/keys :req-un [:dist/types ::views] :opt-un [::u])
                  #(->> (s/gen ::latents)
                        (gen/fmap (fn [latents] (generate-xcat-from-latents latents))))))
+
+(defn valid-xcat?
+  "Validator of a collection of an `xcat` structure."
+  [xcat]
+  (s/valid? ::xcat xcat))
