@@ -7,11 +7,6 @@
             [inferenceql.multimixture.primitives :as prim]
             [inferenceql.multimixture.utils      :as mmix-utils]))
 
-(defn normalize
-  "Normalizes a collection of numbers."
-  [col]
-  (mapv #(double ( / % ( reduce + col))) col))
-
 (defn gen-from-spec
   "Generates a single value from a spec."
   [spec]
@@ -37,7 +32,7 @@
 (defn prob
   "Generator for number between 0 and 1, within reason."
   []
-  (gen/double* {:infinite? false :NaN? false :min 0 :max 1}))
+  (gen/double* {:infinite? false :NaN? false :min 1e-10 :max (- 1 1e-10)}))
 
 
 ;; General probability.
@@ -50,7 +45,7 @@
                                           (s/gen)
                                           (gen/vector)
                                           (gen/not-empty)
-                                          (gen/fmap normalize))))
+                                          (gen/fmap mmix-utils/normalize))))
 
 
 ;; Distributions.
@@ -363,7 +358,7 @@
                 (let [options   (get categorical-options column-name)
                       n-options (count options)
                       probs-gen (s/gen ::probability)
-                      probs     (gen/generate (gen/fmap normalize
+                      probs     (gen/generate (gen/fmap mmix-utils/normalize
                                                         (gen/vector probs-gen n-options)))]
                   {column-name {:p (zipmap options probs)}})
                 {column-name (gen/generate (s/gen (case col-type

@@ -14,6 +14,11 @@
       ##-Inf
       res)))
 
+(defn normalize
+  "Normalizes a collection of numbers."
+  [coll]
+  (mapv #(double (/ % ( reduce + coll))) coll))
+
 (defn prun [n f]
   "Runs `n` parallel calls to function `f`, that is assumed to have
   no arguments."
