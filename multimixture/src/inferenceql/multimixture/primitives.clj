@@ -153,7 +153,7 @@
 (defn crp-logpdf
   "Returns log probability of table counts `x` under a Chinese Restaurant Process
   parameterized by a number `alpha`."
-  [x alpha]
+  [x {:keys [:alpha]}]
   (let [n       (reduce + x)
         p-tilde (+ (* (count x) (Math/log alpha))
                    (->> x
@@ -166,7 +166,7 @@
 (defn crp-simulate
   "Returns log probability of table counts `x` under a Chinese Restaurant Process
   parameterized by a number `alpha`."
-  [n alpha]
+  [n {:keys [:alpha]}]
   (reduce (fn [[counts assignments] i]
             (let [probs-tilde  (conj counts alpha)
                   Z            (reduce + probs-tilde)
@@ -180,14 +180,6 @@
               [counts' assignments']))
           [[1] [0]]
           (range 1 n)))
-
-(let [counts [1]
-      alpha 2
-      probs-tilde (conj counts alpha)
-      Z           (reduce + probs-tilde)
-      probs       (zipmap (range (+ 1 alpha))
-                          (map #(/ % Z) probs-tilde))]
-  ( categorical-simulate probs))
 
 (defn dirichlet-logpdf
   "Returns log probability of `x` under a dirichlet distribution parameterized by
@@ -248,6 +240,7 @@
      :bernoulli   (bernoulli-logpdf   x parameters)
      :beta        (beta-logpdf        x parameters)
      :categorical (categorical-logpdf x parameters)
+     :crp         (crp-logpdf         x parameters)
      :dirichlet   (dirichlet-logpdf   x parameters)
      :gamma       (gamma-logpdf       x parameters)
      :gaussian    (gaussian-logpdf    x parameters)

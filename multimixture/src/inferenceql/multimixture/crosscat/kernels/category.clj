@@ -19,7 +19,7 @@
         categories     (:categories view)
         all-categories (concat categories aux-categories)]
     [all-categories
-     (pmap #(xcat/category-logpdf-score x types %) all-categories)]))
+     (map #(xcat/category-logpdf-score x types %) all-categories)]))
 
 (defn category-weights
   "Returns the weights of each category in the view, based on
@@ -76,7 +76,6 @@
 (defn latents-update
   "Update the view latents data structure.
   If set to delete, we take extra precautions outlined in `kernel-row`.
-
   In:
     `row-id`        [`int`]: index of row, used for identifying
                              latent category assignment.
@@ -88,21 +87,22 @@
   Out:
     [`latents-l`]: Updated latent assignments and counts per category."
   [row-id y y' latents delete?]
-  (-> latents
-      (update-in [:counts y] dec)
-      (update-in [:counts y'] #(if-not %
-                                 1
-                                 (inc %)))
-      (assoc-in [:y row-id] y')
-      ((fn [latents]
-        (if delete?
-           (-> latents
-               (update :counts (comp vec #(remove #{0} %)))
-               (update :y #(mapv (fn [assignment]
-                                  (if (> assignment y)
-                                    (dec assignment)
-                                    assignment)) %)))
-          latents)))))
+  (let [y' (min (count (:counts latents)) y')]
+    (-> latents
+        (update-in [:counts y] dec)
+        (update-in [:counts y'] #(if-not %
+                                   1
+                                   (inc %)))
+        (assoc-in [:y row-id] y')
+        ((fn [latents]
+           (if delete?
+             (-> latents
+                 (update :counts (comp vec #(remove #{0} %)))
+                 (update :y #(mapv (fn [assignment]
+                                    (if (> assignment y)
+                                      (dec assignment)
+                                      assignment)) %)))
+             latents))))))
 
 (defn kernel-row
   "Category inference kernel for a specific row.
@@ -115,9 +115,10 @@
     `types`       [`types`]: statistical types of data, specified in the model.
     `latents` [`latents-l`]: local latents of the current view.
     `view`         [`view`]: current view.
+
   Out:
     [`vec latents-l view`]: updated local latents reflecting potential category
-                            assignment change, updated view reflecting clusters
+                            assignment change, updated view reflecting categories
                             being potentially added or deleted.
 
   There are several cases to consider that make this a little tough
@@ -147,9 +148,9 @@
         singleton?          (= 1 (nth category-counts y))
         [new-m weights]     (category-weights latents y singleton? m)
         [categories scores] (category-scores x view types new-m)
-        y'               (category-sample weights scores)
+        y'                  (category-sample weights scores)
         category-new        (nth categories y')
-        category    (nth categories y)]
+        category            (nth categories y)]
     (if (= y y')
       [latents view]  ; Return latents and view unchanged.
       (if singleton?
@@ -167,7 +168,6 @@
 (defn kernel-view
   "Category inference kernel for one view.
   `latents` must be view-specific, not the entire latents data structure.
-
   In:
     `data`         [`data`]: input data.
     `view`         [`view`]: current view.
@@ -179,17 +179,17 @@
                             assignment changes, updated view reflecting categories
                             being potentially added or deleted."
   [data view types latents m]
-  (let [view-columns (keys (:hypers view))
-        data-filtered (pmap #(select-keys % view-columns) data)
-        n             (count data-filtered)
-        data-row-ids (map-indexed vector data-filtered)]
+  (let [view-columns  (keys (:hypers view))
+        data-filtered (map #(select-keys % view-columns) data)
+        data-row-ids  (map-indexed vector data-filtered)]
     ;; The output of the kernel for the row are the updated
     ;; latents and view. These are fed as input when run on
     ;; subsequent rows.
-    (reduce (fn [[latents view] [row-id x]]
-              (kernel-row x row-id m types latents view))
-            [latents view]
-            data-row-ids)))
+    (->> data-row-ids
+         (reduce (fn [[latents view] [row-id x]]
+                   (kernel-row x row-id m types latents view))
+                 [latents view])
+         (vec))))
 
 (defn kernel
   "Category inference kernel, as specified in the CrossCat paper.
@@ -206,15 +206,15 @@
                            of the views of the model."
   [data model latents m]
   (let [data-formatted (->> data
-                            (mapv (fn [[col-name values]]
-                                    (mapv (fn [value]
+                            (map (fn [[col-name values]]
+                                    (map (fn [value]
                                             {col-name value})
                                           values)))
                             (mmix-utils/transpose)
-                            (mapv #(apply merge %)))
+                            (map #(apply merge %)))
         types (:types model)
         [local-latents views] (mmix-utils/transpose (pmap #(kernel-view data-formatted %1 types %2 m)
                                 (:views model)
                                 (:local latents)))]
-  [(assoc model :views views)
+  [(assoc model   :views views)
    (assoc latents :local local-latents)]))
