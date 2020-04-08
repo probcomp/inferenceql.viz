@@ -33,8 +33,8 @@
     (is (spec/valid-dist-params? probs-out))
     (is (= probs probs-out))))
 
-(deftest category-logpdf
-  "Tests `category-logpdf` by manually checking expected output."
+(deftest category-logpdf-score
+  "Tests `category-logpdf-score` by manually checking expected output."
   (let [x        {"color" "red"
                   "height" 6}
         types    {"color"  :categorical
@@ -45,15 +45,15 @@
                     (prim/logpdf (get x "height")
                                  (get types "height")
                                  (get-in category [:parameters "height"])))
-        logp     (xcat/category-logpdf x types category)]
+        logp     (xcat/category-logpdf-score x types category)]
     ;; Checking test arguments.
     (is (spec/valid-category? category))
 
     ;; Checking output.
     (is (== score logp))))
 
-(deftest view-logpdf
-  "Tests `category-logpdf` by manually checking expected output
+(deftest view-logpdf-score
+  "Tests `view-logpdf-score` by manually checking expected output
   with unevenly-weighted categories."
   (let [x       {"color" "red"
                  "height" 6}
@@ -98,7 +98,7 @@
         ;;            ~= -2.518
         total-score (mmix-utils/logsumexp [score-1 score-2])
         error       1e-8  ; Accounting for floating point errors.
-        logp        (xcat/view-logpdf x types latents view)]
+        logp        (xcat/view-logpdf-score x types latents view)]
 
     ;; Checking test arguments.
     (is (spec/valid-local-latents? latents))
@@ -108,9 +108,11 @@
     (is (< (Math/abs (- logp total-score))
            error))))
 
-(deftest logpdf
-  "Tests `view-logpdf` by manually checking expected output
-  with unevenly-weighted categories."
+(deftest logpdf-score
+  "Tests `logpdf-score` by manually checking expected output
+  with unevenly-weighted categories within one of the views.
+  Note that there is no weighting between views, since columns
+  are independent given views, by assumption."
   (let [x         {"color" "red"
                    "height" 6
                    "happy?" true}
@@ -208,12 +210,13 @@
         total-score (+ (mmix-utils/logsumexp [score-11 score-12])
                        (mmix-utils/logsumexp [score-21 score-22]))
         error       1e-8  ; Accounting for floating point errors.
-        logp        (xcat/logpdf x xcat latents)]
+        logp        (xcat/logpdf-score x xcat latents)]
     ;; Checking test arguments.
     (is (spec/valid-xcat? xcat))
     ;; Checking output.
     (is (< (Math/abs (- logp total-score))
            error))))
+
 
 ;; 1. category-assignment-simulate
 ;; 2. hyperprior-simulate

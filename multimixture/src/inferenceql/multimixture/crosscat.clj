@@ -12,7 +12,7 @@
          (into {})
          (assoc {} :p))))
 
-(defn category-logpdf
+(defn category-logpdf-score
   "Calculates the log probability of data under a given category.
   Assumes `x` contains only columns in that category."
   [x types category]
@@ -22,7 +22,7 @@
                      col-params (get parameters col)]
                  (prim/logpdf value col-type col-params))) x))))
 
-(defn view-logpdf
+(defn view-logpdf-score
   "Calculates the log probability of data under a given view.
   Assumes `x` contains only columns in that view"
   [x types latents view]
@@ -31,11 +31,11 @@
         crp-counts-norm (map #(Math/log (/ % n)) crp-counts)
         categories      (:categories view)]
     (->> categories
-         (map #(category-logpdf x types %))
+         (map #(category-logpdf-score x types %))
          (map (comp #(apply + %) vector) crp-counts-norm)
          mmix-utils/logsumexp)))
 
-(defn logpdf
+(defn logpdf-score
   "Calculates the log probability of data under a given CrossCat model."
   [x model latents]
   (let [types            (:types model)
@@ -46,7 +46,7 @@
                         (let [x-view (into {} (filter #(= view-idx
                                                           (get view-assignments (first %)))
                                                       x))]
-                          (view-logpdf x-view types (get-in latents [:local view-idx]) view))))
+                          (view-logpdf-score x-view types (get-in latents [:local view-idx]) view))))
          (apply +))))
 
 (defn category-assignment-simulate
