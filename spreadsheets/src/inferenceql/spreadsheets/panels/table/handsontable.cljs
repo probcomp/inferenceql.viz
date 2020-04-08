@@ -43,6 +43,10 @@
               :width               "100vw"
               :stretchH            "none"
               :licenseKey          "non-commercial-and-evaluation"}
+              ;; TODO look into the options for the new sparklines columns.
+              ;:colWidths
+              ;:autoColumnSize
+              ;:cells
    :hooks []})
 
 ;; These keywords refer to events in inferenceql.spreadsheets.panels.table.events.

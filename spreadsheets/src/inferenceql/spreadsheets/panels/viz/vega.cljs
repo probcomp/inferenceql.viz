@@ -323,3 +323,5 @@
        :resolve {:legend {:size "independent"
                           :color "independent"}
                  :scale {:color "independent"}}})))
+
+;; TODO: create a new spec for transforming data into a sparkline spec.

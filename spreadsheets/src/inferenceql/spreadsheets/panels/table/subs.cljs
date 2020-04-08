@@ -279,8 +279,12 @@
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
+
+      ;; TODO roll the specification of renderer function into :columns, remove :cells definition. 
+      ;; specify the new renderer for the sparklines column.
       (assoc-in [:settings :columns] (column-settings headers))
       (assoc-in [:settings :cells] cells-style-fn)
+
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props

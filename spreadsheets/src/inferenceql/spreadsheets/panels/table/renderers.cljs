@@ -1,5 +1,8 @@
-(ns inferenceql.spreadsheets.panels.table.renderers 
+(ns inferenceql.spreadsheets.panels.table.renderers
   "A cell renderer functions for use in handsontable properties")
+
+;; TODO: Add a new renderer for rendering data at this attribute. into a vega spec.
+;; Attach a div on the td for the cell, and call vega-embed on it with a spec.
 
 (defn row-wise-likelihood-threshold-renderer
   "Colors rows that have likelihood greater than or equal to `conf-thresh`"
