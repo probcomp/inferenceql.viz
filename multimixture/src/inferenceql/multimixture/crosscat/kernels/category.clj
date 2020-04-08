@@ -19,7 +19,7 @@
         categories     (:categories view)
         all-categories (concat categories aux-categories)]
     [all-categories
-     (pmap #(xcat/category-logpdf x types %) all-categories)]))
+     (pmap #(xcat/category-logpdf-score x types %) all-categories)]))
 
 (defn category-weights
   "Returns the weights of each category in the view, based on
