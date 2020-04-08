@@ -2,16 +2,6 @@
   (:require [inferenceql.multimixture.primitives :as prim]
             [inferenceql.multimixture.utils      :as mmix-utils]))
 
-(defn crp-alpha-counts
-  "Given alphas and counts of customers per table, returns a categorical variable
-  representing the corresponding CRP."
-  [alpha counts]
-  (let [n (apply + counts)]
-    (->> (concat counts [alpha])
-         (map-indexed (fn [idx cnt] {idx (double (/ cnt (+ n alpha)))}))
-         (into {})
-         (assoc {} :p))))
-
 (defn category-logpdf-score
   "Calculates the log probability of data under a given category.
   Assumes `x` contains only columns in that category."
@@ -48,6 +38,16 @@
                                                       x))]
                           (view-logpdf-score x-view types (get-in latents [:local view-idx]) view))))
          (apply +))))
+
+(defn crp-alpha-counts
+  "Given alphas and counts of customers per table, returns a categorical variable
+  representing the corresponding CRP."
+  [alpha counts]
+  (let [n (apply + counts)]
+    (->> (concat counts [alpha])
+         (map-indexed (fn [idx cnt] {idx (double (/ cnt (+ n alpha)))}))
+         (into {})
+         (assoc {} :p))))
 
 (defn category-assignment-simulate
   "Simulates a category assignment given a view's concentration parameter

@@ -153,9 +153,9 @@
 (s/def :gaussian-prior/gaussian (s/keys :req-un [:gaussian-prior/mu
                                                  :gaussian-prior/sigma]))
 
-(s/def ::prior (s/with-gen (s/keys :opt-un [:bernoulli-prior/bernoulli
-                                            :categorical-prior/categorical
-                                            :gaussian-prior/gaussian])
+(s/def ::prior (s/with-gen (s/or :bernoulli   :bernoulli-prior/bernoulli
+                                 :categorical :categorical-prior/categorical
+                                 :gaussian    :gaussian-prior/gaussian)
                   #(gen/one-of [(s/gen :bernoulli-prior/bernoulli)
                                 (s/gen :categorical-prior/categorical)
                                 (s/gen :gaussian-prior/gaussian)])))

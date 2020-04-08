@@ -11,28 +11,6 @@
             [inferenceql.multimixture.primitives :as prim]
             [inferenceql.multimixture.crosscat.specification :as spec]))
 
-(deftest crp-alpha-counts
-  "Tests `crp-alpha-counts` by manually checking expected output."
-  (let [alpha     4
-        counts    [3 4 4 5]
-
-        ;; The distribution for a CRP involves taking the counts
-        ;; of customers at each table and adding an auxiliary table
-        ;; with weight alpha (its concentration parameter) and
-        ;; normalizing.
-        probs     {:p {0 0.15
-                       1 0.20
-                       2 0.20
-                       3 0.25
-                       4 0.20}}
-        probs-out (xcat/crp-alpha-counts alpha counts)]
-    ;; Checking test arguments.
-    (is (spec/valid-dist-params? probs))
-
-    ;; Checking output.
-    (is (spec/valid-dist-params? probs-out))
-    (is (= probs probs-out))))
-
 (deftest category-logpdf-score
   "Tests `category-logpdf-score` by manually checking expected output."
   (let [x        {"color" "red"
@@ -63,8 +41,8 @@
                  :counts [4 6]
                  :y      [1 0 1 0 0 1 1 1 1 0]}
         view    {:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
-                          "height" {:sigma {:beta      {:alpha 0.5 :beta 0.5}}
-                                    :mu    {:beta      {:alpha 0.5 :beta 0.5}}}}
+                          "height" {:sigma {:gamma     {:k     0.5 :theta 0.5}}
+                                    :mu    {:beta      {:alpha 0.5 :beta  0.5}}}}
                  :categories [{:parameters {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
                                             "height" {:mu 6 :sigma 1}}}
                               {:parameters {"color"  {:p {"red" 0.3 "green" 0.2 "blue" 0.5}}
@@ -134,8 +112,8 @@
                    :local [latents-l1 latents-l2]}
 
         view-1    {:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
-                            "height" {:sigma {:beta      {:alpha 0.5 :beta 0.5}}
-                                      :mu    {:beta      {:alpha 0.5 :beta 0.5}}}}
+                            "height" {:sigma {:gamma     {:k     0.5 :theta 0.5}}
+                                      :mu    {:beta      {:alpha 0.5 :beta  0.5}}}}
                    :categories [{:parameters  {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
                                                "height" {:mu 6 :sigma 1}}}
                                 {:parameters {"color"  {:p {"red" 0.3 "green" 0.2 "blue" 0.5}}
@@ -217,6 +195,53 @@
     (is (< (Math/abs (- logp total-score))
            error))))
 
+(deftest crp-alpha-counts
+  "Tests `crp-alpha-counts` by manually checking expected output."
+  (let [alpha     4
+        counts    [3 4 4 5]
+
+        ;; The distribution for a CRP involves taking the counts
+        ;; of customers at each table and adding an auxiliary table
+        ;; with weight alpha (its concentration parameter) and
+        ;; normalizing.
+        probs     {:p {0 0.15
+                       1 0.20
+                       2 0.20
+                       3 0.25
+                       4 0.20}}
+        probs-out (xcat/crp-alpha-counts alpha counts)]
+
+    ;; Checking test arguments.
+    (is (spec/valid-dist-params? probs))
+
+    ;; Checking output.
+    (is (spec/valid-dist-params? probs-out))
+    (is (= probs probs-out))))
+
+(deftest category-assignment-simulate
+  "Tests `category-assignment-simulate` by calculating the empirical
+  distribution and thresholding it with respect to the sampled distribution."
+  (let [alpha   4
+        counts  [3 4 4 5]
+        probs      {:p {0 0.15
+                        1 0.20
+                        2 0.20
+                        3 0.25
+                        4 0.20}}
+        iters   1000
+        samples (repeatedly iters #(xcat/category-assignment-simulate alpha counts))
+        error   (* 0.01 (count counts))]
+
+    ;; Checking test arguments.
+    (is (spec/valid-dist-params? probs))
+
+    ;; Checking output.
+    (mapv (fn [[idx cnt]]
+            (is (< (Math/abs (- (/ cnt
+                                   iters)
+                                (get-in probs [:p idx])))
+                   error)))
+          (frequencies samples))))
 
 ;; 1. category-assignment-simulate
 ;; 2. hyperprior-simulate
