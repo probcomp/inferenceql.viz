@@ -33,6 +33,7 @@
                                lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
+                               lambdaisland/kaocha-cloverage {:mvn/version "1.0-45"}
                                cheshire {:mvn/version "5.8.1"}}}
            :figwheel {:extra-paths ["spreadsheets/figwheel-target"]
                       :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.3"}

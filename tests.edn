@@ -1,4 +1,5 @@
 #kaocha/v1
+{:plugins [:kaocha.plugin/cloverage]}
 {:tests [{:id :aide
           :source-paths ["aide/src"]
           :test-paths ["aide/test"]}
