@@ -71,6 +71,7 @@
     (->> logps
          (map-indexed (fn [idx logp] {idx (- logp Z)}))
          (into {})
+         (assoc {} :p)
          (prim/log-categorical-simulate))))
 
 (defn latents-update
