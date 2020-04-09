@@ -7,6 +7,15 @@
     0
     (Math/exp value)))
 
+(defn loglinspace
+  "Log linear space from start to end with stepsize n over a log scale."
+  [start end n]
+  (let [lstart (Math/log start)
+        lend   (Math/log end)
+        step   (/ (- lend lstart)
+                  n)]
+  (map #(Math/exp %) (range lstart lend step))))
+
 (defn logsumexp
   "Log-sum-exp operation for summing log probabilities without
   leaving the log domain."
