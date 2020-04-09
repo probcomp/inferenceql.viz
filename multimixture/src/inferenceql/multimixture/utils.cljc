@@ -1,12 +1,5 @@
 (ns inferenceql.multimixture.utils)
 
-(defn exp-safe
-  "Safe exponentiation function accounting for NaN values."
-  [value]
-  (if (Double/isNaN value)
-    0
-    (Math/exp value)))
-
 (defn loglinspace
   "Log linear space from start to end with stepsize n over a log scale."
   [start end n]
