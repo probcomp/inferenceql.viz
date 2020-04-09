@@ -13,7 +13,7 @@
   [:div.modal-wrapper
    [:div {:class "modal-backdrop"
           :on-click (fn [event]
-                      (rf/dispatch [:clear-modal])
+                      (rf/dispatch [:override/clear-modal])
                       (.preventDefault event)
                       (.stopPropagation event))}]
    [:div {:class "modal-child"
@@ -28,7 +28,7 @@
 (defn modal
   "Reagent component for rendering modal contents."
   []
-  (let [modal (rf/subscribe [:modal])]
+  (let [modal (rf/subscribe [:override/modal])]
     (fn []
       [:div
        (when (:child @modal)
@@ -48,8 +48,8 @@
   (let [source-text (r/atom (or fn-text ""))
         ;; This gets called below when the set button is clicked.
         set-fn (fn [event]
-                 (rf/dispatch [:set-column-function col-name @source-text])
-                 (rf/dispatch [:clear-modal]))]
+                 (rf/dispatch [:override/set-column-function col-name @source-text])
+                 (rf/dispatch [:override/clear-modal]))]
     (fn []
       [:div.js-function-entry-modal
        [code-editor source-text]
@@ -57,7 +57,7 @@
         [:button {:type "button"
                   :title "Cancel"
                   :class "btn btn-default"
-                  :on-click #(rf/dispatch [:clear-modal])}
+                  :on-click #(rf/dispatch [:override/clear-modal])}
                  "Cancel"]
         [:button {:type "button"
                   :title "Set"

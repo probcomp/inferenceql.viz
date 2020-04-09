@@ -22,30 +22,6 @@ div {
   min-width: 40px;
 }
 
-/* --------------- styling for table titles --------------- */
-
-.table-title {
-  float: left;
-  background-color: #f0f0f0;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #cccccc;
-  border-bottom: none;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  margin-left: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-
-  height: 24px;
-  box-sizing: border-box; 
-}
-
-.table-title-selected {
-  border-width: 3px;
-  border-color: #4b89ff;
-}
-
 /* --------------- styling for the toolbar --------------- */
 
 #toolbar {
@@ -74,14 +50,7 @@ div {
 #search-input {
   width: 100%;
   height: 60px;
-}
-
-input[type=search]{
-  /* allows search input to be styled */
-  -moz-appearance: none;/* older firefox */
-  -webkit-appearance: none; /* safari, chrome, edge and ie mobile */
-  appearance: none; /* rest */
-
+  resize: none;
   font-size: 1rem;
   color: #333;
 
@@ -90,8 +59,9 @@ input[type=search]{
   border-style: solid;
   border-color: #bbbbbb;
   outline-width: 0;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 6px;
 }
 
 .toolbar-button {
@@ -100,27 +70,42 @@ input[type=search]{
   padding: .3em .8em
 }
 
+/* --------------- styling for selection color selector --------------- */
 
-/* --------------- styling for confidence settings --------------- */
-
-#conf-controls {
+#color-selector {
   flex-shrink: 0;
-  width: 185px;
+  width: 105px;
   margin-top: 5px;
   font-size: .875rem;
+  margin-right: 25px;
+  line-height: 16px;
 }
 
-#conf-slider {
-  line-height: 20px;
+#color-selector .list-group {
+  margin-left: 10px;
+  margin-top: 6px;
+  margin-bottom: 0px;
+  width: 84px;
 }
 
-#conf-mode {
-  line-height: 20px;
+#color-selector .list-group-item {
+  padding: 5px 15px;
+  line-height: 12px;
 }
 
-select {
-  font-size: .875rem;
-  color: #333;
+#color-selector .list-group-item.active.blue {
+  background-color: #419be8;
+  border-color: #419be8;
+}
+
+#color-selector .list-group-item.active.green {
+  background-color: mediumseagreen;
+  border-color: mediumseagreen;
+}
+
+#color-selector .list-group-item.active.red {
+  background-color: tomato;
+  border-color: tomato;
 }
 
 /* --------------- styling for vega-vizualization --------------- */
@@ -130,10 +115,19 @@ select {
   justify-content: center;
   border-top: solid;
   border-width: 1px;
-  border-color: #cccccc;
+  border-color: #e7e7e7;
 }
 
 /* --------------- styling for handsontables --------------- */
+
+#table-container {
+  background: #f5f5f5;
+
+  /* This is like setting a border-top of 1px width expect that this border
+  extends into the div instead of outside of it. This way the table will cover
+  this border when it appears, thereby avoiding a double border. */
+  box-shadow:inset 0px 1px 0px 0px #e7e7e7;
+}
 
 .ht_master tr td {
   font-size: .875rem;
@@ -142,8 +136,53 @@ select {
 .handsontable th {
   font-size: .875rem;
 }
-.virtual-hot .ht_master tr td {
+
+.virtual .ht_master tr td {
   background-color: #FAFCE4;
+}
+
+/* These are selectors for coloring the background of single-cell selections
+and multiple cell selections. The td.area:before selector applies to multiple cell selections,
+while td.current:before applies to single cell selections. */
+
+.red-highlight .handsontable td.area:before,
+.red-highlight .handsontable td.current:before {
+    background-color: #FF0000;
+}
+
+.green-highlight .handsontable td.area:before,
+.green-highlight .handsontable td.current:before {
+    background-color: #00FF00;
+}
+
+.blue-highlight .handsontable td.area:before,
+.blue-highlight .handsontable td.current:before {
+    background-color: #005EFF;
+}
+
+/* These css selector definitions enable cell background highlighting for single
+cell selections. Handsontable by default does not highlight single cell selections.
+These selector definitions were mostly taken from Handsontable's method of highlighting multiple
+cell selections.
+
+A special not about the use of :not(.area). Handsontable applies the .area and .current classes
+to the first cell in a mutliple cell selection. To avoid having styles applied from Handsontable's
+css classes for .area and our styles for .current, these following selectors have the :not(.area)
+psuedo-class applied. */
+
+.handsontable td.current:not(.area) {
+  position: relative;
+}
+
+.handsontable td.current:not(.area):before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  bottom: -100%\9; /* Fix for IE9 to spread the ":before" pseudo element to 100% height of the parent element */
+  opacity: 0.1;
 }
 
 /* --------------- styling for js-function entry modal popup --------------- */

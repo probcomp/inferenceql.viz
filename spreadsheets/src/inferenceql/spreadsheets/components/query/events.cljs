@@ -17,27 +17,30 @@
 (def ^:private beta-params {:alpha 0.001, :beta 0.001})
 
 (rf/reg-event-fx
- :parse-query
+ :query/parse-query
  event-interceptors
  (fn [{:keys [db]} [_ text label-info]]
    (let [command (->> (str/trim text)
                       (query/parse))
          {:keys [pos-ids neg-ids unlabeled-ids]} label-info]
      (match command
+       {:type :display-dataset}
+       {:dispatch [:query/display-dataset]}
+
        {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
-       {:dispatch [:generate-virtual-row c num-rows]}
+       {:dispatch [:query/generate-virtual-row c num-rows]}
 
        {:type :anomaly-search :column column :given :row}
-       {:dispatch [:anomaly-search column ["ROW"]]}
+       {:dispatch [:query/anomaly-search column ["ROW"]]}
 
        {:type :anomaly-search :column column :given given-col}
-       {:dispatch [:anomaly-search column [given-col]]}
+       {:dispatch [:query/anomaly-search column [given-col]]}
 
        {:type :anomaly-search :column column}
-       {:dispatch [:anomaly-search column []]}
+       {:dispatch [:query/anomaly-search column []]}
 
        {:type :search-by-labeled :binding {"label" "True"} :given true}
-       {:dispatch [:search-by-labeled pos-ids neg-ids unlabeled-ids]}
+       {:dispatch [:query/search-by-labeled pos-ids neg-ids unlabeled-ids]}
 
        :else
        (let [logged-msg (str "Unimplemented command: " (pr-str command))
@@ -47,32 +50,37 @@
          (js/alert alerted-msg)
          {})))))
 
-(rf/reg-event-db
- :search-by-example
+(rf/reg-event-fx
+ :query/display-dataset
  event-interceptors
- (fn [db [_ example-row]]
-   (let [table-rows (table-db/table-rows db)
+ (fn [{:keys [db]} [_]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)]
+     {:dispatch [:table/set rows headers]})))
+
+(rf/reg-event-fx
+ :query/search-by-example
+ event-interceptors
+ (fn [{:keys [db]} [_ example-row]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)
          search-row (merge example-row {search-column true})
-         result (search/search model/spec search-column [search-row] table-rows n-models beta-params)]
-     (rf/dispatch [:search-result result]))
-   db))
+         result (search/search model/spec search-column [search-row] rows n-models beta-params {})]
+     {:dispatch [:table/set rows headers {:scores result}]})))
 
-(rf/reg-event-db
- :anomaly-search
+(rf/reg-event-fx
+ :query/anomaly-search
  event-interceptors
- (fn [db [_ target-col conditional-cols table-rows]]
-   (let [table-rows (table-db/table-rows db)
-         result (search/anomaly-search model/spec target-col conditional-cols table-rows)
-         virtual-rows (table-db/virtual-rows db)
-         virtual-result (search/anomaly-search model/spec target-col conditional-cols virtual-rows)]
-     (rf/dispatch [:search-result result])
-     (rf/dispatch [:virtual-search-result virtual-result]))
-   db))
+ (fn [{:keys [db]} [_ target-col conditional-cols]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)
+         result (search/anomaly-search model/spec target-col conditional-cols rows)]
+     {:dispatch [:table/set rows headers {:scores result}]})))
 
-(rf/reg-event-db
- :generate-virtual-row
+(rf/reg-event-fx
+ :query/generate-virtual-row
  event-interceptors
- (fn [db [_ conditions num-rows]]
+ (fn [{:keys [db]} [_ conditions num-rows]]
    (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
          gen-fn #(first (mp/infer-and-score
                          :procedure (search/optimized-row-generator model/spec)
@@ -83,8 +91,9 @@
          overrides-insert-fn (co/gen-insert-fn overrides-map)
 
          ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
-         new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))]
-     (table-db/with-virtual-rows db new-rows))))
+         new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))
+         headers (table-db/dataset-headers db)]
+     {:dispatch [:table/set new-rows headers {:virtual true}]})))
 
 (defn- create-search-examples [pos-rows neg-rows]
   (let [remove-nil-key-vals #(into {} (remove (comp nil? second) %))
@@ -102,11 +111,13 @@
         neg-ids-map (zipmap neg-ids (repeat 0))]
     (merge pos-ids-map neg-ids-map)))
 
-(rf/reg-event-db
- :search-by-labeled
+(rf/reg-event-fx
+ :query/search-by-labeled
  event-interceptors
- (fn [db [_ pos-ids neg-ids unlabeled-ids]]
-   (let [rows (table-db/table-rows db)
+ (fn [{:keys [db]} [_ pos-ids neg-ids unlabeled-ids]]
+   (let [rows (table-db/dataset-rows db)
+         headers (table-db/dataset-headers db)
+         raw-labels (table-db/labels db)
 
          pos-rows (map rows pos-ids)
          neg-rows (map rows neg-ids)
@@ -114,7 +125,7 @@
 
          example-rows (create-search-examples pos-rows neg-rows)
 
-         scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params)
+         scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params {})
          scores-ids-map (zipmap unlabeled-ids scores)
 
          scores-ids-map-lab (create-scores-map-for-labeled-rows pos-ids neg-ids)
@@ -122,6 +133,4 @@
          all-scores (->> (merge scores-ids-map scores-ids-map-lab)
                          (sort-by key)
                          (map second))]
-     (rf/dispatch [:clear-virtual-scores])
-     (rf/dispatch [:search-result all-scores]))
-   db))
+     {:dispatch [:table/set rows headers {:scores all-scores :labels raw-labels}]})))

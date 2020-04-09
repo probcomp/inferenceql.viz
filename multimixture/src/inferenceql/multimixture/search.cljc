@@ -5,6 +5,7 @@
             [metaprob.prelude :as mp]
             [inferenceql.distributions :as idbdist]
             [inferenceql.multimixture :as mmix]
+            [inferenceql.multimixture.utils :as mmix-utils]
             [inferenceql.multimixture.basic-queries :as bq]
             [inferenceql.multimixture.specification :as spec]))
 
@@ -69,8 +70,8 @@
       new-spec)))
 
 (defn importance-resampling
-  [& {:keys [model inputs observation-trace n-particles]
-      :or {inputs [], observation-trace {}, n-particles 1}}]
+  [model {:keys [inputs observation-trace n-particles]
+          :or {inputs [], observation-trace {}, n-particles 1}}]
   (let [particles (mp/replicate n-particles
                                 #(mp/infer-and-score :procedure model
                                                      :inputs inputs
@@ -87,13 +88,13 @@
   "Takes a multimixture specification, views, and a set of rows that have a value
   in the new column that is being added. Returns an updated multimixture
   specification."
-  [spec rows column-key beta-params]
+  [spec rows column-key beta-params {:keys [n-particles] :or {n-particles 100}}]
   (first
    ;; TODO: Setting n-particles to 1 causes IOB errors
-   (importance-resampling :model generate-1col-binary-extension
-                          :inputs [spec (count rows) column-key beta-params]
-                          :observation-trace (mmix/with-rows {} rows)
-                          :n-particles 100)))
+   (importance-resampling generate-1col-binary-extension
+                          {:inputs [spec (count rows) column-key beta-params]
+                           :observation-trace (mmix/with-rows {} rows)
+                           :n-particles n-particles})))
 
 (defn score-rows
   [spec rows new-column-key]
@@ -119,7 +120,7 @@
        (remove (comp nil? val))
        (into {})))
 
-(defn  score-row-probability
+(defn score-row-probability
   [row-generator target-col constraint-cols row]
   (let [target (select-keys row [target-col])
         constraints (constraints-for-scoring-p target-col constraint-cols row)]
@@ -133,11 +134,21 @@
     (map #(score-row-probability row-generator target-col conditional-cols %) data)))
 
 (defn search
-  [spec new-column-key known-rows unknown-rows n-models beta-params]
-  (let [specs (repeatedly n-models #(insert-column spec known-rows new-column-key beta-params))
-        predictions (mapv #(score-rows % unknown-rows new-column-key)
-                          specs)]
-    (into []
-          (map #(/ (reduce + %)
-                   n-models))
-          (transpose predictions))))
+  "Conducts classic search via importance sampling, parallelized. If only one spec is given, there
+  will be `n-models` models based on that spec. Otherwise, the number of specs
+  in `spec` must equal n-models."
+  ;; Additional arity for calling search without an options map.
+  ([spec new-column-key known-rows unknown-rows n-models beta-params]
+   (search spec new-column-key known-rows unknown-rows n-models beta-params {}))
+  ([spec new-column-key known-rows unknown-rows n-models beta-params {:keys [n-particles] :or {n-particles 100}}]
+   (let [pmap #?(:clj pmap
+                 :cljs map)
+         specs (if (seq spec)
+                 (mmix-utils/prun n-models #(insert-column spec known-rows new-column-key beta-params {:n-particles n-particles}))
+                 (pmap #(insert-column % known-rows new-column-key beta-params {:n-particles n-particles}) spec))
+         predictions (mapv #(score-rows % unknown-rows new-column-key)
+                           specs)]
+     (into []
+           (map #(/ (reduce + %)
+                    n-models))
+           (transpose predictions)))))

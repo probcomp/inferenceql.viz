@@ -24,8 +24,3 @@
                                       unknown-rows
                                       beta-params)]
     (is (= [0.5 0.5] results))))
-
-(deftest normalize-row-probability
-  (let [unnorm-row [0 1 2 3 4]
-        norm-row   [0 (/ 1 10) (/ 1 5) (/ 3 10) (/ 2 5)]]
-    (is (= norm-row (deterministic/normalize-row-probability unnorm-row)))))

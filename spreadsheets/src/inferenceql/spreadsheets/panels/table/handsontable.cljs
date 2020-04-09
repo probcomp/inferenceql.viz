@@ -1,5 +1,12 @@
 (ns inferenceql.spreadsheets.panels.table.handsontable)
 
+(def label-col-header
+  "Header text for the column used for labeling rows as examples."
+  "🏷")
+(def score-col-header
+  "Header text for the column that shows scores."
+  "probability")
+
 (defn freeze-col-1-2-fn [columns-moving target]
   "Prevents the movement of the first two columns in the table.
   Also prevents other columns from moving into those frist two spots."
@@ -29,23 +36,19 @@
                                     "filter_by_value"
                                     "filter_action_bar"]
               :bindRowsWithHeaders true
-              :selectionMode       :range
+              :selectionMode       :multiple
               :outsideClickDeselects false
               :readOnly            true
-              :height              "32vh"
+              :height              "50vh"
               :width               "100vw"
-              :stretchH            "all"
+              :stretchH            "none"
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
 
 ;; These keywords refer to events in inferenceql.spreadsheets.panels.table.events.
-(def real-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :before-change])
-(def virtual-hot-hooks [:after-deselect :after-selection-end :after-on-cell-mouse-down :after-change])
+(def real-hot-hooks [:hot/after-selection-end :hot/after-on-cell-mouse-down :hot/before-change
+                     :hot/after-column-move :hot/after-column-sort :hot/after-filter])
 
 (def real-hot-settings (-> default-hot-settings
                            (assoc-in [:hooks] real-hot-hooks)
                            (assoc-in [:name] "real-table")))
-(def virtual-hot-settings (-> default-hot-settings
-                              (assoc-in [:hooks] virtual-hot-hooks)
-                              (assoc-in [:name] "virtual-table")
-                              (assoc-in [:settings :height] "20vh")))

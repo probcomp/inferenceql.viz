@@ -9,22 +9,16 @@
 
 (defn app
   []
-  (let [real-hot-props      @(rf/subscribe [:real-hot-props])
-        virtual-hot-props @(rf/subscribe [:virtual-hot-props])
-        real-table-in-viz @(rf/subscribe [:real-table-in-viz])
-        virtual-table-in-viz @(rf/subscribe [:virtual-table-in-viz])
-        vega-lite-spec @(rf/subscribe [:vega-lite-spec])
-        vega-lite-log-level @(rf/subscribe [:vega-lite-log-level])
-        generator      @(rf/subscribe [:generator])]
+  (let [real-hot-props @(rf/subscribe [:table/real-hot-props])
+        vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
+        generators      @(rf/subscribe [:viz/generators])
+        virtual @(rf/subscribe [:table/virtual])
+        highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
-     [:div {:class ["table-title" (when real-table-in-viz "table-title-selected")]}
-      [:span "Real Data"]]
-     [table/handsontable {:style {:overflow "hidden"}}  real-hot-props]
-     [:div {:class ["table-title" (when virtual-table-in-viz "table-title-selected")]}
-      [:span "Virtual Data"]]
-     [table/handsontable {:style {:overflow "hidden"} :class "virtual-hot"} virtual-hot-props]
+     [:div#table-container {:class [highlight-class (when virtual "virtual")]}
+       [table/handsontable {} real-hot-props]]
      [:div#viz-container
       (when vega-lite-spec
-        [viz/vega-lite vega-lite-spec {:actions false :logLevel vega-lite-log-level} generator])]
+        [viz/vega-lite vega-lite-spec {:actions false} generators])]
      [modal/modal]]))
