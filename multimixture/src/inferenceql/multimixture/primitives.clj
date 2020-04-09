@@ -134,8 +134,8 @@
   "Generates a sample from a categorical distribution with parameters `ps`,
   which are log probabilities.
   Generates `n` samples, if specified."
-  ([ps]
-    (let [ps-sorted (sort-by last ps)
+  ([{:keys [:p]}]
+    (let [p-sorted (sort-by last p)
           cdf       (second (reduce (fn [[total v] [variable p]]
                                       (let [new-p (if (= total 0)
                                                     p
@@ -143,12 +143,12 @@
                                             new-entry [variable new-p]]
                                         [new-p (conj v new-entry)]))
                                     [0 []]
-                                    ps-sorted))
-          candidate (first ps-sorted)
+                                    p-sorted))
+          candidate (first p-sorted)
           flip      (Math/log (rand))]
       (ffirst (drop-while #(< (second %) flip) cdf))))
-  ([n ps]
-   (repeatedly n #(log-categorical-simulate ps))))
+  ([n {:keys [:p] :as parameters}]
+   (repeatedly n #(log-categorical-simulate parameters))))
 
 (defn crp-logpdf
   "Returns log probability of table counts `x` under a Chinese Restaurant Process
