@@ -1,18 +1,34 @@
-(ns inferenceql.multimixture.crosscat.kernels.concentration_params
+(ns inferenceql.multimixture.crosscat.kernels.concentration-params
   (:require [inferenceql.multimixture.crosscat   :as xcat]
             [inferenceql.multimixture.primitives :as prim]
             [inferenceql.multimixture.utils      :as mmix-utils]))
 
 (defn alpha-scores
   "Given a grid of alpha values, and counts representing a CRP,
-  calculates the score of each gridpoint."
+  calculates the score of each gridpoint.
+
+  In:
+    `grid`   [`vec double`]: vector of candidates for alpha.
+    `counts`    [`vec int`]: vector of customer counts of each
+                             group.
+  Out:
+    [`vector double`]: scores of each alpha candidate with
+                       respect to the provided counts."
   [grid counts]
   (map #(prim/crp-logpdf counts {:alpha %}) grid))
 
 (defn alpha-sample
   "Given a grid of alpha values and their scores, samples a new
   value of alpha from the normalized categorical distribution
-  created by the scores."
+  created by the scores.
+
+  In:
+    `grid`   [`vec double`]: vector of candidates for alpha.
+    `scores`    [`vec int`]: scores of each alpha candidate
+                             in `grid`.
+  Out:
+    [`int`]: a group assignment sampled from the posterior
+             approximated by the weights."
   [grid scores]
   (let [Z       (mmix-utils/logsumexp scores)
         p-tilde (map #(- % Z) scores)
@@ -22,7 +38,14 @@
 (defn kernel-group
   "Given counts representing a CRP, samples a new value of
   alpha from a discretized approximation to the posterior,
-  alpha ~ P(alpha | counts)."
+  alpha ~ P(alpha | counts).
+
+  In:
+    `counts`    [`vec int`]: vector of customer counts of each
+                             group.
+  Out:
+    [`int`]: a group assignment sampled from the posterior
+             approximated by the weights."
   [counts]
   (let [n-customers   (reduce + counts)
         n-grid-points 100
@@ -37,6 +60,7 @@
 (defn kernel
   "Concentration hyperparameter inference kernel, as specified
   in the CrossCat paper. Requires only a latents structure.
+
   In:
     `latents` [`latents`]: specified latents of CrossCat model.
   Out:
