@@ -36,4 +36,6 @@
                                lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
-                               cheshire {:mvn/version "5.8.1"}}}}}
+                               cheshire {:mvn/version "5.8.1"}}}
+           :rebel-prompt {:extra-deps {com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
+                          :main-opts  ["-m" "rebel-readline.main"]}}}
