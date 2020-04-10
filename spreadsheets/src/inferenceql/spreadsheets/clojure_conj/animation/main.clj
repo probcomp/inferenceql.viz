@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.clojure-conj.animation.data-ulli
+(ns inferenceql.spreadsheets.clojure-conj.animation.main
   (:require
     [inferenceql.spreadsheets.data :refer [fix-row csv-data->maps]]
     [clojure.data.csv :as csv]
