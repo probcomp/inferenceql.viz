@@ -222,32 +222,35 @@
   (let [model (get partition-data model-num)
         iter (get model iter-num)
 
+        ;; A map: {view-id: [col-name-1 col-name-2 ...]}
         view-col-assignments (->> (get iter "view-partitions")
                                   (medley/map-keys #(Integer/parseInt %))
                                   (medley/map-keys #(get column-mapping %))
                                   (group-by second)
                                   (medley/map-vals #(map first %)))
 
+        ;; A map: {view-id: [cluster-id-for-row-1 cluster-id-for-row-2 ... cluster-id-for-row-n]}
         views (->> (get iter "view-row-partitions")
                    (medley/map-keys #(Integer/parseInt %)))
 
+        ;; Unique view-ids
         view-ids (keys views)
+        ;; A maps: {view-id: [cluster-id cluster-id] }
         cluster-ids (medley/map-vals #(vec (distinct %)) views)
 
-        assign-partitions-to-rows
-        (fn [rows views]
-          (let [add-view-info (fn [rows view-id cluster-assignments]
-                                (let [view-name (str "view-" view-id)]
-                                  (map (fn [row c-assignment] (assoc row view-name c-assignment)) rows cluster-assignments)))]
-            (reduce-kv add-view-info rows views)))
+        ;; Assigns to each row its cluster-id in the given view, view-id
+        assign-view-cids-to-rows (fn [rows view-id cluster-assignments]
+                                   (let [view-name (str "view-" view-id)
+                                         assign-cid (fn [row cid] (assoc row view-name cid))]
+                                     (map assign-cid rows cluster-assignments)))
 
-        clustered-so-data (assign-partitions-to-rows so-data views)
+        data-with-cids (reduce-kv assign-view-cids-to-rows so-data views)
 
-        ;; TEMP hack for testing
-        clustered-so-data (take 50 clustered-so-data)
+        ;; TEMP only take 50 rows.
+        data-with-cids (take 50 data-with-cids)
 
         filename-prefix (str "iter-" iter-num)]
-    (write-specs model-dir filename-prefix view-ids cluster-ids view-col-assignments clustered-so-data)))
+    (write-specs model-dir filename-prefix view-ids cluster-ids view-col-assignments data-with-cids)))
 
 (defn make-model-dir [base-path]
   ;; Make clean model directory.
