@@ -49,4 +49,18 @@
     (for [model-num (range num-models)]
       (plot-model model-num))))
 
+;;; Testing ---------------------------------------------------------------------
+
+; (require 'inferenceql.spreadsheets.clojure-conj.animation.data-ulli)
+
 ; (plot-all-models)
+
+(comment
+  (def viz-dir "viz/")
+  (def spec-dir "specs/")
+  (def view-png-dir "views/")
+  (def view-comp-png-dir "comp/")
+  (def gif-dir "anim/")
+
+  (let [model-dir (str viz-dir "model-testing" "/")]
+    (plot/viz-iter "0" "0" model-dir partition-data so-data column-mapping)))
