@@ -8,9 +8,8 @@ query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (
 selections          ::= star | p-column-or-prob (<','> <ws>? p-column-or-prob)*
 <p-column-or-prob>  ::= column-or-prob | <'('> column-or-prob <')'>
 <column-or-prob>    ::= column-selection | probability-of
-column-selection    ::= column-name (<ws> as-clause)?
-as-clause           ::= <'AS'> <ws> selection-name
-selection-name      ::= symbol
+
+column-selection    ::= column-name (<ws> <'AS'> <ws> selection-name)?
 
 (* Sources *)
 
@@ -35,22 +34,20 @@ predicate           ::= (#"<" | #">" | #"<=" | #">=")
 
 (* Generate *)
 
-(* TODO: Make model optional *)
+(* TODO: Rename column-names to variable-names *)
 
-generate            ::= <'GENERATE'> <ws> generated (<ws> <'GIVEN'> <ws> bindings)? <ws> <'UNDER'> <ws> model
-generated           ::= column-name (<','> <ws> column-name)*
+generate            ::= <'GENERATE'> <ws> variable-names (<ws> <'GIVEN'> <ws> bindings)? (<ws> <'UNDER'> <ws> model)?
+variable-names      ::= variable-name (<','> <ws> variable-name)*
 bindings            ::= binding (<','> <ws> binding)*
 
 (* Probability *)
 
-probability-of      ::= <'PROBABILITY OF'> <ws> target (<ws> <'GIVEN'> <ws> constraints)? <ws> <'UNDER'> <ws> model (<ws> as-clause)?
+probability-of      ::= <'PROBABILITY OF'> <ws> target (<ws> <'GIVEN'> <ws> constraints)? (<ws> <'UNDER'> <ws> model)? (<ws> <'AS'> <ws> selection-name)?
 target              ::= events
 constraints         ::= events
 binding             ::= column-name <ws>? <'='> <ws>? value
 <events>            ::= star | event (<','> <ws>? event)*
-<event>             ::= binding-event | column-event
-binding-event       ::= binding
-column-event        ::= column-name
+<event>             ::= binding | column-name
 
 (* Literals *)
 
@@ -74,11 +71,14 @@ limit               ::= nat
 
 (* Shared *)
 
-model               ::= model-lookup | model-generate
+model               ::= model-lookup | <'('> generate <')'>
 model-lookup        ::= model-name
-model-generate      ::= <'('> generate <')'>
-model-name          ::= symbol | <'"'> symbol <'"'>
-column-name         ::= symbol | <'"'> symbol <'"'>
+
+selection-name      ::= name
+<column-name>       ::= name
+<model-name>        ::= name
+<variable-name>     ::= name
+name                ::= symbol | <'"'> symbol <'"'>
 
 star                ::= <'*'>
 
