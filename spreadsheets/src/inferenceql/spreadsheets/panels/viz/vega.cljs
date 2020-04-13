@@ -326,16 +326,30 @@
 
 ;;;;;-----------------------------------------------------
 
+
+(defn points-within-polygon [num-points polygon]
+  (let [bbox (.bbox js/turf polygon)]
+    (loop [points []]
+      (if (>= (count points) num-points)
+        points
+        (let [trial-point (js->clj (.randomPoint js/turf 1 (clj->js {:bbox bbox})))
+              trial-point (get-in trial-point ["features" 0])
+              test-result (js->clj (.pointsWithinPolygon js/turf (clj->js trial-point) polygon))]
+          (if-let [new-point (get-in test-result ["features" 0 "geometry" "coordinates"])]
+            (recur (conj points new-point))
+            (recur points)))))))
+
 (defn points []
   (let [geodata (get-in config/config [:topojson :data "features"])
         find-fn #(when (= (get-in % ["properties" "name"]) "Dorchester") %)
-        map-section (some find-fn geodata)
-        centroid (.centroid js/turf (clj->js map-section))]
-    (.log js/console "Dorchester info: " map-section)
-    (.log js/console "centroid: " (get-in (js->clj centroid) ["geometry" "coordinates"]))))
+        map-section (clj->js (some find-fn geodata))
+        centroid (.centroid js/turf (clj->js map-section))
+
+        points (->> (points-within-polygon 100 map-section)
+                    (map (fn [[long lat]] {:longitude long :latitude lat})))]
+    points))
 
 (defn map-spec []
-  (points)
   {:width 1000,
    :height 1000,
    :layer
@@ -350,4 +364,14 @@
       :strokeWidth 0.5},
      :encoding
      {:color {:value "#eee"},
-      :tooltip {:field "properties"}}}]})
+      :tooltip {:field "properties"}}}
+    {:data
+     {:values (points)}
+     :projection {:type "mercator"},
+     :mark "circle",
+     :encoding
+     {:longitude {:field "longitude", :type "quantitative"},
+      :latitude {:field "latitude", :type "quantitative"},
+      :size {:value 15},
+      :opacity {:value 1},
+      :color {:value "steelblue"}}}]})

@@ -11,7 +11,10 @@
 
 (rf/reg-sub :viz/vega-lite-spec
             (fn []
-              (clj->js (vega/map-spec))))
+              (clj->js
+                (let [spec (vega/map-spec)]
+                  (.log js/console "spec: " spec)
+                  spec))))
 
 (defn make-simulate-fn
   [col-to-sim row override-fns]
