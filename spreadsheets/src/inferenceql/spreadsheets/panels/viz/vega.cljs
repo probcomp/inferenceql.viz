@@ -326,7 +326,16 @@
 
 ;;;;;-----------------------------------------------------
 
+(defn points []
+  (let [geodata (get-in config/config [:topojson :data "features"])
+        find-fn #(when (= (get-in % ["properties" "name"]) "Dorchester") %)
+        map-section (some find-fn geodata)
+        centroid (.centroid js/turf (clj->js map-section))]
+    (.log js/console "Dorchester info: " map-section)
+    (.log js/console "centroid: " (get-in (js->clj centroid) ["geometry" "coordinates"]))))
+
 (defn map-spec []
+  (points)
   {:width 1000,
    :height 1000,
    :layer
