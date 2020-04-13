@@ -9,16 +9,10 @@
 
 (defn app
   []
-  (let [real-hot-props @(rf/subscribe [:table/real-hot-props])
-        vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
-        generators      @(rf/subscribe [:viz/generators])
-        virtual @(rf/subscribe [:table/virtual])
-        highlight-class @(rf/subscribe [:table/highlight-class])]
+  (let [vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
+        generators      @(rf/subscribe [:viz/generators])]
     [:div
      [control/panel]
-     [:div#table-container {:class [highlight-class (when virtual "virtual")]}
-       [table/handsontable {} real-hot-props]]
      [:div#viz-container
       (when vega-lite-spec
-        [viz/vega-lite vega-lite-spec {:actions false} generators])]
-     [modal/modal]]))
+        [viz/vega-lite vega-lite-spec {:actions false} generators])]]))
