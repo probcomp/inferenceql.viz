@@ -327,12 +327,11 @@
 ;;;;;-----------------------------------------------------
 
 (defn map-spec []
-  {:width 500,
-   :height 300,
+  {:width 1000,
+   :height 1000,
    :layer
    [{:data
-     {:url
-      "https://probcomp-geodata.surge.sh/boston-area-merged.geojson",
+     {:values (get-in config/config [:topojson :data])
       :format {:property "features"}},
      :projection {:type "mercator"},
      :mark
