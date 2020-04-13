@@ -47,9 +47,14 @@
           {:on-click (fn [e]
                        (rf/dispatch [:query/parse-query @input-text @label-info])
                        (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Run InferenceQL"]
+          "Run"]
+         [:button.toolbar-button.pure-button
+          {:on-click (fn [e]
+                       (rf/dispatch [:query/parse-query @input-text @label-info])
+                       (.blur (.-target e)))} ; Clear focus off of button after click.
+          "Stop"]
          [:button.toolbar-button.pure-button
           {:on-click (fn [e]
                         (rf/dispatch [:table/clear])
                         (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Clear results"]]]]))
+          "Clear"]]]]))
