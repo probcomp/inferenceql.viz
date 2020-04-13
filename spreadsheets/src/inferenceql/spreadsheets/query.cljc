@@ -6,6 +6,7 @@
      :cljs (:require-macros [inferenceql.spreadsheets.io :as sio]))
   (:require [clojure.edn :as edn]
             [clojure.spec.alpha :as s]
+            [clojure.string :as string]
             [clojure.walk :as walk]
             [datascript.core :as d]
             [instaparse.core :as insta]
@@ -65,44 +66,66 @@
 
 ;;; Parsing and transformation
 
+(defn variable
+  "Converts a string, symbol, or keyword to a valid Datalog variable of the same
+  name."
+  [x]
+  ;; Not using a protocol here for now to avoid having to deal with differing
+  ;; types in Clojure and ClojureScript.
+  (cond (string? x) (symbol (if-not (string/starts-with? x "?")
+                              (str "?" x)
+                              x))
+        (symbol? x) (variable (name x))
+        (keyword? x) (variable (name x))))
+
 (defn genvar
   "Generates a fresh variable for use in Datalog queries."
   ([]
-   (symbol (str "?" (gensym))))
+   (variable (gensym)))
   ([prefix-string]
-   (symbol (str "?" (gensym prefix-string)))))
+   (variable (gensym prefix-string))))
 
-;; Transformation
+;;; Transformation
 
-(defn as-map
+(defn map-transformer
   [ks]
   (fn [& children]
     (let [[pos-children kw-children] (split-at (count ks) children)
           pos-map (zipmap ks pos-children)
-          kw-map (->> kw-children
-                      (map (fn [node]
-                             (if-let [k (::key (meta node))]
-                               {k node}
-                               (let [[k & vs] node]
-                                 {k (or (when (coll? vs)
-                                          (if (= 1 (count vs))
-                                            (first vs)
-                                            (vec vs)))
-                                        true)}))))
-                      (reduce merge))]
+          kw-map (reduce (fn [acc node]
+                           (if-let [k (::key (meta node))]
+                             (assoc acc k node)
+                             (let [[k & vs] node
+                                   v (or (when (coll? vs)
+                                           (if (= 1 (count vs))
+                                             (first vs)
+                                             (vec vs)))
+                                         true)]
+                               (assoc acc k v))))
+                         {}
+                         kw-children)]
       (->> (merge pos-map kw-map)
            (into {})))))
 
-(defn meta-transform
-  [transform-map parse-tree]
-  (let [meta-preserving-map (reduce-kv (fn [m k f]
-                                         (assoc m k (comp #(with-meta % {::key k})
-                                                          f)))
-                                       {}
-                                       transform-map)]
-    (insta/transform meta-preserving-map parse-tree)))
+(defn try-vary-meta
+  "Like `clojure.core/vary-meta`, but doesn't attach metadata if the value doesn't
+  support it."
+  [obj & args]
+  (if (or (symbol? obj) (coll? obj))
+    (apply vary-meta obj args)
+    obj))
+
+(defn meta-preserving-transform-map
+  [transform-map]
+  (reduce-kv (fn [m k f]
+               (assoc m k (comp #(try-vary-meta % assoc ::key k)
+                                f)))
+             {}
+             transform-map))
 
 (def literal-transformations
+  "An `instaparse.core/transform` transform map that transforms literals into
+  their corresponding values."
   {:string edn/read-string
    :symbol edn/read-string
    :nat    edn/read-string
@@ -110,72 +133,68 @@
    :int    edn/read-string})
 
 (defn transform
+  "Transforms an InferenceQL parse tree into a map with the same information, but
+  in a format that is easier to work with. The output of this function is
+  consumed by `execute`."
   [parse-tree]
-  (->> parse-tree
-       (insta/transform literal-transformations)
-       (insta/transform {:name       keyword
-                         :predicate  symbol
-                         :star       (constantly :star)
-                         :ascending  (constantly :ascending)
-                         :descending (constantly :descending)})
-       (meta-transform (->> {:query            (as-map [:selections])
-                             :probability-of   (as-map [:target])
-                             :column-selection (as-map [:column])
-                             :generate         (as-map [:target])
-                             :ordering         (as-map [:column])
-                             :model-lookup     (as-map [:model-name])
+  (let [all-transformations (meta-preserving-transform-map
+                             (merge literal-transformations
+                                    {:query            (map-transformer [:selections])
+                                     :probability-of   (map-transformer [:target])
+                                     :column-selection (map-transformer [:column])
+                                     :generate         (map-transformer [:target])
+                                     :ordering         (map-transformer [:column])
+                                     :model-lookup     (map-transformer [:model-name])
 
-                             :selections     vector
-                             :conditions     vector
-                             :constraints    vector
-                             :variable-names vector
-                             :target         vector
+                                     :name       keyword
+                                     :predicate  symbol
 
-                             :binding hash-map}))))
+                                     :star       (constantly :star)
+                                     :ascending  (constantly :ascending)
+                                     :descending (constantly :descending)
 
-;; Selections
+                                     :selections     vector
+                                     :conditions     vector
+                                     :constraints    vector
+                                     :variable-names vector
+                                     :target         vector
+
+                                     :binding hash-map}))]
+    (insta/transform all-transformations parse-tree)))
+
+;;; Selections
+
+(defn events-clauses
+  "Given a variable and a collection of events, returns a sequence of Datalog
+  `:where` clauses that bind the values satisfying those events to the provided
+  variable."
+  [variable events]
+  (let [row-var (genvar "row-events-")
+        row-events (filterv keyword? events)
+        row-clause (cond (= [:star] events) `[(d/pull ~'$ ~'[*]       ~entity-var) ~row-var]
+                         (seq row-events)   `[(d/pull ~'$ ~row-events ~entity-var) ~row-var]
+                         :else              `[(~'ground {})                        ~row-var])
+
+        binding-sym (genvar "binding-events-")
+        binding-events (transduce (filter map?) merge {} events)
+
+        event-clause `[(~'ground ~binding-events) ~binding-sym]
+        merge-clause `[(merge ~row-var ~binding-sym) ~variable]]
+    [row-clause event-clause merge-clause]))
 
 (defn probability-selection-clauses
   [{:keys [target constraints model selection-name]}]
   (let [selection-name (or selection-name (keyword (gensym "prob")))
-        prob-var (symbol (str "?" (name selection-name)))
+        prob-var (variable selection-name)
 
-        model-var (genvar "model-")
-        target-sym (genvar "target-")
-        constraints-sym (genvar "constraints-")
+        model-var       (genvar "model-")
+        target-var      (genvar "target-")
+        constraints-var (genvar "constraints-")
 
-        target-clauses (let [row-sym (genvar "target-row-events-")
-                             row-events (filterv keyword? target)
-                             row-clause (cond (= [:star] target)
-                                              `[(d/pull ~'$ ~'[*] ~entity-var) ~row-sym]
+        target-clauses      (events-clauses target-var      target)
+        constraints-clauses (events-clauses constraints-var constraints)
 
-                                              (seq row-events)
-                                              `[(d/pull ~'$ ~row-events ~entity-var) ~row-sym]
-
-                                              :else
-                                              `[(~'ground {}) ~row-sym])
-
-                             binding-sym (genvar "target-binding-events-")
-                             binding-events (transduce (filter map?) merge {} target)
-
-                             event-clause `[(~'ground ~binding-events) ~binding-sym]]
-                         [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~target-sym]])
-        constraints-clauses (let [row-sym (genvar "constraint-row-events-")
-                                  row-events (filterv keyword? constraints)
-                                  row-clause (cond (= [:star] constraints)
-                                                   `[(d/pull ~'$ ~'[*] ~entity-var) ~row-sym]
-
-                                                   (seq row-events)
-                                                   `[(d/pull ~'$ ~row-events ~entity-var) ~row-sym]
-
-                                                   :else
-                                                   `[(~'ground {}) ~row-sym])
-
-                                  binding-sym (genvar "constraint-binding-events-")
-                                  binding-events (transduce (filter map?) merge {} constraints)
-                                  event-clause `[(~'ground ~binding-events) ~binding-sym]]
-                              [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~constraints-sym]])
-        logpdf-clauses `[[(queries/logpdf ~model-var ~target-sym ~constraints-sym) ~prob-var]]]
+        logpdf-clauses `[[(queries/logpdf ~model-var ~target-var ~constraints-var) ~prob-var]]]
     {:name   [selection-name]
      :find   [prob-var]
      :in     [model-var]
@@ -187,7 +206,7 @@
   node as a map."
   [{:keys [column selection-name]}]
   (let [name (name (or selection-name column))
-        variable (symbol (str "?" name))]
+        variable (variable name)]
     {:name [(keyword name)]
      :find [variable]
      :where `[[(~'get-else ~'$ ~entity-var ~column :iql/no-value) ~variable]]}))
@@ -199,9 +218,9 @@
 
 (defn selection-clauses
   [selection]
-  (let [[tag selection] (s/conform ::selection selection)]
+  (let [[tag _] (s/conform ::selection selection)]
     (case tag
-      :column-selection (column-selection-clauses selection)
+      :column-selection      (column-selection-clauses selection)
       :probability-selection (probability-selection-clauses selection))))
 
 (defn selections-clauses
@@ -216,26 +235,24 @@
 ;;; Conditions
 
 (def condition-transformations
-  (merge literal-transformations
-         {:presence-condition (fn [c] [[entity-var c '_]])
-          :absence-condition  (fn [c] `[[(~'missing? ~'$ ~entity-var ~c)]])
+  {:presence-condition (fn [c] [[entity-var c '_]])
+   :absence-condition  (fn [c] `[[(~'missing? ~'$ ~entity-var ~c)]])
 
-          :and-condition (fn [cs1 cs2] `[(~'and ~@cs1 ~@cs2)])
-          :or-condition (fn [cs1 cs2] `[(~'or ~@cs1 ~@cs2)])
+   :and-condition (fn [cs1 cs2] `[(~'and ~@cs1 ~@cs2)])
+   :or-condition (fn [cs1 cs2] `[(~'or ~@cs1 ~@cs2)])
 
-          :equality-condition  (fn [c v] [[entity-var c v]])
+   :equality-condition  (fn [c v] [[entity-var c v]])
 
-          :predicate symbol
-          :predicate-condition (fn [c p v]
-                                 (let [sym (genvar)]
-                                   [[entity-var c sym]
-                                    [(list (symbol "clojure.core" (name p)) sym v)]]))}))
+   :predicate symbol
+   :predicate-condition (fn [c p v]
+                          (let [sym (genvar)]
+                            [[entity-var c sym]
+                             [(list (symbol "clojure.core" (name p)) sym v)]]))})
 
-(defn conditions-clauses
-  "Given a conditions node, returns a sequence of Datalog clauses."
+(defn condition-clauses
+  "Returns a sequence of Datalog `:where` clauses for the conditions ."
   [conditions]
-  (mapcat #(insta/transform condition-transformations %)
-          conditions))
+  (insta/transform condition-transformations conditions))
 
 ;;; Parsing
 
@@ -252,17 +269,16 @@
   [query-plan]
   (let [replaced-symbols (->> (select-keys (:query query-plan) [:find :where])
                               (tree-seq coll? seq)
-                              (filter symbol?)
-                              (distinct)
-                              (filter (set (keys default-environment))))
+                              (filter (set (keys default-environment)))
+                              (distinct))
         input-names (zipmap (keys default-environment)
                             (map input-symbols
                                  (vals default-environment)))]
     (-> query-plan
-        (update :query #(walk/postwalk-replace input-names %))
+        (update-in [:query]     #(walk/postwalk-replace input-names %))
         (update-in [:query :in] into (map input-names replaced-symbols))
-        (update :inputs into (map (fn [sym] {:function-name sym})
-                                  replaced-symbols)))))
+        (update-in [:inputs]    into (map (fn [sym] {:function-name sym})
+                                          replaced-symbols)))))
 
 (defn query-plan
   "Given a query parse tree returns a query plan for the top-most query.
@@ -270,7 +286,7 @@
   interpreter. See `q` for details."
   [{:keys [selections conditions]}]
   (let [{sel-find :find sel-in :in sel-where :where sel-inputs :inputs} (selections-clauses selections)
-        cond-where (conditions-clauses conditions)]
+        cond-where (mapcat condition-clauses conditions)]
     {:query {:find sel-find
              :in (into '[$] sel-in)
              :where (into sel-where cond-where)}
@@ -296,7 +312,7 @@
 
 (s/def ::model
   (s/or :model-lookup ::model-lookup
-        :generate ::generate))
+        :generate     ::generate))
 
 (s/def ::source
   (s/or :data true?
@@ -306,9 +322,9 @@
 (s/def ::model-name keyword?)
 
 (s/def ::input
-  (s/or :model-lookup ::model-lookup
+  (s/or :model-lookup    ::model-lookup
         :function-lookup ::function-lookup
-        :generate ::generate))
+        :generate        ::generate))
 
 (defn input
   [x environment]
