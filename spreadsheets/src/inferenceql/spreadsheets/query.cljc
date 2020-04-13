@@ -99,22 +99,21 @@
   not present in the parse tree."
   [& ks]
   (fn [& children]
-    (let [[pos-children kw-children] (split-at (count ks) children)
-          pos-map (zipmap ks pos-children)
-          kw-map (reduce (fn [acc node]
-                           (if-let [k (::key (meta node))]
-                             (assoc acc k node)
-                             (let [[k & vs] node
-                                   v (or (when (coll? vs)
-                                           (if (= 1 (count vs))
-                                             (first vs)
-                                             (vec vs)))
-                                         true)]
-                               (assoc acc k v))))
-                         {}
-                         kw-children)]
-      (->> (merge pos-map kw-map)
-           (into {})))))
+    (let [[req-children opt-children] (split-at (count ks) children)
+          req-map (zipmap ks req-children)
+          opt-map (reduce (fn [acc node]
+                            (if-let [k (::key (meta node))]
+                              (assoc acc k node)
+                              (let [[k & vs] node
+                                    v (or (when (coll? vs)
+                                            (if (= 1 (count vs))
+                                              (first vs)
+                                              (vec vs)))
+                                          true)]
+                                (assoc acc k v))))
+                          {}
+                          opt-children)]
+      (merge req-map opt-map))))
 
 (defn try-vary-meta
   "Like `clojure.core/vary-meta`, but doesn't attach metadata if the value doesn't
