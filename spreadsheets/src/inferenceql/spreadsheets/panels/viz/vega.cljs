@@ -8,6 +8,7 @@
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [inferenceql.spreadsheets.config :as config]
             [goog.string :as gstring]
+            [goog.object :as gobj]
             [medley.core :as medley]))
 
 ;; These are defs related to choropleth related columns in the dataset.
@@ -328,12 +329,13 @@
 
 (defn points-within-polygon [num-points polygon]
   (let [bbox (.bbox js/turf polygon)
+        ;; TODO: Make this faster with batching.
         gen-point (fn []
-                    (let [trial-point (js->clj (.randomPoint js/turf 1 (clj->js {:bbox bbox})))
-                          trial-point (get-in trial-point ["features" 0])
-                          test-result (js->clj (.pointsWithinPolygon js/turf (clj->js trial-point) polygon))]
-                      (get-in test-result ["features" 0 "geometry" "coordinates"])))]
-    (take num-points (remove nil? (repeatedly gen-point)))))
+                    (let [trial-point (-> (.randomPoint js/turf 1 #js {:bbox bbox})
+                                          (gobj/getValueByKeys #js ["features" 0]))
+                          test-result (.pointsWithinPolygon js/turf trial-point polygon)]
+                      (gobj/getValueByKeys test-result #js ["features" 0 "geometry" "coordinates"])))]
+    (js->clj (take num-points (remove nil? (repeatedly gen-point))))))
 
 (defn points []
   (let [geodata (get-in config/config [:topojson :data "features"])
