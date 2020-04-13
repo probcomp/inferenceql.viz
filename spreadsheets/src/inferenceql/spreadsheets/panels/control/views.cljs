@@ -42,23 +42,6 @@
         label-info (rf/subscribe [:table/rows-label-info])]
     [:div#toolbar
      [:div#search-section
-       [:textarea#search-input {:on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
-                                ;; This submits the query when enter is pressed, but allows the user
-                                ;; to enter a linebreak in the textarea with shift-enter.
-                                :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (not (.-shiftKey e)))
-                                                        (do
-                                                          (.preventDefault e)
-                                                          (rf/dispatch [:query/parse-query @input-text @label-info]))))
-                                :placeholder "Enter a query..."
-                                ;; This random attribute value for autoComplete is needed to turn
-                                ;; autoComplete off in Chrome. "off" and "false" do not work.
-                                :autoComplete "my-search-field"
-                                ;; Disables text correction on iOS Safari.
-                                :autoCorrect "off"
-                                :autoCapitalize "none"
-                                ;; HTML5 attr, browser support limited.
-                                :spellCheck "false"
-                                :value @input-text}]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
           {:on-click (fn [e]
@@ -69,6 +52,4 @@
           {:on-click (fn [e]
                         (rf/dispatch [:table/clear])
                         (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Clear results"]]]
-     [:div.flex-box-space-filler]
-     [selection-color-selector]]))
+          "Clear results"]]]]))
