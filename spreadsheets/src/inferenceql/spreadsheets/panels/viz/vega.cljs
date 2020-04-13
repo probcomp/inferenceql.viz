@@ -326,18 +326,14 @@
 
 ;;;;;-----------------------------------------------------
 
-
 (defn points-within-polygon [num-points polygon]
-  (let [bbox (.bbox js/turf polygon)]
-    (loop [points []]
-      (if (>= (count points) num-points)
-        points
-        (let [trial-point (js->clj (.randomPoint js/turf 1 (clj->js {:bbox bbox})))
-              trial-point (get-in trial-point ["features" 0])
-              test-result (js->clj (.pointsWithinPolygon js/turf (clj->js trial-point) polygon))]
-          (if-let [new-point (get-in test-result ["features" 0 "geometry" "coordinates"])]
-            (recur (conj points new-point))
-            (recur points)))))))
+  (let [bbox (.bbox js/turf polygon)
+        gen-point (fn []
+                    (let [trial-point (js->clj (.randomPoint js/turf 1 (clj->js {:bbox bbox})))
+                          trial-point (get-in trial-point ["features" 0])
+                          test-result (js->clj (.pointsWithinPolygon js/turf (clj->js trial-point) polygon))]
+                      (get-in test-result ["features" 0 "geometry" "coordinates"])))]
+    (take num-points (remove nil? (repeatedly gen-point)))))
 
 (defn points []
   (let [geodata (get-in config/config [:topojson :data "features"])
