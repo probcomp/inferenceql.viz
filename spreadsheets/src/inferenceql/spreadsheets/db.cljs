@@ -3,6 +3,7 @@
             [inferenceql.spreadsheets.panels.control.db :as control-panel]
             [inferenceql.spreadsheets.panels.override.db :as override-panel]
             [inferenceql.spreadsheets.panels.table.db :as table-panel]
+            [inferenceql.spreadsheets.panels.viz.db :as viz-panel]
             [inferenceql.spreadsheets.components.highlight.db :as highlight-component]))
 
 ;;; Primary DB spec.
@@ -26,5 +27,6 @@
              control-panel/default-db
              override-panel/default-db
              table-panel/default-db
+             viz-panel/default-db
              highlight-component/default-db]]
     (apply merge dbs)))

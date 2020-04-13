@@ -350,7 +350,7 @@
                     (map (fn [[long lat]] {:longitude long :latitude lat :color "SteelBlue"})))]
     points))
 
-(defn map-spec []
+(defn map-spec [points]
   {:width 1000,
    :height 1000,
    :layer
@@ -367,7 +367,7 @@
      {:color {:value "#eee"},
       :tooltip {:field "properties"}}}
     {:data
-     {:name "points"}
+     {:values points}
      :projection {:type "mercator"},
      :mark "circle",
      :encoding
