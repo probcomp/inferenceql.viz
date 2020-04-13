@@ -34,8 +34,6 @@ predicate           ::= (#"<" | #">" | #"<=" | #">=")
 
 (* Generate *)
 
-(* TODO: Rename column-names to variable-names *)
-
 generate            ::= <'GENERATE'> <ws> variable-names (<ws> <'GIVEN'> <ws> bindings)? (<ws> <'UNDER'> <ws> model)?
 variable-names      ::= variable-name (<','> <ws> variable-name)*
 bindings            ::= binding (<','> <ws> binding)*

@@ -5,6 +5,7 @@
   #?(:clj (:require [inferenceql.spreadsheets.io :as sio])
      :cljs (:require-macros [inferenceql.spreadsheets.io :as sio]))
   (:require [clojure.edn :as edn]
+            [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [clojure.walk :as walk]
@@ -17,6 +18,25 @@
 
 (def entity-var '?entity)
 (def default-model-key :model)
+
+(defn variable
+  "Converts a string, symbol, or keyword to a valid Datalog variable of the same
+  name."
+  [x]
+  ;; Not using a protocol here for now to avoid having to deal with differing
+  ;; types in Clojure and ClojureScript.
+  (cond (string? x) (symbol (cond->> x
+                              (not (string/starts-with? x "?"))
+                              (str "?")))
+        (symbol? x) (variable (name x))
+        (keyword? x) (variable (name x))))
+
+(defn genvar
+  "Like `gensym`, but generates Datalog variables."
+  ([]
+   (variable (gensym)))
+  ([prefix-string]
+   (variable (gensym prefix-string))))
 
 (defn constrain
   [gfn target constraints]
@@ -54,41 +74,30 @@
    'clojrue.core/<= <=})
 
 (def input-symbols
-  {clojure.core/merge '?merge
-   datascript.core/pull '?pull
-   inferenceql.multimixture.basic-queries/logpdf '?logpdf
-
-   =  '?=
-   >  '?>
-   >= '?>=
-   <  '?<
-   <= '?<=})
-
-;;; Parsing and transformation
-
-(defn variable
-  "Converts a string, symbol, or keyword to a valid Datalog variable of the same
-  name."
-  [x]
-  ;; Not using a protocol here for now to avoid having to deal with differing
-  ;; types in Clojure and ClojureScript.
-  (cond (string? x) (symbol (if-not (string/starts-with? x "?")
-                              (str "?" x)
-                              x))
-        (symbol? x) (variable (name x))
-        (keyword? x) (variable (name x))))
-
-(defn genvar
-  "Generates a fresh variable for use in Datalog queries."
-  ([]
-   (variable (gensym)))
-  ([prefix-string]
-   (variable (gensym prefix-string))))
+  (->> default-environment
+       (set/map-invert)
+       (map (juxt key (comp variable val)))
+       (into {})))
 
 ;;; Transformation
 
 (defn map-transformer
-  [ks]
+  "Returns a transformer for use with `insta/transform` that converts one level of
+  a Hiccup parse trees into a map. Takes as its argument a sequence of keys for
+  the required \"positional\" subtrees for the node.
+
+  For example, for a parse tree for node `A` in the grammar
+
+    A = B C? D?
+
+  would be transformed by `(map-transformer :B)` into a map like
+
+    {:B ... :C ... :D ...}
+
+  where the key `:B` is taken from the argument to `map-transformer`. Keys `:C`
+  and `:D` will be omitted in the resulting map if the corresponding nodes were
+  not present in the parse tree."
+  [& ks]
   (fn [& children]
     (let [[pos-children kw-children] (split-at (count ks) children)
           pos-map (zipmap ks pos-children)
@@ -139,12 +148,12 @@
   [parse-tree]
   (let [all-transformations (meta-preserving-transform-map
                              (merge literal-transformations
-                                    {:query            (map-transformer [:selections])
-                                     :probability-of   (map-transformer [:target])
-                                     :column-selection (map-transformer [:column])
-                                     :generate         (map-transformer [:target])
-                                     :ordering         (map-transformer [:column])
-                                     :model-lookup     (map-transformer [:model-name])
+                                    {:query            (map-transformer :selections)
+                                     :probability-of   (map-transformer :target)
+                                     :column-selection (map-transformer :column)
+                                     :generate         (map-transformer :target)
+                                     :ordering         (map-transformer :column)
+                                     :model-lookup     (map-transformer :model-name)
 
                                      :name       keyword
                                      :predicate  symbol
