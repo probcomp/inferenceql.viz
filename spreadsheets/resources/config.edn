@@ -1,3 +1,2 @@
 #or [#maybe-include "config.edn"
-     {:model #edn "model.edn"
-      :data #csv "data.csv"}]
+     {}]
