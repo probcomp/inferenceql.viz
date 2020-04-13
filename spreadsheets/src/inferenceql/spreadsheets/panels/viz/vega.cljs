@@ -323,3 +323,23 @@
        :resolve {:legend {:size "independent"
                           :color "independent"}
                  :scale {:color "independent"}}})))
+
+;;;;;-----------------------------------------------------
+
+(defn map-spec []
+  {:width 500,
+   :height 300,
+   :layer
+   [{:data
+     {:url
+      "https://probcomp-geodata.surge.sh/boston-area-merged.geojson",
+      :format {:property "features"}},
+     :projection {:type "mercator"},
+     :mark
+     {:type "geoshape",
+      :fill "#eee",
+      :stroke "#757575",
+      :strokeWidth 0.5},
+     :encoding
+     {:color {:value "#eee"},
+      :tooltip {:field "properties"}}}]})

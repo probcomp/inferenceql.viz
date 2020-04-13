@@ -10,10 +10,8 @@
             [medley.core :as medley]))
 
 (rf/reg-sub :viz/vega-lite-spec
-            :<- [:table/selection-layers-list]
-            (fn [selection-layers]
-              (clj->js
-                (vega/generate-spec selection-layers))))
+            (fn []
+              (clj->js (vega/map-spec))))
 
 (defn make-simulate-fn
   [col-to-sim row override-fns]
@@ -33,11 +31,12 @@
             :<- [:table/selection-layers]
             :<- [:override/column-override-fns]
             (fn [[layers override-fns]]
-              (->> layers
-                   (medley/map-vals (fn [layer]
-                                      (let [{selections :selections
-                                             cols :selected-columns
-                                             row :row-at-selection-start} layer]
-                                        (when (vega/simulatable? selections cols)
-                                          (make-simulate-fn (first cols) row override-fns)))))
-                   (medley/remove-vals nil?))))
+              (when false
+                (->> layers
+                     (medley/map-vals (fn [layer]
+                                        (let [{selections :selections
+                                               cols :selected-columns
+                                               row :row-at-selection-start} layer]
+                                          (when (vega/simulatable? selections cols)
+                                            (make-simulate-fn (first cols) row override-fns)))))
+                     (medley/remove-vals nil?)))))
