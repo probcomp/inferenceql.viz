@@ -367,7 +367,7 @@
      {:color {:value "#eee"},
       :tooltip {:field "properties"}}}
     {:data
-     {:values (points 1000)}
+     {:name "points"}
      :projection {:type "mercator"},
      :mark "circle",
      :encoding
