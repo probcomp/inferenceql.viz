@@ -17,7 +17,7 @@ figwheel-public-dir := $(current-dir)/figwheel-target/public
 figwheel-resource-dir := $(figwheel-public-dir)/resources
 figwheel-index-file := $(figwheel-public-dir)/index.html
 
-all: model-spec js
+all: js
 
 .PHONY: model-spec
 model-spec:
@@ -97,10 +97,10 @@ figwheel-static: figwheel-clean-static $(figwheel-public-dir) $(figwheel-resourc
 
 ## Starts the spreadsheets app using Figwheel.
 .PHONY: figwheel
-figwheel: model-spec figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
+figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel
 
 ## Starts the spreadsheets app using Figwheel and Re-frame-10x.
 .PHONY: figwheel-10x
-figwheel-10x: model-spec figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
+figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel:10x
