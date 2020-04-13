@@ -1,7 +1,11 @@
 (* Queries *)
 
-query               ::= <'SELECT'> <ws> selections (<ws> <'FROM'> <ws> source) (<ws> <'WHERE'> <ws> conditions)? (<ws> <'ORDER BY'> <ws> ordering)? (<ws> <'LIMIT'> <ws> limit)? <';'>?
-<p-query>           ::= query | <'('> query <')'>
+query               ::= <'SELECT'> <ws> selections
+                        (<ws> <'FROM'> <ws> source)
+                        (<ws> <'WHERE'> <ws> conditions)?
+                        (<ws> <'ORDER BY'> <ws> ordering)?
+                        (<ws> <'LIMIT'> <ws> limit)?
+                        <';'>?
 
 (* Selections *)
 
@@ -34,13 +38,18 @@ predicate           ::= (#"<" | #">" | #"<=" | #">=")
 
 (* Generate *)
 
-generate            ::= <'GENERATE'> <ws> variable-names (<ws> <'GIVEN'> <ws> bindings)? (<ws> <'UNDER'> <ws> model)?
+generate            ::= <'GENERATE'> <ws> variable-names
+                        (<ws> <'GIVEN'> <ws> bindings)?
+                        (<ws> <'UNDER'> <ws> model)?
 variable-names      ::= variable-name (<','> <ws> variable-name)*
 bindings            ::= binding (<','> <ws> binding)*
 
 (* Probability *)
 
-probability-of      ::= <'PROBABILITY OF'> <ws> target (<ws> <'GIVEN'> <ws> constraints)? (<ws> <'UNDER'> <ws> model)? (<ws> <'AS'> <ws> selection-name)?
+probability-of      ::= <'PROBABILITY OF'> <ws> target
+                        (<ws> <'GIVEN'> <ws> constraints)?
+                        (<ws> <'UNDER'> <ws> model)?
+                        (<ws> <'AS'> <ws> selection-name)?
 target              ::= events
 constraints         ::= events
 binding             ::= column-name <ws>? <'='> <ws>? value

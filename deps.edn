@@ -29,6 +29,7 @@
          "search-by-example/src"
          "search-by-example/test"
          "spreadsheets/src"
+         "spreadsheets/test"
          "spreadsheets/resources"]
  :aliases {:test {:extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
                                cheshire {:mvn/version "5.8.1"}

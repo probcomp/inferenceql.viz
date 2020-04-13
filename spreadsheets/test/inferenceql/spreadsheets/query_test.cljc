@@ -19,12 +19,17 @@
   (gen/bind (chuck.gen/sub-map columns)
             #(apply gen/hash-map (mapcat identity %))))
 
+(def string-alpha
+  (gen/fmap string/join (gen/vector gen/char-alpha)))
+
+(def gen-column
+  (gen/fmap keyword (gen/such-that (comp pos? count) string-alpha)))
+
 (def gen-table
   "Generator for full \"tables\" (vectors of maps). Each row will have keys drawn
   from a consistent subset, and the values for each key will be drawn from a
   fixed generator."
-  (let [gen-column (gen/fmap keyword (chuck.gen/string-from-regex #"[a-zA-Z]\w*"))
-        value-generators [gen/small-integer gen/nat gen/int]]
+  (let [value-generators [gen/small-integer gen/nat gen/int]]
     (gen/bind (gen/map gen-column (gen/elements value-generators))
               (comp gen/vector gen-row))))
 
@@ -52,12 +57,16 @@
     (let [s (pr-str n)]
       (is (= n (parse-and-transform-literals s :start :int))))))
 
-(defspec float-parsing
-  (prop/for-all [n (gen/double* {:infinite? false :NaN? false})]
-    (let [s (pr-str n)]
-      (is (== n (parse-and-transform-literals s :start :float))))))
 
-;; Parsing success/failure
+;; Float parsing is a bit different in CLJS. Among other things, whole-numbered
+;; floats are printed without a decimal point. Someone should come back and try
+;; to make this work in CLJS at some point.
+#?(:clj (defspec float-parsing
+          (prop/for-all [n (gen/double* {:infinite? false :NaN? false})]
+            (let [s (pr-str n)]
+              (is (== n (parse-and-transform-literals s :start :float)))))))
+
+;;; Query parsing success/failure
 
 (deftest parsing-success
   (are [start query] (nil? (insta/get-failure (query/parse query :start start)))

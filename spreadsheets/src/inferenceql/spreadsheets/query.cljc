@@ -63,15 +63,18 @@
            [target-val trace score]))))))
 
 (def default-environment
-  {'clojure.core/merge clojure.core/merge
-   'datascript.core/pull datascript.core/pull
-   'inferenceql.multimixture.basic-queries/logpdf inferenceql.multimixture.basic-queries/logpdf
+  (merge
+   #?(:clj {'clojure.core/merge merge}
+      :cljs {'cljs.core/merge merge})
+   {'clojure.core/merge merge
+    'datascript.core/pull datascript.core/pull
+    'inferenceql.multimixture.basic-queries/logpdf inferenceql.multimixture.basic-queries/logpdf
 
-   'clojure.core/=  =
-   'clojure.core/>  >
-   'clojure.core/>= >=
-   'clojure.core/<  <
-   'clojrue.core/<= <=})
+    'clojure.core/=  =
+    'clojure.core/>  >
+    'clojure.core/>= >=
+    'clojure.core/<  <
+    'clojrue.core/<= <=}))
 
 (def input-symbols
   (->> default-environment
@@ -147,7 +150,7 @@
   [parse-tree]
   (let [all-transformations (meta-preserving-transform-map
                              (merge literal-transformations
-                                    {:query            (map-transformer :selections)
+                                    {:query            (map-transformer)
                                      :probability-of   (map-transformer :target)
                                      :column-selection (map-transformer :column)
                                      :generate         (map-transformer :target)
@@ -376,11 +379,11 @@
                                  %))
                 true (map #(dissoc % :db/id :iql/type))
                 limit (take limit))
-         metadata {:iql/columns (or names
-                                    (into []
-                                          (comp (mapcat keys)
-                                                (distinct))
-                                          rows))}]
+         metadata (or names
+                      (into []
+                            (comp (mapcat keys)
+                                  (distinct))
+                            rows))]
      (vary-meta rows assoc :iql/columns metadata))))
 
 (defn q
