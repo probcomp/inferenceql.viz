@@ -65,11 +65,6 @@
 
 ;;; Parsing and transformation
 
-(def ^:dynamic *logpdf-symbol*
-  "A dynamic variable storing the symbol of the function to be used for
-  calculating a model's log probability density function.."
-  'inferenceql.multimixture.basic-queries/logpdf)
-
 (defn genvar
   "Generates a fresh variable for use in Datalog queries."
   ([]
