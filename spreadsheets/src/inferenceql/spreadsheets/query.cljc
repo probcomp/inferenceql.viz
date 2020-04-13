@@ -6,6 +6,7 @@
      :cljs (:require-macros [inferenceql.spreadsheets.io :as sio]))
   (:require [clojure.edn :as edn]
             [clojure.spec.alpha :as s]
+            [clojure.walk :as walk]
             [datascript.core :as d]
             [instaparse.core :as insta]
             [metaprob.generative-functions :as g :refer [gen]]
@@ -43,12 +44,24 @@
 (def default-environment
   {'clojure.core/merge clojure.core/merge
    'datascript.core/pull datascript.core/pull
-   'inferenceql.multimixture.basic-queries/logpdf inferenceql.multimixture.basic-queries/logpdf})
+   'inferenceql.multimixture.basic-queries/logpdf inferenceql.multimixture.basic-queries/logpdf
+
+   'clojure.core/=  =
+   'clojure.core/>  >
+   'clojure.core/>= >=
+   'clojure.core/<  <
+   'clojrue.core/<= <=})
 
 (def input-symbols
   {clojure.core/merge '?merge
    datascript.core/pull '?pull
-   inferenceql.multimixture.basic-queries/logpdf '?logpdf})
+   inferenceql.multimixture.basic-queries/logpdf '?logpdf
+
+   =  '?=
+   >  '?>
+   >= '?>=
+   <  '?<
+   <= '?<=})
 
 ;;; Parsing and transformation
 
@@ -216,25 +229,25 @@
 
 (def condition-transformations
   (merge literal-transformations
-         {:presence-condition (fn [c] [entity-var c '_])
-          :absence-condition  (fn [c] `[(~'missing? ~'$ ~entity-var ~c)])
+         {:presence-condition (fn [c] [[entity-var c '_]])
+          :absence-condition  (fn [c] `[[(~'missing? ~'$ ~entity-var ~c)]])
 
-          :and-condition #(list 'and %1 %2)
-          :or-condition  #(list 'or  %1 %2)
+          :and-condition (fn [cs1 cs2] `[(~'and ~@cs1 ~@cs2)])
+          :or-condition (fn [cs1 cs2] `[(~'or ~@cs1 ~@cs2)])
 
-          :equality-condition  (fn [c v] [entity-var c v])
+          :equality-condition  (fn [c v] [[entity-var c v]])
 
           :predicate symbol
           :predicate-condition (fn [c p v]
                                  (let [sym (genvar)]
                                    [[entity-var c sym]
-                                    [(list p sym v)]]))}))
+                                    [(list (symbol "clojure.core" (name p)) sym v)]]))}))
 
 (defn conditions-clauses
   "Given a conditions node, returns a sequence of Datalog clauses."
   [conditions]
-  (map #(insta/transform condition-transformations %)
-       conditions))
+  (mapcat #(insta/transform condition-transformations %)
+          conditions))
 
 ;;; Parsing
 
@@ -246,6 +259,22 @@
                 :string-ci true))
 
 ;;; Query execution
+
+(defn inputize
+  [query-plan]
+  (let [replaced-symbols (->> (select-keys (:query query-plan) [:find :where])
+                              (tree-seq coll? seq)
+                              (filter symbol?)
+                              (distinct)
+                              (filter (set (keys default-environment))))
+        input-names (zipmap (keys default-environment)
+                            (map input-symbols
+                                 (vals default-environment)))]
+    (-> query-plan
+        (update :query #(walk/postwalk-replace input-names %))
+        (update-in [:query :in] into (map input-names replaced-symbols))
+        (update :inputs into (map (fn [sym] {:function-name sym})
+                                  replaced-symbols)))))
 
 (defn query-plan
   "Given a query parse tree returns a query plan for the top-most query.
@@ -324,7 +353,7 @@
                                     (let [model (input source environment)]
                                       (repeatedly limit model)))
                         :query (execute source rows))))
-         {query :query input-descs :inputs} (query-plan parse-map)
+         {query :query input-descs :inputs} (inputize (query-plan parse-map))
          inputs (map #(input % environment) input-descs)
          rows (cond->> (apply d/q query db inputs)
                 names (map #(zipmap (into [:db/id] names) ; TODO: Can this not be hard-coded?
