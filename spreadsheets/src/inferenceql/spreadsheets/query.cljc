@@ -343,8 +343,8 @@
    (execute parse-map rows {}))
   ([{:keys [selections source ordering limit] :as parse-map} rows models]
    (let [environment (merge default-environment models)
-         keyfn (get-in parse-map [:ordering :column] :db/id)
-         cmp (case (get-in parse-map [:ordering :direction])
+         keyfn (get ordering :column :db/id)
+         cmp (case (get ordering :direction)
                :ascending compare
                :descending #(compare %2 %1)
                nil compare)
@@ -363,13 +363,17 @@
                 names (map #(zipmap (into [:db/id] names) ; TODO: Can this not be hard-coded?
                                     %))
                 true (sort-by keyfn cmp)
-                true (map #(->> %
-                                (remove (comp #{:iql/no-value} val))
-                                (into {})))
+                true (map #(into {}
+                                 (remove (comp #{:iql/no-value} val))
+                                 %))
                 true (map #(dissoc % :db/id :iql/type))
                 limit (take limit))
-         metadata {:iql/columns (or names (into [] (comp (mapcat keys) (distinct)) rows))}]
-     (with-meta rows metadata))))
+         metadata {:iql/columns (or names
+                                    (into []
+                                          (comp (mapcat keys)
+                                                (distinct))
+                                          rows))}]
+     (vary-meta rows assoc :iql/columns metadata))))
 
 (defn q
   "Returns the result of executing a query on a set of rows. A registry
