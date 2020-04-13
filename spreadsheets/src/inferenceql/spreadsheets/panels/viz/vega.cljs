@@ -327,23 +327,26 @@
 
 ;;;;;-----------------------------------------------------
 
-(defn points-within-polygon [num-points polygon]
-  (let [bbox (.bbox js/turf polygon)
+(defn points-within-polygon [num-points polygons]
+  (let [bbox (.bbox js/turf polygons)
         ;; TODO: Make this faster with batching.
         gen-point (fn []
                     (let [trial-point (-> (.randomPoint js/turf 1 #js {:bbox bbox})
                                           (gobj/getValueByKeys #js ["features" 0]))
-                          test-result (.pointsWithinPolygon js/turf trial-point polygon)]
+                          test-result (.pointsWithinPolygon js/turf trial-point polygons)]
                       (gobj/getValueByKeys test-result #js ["features" 0 "geometry" "coordinates"])))]
     (js->clj (take num-points (remove nil? (repeatedly gen-point))))))
 
-(defn points []
+(defn points [num-points]
   (let [geodata (get-in config/config [:topojson :data "features"])
-        find-fn #(when (= (get-in % ["properties" "name"]) "Dorchester") %)
-        map-section (clj->js (some find-fn geodata))
-        centroid (.centroid js/turf (clj->js map-section))
 
-        points (->> (points-within-polygon 100 map-section)
+        select-fn (fn [feature]
+                    (let [name (get-in feature ["properties" "name"])]
+                      (#{"South Boston" "South End" "Roxbury"} name)))
+        features (clj->js (filter select-fn geodata))
+        feature-collection (.featureCollection js/turf features)
+        ;; centroid (.centroid js/turf (clj->js map-section))
+        points (->> (points-within-polygon num-points feature-collection)
                     (map (fn [[long lat]] {:longitude long :latitude lat :color "SteelBlue"})))]
     points))
 
@@ -364,12 +367,12 @@
      {:color {:value "#eee"},
       :tooltip {:field "properties"}}}
     {:data
-     {:values (points)}
+     {:values (points 1000)}
      :projection {:type "mercator"},
      :mark "circle",
      :encoding
      {:longitude {:field "longitude", :type "quantitative"},
       :latitude {:field "latitude", :type "quantitative"},
-      :size {:value 15},
+      :size {:value 5},
       :opacity {:value 1},
       :color {:signal "datum.color"}}}]})
