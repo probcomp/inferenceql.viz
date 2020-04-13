@@ -344,7 +344,7 @@
         centroid (.centroid js/turf (clj->js map-section))
 
         points (->> (points-within-polygon 100 map-section)
-                    (map (fn [[long lat]] {:longitude long :latitude lat})))]
+                    (map (fn [[long lat]] {:longitude long :latitude lat :color "SteelBlue"})))]
     points))
 
 (defn map-spec []
@@ -372,4 +372,4 @@
       :latitude {:field "latitude", :type "quantitative"},
       :size {:value 15},
       :opacity {:value 1},
-      :color {:value "steelblue"}}}]})
+      :color {:signal "datum.color"}}}]})
