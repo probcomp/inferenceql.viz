@@ -40,6 +40,16 @@
                target-val (select-keys val target)]
            [target-val trace score]))))))
 
+(def default-environment
+  {'clojure.core/merge clojure.core/merge
+   'datascript.core/pull datascript.core/pull
+   'inferenceql.multimixture.basic-queries/logpdf inferenceql.multimixture.basic-queries/logpdf})
+
+(def input-symbols
+  {clojure.core/merge '?merge
+   datascript.core/pull '?pull
+   inferenceql.multimixture.basic-queries/logpdf '?logpdf})
+
 ;;; Parsing and transformation
 
 (def ^:dynamic *logpdf-symbol*
@@ -123,15 +133,20 @@
         prob-var (symbol (str "?" (name selection-name)))
 
         model-var (genvar "model-")
-
         target-sym (genvar "target-")
+        constraints-sym (genvar "constraints-")
+
+        pull-sym (get input-symbols datascript.core/pull)
+        merge-sym (get input-symbols clojure.core/merge)
+        logpdf-sym (get input-symbols inferenceql.multimixture.basic-queries/logpdf)
+
         target-clauses (let [row-sym (genvar "target-row-events-")
                              row-events (filterv keyword? target)
                              row-clause (cond (= [:star] target)
-                                              `[(datascript.core/pull ~'$ ~'[*] ~entity-var) ~row-sym]
+                                              `[(~pull-sym ~'$ ~'[*] ~entity-var) ~row-sym]
 
                                               (seq row-events)
-                                              `[(datascript.core/pull ~'$ ~row-events ~entity-var) ~row-sym]
+                                              `[(~pull-sym ~'$ ~row-events ~entity-var) ~row-sym]
 
                                               :else
                                               `[(~'ground {}) ~row-sym])
@@ -140,30 +155,31 @@
                              binding-events (transduce (filter map?) merge {} target)
 
                              event-clause `[(~'ground ~binding-events) ~binding-sym]]
-                         [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~target-sym]])
+                         [row-clause event-clause `[(~merge-sym ~row-sym ~binding-sym) ~target-sym]])
+        constraints-clauses (let [row-sym (genvar "constraint-row-events-")
+                                  row-events (filterv keyword? constraints)
+                                  row-clause (cond (= [:star] constraints)
+                                                   `[(~pull-sym ~'$ ~'[*] ~entity-var) ~row-sym]
 
-        constraints-sym (genvar "constraints-")
-        conditions-clauses (let [row-sym (genvar "constraint-row-events-")
-                                 row-events (filterv keyword? constraints)
-                                 row-clause (cond (= [:star] constraints)
-                                                  `[(datascript.core/pull ~'$ ~'[*] ~entity-var) ~row-sym]
+                                                   (seq row-events)
+                                                   `[(~pull-sym ~'$ ~row-events ~entity-var) ~row-sym]
 
-                                                  (seq row-events)
-                                                  `[(datascript.core/pull ~'$ ~row-events ~entity-var) ~row-sym]
+                                                   :else
+                                                   `[(~'ground {}) ~row-sym])
 
-                                                  :else
-                                                  `[(~'ground {}) ~row-sym])
-
-                                 binding-sym (genvar "constraint-binding-events-")
-                                 binding-events (transduce (filter map?) merge {} constraints)
-                                 event-clause `[(~'ground ~binding-events) ~binding-sym]]
-                             [row-clause event-clause `[(merge ~row-sym ~binding-sym) ~constraints-sym]])
-        logpdf-clauses `[[(~*logpdf-symbol* ~model-var ~target-sym ~constraints-sym) ~prob-var]]]
+                                  binding-sym (genvar "constraint-binding-events-")
+                                  binding-events (transduce (filter map?) merge {} constraints)
+                                  event-clause `[(~'ground ~binding-events) ~binding-sym]]
+                              [row-clause event-clause `[(~merge-sym ~row-sym ~binding-sym) ~constraints-sym]])
+        logpdf-clauses `[[(~logpdf-sym ~model-var ~target-sym ~constraints-sym) ~prob-var]]]
     {:name   [selection-name]
      :find   [prob-var]
-     :in     [model-var]
-     :inputs [model]
-     :where  (reduce into [target-clauses conditions-clauses logpdf-clauses])}))
+     :in     [model-var pull-sym merge-sym logpdf-sym]
+     :inputs [model
+              {:function-name 'datascript.core/pull}
+              {:function-name 'clojure.core/merge}
+              {:function-name 'inferenceql.multimixture.basic-queries/logpdf}]
+     :where  (reduce into [target-clauses constraints-clauses logpdf-clauses])}))
 
 (defn column-selection-clauses
   "Returns the `:find` and `:where` clauses for a `:column-selection` parse tree
@@ -287,9 +303,6 @@
                          (constrain (input model environment)
                                     (or target {})
                                     (or constraints {}))))))
-
-(def default-environment
-  {})
 
 (defn execute
   "Like `q`, only operates on a query parse tree rather than a query string."
