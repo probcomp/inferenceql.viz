@@ -1,7 +1,7 @@
 (* Queries *)
 
 query               ::= <'SELECT'> <ws> selections
-                        (<ws> <'FROM'> <ws> source)
+                        (<ws> <'FROM'> <ws> source)?
                         (<ws> <'WHERE'> <ws> conditions)?
                         (<ws> <'ORDER BY'> <ws> ordering)?
                         (<ws> <'LIMIT'> <ws> limit)?

@@ -360,14 +360,19 @@
                :descending #(compare %2 %1)
                nil compare)
          names (-> selections (selections-clauses) (:name)) ; TODO: fix redundant call to selections-clauses
-         db (iql-db (let [[tag _] (s/conform ::source source)]
-                      (case tag
-                        :data rows
-                        :generate (if-not limit
-                                    (throw (ex-info "Cannot SELECT from GENERATE without LIMIT" {}))
-                                    (let [model (input source environment)]
-                                      (repeatedly limit model)))
-                        :query (execute source rows))))
+         db (iql-db (if-not source
+                      rows
+                      (let [conformed (s/conform ::source source)]
+                        (if (= ::s/invalid conformed)
+                          (throw (ex-info "Invalid source" {:source source}))
+                          (let [[tag _] conformed]
+                            (case tag
+                              :data rows
+                              :generate (if-not limit
+                                          (throw (ex-info "Cannot SELECT from GENERATE without LIMIT" {}))
+                                          (let [model (input source environment)]
+                                            (repeatedly limit model)))
+                              :query (execute source rows)))))))
          {query :query input-descs :inputs} (inputize (query-plan parse-map))
          inputs (map #(input % environment) input-descs)
          rows (cond->> (apply d/q query db inputs)
