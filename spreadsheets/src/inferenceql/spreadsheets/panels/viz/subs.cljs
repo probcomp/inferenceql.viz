@@ -16,9 +16,7 @@
             :<- [:viz/points]
             (fn [points]
               (clj->js
-                (let [spec (vega/map-spec points)]
-                  (.log js/console "spec: " spec)
-                  spec))))
+                (vega/map-spec points))))
 
 (rf/reg-sub :viz/generators
             (fn []
