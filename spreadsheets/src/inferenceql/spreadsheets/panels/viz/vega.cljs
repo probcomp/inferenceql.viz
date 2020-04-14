@@ -379,11 +379,13 @@
                        (map #(get % "locs")))
 
         locs-at-timestep (for [loc-list loc-lists]
-                           (let [loc-pairs (partition 2 1 loc-list)]
-                             (some (fn [[prev-loc cur-loc]]
-                                     (when (> (get cur-loc "time") timestep)
-                                           (get prev-loc "loc")))
-                                   loc-pairs)))
+                           (let [loc-pairs (partition 2 1 loc-list)
+                                 last-pos (some (fn [[prev-loc cur-loc]]
+                                                  (when (> (get cur-loc "time") timestep)
+                                                        (get prev-loc "loc")))
+                                                loc-pairs)
+                                 last-pos-rec (get (last loc-list) "loc")]
+                             (or last-pos last-pos-rec)))
         locs-with-status (map (fn [a-map status]
                                 (let [color (if status "red" "SteelBlue")]
                                   (assoc a-map :color color)))

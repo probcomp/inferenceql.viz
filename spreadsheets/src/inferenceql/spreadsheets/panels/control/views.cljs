@@ -53,4 +53,4 @@
   (let [timestep (rf/subscribe [:viz/timestep])]
     [:div#toolbar
      [:div#search-section
-       [slider 0 250 0.1]]]))
+       [slider 0 60 0.1]]]))
