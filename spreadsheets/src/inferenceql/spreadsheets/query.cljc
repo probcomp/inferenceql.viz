@@ -195,7 +195,9 @@
 
 (defn probability-selection-clauses
   [{:keys [target constraints model selection-name]}]
-  (let [selection-name (or selection-name (keyword (gensym "prob")))
+  (let [model (or model {:model-name :model})
+
+        selection-name (or selection-name (keyword (gensym "prob")))
         prob-var (variable selection-name)
 
         model-var       (genvar "model-")
