@@ -327,6 +327,16 @@
 
 ;;;;;-----------------------------------------------------
 
+(defn map-subset []
+  (let [geodata (get-in config/config [:topojson :data "features"])
+        select-fn (fn [feature]
+                    (let [n-hood (get-in feature ["properties" "N_HOOD"])
+                          mit-bldg (get-in feature ["properties" "bldg_num"])]
+                      mit-bldg))
+        features (clj->js (filter select-fn geodata))]
+    (js->clj (.featureCollection js/turf features))))
+
+
 (defn points-within-polygon [num-points polygons]
   (let [bbox (.bbox js/turf polygons)
         ;; TODO: Make this faster with batching.
@@ -338,11 +348,11 @@
     (js->clj (take num-points (remove nil? (repeatedly gen-point))))))
 
 (defn points [num-points]
-  (let [geodata (get-in config/config [:topojson :data "features"])
-
+  (let [geodata (get (map-subset) "features")
         select-fn (fn [feature]
-                    (let [name (get-in feature ["properties" "name"])]
-                      (#{"South Boston" "South End" "Roxbury"} name)))
+                    (let [n-hood (get-in feature ["properties" "N_HOOD"])
+                          mit-bldg (get-in feature ["properties" "bldg_num"])]
+                      mit-bldg))
         features (clj->js (filter select-fn geodata))
         feature-collection (.featureCollection js/turf features)
         ;; centroid (.centroid js/turf (clj->js map-section))
@@ -355,7 +365,7 @@
    :height 1000,
    :layer
    [{:data
-     {:values (get-in config/config [:topojson :data])
+     {:values (map-subset)
       :format {:property "features"}},
      :projection {:type "mercator"},
      :mark
