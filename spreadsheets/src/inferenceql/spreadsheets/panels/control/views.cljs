@@ -53,7 +53,7 @@
   (let [timestep (rf/subscribe [:viz/timestep])]
     [:div#toolbar
      [:div#search-section
-       [slider 0 250 1]
+       [slider 0 250 0.1]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
           {:on-click (fn [e]

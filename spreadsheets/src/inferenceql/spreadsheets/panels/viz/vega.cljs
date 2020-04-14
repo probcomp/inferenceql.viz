@@ -361,14 +361,58 @@
                     (map (fn [[long lat]] {:longitude long :latitude lat :color "SteelBlue"})))]
     points))
 
+;;;;;-----------------------------------------------------
+
 (defn source-points []
   (let [sources (get-in config/config [:trace-data "sources"])]
     sources))
 
+(defn infection-status [timestep]
+  (let [times (get-in config/config [:trace-data "infection_times"])]
+    (map #(when % (>= timestep %)) times)))
+
 (defn agent-points [timestep]
-  (let [agents (->> (get-in config/config [:trace-data "agents"])
-                    (map #(get-in % ["locs" timestep "loc"])))]
-    agents))
+  (let [loc-lists (->> (get-in config/config [:trace-data "agents"])
+                       (map #(get % "locs")))
+
+        locs-at-timestep (for [loc-list loc-lists]
+                           (let [loc-pairs (partition 2 1 loc-list)]
+                             (some (fn [[prev-loc cur-loc]]
+                                     (when (> (get cur-loc "time") timestep)
+                                           (get prev-loc "loc")))
+                                   loc-pairs)))]
+    (.log js/console "status: " (infection-status timestep))
+    (map (fn [a-map status]
+           (let [color (if status "red" "SteelBlue")]
+             (assoc a-map :color color)))
+         locs-at-timestep
+         (infection-status timestep))))
+
+;;;;;-----------------------------------------------------
+
+(defn contacts []
+  (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
+        t1 (distinct (map #(get % "t1") contact-maps))
+        t2 (distinct (map #(get % "t2") contact-maps))
+
+        first-contacts (filter #(= (get % "t1") (nth t1 11)) contact-maps)]
+    (.log js/console "foo: " first-contacts)))
+
+(defn infected-bak []
+  (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
+        agent-1-ids (map #(get-in % ["agent1" "agent"]) contact-maps)
+        agent-2-ids (map #(get-in % ["agent2" "agent"]) contact-maps)
+        agent-x-ids (map #(get-in % ["agent" "agent"]) contact-maps)
+        ids (sort (remove nil? (distinct (concat agent-1-ids agent-2-ids agent-x-ids))))]
+    (.log js/console "ids: " ids)))
+
+(defn infected []
+  (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
+        agent-1-ids (map #(get-in % ["agent1" "agent"]) contact-maps)
+        agent-2-ids (map #(get-in % ["agent2" "agent"]) contact-maps)
+        agent-x-ids (map #(get-in % ["agent" "agent"]) contact-maps)
+        ids (sort (remove nil? (distinct (concat agent-1-ids agent-2-ids agent-x-ids))))]
+    (.log js/console "ids: " ids)))
 
 (defn map-spec [agent-points]
   {:width 1000,
@@ -395,7 +439,7 @@
       :latitude {:field "lat", :type "quantitative"},
       :size {:value 5},
       :opacity {:value 1},
-      :color {:value "SteelBlue"}}}
+      :color {:field "color"}}}
     {:data
      {:values (source-points)}
      :projection {:type "mercator"},
