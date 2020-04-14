@@ -372,7 +372,10 @@
     (map #(when % (>= timestep %)) times)))
 
 (defn agent-points [timestep]
-  (let [loc-lists (->> (get-in config/config [:trace-data "agents"])
+  (let [bounds (.bbox js/turf (clj->js (map-subset)))
+        [min-lon min-lat max-lon max-lat] bounds
+
+        loc-lists (->> (get-in config/config [:trace-data "agents"])
                        (map #(get % "locs")))
 
         locs-at-timestep (for [loc-list loc-lists]
@@ -380,13 +383,19 @@
                              (some (fn [[prev-loc cur-loc]]
                                      (when (> (get cur-loc "time") timestep)
                                            (get prev-loc "loc")))
-                                   loc-pairs)))]
-    (.log js/console "status: " (infection-status timestep))
-    (map (fn [a-map status]
-           (let [color (if status "red" "SteelBlue")]
-             (assoc a-map :color color)))
-         locs-at-timestep
-         (infection-status timestep))))
+                                   loc-pairs)))
+        locs-with-status (map (fn [a-map status]
+                                (let [color (if status "red" "SteelBlue")]
+                                  (assoc a-map :color color)))
+                              locs-at-timestep
+                              (infection-status timestep))
+
+
+        in-bounds (fn [loc-map]
+                    (and (<= min-lon (get loc-map "lon") max-lon)
+                         (<= min-lat (get loc-map "lat") max-lat)))]
+
+    (filter in-bounds locs-with-status)))
 
 ;;;;;-----------------------------------------------------
 
