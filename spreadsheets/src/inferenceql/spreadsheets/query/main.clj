@@ -72,30 +72,3 @@
           (let [data (slurp-csv data)
                 model (slurp-model model)]
             (repl data {:model model})))))
-
-(comment
-
-  (p (query/q "select elephant as e, rain as r, (probability of elephant given rain under model as p) from data order by p asc limit 20"
-              (slurp-csv "https://bcomp.pro/elephantdata")
-              {:model (slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  (p (query/q "select * from (generate elephant under model) limit 10"
-              (slurp-csv "https://bcomp.pro/elephantdata")
-              {:model (slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  (p (query/q "select elephant, rain, (probability of elephant given rain under model as p) from data order by p limit 10"
-              (slurp-csv "https://bcomp.pro/elephantdata")
-              {:model (slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  (p (query/q "select * from data order by elephant"
-              (slurp-csv "https://bcomp.pro/elephantdata")
-              {:model (slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  (p (query/q "select * from data;"
-              (slurp-csv "https://bcomp.pro/elephantdata")
-              {:model (slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  (pprint/print-table
-   '({:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "no", :teacher_sick "no"} {:elephant "no", :rain "yes", :student_happy "no", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "no", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "no", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "no", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "no", :student_happy "no", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "no", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "no", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "no", :teacher_sick "no"} {:elephant "yes", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "no", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "no", :teacher_sick "no"} {:elephant "no", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "yes", :student_happy "yes", :teacher_sick "no"} {:elephant "no", :rain "no", :student_happy "yes", :teacher_sick "no"} {:elephant "yes", :rain "no", :student_happy "yes", :teacher_sick "no"}))
-
-  )
