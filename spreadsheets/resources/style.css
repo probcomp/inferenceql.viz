@@ -30,7 +30,6 @@ div {
   margin-bottom: 10px;
   margin-left: 10px;
   margin-right: 10px;
-  justify-content: center;
 }
 /* --------------- styling for search input --------------- */
 
@@ -110,7 +109,6 @@ div {
 
 #viz-container {
   display: flex;
-  justify-content: center;
   border-top: solid;
   border-width: 1px;
   border-color: #e7e7e7;
