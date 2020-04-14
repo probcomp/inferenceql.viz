@@ -35,13 +35,25 @@
        [selection-color cur-val :green "Green"]
        [selection-color cur-val :red "Red"]]]))
 
+(defn slider [min max step]
+  (let [cur-val @(rf/subscribe [:viz/timestep])]
+    [:div.slider
+      [:span "Timestep: "]
+      [:input {:type :range :name :timestep
+               :min min :max max :step step
+               :value cur-val
+               :on-change (fn [e]
+                            (let [new-val (js/parseFloat (-> e .-target .-value))]
+                              (rf/dispatch [:viz/set-timestep new-val])))}]
+      [:label cur-val]]))
+
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
-  (let [input-text (rf/subscribe [:control/query-string])
-        label-info (rf/subscribe [:table/rows-label-info])]
+  (let [timestep (rf/subscribe [:viz/timestep])]
     [:div#toolbar
      [:div#search-section
+       [slider 0 250 1]
        [:div#search-buttons
          [:button.toolbar-button.pure-button
           {:on-click (fn [e]

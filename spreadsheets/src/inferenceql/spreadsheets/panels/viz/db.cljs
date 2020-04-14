@@ -3,4 +3,5 @@
             [inferenceql.spreadsheets.data :refer [nyt-data]]))
 
 (def default-db
-  {:viz-panel {:points []}})
+  {:viz-panel {:points []
+               :timestep 7}})

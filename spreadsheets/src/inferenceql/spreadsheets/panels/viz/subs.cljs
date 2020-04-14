@@ -7,6 +7,10 @@
             (fn [db _]
               (get-in db [:viz-panel :points])))
 
+(rf/reg-sub :viz/timestep
+            (fn [db _]
+              (get-in db [:viz-panel :timestep])))
+
 (rf/reg-sub :viz/vega-lite-spec
             :<- [:viz/points]
             (fn [points]
