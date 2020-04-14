@@ -53,20 +53,4 @@
   (let [timestep (rf/subscribe [:viz/timestep])]
     [:div#toolbar
      [:div#search-section
-       [slider 0 250 0.1]
-       [:div#search-buttons
-         [:button.toolbar-button.pure-button
-          {:on-click (fn [e]
-                       (rf/dispatch [:viz/run])
-                       (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Run"]
-         [:button.toolbar-button.pure-button
-          {:on-click (fn [e]
-                       (rf/dispatch [:viz/stop])
-                       (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Stop"]
-         [:button.toolbar-button.pure-button
-          {:on-click (fn [e]
-                        (rf/dispatch [:viz/clear])
-                        (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Clear"]]]]))
+       [slider 0 250 0.1]]]))
