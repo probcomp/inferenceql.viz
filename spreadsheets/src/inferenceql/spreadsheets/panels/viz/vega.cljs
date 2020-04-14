@@ -411,7 +411,7 @@
 
     (.log js/console "foo: " first-contacts)))
 
-(defn contacts []
+(defn contacts-by-person-by-time []
   (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
         agent-ids (range 1 51)
         contact-times (distinct (map #(get % "t1") contact-maps))
@@ -430,10 +430,15 @@
                          (assoc-in a-map [a-id time] contacts-for-agent)))]
     (.log js/console "contacts: " (reduce add-contacts {} pairs))))
 
-
+(defn contacts-by-time [timestep]
+  (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
+        contacts-for-time (filter #(and (<= (get % "t1") timestep)
+                                        (>= (get % "t2") timestep))
+                                  contact-maps)]
+    (.log js/console "contacts: " contacts-for-time)))
 
 (defn map-spec [agent-points]
-  (contacts)
+  (contacts-by-time 0.25)
   {:width 1000,
    :height 500,
    :layer
