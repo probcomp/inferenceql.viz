@@ -10,9 +10,12 @@
 (defn app
   []
   (let [vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
+        circle-spec @(rf/subscribe [:viz/circle-spec])
         generators      @(rf/subscribe [:viz/generators])]
     [:div
      [control/panel]
      [:div#viz-container
       (when vega-lite-spec
-        [viz/vega-lite vega-lite-spec {:actions false} generators])]]))
+        [viz/vega-lite vega-lite-spec {:actions false} generators])
+      (when circle-spec
+        [viz/vega-lite circle-spec {:actions false :mode "vega"}])]]))

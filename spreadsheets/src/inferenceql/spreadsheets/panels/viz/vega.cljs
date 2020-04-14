@@ -437,6 +437,29 @@
                                   contact-maps)]
     (.log js/console "contacts: " contacts-for-time)))
 
+(defn circle-tree []
+  (let [root-id -1
+        root-node {:name "root" :id root-id :alpha 0.5 :beta 0}
+
+        source-ids (range 1 7)
+        agent-ids (range 1 51)
+
+        locs (drop 1 (range 0 1 (/ 1 57)))
+        source-locs (take 6 locs)
+        agent-locs (take 50 (drop 6 locs))
+
+        source-nodes (for [[id loc] (map vector source-ids source-locs)]
+                       (let [name (str "Source " id)]
+                         {:name name :id id :parent root-id :alpha loc :beta 1}))
+
+        agent-nodes (for [[id loc] (map vector agent-ids agent-locs)]
+                      (let [name (str "Agent " id)]
+                        {:name name :id id :parent root-id :alpha loc :beta 1}))]
+    (concat [root-node] agent-nodes source-nodes)))
+
+(defn circle-dependencies [timestep]
+  [])
+
 (defn map-spec [agent-points]
   (contacts-by-time 0.25)
   {:width 1000,
