@@ -8,6 +8,7 @@
  event-interceptors
  (fn [{:keys [db]} [_]]
    (let [new-points (vega/points 100)]
+     ;; TODO: make simulations on tick work.
      {:db (update-in db [:viz-panel :points] concat new-points)})))
 
 (rf/reg-event-db
