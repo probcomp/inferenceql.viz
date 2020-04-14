@@ -31,9 +31,12 @@
                                                 "height" {:mu 3 :sigma 1}}}]}]})
 (spec/valid-xcat? xcat)
 
+(def m 1)
+
 (let [[xcat' latents'] (c/kernel data xcat latents m)
+      targets          #{"color"}
       constraints      {"height" 6}
-      simulated        (xcat/simulate xcat latents constraints)]
+      simulated        (xcat/simulate xcat latents :targets targets :constraints constraints)]
   (println "LL old model    : " (xcat/log-likelihood data xcat latents))
   (println "old assignments : " (get-in latents [:local 0 :y]))
   (println "LL new model    : " (xcat/log-likelihood data xcat' latents'))

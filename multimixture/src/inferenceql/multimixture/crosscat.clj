@@ -90,18 +90,18 @@
 
 (defn simulate-category
   "Given a category, statistical types, and constraints, simulates unconstrained values."
-  [category types constraints]
-  (let [
-        parameters-to-sample (->> (:parameters category)
-                                  (filter (fn [[k v]]
-                                            (not (contains? constraints k))))
+  [category types targets constraints]
+  (let [parameters-to-sample (->> (:parameters category)
+                                  (filter (fn [[k params]]
+                                            (and (not (contains? constraints k))
+                                                 (contains? targets k))))
                                   (into {}))]
     (->> parameters-to-sample
          (map (fn [[col-name col-params]]
                 (let [col-type (get types col-name)]
                   {col-name (prim/simulate col-type col-params)})))
-         (into {})
-         (merge constraints))))
+         (into {}))))
+         ; (merge constraints))))
 
 (defn hyperprior-simulate
   "Given a hyperprior, simulates a new hyperparameter."
@@ -141,7 +141,7 @@
         (println "NO CONSTRAINTS")
         crp-weights)
       (do
-        (println "CONSTRAINTS: " constraints)
+        ; (println "CONSTRAINTS: " constraints)
         (let [adjusted-weights (map + crp-weights (map (fn [category]
                                                          (category-logpdf-score
                                                            constraints
@@ -161,34 +161,43 @@
 (defn simulate-view
   "Given a view and constraints, simulates unconstrained values from
   that view."
-  [view latents types constraints & {:keys [:m] :or {m 1}}]
+  [view latents types targets constraints & {:keys [:m] :or {m 1}}]
   (let [aux-categories (generate-category m view types)
         categories     (concat (:categories view) aux-categories)
         weights      (view-category-weights categories latents types constraints)
         category     (sample-category weights categories)
         ]
-    (println "Category: " category)
-    (simulate-category category types constraints)))
+    ; (println "Category: " category)
+    (simulate-category category types targets constraints)))
 
-(defn simulate-views
-  "Given a model and constraints, simulates unconstrained values
-  across views."
-  [model latents constraints]
-  (let [views (:views model)
-        types (:types model)]
-    (->> views
-         (map-indexed (fn [view-idx view]
-                        (let [view-latents     (get-in latents [:local view-idx])]
-                          (simulate-view view view-latents types constraints))))
-         (merge))))
+; (defn simulate-views
+;   "Given a model and constraints, simulates unconstrained values
+;   across views."
+;   [model latents constraints]
+;   (let [views (:views model)
+;         types (:types model)]
+;     (->> views
+;          (map-indexed (fn [view-idx view]
+;                         (let [view-latents     (get-in latents [:local view-idx])]
+;                           (simulate-view view view-latents types constraints))))
+;          (merge))))
 
 (defn simulate
   "Given a model, latents, and possible constraints, simulates
   unconstrained values from the model."
-  ([model latents]
-   (simulate model latents {}))
-  ([model latents constraints]
-   (simulate-views model latents constraints)))
+ [model latents & {:keys [:targets :constraints] :or {constraints {}}}]
+   (let [views (:views model)
+         types (:types model)]
+     (->> views
+          (map-indexed (fn [view-idx view]
+                         (let [view-latents     (get-in latents [:local view-idx])]
+                           (simulate-view view view-latents types targets constraints))))
+          (into {}))))
+  ; ([model latents targets ]
+  ;  (simulate model latents {}))
+  ; ([model latents targets constraints]
+  ;  (simulate-views model latents constraints)))
+
 
 
 ;; OLD STUFF TO BE DELETED/REPURPOSED
