@@ -1,2 +1,3 @@
 #or [#maybe-include "config.edn"
-     {:topojson {:data #json "geojson/boston-area-merged.geojson"}}]
+     {:topojson {:data #json "geojson/boston-area-merged.geojson"}
+      :trace-data #json "sample-trace.json"}]
