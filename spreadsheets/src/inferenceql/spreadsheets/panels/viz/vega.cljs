@@ -362,7 +362,7 @@
 
 (defn map-spec [points]
   {:width 1000,
-   :height 1000,
+   :height 500,
    :layer
    [{:data
      {:values (map-subset)
