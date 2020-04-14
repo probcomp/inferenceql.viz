@@ -3,13 +3,14 @@
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [medley.core :as medley]))
 
-(rf/reg-sub :viz/points
-            (fn [db _]
-              (get-in db [:viz-panel :points])))
-
 (rf/reg-sub :viz/timestep
             (fn [db _]
               (get-in db [:viz-panel :timestep])))
+
+(rf/reg-sub :viz/points
+            :<- [:viz/timestep]
+            (fn [timestep]
+              (vega/agent-points timestep)))
 
 (rf/reg-sub :viz/vega-lite-spec
             :<- [:viz/points]

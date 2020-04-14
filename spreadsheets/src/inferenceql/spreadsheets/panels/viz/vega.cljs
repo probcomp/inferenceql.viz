@@ -332,7 +332,8 @@
         select-fn (fn [feature]
                     (let [n-hood (get-in feature ["properties" "N_HOOD"])
                           mit-bldg (get-in feature ["properties" "bldg_num"])]
-                      mit-bldg))
+                      (or (#{1 2 3 4 5} n-hood)
+                          mit-bldg)))
         features (clj->js (filter select-fn geodata))]
     (js->clj (.featureCollection js/turf features))))
 
@@ -360,7 +361,16 @@
                     (map (fn [[long lat]] {:longitude long :latitude lat :color "SteelBlue"})))]
     points))
 
-(defn map-spec [points]
+(defn source-points []
+  (let [sources (get-in config/config [:trace-data "sources"])]
+    sources))
+
+(defn agent-points [timestep]
+  (let [agents (->> (get-in config/config [:trace-data "agents"])
+                    (map #(get-in % ["locs" timestep "loc"])))]
+    agents))
+
+(defn map-spec [agent-points]
   {:width 1000,
    :height 500,
    :layer
@@ -377,12 +387,22 @@
      {:color {:value "#eee"},
       :tooltip {:field "properties"}}}
     {:data
-     {:values points}
+     {:values agent-points}
      :projection {:type "mercator"},
      :mark "circle",
      :encoding
-     {:longitude {:field "longitude", :type "quantitative"},
-      :latitude {:field "latitude", :type "quantitative"},
+     {:longitude {:field "lon", :type "quantitative"},
+      :latitude {:field "lat", :type "quantitative"},
       :size {:value 5},
       :opacity {:value 1},
-      :color {:signal "datum.color"}}}]})
+      :color {:value "SteelBlue"}}}
+    {:data
+     {:values (source-points)}
+     :projection {:type "mercator"},
+     :mark "square",
+     :encoding
+     {:longitude {:field "lon", :type "quantitative"},
+      :latitude {:field "lat", :type "quantitative"},
+      :size {:value 5},
+      :opacity {:value 1},
+      :color {:value "red"}}}]})
