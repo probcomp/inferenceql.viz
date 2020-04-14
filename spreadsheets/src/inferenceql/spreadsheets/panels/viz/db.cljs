@@ -4,4 +4,4 @@
 
 (def default-db
   {:viz-panel {:points []
-               :timestep 7}})
+               :timestep 0}})
