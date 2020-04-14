@@ -198,10 +198,10 @@
     (+ Z-inv logDirichlet)))
 
 (defn dirichlet-simulate
-  "Generates a sample from a dirhlet distribution with vector parameter `alpha`.
+  "Generates a sample from a dirichlet distribution with vector parameter `alpha`.
   Generates `n` samples, if specified."
   ([{:keys [:alpha]}]
-    (let [y (map #(gamma-simulate {:k %}) alpha)
+    (let [y (map #(gamma-simulate {:k % :theta 1}) alpha)
           Z (reduce + y)]
       (mapv #(/ % Z) y)))
   ([n {:keys [:alpha] :as parameters}]
@@ -253,12 +253,13 @@
   Generates `n` samples, if specified."
   ([primitive parameters]
    (case primitive
-     :bernoulli   (bernoulli-simulate   parameters)
-     :beta        (beta-simulate        parameters)
-     :categorical (categorical-simulate parameters)
-     :dirichlet   (dirichlet-simulate   parameters)
-     :gamma       (gamma-simulate       parameters)
-     :gaussian    (gaussian-simulate    parameters)
+     :bernoulli       (bernoulli-simulate       parameters)
+     :beta            (beta-simulate            parameters)
+     :categorical     (categorical-simulate     parameters)
+     :dirichlet       (dirichlet-simulate       parameters)
+     :gamma           (gamma-simulate           parameters)
+     :gaussian        (gaussian-simulate        parameters)
+     :log-categorical (log-categorical-simulate parameters)
      (throw (ex-info (str  "Primitive doesn't exist: " primitive) {:primitive primitive}))))
   ([n primitive parameters]
    (repeatedly n #(simulate primitive parameters))))

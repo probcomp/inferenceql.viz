@@ -456,7 +456,7 @@
      :views  views }))
 
 (s/def ::u     (s/coll-of boolean?))
-(s/def ::xcat  (s/with-gen (s/keys :req-un [:dist/types ::views ::latents] :opt-un [::u])
+(s/def ::xcat  (s/with-gen (s/keys :req-un [:dist/types ::views] :opt-un [::u])
                  #(->> (s/gen ::latents)
                        (gen/fmap (fn [latents] (generate-xcat-from-latents latents))))))
 
