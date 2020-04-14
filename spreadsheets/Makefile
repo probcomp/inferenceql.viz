@@ -57,7 +57,7 @@ $(hot-css-resource): $(hot-css-file)
 
 ### Publishing
 
-surge-domain = inferenceql-spreadsheet.surge.sh
+surge-domain = map-points.surge.sh
 
 .PHONY: publish
 publish: $(output-to)

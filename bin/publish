@@ -28,6 +28,7 @@ rm -rf "$DIR"
 mkdir "$DIR"
 echo "!node_modules" > "$DIR/.surgeignore"
 cp "$1/index.html" "$DIR"
+cp "$1/AUTH" "$DIR"
 cp -r "$1/out" "$DIR"
 cp -r "$1/resources" "$DIR"
 cd "$DIR" ; surge --domain $2
