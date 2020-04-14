@@ -401,31 +401,39 @@
 
 ;;;;;-----------------------------------------------------
 
-(defn contacts []
+(defn contacts-bak []
   (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
         t1 (distinct (map #(get % "t1") contact-maps))
-        t2 (distinct (map #(get % "t2") contact-maps))
+        first-contacts (filter #(= (get % "t1") (nth t1 11)) contact-maps)
 
-        first-contacts (filter #(= (get % "t1") (nth t1 11)) contact-maps)]
+        first-contacts (for [t (take 5 (drop 20 t1))]
+                         (filter #(= (get % "t1") t) contact-maps))]
+
     (.log js/console "foo: " first-contacts)))
 
-(defn infected-bak []
+(defn contacts []
   (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
-        agent-1-ids (map #(get-in % ["agent1" "agent"]) contact-maps)
-        agent-2-ids (map #(get-in % ["agent2" "agent"]) contact-maps)
-        agent-x-ids (map #(get-in % ["agent" "agent"]) contact-maps)
-        ids (sort (remove nil? (distinct (concat agent-1-ids agent-2-ids agent-x-ids))))]
-    (.log js/console "ids: " ids)))
+        agent-ids (range 1 51)
+        contact-times (distinct (map #(get % "t1") contact-maps))
 
-(defn infected []
-  (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
-        agent-1-ids (map #(get-in % ["agent1" "agent"]) contact-maps)
-        agent-2-ids (map #(get-in % ["agent2" "agent"]) contact-maps)
-        agent-x-ids (map #(get-in % ["agent" "agent"]) contact-maps)
-        ids (sort (remove nil? (distinct (concat agent-1-ids agent-2-ids agent-x-ids))))]
-    (.log js/console "ids: " ids)))
+        pairs (for [a-id agent-ids time contact-times]
+                [a-id time])
+
+        _ (.log js/console "pairs: " pairs)
+
+        add-contacts (fn [a-map [a-id time]]
+                       (let [contacts-for-time (filter #(= (get % "t1") time) contact-maps)
+                             involves-agent #(or (= (get-in % ["agent1" "agent"]) a-id)
+                                                 (= (get-in % ["agent2" "agent"]) a-id)
+                                                 (= (get-in % ["agent" "agent"]) a-id))
+                             contacts-for-agent (filter involves-agent contacts-for-time)]
+                         (assoc-in a-map [a-id time] contacts-for-agent)))]
+    (.log js/console "contacts: " (reduce add-contacts {} pairs))))
+
+
 
 (defn map-spec [agent-points]
+  (contacts)
   {:width 1000,
    :height 500,
    :layer
