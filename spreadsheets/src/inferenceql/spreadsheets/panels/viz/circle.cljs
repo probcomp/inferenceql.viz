@@ -3,7 +3,8 @@
 (defn spec [tree dependencies]
   {:autosize "none",
    :legends [],
-   :width 720,
+   :width 500,
+   :height 500,
    :scales
    [{:name "color",
      :type "ordinal",
@@ -66,7 +67,7 @@
    :$schema "https://vega.github.io/schema/vega/v5.json",
    :signals
    [{:name "tension", :value 0.33}
-    {:name "radius", :value 280}
+    {:name "radius", :value 200}
     {:name "extent", :value 360}
     {:name "rotate", :value 0}
     {:name "textSize", :value 12}
@@ -92,7 +93,6 @@
     {:name "edgeClicked"}
     {:name "edgeThreshold"}
     {:name "confidenceThreshold"}],
-   :height 720,
    :data
    [{:name "tree",
      :values tree
