@@ -435,14 +435,14 @@
         contacts-for-time (filter #(and (<= (get % "t1") timestep)
                                         (>= (get % "t2") timestep))
                                   contact-maps)]
-    (.log js/console "contacts: " contacts-for-time)))
+    contacts-for-time))
 
 (defn circle-tree []
   (let [root-id -1
         root-node {:name "root" :id root-id :alpha 0.5 :beta 0}
 
         source-ids (range 1 7)
-        agent-ids (range 1 51)
+        agent-ids (map #(+ 6 %) (range 1 51))
 
         locs (drop 1 (range 0 1 (/ 1 57)))
         source-locs (take 6 locs)
@@ -455,13 +455,31 @@
         agent-nodes (for [[id loc] (map vector agent-ids agent-locs)]
                       (let [name (str "Agent " id)]
                         {:name name :id id :parent root-id :alpha loc :beta 1}))]
-    (concat [root-node] agent-nodes source-nodes)))
+    (or (concat [root-node] agent-nodes source-nodes)
+        [])))
 
 (defn circle-dependencies [timestep]
-  [])
+  (let [contacts (contacts-by-time timestep)
+        ret (for [contact contacts]
+              (if (get contact "source") ; interaction with source
+                (let [source-id (get contact "source")
+                      target-id (get-in contact ["agent" "agent"])]
+                  {:source-id source-id
+                   :target-id (+ target-id 6)
+                   :source-name (str "Source " source-id)
+                   :target-name (str "Agent " target-id)
+                   :edge-present true})
+                (let [source-id (get-in contact ["agent1" "agent"])
+                      target-id (get-in contact ["agent2" "agent"])]
+                  {:source-id (+ source-id 6)
+                   :target-id (+ target-id 6)
+                   :source-name (str "Agent " source-id)
+                   :target-name (str "Agent " target-id)
+                   :edge-present true})))]
+    (.log js/console "ret: " ret)
+    (or ret [])))
 
 (defn map-spec [agent-points]
-  (contacts-by-time 0.25)
   {:width 1000,
    :height 500,
    :layer
