@@ -5,13 +5,15 @@
    "An example of Cartesian layouts for a node-link diagram of hierarchical data.",
    :width 700,
    :height 600,
+   :title {:text "Infection Tree"}
+   :padding 25,
+   :config { :title { :fontSize 16}}
    :scales
    [{:name "color",
      :type "linear",
      :range {:scheme "magma"},
      :domain {:data "tree", :field "depth"},
      :zero true}],
-   :padding 5,
    :marks
    [{:type "path",
      :from {:data "links"},
@@ -39,16 +41,12 @@
        :opacity {:signal "labels ? 1 : 0"}}}}],
    :$schema "https://vega.github.io/schema/vega/v5.json",
    :signals
-   [{:name "labels", :value true, :bind {:input "checkbox"}}
+   [{:name "labels", :value true,}
     {:name "layout",
-     :value "tidy",
-     :bind {:input "radio", :options ["tidy" "cluster"]}}
+     :value "tidy",}
     {:name "links",
-     :value "diagonal",
-     :bind
-     {:input "select",
-      :options ["line" "curve" "diagonal" "orthogonal"]}}
-    {:name "separation", :value false, :bind {:input "checkbox"}}],
+     :value "diagonal",}
+    {:name "separation", :value false}] 
    :data
    [{:name "tree",
      :values tree

@@ -52,7 +52,7 @@
             :<- [:viz/infection-tree]
             (fn [tree]
               (let [spec (clj->js
-                           (tree2/spec tree))]
+                           (tree/spec tree))]
                 (.log js/console "spec: " spec)
                 spec)))
 
