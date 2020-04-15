@@ -36,6 +36,10 @@
          :signal "colorIn"}
         {:test "indata('selected', 'target-id', datum.id)",
          :signal "colorOut"}
+        {:test "datum.status == 'infected'",
+         :value "orange"}
+        {:test "datum.status == 'source'",
+         :value "red"}
         {:value "black"}]}}}
     {:type "group",
      :from
@@ -49,13 +53,15 @@
        :interactive true,
        :from {:data "path"},
        :encode
-       {:enter {:interpolate {:value "bundle"}, :strokeWidth {:value 5}},
+       {:enter {:interpolate {:value "bundle"}, :strokeWidth {:value 3}},
         :update
         {:stroke
          [{:test
            "parent['source-id'] === activeSource && parent['target-id'] === activeTarget",
            :signal "colorOut"}
-          {:value "steelblue"}],
+          {:test "parent['infected']",
+           :value "red"}
+          {:value "steelblue"},]
          :strokeOpacity
          [{:test
            "parent['source-id'] === activeSource && parent['target-id'] === activeTarget",

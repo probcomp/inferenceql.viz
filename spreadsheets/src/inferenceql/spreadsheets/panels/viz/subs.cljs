@@ -26,11 +26,17 @@
             (fn [timestep]
               (vega/circle-dependencies timestep)))
 
+(rf/reg-sub :viz/tree
+            :<- [:viz/timestep]
+            (fn [timestep]
+              (vega/circle-tree timestep)))
+
 (rf/reg-sub :viz/circle-spec
             :<- [:viz/dependencies]
-            (fn [dependencies]
+            :<- [:viz/tree]
+            (fn [[dependencies tree]]
               (let [spec (clj->js
-                           (circle/spec (vega/circle-tree) dependencies))]
+                           (circle/spec tree dependencies))]
                 (.log js/console "spec: " spec)
                 spec)))
 

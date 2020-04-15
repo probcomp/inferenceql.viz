@@ -437,24 +437,25 @@
                                   contact-maps)]
     contacts-for-time))
 
-(defn circle-tree []
+(defn circle-tree [timestep]
   (let [root-id -1
         root-node {:name "root" :id root-id :alpha 0.5 :beta 0}
 
         source-ids (range 1 7)
         agent-ids (map #(+ 6 %) (range 1 51))
 
-        locs (range 0 1 (/ 1 56))
+        locs (drop 1 (range 0 1 (/ 1 57)))
         source-locs (take 6 locs)
         agent-locs (take 50 (drop 6 locs))
 
         source-nodes (for [[id loc] (map vector source-ids source-locs)]
                        (let [name (str "Source " id)]
-                         {:name name :id id :parent root-id :alpha loc :beta 1}))
+                         {:name name :id id :parent root-id :alpha loc :beta 1 :status "source"}))
 
-        agent-nodes (for [[id loc] (map vector agent-ids agent-locs)]
+        statuses (infection-status timestep)
+        agent-nodes (for [[id loc status] (map vector agent-ids agent-locs statuses)]
                       (let [name (str "Agent " (- id 6))]
-                        {:name name :id id :parent root-id :alpha loc :beta 1}))]
+                        {:name name :id id :parent root-id :alpha loc :beta 1 :status (when status "infected")}))]
     (or (concat [root-node] agent-nodes source-nodes)
         [])))
 
@@ -463,19 +464,23 @@
         ret (for [contact contacts]
               (if (get contact "source") ; interaction with source
                 (let [source-id (get contact "source")
-                      target-id (get-in contact ["agent" "agent"])]
+                      target-id (get-in contact ["agent" "agent"])
+                      infected (get-in contact ["agent" "infected"])]
                   {:source-id source-id
                    :target-id (+ target-id 6)
                    :source-name (str "Source " source-id)
                    :target-name (str "Agent " target-id)
-                   :edge-present true})
+                   :edge-present true
+                   :infected infected})
                 (let [source-id (get-in contact ["agent1" "agent"])
-                      target-id (get-in contact ["agent2" "agent"])]
+                      target-id (get-in contact ["agent2" "agent"])
+                      infected (get-in contact ["transmitted"])]
                   {:source-id (+ source-id 6)
                    :target-id (+ target-id 6)
                    :source-name (str "Agent " source-id)
                    :target-name (str "Agent " target-id)
-                   :edge-present true})))]
+                   :edge-present true
+                   :infected infected})))]
     (.log js/console "ret: " ret)
     (or ret [])))
 
