@@ -444,7 +444,7 @@
         source-ids (range 1 7)
         agent-ids (map #(+ 6 %) (range 1 51))
 
-        locs (drop 1 (range 0 1 (/ 1 57)))
+        locs (range 0 1 (/ 1 56))
         source-locs (take 6 locs)
         agent-locs (take 50 (drop 6 locs))
 
@@ -453,7 +453,7 @@
                          {:name name :id id :parent root-id :alpha loc :beta 1}))
 
         agent-nodes (for [[id loc] (map vector agent-ids agent-locs)]
-                      (let [name (str "Agent " id)]
+                      (let [name (str "Agent " (- id 6))]
                         {:name name :id id :parent root-id :alpha loc :beta 1}))]
     (or (concat [root-node] agent-nodes source-nodes)
         [])))
