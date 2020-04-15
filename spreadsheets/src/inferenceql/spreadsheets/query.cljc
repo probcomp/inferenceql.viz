@@ -361,15 +361,12 @@
         :generate-table ::generate-table
         :select (s/keys :req-un [::selections])))
 
-
 (s/def ::input
   (s/or :table-lookup    ::table-lookup
         :model-lookup    ::model-lookup
         :function-lookup ::function-lookup
         :generate-table  ::generate-table
         :generate-model  ::generate-model))
-
-#_(s/explain ::input {:table-lookup :data})
 
 (defn input
   [x environment]
@@ -431,64 +428,3 @@
      (if-not (insta/failure? parse-tree)
        (execute (transform parse-tree) rows models)
        parse-tree))))
-
-
-(comment
-
-  (-> "select elephant, rain, (probability of elephant given rain under model as prob) order by elephant desc limit 10"
-      (parse)
-      (transform)
-      (get-in [:selections 2])
-      (probability-selection-clauses))
-
-  (-> "select * from (generate elephant, rain given rain=\"yes\" under model)"
-      (parse)
-      (transform)
-      (query-plan)
-      (:inputs)
-      (first)
-      (input {:model (inferenceql.spreadsheets.query.main/slurp-model "https://bcomp.pro/elephantmodel")})
-      (repeatedly))
-
-  (set! *print-length* 10)
-
-  (-> "select * limit 10"
-      (parse)
-      (transform)
-      (query-plan))
-
-
-  (q "select x from data order by x desc"
-     [{:x 0}
-      {:x 2}
-      {:x 1}])
-
-  (-> "select * from (generate elephant, rain given rain=\"yes\" under model) limit 10"
-      (parse)
-      (transform)
-      (query-plan)
-      (:inputs)
-      (first)
-      (input {:model (main/slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  (-> "select * from (generate elephant, rain given rain=\"yes\" under model) limit 1"
-      (parse)
-      (transform)
-      (query-plan)
-      (:inputs)
-      (first)
-      (input {:model (main/slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  (set! *print-length* 10)
-
-  (require '[inferenceql.spreadsheets.query.main :as main])
-
-  (q "select * from (generate elephant, rain given rain=\"yes\" under model)"
-     (main/slurp-csv "https://bcomp.pro/elephantdata")
-     {:model (main/slurp-model "https://bcomp.pro/elephantmodel")})
-
-  (q "select * from (generate elephant, rain given rain=\"yes\" under model)"
-     (main/slurp-csv "https://bcomp.pro/elephantdata")
-     {:model (main/slurp-model "https://bcomp.pro/elephantmodel")})
-
-  )

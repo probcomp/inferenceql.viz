@@ -72,11 +72,3 @@
           (let [data (slurp-csv data)
                 model (slurp-model model)]
             (repl data {:model model})))))
-
-(comment
-
-  (p (query/q "select * from data"
-              (slurp-csv "https://bcomp.pro/elephantdata")
-              {:model (slurp-model "https://bcomp.pro/elephantmodel")}))
-
-  )
