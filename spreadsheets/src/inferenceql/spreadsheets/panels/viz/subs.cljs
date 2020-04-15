@@ -2,6 +2,7 @@
   (:require [re-frame.core :as rf]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.viz.circle :as circle]
+            [inferenceql.spreadsheets.panels.viz.tree :as tree]
             [medley.core :as medley]))
 
 (rf/reg-sub :viz/timestep
@@ -37,6 +38,20 @@
             (fn [[dependencies tree]]
               (let [spec (clj->js
                            (circle/spec tree dependencies))]
+                spec)))
+
+;-----------------
+
+(rf/reg-sub :viz/infection-tree
+            :<- [:viz/timestep]
+            (fn [timestep]
+              (vega/infection-tree timestep)))
+
+(rf/reg-sub :viz/tree-spec
+            :<- [:viz/infection-tree]
+            (fn [tree]
+              (let [spec (clj->js
+                           (tree/spec tree))]
                 (.log js/console "spec: " spec)
                 spec)))
 

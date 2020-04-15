@@ -11,6 +11,7 @@
   []
   (let [vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         circle-spec @(rf/subscribe [:viz/circle-spec])
+        tree-spec @(rf/subscribe [:viz/tree-spec])
         generators      @(rf/subscribe [:viz/generators])]
     [:div
      [control/panel]
@@ -18,4 +19,6 @@
       (when circle-spec
         [viz/vega-lite circle-spec {:actions false :mode "vega"}])
       (when vega-lite-spec
-        [viz/vega-lite vega-lite-spec {:actions false} generators])]]))
+        [viz/vega-lite vega-lite-spec {:actions false} generators])]
+     (when tree-spec
+       [viz/vega-lite tree-spec {:actions false :mode "vega"}])]))

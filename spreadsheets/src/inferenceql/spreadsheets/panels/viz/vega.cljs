@@ -481,8 +481,55 @@
                    :target-name (str "Agent " target-id)
                    :edge-present true
                    :infected infected})))]
-    (.log js/console "ret: " ret)
     (or ret [])))
+
+(defn infection-tree [timestep]
+  (let [contact-maps (->> (get-in config/config [:trace-data "contacts"]))
+        contacts-before-time (filter #(<= (get % "t1") timestep)
+                                     contact-maps)
+
+        transmitted-contacts (filter #(= (get % "transmitted") true)
+                                     contact-maps)
+        _ (.log js/console "transmitted-contacts: " transmitted-contacts)
+
+        ret (for [contact contacts-before-time]
+              (if (get contact "source") ; interaction with source
+                (let [source-id (get contact "source")
+                      target-id (get-in contact ["agent" "agent"])
+                      infected (get-in contact ["agent" "infected"])]
+                  (when infected
+                    {:id (+ target-id 6)
+                     :parent source-id
+                     :name (str "Agent " target-id)}))
+                (let [source-id (get-in contact ["agent1" "agent"])
+                      target-id (get-in contact ["agent2" "agent"])
+                      source-status (get-in contact ["agent1" "infected"])
+                      target-status (get-in contact ["agent2" "infected"])
+                      infected (get-in contact ["transmitted"])]
+                  (cond
+                    (and infected source-status)
+                    {:id (+ target-id 6)
+                     :parent (+ source-id 6)
+                     :name (str "Agent " target-id)}
+
+                    (and infected target-status)
+                    {:id (+ source-id 6)
+                     :parent (+ target-id 6)
+                     :name (str "Agent " source-id)}
+
+                    :else
+                    nil))))
+        ret (remove nil? ret)
+        ret (group-by #(:id %) ret)
+        ;; TODO take the earliest.
+        ret (map first (vals ret))
+
+        root {:id -1 :name "root"}
+        sources (for [i (range 1 7)]
+                  {:id i :parent -1 :name (str "Source " i)})
+        final-ret (concat [root] ret sources)]
+    (.log js/console "ret: " final-ret)
+    (or final-ret [])))
 
 (defn map-spec [agent-points]
   {:width 1000,
