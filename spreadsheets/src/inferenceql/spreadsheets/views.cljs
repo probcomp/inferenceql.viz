@@ -15,7 +15,7 @@
     [:div
      [control/panel]
      [:div#viz-container
-      (when vega-lite-spec
-        [viz/vega-lite vega-lite-spec {:actions false} generators])
       (when circle-spec
-        [viz/vega-lite circle-spec {:actions false :mode "vega"}])]]))
+        [viz/vega-lite circle-spec {:actions false :mode "vega"}])
+      (when vega-lite-spec
+        [viz/vega-lite vega-lite-spec {:actions false} generators])]]))
