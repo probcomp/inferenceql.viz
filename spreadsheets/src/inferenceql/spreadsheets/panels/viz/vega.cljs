@@ -365,8 +365,7 @@
 
 (defn source-points []
   (let [sources (get-in config/config [:trace-data "sources"])]
-    (map #(assoc % "color" "red") sources)
-    sources))
+    (map #(assoc % "status" "Source") sources)))
 
 (defn infection-status [timestep]
   (let [times (get-in config/config [:trace-data "infection_times"])]
@@ -549,7 +548,7 @@
      {:color {:value "#eee"},
       :tooltip {:field "properties"}}}
     {:data
-     {:values agent-points}
+     {:values (concat agent-points (source-points))}
      :projection {:type "mercator"},
      :mark "circle",
      :encoding
@@ -558,16 +557,5 @@
       :size {:value 5},
       :opacity {:value 1},
       :color {:field "status" :type "nominal"
-              :scale {:range ["SteelBlue", "orange"]
-                      :domain ["Not infected" "Infected"]}}}}
-
-    {:data
-     {:values (source-points)}
-     :projection {:type "mercator"},
-     :mark "square",
-     :encoding
-     {:longitude {:field "lon", :type "quantitative"},
-      :latitude {:field "lat", :type "quantitative"},
-      :size {:value 5},
-      :opacity {:value 1},
-      :color {:value "red"}}}]})
+              :scale {:range ["SteelBlue", "orange" "red"]
+                      :domain ["Not infected" "Infected" "Source"]}}}}]})
