@@ -17,7 +17,9 @@ column-selection    ::= column-name (<ws> <'AS'> <ws> selection-name)?
 
 (* Sources *)
 
-source              ::= <'data'> | <'('> query <')'> | <'('> generate <')'>
+source              ::= table-lookup | <'('> query <')'> | generated-table
+generated-table     ::= <'('> generate-model <')'>
+table-lookup        ::= table-name
 
 (* Conditions *)
 
@@ -38,7 +40,7 @@ predicate           ::= (#"<" | #">" | #"<=" | #">=")
 
 (* Generate *)
 
-generate            ::= <'GENERATE'> <ws> variable-names
+generate-model      ::= <'GENERATE'> <ws> variable-names
                         (<ws> <'GIVEN'> <ws> bindings)?
                         (<ws> <'UNDER'> <ws> model)?
 variable-names      ::= variable-name (<','> <ws> variable-name)*
@@ -78,11 +80,12 @@ limit               ::= nat
 
 (* Shared *)
 
-model               ::= model-lookup | <'('> generate <')'>
+model               ::= model-lookup | <'('> generate-model <')'>
 model-lookup        ::= model-name
 
 selection-name      ::= name
 <column-name>       ::= name
+table-name          ::= "data"
 <model-name>        ::= name
 <variable-name>     ::= name
 name                ::= symbol | <'"'> symbol <'"'>

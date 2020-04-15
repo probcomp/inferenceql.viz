@@ -19,6 +19,15 @@
 (def entity-var '?entity)
 (def default-model-key :model)
 
+(defn safe-get
+  [coll k]
+  (if (contains? coll k)
+    (get coll k)
+    (throw (ex-info "Collection does not contain key"
+                    {::error ::safe-get
+                     ::coll coll
+                     ::k k}))))
+
 (defn variable
   "Converts a string, symbol, or keyword to a valid Datalog variable of the same
   name."
@@ -153,11 +162,14 @@
                                     {:query            (map-transformer)
                                      :probability-of   (map-transformer :target)
                                      :column-selection (map-transformer :column)
-                                     :generate         (map-transformer :target)
+                                     :generate-model   (map-transformer :target)
                                      :ordering         (map-transformer :column)
+                                     :table-lookup     (map-transformer :table-name)
                                      :model-lookup     (map-transformer :model-name)
+                                     :generated-table  (map-transformer :generate-model)
 
                                      :name       keyword
+                                     :table-name keyword
                                      :predicate  symbol
 
                                      :star       (constantly :star)
@@ -297,13 +309,21 @@
   "Given a query parse tree returns a query plan for the top-most query.
   Subqueries will not be considered and are handled in a different step by the
   interpreter. See `q` for details."
-  [{:keys [selections conditions]}]
+  [{:keys [selections source conditions limit] :or {source {:table-name :data}}}]
   (let [{sel-find :find sel-in :in sel-where :where sel-inputs :inputs} (selections-clauses selections)
+        source (cond (not (s/valid? ::generate-table source))
+                     source
+
+                     (not limit)
+                     (throw (ex-info "Cannot GENERATE without LIMIT" {}))
+
+                     :else
+                     (assoc source :limit limit))
         cond-where (mapcat condition-clauses conditions)]
     {:query {:find sel-find
              :in (into '[$] sel-in)
              :where (into sel-where cond-where)}
-     :inputs sel-inputs}))
+     :inputs (into [source] sel-inputs)}))
 
 (defn iql-db
   "Converts a vector of maps into Datalog database that can be queried with `q`."
@@ -316,75 +336,82 @@
 
 (s/def ::target any?)
 
-(s/def ::model-lookup (s/keys :req-un [::model-name]))
+(s/def ::function-name symbol?)
+(s/def ::table-name    keyword?)
+(s/def ::model-name    keyword?)
 
+(s/def ::table-lookup (s/keys :req-un [::table-name]))
+(s/def ::model-lookup (s/keys :req-un [::model-name]))
 (s/def ::function-lookup (s/keys :req-un [::function-name]))
 
-(s/def ::generate (s/keys :req-un [::target ::model]
-                          :opt-un [::constraints]))
+(s/def ::generate-model (s/keys :req-un [::target ::model]
+                                :opt-un [::constraints]))
+
+(s/def ::limit nat-int?)
+
+(s/def ::generate-table (s/keys :req-un [::generate-model]
+                                :opt-un [::limit]))
 
 (s/def ::model
   (s/or :model-lookup ::model-lookup
-        :generate     ::generate))
+        :generate-model ::generate-model))
 
 (s/def ::source
   (s/or :data true?
-        :generate ::generate
+        :generate-table ::generate-table
         :select (s/keys :req-un [::selections])))
 
-(s/def ::model-name keyword?)
 
 (s/def ::input
-  (s/or :model-lookup    ::model-lookup
+  (s/or :table-lookup    ::table-lookup
+        :model-lookup    ::model-lookup
         :function-lookup ::function-lookup
-        :generate        ::generate))
+        :generate-table  ::generate-table
+        :generate-model  ::generate-model))
+
+#_(s/explain ::input {:table-lookup :data})
 
 (defn input
   [x environment]
-  (let [[tag _] (s/conform ::input x)]
-    (case tag
-      :model-lookup    (get environment (:model-name x))
-      :function-lookup (get environment (:function-name x))
-      :generate        (let [{:keys [model target constraints]} x]
-                         (constrain (input model environment)
-                                    (or target {})
-                                    (or constraints {}))))))
+  (if-not (s/valid? ::input x)
+    (throw (ex-info "Query plan produced malformed input"
+                    {::input x
+                     ::explain-data (s/explain-data ::input x)}))
+    (let [[tag _] (s/conform ::input x)]
+      (case tag
+        :table-lookup    (get environment (:table-name x))
+        :model-lookup    (get environment (:model-name x))
+        :function-lookup (get environment (:function-name x))
+        :generate-model  (let [{:keys [model target bindings]} x]
+                           (constrain (input model environment)
+                                      (or target {})
+                                      (or bindings {})))
+        :generate-table (let [gfn (input (:generate-model x) environment)]
+                          (repeatedly (safe-get x :limit) gfn))))))
 
 (defn execute
   "Like `q`, only operates on a query parse tree rather than a query string."
   ([parse-map rows]
    (execute parse-map rows {}))
-  ([{:keys [selections source ordering limit] :as parse-map} rows models]
-   (let [environment (merge default-environment models)
+  ([{:keys [selections ordering limit] :as parse-map} rows models]
+   (let [environment (merge default-environment models {:data rows})
          keyfn (get ordering :column :db/id)
          cmp (case (get ordering :direction)
                :ascending compare
                :descending #(compare %2 %1)
                nil compare)
          names (-> selections (selections-clauses) (:name)) ; TODO: fix redundant call to selections-clauses
-         db (iql-db (if-not source
-                      rows
-                      (let [conformed (s/conform ::source source)]
-                        (if (= ::s/invalid conformed)
-                          (throw (ex-info "Invalid source" {:source source}))
-                          (let [[tag _] conformed]
-                            (case tag
-                              :data rows
-                              :generate (if-not limit
-                                          (throw (ex-info "Cannot SELECT from GENERATE without LIMIT" {}))
-                                          (let [model (input source environment)]
-                                            (repeatedly limit model)))
-                              :query (execute source rows)))))))
          {query :query input-descs :inputs} (inputize (query-plan parse-map))
-         inputs (map #(input % environment) input-descs)
-         rows (cond->> (apply d/q query db inputs)
+         inputs (-> (mapv #(input % environment) input-descs)
+                    (update 0 iql-db))
+         rows (cond->> (apply d/q query inputs)
                 names (map #(zipmap (into [:db/id] names) ; TODO: Can this not be hard-coded?
                                     %))
-                true (sort-by keyfn cmp)
-                true (map #(into {}
-                                 (remove (comp #{:iql/no-value} val))
-                                 %))
-                true (map #(dissoc % :db/id :iql/type))
+                :always (sort-by keyfn cmp)
+                :always (map #(into {}
+                                    (remove (comp #{:iql/no-value} val))
+                                    %))
+                :always (map #(dissoc % :db/id :iql/type))
                 limit (take limit))
          metadata (or names
                       (into []
@@ -404,3 +431,64 @@
      (if-not (insta/failure? parse-tree)
        (execute (transform parse-tree) rows models)
        parse-tree))))
+
+
+(comment
+
+  (-> "select elephant, rain, (probability of elephant given rain under model as prob) order by elephant desc limit 10"
+      (parse)
+      (transform)
+      (get-in [:selections 2])
+      (probability-selection-clauses))
+
+  (-> "select * from (generate elephant, rain given rain=\"yes\" under model)"
+      (parse)
+      (transform)
+      (query-plan)
+      (:inputs)
+      (first)
+      (input {:model (inferenceql.spreadsheets.query.main/slurp-model "https://bcomp.pro/elephantmodel")})
+      (repeatedly))
+
+  (set! *print-length* 10)
+
+  (-> "select * limit 10"
+      (parse)
+      (transform)
+      (query-plan))
+
+
+  (q "select x from data order by x desc"
+     [{:x 0}
+      {:x 2}
+      {:x 1}])
+
+  (-> "select * from (generate elephant, rain given rain=\"yes\" under model) limit 10"
+      (parse)
+      (transform)
+      (query-plan)
+      (:inputs)
+      (first)
+      (input {:model (main/slurp-model "https://bcomp.pro/elephantmodel")}))
+
+  (-> "select * from (generate elephant, rain given rain=\"yes\" under model) limit 1"
+      (parse)
+      (transform)
+      (query-plan)
+      (:inputs)
+      (first)
+      (input {:model (main/slurp-model "https://bcomp.pro/elephantmodel")}))
+
+  (set! *print-length* 10)
+
+  (require '[inferenceql.spreadsheets.query.main :as main])
+
+  (q "select * from (generate elephant, rain given rain=\"yes\" under model)"
+     (main/slurp-csv "https://bcomp.pro/elephantdata")
+     {:model (main/slurp-model "https://bcomp.pro/elephantmodel")})
+
+  (q "select * from (generate elephant, rain given rain=\"yes\" under model)"
+     (main/slurp-csv "https://bcomp.pro/elephantdata")
+     {:model (main/slurp-model "https://bcomp.pro/elephantmodel")})
+
+  )
