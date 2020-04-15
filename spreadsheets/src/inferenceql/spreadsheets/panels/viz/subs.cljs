@@ -53,7 +53,6 @@
             (fn [tree]
               (let [spec (clj->js
                            (tree/spec tree))]
-                (.log js/console "spec: " spec)
                 spec)))
 
 (rf/reg-sub :viz/generators

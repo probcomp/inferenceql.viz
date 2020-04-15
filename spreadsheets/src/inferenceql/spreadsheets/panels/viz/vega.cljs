@@ -491,7 +491,6 @@
 
         transmitted-contacts (filter #(= (get % "transmitted") true)
                                      contact-maps)
-        _ (.log js/console "transmitted-contacts: " transmitted-contacts)
 
         ret (for [contact contacts-before-time]
               (if (get contact "source") ; interaction with source
@@ -529,7 +528,6 @@
         sources (for [i (range 1 7)]
                   {:id i :parent -1 :name (str "Source " i)})
         final-ret (concat [root] ret sources)]
-    (.log js/console "ret: " final-ret)
     (or final-ret [])))
 
 (defn map-spec [agent-points]
