@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.viz.tree-2)
+(ns inferenceql.spreadsheets.panels.viz.tree2)
 
 (defn spec [tree]
   {:description
