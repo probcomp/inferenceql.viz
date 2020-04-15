@@ -3,6 +3,7 @@
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.viz.circle :as circle]
             [inferenceql.spreadsheets.panels.viz.tree :as tree]
+            [inferenceql.spreadsheets.panels.viz.tree-2 :as tree-2]
             [medley.core :as medley]))
 
 (rf/reg-sub :viz/timestep
@@ -51,7 +52,7 @@
             :<- [:viz/infection-tree]
             (fn [tree]
               (let [spec (clj->js
-                           (tree/spec tree))]
+                           (tree-2/spec tree))]
                 (.log js/console "spec: " spec)
                 spec)))
 
