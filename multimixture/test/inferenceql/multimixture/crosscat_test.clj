@@ -189,8 +189,185 @@
                        (mmix-utils/logsumexp [score-21 score-22]))
         error       1e-8  ; Accounting for floating point errors.
         logp        (xcat/logpdf-score x xcat latents)]
+
     ;; Checking test arguments.
     (is (spec/valid-xcat? xcat))
+
     ;; Checking output.
     (is (< (Math/abs (- logp total-score))
            error))))
+
+
+(deftest log-likelihood-view
+  "Tests `log-likelihood-view` by manually checking expected output."
+  (let [x       {"color" "red"
+                 "height" 6}
+        row-id  1
+        types   {"color"  :categorical
+                 "height" :gaussian}
+        latents {:alpha   1
+                 :counts [4 6]
+                 :y      [1 0 1 0 0 1 1 1 1 0]}
+        view    {:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
+                          "height" {:sigma {:gamma     {:k     0.5 :theta 0.5}}
+                                    :mu    {:beta      {:alpha 0.5 :beta  0.5}}}}
+                 :categories [{:parameters {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
+                                            "height" {:mu 6 :sigma 1}}}
+                              {:parameters {"color"  {:p {"red" 0.3 "green" 0.2 "blue" 0.5}}
+                                            "height" {:mu 3 :sigma 1}}}]}
+
+        ;; logP["color" = "red", "height" = 6 | c_0]
+        ;;    = log(P["color" = "red" | c_0]) + log(P["height" = 6 | c_0])
+        ;;    = log(0.5) + log(P[6 ~ N(6, 1))
+        ;;   ~= -0.693 + -0.919
+        ;;    = -1.612 -> exp: 0.199
+        ll (+ (prim/logpdf (get x "color")
+                           (get types "color")
+                           (get-in view [:categories 0 :parameters "color"]))
+              (prim/logpdf (get x "height")
+                           (get types "height")
+                           (get-in view [:categories 0 :parameters "height"])))
+
+        ll'   (xcat/log-likelihood-view x row-id types latents view)]
+
+    ;; Checking test arguments.
+    (is (spec/valid-local-latents? latents))
+    (is (spec/valid-view? view))
+
+    ;; Testing output.
+    (is (== ll ll'))))
+
+(deftest log-likelihood-views
+  "Tests `log-likelihood-views` by manually checking expected output."
+  (let [x       {"color" "red"
+                 "height" 6
+                 "happy?" true}
+        row-id  1
+        types   {"color"  :categorical
+                 "height" :gaussian
+                 "happy?" :bernoulli}
+        latents {:global {:alpha 1
+                          :counts [2 1]
+                          :z {"color" 0
+                              "happy?" 1
+                              "height" 0}}
+                 :local [{:alpha   1
+                          :counts [4 6]
+                          :y      [1 0 1 0 0 1 1 1 1 0]}
+                         {:alpha   1
+                          :counts [7 3]
+                          :y      [0 1 0 0 0 0 0 1 1 0]}]}
+
+        views   [{:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
+                           "height" {:sigma {:gamma     {:k     0.5 :theta 0.5}}
+                                     :mu    {:beta      {:alpha 0.5 :beta  0.5}}}}
+                  :categories [{:parameters {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
+                                             "height" {:mu 6 :sigma 1}}}
+                               {:parameters {"color"  {:p {"red" 0.3 "green" 0.2 "blue" 0.5}}
+                                             "height" {:mu 3 :sigma 1}}}]}
+                 {:hypers {"happy?"  {:p     {:beta {:alpha 0.5 :beta 0.5}}}}
+                  :categories [{:parameters {"happy?"  {:p 0.1}}}
+                               {:parameters {"happy?"  {:p 0.9}}}]}]
+
+        model  {:types types
+                :views views}
+
+        ;; logP["color" = "red", "height" = 6 | c_0, view_0] + logP["happy?" = true | c_1, view_1]
+        ;;    = log(P["color" = "red" | c_0]) + log(P["height" = 6 | c_0]) + log(P["happy?" = true | c_1)
+        ;;    = log(0.5) + log(P[6 ~ N(6, 1)) + log(0.9)
+        ;;   ~= -0.693 + -0.919 + -0.105
+        ;;    = -1.717 -> exp: 0.180
+        ll (+ (prim/logpdf (get x "color")
+                           (get types "color")
+                           (get-in views [0 :categories 0 :parameters "color"]))
+              (prim/logpdf (get x "height")
+                           (get types "height")
+                           (get-in views [0 :categories 0 :parameters "height"]))
+              (prim/logpdf (get x "happy?")
+                           (get types "happy?")
+                           (get-in views [1 :categories 1 :parameters "happy?"])))
+
+        ll'   (xcat/log-likelihood-views x row-id model latents)]
+
+    ;; Checking test arguments.
+    (is (spec/valid-xcat?    model))
+    (is (spec/valid-latents? latents))
+
+    ;; Testing output.
+    (is (== ll ll'))))
+
+(deftest log-likelihood
+  "Tests `log-likelihood` by manually checking expected output."
+  (let [data {"color"  ["red" "green"]
+              "height" [  6      4   ]
+              "happy?" [ true  false ]}
+        
+        types   {"color"  :categorical
+                 "height" :gaussian
+                 "happy?" :bernoulli}
+
+        latents {:global {:alpha 1
+                          :counts [2 1]
+                          :z {"color" 0
+                              "happy?" 1
+                              "height" 0}}
+                 :local [{:alpha   1
+                          :counts [4 6]
+                          :y      [1 0 1 0 0 1 1 1 1 0]}
+                         {:alpha   1
+                          :counts [7 3]
+                          :y      [0 1 0 0 0 0 0 1 1 0]}]}
+
+        views   [{:hypers {"color"  {:p     {:dirichlet {:alpha [1 1 1]}}}
+                           "height" {:sigma {:gamma     {:k     0.5 :theta 0.5}}
+                                     :mu    {:beta      {:alpha 0.5 :beta  0.5}}}}
+                  :categories [{:parameters {"color"  {:p {"red" 0.5 "green" 0.1 "blue" 0.4}}
+                                             "height" {:mu 6 :sigma 1}}}
+                               {:parameters {"color"  {:p {"red" 0.3 "green" 0.2 "blue" 0.5}}
+                                             "height" {:mu 3 :sigma 1}}}]}
+                 {:hypers {"happy?"  {:p     {:beta {:alpha 0.5 :beta 0.5}}}}
+                  :categories [{:parameters {"happy?"  {:p 0.1}}}
+                               {:parameters {"happy?"  {:p 0.9}}}]}]
+
+        model  {:types types
+                :views views}
+
+        ll-1 (+ (prim/logpdf "red"
+                             (get types "color")
+                             (get-in views [0 :categories 1 :parameters "color"]))
+                (prim/logpdf 6
+                             (get types "height")
+                             (get-in views [0 :categories 1 :parameters "height"]))
+                (prim/logpdf true
+                             (get types "happy?")
+                             (get-in views [1 :categories 0 :parameters "happy?"])))
+
+        ll-2 (+ (prim/logpdf "green"
+                             (get types "color")
+                             (get-in views [0 :categories 0 :parameters "color"]))
+                (prim/logpdf 4
+                             (get types "height")
+                             (get-in views [0 :categories 0 :parameters "height"]))
+                (prim/logpdf false
+                             (get types "happy?")
+                             (get-in views [1 :categories 1 :parameters "happy?"])))
+
+        ll   (+ ll-1 ll-2)
+        ll'  (xcat/log-likelihood data model latents)]
+
+    ;; Checking test arguments.
+    (is (spec/valid-xcat?    model))
+    (is (spec/valid-latents? latents))
+
+    ;; Testing output.
+    (is (== ll ll'))))
+
+;; crp-weights
+;; simulate-category
+;; hyperprior-simulate
+;; categorical-param-names
+;; generate-category
+;; view-category-weights
+;; sample-category
+;; simulate-view
+;; simulate
