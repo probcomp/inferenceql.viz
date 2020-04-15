@@ -3,6 +3,7 @@
 (defn spec [tree]
   {:description
    "An example of a radial layout for a node-link diagram of hierarchical data.",
+   :title {:text "Infection Tree"}
    :autosize "none",
    :width 720,
    :scales
@@ -11,7 +12,8 @@
      :range {:scheme "magma"},
      :domain {:data "tree", :field "depth"},
      :zero true}],
-   :padding 5,
+   :padding 25,
+   :config { :title { :fontSize 16}}
    :marks
    [{:type "path",
      :from {:data "links"},
@@ -34,7 +36,7 @@
      :encode
      {:enter
       {:text {:field "name"},
-       :fontSize {:value 9},
+       :fontSize {:value 12},
        :baseline {:value "middle"}},
       :update
       {:x {:field "x"},

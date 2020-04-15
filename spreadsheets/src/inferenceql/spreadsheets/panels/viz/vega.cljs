@@ -365,6 +365,7 @@
 
 (defn source-points []
   (let [sources (get-in config/config [:trace-data "sources"])]
+    (map #(assoc % "color" "red") sources)
     sources))
 
 (defn infection-status [timestep]
@@ -387,8 +388,8 @@
                                  last-pos-rec (get (last loc-list) "loc")]
                              (or last-pos last-pos-rec)))
         locs-with-status (map (fn [a-map status]
-                                (let [color (if status "red" "SteelBlue")]
-                                  (assoc a-map :color color)))
+                                (let [status (if status "Infected" "Not infected")]
+                                  (assoc a-map :status status)))
                               locs-at-timestep
                               (infection-status timestep))
 
@@ -533,6 +534,8 @@
 
 (defn map-spec [agent-points]
   {:width 1000,
+   :title {:text "Map with Moving Agents"
+           :fontSize 16}
    :height 500,
    :layer
    [{:data
@@ -556,7 +559,10 @@
       :latitude {:field "lat", :type "quantitative"},
       :size {:value 5},
       :opacity {:value 1},
-      :color {:field "color"}}}
+      :color {:field "status" :type "nominal"
+              :scale {:range ["SteelBlue", "orange"]
+                      :domain ["Not infected" "Infected"]}}}}
+
     {:data
      {:values (source-points)}
      :projection {:type "mercator"},

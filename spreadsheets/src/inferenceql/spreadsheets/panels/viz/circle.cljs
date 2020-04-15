@@ -2,6 +2,8 @@
 
 (defn spec [tree dependencies]
   {:autosize "none",
+   :title {:text "Contact Graph"}
+   :config { :title { :fontSize 16}}
    :legends [],
    :width 500,
    :height 500,
@@ -10,7 +12,7 @@
      :type "ordinal",
      :domain ["depends on" "imported by"],
      :range [{:signal "colorIn"} {:signal "colorOut"}]}],
-   :padding 5,
+   :padding 25,
    :marks
    [{:type "text",
      :from {:data "leaves"},
