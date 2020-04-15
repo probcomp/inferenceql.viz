@@ -1,6 +1,6 @@
 (ns inferenceql.spreadsheets.query-test
   (:require [clojure.string :as string]
-            [clojure.test :as test :refer [are deftest is]]
+            [clojure.test :as test :refer [are deftest is testing]]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
@@ -39,6 +39,13 @@
                            gen-table)
             #(gen/tuple (gen/return %)
                         (gen/elements (mapcat keys %)))))
+
+(def gen-table-col-subset
+  (gen/bind (gen/such-that #(seq (mapcat keys %))
+                           gen-table)
+            #(gen/tuple (gen/return %)
+                        (gen/not-empty
+                         (chuck.gen/subset (mapcat keys %))))))
 
 ;;; Literals
 
@@ -82,13 +89,6 @@
   (prop/for-all [table gen-table]
     (let [results (query/q "SELECT * FROM data" table)]
       (is (= results table)))))
-
-(def gen-table-col-subset
-  (gen/bind (gen/such-that #(seq (mapcat keys %))
-                           gen-table)
-            #(gen/tuple (gen/return %)
-                        (gen/not-empty
-                         (chuck.gen/subset (mapcat keys %))))))
 
 (defspec select-col
   (prop/for-all [[table ks] gen-table-col-subset]
@@ -193,3 +193,23 @@
       1.0 "no"  "no"
       0.0 "yes" "no"
       0.0 "no"  "yes")))
+
+(deftest generate-generates-correct-columns
+  (testing "Generate"
+    (let [model (search/optimized-row-generator simple-mmix)
+          q #(query/q % [] {:model model})]
+      (testing "with a single variable"
+        (doseq [result (q "SELECT * FROM (GENERATE y UNDER model) LIMIT 10")]
+          (is (= #{:y} (set (keys result))))))
+      (testing "with multiple variables"
+        (doseq [result (q "SELECT * FROM (GENERATE x, y UNDER model) LIMIT 10")]
+          (is (= #{:x :y} (set (keys result))))))
+      (testing "with a literal event"
+        (doseq [result (q "SELECT * FROM (GENERATE x GIVEN x=\"yes\" UNDER model) LIMIT 10")]
+          (is (= {:x "yes"} (select-keys result [:x])))))
+      (testing "expressions can have a subset of columns selected from them"
+        (doseq [result (q "SELECT y FROM (GENERATE x, y UNDER model) LIMIT 10")]
+          (is (= [:y] (keys result)))))
+      (testing "can be nested"
+        (doseq [result (q "SELECT x, y FROM (GENERATE x, y UNDER (GENERATE x, y UNDER model)) LIMIT 10")]
+          (is (= #{:x :y} (set (keys result)))))))))
