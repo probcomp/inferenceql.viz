@@ -410,12 +410,13 @@
                                     %))
                 :always (map #(dissoc % :db/id :iql/type))
                 limit (take limit))
-         metadata (or names
-                      (into []
-                            (comp (mapcat keys)
-                                  (distinct))
-                            rows))]
-     (vary-meta rows assoc :iql/columns metadata))))
+         column-order (or names
+                          (into []
+                                (comp (mapcat keys)
+                                      (distinct))
+                                rows))
+         is-virtual-data (some? (get-in parse-map [:source :generate-model]))]
+     (vary-meta rows assoc :iql/columns column-order :iql/is-virtual-data is-virtual-data))))
 
 (defn q
   "Returns the result of executing a query on a set of rows. A registry

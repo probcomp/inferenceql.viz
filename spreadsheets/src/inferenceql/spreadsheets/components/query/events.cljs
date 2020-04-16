@@ -27,11 +27,7 @@
 
          result (query/q command rows models)
          columns (:iql/columns (meta result))
-         ;; TODO add following lines in spreadsheets/src/inferenceql/spreadsheets/query.cljc
-         ;; after zane-query branch is merged.
-         ;; metadata {:iql/columns (or names (into [] (comp (mapcat keys) (distinct)) rows))
-         ;;           :virtual-data (= :generate (first (source ast))))
-         virtual (:virtual-data (meta result))]
+         virtual (:iql/is-virtual-data (meta result))]
     (if-not (insta/failure? result)
       {:dispatch [:table/set result columns {:virtual virtual}]}
       (let [logged-msg (str "Invalid query syntax: " result)
