@@ -213,17 +213,9 @@
 
 ;;; Subs related to populating tables with data.
 
-(defn table-headers
-  [db _]
-  (db/table-headers db))
-(rf/reg-sub :table/table-headers table-headers)
-
-(rf/reg-sub :table/computed-headers
-            (fn [_ _]
-              (rf/subscribe [:table/table-headers]))
-            (fn [headers]
-              (when (seq headers)
-                (into [hot/label-col-header hot/score-col-header] headers))))
+(rf/reg-sub :table/table-headers
+            (fn [db _]
+              (db/table-headers db)))
 
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
@@ -285,7 +277,7 @@
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
-              {:headers (rf/subscribe [:table/computed-headers])
+              {:headers (rf/subscribe [:table/table-headers])
                :rows    (rf/subscribe [:table/computed-rows])
                :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
@@ -296,7 +288,7 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/computed-headers])})
+    :col-names (rf/subscribe [:table/table-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -348,7 +340,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/computed-headers])})
+    :computed-headers (rf/subscribe [:table/table-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode

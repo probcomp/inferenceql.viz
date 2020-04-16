@@ -1,6 +1,7 @@
 (ns inferenceql.spreadsheets.csv
   "Functions for processing csv data files."
   (:require [clojure.string :as str]
+            [clojure.walk :as walk]
             [medley.core :as medley]))
 
 (defn- float-string?
@@ -43,9 +44,15 @@
 
 (defn csv-data->clean-maps
   "Takes `csv-data`, a vector of row vectors, and returns a seq of cleaned, casted data in maps.
-  Casts data according to types in `column-types`."
-  [column-types csv-data]
-  (->> csv-data
-       (mapv clean-items-in-row-vec)
-       (csv-data->maps)
-       (mapv #(cast-items-in-row column-types %))))
+  Casts data according to types in `column-types`.
+  It can also take an options map that can keywordize column names."
+  ([column-types csv-data]
+   (csv-data->clean-maps column-types csv-data {}))
+  ([column-types csv-data {:keys [keywordize-cols] :or {keywordize-cols false}}]
+   (let [column-types (cond->> column-types
+                               keywordize-cols (walk/keywordize-keys))]
+     (cond->> csv-data
+              true (mapv clean-items-in-row-vec)
+              true (csv-data->maps)
+              keywordize-cols (mapv walk/keywordize-keys)
+              true (mapv #(cast-items-in-row column-types %))))))
