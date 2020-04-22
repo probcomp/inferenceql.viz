@@ -6,7 +6,7 @@
             [inferenceql.distributions :as idbdist]
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.utils :as mmix-utils]
-            [inferenceql.multimixture.basic-queries :as bq]
+            [inferenceql.multimixture.gpm :as gpm]
             [inferenceql.multimixture.specification :as spec]))
 
 (s/fdef optimized-row-generator
@@ -126,7 +126,7 @@
         constraints (constraints-for-scoring-p target-col constraint-cols row)]
     (if (nil? (get target target-col))
       1
-      (Math/exp (bq/logpdf row-generator target constraints)))))
+      (Math/exp (gpm/logpdf (gpm/Multimixture row-generator) target constraints)))))
 
 (defn anomaly-search
   [spec target-col conditional-cols data]

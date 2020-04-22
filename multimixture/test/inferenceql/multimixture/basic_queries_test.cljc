@@ -7,8 +7,8 @@
             #?(:clj [inferenceql.plotting.generate-vljson :as plot])
             [inferenceql.utils :as utils]
             [inferenceql.multimixture.specification :as spec]
-            [inferenceql.multimixture.basic-queries :as bq]
             [inferenceql.multimixture.search :as search] ;; XXX: why is the "optimized" row generator in search?
+            [inferenceql.multimixture.gpm :as gpm]
             [metaprob.distributions :as dist]))
 
 ;; The following data generator has some interesting properties:
@@ -166,17 +166,24 @@
 ;; Define the row-generator used below.
 (def row-generator (search/optimized-row-generator multi-mixture))
 
+;; Define the MMix GPM.
+(def gpm-mmix (gpm/Multimixture multi-mixture))
+
 ;; Some smoke tests. Because the code for the tests didn't run anymore as state
 ;; lost in a squash-merge, I needed those smoke tests to gain confidence on all
 ;; datastructure beeing correct.
 (deftest test-smoke-row-generator
   (is (map? (row-generator))))
+
 (deftest test-smoke-simulate
-  (is (= 3 (count (bq/simulate row-generator {} 3)))))
+  (is (= 3 (count (gpm/simulate gpm-mmix {} {} 3)))))
+
 (deftest test-smoke-simulate-conditional
-  (is (= 999. (get (first (bq/simulate row-generator {"x" 999.} 3)) "x"))))
+  (is (= 999. (get (first (gpm/simulate gpm-mmix {} {"x" 999.} 3))
+                   "x"))))
+
 (deftest test-smoke-logpdf
-  (is (float? (bq/logpdf row-generator {"x" 0.} {"y" 1.}))))
+  (is (float? (gpm/logpdf gpm-mmix {"x" 0.} {"y" 1.}))))
 
 (def plot-point-count 1000)
 ;; The purpose of this test is to help the reader understand the test suite. It
@@ -226,10 +233,8 @@
     (testing (str "Conditioned on  deterministic category" cluster)
       ;; We simulate all variables together in a single test like this because
       ;; there's currently a performance benefit to doing so.
-      (let [point (test-point point-id)
-            samples (bq/simulate row-generator
-                                 {"a" (str cluster)}
-                                 simulation-count)]
+      (let [point   (test-point point-id)
+            samples (gpm/simulate gpm-mmix {} {"a" (str cluster)} simulation-count)]
         (doseq [variable variables]
           (cond (spec/numerical? multi-mixture variable)
                 (let [samples (utils/col variable samples)]
@@ -241,9 +246,10 @@
                                                  utils/relerr
                                                  (/ sigma 2))))
                       (testing "standard deviation"
-                        (is (utils/within-factor? sigma
-                                                  (utils/std samples)
-                                                  2)))))
+                        (is (utils/within-factor?
+                              sigma
+                              (utils/std samples)
+                              2)))))
                   (spec/nominal? multi-mixture variable))))))))
 
 (defn- true-categorical-p
@@ -262,14 +268,12 @@
   ;; from the right clusters.
   (doseq [[point-id clusters] (invert-map cluster-point-mapping)]
     (testing (str "Conditioned on point P" point-id)
-      (let [point (stringify-keys (test-point point-id))
-            samples (bq/simulate row-generator
-                                 point
-                                 simulation-count)]
+      (let [point   (stringify-keys (test-point point-id))
+            samples (gpm/simulate gpm-mmix {} point simulation-count)]
         (testing "validate cluster assignments/categorical distribution"
-          (let [samples-a (utils/column-subset samples ["a"])
+          (let [samples-a          (utils/column-subset samples ["a"])
                 cluster-p-fraction (utils/probability-for-categories samples-a (map str (range 6)))
-                true-p-category (true-categorical-p point-cluster-mapping point-id)]
+                true-p-category    (true-categorical-p point-cluster-mapping point-id)]
             (is (almost-equal-maps? true-p-category cluster-p-fraction))))))))
 
 (deftest logpdf-numerical-given-categorical
@@ -283,10 +287,7 @@
                                                 (dist/score-gaussian (get point variable) [mu sigma]))))
                                        +
                                        numerical-variables)
-          queried-logpdf (bq/logpdf row-generator
-                                    point
-                                    {"a" (str cluster)})]
-
+          queried-logpdf (gpm/logpdf gpm-mmix point {"a" (str cluster)})]
       (is (almost-equal-p? analytical-logpdf queried-logpdf)))))
 
 ;; XXX -- not sure what to do with the next two tests. I have added to gain
@@ -294,6 +295,7 @@
 ;; There more complicated machinery for the larger mmix model did not do that
 ;; for me. I don't know where those tests should go.
 ;; They are not documented in the README
+
 (deftest logpdf-categoricals-given-point-one-component-model
   ;; Tests a 3 dimensional, single component model.
   (let [mmix-simple {:vars {"x" :gaussian
@@ -302,10 +304,12 @@
                      :views [[{:probability 1.
                                :parameters {"x" {:mu 3 :sigma 1}
                                             "a" {"0" 1.0 "1" 0.0}
-                                            "b" {"0" 0.95, "1" 0.05}}}]]}
-        simple-row-gen (search/optimized-row-generator mmix-simple)]
-    (is (= 0.95 (Math/exp (bq/logpdf simple-row-gen {"b" "0"} {"x" 3.}))))))
-(logpdf-categoricals-given-point-one-component-model)
+                                            "b" {"0" 0.95, "1" 0.05}}}]]}]
+    (is (= 0.95  (Math/exp (gpm/logpdf
+                            (gpm/Multimixture mmix-simple)
+                            {"b" "0"}
+                            {"x" 3.}))))))
+
 ;;; XXX -- same as above.
 (deftest logpdf-categoricals-given-point-two-component-mix
   ;; Tests a 3 dimensional, two component model.
@@ -319,9 +323,12 @@
                               {:probability 0.05
                                :parameters {"x" {:mu 3 :sigma 1}
                                             "a" {"0" 1.0 "1" 0.0}
-                                            "b" {"0" 0.0 "1" 1.0 }}}]]}
-        simple-row-gen (search/optimized-row-generator mmix-simple)]
-    (is (almost-equal-p? 0.95 (Math/exp (bq/logpdf simple-row-gen {"b" "0"} {"x" 3.}))))))
+                                            "b" {"0" 0.0 "1" 1.0 }}}]]}]
+    (is (almost-equal-p? 0.95 (Math/exp (gpm/logpdf
+                                         (gpm/Multimixture mmix-simple)
+                                         {"b" "0"}
+                                         {"x" 3.}
+                                         ))))))
 
 ;; Define categories that are possible for "a" and "b". Relies on the assumption
 ;; that "a" and "b" have the same categories.
@@ -335,11 +342,14 @@
   (doseq [[point-id cluster-set] points-unique-cluster-mapping]
     (doseq [category categories]
       (testing (str "Point " point-id " Observing b=" category)
-        (let [point (stringify-keys (test-point point-id))
-              cluster (first cluster-set)
+        (let [point          (stringify-keys (test-point point-id))
+              cluster        (first cluster-set)
               analytical-pdf (get
-                              (get (:parameters (nth (first (:views multi-mixture )) cluster)) "b") category)
-              queried-pdf   (Math/exp (bq/logpdf row-generator {"b" category} point))]
+                               (get (:parameters (nth (first (:views multi-mixture )) cluster)) "b") category)
+              queried-pdf    (Math/exp (gpm/logpdf
+                                        gpm-mmix
+                                        {"b" category}
+                                        point))]
           (is (almost-equal-p? analytical-pdf queried-pdf)))))))
 
 
@@ -354,5 +364,8 @@
                                ;; to have generated this observation.
                                0   ;; No component is likely to have generated this observation
                                )
-              queried-pdf   (Math/exp (bq/logpdf row-generator {"a" category} point))]
+              queried-pdf   (Math/exp (gpm/logpdf
+                                       gpm-mmix
+                                       {"a" category}
+                                       point))]
           (is (almost-equal-p? analytical-pdf queried-pdf)))))))

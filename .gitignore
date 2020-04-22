@@ -13,6 +13,7 @@
 /spreadsheets/out/
 /spreadsheets/figwheel-target
 /spreadsheets/resources/handsontable.full.css
+/spreadsheets/resources/model.edn
 /spreadsheets/src/inferdb/spreadsheets/pfcas.cljc
 
 */out/*

@@ -3,7 +3,7 @@
             [inferenceql.multimixture.search :as search]
             [inferenceql.multimixture :as mmix]
             [metaprob.prelude :as mp]
-            [inferenceql.multimixture.basic-queries :as bq]
+            [inferenceql.multimixture.gpm :as gpm]
             [medley.core :as medley]
             [clojure.set :as set]
             [clojure.spec.alpha :as s]))
@@ -47,17 +47,16 @@
 
 (defn score-row-uncond
   "Scores the likelihood of `row`."
-  [row-generator row]
+  [multi-mixture row]
   (let [target (util/filter-nil-kvs row)
         constraints {}]
-    (Math/exp (bq/logpdf row-generator target constraints))))
+    (Math/exp (gpm/logpdf (gpm/Multimixture multi-mixture) target constraints))))
 
 (s/fdef row-likelihoods :ret ::row-likelihoods)
 (defn row-likelihoods
   "Returns a sequence of normalized likelihoods for `rows`"
   [spec rows]
-  (let [row-gen (search/optimized-row-generator spec)
-        likelihoods (map #(score-row-uncond row-gen %) rows)
+  (let [likelihoods (map #(score-row-uncond spec %) rows)
         distinct-vals-present (> (count (distinct likelihoods)) 1)]
     (if distinct-vals-present
       (min-max-normalize likelihoods)
@@ -70,21 +69,20 @@
 (defn score-cells-in-row
   "Scores the likelihood of each cell in `row`.
    It does this conditional on the other cells `row`."
-  [row-generator row]
+  [multi-mixture row]
   (let [clean-row (util/filter-nil-kvs row)
         cell-pairs (seq clean-row)
         likelihood-pairs (for [[k v] cell-pairs]
                            (let [target (assoc {} k v)
                                  constraints (dissoc clean-row k)]
-                             [k (Math/exp (bq/logpdf row-generator target constraints))]))]
+                             [k (Math/exp (gpm/logpdf (gpm/Multimixture multi-mixture) target constraints))]))]
     (into {} likelihood-pairs)))
 
 (defn cell-likelihoods
   "Returns the likelihood of all the cells in `rows`"
   [spec rows]
-  (let [row-gen (search/optimized-row-generator spec)]
-    ;; TODO normalize scores before returning.
-    (map #(score-cells-in-row row-gen %) rows)))
+  ;; TODO normalize scores before returning.
+  (map #(score-cells-in-row spec %) rows))
 
 ;;; These functions are for imputing data in empty cells and
 ;;; also returning a score for the imputed values.

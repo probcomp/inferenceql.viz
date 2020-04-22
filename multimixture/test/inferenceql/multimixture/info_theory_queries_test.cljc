@@ -3,9 +3,8 @@
             [inferenceql.utils :as utils]
             #?(:clj [inferenceql.plotting.generate-vljson :as plot])
             [inferenceql.multimixture.specification :as spec]
-            [inferenceql.multimixture.info-theory-queries :as itq]
             [inferenceql.multimixture.search :as search]
-            [inferenceql.multimixture.basic-queries :as bq]))
+            [inferenceql.multimixture.gpm :as gpm]))
 
 (def multi-mixture
   {:vars {"x" :gaussian
@@ -39,11 +38,24 @@
 (deftest test-smoke-row-generator
  (is (map? (row-generator))))
 
+;; Define the MMix GPM.
+(def gpm-mmix (gpm/Multimixture multi-mixture))
+
 (deftest test-smoke-mi
- (is (utils/pos-float? (itq/mutual-information row-generator ["x"] ["y"] {} 2))))
+ (is (utils/pos-float? (gpm/mutual-information
+                        gpm-mmix 
+                        ["x"]
+                        ["y"]
+                        {}
+                        2))))
 
 (deftest test-smoke-cmi
- (is (float? (itq/mutual-information row-generator ["x"] ["y"] {"a" "0"} 2))))
+ (is (float? (gpm/mutual-information
+              gpm-mmix 
+              ["x"]
+              ["y"]
+              {"a" "0"}
+              2))))
 
 (def sampled-points-for-plot 1000)
 
@@ -51,8 +63,9 @@
           "This tests saves plots for all simulated data in out/json results/"
           ;; Charts can be generated with make charts.
          (testing "(smoke) simulate n complete rows and save them as vl-json"
-           (let [samples (bq/simulate
-                          row-generator
+           (let [samples (gpm/simulate
+                          gpm-mmix
+                          {}
                           {}
                           sampled-points-for-plot)]
              (utils/save-json "simulations-for-mi-x-y"
@@ -70,20 +83,39 @@
                                                       "View 2: V W"))
              (is (= sampled-points-for-plot (count samples)))))))
 
-
 (def num-samples 100)
 (def threshold 0.01)
 
 (defn- almost-equal? [a b] (utils/almost-equal? a b utils/relerr threshold))
 
 (deftest positive-mi
- (is (< 0.5 (itq/mutual-information row-generator ["x"] ["y"] {} num-samples))))
+ (is (< 0.5 (gpm/mutual-information
+             gpm-mmix 
+             ["x"]
+             ["y"]
+             {}
+             num-samples))))
 
 (deftest zero-mi
- (is (almost-equal? 0. (itq/mutual-information row-generator ["v"] ["w"] {} num-samples))))
+  (is (almost-equal? 0. (gpm/mutual-information
+                         gpm-mmix
+                         ["v"]
+                         ["w"]
+                         {}
+                         num-samples))))
 
 (deftest zero-cmi
- (is (almost-equal? 0. (itq/mutual-information row-generator ["x"] ["y"] {"a" "0"} num-samples))))
+ (is (almost-equal? 0. (gpm/mutual-information
+                        gpm-mmix
+                        ["x"]
+                        ["y"]
+                        {"a" "0"}
+                        num-samples))))
 
 (deftest zero-cmi-marginal
- (is (almost-equal? 0. (itq/mutual-information row-generator ["x"] ["y"] ["a"] num-samples))))
+ (is (almost-equal? 0. (gpm/mutual-information
+                        gpm-mmix
+                        ["x"]
+                        ["y"]
+                        ["a"]
+                        num-samples))))

@@ -5,7 +5,6 @@
 (require '[clojure.pprint :as pprint])
 (require '[inferenceql.spreadsheets.csv :as csv-utils])
 (require '[inferenceql.multimixture.search :as search])
-(require '[inferenceql.multimixture.basic-queries :as bq])
 (require '[inferenceql.utils :as utils])
 (require '[metaprob.distributions :as mpdist])
 (require '[medley.core :as medley])
