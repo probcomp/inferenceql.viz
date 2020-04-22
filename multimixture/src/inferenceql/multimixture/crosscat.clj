@@ -104,7 +104,7 @@
   (let [parameters-to-sample (->> (:parameters category)
                                   (filter (fn [[k params]]
                                             (and (not (contains? constraints k))
-                                                 (contains? targets k))))
+                                                 (some #(= % k) targets))))
                                   (into {}))]
     (->> parameters-to-sample
          (map (fn [[col-name col-params]]
@@ -176,7 +176,7 @@
 (defn simulate
   "Given a model, latents, and possible constraints, simulates
   unconstrained values from the model."
- [model latents & {:keys [:targets :constraints] :or {constraints {}}}]
+ [model latents targets constraints]
    (let [views (:views model)
          types (:types model)]
      (->> views
@@ -184,63 +184,3 @@
                          (let [view-latents     (get-in latents [:local view-idx])]
                            (simulate-view view view-latents types targets constraints))))
           (into {}))))
-
-
-
-;; OLD STUFF TO BE DELETED/REPURPOSED
-
-; (defn category-assignment-simulate
-;   "Simulates a category assignment given a view's concentration parameter
-;   and category-row counts."
-;   [alpha counts]
-;   (let [crp-probs (crp-alpha-counts alpha counts)]
-;     (prim/categorical-simulate crp-probs)))
-
-; (defn category-simulate
-;   "Given a category and statistical types, simulates a value from that category."
-;   [types category]
-;   (let [parameters (:parameters category)]
-;     (into {}
-;           (pmap (fn [[col-name col-params]]
-;                   (let [col-type (col-name types)]
-;                     {col-name (prim/simulate col-type col-params)}))
-;                 parameters))))
-
-; (defn generate-category
-;   "Given a view and statistical types, simulates a category specification
-;   from that view."
-;   ([view types]
-;    (let [hypers     (:hypers view)
-;          view-types (select-keys types (keys hypers)) ]
-;      (->> hypers
-;           (map (fn [[col-name hyperpriors]]
-;                   {col-name (into {} (map (fn [[hyper-name hyper-dist]]
-;                                             (if (= :categorical (get view-types col-name))
-;                                              {hyper-name (zipmap (categorical-param-names view col-name)
-;                                                                  (hyperprior-simulate hyper-dist))}
-;                                              {hyper-name (hyperprior-simulate hyper-dist)}))
-;                                          hyperpriors))}))
-;           (into {})
-;           (assoc {} :parameters))))
-;   ([n view types]
-;    (repeatedly n #(generate-category view types))))
-
-; (defn view-simulate
-;   "Given latents and a view, simulates a sample from that view."
-;   [types latents view]
-;   (let [alpha         (:alpha latents)
-;         counts        (:counts latents)
-;         n-categories  (count counts)
-;         y             (category-assignment-simulate alpha counts)]
-;     (if (= y n-categories)
-;       (category-simulate types (generate-category  view types))
-;       (category-simulate types (get-in view [:categories y])))))
-
-; (defn simulate
-;   "Given a CrossCat model and latent variables, simulates a sample from
-;   that model."
-;   [model latents]
-;   (let [column-types (:types model)
-;         views        (:views model)
-;         view-latents (map vector views (:local latents))]
-;     (into {} (pmap (fn [[view latent]] (view-simulate column-types latent view)) view-latents))))
