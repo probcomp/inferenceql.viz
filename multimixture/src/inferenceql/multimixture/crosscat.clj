@@ -2,10 +2,6 @@
   (:require [inferenceql.multimixture.primitives :as prim]
             [inferenceql.multimixture.utils      :as mmix-utils]))
 
-;; "LogPDF score" is used for data that hasn't been incorporated into
-;; the CrossCat model, and so has no latent assignment. I'm uncertain
-;; about the usefulness of these particular functions, so I'm keeping
-;; them and their tests around for now.
 (defn category-logpdf-score
   "Calculates the log probability of data under a given category.
   Assumes `x` contains only columns in that category."
@@ -19,28 +15,40 @@
 (defn view-logpdf-score
   "Calculates the log probability of data under a given view.
   Assumes `x` contains only columns in that view."
-  [x types latents view]
+  [targets constraints types latents view]
   (let [crp-counts      (:counts latents)
         n               (apply + crp-counts)
         crp-counts-norm (map #(Math/log (/ % n)) crp-counts)
-        categories      (:categories view)]
-    (->> categories
-         (map #(category-logpdf-score x types %))
-         (map (comp #(apply + %) vector) crp-counts-norm)
-         mmix-utils/logsumexp)))
+        categories      (:categories view)
+        ll              (map #(category-logpdf-score targets types %) categories)
+        weights         (if (empty? constraints)
+                          crp-counts-norm
+                          (let [unnorm (map #(category-logpdf-score constraints types %) categories)
+                                Z      (mmix-utils/logsumexp unnorm)]
+                            (map #(- % Z) unnorm)))]
+   (mmix-utils/logsumexp
+     (map (comp #(apply + %) vector)
+          ll weights))))
+
+(defn filter-columns
+  "Given view assignments, filters `columns` to contain only relevant views."
+  [view-idx view-assignments columns]
+  (into {} (filter #(= view-idx
+                       (get view-assignments (first %)))
+                   columns)))
 
 (defn logpdf-score
   "Calculates the log probability of data under a given CrossCat model."
-  [x model latents]
+  [model latents targets constraints]
   (let [types            (:types model)
         view-assignments (get-in latents [:global :z])
         views            (:views model)]
     (->> views
          (map-indexed (fn [view-idx view]
-                        (let [x-view (into {} (filter #(= view-idx
-                                                          (get view-assignments (first %)))
-                                                      x))]
-                          (view-logpdf-score x-view types (get-in latents [:local view-idx]) view))))
+                        (let [x-view           (filter-columns view-idx view-assignments targets)
+                              constraints-view (filter-columns view-idx view-assignments constraints)
+                              latents-view     (get-in latents [:local view-idx])]
+                          (view-logpdf-score x-view constraints-view types latents-view view))))
          (reduce +))))
 
 ;; "Log likelihood" is used to evaluate the current latent assignments

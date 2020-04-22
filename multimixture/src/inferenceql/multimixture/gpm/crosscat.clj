@@ -6,12 +6,14 @@
 (defrecord CrossCat
   [model latents]
   gpm-proto/GPM
-  (logpdf [this targets constraints inputs])
+  (logpdf [this targets constraints inputs]
+    (xcat/logpdf-score model latents targets constraints))
   (simulate [this targets constraints n-samples inputs]
     (repeatedly n-samples #(xcat/simulate
                             model
                             latents
-                            {:targets targets :constraints constraints})))
+                            targets
+                            constraints)))
   (mutual-information [this target-a target-b constraints n-samples]))
 (let [model   {:types {"foo" :bernoulli
                        "bar" :gaussian}
@@ -30,7 +32,9 @@
                          :counts [5 5]
                          :y [0 1 0 1 0 1 0 1 0 1]}]}
       CCat   (->CrossCat model latents)
-      targets ["foo"]
+      targets {"foo" true}
       constraints {"bar" 5}
+      ; constraints {}
       ]
-(gpm-proto/simulate CCat targets constraints 1 {}))
+; (frequencies (gpm-proto/simulate CCat targets constraints 100 {})))
+(Math/exp (gpm-proto/logpdf CCat targets constraints  {})))
