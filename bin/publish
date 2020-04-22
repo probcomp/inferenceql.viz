@@ -1,34 +1,42 @@
 #!/bin/sh
 
 usage() {
-    echo "Usage: ${0} spreadsheet-dir surge-domain"
+    echo "Usage: ${0} [surge-domain]"
+    echo "    surge-domain example: probcomp.surge.sh"
 }
 
-if [ $# -eq 0 ]; then
+## If more than 1 argument, abort and print usage.
+if [ $# -gt 1 ]; then
     usage
     exit 1
 fi
 
-# Thanks chepner for the solution that doesn't rely on `[[`
-# https://stackoverflow.com/a/20204890
-case $1 in
-  /*)
-    ;;
-  *)
-    usage
-    echo
-    echo "spreadsheet-dir must be an absolute path."
+## Get the full path to this script's location.
+## https://stackoverflow.com/questions/59895/
+readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+readonly IQL_DIR="$(dirname "$SCRIPT_DIR")"
+readonly PUB_DIR="$IQL_DIR/spreadsheets/.publish"
+readonly AUTH_FILE="$PUB_DIR/AUTH"
+
+## Abort if publish directory is not present.
+if [[ ! -d "$PUB_DIR" ]] ; then
+    echo "spreadsheets/.publish directory does not exist. Script can not publish."
     exit 1
-    ;;
-esac
+fi
 
-readonly DIR="$1/.publish"
+## Abort if AUTH file not present.
+if [[ ! -f "$AUTH_FILE" ]] ; then
+    echo "No AUTH file present in .publish directory. An AUTH file is required to use this script."
+    exit 1
+fi
 
-rm -rf "$DIR"
-mkdir "$DIR"
-echo "!node_modules" > "$DIR/.surgeignore"
-cp "$1/index.html" "$DIR"
-cp -r "$1/out" "$DIR"
-cp -r "$1/resources" "$DIR"
-cd "$DIR" ; surge --domain $2
-rm -rf "$DIR"
+## If a surge-domain was passed in, run `surge` with that domain.
+## Otherwise simply run `surge` which will use the CNAME file in the publish dir if present
+## or surge will generate a domain to use.
+if [[ ! -z "$1" ]]
+then
+    cd "$PUB_DIR" && surge $PUB_DIR $1
+else
+    cd "$PUB_DIR" && surge
+fi

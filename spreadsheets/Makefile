@@ -10,6 +10,12 @@ output-to	 := $(output-dir)/main.js
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/handsontable.full.css
 
+### Definitions for publishing.
+
+publish-dir := $(current-dir)/.publish
+auth-file := $(current-dir)/AUTH
+cname-file := $(current-dir)/CNAME
+
 ### Definitions for Figwheel.
 
 figwheel-build-dir := $(current-dir)/figwheel-target
@@ -32,6 +38,7 @@ watch: $(hot-css-resource)
 clean:
 	rm -Rf $(output-dir)
 	rm -Rf $(figwheel-build-dir)
+	rm -Rf $(publish-dir)
 
 ### Compilation
 
@@ -57,11 +64,26 @@ $(hot-css-resource): $(hot-css-file)
 
 ### Publishing
 
-surge-domain = inferenceql-spreadsheet.surge.sh
+.PHONY: publish-dir
+publish-dir: $(output-to) $(publish-dir)
 
+$(publish-dir):
+	mkdir -p $(publish-dir)
+ 	## Copy static index.html file.
+	cp $(current-dir)/index.html $(publish-dir)
+	## Copy static resource files.
+	cp -r $(resource-dir) $(publish-dir)
+	## Copy compiled js files.
+	cp -r $(output-dir) $(publish-dir)
+	## Copy AUTH file if it exists.
+	-[ -f $(auth-file) ] && cp $(auth-file) $(publish-dir)
+	## Copy CNAME file if it exists.
+	-[ -f $(cname-file) ] && cp $(cname-file) $(publish-dir)
+
+## This target can be called like `make publish DOMAIN=probcomp.surge.sh`
 .PHONY: publish
-publish: $(output-to)
-	cd ..; bin/publish $(current-dir) $(surge-domain)
+publish: publish-dir
+	cd ..; bin/publish $(DOMAIN)
 
 ### Compilation with Figwheel
 
