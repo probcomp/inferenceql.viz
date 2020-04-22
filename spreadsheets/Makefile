@@ -76,13 +76,9 @@ $(publish-dir):
 	## Copy compiled js files.
 	cp -r $(output-dir) $(publish-dir)
 	## Copy AUTH file if it exists.
-	## TODO: Is there a better way to continue on error here that "-"
 	-[ -f $(auth-file) ] && cp $(auth-file) $(publish-dir)
 	## Copy CNAME file if it exists.
 	-[ -f $(cname-file) ] && cp $(cname-file) $(publish-dir)
-	## Ignore node-modules dir in surge publish.
-	## TODO should this be out/node_modules?
-	echo "!node_modules" > $(publish-dir)/.surgeignore
 
 ## This target can be called like `make publish DOMAIN=probcomp.surge.sh`
 .PHONY: publish
