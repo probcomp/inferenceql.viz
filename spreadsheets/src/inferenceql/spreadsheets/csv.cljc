@@ -3,11 +3,11 @@
   (:require [clojure.string :as str]
             [medley.core :as medley]))
 
-(defn- float-string?
-  "Returns true if `s` is a string containing only a number with a decimal, false
-  otherwise."
+(defn- numerical-string?
+  "Returns true if `s` is a string containing a number, false otherwise."
   [s]
-  (some? (re-matches #"^\d+\.\d+$" s)))
+  (when s
+    (some? (re-matches #"^\d+(\.\d+)?$" s))))
 
 (defn parse-float
   "Returns `s` as a float if it can be parsed, otherwise `nil`."
@@ -23,7 +23,7 @@
   "Casts vals in a map `row` based on their type as defined by `column-types`."
   (medley/map-kv (fn [k v]
                    (let [type (get column-types k)]
-                     (if (and (= type :gaussian) (float-string? v))
+                     (if (and (= type :gaussian) (numerical-string? v))
                        [k (parse-float v)]
                        [k v])))
                  row))
