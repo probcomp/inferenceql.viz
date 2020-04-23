@@ -107,7 +107,7 @@
   "Log PDF for categorical distribution."
   [x {:keys [:p]}]
   (let [prob (get p x)]
-    (if-not prob
+    (if (or (zero? prob) (nil? prob))
       ##-Inf
       (Math/log prob))))
 
