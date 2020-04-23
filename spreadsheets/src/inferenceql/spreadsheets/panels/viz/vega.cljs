@@ -263,12 +263,13 @@
   (let [zoom-control-name (keyword (gensym "zoom-control")) ; Random id so pan/zoom is independent.
         [x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
+        quant-dimension (if (= x-type "quantitative") :x :y)
         [width height] (map strip-plot-size-helper cols-to-draw)]
     {:width width
      :height height
      :data {:values data}
      :mark {:type "tick"}
-     :selection {zoom-control-name {:type "interval" :bind "scales"}}
+     :selection {zoom-control-name {:type "interval" :bind "scales" :encodings [quant-dimension]}}
      :encoding {:x {:field x-field
                     :type x-type
                     :axis {:grid true :gridDash [2 2]}}
