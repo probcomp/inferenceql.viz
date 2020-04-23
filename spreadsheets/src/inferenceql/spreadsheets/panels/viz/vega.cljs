@@ -173,7 +173,10 @@
                             ;; in `cleaned-selections`.
                             {:filter (gstring/format "datum['%s']" map-names-col)}]
                 :projection {:type (get topojson-config :projection-type)}
-                :mark "geoshape"
+                :mark {:type "geoshape"
+                       :color "#eee"
+                       :stroke "#757575"
+                       :strokeWidth "0.5"}
                 :encoding {:tooltip [{:field map-names-col
                                       :type "nominal"}]}}
 
