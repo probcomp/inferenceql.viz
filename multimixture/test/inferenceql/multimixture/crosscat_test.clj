@@ -462,7 +462,6 @@
 
         ll   (+ ll-1 ll-2)
         ll'  (xcat/log-likelihood data model latents)]
-
     ;; Checking test arguments.
     (is (spec/valid-xcat?    model))
     (is (spec/valid-latents? latents))
@@ -470,8 +469,87 @@
     ;; Testing output.
     (is (== ll ll'))))
 
-;; crp-weights
-;; simulate-category
+(deftest crp-weights
+  "Tests `crp-weights` by manually checking expected output for single counts
+  (one category or column) and multiple counts (several categories or columns)."
+  (let [alpha         0.1
+        counts-single [10]
+        counts-many   [5 5 5 5 5 5 5 5 5 5]
+        output-single [(Math/log (/ 10 (+ 10 alpha))) (Math/log (/ alpha (+ 10 alpha)))]
+        output-many   (map #(Math/log %) (concat (repeat (count counts-many)
+                                                              (/ 5 (+ 50 alpha)))
+                                                      [(/ alpha (+ 50 alpha))]))
+
+        weights-single (xcat/crp-weights alpha counts-single)
+        weights-many   (xcat/crp-weights alpha counts-many)]
+
+    ;; Testing output.
+    (is (= output-single weights-single))
+    (is (= output-many   weights-many))))
+
+(deftest simulate-category
+(let [types    {"happy?" :bernoulli
+                "height" :gaussian
+                "color"  :categorical}
+
+      category {:parameters {"happy?" {:p 0.9}
+                             "height" {:mu 6 :sigma 0.01}
+                             "color"  {:p {"red" 0.5 "blue" 0.3 "green" 0.2}}}}
+
+      targets-no-constraints ["happy?" "height" "color"]
+      targets-constraints    ["happy?" "height"]
+      constraints            ["color"]
+
+      n                     10000
+      error                 0.005
+
+      samples-unconstrained (repeatedly n #(xcat/simulate-category
+                                            category
+                                            types
+                                            targets-no-constraints
+                                            {}))
+
+      samples-constrained   (repeatedly n #(xcat/simulate-category
+                                            category
+                                            types
+                                            targets-constraints
+                                            constraints))
+      stats-fn              (fn [samples]
+                              (reduce (fn [m col]
+                                        (let [values (map #(get % col) samples)
+                                              stat  (if (= (get types col) :gaussian)
+                                                      (/ (reduce + values) n)
+                                                      (frequencies values))]
+                                          (assoc m col stat)))
+                                      {}
+                                      (keys types)))
+      stats-unconstrained   (stats-fn samples-unconstrained)
+      stats-constrained     (stats-fn samples-constrained)]
+    ;; Checking test arguments.
+    (is (spec/valid-category? category))
+
+    ;; Testing unconstrained output.
+    ;; Bernoulli.
+    (is (< (Math/abs (- (get-in category [:parameters "happy?" :p])
+                        (/ (get-in stats-unconstrained ["happy?" true])
+                           n)))
+           error))
+
+    ;; Categorical. Only need to check two, since the third is implied.
+    (is (< (Math/abs (- (get-in category [:parameters "color" :p "red"])
+                        (/ (get-in stats-unconstrained ["color" "red"])
+                           n)))
+           error))
+    (is (< (Math/abs (- (get-in category [:parameters "color" :p "green"])
+                        (/ (get-in stats-unconstrained ["color" "green"])
+                           n)))
+           error))
+
+    ;; Gaussian.
+    (is (< (Math/abs (- (get-in category [:parameters "height" :mu])
+                        (get stats-unconstrained "height")))
+           error))))
+
 ;; hyperprior-simulate
 ;; categorical-param-names
 ;; generate-category
