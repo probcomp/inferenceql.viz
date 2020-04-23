@@ -45,10 +45,10 @@
         views            (:views model)]
     (->> views
          (map-indexed (fn [view-idx view]
-                        (let [x-view           (filter-columns view-idx view-assignments targets)
+                        (let [targets-view     (filter-columns view-idx view-assignments targets)
                               constraints-view (filter-columns view-idx view-assignments constraints)
                               latents-view     (get-in latents [:local view-idx])]
-                          (view-logpdf-score x-view constraints-view types latents-view view))))
+                          (view-logpdf-score targets-view constraints-view types latents-view view))))
          (reduce +))))
 
 ;; "Log likelihood" is used to evaluate the current latent assignments
