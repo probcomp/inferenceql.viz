@@ -75,9 +75,7 @@ div {
 #color-selector {
   flex-shrink: 0;
   width: 105px;
-  margin-top: 5px;
   font-size: .875rem;
-  margin-right: 25px;
   line-height: 16px;
 }
 
