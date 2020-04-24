@@ -12,7 +12,6 @@
 ;; These are defs related to choropleth related columns in the dataset.
 ;; See spreadsheets/resources/config.edn for more info.
 (def ^:private fips-col (get-in config/config [:topojson :table-fips-col]))
-(def ^:private map-names-col (get-in config/config [:topojson :table-map-names-col]))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -147,6 +146,14 @@
                                       ;; Add padding to fips codes.
                                       (mapv #(medley/update-existing % fips-col pad-fips)))
 
+
+          row-attr "row"
+          ;; We will join geo features on this collection of maps which have whole
+          ;; rows as one their attributes and a geo-id as an other.
+          selections-keyed (for [cs cleaned-selections]
+                             {fips-col (get cs fips-col)
+                              row-attr cs})
+
           type :geojson
           data-format (case type
                             :geojson {:property "features"}
@@ -159,21 +166,23 @@
                 :data {:values (get topojson-config :data)
                        :format data-format}
                 :transform [{:lookup (get topojson-config :prop)
-                             :from {:data {:values cleaned-selections}
+                             :from {:data {:values selections-keyed}
                                     :key fips-col
-                                    :fields [map-names-col]}}
+                                    :fields [row-attr]}}
                             ;; We filter entities in the topojson that did not join on a row
                             ;; in `cleaned-selections`.
-                            {:filter (gstring/format "datum['%s']" map-names-col)}]
+                            {:filter (gstring/format "datum['%s']" row-attr)}]
                 :projection {:type (get topojson-config :projection-type)}
                 :mark {:type "geoshape"
                        :color "#eee"
                        :stroke "#757575"
                        :strokeWidth "0.5"}
-                :encoding {:tooltip [{:field map-names-col
-                                      :type "nominal"}]}}
+                :encoding {:tooltip {:field row-attr
+                                     ;; This field is actually an object, but specifying type
+                                     ;; nominal here to remove vega-tooltip warning message.
+                                     :type "nominal"}}}
 
-          color-spec {:field map-column
+          color-spec {:field (str row-attr "." map-column)
                       :type (vega-type map-column)
                       :scale {:type "quantize"
                               :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}}]
@@ -181,10 +190,7 @@
       ;; color the choropleth according to the values in that column, `map-column`.
       (if-not map-column
         spec
-        (-> spec
-            (assoc-in [:encoding :color] color-spec)
-            (update-in [:encoding :tooltip] conj color-spec)
-            (update-in [:transform 0 :from :fields] conj map-column))))))
+        (assoc-in spec [:encoding :color] color-spec)))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.

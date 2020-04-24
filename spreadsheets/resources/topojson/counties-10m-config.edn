@@ -25,9 +25,6 @@
             ;; This is the name of the column in your dataset that is joined against
             ;; :prop in the topojson file.
             :table-fips-col "geo_fips"
-            ;; This is the name of the column in your dataset that is used to label each
-            ;; portion of the choropleth. e.g. state names or county names, etc.
-            :table-map-names-col "county"
 
             ;; This is the length of the fips codes in the topojson pointed to by
             ;; :prop. If items in the table fips column are not the
