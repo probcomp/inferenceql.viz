@@ -11,7 +11,7 @@
 
 ;; These are defs related to choropleth related columns in the dataset.
 ;; See spreadsheets/resources/config.edn for more info.
-(def ^:private fips-col (get-in config/config [:topojson :table-fips-col]))
+(def ^:private geo-id-col (get-in config/config [:topojson :table-geo-id-col]))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -63,7 +63,7 @@
   (cond (contains? #{hot/score-col-header} col-name)
         "quantitative"
 
-        (contains? #{hot/label-col-header fips-col} col-name)
+        (contains? #{hot/label-col-header geo-id-col} col-name)
         "nominal"
 
         :else
@@ -133,26 +133,25 @@
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
   (when-let [topojson-config (get config/config :topojson)]
-    (let [map-column (first (filter #(not= fips-col %) ; The other column selected, if any.
-                                    selected-columns))
+    (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
+                                      selected-columns))
 
           pad-fips (fn [v] (left-pad v (get topojson-config :fips-code-length) \0))
-          cleaned-selections (cond->> selections
-                                      (= map-column "probability")
-                                      ;; Remove rows with probability values of 1.
-                                      (remove #(= (get % "probability") 1.0))
+          rows-cleaned (cond->> selections
+                                (= color-by-col "probability")
+                                ;; Remove rows with probability values of 1.
+                                (remove #(= (get % "probability") 1.0))
 
-                                      (some? (get topojson-config :fips-code-length))
-                                      ;; Add padding to fips codes.
-                                      (mapv #(medley/update-existing % fips-col pad-fips)))
-
+                                (some? (get topojson-config :fips-code-length))
+                                ;; Add padding to fips codes.
+                                (mapv #(medley/update-existing % geo-id-col pad-fips)))
 
           row-attr "row"
           ;; We will join geo features on this collection of maps which have whole
           ;; rows as one their attributes and a geo-id as an other.
-          selections-keyed (for [cs cleaned-selections]
-                             {fips-col (get cs fips-col)
-                              row-attr cs})
+          rows-keyed (for [r rows-cleaned]
+                       {geo-id-col (get r geo-id-col)
+                        row-attr r})
 
           type :geojson
           data-format (case type
@@ -166,8 +165,8 @@
                 :data {:values (get topojson-config :data)
                        :format data-format}
                 :transform [{:lookup (get topojson-config :prop)
-                             :from {:data {:values selections-keyed}
-                                    :key fips-col
+                             :from {:data {:values rows-keyed}
+                                    :key geo-id-col
                                     :fields [row-attr]}}
                             ;; We filter entities in the topojson that did not join on a row
                             ;; in `cleaned-selections`.
@@ -182,13 +181,13 @@
                                      ;; nominal here to remove vega-tooltip warning message.
                                      :type "nominal"}}}
 
-          color-spec {:field (str row-attr "." map-column)
-                      :type (vega-type map-column)
+          color-spec {:field (str row-attr "." color-by-col)
+                      :type (vega-type color-by-col)
                       :scale {:type "quantize"
                               :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}}]
-      ;; If we have another column selected besides `fips-col`,
-      ;; color the choropleth according to the values in that column, `map-column`.
-      (if-not map-column
+      ;; If we have another column selected besides `geo-id-col`,
+      ;; color the choropleth according to the values in that column, `color-by-col`.
+      (if-not color-by-col
         spec
         (assoc-in spec [:encoding :color] color-spec)))))
 
@@ -298,7 +297,7 @@
          row :row-at-selection-start} selection-layer]
     ;; Only produce a spec when we can find a vega-type for all selected columns.
     (when (every? some? (map vega-type cols))
-      (let [spec (cond (some #{fips-col} cols) ; Fips column selected.
+      (let [spec (cond (some #{geo-id-col} cols) ; Fips column selected.
                        (gen-choropleth selections cols)
 
                        (simulatable? selections cols)
