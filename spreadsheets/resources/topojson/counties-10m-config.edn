@@ -24,7 +24,7 @@
 
             ;; This is the name of the column in your dataset that is joined against
             ;; :prop in the topojson file.
-            :table-fips-col "geo_fips"
+            :table-geo-id-col "geo_fips"
 
             ;; This is the length of the fips codes in the topojson pointed to by
             ;; :prop. If items in the table fips column are not the
