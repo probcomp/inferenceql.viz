@@ -11,15 +11,14 @@
 
 ;; These are defs related to choropleth related columns in the dataset.
 ;; See spreadsheets/resources/config.edn for more info.
-(def ^:private fips-col (get-in config/config [:topojson :table-fips-col]))
-(def ^:private map-names-col (get-in config/config [:topojson :table-map-names-col]))
+(def ^:private geo-id-col (get-in config/config [:geo :table-geo-id-col]))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
-  500)
+  700)
 (def vega-map-height
   "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
-  300)
+  700)
 
 (def vega-strip-plot-quant-size
   "Size of the strip plot for the quantitative dimension"
@@ -64,7 +63,7 @@
   (cond (contains? #{hot/score-col-header} col-name)
         "quantitative"
 
-        (contains? #{hot/label-col-header fips-col} col-name)
+        (contains? #{hot/label-col-header geo-id-col} col-name)
         "nominal"
 
         :else
@@ -133,51 +132,61 @@
 
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
-  (when-let [topojson-config (get config/config :topojson)]
-    (let [map-column (first (filter #(not= fips-col %) ; The other column selected, if any.
-                                    selected-columns))
+  (when-let [geo-config (get config/config :geo)]
+    (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
+                                      selected-columns))
 
-          pad-fips (fn [v] (left-pad v (get topojson-config :fips-code-length) \0))
-          cleaned-selections (cond->> selections
-                                      (= map-column "probability")
-                                      ;; Remove rows with probability values of 1.
-                                      (remove #(= (get % "probability") 1.0))
+          pad-fips (fn [v] (left-pad v (get geo-config :fips-code-length) \0))
+          rows-cleaned (cond->> selections
+                                (= color-by-col "probability")
+                                ;; Remove rows with probability values of 1.
+                                (remove #(= (get % "probability") 1.0))
 
-                                      (some? (get topojson-config :fips-code-length))
-                                      ;; Add padding to fips codes.
-                                      (mapv #(medley/update-existing % fips-col pad-fips)))
+                                (some? (get geo-config :fips-code-length))
+                                ;; Add padding to fips codes.
+                                (mapv #(medley/update-existing % geo-id-col pad-fips))
+
+                                true
+                                ;; This is a hack for getting tooltips to work with multiple plots.
+                                (mapv #(assoc % :geometry "[...]")))
+
+          data-format (case (get geo-config :filetype)
+                            :geojson {:property "features"}
+                            :topojson {:type "topojson"
+                                       :feature (get geo-config :feature)})
 
           spec {:$schema default-vega-lite-schema
                 :width vega-map-width
                 :height vega-map-height
-                :data {:values (get topojson-config :data)
-                       :format {:type "topojson"
-                                :feature (get topojson-config :feature)}}
-                :transform [{:lookup (get topojson-config :prop)
-                             :from {:data {:values cleaned-selections}
-                                    :key fips-col
-                                    :fields [map-names-col]}}
+                :data {:values (get geo-config :data)
+                       :format data-format}
+                :transform [{:lookup (get geo-config :prop)
+                             :from {:data {:values rows-cleaned}
+                                    :key geo-id-col}
+                             :as "row"}
                             ;; We filter entities in the topojson that did not join on a row
-                            ;; in `cleaned-selections`.
-                            {:filter (gstring/format "datum['%s']" map-names-col)}]
-                :projection {:type (get topojson-config :projection-type)}
+                            ;; in `rows-cleaned`.
+                            {:filter "datum.row"}]
+                :projection {:type (get geo-config :projection-type)}
                 :mark {:type "geoshape"
                        :color "#eee"
                        :stroke "#757575"
                        :strokeWidth "0.5"}
-                :encoding {:tooltip [{:field map-names-col
-                                      :type "nominal"}]}}
-
-          color-spec {:field map-column
-                      :type (vega-type map-column)}]
-      ;; If we have another column selected besides `fips-col`,
-      ;; color the choropleth according to the values in that column, `map-column`.
-      (if-not map-column
+                       ;;:tooltip {:content "data"}}
+                :encoding {:tooltip {:field "row"
+                                     ;; This field is actually an object, but specifying type
+                                     ;; nominal here to remove vega-tooltip warning message.
+                                     :type "nominal"}}}]
+      ;; If we have another column selected besides `geo-id-col`,
+      ;; color the choropleth according to the values in that column, `color-by-col`.
+      (if-not color-by-col
         spec
-        (-> spec
-            (assoc-in [:encoding :color] color-spec)
-            (update-in [:encoding :tooltip] conj color-spec)
-            (update-in [:transform 0 :from :fields] conj map-column))))))
+        (assoc-in spec [:encoding :color]
+                       {:field (str "row." (name color-by-col))
+                        :type (vega-type color-by-col)
+                        :scale {:type "quantize"
+                                :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}
+                        :legend {:title color-by-col}})))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
@@ -284,7 +293,7 @@
          row :row-at-selection-start} selection-layer]
     ;; Only produce a spec when we can find a vega-type for all selected columns.
     (when (every? some? (map vega-type cols))
-      (let [spec (cond (some #{fips-col} cols) ; Fips column selected.
+      (let [spec (cond (some #{geo-id-col} cols) ; Fips column selected.
                        (gen-choropleth selections cols)
 
                        (simulatable? selections cols)
