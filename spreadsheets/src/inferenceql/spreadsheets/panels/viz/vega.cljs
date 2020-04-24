@@ -16,10 +16,10 @@
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
-  500)
+  700)
 (def vega-map-height
   "Height setting for the choropleth specs produced by the :vega-lite-spec sub"
-  300)
+  700)
 
 (def vega-strip-plot-quant-size
   "Size of the strip plot for the quantitative dimension"
@@ -147,12 +147,17 @@
                                       ;; Add padding to fips codes.
                                       (mapv #(medley/update-existing % fips-col pad-fips)))
 
+          type :geojson
+          data-format (case type
+                            :geojson {:property "features"}
+                            :topojson {:type "topojson"
+                                       :feature (get topojson-config :feature)})
+
           spec {:$schema default-vega-lite-schema
                 :width vega-map-width
                 :height vega-map-height
                 :data {:values (get topojson-config :data)
-                       :format {:type "topojson"
-                                :feature (get topojson-config :feature)}}
+                       :format data-format}
                 :transform [{:lookup (get topojson-config :prop)
                              :from {:data {:values cleaned-selections}
                                     :key fips-col
@@ -169,7 +174,9 @@
                                       :type "nominal"}]}}
 
           color-spec {:field map-column
-                      :type (vega-type map-column)}]
+                      :type (vega-type map-column)
+                      :scale {:type "quantize"
+                              :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}}]
       ;; If we have another column selected besides `fips-col`,
       ;; color the choropleth according to the values in that column, `map-column`.
       (if-not map-column
