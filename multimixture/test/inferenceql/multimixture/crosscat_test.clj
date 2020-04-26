@@ -589,3 +589,45 @@
     (is (every? #(and (spec/valid-category? %)
                       (= (set (keys types))
                          (set (keys (:parameters %))))) samples-many))))
+
+(deftest mutual-information
+  (let [model   {:types {"foo" :bernoulli
+                         "bar" :gaussian
+                         "baz" :categorical}
+                 :views [{:hypers     {"foo" {:p {:beta {:alpha 0.5 :beta 0.5}}}
+                                       "bar" {:mu {:beta {:alpha 0.5 :beta 0.5}}
+                                              :sigma {:gamma {:k 1 :theta 5}}}
+                                       "baz" {:p {:dirichlet {:alpha [1 1 1]}}}}
+                          :categories [{:parameters {"foo" {:p 0.01}
+                                                     "bar" {:mu 0 :sigma 0.1}
+                                                     "baz" {:p {"fizz" 0.8 "bang" 0.1 "boom" 0.1}}}}
+                                       {:parameters {"foo" {:p 0.99}
+                                                     "bar" {:mu 5 :sigma 0.1}
+                                                     "baz" {:p {"fizz" 0.1 "bang" 0.2 "boom" 0.7}}}}]}]}
+        latents {:global {:alpha 1
+                          :counts [2]
+                          :z  {"foo" 0
+                               "bar" 0}}
+                 :local  [{:alpha  1
+                           :counts [5 5]
+                           :y [0 1 0 1 0 1 0 1 0 1]}]}
+        target-a     "foo"
+        target-b     "bar"
+        n-samples    1000
+        constraints {"foo" true}
+
+        mi-unconstrained (xcat/mutual-information model latents target-a target-b {} n-samples)
+        mi-constrained   (xcat/mutual-information model latents target-a target-b constraints n-samples)
+
+        near-zero 1e-15]
+
+    ;; Checking test arguments.
+    (spec/valid-xcat? model)
+    (spec/valid-latents? latents)
+
+    ;; Testing output.
+    (is (< (Math/exp mi-unconstrained)
+           near-zero))
+
+    (is (< (Math/exp mi-constrained)
+           near-zero))))

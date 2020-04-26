@@ -1,6 +1,7 @@
 (ns inferenceql.multimixture.crosscat
   (:require [inferenceql.multimixture.primitives :as prim]
-            [inferenceql.multimixture.utils      :as mmix-utils]))
+            [inferenceql.utils :as utils]
+            [inferenceql.multimixture.utils :as mmix-utils]))
 
 (defn category-logpdf-score
   "Calculates the log probability of data under a given category.
@@ -192,3 +193,27 @@
                          (let [view-latents     (get-in latents [:local view-idx])]
                            (simulate-view view view-latents types targets constraints))))
           (into {}))))
+
+(defn mutual-information
+  "Given a model, latents, and constraints, calculates a Monte Carlo estimate
+  of mutual information between two targets, with the specified number of estimates."
+    [model latents target-a target-b constraints n-samples]
+    (let [joint-target    (vector target-a target-b)
+          samples         (repeatedly n-samples
+                                      #(simulate
+                                         model
+                                         latents
+                                         (vector target-a target-b)
+                                         constraints))
+          logpdf-estimate (fn [target]
+                            (utils/average (map-indexed (fn [i sample]
+                                                          (logpdf-score
+                                                           model
+                                                           latents
+                                                           (select-keys sample target)
+                                                           constraints))
+                                                        samples)))
+          logpdf-a  (logpdf-estimate target-a)
+          logpdf-b  (logpdf-estimate target-b)
+          logpdf-ab (logpdf-estimate joint-target)]
+      (- logpdf-ab (+ logpdf-a logpdf-b))))
