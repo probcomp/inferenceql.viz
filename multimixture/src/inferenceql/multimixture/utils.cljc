@@ -1,5 +1,10 @@
 (ns inferenceql.multimixture.utils)
 
+(defn average
+  "Takes the average of a coll of numbers."
+  [coll]
+  (/ (reduce + coll) (count coll)))
+
 (defn loglinspace
   "Log linear space from start to end with stepsize n over a log scale."
   [start end n]
@@ -21,9 +26,12 @@
           res           (+ a0 (Math/log
                                 (+ 1 (reduce + (map #(Math/exp (- % a0))
                                                 tail)))))]
-      (if (Double/isNaN res) ; A zero-probability event has occurred.
-        ##-Inf
-        res))))
+      #?(:clj (if (Double/isNaN res) ; A zero-probability event has occurred.
+                  ##-Inf
+                  res)
+         :cljs (if (js/isNaN res)
+                 ##-Inf
+                 res)))))
 
 (defn normalize
   "Normalizes a collection of numbers."
