@@ -501,7 +501,7 @@
       constraints            ["color"]
 
       n                     10000
-      error                 0.005
+      error                 0.05
 
       samples-unconstrained (repeatedly n #(xcat/simulate-category
                                             category
@@ -550,10 +550,42 @@
                         (get stats-unconstrained "height")))
            error))))
 
-;; hyperprior-simulate
-;; categorical-param-names
-;; generate-category
-;; view-category-weights
-;; sample-category
-;; simulate-view
-;; simulate
+(deftest categorical-param-names
+  (let [view {:hypers {"color" {:p {:dirichlet {:alpha [1 1 1]}}}}
+              :categories [{:parameters {"color" {:p {"red" 0.5 "green" 0.3 "blue" 0.2}}}}]}
+        col-name "color"
+        names    ["red" "green" "blue"]
+        output   (xcat/categorical-param-names view col-name)]
+    ;; Checking test arguments.
+    (spec/valid-view? view)
+
+    ;; Testing output.
+    (is (= (set names) (set output)))))
+
+(deftest generate-category
+  (let [types    {"happy?" :bernoulli
+                  "height" :gaussian
+                  "color"  :categorical}
+        view {:hypers {"color" {:p {:dirichlet {:alpha [1 1 1]}}}
+                       "height" {:mu {:beta {:alpha 0.5 :beta 0.5}}
+                                 :sigma {:gamma {:k 1 :theta 6}}}
+                       "happy?" {:p {:beta {:alpha 0.5 :beta 0.5}}}}
+              :categories [{:parameters {"color" {:p {"red" 0.5 "green" 0.3 "blue" 0.2}}
+                                         "height" {:mu 0 :sigma 1}
+                                         "happy?" {:p 0.9}}}]}
+
+        m-single  1
+        m-many    5
+
+        samples-single (xcat/generate-category m-single view types)
+        samples-many   (xcat/generate-category m-many   view types)]
+    ;; Checking test arguments.
+    (spec/valid-view? view)
+
+    ;; Testing output.
+    (is (every? #(and (spec/valid-category? %)
+                      (= (set (keys types))
+                         (set (keys (:parameters %))))) samples-single))
+    (is (every? #(and (spec/valid-category? %)
+                      (= (set (keys types))
+                         (set (keys (:parameters %))))) samples-many))))
