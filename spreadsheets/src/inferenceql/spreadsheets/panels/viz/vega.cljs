@@ -132,17 +132,17 @@
 
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
-  (when-let [topojson-config (get config/config :topojson)]
+  (when-let [geo-data-config (get config/config :geo-data)]
     (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
                                       selected-columns))
 
-          pad-fips (fn [v] (left-pad v (get topojson-config :fips-code-length) \0))
+          pad-fips (fn [v] (left-pad v (get geo-data-config :fips-code-length) \0))
           rows-cleaned (cond->> selections
                                 (= color-by-col "probability")
                                 ;; Remove rows with probability values of 1.
                                 (remove #(= (get % "probability") 1.0))
 
-                                (some? (get topojson-config :fips-code-length))
+                                (some? (get geo-data-config :fips-code-length))
                                 ;; Add padding to fips codes.
                                 (mapv #(medley/update-existing % geo-id-col pad-fips)))
 
@@ -153,25 +153,24 @@
                        {geo-id-col (get r geo-id-col)
                         row-attr r})
 
-          type :geojson
-          data-format (case type
+          data-format (case (:filetype geo-data-config)
                             :geojson {:property "features"}
                             :topojson {:type "topojson"
-                                       :feature (get topojson-config :feature)})
+                                       :feature (get geo-data-config :feature)})
 
           spec {:$schema default-vega-lite-schema
                 :width vega-map-width
                 :height vega-map-height
-                :data {:values (get topojson-config :data)
+                :data {:values (get geo-data-config :data)
                        :format data-format}
-                :transform [{:lookup (get topojson-config :prop)
+                :transform [{:lookup (get geo-data-config :prop)
                              :from {:data {:values rows-keyed}
                                     :key geo-id-col
                                     :fields [row-attr]}}
                             ;; We filter entities in the topojson that did not join on a row
                             ;; in `cleaned-selections`.
                             {:filter (gstring/format "datum['%s']" row-attr)}]
-                :projection {:type (get topojson-config :projection-type)}
+                :projection {:type (get geo-data-config :projection-type)}
                 :mark {:type "geoshape"
                        :color "#eee"
                        :stroke "#757575"
