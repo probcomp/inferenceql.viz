@@ -1,0 +1,39 @@
+;;;; This is an example config.edn file for configuring the app to use the
+;; U.S. counties, counties-10.json, topojson file.
+
+;;; This file can be renamed `config.edn` and placed in the root directory of the project--
+;;; likely called `inferenceql`.
+
+;;; Configuring a topojson file enables choropleth visualizations.
+
+;;; The topojson-related table column names specified under :table-fips-col and
+;;; :table-maps-names-col may vary in your dataset however.
+
+;;; The file referenced under the path `:topojson :data` must be placed in the
+;;; `inferenceql/spreadsheets/resources/topojson` directory.
+
+{:model #edn "model.edn"
+ :data #csv "data.csv"
+ :geodata {:data #json "topojson/counties-10m.json"
+           :filetype :topojson
+
+           ;; This is the key for the collection of objects in the topojson that we will match
+           ;; with rows.
+           :feature "counties"
+           ;; This is the property in each topojson feature that is matched with
+           ;; `:table-fips-col`.
+           :prop "id"
+
+           ;; This is the name of the column in your dataset that is joined against
+           ;; :prop in the topojson file.
+           :table-fips-col "geo_fips"
+
+           ;; This is the length of the fips codes in the topojson pointed to by
+           ;; :prop. If items in the table fips column are not the
+           ;; proper length they will be 0-padded so they match this length.
+           :fips-code-length 5
+
+           ;; This is the type of d3-geo projection to use when rendering the topojson data.
+           ;; See here for more info:
+           ;; https://vega.github.io/vega-lite/docs/projection.html#projection-types
+           :projection-type "albersUsa"}}
