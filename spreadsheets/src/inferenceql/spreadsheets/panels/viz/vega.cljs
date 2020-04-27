@@ -11,7 +11,7 @@
 
 ;; These are defs related to choropleth related columns in the dataset.
 ;; See spreadsheets/resources/config.edn for more info.
-(def ^:private geo-id-col (get-in config/config [:topojson :table-geo-id-col]))
+(def ^:private geo-id-col (get-in config/config [:geo :table-geo-id-col]))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -132,17 +132,18 @@
 
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
-  (when-let [geo-data-config (get config/config :geo-data)]
+  (.log js/console "here!")
+  (when-let [geo-config (get config/config :geo)]
     (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
                                       selected-columns))
 
-          pad-fips (fn [v] (left-pad v (get geo-data-config :fips-code-length) \0))
+          pad-fips (fn [v] (left-pad v (get geo-config :fips-code-length) \0))
           rows-cleaned (cond->> selections
                                 (= color-by-col "probability")
                                 ;; Remove rows with probability values of 1.
                                 (remove #(= (get % "probability") 1.0))
 
-                                (some? (get geo-data-config :fips-code-length))
+                                (some? (get geo-config :fips-code-length))
                                 ;; Add padding to fips codes.
                                 (mapv #(medley/update-existing % geo-id-col pad-fips)))
 
@@ -153,24 +154,24 @@
                        {geo-id-col (get r geo-id-col)
                         row-attr r})
 
-          data-format (case (:filetype geo-data-config)
+          data-format (case (get geo-config :filetype)
                             :geojson {:property "features"}
                             :topojson {:type "topojson"
-                                       :feature (get geo-data-config :feature)})
+                                       :feature (get geo-config :feature)})
 
           spec {:$schema default-vega-lite-schema
                 :width vega-map-width
                 :height vega-map-height
-                :data {:values (get geo-data-config :data)
+                :data {:values (get geo-config :data)
                        :format data-format}
-                :transform [{:lookup (get geo-data-config :prop)
+                :transform [{:lookup (get geo-config :prop)
                              :from {:data {:values rows-keyed}
                                     :key geo-id-col
                                     :fields [row-attr]}}
                             ;; We filter entities in the topojson that did not join on a row
                             ;; in `cleaned-selections`.
                             {:filter (gstring/format "datum['%s']" row-attr)}]
-                :projection {:type (get geo-data-config :projection-type)}
+                :projection {:type (get geo-config :projection-type)}
                 :mark {:type "geoshape"
                        :color "#eee"
                        :stroke "#757575"

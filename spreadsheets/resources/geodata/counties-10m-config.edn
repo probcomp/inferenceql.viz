@@ -14,26 +14,26 @@
 
 {:model #edn "model.edn"
  :data #csv "data.csv"
- :geodata {:data #json "topojson/counties-10m.json"
-           :filetype :topojson
+ :geo {:data #json "topojson/counties-10m.json"
+       :filetype :topojson
 
-           ;; This is the key for the collection of objects in the topojson that we will match
-           ;; with rows.
-           :feature "counties"
-           ;; This is the property in each topojson feature that is matched with
-           ;; `:table-fips-col`.
-           :prop "id"
+       ;; This is the key for the collection of objects in the topojson that we will match
+       ;; with rows.
+       :feature "counties"
+       ;; This is the property in each topojson feature that is matched with
+       ;; `:table-fips-col`.
+       :prop "id"
 
-           ;; This is the name of the column in your dataset that is joined against
-           ;; :prop in the topojson file.
-           :table-fips-col "geo_fips"
+       ;; This is the name of the column in your dataset that is joined against
+       ;; :prop in the topojson file.
+       :table-geo-id-col "geo_fips"
 
-           ;; This is the length of the fips codes in the topojson pointed to by
-           ;; :prop. If items in the table fips column are not the
-           ;; proper length they will be 0-padded so they match this length.
-           :fips-code-length 5
+       ;; This is the length of the fips codes in the topojson pointed to by
+       ;; :prop. If items in the table fips column are not the
+       ;; proper length they will be 0-padded so they match this length.
+       :fips-code-length 5
 
-           ;; This is the type of d3-geo projection to use when rendering the topojson data.
-           ;; See here for more info:
-           ;; https://vega.github.io/vega-lite/docs/projection.html#projection-types
-           :projection-type "albersUsa"}}
+       ;; This is the type of d3-geo projection to use when rendering the topojson data.
+       ;; See here for more info:
+       ;; https://vega.github.io/vega-lite/docs/projection.html#projection-types
+       :projection-type "albersUsa"}}
