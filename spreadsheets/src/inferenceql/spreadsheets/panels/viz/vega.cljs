@@ -46,6 +46,11 @@
                           c))
        s))
 
+(defn probability-column? [column]
+  "Returns whether a `column` was the result of probability-of statement.
+  `column` is the name of the column."
+  (some? (re-matches #"^prob\d+$" (name column))))
+
 (defn stat-type
   "Returns a multi-mixture stat-type given a column name from the data table."
   [col-name]
@@ -60,7 +65,7 @@
   "Returns a vega-lite type given `col-name`, a column name from the data table.
   May return nil if multi-mix stat-type for `col-name` can`t be found."
   [col-name]
-  (cond (contains? #{hot/score-col-header} col-name)
+  (cond (probability-column? col-name)
         "quantitative"
 
         (contains? #{hot/label-col-header geo-id-col} col-name)

@@ -2,9 +2,11 @@
 {:tests [{:id :aide
           :source-paths ["aide/src"]
           :test-paths ["aide/test"]}
+
          {:id :cgpm
           :source-paths ["cgpm/src"]
           :test-paths ["cgpm/test"]}
+
          {:id :multimixture-clj
           :source-paths ["multimixture/src"]
           :test-paths ["multimixture/test"]}
@@ -13,6 +15,7 @@
           :cljs/timeout 20000
           :source-paths ["multimixture/src"]
           :test-paths ["multimixture/test"]}
+
          {:id :search-clj
           :source-paths ["search-by-example/src"]
           :test-paths ["search-by-example/test"]}
@@ -21,6 +24,12 @@
           :cljs/timeout 20000
           :source-paths ["search-by-example/src"]
           :test-paths ["search-by-example/test"]}
+
          {:id :spreadsheets-clj
+          :source-paths ["spreadsheets/src"]
+          :test-paths ["spreadsheets/test"]}
+         {:id :spreadsheets-cljs
+          :type :kaocha.type/cljs
+          :cljs/timeout 20000
           :source-paths ["spreadsheets/src"]
           :test-paths ["spreadsheets/test"]}]}

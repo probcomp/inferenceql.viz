@@ -156,18 +156,34 @@
       {:vars stat-types
        :views (view-specs json-model)})))
 
+(defn keywordize-columns
+  "Keywordizes columns names in a multi-mixture spec, `spec`."
+  [spec]
+  (let [keywordize (fn [a-map] (medley/map-keys #(keyword %) a-map))] ; A non-recursive keywordize.
+    (-> spec
+        (update :vars keywordize)
+        (update :views (fn [views]
+                         (vec (for [column-partition views]
+                                (vec (for [cluster column-partition]
+                                       (update cluster :parameters keywordize))))))))))
+
+;; Bayes DB export JSON.
 (def bdb-models (json/read-str (slurp bdb-models-path)))
+
+;; A vector of maps representing the dataset.
 (def rows (->> data-path
                (slurp)
                (csv/read-csv)
                (csv-utils/csv-data->clean-maps (column-types bdb-models))))
 
+;; A collection of multi-mixture specs.
 (def all-specs (generate-specs-from-json bdb-models rows))
-;; This is the multi-mixture spec we will write to a file as model.edn.
+;; This is the one multi-mixture spec we will write to a file as model.edn.
 (def spec-to-use (or (nth all-specs model-number)
                      (nth all-specs 0)))
 
 (with-open [w (clojure.java.io/writer model-edn-path)]
   (binding [*print-length* false
             *out* w]
-    (pprint/pprint spec-to-use)))
+    ;; NOTE: Writing out spec with keyword column names.
+    (pprint/pprint (keywordize-columns spec-to-use))))

@@ -2,6 +2,7 @@
   (:require [clojure.core.match :refer [match]]
             [clojure.string :as str]
             [re-frame.core :as rf]
+            [instaparse.core :as insta]
             [metaprob.prelude :as mp]
             [inferenceql.multimixture :as mmix]
             [inferenceql.multimixture.search :as search]
@@ -20,35 +21,21 @@
  :query/parse-query
  event-interceptors
  (fn [{:keys [db]} [_ text label-info]]
-   (let [command (->> (str/trim text)
-                      (query/parse))
-         {:keys [pos-ids neg-ids unlabeled-ids]} label-info]
-     (match command
-       {:type :display-dataset}
-       {:dispatch [:query/display-dataset]}
+   (let [rows (table-db/dataset-rows db)
+         command (str/trim text)
+         models {:model (search/optimized-row-generator model/spec)}
 
-       {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
-       {:dispatch [:query/generate-virtual-row c num-rows]}
-
-       {:type :anomaly-search :column column :given :row}
-       {:dispatch [:query/anomaly-search column ["ROW"]]}
-
-       {:type :anomaly-search :column column :given given-col}
-       {:dispatch [:query/anomaly-search column [given-col]]}
-
-       {:type :anomaly-search :column column}
-       {:dispatch [:query/anomaly-search column []]}
-
-       {:type :search-by-labeled :binding {"label" "True"} :given true}
-       {:dispatch [:query/search-by-labeled pos-ids neg-ids unlabeled-ids]}
-
-       :else
-       (let [logged-msg (str "Unimplemented command: " (pr-str command))
-             alerted-msg "Invalid query syntax."]
-         ;; TODO: These could be their own effects!
-         (js/console.error logged-msg)
-         (js/alert alerted-msg)
-         {})))))
+         result (query/q command rows models)
+         columns (:iql/columns (meta result))
+         virtual (:iql/is-virtual-data (meta result))]
+    (if-not (insta/failure? result)
+      {:dispatch [:table/set result columns {:virtual virtual}]}
+      (let [logged-msg (str "Invalid query syntax: " result)
+            alerted-msg "Invalid query syntax."]
+        ;; TODO: These could be their own effects!
+        (js/console.error logged-msg)
+        (js/alert alerted-msg)
+        {})))))
 
 (rf/reg-event-fx
  :query/display-dataset
