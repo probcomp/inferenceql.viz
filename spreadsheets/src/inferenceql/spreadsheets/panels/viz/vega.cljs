@@ -152,13 +152,6 @@
                                 ;; Add padding to fips codes.
                                 (mapv #(medley/update-existing % geo-id-col pad-fips)))
 
-          row-attr "row"
-          ;; We will join geo features on this collection of maps which have whole
-          ;; rows as one their attributes and a geo-id as an other.
-          rows-keyed (for [r rows-cleaned]
-                       {geo-id-col (get r geo-id-col)
-                        row-attr r})
-
           data-format (case (get geo-config :filetype)
                             :geojson {:property "features"}
                             :topojson {:type "topojson"
@@ -170,18 +163,19 @@
                 :data {:values (get geo-config :data)
                        :format data-format}
                 :transform [{:lookup (get geo-config :prop)
-                             :from {:data {:values rows-keyed}
-                                    :key geo-id-col
-                                    :fields [row-attr]}}
+                             :from {:data {:values rows-cleaned}
+                                    :key geo-id-col}
+                             :as "row"}
                             ;; We filter entities in the topojson that did not join on a row
-                            ;; in `cleaned-selections`.
-                            {:filter (gstring/format "datum['%s']" row-attr)}]
+                            ;; in `rows-cleaned`.
+                            {:filter "datum.row"}]
                 :projection {:type (get geo-config :projection-type)}
                 :mark {:type "geoshape"
                        :color "#eee"
                        :stroke "#757575"
                        :strokeWidth "0.5"}
-                :encoding {:tooltip {:field row-attr
+                       ;;:tooltip {:content "data"}}
+                :encoding {:tooltip {:field "row"
                                      ;; This field is actually an object, but specifying type
                                      ;; nominal here to remove vega-tooltip warning message.
                                      :type "nominal"}}}]
@@ -191,7 +185,7 @@
       (if-not color-by-col
         spec
         (assoc-in spec [:encoding :color]
-                       {:field (str row-attr "." (name color-by-col))
+                       {:field (str "row." (name color-by-col))
                         :type (vega-type color-by-col)
                         :scale {:type "quantize"
                                 :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}})))))
