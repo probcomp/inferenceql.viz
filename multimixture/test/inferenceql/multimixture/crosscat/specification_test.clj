@@ -62,7 +62,6 @@
          (and (some #{:p} parameter-list)
               (= 1 (count parameter-list))))))
 
-
 ;; Smoke test for beta distribution spec.
 (defspec beta-spec 50
   (prop/for-all [alpha          (s/gen        :beta-dist/alpha)
