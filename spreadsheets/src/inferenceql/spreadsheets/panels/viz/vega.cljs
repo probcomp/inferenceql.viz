@@ -145,7 +145,11 @@
 
                                 (some? (get geo-config :fips-code-length))
                                 ;; Add padding to fips codes.
-                                (mapv #(medley/update-existing % geo-id-col pad-fips)))
+                                (mapv #(medley/update-existing % geo-id-col pad-fips))
+
+                                true
+                                ;; This is a hack for getting tooltips to work with multiple plots.
+                                (mapv #(assoc % :geometry "[...]")))
 
           data-format (case (get geo-config :filetype)
                             :geojson {:property "features"}
