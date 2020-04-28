@@ -33,10 +33,8 @@
              [v trace score])))))))
 
 ;; XXX Currently, assumes that the row generator of the mmix map is passed in.
-(defrecord Multimixture
-  [model]
+(defrecord Multimixture [model]
   gpm-proto/GPM
-
   (logpdf [this targets constraints inputs]
     (let [target-addrs-vals            (mmix/with-row-values {} targets)
           constraint-addrs-vals        (mmix/with-row-values {} constraints)

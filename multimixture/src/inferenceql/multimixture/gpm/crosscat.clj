@@ -3,8 +3,7 @@
             [inferenceql.multimixture.crosscat :as xcat]
             [inferenceql.multimixture.gpm.proto :as gpm-proto]))
 
-(defrecord CrossCat
-  [model latents]
+(defrecord CrossCat [model latents]
   gpm-proto/GPM
   (logpdf [this targets constraints inputs]
     (xcat/logpdf-score model latents targets constraints))
