@@ -33,7 +33,7 @@
       (let [logged-msg (str "Invalid query syntax: " result)
             alerted-msg "Invalid query syntax."]
         ;; TODO: These could be their own effects!
-        (js/console.error logged-msg)
+        (js/console.error logged-msg result)
         (js/alert alerted-msg)
         {})))))
 

@@ -11,7 +11,7 @@
 
 ;; These are defs related to choropleth related columns in the dataset.
 ;; See spreadsheets/resources/config.edn for more info.
-(def ^:private geo-id-col (get-in config/config [:geo :table-geo-id-col]))
+(def ^:private geo-id-col (keyword (get-in config/config [:geo :table-geo-id-col])))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -49,7 +49,8 @@
 (defn probability-column? [column]
   "Returns whether a `column` was the result of probability-of statement.
   `column` is the name of the column."
-  (some? (re-matches #"^prob\d+$" (name column))))
+  (when column
+    (some? (re-matches #"^prob[\w\-]*$" (name column)))))
 
 (defn stat-type
   "Returns a multi-mixture stat-type given a column name from the data table."
@@ -137,16 +138,15 @@
 
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
-  (.log js/console "here!")
   (when-let [geo-config (get config/config :geo)]
     (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
                                       selected-columns))
 
           pad-fips (fn [v] (left-pad v (get geo-config :fips-code-length) \0))
           rows-cleaned (cond->> selections
-                                (= color-by-col "probability")
+                                (probability-column? color-by-col)
                                 ;; Remove rows with probability values of 1.
-                                (remove #(= (get % "probability") 1.0))
+                                (remove #(= (get % color-by-col) 1.0))
 
                                 (some? (get geo-config :fips-code-length))
                                 ;; Add padding to fips codes.
@@ -184,17 +184,17 @@
                 :encoding {:tooltip {:field row-attr
                                      ;; This field is actually an object, but specifying type
                                      ;; nominal here to remove vega-tooltip warning message.
-                                     :type "nominal"}}}
+                                     :type "nominal"}}}]
 
-          color-spec {:field (str row-attr "." color-by-col)
-                      :type (vega-type color-by-col)
-                      :scale {:type "quantize"
-                              :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}}]
       ;; If we have another column selected besides `geo-id-col`,
       ;; color the choropleth according to the values in that column, `color-by-col`.
       (if-not color-by-col
         spec
-        (assoc-in spec [:encoding :color] color-spec)))))
+        (assoc-in spec [:encoding :color]
+                       {:field (str row-attr "." (name color-by-col))
+                        :type (vega-type color-by-col)
+                        :scale {:type "quantize"
+                                :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}})))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
