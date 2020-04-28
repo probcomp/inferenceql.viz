@@ -19,7 +19,7 @@ div {
 
 .flex-box-space-filler {
   flex: auto;
-  min-width: 40px;
+  min-width: 20px;
 }
 
 /* --------------- styling for the toolbar --------------- */
@@ -110,7 +110,6 @@ div {
 
 #viz-container {
   display: flex;
-  justify-content: center;
   border-top: solid;
   border-width: 1px;
   border-color: #e7e7e7;
