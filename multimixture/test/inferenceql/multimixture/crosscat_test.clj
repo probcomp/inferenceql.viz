@@ -476,9 +476,11 @@
         counts-single [10]
         counts-many   [5 5 5 5 5 5 5 5 5 5]
         output-single [(Math/log (/ 10 (+ 10 alpha))) (Math/log (/ alpha (+ 10 alpha)))]
-        output-many   (map #(Math/log %) (concat (repeat (count counts-many)
-                                                              (/ 5 (+ 50 alpha)))
-                                                      [(/ alpha (+ 50 alpha))]))
+        output-many   (map
+                       #(Math/log %)
+                       (concat
+                        (repeat (count counts-many) (/ 5 (+ 50 alpha)))
+                        [(/ alpha (+ 50 alpha))]))
 
         weights-single (xcat/crp-weights alpha counts-single)
         weights-many   (xcat/crp-weights alpha counts-many)]
@@ -563,32 +565,25 @@
     (is (= (set names) (set output)))))
 
 (deftest generate-category
-  (let [types    {"happy?" :bernoulli
-                  "height" :gaussian
-                  "color"  :categorical}
-        view {:hypers {"color" {:p {:dirichlet {:alpha [1 1 1]}}}
-                       "height" {:mu {:beta {:alpha 0.5 :beta 0.5}}
-                                 :sigma {:gamma {:k 1 :theta 6}}}
-                       "happy?" {:p {:beta {:alpha 0.5 :beta 0.5}}}}
-              :categories [{:parameters {"color" {:p {"red" 0.5 "green" 0.3 "blue" 0.2}}
-                                         "height" {:mu 0 :sigma 1}
-                                         "happy?" {:p 0.9}}}]}
+  (let [types  {"happy?" :bernoulli
+                "height" :gaussian
+                "color"  :categorical}
 
-        m-single  1
-        m-many    5
+        view   {:hypers {"color" {:p {:dirichlet {:alpha [1 1 1]}}}
+                         "height" {:mu {:beta {:alpha 0.5 :beta 0.5}}
+                                   :sigma {:gamma {:k 1 :theta 6}}}
+                         "happy?" {:p {:beta {:alpha 0.5 :beta 0.5}}}}
+                :categories [{:parameters {"color" {:p {"red" 0.5 "green" 0.3 "blue" 0.2}}
+                                           "height" {:mu 0 :sigma 1}
+                                           "happy?" {:p 0.9}}}]}
 
-        samples-single (xcat/generate-category m-single view types)
-        samples-many   (xcat/generate-category m-many   view types)]
+        sample (xcat/generate-category view types)]
     ;; Checking test arguments.
     (spec/valid-view? view)
 
     ;; Testing output.
-    (is (every? #(and (spec/valid-category? %)
-                      (= (set (keys types))
-                         (set (keys (:parameters %))))) samples-single))
-    (is (every? #(and (spec/valid-category? %)
-                      (= (set (keys types))
-                         (set (keys (:parameters %))))) samples-many))))
+    (is (and (spec/valid-category? sample)
+             (= (set (keys types)) (set (keys (:parameters sample))))))))
 
 (deftest mutual-information
   (let [model   {:types {"foo" :bernoulli
