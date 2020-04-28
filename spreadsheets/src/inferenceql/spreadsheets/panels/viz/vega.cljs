@@ -202,12 +202,13 @@
   [data cols-to-draw]
   (let [zoom-control-name (keyword (gensym "zoom-control"))] ; Random id so pan/zoom is independent.
     {:data {:values data}
-     :mark "circle"
+     :mark {:type "circle" :tooltip {:content "data"}}
      :selection {zoom-control-name {:type "interval" :bind "scales"}}
      :encoding {:x {:field (first cols-to-draw)
                     :type "quantitative"}
                 :y {:field (second cols-to-draw)
                     :type "quantitative"}}}))
+
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -265,7 +266,7 @@
     {:width width
      :height height
      :data {:values data}
-     :mark {:type "tick"}
+     :mark {:type "tick" :tooltip {:content "data"}}
      :selection {zoom-control-name {:type "interval" :bind "scales" :encodings [quant-dimension]}}
      :encoding {:x {:field x-field
                     :type x-type
