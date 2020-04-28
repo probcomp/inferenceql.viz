@@ -30,9 +30,6 @@
         k     5
         theta 2
         error 0.0001]
-    (is (< (Math/abs (- (Math/exp (prim/gamma-logpdf x {:k k}))
-                        0.19536))
-           error))
     (is (< (Math/abs (- (Math/exp (prim/gamma-logpdf x {:k k :theta theta}))
                        0.04511))
            error))))
@@ -41,16 +38,10 @@
   (let [k               5
         theta           2
         n               100000
-        samples-k       (prim/gamma-simulate n {:k k})
         samples-k-theta (prim/gamma-simulate n {:k k :theta theta})
-        mean-k          (/ (reduce + samples-k)
-                           n)
         mean-k-theta    (/ (reduce + samples-k-theta)
                            n)
         error   0.05]
-    (is (< (Math/abs (- mean-k
-                        k))
-           error))
     (is (< (Math/abs (- mean-k-theta
                         (* k theta)))
            error))))
