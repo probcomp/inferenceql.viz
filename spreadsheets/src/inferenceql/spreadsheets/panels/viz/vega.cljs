@@ -191,7 +191,7 @@
   (let [zoom-control-name (keyword (gensym "zoom-control"))] ; Random id so pan/zoom is independent.
     {:data {:values data}
      :mark {:type "circle" :tooltip {:content "data"}}
-     :selection {zoom-control-name {:type "interval" :bind "scales"}}
+     ;:selection {zoom-control-name {:type "interval" :bind "scales"}}
      :encoding {:x {:field (first cols-to-draw)
                     :type "quantitative"}
                 :y {:field (second cols-to-draw)
@@ -255,7 +255,7 @@
      :height height
      :data {:values data}
      :mark {:type "tick" :tooltip {:content "data"}}
-     :selection {zoom-control-name {:type "interval" :bind "scales" :encodings [quant-dimension]}}
+     ;:selection {zoom-control-name {:type "interval" :bind "scales" :encodings [quant-dimension]}}
      :encoding {:x {:field x-field
                     :type x-type
                     :axis {:grid true :gridDash [2 2]}}
