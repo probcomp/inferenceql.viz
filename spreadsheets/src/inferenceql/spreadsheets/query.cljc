@@ -182,7 +182,8 @@
                                      :variable-names vector
                                      :target         vector
 
-                                     :binding hash-map}))]
+                                     :binding hash-map
+                                     :bindings merge}))]
     (insta/transform all-transformations parse-tree)))
 
 ;;; Selections
