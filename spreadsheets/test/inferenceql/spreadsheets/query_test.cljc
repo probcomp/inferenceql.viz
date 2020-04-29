@@ -204,9 +204,13 @@
       (testing "with multiple variables"
         (doseq [result (q "SELECT * FROM (GENERATE x, y UNDER model) LIMIT 10")]
           (is (= #{:x :y} (set (keys result))))))
-      (testing "with a literal event"
-        (doseq [result (q "SELECT * FROM (GENERATE x GIVEN x=\"yes\" UNDER model) LIMIT 10")]
-          (is (= {:x "yes"} (select-keys result [:x])))))
+      (testing "with literal events"
+        (testing "but just one"
+          (doseq [result (q "SELECT * FROM (GENERATE x GIVEN x=\"yes\" UNDER model) LIMIT 10")]
+            (is (= {:x "yes"} (select-keys result [:x])))))
+        (testing "and more than one"
+          (doseq [result (q "SELECT * FROM (GENERATE x, y GIVEN x=\"yes\", y=\"yes\" UNDER model) LIMIT 10")]
+            (is (= {:x "yes", :y "yes"} (select-keys result [:x :y]))))))
       (testing "expressions can have a subset of columns selected from them"
         (doseq [result (q "SELECT y FROM (GENERATE x, y UNDER model) LIMIT 10")]
           (is (= [:y] (keys result)))))
