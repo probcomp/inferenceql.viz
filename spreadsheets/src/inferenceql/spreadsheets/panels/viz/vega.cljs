@@ -184,15 +184,20 @@
                                      ;; nominal here to remove vega-tooltip warning message.
                                      :type "nominal"}}}]
 
-      ;; If we have another column selected besides `geo-id-col`,
-      ;; color the choropleth according to the values in that column, `color-by-col`.
       (if-not color-by-col
         spec
-        (assoc-in spec [:encoding :color]
-                       {:field (str "row." (name color-by-col))
-                        :type (vega-type color-by-col)
-                        :scale {:type "quantize"
-                                :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}})))))
+        ;; If we have another column selected besides `geo-id-col`,
+        ;; color the choropleth according to the values in that column, `color-by-col`.
+        (let [scale (if (probability-column? color-by-col)
+                        {:type "quantize"
+                         :range ["#f2f2f2" "#deebf7","#bdd7e7","#6baed6","#2171b5"]
+                         :reverse true}
+                        {:type "quantize"
+                         :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]})
+              color-spec {:field (str "row." (name color-by-col))
+                          :type (vega-type color-by-col)
+                          :scale scale}]
+          (assoc-in spec [:encoding :color] color-spec))))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
