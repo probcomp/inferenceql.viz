@@ -12,11 +12,8 @@
 (rf/reg-sub :viz/vega-lite-spec
             :<- [:table/selection-layers-list]
             (fn [selection-layers]
-              (let [spec
-                    (clj->js
-                      (vega/generate-spec selection-layers))]
-                (.log js/console "spec: " spec)
-                spec)))
+                (clj->js
+                  (vega/generate-spec selection-layers))))
 
 (defn make-simulate-fn
   [col-to-sim row override-fns]
