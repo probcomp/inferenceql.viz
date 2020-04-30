@@ -196,7 +196,8 @@
                          :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]})
               color-spec {:field (str "row." (name color-by-col))
                           :type (vega-type color-by-col)
-                          :scale scale}]
+                          :scale scale
+                          :legend {:title color-by-col}}]
           (assoc-in spec [:encoding :color] color-spec))))))
 
 (defn- scatter-plot
