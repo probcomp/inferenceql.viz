@@ -46,6 +46,11 @@
                           c))
        s))
 
+(defn probability-column? [col-name]
+  "Returns whether a `col-name` was the result of probability-of statement.
+  `col-name` is the name of the column."
+  (= "probability" col-name))
+
 (defn stat-type
   "Returns a multi-mixture stat-type given a column name from the data table."
   [col-name]
@@ -138,9 +143,9 @@
 
           pad-fips (fn [v] (left-pad v (get geo-config :fips-code-length) \0))
           rows-cleaned (cond->> selections
-                                (= color-by-col "probability")
+                                (probability-column? color-by-col)
                                 ;; Remove rows with probability values of 1.
-                                (remove #(= (get % "probability") 1.0))
+                                (remove #(= (get % color-by-col) 1.0))
 
                                 (some? (get geo-config :fips-code-length))
                                 ;; Add padding to fips codes.
@@ -177,16 +182,22 @@
                                      ;; This field is actually an object, but specifying type
                                      ;; nominal here to remove vega-tooltip warning message.
                                      :type "nominal"}}}]
-      ;; If we have another column selected besides `geo-id-col`,
-      ;; color the choropleth according to the values in that column, `color-by-col`.
       (if-not color-by-col
         spec
-        (assoc-in spec [:encoding :color]
-                       {:field (str "row." (name color-by-col))
-                        :type (vega-type color-by-col)
-                        :scale {:type "quantize"
-                                :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}
-                        :legend {:title color-by-col}})))))
+        ;; If we have another column selected besides `geo-id-col`,
+        ;; color the choropleth according to the values in that column, `color-by-col`.
+        (let [color-range (if (probability-column? color-by-col)
+                              ["#f2f2f2" "#deebf7","#bdd7e7","#6baed6","#2171b5"]
+                              ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"])
+              reverse-scale (probability-column? color-by-col)
+
+              color-spec {:field (str "row." (name color-by-col))
+                          :type (vega-type color-by-col)
+                          :scale {:type "quantize"
+                                  :range color-range
+                                  :reverse reverse-scale}
+                          :legend {:title color-by-col}}]
+          (assoc-in spec [:encoding :color] color-spec))))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
