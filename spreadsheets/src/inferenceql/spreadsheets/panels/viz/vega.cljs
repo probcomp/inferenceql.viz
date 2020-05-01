@@ -186,7 +186,8 @@
                        {:field (str "row." (name color-by-col))
                         :type (vega-type color-by-col)
                         :scale {:type "quantize"
-                                :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}})))))
+                                :range ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"]}
+                        :legend {:title color-by-col}})))))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
