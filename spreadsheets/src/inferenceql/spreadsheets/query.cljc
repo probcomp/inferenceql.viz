@@ -5,7 +5,7 @@
             [clojure.edn :as edn]
             [instaparse.core :as insta]
             [metaprob.prelude :as mp]
-            [inferenceql.multimixture :as mmix]
+            [inferenceql.inference.multimixture :as mmix]
             [inferenceql.spreadsheets.model :as model]))
 
 (def parser (insta/parser (sio/inline-resource "query.bnf")))

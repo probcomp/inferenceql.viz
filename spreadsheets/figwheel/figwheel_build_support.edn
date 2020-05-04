@@ -1,6 +1,6 @@
 ;; Augments the build.edn for spreadsheets app.
 ;; Used to set watch dirs and hooks.
 
-^{:watch-dirs ["spreadsheets/src" "multimixture/src"]
+^{:watch-dirs ["spreadsheets/src"]
   :css-dirs ["spreadsheets/resources"]}
 {}

@@ -5,14 +5,6 @@
          {:id :cgpm
           :source-paths ["cgpm/src"]
           :test-paths ["cgpm/test"]}
-         {:id :multimixture-clj
-          :source-paths ["multimixture/src"]
-          :test-paths ["multimixture/test"]}
-         {:id :multimixture-cljs
-          :type :kaocha.type/cljs
-          :cljs/timeout 20000
-          :source-paths ["multimixture/src"]
-          :test-paths ["multimixture/test"]}
          {:id :search-clj
           :source-paths ["search-by-example/src"]
           :test-paths ["search-by-example/test"]}

@@ -1,9 +1,9 @@
 (ns inferenceql.spreadsheets.score
   (:require [inferenceql.spreadsheets.util :as util]
-            [inferenceql.multimixture.search :as search]
-            [inferenceql.multimixture :as mmix]
+            [inferenceql.inference.multimixture.search :as search]
+            [inferenceql.inference.multimixture :as mmix]
             [metaprob.prelude :as mp]
-            [inferenceql.multimixture.gpm :as gpm]
+            [inferenceql.inference.multimixture.gpm :as gpm]
             [medley.core :as medley]
             [clojure.set :as set]
             [clojure.spec.alpha :as s]))

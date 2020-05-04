@@ -17,6 +17,12 @@ jobs: # basic units of work in a run
       - run:
           name: Install build tools
           command: sudo apt-get update && sudo apt-get install -y make
+      - add_ssh_keys:
+          fingerprints:
+            - "2b:84:62:54:6a:af:90:8d:41:79:c7:aa:de:6e:8d:7a"
+      - run:
+          name: Download dependencies
+          command: clojure -Stree
       - run:
           name: Build
           command: make
@@ -31,9 +37,5 @@ jobs: # basic units of work in a run
               --junit-xml-file /tmp/test-results/all/results.xml
       - store_test_results:
           path: /tmp/test-results
-      - run:
-          name: Artifacts
-          command: make -w -C multimixture
-          when: always
       - store_artifacts:
           path: spreadsheets/out/charts

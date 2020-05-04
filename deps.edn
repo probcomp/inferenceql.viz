@@ -15,6 +15,8 @@
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.7"}
         reagent-forms {:mvn/version "0.5.43"}
+        probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
+                                        :sha "d01e78bf8dda44a20dcdf5a2813506815b60b3cc"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"
@@ -22,8 +24,6 @@
          "aide/test"
          "cgpm/src"
          "cgpm/test"
-         "multimixture/src"
-         "multimixture/test"
          "search-by-example/src"
          "search-by-example/test"
          "spreadsheets/src"

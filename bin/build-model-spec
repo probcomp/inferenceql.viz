@@ -4,8 +4,8 @@
 (require '[clojure.data.csv :as csv])
 (require '[clojure.pprint :as pprint])
 (require '[inferenceql.spreadsheets.csv :as csv-utils])
-(require '[inferenceql.multimixture.search :as search])
-(require '[inferenceql.utils :as utils])
+(require '[inferenceql.inference.multimixture.search :as search])
+(require '[inferenceql.inference.utils :as utils])
 (require '[metaprob.distributions :as mpdist])
 (require '[medley.core :as medley])
 

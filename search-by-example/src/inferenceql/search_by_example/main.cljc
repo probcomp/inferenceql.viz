@@ -1,5 +1,5 @@
 (ns inferenceql.search-by-example.main
-  (:require [inferenceql.multimixture.dsl :as mmix]
+  (:require [inferenceql.inference.multimixture.dsl :as mmix]
             [metaprob.prelude :as prelude]
             [metaprob.trace :as trace]))
 

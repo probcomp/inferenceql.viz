@@ -1,9 +1,9 @@
 (ns inferenceql.search-by-example.api
   (:require [clojure.set :as set]
             [clojure.string :as str]
-            [inferenceql.multimixture :as mmix]
-            [inferenceql.multimixture.search :as search]
-            [inferenceql.multimixture.specification :as spec]
+            [inferenceql.inference.multimixture :as mmix]
+            [inferenceql.inference.multimixture.search :as search]
+            [inferenceql.inference.multimixture.specification :as spec]
             [inferenceql.spreadsheets.data :as data]
             [inferenceql.spreadsheets.model :as model]))
 

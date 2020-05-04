@@ -1,8 +1,8 @@
 (ns inferenceql.spreadsheets.panels.viz.subs
   (:require [re-frame.core :as rf]
             [metaprob.prelude :as mp]
-            [inferenceql.multimixture :as mmix]
-            [inferenceql.multimixture.search :as search]
+            [inferenceql.inference.multimixture :as mmix]
+            [inferenceql.inference.multimixture.search :as search]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.override.helpers :as co]

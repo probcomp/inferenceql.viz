@@ -1,11 +1,9 @@
-multimixture-dir      := multimixture
 search-by-example-dir := search-by-example
 spreadsheets-dir      := spreadsheets
 node-modules-dir      := node_modules
 out-dir               := out
 
 module-dirs := \
-	$(multimixture-dir) \
 	$(spreadsheets-dir) \
 	$(search-by-example-dir)
 
