@@ -1,0 +1,19 @@
+{:data #csv "data.csv"
+ :bayes-db-export #export-json "data_models.json"
+ :model #model-edn "model.edn"
+
+ :geo {:data #json "geodata/nyc-zip-codes.geojson"
+       :filetype :geojson
+
+       ;; This is the property in each topojson feature that is matched with
+       ;; `:table-fips-col`.
+       :prop "properties.ZIPCODE"
+
+       ;; This is the name of the column in your dataset that is joined against
+       ;; :prop in the topojson file.
+       :table-geo-id-col "zip-code"
+
+       ;; This is the type of d3-geo projection to use when rendering the topojson data.
+       ;; See here for more info:
+       ;; https://vega.github.io/vega-lite/docs/projection.html#projection-types
+       :projection-type "albersUsa"}}
