@@ -110,7 +110,6 @@ div {
 
 #viz-container {
   display: flex;
-  justify-content: center;
   border-top: solid;
   border-width: 1px;
   border-color: #e7e7e7;
