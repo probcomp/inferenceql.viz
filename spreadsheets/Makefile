@@ -79,6 +79,8 @@ $(publish-dir):
 	-[ -f $(auth-file) ] && cp $(auth-file) $(publish-dir)
 	## Copy CNAME file if it exists.
 	-[ -f $(cname-file) ] && cp $(cname-file) $(publish-dir)
+	## Prevent ignore of node-modules dir in surge publish.
+	echo "!node_modules" > $(publish-dir)/.surgeignore
 
 ## This target can be called like `make publish DOMAIN=probcomp.surge.sh`
 .PHONY: publish
