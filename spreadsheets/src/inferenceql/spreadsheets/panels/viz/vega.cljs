@@ -145,20 +145,20 @@
           rows-cleaned (cond->> selections
                                 (probability-column? color-by-col)
                                 ;; Remove rows with probability values of 1.
-                                (remove #(= (get % color-by-col) 1.0))
+                                (remove #(= 1.0 (get % color-by-col)))
 
                                 (some? (get geo-config :fips-code-length))
                                 ;; Add padding to fips codes.
                                 (mapv #(medley/update-existing % geo-id-col pad-fips))
 
-                                true
+                                :else
                                 ;; This is a hack for getting tooltips to work with multiple plots.
                                 (mapv #(assoc % :geometry "[...]")))
 
           data-format (case (get geo-config :filetype)
-                            :geojson {:property "features"}
-                            :topojson {:type "topojson"
-                                       :feature (get geo-config :feature)})
+                        :geojson {:property "features"}
+                        :topojson {:type "topojson"
+                                   :feature (get geo-config :feature)})
 
           spec {:$schema default-vega-lite-schema
                 :width vega-map-width
@@ -177,7 +177,6 @@
                        :color "#eee"
                        :stroke "#757575"
                        :strokeWidth "0.5"}
-                       ;;:tooltip {:content "data"}}
                 :encoding {:tooltip {:field "row"
                                      ;; This field is actually an object, but specifying type
                                      ;; nominal here to remove vega-tooltip warning message.
@@ -187,8 +186,8 @@
         ;; If we have another column selected besides `geo-id-col`,
         ;; color the choropleth according to the values in that column, `color-by-col`.
         (let [color-range (if (probability-column? color-by-col)
-                              ["#f2f2f2" "#deebf7","#bdd7e7","#6baed6","#2171b5"]
-                              ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"])
+                            ["#f2f2f2" "#deebf7","#bdd7e7","#6baed6","#2171b5"]
+                            ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"])
               reverse-scale (probability-column? color-by-col)
 
               color-spec {:field (str "row." (name color-by-col))
