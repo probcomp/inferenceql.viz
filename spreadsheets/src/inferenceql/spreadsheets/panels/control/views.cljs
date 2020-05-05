@@ -49,7 +49,9 @@
                                                         (do
                                                           (.preventDefault e)
                                                           (rf/dispatch [:query/parse-query @input-text @label-info]))))
-                                :placeholder "Enter a query..."
+                                :placeholder (str "Write a query here.\n"
+                                                  "  [shift-enter] - inserts a newline\n"
+                                                  "  [enter] - executes query")
                                 ;; This random attribute value for autoComplete is needed to turn
                                 ;; autoComplete off in Chrome. "off" and "false" do not work.
                                 :autoComplete "my-search-field"
@@ -70,5 +72,5 @@
                         (rf/dispatch [:table/clear])
                         (.blur (.-target e)))} ; Clear focus off of button after click.
           "Clear results"]]]
-     [:div.flex-box-space-filler]
+     [:div.flex-box-space-filler-60]
      [selection-color-selector]]))

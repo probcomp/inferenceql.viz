@@ -19,8 +19,8 @@
      [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
      [:div#viz-container
-      [:div.flex-box-space-filler]
+      [:div.flex-box-space-filler-20]
       (when vega-lite-spec
         [viz/vega-lite vega-lite-spec {:actions false} generators])
-      [:div.flex-box-space-filler]]
+      [:div.flex-box-space-filler-20]]
      [modal/modal]]))
