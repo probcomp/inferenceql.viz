@@ -3,7 +3,7 @@
             [inferenceql.inference.multimixture.search :as search]
             [inferenceql.inference.multimixture :as mmix]
             [metaprob.prelude :as mp]
-            [inferenceql.inference.multimixture.gpm :as gpm]
+            [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]
             [clojure.set :as set]
             [clojure.spec.alpha :as s]))
