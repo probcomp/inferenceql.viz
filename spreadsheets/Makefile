@@ -10,6 +10,8 @@ output-to	 := $(output-dir)/main.js
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/handsontable.full.css
 
+model-edn-file := $(resource-dir)/model.edn
+
 ### Definitions for publishing.
 
 publish-dir := $(current-dir)/.publish
@@ -23,10 +25,9 @@ figwheel-public-dir := $(current-dir)/figwheel-target/public
 figwheel-resource-dir := $(figwheel-public-dir)/resources
 figwheel-index-file := $(figwheel-public-dir)/index.html
 
-all: model-spec js
+all: $(model-edn-file) js
 
-.PHONY: model-spec
-model-spec:
+$(model-edn-file):
 	cd ..; bin/build-model-spec
 
 js: $(output-to)
@@ -39,6 +40,7 @@ clean:
 	rm -Rf $(output-dir)
 	rm -Rf $(figwheel-build-dir)
 	rm -Rf $(publish-dir)
+	rm -Rf $(model-edn-file)
 
 ### Compilation
 

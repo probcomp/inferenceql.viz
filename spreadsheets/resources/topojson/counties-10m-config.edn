@@ -12,8 +12,9 @@
 ;;; The file referenced under the path `:topojson :data` must be placed in the
 ;;; `inferenceql/spreadsheets/resources/topojson` directory.
 
-{:model #edn "model.edn"
- :data #csv "data.csv"
+{:data #csv "data.csv"
+ :bayes-db-export #export-json "data_models.json"
+ :model #model-edn "model.edn"
  :topojson {:data #json "topojson/counties-10m.json"
             ;; This is the key for the collection of objects in the topojson that we will match
             ;; with rows.

@@ -4,15 +4,10 @@
 (require '[clojure.data.csv :as csv])
 (require '[clojure.pprint :as pprint])
 (require '[inferenceql.spreadsheets.csv :as csv-utils])
-(require '[inferenceql.inference.multimixture.search :as search])
 (require '[inferenceql.inference.utils :as utils])
+(require '[inferenceql.spreadsheets.config-reader :as config-reader])
 (require '[metaprob.distributions :as mpdist])
 (require '[medley.core :as medley])
-
-(def model-number 0)
-(def bdb-models-path  "spreadsheets/resources/data_models.json")
-(def data-path "spreadsheets/resources/data.csv")
-(def model-edn-path "spreadsheets/resources/model.edn")
 
 (defn infql-type
   "Converts from the column types in a BayesDB export and the types in an InferenceQL model.edn"
@@ -155,18 +150,24 @@
       {:vars stat-types
        :views (view-specs json-model)})))
 
-(def bdb-models (json/read-str (slurp bdb-models-path)))
-(def rows (->> data-path
-               (slurp)
-               (csv/read-csv)
-               (csv-utils/csv-data->clean-maps (column-types bdb-models))))
+;;; Script section
+
+(def model-number-to-use 0)
+(def resources-dir "spreadsheets/resources/")
+(def config (config-reader/read :model-builder))
+
+(def bdb-models (:bayes-db-export config))
+(def rows (csv-utils/csv-data->clean-maps (column-types bdb-models)
+                                          (:data config)))
+(def model-edn-path (str resources-dir (:model config)))
 
 (def all-specs (generate-specs-from-json bdb-models rows))
 ;; This is the multi-mixture spec we will write to a file as model.edn.
-(def spec-to-use (or (nth all-specs model-number)
+(def spec-to-use (or (nth all-specs model-number-to-use)
                      (nth all-specs 0)))
 
-(with-open [w (clojure.java.io/writer model-edn-path)]
-  (binding [*print-length* false
-            *out* w]
-    (pprint/pprint spec-to-use)))
+(defn -main [])
+  (with-open [w (clojure.java.io/writer model-edn-path)]
+    (binding [*print-length* false
+              *out* w]
+      (pprint/pprint spec-to-use)))
