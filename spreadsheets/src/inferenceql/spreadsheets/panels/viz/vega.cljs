@@ -134,7 +134,8 @@
                   :field col
                   :type (vega-type col)}
               :y {:aggregate "count"
-                  :type "quantitative"}}})
+                  :type "quantitative"}}
+   :selection {:dummy {:type "single" :empty "none"}}})
 
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
