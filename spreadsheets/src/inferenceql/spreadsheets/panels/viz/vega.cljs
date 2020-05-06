@@ -174,14 +174,20 @@
                             ;; in `rows-cleaned`.
                             {:filter "datum.row"}]
                 :projection {:type (get geo-config :projection-type)}
-                :mark {:type "geoshape"
-                       :color "#eee"
-                       :stroke "#757575"
-                       :strokeWidth "0.5"}
-                :encoding {:tooltip {:field "row"
-                                     ;; This field is actually an object, but specifying type
-                                     ;; nominal here to remove vega-tooltip warning message.
-                                     :type "nominal"}}}]
+                :layer [{:mark {:type "geoshape"
+                                :color "#eee"
+                                :stroke "#757575"
+                                :strokeWidth "0.5"}
+                         :encoding {:tooltip {:field "row"
+                                              ;; This field is actually an object, but specifying type
+                                              ;; nominal here to remove vega-tooltip warning message.
+                                              :type "nominal"}}
+                         :selection {:pts {:type "multi" :empty "none"}}}
+                        {:transform [{:filter {:selection "pts"}}],
+                         :mark {:type "geoshape",
+                                :fill nil,
+                                :stroke "red"}}]}]
+
       (if-not color-by-col
         spec
         ;; If we have another column selected besides `geo-id-col`,
