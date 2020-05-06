@@ -182,12 +182,12 @@
                          :encoding {:tooltip {:field "row"
                                               ;; This field is actually an object, but specifying type
                                               ;; nominal here to remove vega-tooltip warning message.
-                                              :type "nominal"}}
-                         :selection {:pts {:type "multi" :empty "none"}}}
-                        {:transform [{:filter {:selection "pts"}}],
-                         :mark {:type "geoshape",
-                                :fill nil,
-                                :stroke "red"}}]}]
+                                              :type "nominal"}
+                                    :stroke {:condition {:selection "pts"
+                                                         :value "green"}}
+                                    :strokeWidth {:condition {:selection "pts"
+                                                              :value 2.0}}}
+                         :selection {:pts {:type "multi" :empty "none"}}}]}]
 
       (if-not color-by-col
         spec
