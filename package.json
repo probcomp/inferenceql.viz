@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "@cljs-oss/module-deps": "^1.1.1",
-    "canvas": "^2.5.0",
     "handsontable": "^7.4.0",
     "isomorphic-ws": "^4.0.1",
     "vega": "^5.11.1",
