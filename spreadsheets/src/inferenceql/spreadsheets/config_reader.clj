@@ -8,8 +8,9 @@
             [aero.core :as aero]))
 
 (defmethod aero/reader 'maybe-include
-  [_ _ s]
-  (try (aero.core/read-config s {:resolver aero/root-resolver})
+  [{:keys [profile]} _ s]
+  (try (aero.core/read-config s {:resolver aero/root-resolver
+                                 :profile profile})
        (catch FileNotFoundException _
          nil)))
 
