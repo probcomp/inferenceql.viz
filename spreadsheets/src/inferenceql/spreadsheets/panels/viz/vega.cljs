@@ -213,11 +213,26 @@
   (let [zoom-control-name (keyword (gensym "zoom-control"))] ; Random id so pan/zoom is independent.
     {:data {:values data}
      :mark {:type "circle" :tooltip {:content "data"}}
-     :selection {zoom-control-name {:type "interval" :bind "scales"}}
+     :selection {zoom-control-name {:type "interval"
+                                    :bind "scales"
+                                    :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                                    :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                                    :clear "dblclick[!event.shiftKey]"}
+                 :brush {:type "interval"
+                         :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                         :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                         :clear "dblclick[event.shiftKey]"
+                         :zoom false
+                         :empty "none"}}
      :encoding {:x {:field (first cols-to-draw)
                     :type "quantitative"}
                 :y {:field (second cols-to-draw)
-                    :type "quantitative"}}}))
+                    :type "quantitative"}
+                :color {:condition {:selection "brush"
+                                    :value "goldenrod"}}}}))
+
+
+
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
