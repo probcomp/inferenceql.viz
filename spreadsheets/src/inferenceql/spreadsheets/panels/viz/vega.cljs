@@ -166,7 +166,7 @@
 
                                 :else
                                 ;; This is a hack for getting tooltips to work with multiple plots.
-                                (mapv #(assoc % :geometry "[...]")))
+                                (mapv #(assoc % :geo "[...]")))
 
           data-format (case (get geo-config :filetype)
                         :geojson {:property "features"}
@@ -184,7 +184,15 @@
                              :as "row"}
                             ;; We filter entities in the topojson that did not join on a row
                             ;; in `rows-cleaned`.
-                            {:filter "datum.row"}]
+                            {:filter "datum.row"}
+                            ;; NOTE: Hopefully, rows in `rows-cleaned` do not have
+                            ;; attributes called: type, properties, or geometry.
+                            ;; Otherwise this spec will fail. Those attributes
+                            ;; conflict with those found in the geojson.
+                            {:lookup (get geo-config :prop)
+                             :from {:data {:values rows-cleaned}
+                                    :key geo-id-col
+                                    :fields (keys (first rows-cleaned))}}]
                 :projection {:type (get geo-config :projection-type)}
                 :layer [{:mark {:type "geoshape"
                                 :color "#eee"
@@ -198,7 +206,7 @@
                                                          :value "green"}}
                                     :strokeWidth {:condition {:selection "pts"
                                                               :value 2.0}}}
-                         :selection {:pts {:type "multi" :empty "none"}}}]}]
+                         :selection {:pts {:type "multi" :empty "none" :fields ["zip-code"]}}}]}]
 
       (if-not color-by-col
         spec
