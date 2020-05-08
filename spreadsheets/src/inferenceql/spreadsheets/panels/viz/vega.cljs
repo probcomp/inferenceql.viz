@@ -129,13 +129,24 @@
 
 (defn gen-histogram [col selections]
   {:data {:values selections}
-   :mark {:type "bar" :color default-table-color}
-   :encoding {:x {:bin (should-bin? col)
-                  :field col
-                  :type (vega-type col)}
-              :y {:aggregate "count"
-                  :type "quantitative"}}
-   :selection {:dummy {:type "single" :empty "none"}}})
+   :layer [{:mark {:type "bar" 
+                   :color default-table-color}
+            :encoding {:x {:bin (should-bin? col)
+                           :field col
+                           :type (vega-type col)}
+                        :y {:aggregate "count"
+                            :type "quantitative"}}
+            :selection {:pts {:type "interval" :encodings ["x"] :empty "none"}}}
+
+           {:transform [{:filter {:selection "pts"}}],
+            :mark {:type "bar",
+                   :color "goldenrod"}
+            :encoding {:x {:bin (should-bin? col)
+                           :field col
+                           :type (vega-type col)}
+                       :y {:aggregate "count", 
+                           :type "quantitative"}}}]})
+
 
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
