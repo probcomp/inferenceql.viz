@@ -218,17 +218,17 @@
                                     :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
                                     :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
                                     :clear "dblclick[!event.shiftKey]"}
-                 :brush {:type "interval"
-                         :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                         :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                         :clear "dblclick[event.shiftKey]"
-                         :zoom false
-                         :empty "none"}}
+                 :pts {:type "interval"
+                       :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                       :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                       :clear "dblclick[event.shiftKey]"
+                       :zoom false
+                       :empty "none"}}
      :encoding {:x {:field (first cols-to-draw)
                     :type "quantitative"}
                 :y {:field (second cols-to-draw)
                     :type "quantitative"}
-                :color {:condition {:selection "brush"
+                :color {:condition {:selection "pts"
                                     :value "goldenrod"}}}}))
 
 
