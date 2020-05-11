@@ -205,7 +205,15 @@
                                     :stroke {:condition {:selection "pts"
                                                          :value "green"}}
                                     :strokeWidth {:condition {:selection "pts"
-                                                              :value 2.0}}}
+                                                              :value 1.0}}
+                                    ;; TODO: Find a better way highlight selected geoshapes.
+                                    ;; There might be a penalty to using opacity.
+                                    :opacity {:condition [{:selection "pts"
+                                                           :value 1.0}
+                                                          ;; FIXME: this is specific to the :pts name
+                                                          {:test "length(data(\"pts_store\")) == 0"
+                                                           :value 1.0}]
+                                              :value 0.2}}
                          :selection {:pts {:type "multi" :empty "none" :fields ["zip-code"]}}}]}]
 
       (if-not color-by-col
