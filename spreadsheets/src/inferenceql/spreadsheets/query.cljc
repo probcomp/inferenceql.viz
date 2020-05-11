@@ -71,6 +71,12 @@
                target-val (select-keys val target)]
            [target-val trace score]))))))
 
+(defn exp-logpdf
+  "A hack to exponentiate results of logpdf"
+  [& args]
+  (let [res (apply queries/logpdf args)]
+    (Math/pow Math/E res)))
+
 (def default-environment
   (merge
    #?(:clj {'clojure.core/merge merge}
@@ -78,6 +84,7 @@
    {'clojure.core/merge merge
     'datascript.core/pull datascript.core/pull
     'inferenceql.multimixture.basic-queries/logpdf inferenceql.multimixture.basic-queries/logpdf
+    'inferenceql.spreadsheets.query/exp-logpdf inferenceql.spreadsheets.query/exp-logpdf
 
     'clojure.core/=  =
     'clojure.core/>  >
@@ -220,7 +227,7 @@
         target-clauses      (events-clauses target-var      target)
         constraints-clauses (events-clauses constraints-var constraints)
 
-        logpdf-clauses `[[(queries/logpdf ~model-var ~target-var ~constraints-var) ~prob-var]]]
+        logpdf-clauses `[[(exp-logpdf ~model-var ~target-var ~constraints-var) ~prob-var]]]
     {:name   [selection-name]
      :find   [prob-var]
      :in     [model-var]
