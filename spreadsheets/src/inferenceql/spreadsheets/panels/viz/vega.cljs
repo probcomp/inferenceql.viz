@@ -192,14 +192,19 @@
                               ["#f2f2f2" "#deebf7","#bdd7e7","#6baed6","#2171b5"]
                               ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"])
               reverse-scale (probability-column? color-by-col)
+              scale (case (vega-type color-by-col)
+                      "quantitative" {:type "quantize"
+                                      :range color-range
+                                      :reverse reverse-scale}
+                      "nominal" {:type "ordinal"
+                                 :scheme {:name "nyt"}})
 
               color-spec {:field (str "row." (name color-by-col))
                           :type (vega-type color-by-col)
-                          :scale {:type "quantize"
-                                  :range color-range
-                                  :reverse reverse-scale}
+                          :scale scale
                           :legend {:title color-by-col}}]
           (assoc-in spec [:encoding :color] color-spec))))))
+
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
