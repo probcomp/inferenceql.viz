@@ -237,7 +237,6 @@
                           :legend {:title color-by-col}}]
           (assoc-in spec [:encoding :color] color-spec))))))
 
-
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
@@ -262,9 +261,6 @@
                     :type "quantitative"}
                 :color {:condition {:selection "pts"
                                     :value "goldenrod"}}}}))
-
-
-
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
