@@ -3,13 +3,13 @@
             [clojure.string :as str]
             [re-frame.core :as rf]
             [metaprob.prelude :as mp]
+            [inferenceql.query :as query]
             [inferenceql.inference.multimixture :as mmix]
             [inferenceql.inference.multimixture.search :as search]
             [inferenceql.spreadsheets.db :as db]
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.query :as query]
             [inferenceql.spreadsheets.panels.override.helpers :as co]))
 
 (def ^:private search-column "new property")
