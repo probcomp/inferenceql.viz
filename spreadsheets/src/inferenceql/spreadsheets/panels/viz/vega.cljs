@@ -246,15 +246,15 @@
      :mark {:type "circle" :tooltip {:content "data"}}
      :selection {zoom-control-name {:type "interval"
                                     :bind "scales"
-                                    :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                    :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                    :clear "dblclick[!event.shiftKey]"
-                                    :zoom "wheel![!event.shiftKey]"}
+                                    :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :clear "dblclick[event.shiftKey]"
+                                    :zoom "wheel![event.shiftKey]"}
                  :pts {:type "interval"
-                       :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                       :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                       :clear "dblclick[event.shiftKey]"
-                       :zoom "wheel![event.shiftKey]"
+                       :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :clear "dblclick[!event.shiftKey]"
+                       :zoom "wheel![!event.shiftKey]"
                        :empty "none"}}
      :encoding {:x {:field (first cols-to-draw)
                     :type "quantitative"}
@@ -321,16 +321,16 @@
      :mark {:type "tick" :tooltip {:content "data"}}
      :selection {zoom-control-name {:type "interval"
                                     :bind "scales"
-                                    :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                    :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                    :clear "dblclick[!event.shiftKey]"
+                                    :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :clear "dblclick[event.shiftKey]"
                                     :encodings [quant-dimension]
-                                    :zoom "wheel![!event.shiftKey]"}
+                                    :zoom "wheel![event.shiftKey]"}
                  :pts {:type "interval"
-                       :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                       :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                       :clear "dblclick[event.shiftKey]"
-                       :zoom "wheel![event.shiftKey]"
+                       :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :clear "dblclick[!event.shiftKey]"
+                       :zoom "wheel![!event.shiftKey]"
                        :empty "none"}}
      :encoding {:x {:field x-field
                     :type x-type
