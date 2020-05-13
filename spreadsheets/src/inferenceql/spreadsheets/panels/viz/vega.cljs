@@ -248,12 +248,13 @@
                                     :bind "scales"
                                     :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
                                     :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                    :clear "dblclick[!event.shiftKey]"}
+                                    :clear "dblclick[!event.shiftKey]"
+                                    :zoom "wheel![!event.shiftKey]"}
                  :pts {:type "interval"
                        :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
                        :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
                        :clear "dblclick[event.shiftKey]"
-                       :zoom false
+                       :zoom "wheel![event.shiftKey]"
                        :empty "none"}}
      :encoding {:x {:field (first cols-to-draw)
                     :type "quantitative"}
