@@ -1,7 +1,8 @@
 (ns inferenceql.spreadsheets.panels.viz.views
   "Views for displaying vega-lite specs"
   (:require [yarn.vega-embed]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [re-frame.core :as rf]))
 
 (def ^:private log-level-default
   (.-Error js/vega))
@@ -53,8 +54,12 @@
                                                     (when (= current-run @run)
                                                       (gen-and-insert generators res)
                                                       (js/requestAnimationFrame send)))))))
-                      true (.catch (fn [err]
-                                     (js/console.error err)))))))]
+                      :always (.then (fn [res]
+                                       (.addDataListener (.-view res) "pts_store"
+                                                         (fn [_ds-name data]
+                                                           (rf/dispatch [:viz/set-pts-store data])))))
+                      :always (.catch (fn [err]
+                                        (js/console.error err)))))))]
     (r/create-class
      {:display-name "vega-lite"
 

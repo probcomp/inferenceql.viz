@@ -324,14 +324,20 @@
                                 :name "Clear js function"
                                 :callback clear-function-fn}}})))
 
-(rf/reg-sub
- :table/cells-style-fn
- (fn [_ _]
-   {:cell-renderer-fn (rf/subscribe [:table/cell-renderer-fn])})
- (fn [{:keys [cell-renderer-fn]}]
-   ;; Returns a function used by the :cells property in Handsontable's options.
-   (fn [row col]
-     (clj->js {:renderer cell-renderer-fn}))))
+(rf/reg-sub :table/cells-style-fn
+            :<- [:table/cell-renderer-fn]
+            :<- [:viz/pts-store-filter]
+            (fn [[cell-renderer-fn pts-store-filter]]
+              ;; Returns a function used by the :cells property in Handsontable's options.
+              (fn [row col prop]
+                (this-as obj
+                  (let [hot (.-instance obj)
+                        visual-row (.toVisualRow hot row)
+                        ;; TODO may need to keywordize keys
+                        row-data (js->clj (.getSourceDataAtRow hot row))]
+                    ;(.log js/console "row-data: " row-data)
+                    #_(when (even? row-id)
+                        (.setCellMeta hot row col "className" "selected-row")))))))
 
 (rf/reg-sub
  :table/cell-renderer-fn

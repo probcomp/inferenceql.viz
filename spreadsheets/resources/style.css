@@ -146,6 +146,10 @@ div {
   background-color: #FAFCE4;
 }
 
+.handsontable .selected-row {
+  background-color: palegoldenrod;
+}
+
 /* These are selectors for coloring the background of single-cell selections
 and multiple cell selections. The td.area:before selector applies to multiple cell selections,
 while td.current:before applies to single cell selections. */

@@ -43,3 +43,31 @@
                                         (when (vega/simulatable? selections cols)
                                           (make-simulate-fn (first cols) row override-fns)))))
                    (medley/remove-vals nil?))))
+
+(rf/reg-sub :viz/pts-store
+  (fn [db _]
+    (get-in db [:viz-panel :pts-store])))
+
+;; Returns a function that checks whether a data row matches the filtering criteria in `:viz/pts-store`
+(rf/reg-sub :viz/pts-store-filter
+            :<- [:viz/pts-store]
+            (fn [pts-store]
+              (when pts-store
+                (let [filter-maps (if (= 1 (count pts-store))
+                                    (let [s (first pts-store)]
+                                      (map (fn [[fields vals]]
+                                             {:field (get fields "field")
+                                              :type (get fields "type")
+                                              :vals vals})
+                                           (map vector (get s "fields") (get s "values"))))
+                                    (let [s (first (get (first pts-store) "fields"))
+                                          vals (mapcat #(get % "values") pts-store)]
+                                      (assert (= 1 (count (distinct (map #(get-in % ["fields" "field"]) pts-store)))))
+                                      (assert (= 1 (count (distinct (map #(get-in % ["fields" "type"]) pts-store)))))
+                                      {:field (get s "field")
+                                       :type (get s "type")
+                                       :vals vals}))]
+                  (.log js/console "filter-maps" filter-maps)))))
+                  ;; TODO generate predicates for filter maps.
+
+

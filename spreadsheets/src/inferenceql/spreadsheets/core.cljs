@@ -10,6 +10,7 @@
             [inferenceql.spreadsheets.panels.control.events]
             [inferenceql.spreadsheets.panels.control.subs]
             ;; Viz Panel
+            [inferenceql.spreadsheets.panels.viz.events]
             [inferenceql.spreadsheets.panels.viz.subs]
             [inferenceql.spreadsheets.panels.viz.init :as viz.init]
             ;; Table Panel
