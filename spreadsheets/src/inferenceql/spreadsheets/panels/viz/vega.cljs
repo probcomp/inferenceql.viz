@@ -320,6 +320,14 @@
   Useful for comparing quantitative-nominal data."
   [data cols-to-draw]
   (let [zoom-control-name (keyword (gensym "zoom-control")) ; Random id so pan/zoom is independent.
+
+        ;; NOTE: This is a temporary hack to that forces the x-channel in the plot to be "numerical"
+        ;; and the y-channel to be "nominal". The rest of the code remains nuetral to the order so that
+        ;; it can be used by the iql-viz query language later regardless of column type order.
+        first-col-nominal (= "nominal" (vega-type (first cols-to-draw)))
+        cols-to-draw (cond->> (take 2 cols-to-draw)
+                       first-col-nominal (reverse))
+
         [x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
         quant-dimension (if (= x-type "quantitative") :x :y)
