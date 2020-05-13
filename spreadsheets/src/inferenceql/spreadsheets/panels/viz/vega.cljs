@@ -22,10 +22,17 @@
 
 (def vega-strip-plot-quant-size
   "Size of the strip plot for the quantitative dimension"
-  350)
+  400)
 (def vega-strip-plot-step-size
   "Width of each band in the strip plot in the categorical dimension"
-  30)
+  40)
+
+(def vega-plot-width
+  "A general width setting vega-lite plots"
+  400)
+(def vega-plot-height
+  "A general height setting vega-lite plots"
+  400)
 
 (def default-table-color "SteelBlue")
 
@@ -242,7 +249,9 @@
   Useful for comparing quatitative-quantitative data."
   [data cols-to-draw]
   (let [zoom-control-name (keyword (gensym "zoom-control"))] ; Random id so pan/zoom is independent.
-    {:data {:values data}
+    {:width vega-plot-width
+     :height vega-plot-height
+     :data {:values data}
      :mark {:type "circle" :tooltip {:content "data"}}
      :selection {zoom-control-name {:type "interval"
                                     :bind "scales"
