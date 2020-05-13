@@ -319,13 +319,27 @@
      :height height
      :data {:values data}
      :mark {:type "tick" :tooltip {:content "data"}}
-     :selection {zoom-control-name {:type "interval" :bind "scales" :encodings [quant-dimension]}}
+     :selection {zoom-control-name {:type "interval"
+                                    :bind "scales"
+                                    :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                                    :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                                    :clear "dblclick[!event.shiftKey]"
+                                    :encodings [quant-dimension]
+                                    :zoom "wheel![!event.shiftKey]"}
+                 :pts {:type "interval"
+                       :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                       :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                       :clear "dblclick[event.shiftKey]"
+                       :zoom "wheel![event.shiftKey]"
+                       :empty "none"}}
      :encoding {:x {:field x-field
                     :type x-type
                     :axis {:grid true :gridDash [2 2]}}
                 :y {:field y-field
                     :type y-type
-                    :axis {:grid true :gridDash [2 2]}}}}))
+                    :axis {:grid true :gridDash [2 2]}}
+                :color {:condition {:selection "pts"
+                                    :value "goldenrod"}}}}))
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.
