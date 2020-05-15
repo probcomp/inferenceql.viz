@@ -278,20 +278,30 @@
 
 ;;; Subs related to settings and overall state of tables.
 
+(defn cells-fn
+  ;; Returns a function used by the :cells property in Handsontable's options.
+  [row col _prop]
+  (this-as obj
+    (let [hot (.-instance obj)
+          visual-row (.toVisualRow hot row)
+          selected (.getDataAtRowProp hot visual-row "selected--")]
+      ;; TODO pick a better key for this
+      (when selected
+        (.setCellMeta hot row col "className" "selected-row")))))
+
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn context-menu selections-coords]} _]
+  [{:keys [headers rows context-menu selections-coords]} _]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
       (assoc-in [:settings :columns] (column-settings headers))
-      (assoc-in [:settings :cells] cells-style-fn)
+      (assoc-in [:settings :cells] cells-fn)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/table-headers])
                :rows    (rf/subscribe [:table/computed-rows])
-               :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
                :selections-coords (rf/subscribe [:table/selections-coords])})
             real-hot-props)
@@ -335,18 +345,6 @@
               "clear_function" {:disabled disable-fn
                                 :name "Clear js function"
                                 :callback clear-function-fn}}})))
-
-(rf/reg-sub :table/cells-style-fn
-            ;; TODO: does this work with no args.
-            (fn []
-              ;; Returns a function used by the :cells property in Handsontable's options.
-              (fn [row col prop]
-                (this-as obj
-                  (let [hot (.-instance obj)
-                        row-data (js->clj (.getSourceDataAtRow hot row))]
-                    ;; TODO pick a better key for this
-                    (when (:selected-- row-data)
-                      (.setCellMeta hot row col "className" "selected-row")))))))
 
 (rf/reg-sub
  :table/cell-renderer-fn
