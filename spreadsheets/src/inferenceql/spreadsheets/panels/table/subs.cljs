@@ -217,6 +217,7 @@
             (fn [db _]
               (db/table-headers db)))
 
+;; TODO Make this a set of row-numbers that are selected
 (rf/reg-sub :table/selected-row-flags
             :<- [:table/table-rows]
             :<- [:viz/pts-store-filter]
@@ -278,13 +279,15 @@
 
 ;;; Subs related to settings and overall state of tables.
 
+;; TODO make this a subscription again, and have it depend on :table/selected-row-flags
 (defn cells-fn
   ;; Returns a function used by the :cells property in Handsontable's options.
   [row col _prop]
   (this-as obj
     (let [hot (.-instance obj)
           visual-row (.toVisualRow hot row)
-          selected (.getDataAtRowProp hot visual-row "selected--")]
+          ;; TODO investigate why this dosen't work with visual indices as specified in the API.
+          selected (.getDataAtRowProp hot row "selected--")]
       ;; TODO pick a better key for this
       (when selected
         (.setCellMeta hot row col "className" "selected-row")))))
