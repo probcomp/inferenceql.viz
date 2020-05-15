@@ -325,18 +325,16 @@
                                 :callback clear-function-fn}}})))
 
 (rf/reg-sub :table/cells-style-fn
-            :<- [:table/cell-renderer-fn]
-            :<- [:viz/pts-store-filter]
-            (fn [[cell-renderer-fn pts-store-filter]]
+            ;; TODO: does this work with no args.
+            (fn []
               ;; Returns a function used by the :cells property in Handsontable's options.
               (fn [row col prop]
-                (when pts-store-filter
-                  (this-as obj
-                    (let [hot (.-instance obj)
-                          visual-row (.toVisualRow hot row)
-                          row-data (js->clj (.getSourceDataAtRow hot row))]
-                      (when (pts-store-filter row-data)
-                        (.setCellMeta hot row col "className" "selected-row"))))))))
+                (this-as obj
+                  (let [hot (.-instance obj)
+                        row-data (js->clj (.getSourceDataAtRow hot row))]
+                    ;; TODO pick a better key for this
+                    (when (:selected-- row-data)
+                      (.setCellMeta hot row col "className" "selected-row")))))))
 
 (rf/reg-sub
  :table/cell-renderer-fn
