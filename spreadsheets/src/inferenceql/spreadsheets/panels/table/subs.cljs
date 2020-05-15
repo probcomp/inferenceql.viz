@@ -217,14 +217,23 @@
             (fn [db _]
               (db/table-headers db)))
 
+(rf/reg-sub :table/selected-row-flags
+            :<- [:table/table-rows]
+            :<- [:viz/pts-store-filter]
+            (fn [[rows pts-store-filter]]
+              ;; Returns a function used by the :cells property in Handsontable's options.
+              (when pts-store-filter
+                (map pts-store-filter rows))))
+
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table/table-rows])
                :scores (rf/subscribe [:table/scores])
                :labels (rf/subscribe [:table/labels])
+               :selected-row-flags (rf/subscribe [:table/selected-row-flags])
                :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])})
-            (fn [{:keys [rows scores labels imputed-values conf-mode]}]
+            (fn [{:keys [rows scores labels selected-row-flags imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
                                        (seq imputed-values))]
                 (cond->> rows
@@ -236,7 +245,10 @@
                                scores)
                   labels (mapv (fn [label row]
                                  (assoc row hot/label-col-header label))
-                               labels)))))
+                               labels)
+                  selected-row-flags (mapv (fn [flag row]
+                                             (assoc row "selected--" flag))
+                                           selected-row-flags)))))
 
 (defn table-rows
   [db _]
