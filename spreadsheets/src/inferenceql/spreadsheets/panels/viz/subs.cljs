@@ -52,7 +52,7 @@
 (rf/reg-sub :viz/pts-store-filter
             :<- [:viz/pts-store]
             (fn [pts-store]
-              (when pts-store
+              (when (seq pts-store)
                 (let [filter-maps (if (= 1 (count pts-store))
                                     (let [s (first pts-store)]
                                       (map (fn [[fields vals]]
@@ -64,10 +64,21 @@
                                           vals (mapcat #(get % "values") pts-store)]
                                       (assert (= 1 (count (distinct (map #(get-in % ["fields" "field"]) pts-store)))))
                                       (assert (= 1 (count (distinct (map #(get-in % ["fields" "type"]) pts-store)))))
-                                      {:field (get s "field")
-                                       :type (get s "type")
-                                       :vals vals}))]
-                  (.log js/console "filter-maps" filter-maps)))))
-                  ;; TODO generate predicates for filter maps.
+                                      [{:field (get s "field")
+                                        :type (get s "type")
+                                        :vals vals}]))]
+                  (.log js/console "filter-maps" filter-maps)
+                  (fn [a-row]
+                    ;(.log js/console "a-row: " a-row)
+                    (let [passes-filter? (fn [filter-map]
+                                           (case (:type filter-map)
+                                             "R" (let [[low high] (sort (:vals filter-map))
+                                                       row-val (get a-row (:field filter-map))]
+                                                   (<= low row-val high))
+                                             "E" (let [row-val (get a-row (:field filter-map))]
+                                                   (contains? (set (:vals filter-map)) row-val))))]
+                      ;(.log js/console "filter checks: " (map passes-filter? filter-maps))
+                      (every? true? (map passes-filter? filter-maps))))))))
+
 
 

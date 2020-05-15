@@ -55,6 +55,8 @@
                                                       (gen-and-insert generators res)
                                                       (js/requestAnimationFrame send)))))))
                       :always (.then (fn [res]
+                                       ;; TODO: should check that pts_store exists or make this optional
+                                       ;; in a different way.
                                        (.addDataListener (.-view res) "pts_store"
                                                          (fn [_ds-name data]
                                                            (rf/dispatch [:viz/set-pts-store data])))))

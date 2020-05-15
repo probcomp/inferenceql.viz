@@ -5,6 +5,7 @@
   {:viz-panel nil})
 
 (s/def ::viz-panel (s/nilable (s/keys :opt-un [::pts-store])))
+;; TODO: improve spec.
 (s/def ::pts-store any?)
 
 ;; Accessor functions for indexing into parts of the control-panel's db.
