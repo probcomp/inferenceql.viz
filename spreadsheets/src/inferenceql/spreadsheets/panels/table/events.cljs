@@ -105,7 +105,8 @@
    (let [selection-layers (.getSelected hot)
          color (control-db/selection-color db)]
      {:db (assoc-in db [:table-panel :selection-layers color :coords] (js->clj selection-layers))
-      :dispatch [:table/check-selection]})))
+      :dispatch-n [[:table/check-selection]
+                   [:viz/set-pts-store nil]]})))
 
 (rf/reg-event-db
  :hot/after-on-cell-mouse-down

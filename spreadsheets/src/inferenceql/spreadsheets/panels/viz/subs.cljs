@@ -53,21 +53,30 @@
             :<- [:viz/pts-store]
             (fn [pts-store]
               (when (seq pts-store)
-                (let [filter-maps (if (= 1 (count pts-store))
-                                    (let [s (first pts-store)]
+                (let [flatten-entry (fn [s]
                                       (map (fn [[fields vals]]
                                              {:field (get fields "field")
                                               :type (get fields "type")
                                               :vals vals})
                                            (map vector (get s "fields") (get s "values"))))
-                                    (let [s (first (get (first pts-store) "fields"))
-                                          vals (mapcat #(get % "values") pts-store)]
-                                      (assert (= 1 (count (distinct (map #(get-in % ["fields" "field"]) pts-store)))))
-                                      (assert (= 1 (count (distinct (map #(get-in % ["fields" "type"]) pts-store)))))
-                                      [{:field (get s "field")
-                                        :type (get s "type")
-                                        :vals vals}]))]
-                  (.log js/console "filter-maps" filter-maps)
+                      entries (mapcat flatten-entry pts-store)
+                      ;; TODO: This group-by op might be slow, but it might not matter once we debouce.
+                      groups (group-by (juxt :field :type) entries)
+
+                      filter-maps (reduce-kv (fn [accum [field type] entries]
+                                               (case type
+                                                 "R" (do (assert (= 1 (count entries)))
+                                                       (concat accum entries))
+                                                 "E" (let [reduced-entity-map {:field field
+                                                                               :type type
+                                                                               :vals (map :vals entries)}]
+                                                       (concat accum [reduced-entity-map]))))
+                                             []
+                                             groups)]
+
+
+                  ;(.log js/console "groups: " groups)
+                  ;(.log js/console "filter-maps" filter-maps)
                   (fn [a-row]
                     ;(.log js/console "a-row: " a-row)
                     (let [passes-filter? (fn [filter-map]
@@ -77,7 +86,6 @@
                                                    (<= low row-val high))
                                              "E" (let [row-val (get a-row (:field filter-map))]
                                                    (contains? (set (:vals filter-map)) row-val))))]
-                      ;(.log js/console "filter checks: " (map passes-filter? filter-maps))
                       (every? true? (map passes-filter? filter-maps))))))))
 
 
