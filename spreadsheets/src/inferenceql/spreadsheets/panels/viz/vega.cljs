@@ -210,7 +210,7 @@
                                               ;; nominal here to remove vega-tooltip warning message.
                                               :type "nominal"}
                                     :stroke {:condition {:selection "pts"
-                                                         :value "green"}}
+                                                         :value "darkslategrey"}}
                                     :strokeWidth {:condition {:selection "pts"
                                                               :value 1.0}}
                                     ;; TODO: Find a better way highlight selected geoshapes.
