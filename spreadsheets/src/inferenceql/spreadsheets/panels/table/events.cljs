@@ -8,31 +8,35 @@
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :table/set
  event-interceptors
  ;; `rows` and `headers` are required arguments essentially, and
  ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
  ;; to be passed in a map.
- (fn [db [_ rows headers {:keys [scores labels virtual]}]]
-   (let [vec-maybe #(some-> % vec)] ; Casts a value to a vec if it is not nil.
-     (-> db
-         (assoc-in [:table-panel :rows] (vec-maybe rows))
-         (assoc-in [:table-panel :headers] (vec-maybe headers))
-         (util/assoc-or-dissoc-in [:table-panel :scores] (vec-maybe scores))
-         (util/assoc-or-dissoc-in [:table-panel :labels] (vec-maybe labels))
-         (util/assoc-or-dissoc-in [:table-panel :virtual] virtual)
+ (fn [{:keys [db]} [_ rows headers {:keys [scores labels virtual]}]]
+   (let [vec-maybe #(some-> % vec) ; Casts a value to a vec if it is not nil.
+         new-db (-> db
+                    (assoc-in [:table-panel :rows] (vec-maybe rows))
+                    (assoc-in [:table-panel :headers] (vec-maybe headers))
+                    (util/assoc-or-dissoc-in [:table-panel :scores] (vec-maybe scores))
+                    (util/assoc-or-dissoc-in [:table-panel :labels] (vec-maybe labels))
+                    (util/assoc-or-dissoc-in [:table-panel :virtual] virtual)
 
-         ;; Clear all selections in all selection layers.
-         (assoc-in [:table-panel :selection-layers] {})))))
+                    ;; Clear all selections in all selection layers.
+                    (assoc-in [:table-panel :selection-layers] {}))]
+     {:db new-db
+      :dispatch [:viz/set-pts-store nil]})))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :table/clear
  event-interceptors
- (fn [db [_]]
-   (-> db
-       (update-in [:table-panel] dissoc :rows :headers :labels :scores)
-       (assoc-in [:table-panel :selection-layers] {}))))
+ (fn [{:keys [db]} [_]]
+   (let [new-db (-> db
+                    (update-in [:table-panel] dissoc :rows :headers :labels :scores)
+                    (assoc-in [:table-panel :selection-layers] {}))]
+     {:db new-db
+      :dispatch [:viz/set-pts-store nil]})))
 
 ;; Checks if the selection in the current selection layer is valid.
 ;; If it is not valid, the current selection layer is cleared.
@@ -105,8 +109,7 @@
    (let [selection-layers (.getSelected hot)
          color (control-db/selection-color db)]
      {:db (assoc-in db [:table-panel :selection-layers color :coords] (js->clj selection-layers))
-      :dispatch-n [[:table/check-selection]
-                   [:viz/set-pts-store nil]]})))
+      :dispatch [:table/check-selection]})))
 
 (rf/reg-event-db
  :hot/after-on-cell-mouse-down
