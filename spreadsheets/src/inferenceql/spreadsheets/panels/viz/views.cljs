@@ -45,26 +45,29 @@
                   (let [spec (clj->js spec)
                         opt (clj->js (merge default-vega-embed-options
                                             opt))]
-                    (cond-> (js/vegaEmbed (r/dom-node this)
-                                          spec
-                                          opt)
-                      (seq generators) (.then (fn [res]
-                                               (let [current-run (swap! run inc)]
-                                                 (js/requestAnimationFrame
-                                                  (fn send []
-                                                    (when (= current-run @run)
-                                                      (gen-and-insert generators res)
-                                                      (js/requestAnimationFrame send)))))))
-                      :always (.then (fn [res]
-                                       ;; TODO: should check that pts_store exists or make this optional
-                                       ;; in a different way.
-                                       (.addDataListener (.-view res) "pts_store"
-                                                         (gfn/debounce
-                                                           (fn [_ds-name data]
-                                                             (rf/dispatch [:viz/set-pts-store data]))
-                                                           150))))
-                      :always (.catch (fn [err]
-                                        (js/console.error err)))))))]
+                    (doto (js/vegaEmbed (r/dom-node this)
+                                        spec
+                                        opt)
+                      (.then (fn [res]
+                               (when generators
+                                 (let [current-run (swap! run inc)]
+                                   (js/requestAnimationFrame
+                                    (fn send []
+                                      (when (= current-run @run)
+                                        (gen-and-insert generators res)
+                                        (js/requestAnimationFrame send))))))))
+                      (.then (fn [res]
+                               (let [view-obj (.-view res)
+                                     pts-store-exists (try (some? (.data view-obj "pts_store"))
+                                                           (catch :default e false))]
+                                 (when pts-store-exists
+                                   (.addDataListener view-obj "pts_store"
+                                                     (gfn/debounce
+                                                       (fn [_ds-name data]
+                                                         (rf/dispatch [:viz/set-pts-store data]))
+                                                       150))))))
+                      (.catch (fn [err]
+                                (js/console.error err)))))))]
     (r/create-class
      {:display-name "vega-lite"
 
