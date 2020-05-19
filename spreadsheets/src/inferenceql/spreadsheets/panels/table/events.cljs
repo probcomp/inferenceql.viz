@@ -126,7 +126,7 @@
        ; Deselect all cells in selection layer on alt-click.
        (update-in db [:table-panel :selection-layers] dissoc color)
        ;; Otherwise just save whether a header was clicked or not.
-       (assoc-in db [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
+       (assoc-in db [:table-panel :selection-layers-header-clicked color] header-clicked-flag)))))
 
 (defn assoc-visual-table-state
   "Associates the displayed stated of `hot` into `db`.
