@@ -69,7 +69,7 @@
                                                        (concat accum entries))
                                                  "E" (let [reduced-entity-map {:field field
                                                                                :type type
-                                                                               :vals (map :vals entries)}]
+                                                                               :vals (flatten (map :vals entries))}]
                                                        (concat accum [reduced-entity-map]))))
                                              []
                                              groups)]
