@@ -12,15 +12,13 @@
   (let [real-hot-props @(rf/subscribe [:table/real-hot-props])
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         generators      @(rf/subscribe [:viz/generators])
+        pts-store @(rf/subscribe [:viz/pts-store])
         virtual @(rf/subscribe [:table/virtual])
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
      [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
-     [:div#viz-container
-      [:div.flex-box-space-filler-20]
-      (when vega-lite-spec
-        [viz/vega-lite vega-lite-spec {:actions false} generators])
-      [:div.flex-box-space-filler-20]]
+     (when vega-lite-spec
+       [viz/vega-lite vega-lite-spec {:actions false} generators pts-store])
      [modal/modal]]))
