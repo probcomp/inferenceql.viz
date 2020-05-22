@@ -98,14 +98,15 @@ $(figwheel-index-file): $(figwheel-public-dir)
 	## Copy static index.html file.
 	cp $(current-dir)/index.html $(figwheel-index-file)
 
-$(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource)
+$(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource) $(model-edn-file)
 	## Copy static resource files.
 	cp -r $(resource-dir) $(figwheel-resource-dir)
 
-# Deletes the entire figwheel build directory.
+# Deletes the entire figwheel build directory and also the model file.
 .PHONY: figwheel-clean
 figwheel-clean:
 	rm -Rf $(figwheel-build-dir)
+	rm -Rf $(model-edn-file)
 
 # Deletes the static files in the figwheel build directory.
 .PHONY: figwheel-clean-static
@@ -116,17 +117,17 @@ figwheel-clean-static:
 # Deletes the static files in the figwheel build directory and
 # copies them over again. This is useful for updating static files
 # that have changed while an instance of figwheel is running.
-# The mostly likely files to have changed are CSS files that have
+# The mostly likely files to have changed are CSS files that have been
 # recently edited.
 .PHONY: figwheel-static
 figwheel-static: figwheel-clean-static $(figwheel-public-dir) $(figwheel-resource-dir) $(figwheel-index-file)
 
 ## Starts the spreadsheets app using Figwheel.
 .PHONY: figwheel
-figwheel: model-spec figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
+figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel
 
 ## Starts the spreadsheets app using Figwheel and Re-frame-10x.
 .PHONY: figwheel-10x
-figwheel-10x: model-spec figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
+figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	cd .. && clojure -A:figwheel:10x
