@@ -23,12 +23,18 @@
           (let [error-messages
                 (case (:cognitect.anomalies/category (ex-data e))
                   :cognitect.anomalies/incorrect
-                  (let [ip-fail-obj (:inferenceql.query.instaparse/failure (ex-data e))
-                        ip-fail-msg (with-out-str (print ip-fail-obj))]
-                    {:log-msg (str (ex-message e) "\n" ip-fail-msg)
-                     :alert-msg (str "Your query could not be parsed."
-                                     "\n"
-                                     "Open the browser console to see how to fix it.")})
+                  (if-let [ip-fail-obj (:inferenceql.query.instaparse/failure (ex-data e))]
+                    ;; When information on the parsing error is available.
+                    (let [ip-fail-msg (with-out-str (print ip-fail-obj))]
+                      {:log-msg (str (ex-message e) "\n" ip-fail-msg)
+                       :alert-msg (str "Your query could not be parsed."
+                                       "\n"
+                                       "Open the browser console to see how to fix it.")})
+                    ;; When information on the parsing error is not available.
+                    {:log-msg "Parse Error: Could not be parse query."
+                     :altert-msg (str "Your query could not be parsed. "
+                                      "\n"
+                                      "Please check your query.")})
 
                   ;; default case
                   {:log-msg (ex-message e)
