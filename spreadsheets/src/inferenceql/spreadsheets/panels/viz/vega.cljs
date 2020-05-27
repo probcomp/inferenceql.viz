@@ -141,8 +141,8 @@
             :encoding {:x {:bin (should-bin? col)
                            :field col
                            :type (vega-type col)}
-                        :y {:aggregate "count"
-                            :type "quantitative"}}
+                       :y {:aggregate "count"
+                           :type "quantitative"}}
             :selection {:pts {:type "interval" :encodings ["x"] :empty "none"}}}
 
            {:transform [{:filter {:selection "pts"}}],
