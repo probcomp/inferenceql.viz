@@ -1,7 +1,7 @@
 # IQL-SQL
 
 (name to be improved)
-Loosely speaking, we can think of the functional capabilities of this language in terms of a non-relational subset of SQL (**no joins**) but with a few extensions:
+Loosely speaking, we can think of the functional capabilities of this language in terms of a non-relational subset of SQL (**no joins**) but with a few extensions.
 
 ## SELECT 
 ```
@@ -53,7 +53,7 @@ SELECT … FROM (SELECT PROBABILITY OF x = 3 GIVEN *))
 
 ## GENERATE
 
-here is a global default table ("data") and model ("model") which are always available to users. When the interpreter is instantiated, the data table and GPM used for these are specified manually. Conceptually, “data” has columns that are the columns in the underlying Data Table concept. Besides the default model, we assume there is a registry of models, mapping names to Clojure objects implementing the model, supplied when the IQL Interpreter is created. Every model can be queried using its name, for example in a query of the form:
+There is a global default table ("data") and model ("model") which are always available to users. When the interpreter is instantiated, the data table and GPM used for these are specified manually. Conceptually, “data” has columns that are the columns in the underlying Data Table concept. Besides the default model, we assume there is a registry of models, mapping names to Clojure objects implementing the model, supplied when the IQL Interpreter is created. Every model can be queried using its name, for example in a query of the form:
 
 ```
 GENERATE x, y GIVEN z=5 UNDER my_named_model
@@ -103,9 +103,9 @@ PROBABILITY DENSITY OF <target_cols> [GIVEN <input_cols=vals>] [UNDER <model>]
 not violate the expectation a user might hold. The two keywords will interact as follows:
 
 These sub-expressions can be used only in `SELECT` expressions, for now. 
--`PROBABILITY OF x='a' [...]` evaluates to `PROBABILITY DENSITY OF x='a' [...]` (below) if x has statistical type `NOMINAL`.
--`PROBABILITY OF x=3.14 [...]` where x has statistical type `NUMERICAL` throws an error.
--`PROBABILITY DENSITY OF x=3.14` [...] returns an unnormalized probability.
+* `PROBABILITY OF x='a' [...]` evaluates to `PROBABILITY DENSITY OF x='a' [...]` (below) if x has statistical type `NOMINAL`.
+* `PROBABILITY OF x=3.14 [...]` where x has statistical type `NUMERICAL` throws an error.
+* `PROBABILITY DENSITY OF x=3.14` [...] returns an unnormalized probability.
 
 
 [-> back](../index.md)

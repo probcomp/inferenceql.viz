@@ -4,4 +4,4 @@
 1. [IQL-SQL](sql/index.md)
 
 
-[back ->](../../index.md)
+[back ->](../index.md)
