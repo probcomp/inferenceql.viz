@@ -52,7 +52,7 @@
    (let [column-types (cond->> column-types
                                keywordize-cols (walk/keywordize-keys))]
      (cond->> csv-data
-              :always (mapv clean-items-in-row-vec)
-              :always (csv-data->maps)
-              keywordize-cols (mapv walk/keywordize-keys)
-              :always (mapv #(cast-items-in-row column-types %))))))
+       :always (mapv clean-items-in-row-vec)
+       :always (csv-data->maps)
+       keywordize-cols (mapv walk/keywordize-keys)
+       :always (mapv #(cast-items-in-row column-types %))))))

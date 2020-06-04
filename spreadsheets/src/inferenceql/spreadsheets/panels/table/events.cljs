@@ -125,6 +125,10 @@
        (assoc-in db [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
 
 (defn assoc-visual-table-state
+  "Associates the displayed stated of `hot` into `db`.
+  The visual table state includes data changes caused by filtering, re-ordering columns, sorting columns, etc.
+  We use this visual state to along with selection coordinates to produce the data subset selected.
+  This gets passed onto the visualization code--all via subscriptions."
   [db hot]
   (let [rows (js->clj (.getData hot))
         headers (mapv keyword (js->clj (.getColHeader hot)))
