@@ -1,136 +1,45 @@
 (ns inferenceql.spreadsheets.components.query.events
-  (:require [clojure.core.match :refer [match]]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [re-frame.core :as rf]
-            [metaprob.prelude :as mp]
-            [inferenceql.inference.multimixture :as mmix]
-            [inferenceql.inference.multimixture.search :as search]
-            [inferenceql.spreadsheets.db :as db]
+            [inferenceql.query :as query]
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.query :as query]
-            [inferenceql.spreadsheets.panels.override.helpers :as co]))
-
-(def ^:private search-column "new property")
-(def ^:private n-models 10)
-(def ^:private beta-params {:alpha 0.001, :beta 0.001})
+            [inferenceql.inference.gpm :as gpm]))
 
 (rf/reg-event-fx
- :query/parse-query
- event-interceptors
- (fn [{:keys [db]} [_ text label-info]]
-   (let [command (->> (str/trim text)
-                      (query/parse))
-         {:keys [pos-ids neg-ids unlabeled-ids]} label-info]
-     (match command
-       {:type :display-dataset}
-       {:dispatch [:query/display-dataset]}
+  :query/parse-query
+  event-interceptors
+  (fn [{:keys [db]} [_ text label-info]]
+    (let [rows (table-db/dataset-rows db)
+          command (str/trim text)
+          models {:model (gpm/Multimixture model/spec)}]
+      (try
+        (let [result (query/q command rows models)
+              columns (:iql/columns (meta result))]
+          ;; TODO: add flag for virtual data.
+          {:dispatch [:table/set result columns {:virtual false}]})
+        (catch ExceptionInfo e
+          (let [error-messages
+                (case (:cognitect.anomalies/category (ex-data e))
+                  :cognitect.anomalies/incorrect
+                  (if-let [ip-fail-obj (:inferenceql.query.instaparse/failure (ex-data e))]
+                    ;; When information on the parsing error is available.
+                    (let [ip-fail-msg (with-out-str (print ip-fail-obj))]
+                      {:log-msg (str (ex-message e) "\n" ip-fail-msg)
+                       :alert-msg (str "Your query could not be parsed."
+                                       "\n"
+                                       "Open the browser console to see how to fix it.")})
+                    ;; When information on the parsing error is not available.
+                    {:log-msg "Parse Error: Could not be parse query."
+                     :altert-msg (str "Your query could not be parsed. "
+                                      "\n"
+                                      "Please check your query.")})
 
-       {:type :generate-virtual-row, :conditions c, :num-rows num-rows}
-       {:dispatch [:query/generate-virtual-row c num-rows]}
-
-       {:type :anomaly-search :column column :given :row}
-       {:dispatch [:query/anomaly-search column ["ROW"]]}
-
-       {:type :anomaly-search :column column :given given-col}
-       {:dispatch [:query/anomaly-search column [given-col]]}
-
-       {:type :anomaly-search :column column}
-       {:dispatch [:query/anomaly-search column []]}
-
-       {:type :search-by-labeled :binding {"label" "True"} :given true}
-       {:dispatch [:query/search-by-labeled pos-ids neg-ids unlabeled-ids]}
-
-       :else
-       (let [logged-msg (str "Unimplemented command: " (pr-str command))
-             alerted-msg "Invalid query syntax."]
-         ;; TODO: These could be their own effects!
-         (js/console.error logged-msg)
-         (js/alert alerted-msg)
-         {})))))
-
-(rf/reg-event-fx
- :query/display-dataset
- event-interceptors
- (fn [{:keys [db]} [_]]
-   (let [rows (table-db/dataset-rows db)
-         headers (table-db/dataset-headers db)]
-     {:dispatch [:table/set rows headers]})))
-
-(rf/reg-event-fx
- :query/search-by-example
- event-interceptors
- (fn [{:keys [db]} [_ example-row]]
-   (let [rows (table-db/dataset-rows db)
-         headers (table-db/dataset-headers db)
-         search-row (merge example-row {search-column true})
-         result (search/search model/spec search-column [search-row] rows n-models beta-params {})]
-     {:dispatch [:table/set rows headers {:scores result}]})))
-
-(rf/reg-event-fx
- :query/anomaly-search
- event-interceptors
- (fn [{:keys [db]} [_ target-col conditional-cols]]
-   (let [rows (table-db/dataset-rows db)
-         headers (table-db/dataset-headers db)
-         result (search/anomaly-search model/spec target-col conditional-cols rows)]
-     {:dispatch [:table/set rows headers {:scores result}]})))
-
-(rf/reg-event-fx
- :query/generate-virtual-row
- event-interceptors
- (fn [{:keys [db]} [_ conditions num-rows]]
-   (let [constraint-addrs-vals (mmix/with-row-values {} conditions)
-         gen-fn #(first (mp/infer-and-score
-                         :procedure (search/optimized-row-generator model/spec)
-                         :observation-trace constraint-addrs-vals))
-         has-negative-vals? #(some (every-pred number? neg?) (vals %))
-
-         overrides-map (get-in db [:override-panel :column-override-fns])
-         overrides-insert-fn (co/gen-insert-fn overrides-map)
-
-         ;; TODO: '(remove negative-vals? ...)' is hack for StrangeLoop2019
-         new-rows (take num-rows (map overrides-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))
-         headers (table-db/dataset-headers db)]
-     {:dispatch [:table/set new-rows headers {:virtual true}]})))
-
-(defn- create-search-examples [pos-rows neg-rows]
-  (let [remove-nil-key-vals #(into {} (remove (comp nil? second) %))
-        pos-rows-examples (->> pos-rows
-                               (map #(merge % {search-column true}))
-                               (map remove-nil-key-vals))
-        neg-rows-examples (->> neg-rows
-                               (map #(merge % {search-column false}))
-                               (map remove-nil-key-vals))
-        examples (concat pos-rows-examples neg-rows-examples)]
-    examples))
-
-(defn- create-scores-map-for-labeled-rows [pos-ids neg-ids]
-  (let [pos-ids-map (zipmap pos-ids (repeat 1))
-        neg-ids-map (zipmap neg-ids (repeat 0))]
-    (merge pos-ids-map neg-ids-map)))
-
-(rf/reg-event-fx
- :query/search-by-labeled
- event-interceptors
- (fn [{:keys [db]} [_ pos-ids neg-ids unlabeled-ids]]
-   (let [rows (table-db/dataset-rows db)
-         headers (table-db/dataset-headers db)
-         raw-labels (table-db/labels db)
-
-         pos-rows (map rows pos-ids)
-         neg-rows (map rows neg-ids)
-         unlabeled-rows (map rows unlabeled-ids)
-
-         example-rows (create-search-examples pos-rows neg-rows)
-
-         scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params {})
-         scores-ids-map (zipmap unlabeled-ids scores)
-
-         scores-ids-map-lab (create-scores-map-for-labeled-rows pos-ids neg-ids)
-
-         all-scores (->> (merge scores-ids-map scores-ids-map-lab)
-                         (sort-by key)
-                         (map second))]
-     {:dispatch [:table/set rows headers {:scores all-scores :labels raw-labels}]})))
+                  ;; default case
+                  {:log-msg (ex-message e)
+                   :alert-msg (ex-message e)})]
+            ;; TODO: These could be their own effects!
+            (js/console.error (:log-msg error-messages))
+            (js/alert (:alert-msg error-messages))
+            {}))))))

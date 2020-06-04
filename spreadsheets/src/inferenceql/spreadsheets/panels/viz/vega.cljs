@@ -11,7 +11,7 @@
 
 ;; These are defs related to choropleth related columns in the dataset.
 ;; See spreadsheets/resources/config.edn for more info.
-(def ^:private geo-id-col (get-in config/config [:geo :table-geo-id-col]))
+(def ^:private geo-id-col (keyword (get-in config/config [:geo :table-geo-id-col])))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
@@ -49,7 +49,8 @@
 (defn probability-column? [col-name]
   "Returns whether a `col-name` was the result of probability-of statement.
   `col-name` is the name of the column."
-  (= "probability" col-name))
+  (when col-name
+    (some? (re-matches #"^prob[\w\-]*$" (name col-name)))))
 
 (defn stat-type
   "Returns a multi-mixture stat-type given a column name from the data table."
@@ -65,7 +66,7 @@
   "Returns a vega-lite type given `col-name`, a column name from the data table.
   May return nil if multi-mix stat-type for `col-name` can`t be found."
   [col-name]
-  (cond (contains? #{hot/score-col-header} col-name)
+  (cond (probability-column? col-name)
         "quantitative"
 
         (contains? #{hot/label-col-header geo-id-col} col-name)
