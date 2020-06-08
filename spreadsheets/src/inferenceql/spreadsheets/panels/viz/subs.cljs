@@ -82,9 +82,9 @@
                     (let [passes-filter? (fn [filter-map]
                                            (case (:type filter-map)
                                              "R" (let [[low high] (sort (:vals filter-map))
-                                                       row-val (get a-row (:field filter-map))]
+                                                       row-val (get a-row (keyword (:field filter-map)))]
                                                    (<= low row-val high))
-                                             "E" (let [row-val (get a-row (:field filter-map))]
+                                             "E" (let [row-val (get a-row (keyword (:field filter-map)))]
                                                    (contains? (set (:vals filter-map)) row-val))))]
                       (every? true? (map passes-filter? filter-maps))))))))
 
