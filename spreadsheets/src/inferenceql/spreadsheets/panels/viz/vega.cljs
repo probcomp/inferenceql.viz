@@ -22,10 +22,17 @@
 
 (def vega-strip-plot-quant-size
   "Size of the strip plot for the quantitative dimension"
-  350)
+  400)
 (def vega-strip-plot-step-size
   "Width of each band in the strip plot in the categorical dimension"
-  30)
+  40)
+
+(def vega-plot-width
+  "A general width setting vega-lite plots"
+  400)
+(def vega-plot-height
+  "A general height setting vega-lite plots"
+  400)
 
 (def default-table-color "SteelBlue")
 
@@ -129,12 +136,24 @@
 
 (defn gen-histogram [col selections]
   {:data {:values selections}
-   :mark {:type "bar" :color default-table-color}
-   :encoding {:x {:bin (should-bin? col)
-                  :field col
-                  :type (vega-type col)}
-              :y {:aggregate "count"
-                  :type "quantitative"}}})
+   :layer [{:mark {:type "bar" 
+                   :color default-table-color}
+            :encoding {:x {:bin (should-bin? col)
+                           :field col
+                           :type (vega-type col)}
+                       :y {:aggregate "count"
+                           :type "quantitative"}}
+            :selection {:pts {:type "interval" :encodings ["x"] :empty "none"}}}
+
+           {:transform [{:filter {:selection "pts"}}],
+            :mark {:type "bar",
+                   :color "goldenrod"}
+            :encoding {:x {:bin (should-bin? col)
+                           :field col
+                           :type (vega-type col)}
+                       :y {:aggregate "count", 
+                           :type "quantitative"}}}]})
+
 
 (defn gen-choropleth [selections selected-columns]
   ;; TODO: Add a spec for topojson config map.
@@ -154,7 +173,7 @@
 
                                 :else
                                 ;; This is a hack for getting tooltips to work with multiple plots.
-                                (mapv #(assoc % :geometry "[...]")))
+                                (mapv #(assoc % :geo "[...]")))
 
           data-format (case (get geo-config :filetype)
                         :geojson {:property "features"}
@@ -172,16 +191,38 @@
                              :as "row"}
                             ;; We filter entities in the topojson that did not join on a row
                             ;; in `rows-cleaned`.
-                            {:filter "datum.row"}]
+                            {:filter "datum.row"}
+                            ;; NOTE: Hopefully, rows in `rows-cleaned` do not have
+                            ;; attributes called: type, properties, or geometry.
+                            ;; Otherwise this spec will fail. Those attributes
+                            ;; conflict with those found in the geojson.
+                            {:lookup (get geo-config :prop)
+                             :from {:data {:values rows-cleaned}
+                                    :key geo-id-col
+                                    :fields (keys (first rows-cleaned))}}]
                 :projection {:type (get geo-config :projection-type)}
-                :mark {:type "geoshape"
-                       :color "#eee"
-                       :stroke "#757575"
-                       :strokeWidth "0.5"}
-                :encoding {:tooltip {:field "row"
-                                     ;; This field is actually an object, but specifying type
-                                     ;; nominal here to remove vega-tooltip warning message.
-                                     :type "nominal"}}}]
+                :layer [{:mark {:type "geoshape"
+                                :color "#eee"
+                                :stroke "#757575"
+                                :strokeWidth "0.5"}
+                         :encoding {:tooltip {:field "row"
+                                              ;; This field is actually an object, but specifying type
+                                              ;; nominal here to remove vega-tooltip warning message.
+                                              :type "nominal"}
+                                    :stroke {:condition {:selection "pts"
+                                                         :value "darkslategrey"}}
+                                    :strokeWidth {:condition {:selection "pts"
+                                                              :value 1.0}}
+                                    ;; TODO: Find a better way highlight selected geoshapes.
+                                    ;; There might be a penalty to using opacity.
+                                    :opacity {:condition [{:selection "pts"
+                                                           :value 1.0}
+                                                          ;; FIXME: this is specific to the :pts name
+                                                          {:test "length(data(\"pts_store\")) == 0"
+                                                           :value 1.0}]
+                                              :value 0.2}}
+                         :selection {:pts {:type "multi" :empty "none" :fields ["zip-code"]}}}]}]
+
       (if-not color-by-col
         spec
         ;; If we have another column selected besides `geo-id-col`,
@@ -190,12 +231,16 @@
                             ["#f2f2f2" "#deebf7","#bdd7e7","#6baed6","#2171b5"]
                             ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"])
               reverse-scale (probability-column? color-by-col)
+              scale (case (vega-type color-by-col)
+                      "quantitative" {:type "quantize"
+                                      :range color-range
+                                      :reverse reverse-scale}
+                      "nominal" {:type "ordinal"
+                                 :scheme {:name "nyt"}})
 
               color-spec {:field (str "row." (name color-by-col))
                           :type (vega-type color-by-col)
-                          :scale {:type "quantize"
-                                  :range color-range
-                                  :reverse reverse-scale}
+                          :scale scale
                           :legend {:title color-by-col}}]
           (assoc-in spec [:encoding :color] color-spec))))))
 
@@ -203,12 +248,29 @@
   "Generates vega-lite spec for a scatter plot.
   Useful for comparing quatitative-quantitative data."
   [data cols-to-draw]
-  {:data {:values data}
-   :mark {:type "circle" :tooltip {:content "data"}}
-   :encoding {:x {:field (first cols-to-draw)
-                  :type "quantitative"}
-              :y {:field (second cols-to-draw)
-                  :type "quantitative"}}})
+  (let [zoom-control-name (keyword (gensym "zoom-control"))] ; Random id so pan/zoom is independent.
+    {:width vega-plot-width
+     :height vega-plot-height
+     :data {:values data}
+     :mark {:type "circle" :tooltip {:content "data"}}
+     :selection {zoom-control-name {:type "interval"
+                                    :bind "scales"
+                                    :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :clear "dblclick[event.shiftKey]"
+                                    :zoom "wheel![event.shiftKey]"}
+                 :pts {:type "interval"
+                       :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :clear "dblclick[!event.shiftKey]"
+                       :zoom "wheel![!event.shiftKey]"
+                       :empty "none"}}
+     :encoding {:x {:field (first cols-to-draw)
+                    :type "quantitative"}
+                :y {:field (second cols-to-draw)
+                    :type "quantitative"}
+                :color {:condition {:selection "pts"
+                                    :value "goldenrod"}}}}))
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -257,19 +319,44 @@
   "Generates vega-lite spec for a strip plot.
   Useful for comparing quantitative-nominal data."
   [data cols-to-draw]
-  (let [[x-field y-field] cols-to-draw
+  (let [zoom-control-name (keyword (gensym "zoom-control")) ; Random id so pan/zoom is independent.
+
+        ;; NOTE: This is a temporary hack to that forces the x-channel in the plot to be "numerical"
+        ;; and the y-channel to be "nominal". The rest of the code remains nuetral to the order so that
+        ;; it can be used by the iql-viz query language later regardless of column type order.
+        first-col-nominal (= "nominal" (vega-type (first cols-to-draw)))
+        cols-to-draw (cond->> (take 2 cols-to-draw)
+                       first-col-nominal (reverse))
+
+        [x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
+        quant-dimension (if (= x-type "quantitative") :x :y)
         [width height] (map strip-plot-size-helper cols-to-draw)]
     {:width width
      :height height
      :data {:values data}
      :mark {:type "tick" :tooltip {:content "data"}}
+     :selection {zoom-control-name {:type "interval"
+                                    :bind "scales"
+                                    :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                    :clear "dblclick[event.shiftKey]"
+                                    :encodings [quant-dimension]
+                                    :zoom "wheel![event.shiftKey]"}
+                 :pts {:type "interval"
+                       :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                       :clear "dblclick[!event.shiftKey]"
+                       :zoom "wheel![!event.shiftKey]"
+                       :empty "none"}}
      :encoding {:x {:field x-field
                     :type x-type
                     :axis {:grid true :gridDash [2 2]}}
                 :y {:field y-field
                     :type y-type
-                    :axis {:grid true :gridDash [2 2]}}}}))
+                    :axis {:grid true :gridDash [2 2]}}
+                :color {:condition {:selection "pts"
+                                    :value "goldenrod"}}}}))
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.

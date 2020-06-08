@@ -217,14 +217,24 @@
             (fn [db _]
               (db/table-headers db)))
 
+;; TODO Make this a set of row-numbers that are selected
+(rf/reg-sub :table/selected-row-flags
+            :<- [:table/table-rows]
+            :<- [:viz/pts-store-filter]
+            (fn [[rows pts-store-filter]]
+              ;; Returns a function used by the :cells property in Handsontable's options.
+              (when pts-store-filter
+                (map pts-store-filter rows))))
+
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table/table-rows])
                :scores (rf/subscribe [:table/scores])
                :labels (rf/subscribe [:table/labels])
+               :selected-row-flags (rf/subscribe [:table/selected-row-flags])
                :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])})
-            (fn [{:keys [rows scores labels imputed-values conf-mode]}]
+            (fn [{:keys [rows scores labels selected-row-flags imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
                                        (seq imputed-values))]
                 (cond->> rows
@@ -236,7 +246,10 @@
                                scores)
                   labels (mapv (fn [label row]
                                  (assoc row hot/label-col-header label))
-                               labels)))))
+                               labels)
+                  selected-row-flags (mapv (fn [flag row]
+                                             (assoc row "selected--" flag))
+                                           selected-row-flags)))))
 
 (defn table-rows
   [db _]
@@ -266,20 +279,32 @@
 
 ;;; Subs related to settings and overall state of tables.
 
+;; TODO make this a subscription again, and have it depend on :table/selected-row-flags
+(defn cells-fn
+  ;; Returns a function used by the :cells property in Handsontable's options.
+  [row col _prop]
+  (this-as obj
+    (let [hot (.-instance obj)
+          visual-row (.toVisualRow hot row)
+          ;; TODO investigate why this dosen't work with visual indices as specified in the API.
+          selected (.getDataAtRowProp hot row "selected--")]
+      ;; TODO pick a better key for this
+      (when selected
+        (.setCellMeta hot row col "className" "selected-row")))))
+
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn context-menu selections-coords]} _]
+  [{:keys [headers rows context-menu selections-coords]} _]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
       (assoc-in [:settings :columns] (column-settings headers))
-      (assoc-in [:settings :cells] cells-style-fn)
+      (assoc-in [:settings :cells] cells-fn)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/table-headers])
                :rows    (rf/subscribe [:table/computed-rows])
-               :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
                :selections-coords (rf/subscribe [:table/selections-coords])})
             real-hot-props)
@@ -323,15 +348,6 @@
               "clear_function" {:disabled disable-fn
                                 :name "Clear js function"
                                 :callback clear-function-fn}}})))
-
-(rf/reg-sub
- :table/cells-style-fn
- (fn [_ _]
-   {:cell-renderer-fn (rf/subscribe [:table/cell-renderer-fn])})
- (fn [{:keys [cell-renderer-fn]}]
-   ;; Returns a function used by the :cells property in Handsontable's options.
-   (fn [row col]
-     (clj->js {:renderer cell-renderer-fn}))))
 
 (rf/reg-sub
  :table/cell-renderer-fn

@@ -10,7 +10,9 @@
             [inferenceql.spreadsheets.panels.control.events]
             [inferenceql.spreadsheets.panels.control.subs]
             ;; Viz Panel
+            [inferenceql.spreadsheets.panels.viz.events]
             [inferenceql.spreadsheets.panels.viz.subs]
+            [inferenceql.spreadsheets.panels.viz.init :as viz.init]
             ;; Table Panel
             [inferenceql.spreadsheets.panels.table.events]
             [inferenceql.spreadsheets.panels.table.subs]
@@ -29,6 +31,8 @@
 (set! *warn-on-infer* true)
 
 (rf/dispatch-sync [:initialize-db])
+
+(viz.init/add-custom-vega-color-schemes)
 
 (defn ^:export -main
   []

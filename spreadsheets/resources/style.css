@@ -123,6 +123,10 @@ div {
   border-color: #e7e7e7;
 }
 
+#vg-tooltip-element.vg-tooltip.custom-theme table {
+  font-size: .75rem;
+}
+
 /* --------------- styling for handsontables --------------- */
 
 #table-container {
@@ -144,6 +148,10 @@ div {
 
 .virtual .ht_master tr td {
   background-color: #FAFCE4;
+}
+
+.handsontable .selected-row {
+  background-color: palegoldenrod;
 }
 
 /* These are selectors for coloring the background of single-cell selections
