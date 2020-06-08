@@ -67,7 +67,7 @@ $(hot-css-resource): $(hot-css-file)
 ### Publishing
 
 .PHONY: publish-dir
-publish-dir: $(output-to) $(publish-dir)
+publish-dir: $(model-edn-file) js $(publish-dir)
 
 $(publish-dir):
 	mkdir -p $(publish-dir)
