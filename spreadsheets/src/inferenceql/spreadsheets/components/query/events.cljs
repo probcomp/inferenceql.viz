@@ -5,13 +5,15 @@
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
-            [inferenceql.inference.gpm :as gpm]))
+            [inferenceql.inference.gpm :as gpm]
+            [medley.core :as medley]))
 
 (rf/reg-event-fx
   :query/parse-query
   event-interceptors
   (fn [{:keys [db]} [_ text label-info]]
-    (let [rows (table-db/dataset-rows db)
+    (let [rows (->> (table-db/dataset-rows db)
+                 (map #(medley/remove-vals nil? %)))
           command (str/trim text)
           models {:model (gpm/Multimixture model/spec)}]
       (try
