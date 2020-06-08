@@ -364,13 +364,23 @@
   [data cols-to-draw]
   (let [[x-field y-field] cols-to-draw]
     {:data {:values data}
-     :mark {:type "circle"}
-     :encoding {:x {:field x-field
-                    :type "nominal"}
-                :y {:field y-field
-                    :type "nominal"}
-                :size {:aggregate "count"
-                       :type "quantitative"}}}))
+     :layer [{:mark {:type "circle"}
+              :encoding {:x {:field x-field
+                             :type "nominal"}
+                         :y {:field y-field
+                             :type "nominal"}
+                         :size {:aggregate "count"
+                                :type "quantitative"}}
+              :selection {:pts {:type "interval" :empty "none"}}}
+             {:transform [{:filter {:selection "pts"}}]
+              :mark {:type "circle"
+                     :color "goldenrod"}
+              :encoding {:x {:field x-field
+                             :type "nominal"}
+                         :y {:field y-field
+                             :type "nominal"}
+                         :size {:aggregate "count"
+                                :type "quantitative"}}}]}))
 
 (defn gen-comparison-plot [cols selections]
   (let [cols-types (set (doall (map vega-type cols)))]
