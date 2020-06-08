@@ -19,9 +19,10 @@
   [col-to-sim row override-fns]
   (let [override-map (select-keys override-fns [col-to-sim])
         override-insert-fn (co/gen-insert-fn override-map)
-        constraints (mmix/with-row-values {} (-> row
-                                                 (select-keys (keys (:vars model/spec)))
-                                                 (dissoc col-to-sim)))
+        constraints (mmix/with-row-values {} (as-> row $
+                                               (select-keys $ (keys (:vars model/spec)))
+                                               (dissoc $ col-to-sim)
+                                               (medley/remove-vals nil? $)))
         gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                            :observation-trace constraints))
         has-negative-vals? #(some (every-pred number? neg?) (vals %))]
