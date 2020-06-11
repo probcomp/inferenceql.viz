@@ -11,7 +11,7 @@
 (rf/reg-event-fx
   :query/parse-query
   event-interceptors
-  (fn [{:keys [db]} [_ text label-info]]
+  (fn [{:keys [db]} [_ text]]
     (let [rows (->> (table-db/dataset-rows db)
                     (map #(medley/remove-vals nil? %)))
           command (str/trim text)

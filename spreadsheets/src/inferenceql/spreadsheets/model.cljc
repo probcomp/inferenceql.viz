@@ -1,5 +1,4 @@
 (ns inferenceql.spreadsheets.model
-  (:require [inferenceql.spreadsheets.config :as config]
-            [inferenceql.inference.multimixture.specification :as spec]))
+  (:require [inferenceql.spreadsheets.config :as config]))
 
 (def spec (get config/config :model))

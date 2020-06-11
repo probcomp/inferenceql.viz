@@ -10,23 +10,11 @@
 (s/def ::table-panel (s/keys :req-un [::dataset-headers
                                       ::dataset-rows
                                       ::selection-layers]
-                             :opt-un [::scores
-                                      ::labels
-                                      ::headers
+                             :opt-un [::headers
                                       ::rows
                                       ::visual-headers
                                       ::visual-rows
                                       ::virtual]))
-
-;;; Specs related to scores computed on rows.
-
-(s/def ::score number?)
-(s/def ::scores (s/coll-of ::score :kind vector?))
-
-;;; Specs related to user-set labels on rows.
-
-(s/def ::label (s/nilable string?))
-(s/def ::labels (s/coll-of ::label :kind vector?))
 
 ;;; Specs related to table data.
 

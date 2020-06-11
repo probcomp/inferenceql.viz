@@ -38,8 +38,7 @@
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
-  (let [input-text (rf/subscribe [:control/query-string])
-        label-info (rf/subscribe [:table/rows-label-info])]
+  (let [input-text (rf/subscribe [:control/query-string])]
     [:div#toolbar
      [:div#search-section
        [:textarea#search-input {:on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
@@ -48,7 +47,7 @@
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (not (.-shiftKey e)))
                                                         (do
                                                           (.preventDefault e)
-                                                          (rf/dispatch [:query/parse-query @input-text @label-info]))))
+                                                          (rf/dispatch [:query/parse-query @input-text]))))
                                 :placeholder (str "Write a query here.\n"
                                                   "  [shift-enter] - inserts a newline\n"
                                                   "  [enter] - executes query")
@@ -64,7 +63,7 @@
        [:div#search-buttons
          [:button.toolbar-button.pure-button
           {:on-click (fn [e]
-                       (rf/dispatch [:query/parse-query @input-text @label-info])
+                       (rf/dispatch [:query/parse-query @input-text])
                        (.blur (.-target e)))} ; Clear focus off of button after click.
           "Run InferenceQL"]
          [:button.toolbar-button.pure-button

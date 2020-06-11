@@ -19,62 +19,6 @@
 (s/def ::selection-state (s/merge ::db/selection-state ::selection-state-augments))
 (s/def ::selection-layers (s/map-of ::db/selection-color ::selection-state))
 
-;;; Subs related to entries in the user-editable labels column within the real-data table.
-
-(def clean-label
-  "Prepares the user-typed label for checking."
-  (fnil (comp str/upper-case str/trim) ""))
-
-(defn- pos-label? [label-str]
-  (let [f (clean-label label-str)]
-    ;; TODO: add more truthy values
-    (or (= f "TRUE")
-        (= f "1"))))
-
-(defn- neg-label? [label-str]
-  (let [f (clean-label label-str)]
-    ;; TODO: add more falsey values
-    (or (= f "FALSE")
-        (= f "0"))))
-
-(defn- unlabeled? [label-str]
-  (and (not (pos-label? label-str))
-       (not (neg-label? label-str))))
-
-(defn row-ids-labeled-pos
-  [labels]
-  (let [labels-with-ids (map vector labels (range))
-        ids (->> (filter #(pos-label? (first %)) labels-with-ids)
-                 (map second))]
-    ids))
-
-(defn row-ids-labeled-neg
-  [labels]
-  (let [labels-with-ids (map vector labels (range))
-        ids (->> (filter #(neg-label? (first %)) labels-with-ids)
-                 (map second))]
-    ids))
-
-(defn row-ids-unlabeled
-  [labels]
-  (let [labels-with-ids (map vector labels (range))
-        ids (->> (filter #(unlabeled? (first %)) labels-with-ids)
-                 (map second))]
-    ids))
-
-(rf/reg-sub
- :table/labels
- (fn [db _]
-   (db/labels db)))
-
-(rf/reg-sub
- :table/rows-label-info
- :<- [:table/labels]
- (fn [labels _]
-   {:pos-ids (row-ids-labeled-pos labels)
-    :neg-ids (row-ids-labeled-neg labels)
-    :unlabeled-ids (row-ids-unlabeled labels)}))
-
 ;;; Subs related selection layer color.
 
 (rf/reg-sub :table/highlight-class
@@ -199,12 +143,6 @@
             (fn [selection-state]
               (get selection-state :coords)))
 
-;;; Subs related to scores computed on rows in the tables.
-
-(rf/reg-sub :table/scores
-            (fn [db _]
-              (db/scores db)))
-
 ;;; Subs related to the type of data in the table.
 
 (rf/reg-sub :table/virtual
@@ -220,23 +158,15 @@
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table/table-rows])
-               :scores (rf/subscribe [:table/scores])
-               :labels (rf/subscribe [:table/labels])
                :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])})
-            (fn [{:keys [rows scores labels imputed-values conf-mode]}]
+            (fn [{:keys [rows imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
                                        (seq imputed-values))]
                 (cond->> rows
                   merge-imputed (mapv (fn [imputed-values-in-row row]
                                         (merge row imputed-values-in-row))
-                                      imputed-values)
-                  scores (mapv (fn [score row]
-                                 (assoc row hot/score-col-header score))
-                               scores)
-                  labels (mapv (fn [label row]
-                                 (assoc row hot/label-col-header label))
-                               labels)))))
+                                      imputed-values)))))
 
 (defn table-rows
   [db _]
