@@ -6,6 +6,7 @@
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
             [inferenceql.spreadsheets.views :as views]
+            [inferenceql.spreadsheets.vega :as vega.init]
             ;; Control Panel
             [inferenceql.spreadsheets.panels.control.events]
             [inferenceql.spreadsheets.panels.control.subs]
@@ -29,6 +30,8 @@
 (set! *warn-on-infer* true)
 
 (rf/dispatch-sync [:initialize-db])
+
+(vega.init/add-custom-vega-color-schemes)
 
 (defn ^:export -main
   []
