@@ -13,9 +13,11 @@
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         generators      @(rf/subscribe [:viz/generators])
         virtual @(rf/subscribe [:table/virtual])
-        highlight-class @(rf/subscribe [:table/highlight-class])]
+        highlight-class @(rf/subscribe [:table/highlight-class])
+        show-table-controls @(rf/subscribe [:table/show-table-controls])]
     [:div
      [control/panel]
+     [table/controls show-table-controls]
      [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
      [:div#viz-container

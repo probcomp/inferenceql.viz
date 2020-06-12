@@ -32,7 +32,7 @@ div {
 #toolbar {
   display: flex;
   margin-top: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
   margin-left: 10px;
   margin-right: 10px;
 }
@@ -121,6 +121,19 @@ div {
   border-top: solid;
   border-width: 1px;
   border-color: #e7e7e7;
+}
+
+/* --------------- styling for table controls --------------- */
+
+#table-controls {
+  margin-bottom: 5px;
+  font-size: .875rem;
+}
+
+.table-button {
+  align-self: center;
+  margin-left: 6px;
+  padding: 0em .2em
 }
 
 /* --------------- styling for handsontables --------------- */
