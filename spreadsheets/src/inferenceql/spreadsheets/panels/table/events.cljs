@@ -94,15 +94,7 @@
       (assert (every? #{label-col} (map :col change-maps)))
       (assert (valid-change-sources source))
 
-      (let [num-rows (count (db/physical-row-order db))
-            ;; Get the current vector of lables in the db or make new vector of nils.
-            default-labels (vec (repeat num-rows nil))
-            labels (or (db/labels db) default-labels)
-
-            row-new-vals (mapcat (juxt :row :new-val) change-maps)
-            ;; Apply the changes to the labels.
-            labels-changed (apply assoc labels row-new-vals)]
-        (db/with-labels db labels-changed)))))
+      db)))
 
 (rf/reg-event-fx
  :hot/after-selection-end
