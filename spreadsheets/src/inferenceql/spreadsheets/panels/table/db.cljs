@@ -6,12 +6,17 @@
   {:table-panel {:dataset {:headers (into [] (keys (first data/app-dataset)))
                            :rows-by-id data/app-dataset-indexed
                            :row-order data/app-dataset-order}
-                 :selection-layers {}}})
+                 :selection-layers {}
+                 :label-column-show false}})
 
 (s/def ::table-panel (s/keys :req-un [::dataset
                                       ::selection-layers]
                              :opt-un [::physical-data
                                       ::visual-data]))
+
+;;; Specs related to user-set labels on rows.
+
+(s/def ::label-column-show boolean?)
 
 ;;; Specs related to table data.
 
@@ -22,8 +27,12 @@
 (s/def ::rows (s/coll-of ::row :kind vector?))
 
 (s/def :inferenceql.viz.row/id__ ::row-id)
+(s/def :inferenceql.viz.row/label__ string?)
+(s/def :inferenceql.viz.row/user-added-row__ boolean?)
 ;; ::row-special specs out special attributes that get added onto rows.
-(s/def ::row-special (s/keys :req [:inferenceql.viz.row/id__]))
+(s/def ::row-special (s/keys :req [:inferenceql.viz.row/id__]
+                             :opt [:inferenceql.viz.row/label__
+                                   :inferenceql.viz.row/user-added-row__]))
 
 (s/def ::rows-by-id (s/map-of ::row-id (s/merge ::row ::row-special)))
 (s/def ::row-order (s/coll-of ::row-id))
@@ -73,6 +82,13 @@
 (defn dataset-row-order
   [db]
   (get-in db [:table-panel :dataset :row-order]))
+
+(defn user-added-row-ids
+  [db]
+  (->> (vals (dataset-rows-by-id db))
+    (filter (comp true? :inferenceql.viz.row/user-added-row__))
+    (map :inferenceql.viz.row/id__)
+    (set)))
 
 ;;; Accessor functions to the data displayed in the table.
 

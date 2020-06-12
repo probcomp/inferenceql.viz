@@ -14,7 +14,8 @@
 
 (def app-dataset
   ;; Adding hidden attributes to each row.
-  (mapv #(assoc % :inferenceql.viz.row/id__ (generate-row-id))
+  (mapv #(assoc % :inferenceql.viz.row/id__ (generate-row-id)
+                  :inferenceql.viz.row/user-added-row__ false)
         nyt-data))
 
 (def app-dataset-indexed

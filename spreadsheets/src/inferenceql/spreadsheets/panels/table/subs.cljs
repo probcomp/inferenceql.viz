@@ -169,6 +169,14 @@
             (fn [[rows rows-order]]
               (map rows rows-order)))
 
+(rf/reg-sub :table/computed-headers
+            :<- [:table/physical-headers]
+            :<- [:table/label-column-show]
+            (fn [[headers label-column-show]]
+              (when headers
+                (cond->> headers
+                  label-column-show (concat [hot/label-col-header])))))
+
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table/physical-display-rows])
@@ -182,13 +190,15 @@
                                         (merge row imputed-values-in-row))
                                       imputed-values)))))
 
+
 (defn- column-settings [headers]
   "Returns an array of objects that define settings for each column
   in the table including which attribute from the underlying map for the row
   is presented."
   (let [settings-map (fn [attr]
                        (if (= attr hot/label-col-header)
-                         {:data attr :readOnly false} ; Make the score column user-editable.
+                         ;; Grabs the correct data for the label column and makes it user-editable.
+                         {:data (name :inferenceql.viz.row/label__) :readOnly false}
                          {:data attr}))]
     (map settings-map headers)))
 
@@ -203,6 +213,16 @@
             (fn [db _]
               (db/visual-rows db)))
 
+(rf/reg-sub :table/sort-state
+            (fn [db _]
+              (get-in db [:table-panel :sort-state])))
+
+;;; Subs related showing/hiding certain columns or table controls.
+
+(rf/reg-sub :table/label-column-show
+            (fn [db _]
+              (get-in db [:table-panel :label-column-show])))
+
 (rf/reg-sub :table/show-table-controls
             :<- [:table/physical-row-order]
             ;; Returns value for css visibility property.
@@ -213,29 +233,48 @@
 
 ;;; Subs related to settings and overall state of tables.
 
+(defn cells-fn
+  "Returns a function used by the :cells property in Handsontable's options."
+  [row col prop]
+  (this-as obj
+    (let [hot (.-instance obj)
+          ;; NOTE: The documentations claims that the cells function in called with physical cell coordinates for
+          ;; `row` and `col` but that does not seem to be the case. There might be some unusual calls made when
+          ;; sorting is done in table. Nevertheless, treating `row` and `col` as visual indices seems to work ok.
+          user-added (.getDataAtRowProp hot row (name :inferenceql.viz.row/user-added-row__))
+
+          label-column-cell (= prop (name :inferenceql.viz.row/label__))
+
+          classes-to-add (remove nil? [(when user-added "editable-cell") (when label-column-cell "label-cell")])
+          class-str (str/join " " classes-to-add)]
+      (when (or user-added label-column-cell)
+        (.setCellMeta hot row col "readOnly" false)
+        (.setCellMeta hot row col "className" class-str)))))
+
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn context-menu selections-coords]} _]
+  [{:keys [headers rows context-menu selections-coords sort-state]} _]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
       (assoc-in [:settings :columns] (column-settings headers))
-      (assoc-in [:settings :cells] cells-style-fn)
+      (assoc-in [:settings :cells] cells-fn)
       (assoc-in [:settings :contextMenu] context-menu)
-      (assoc-in [:selections-coords] selections-coords)))
+      (assoc-in [:selections-coords] selections-coords)
+      (assoc-in [:sort-state] sort-state)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
-              {:headers (rf/subscribe [:table/physical-headers])
+              {:headers (rf/subscribe [:table/computed-headers])
                :rows    (rf/subscribe [:table/computed-rows])
-               :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
-               :selections-coords (rf/subscribe [:table/selections-coords])})
+               :selections-coords (rf/subscribe [:table/selections-coords])
+               :sort-state (rf/subscribe [:table/sort-state])})
             real-hot-props)
 
 (rf/reg-sub
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/physical-headers])})
+    :col-names (rf/subscribe [:table/computed-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -287,7 +326,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/physical-headers])})
+    :computed-headers (rf/subscribe [:table/computed-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode

@@ -56,7 +56,7 @@
                ;; functions.
                (js/Handsontable.hooks.add camel-key
                                           (fn [& args]
-                                            (rf/dispatch (into [key hot unique-id] args))
+                                            (rf/dispatch-sync (into [key hot unique-id] args))
                                             true)
                                           hot)))
            ;; set the atom to the hot object
@@ -67,9 +67,7 @@
          (let [[_ old-attributes old-props] old-argv
                [_ new-attributes new-props] (reagent/argv this)]
            (when (not= (:settings old-props) (:settings new-props))
-             (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
-                   sort-config (.getSortConfig sorting-plugin)
-
+             (let [
                    dataset-empty (and (empty? (get-in new-props [:settings :data]))
                                       (empty? (get-in new-props [:settings :colHeaders])))
                    dataset-size-changed (or (not= (count (get-in new-props [:settings :data]))
@@ -100,8 +98,10 @@
 
                (update-hot! @hot-instance (clj->js (:settings new-props)))
 
-               ;; Maintain the same sort order as before the update
-               (.sort sorting-plugin sort-config)
+               ;; Maintain the same sort order as before the update or a new order if provided.
+               (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")]
+                 (when-let [config (clj->js (:sort-state new-props))]
+                   (.sort sorting-plugin config)))
 
                ;; If we cleared selections because of a dataset-size change, apply the latest
                ;; selection state from props.
@@ -155,7 +155,13 @@
              (if-let [coords (clj->js (:selections-coords new-props))]
                (.selectCells @hot-instance coords false)
                ;; When coords is nil it means nothing should be selected in the table.
-               (.deselectCell @hot-instance)))))
+               (.deselectCell @hot-instance)))
+
+           (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")]
+             (when (and (not= (:sort-state new-props) (js->clj (.getSortConfig sorting-plugin)))
+                        (not= (:sort-state new-props) (:sort-state old-props)))
+               (when-let [config (clj->js (:sort-state new-props))]
+                 (.sort sorting-plugin config))))))
 
        :component-will-unmount
        (fn [this]
