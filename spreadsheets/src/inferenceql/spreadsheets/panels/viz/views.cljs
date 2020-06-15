@@ -23,7 +23,7 @@
 
 (defn vega-lite
   "vega-lite reagent component"
-  [spec opt generators]
+  [spec opt generators pts-store]
   (let [run (atom 0)
         ;; Uses generator functions in map `generators` to generate new rows and
         ;; insert them into `vega-instance`.
@@ -71,5 +71,9 @@
         (swap! run inc))
 
       :reagent-render
-      (fn [spec]
-        [:div#vis])})))
+      (fn [spec opt generators pts-store]
+        (when spec
+          [:div#viz-container
+           [:div.flex-box-space-filler-20]
+           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
+           [:div.flex-box-space-filler-20]]))})))
