@@ -17,7 +17,6 @@
    :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
             :legend {:labelFontSize 12 :titleFontSize 12}
             :header {:labelFontSize 14}
-            :mark {:tooltip true}
             ;; Remove title from faceted plots.
             :headerFacet {:title nil}
             :concat {:spacing 50}}})
