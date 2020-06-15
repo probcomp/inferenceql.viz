@@ -1,1987 +1,1168 @@
-age,gender,bmi,health_status,smoker,exercise
-50-59,Male,23.0,Average,never,1.0
-60-69,Female,27.0,Average,never,1.0
-21-29,Female,19.0,Well above average,never,1.0
-50-59,Female,22.0,Well above average,never,1.0
-50-59,Male,,Average,never,1.0
-21-29,Male,22.0,Average,never,1.0
-60-69,Female,34.0,Above average,never,1.0
-30-39,Male,21.0,Well above average,never,1.0
-60-69,Male,32.0,Above average,never,1.0
-50-59,Male,33.0,Above average,never,1.0
-60-69,Male,35.0,Below average,never,1.0
-50-59,Male,28.0,Average,former,0.0
-60-69,Female,32.0,Above average,never,1.0
-60-69,Female,30.0,Well above average,never,1.0
-50-59,Female,23.0,Below average,never,1.0
-60-69,Female,24.0,Above average,former,1.0
-40-49,Female,18.0,Well above average,former,0.0
-50-59,Female,37.0,Average,never,1.0
-70-79,Male,26.0,Above average,never,1.0
-60-69,Female,22.0,Average,former,0.0
-40-49,Male,26.0,Well above average,former,1.0
-40-49,Female,20.0,Well above average,never,1.0
-70-79,Female,23.0,Above average,former,0.0
-50-59,Male,31.0,Average,never,1.0
-18-20,Male,23.0,Above average,former,1.0
-40-49,Male,22.0,Above average,never,1.0
-70-79,Female,46.0,Average,former,0.0
-30-39,Female,23.0,Average,never,0.0
-30-39,Male,36.0,Average,never,0.0
-30-39,Male,32.0,Above average,never,0.0
-21-29,Male,18.0,Above average,never,1.0
-40-49,Male,22.0,Well above average,never,1.0
-30-39,Male,27.0,Above average,never,1.0
-50-59,Female,28.0,Below average,never,0.0
-50-59,Female,35.0,Below average,never,0.0
-40-49,Female,25.0,Above average,former,1.0
-50-59,Female,31.0,Above average,never,1.0
-30-39,Male,22.0,Well above average,never,1.0
-30-39,Male,31.0,Average,never,1.0
-60-69,Male,29.0,Above average,never,0.0
-40-49,Male,35.0,Below average,never,0.0
-21-29,Female,,Average,never,0.0
-60-69,Male,24.0,Above average,never,1.0
-70-79,Male,31.0,Above average,former,1.0
-21-29,Male,21.0,Above average,never,1.0
-50-59,Female,24.0,Above average,never,1.0
-60-69,Female,34.0,Above average,never,1.0
-60-69,Female,23.0,Above average,never,1.0
-21-29,Male,24.0,Above average,never,1.0
-40-49,Male,34.0,Average,never,0.0
-50-59,Female,34.0,Average,never,1.0
-21-29,Male,24.0,Above average,never,1.0
-70-79,Female,27.0,Above average,never,0.0
-70-79,Female,23.0,Well below average,never,1.0
-21-29,Female,21.0,Above average,never,1.0
-30-39,Female,28.0,Above average,never,1.0
-70-79,Male,24.0,Above average,never,1.0
-21-29,Male,22.0,Average,ecig,1.0
-21-29,Male,21.0,Average,never,1.0
-60-69,Female,24.0,Above average,never,1.0
-60-69,Female,23.0,Well above average,never,1.0
-60-69,Female,24.0,Above average,former,1.0
-30-39,Female,26.0,Above average,never,1.0
-50-59,Female,42.0,Average,never,0.0
-40-49,Female,25.0,Average,never,1.0
-80-older,Male,23.0,Well above average,never,1.0
-21-29,Female,28.0,Above average,never,1.0
-40-49,Female,38.0,Above average,never,1.0
-21-29,Female,18.0,Above average,never,1.0
-30-39,Female,27.0,Above average,never,0.0
-60-69,Female,33.0,Below average,never,0.0
-40-49,Male,25.0,Above average,never,1.0
-40-49,Male,25.0,Above average,former,1.0
-30-39,Female,22.0,Above average,never,1.0
-40-49,Female,25.0,Average,former,1.0
-21-29,Female,,,never,
-60-69,Male,41.0,Below average,never,0.0
-30-39,Male,25.0,Above average,former,1.0
-50-59,Female,19.0,Well above average,never,1.0
-50-59,Female,26.0,Average,never,1.0
-40-49,Female,19.0,Well above average,never,1.0
-50-59,Female,22.0,Above average,never,1.0
-40-49,Male,26.0,Above average,former,1.0
-21-29,Male,28.0,Above average,never,1.0
-21-29,Female,16.0,Average,never,0.0
-40-49,Male,,Well above average,former,1.0
-40-49,Male,35.0,Average,former,0.0
-50-59,Male,,Well below average,never,0.0
-40-49,Male,29.0,Above average,never,1.0
-60-69,Female,21.0,Well above average,former,1.0
-50-59,Female,27.0,Above average,never,1.0
-50-59,Female,21.0,Well above average,former,1.0
-21-29,Female,22.0,Above average,never,1.0
-60-69,Female,22.0,Above average,never,1.0
-21-29,Female,23.0,Average,never,1.0
-21-29,Female,26.0,Average,former,1.0
-21-29,Female,34.0,Average,never,1.0
-21-29,Female,23.0,Above average,never,1.0
-40-49,Female,26.0,Average,ecig,0.0
-70-79,Male,28.0,Above average,never,1.0
-40-49,Female,20.0,Above average,never,1.0
-21-29,Female,25.0,Above average,former,0.0
-30-39,Female,29.0,Above average,never,1.0
-30-39,Female,22.0,Above average,never,0.0
-70-79,Female,35.0,Average,never,1.0
-60-69,Female,27.0,Average,never,1.0
-30-39,Female,31.0,Average,never,0.0
-70-79,Male,23.0,Above average,former,1.0
-40-49,Male,24.0,Well above average,never,1.0
-40-49,Male,27.0,Average,never,1.0
-30-39,Female,27.0,Above average,former,1.0
-30-39,Female,20.0,Average,never,0.0
-40-49,Male,30.0,Above average,former,1.0
-40-49,Male,24.0,Above average,never,0.0
-60-69,Female,29.0,Above average,never,0.0
-40-49,Male,29.0,Above average,former,1.0
-70-79,Female,25.0,Average,former,1.0
-30-39,Female,24.0,Above average,never,1.0
-30-39,Female,27.0,Well above average,never,1.0
-30-39,Female,33.0,Average,never,1.0
-21-29,Male,24.0,Well above average,never,1.0
-50-59,Female,21.0,Below average,never,0.0
-50-59,Female,27.0,Average,never,1.0
-21-29,Female,28.0,Well above average,never,1.0
-30-39,Female,22.0,Above average,former,1.0
-30-39,Female,27.0,Well above average,never,1.0
-40-49,Female,28.0,Average,never,0.0
-50-59,Male,29.0,Above average,never,1.0
-40-49,Female,28.0,Above average,former,1.0
-40-49,Male,22.0,Above average,never,1.0
-21-29,Female,20.0,Above average,never,1.0
-50-59,Female,21.0,Above average,never,1.0
-40-49,Female,19.0,Above average,never,0.0
-50-59,Female,24.0,Average,never,0.0
-40-49,Female,23.0,Above average,never,0.0
-21-29,Male,21.0,Above average,never,1.0
-40-49,Male,22.0,Average,never,0.0
-30-39,Male,27.0,Above average,never,1.0
-30-39,Female,21.0,Well above average,never,1.0
-21-29,Male,22.0,Above average,never,1.0
-40-49,Female,32.0,Above average,never,1.0
-40-49,Male,27.0,Average,never,0.0
-40-49,Female,23.0,Above average,never,1.0
-50-59,Female,24.0,Well above average,former,1.0
-40-49,Male,23.0,Average,never,0.0
-50-59,Male,20.0,Average,never,1.0
-60-69,Male,36.0,Below average,former,1.0
-40-49,Male,24.0,Average,never,1.0
-40-49,Female,,Well above average,never,1.0
-21-29,Female,19.0,Above average,never,0.0
-40-49,Male,,Average,never,0.0
-60-69,Female,26.0,Above average,never,1.0
-21-29,Male,26.0,Average,former,1.0
-60-69,Female,33.0,Above average,never,1.0
-30-39,Female,20.0,Above average,never,1.0
-30-39,Female,19.0,Well above average,never,1.0
-21-29,Female,24.0,Above average,never,1.0
-30-39,Male,23.0,Well above average,never,1.0
-60-69,Male,34.0,Below average,never,1.0
-30-39,Female,22.0,Above average,never,1.0
-40-49,Male,29.0,Below average,former,0.0
-60-69,Male,29.0,Average,former,1.0
-50-59,Male,28.0,Average,never,0.0
-21-29,Female,23.0,Above average,never,0.0
-40-49,Female,24.0,Average,never,1.0
-70-79,Male,27.0,Above average,never,1.0
-40-49,Female,28.0,Above average,never,1.0
-60-69,Male,26.0,Above average,never,1.0
-30-39,Male,23.0,Above average,never,1.0
-60-69,Male,31.0,Above average,never,1.0
-40-49,Male,29.0,Above average,never,1.0
-30-39,Female,18.0,Above average,never,1.0
-60-69,Female,19.0,Well above average,never,1.0
-21-29,Male,20.0,Average,never,0.0
-50-59,Male,24.0,Well above average,never,1.0
-21-29,Male,24.0,Above average,former,1.0
-50-59,Male,27.0,Average,never,1.0
-40-49,Male,23.0,Above average,never,1.0
-50-59,Male,24.0,Above average,never,1.0
-30-39,Female,20.0,Average,never,0.0
-60-69,Female,21.0,Well above average,never,1.0
-50-59,Female,26.0,Average,never,0.0
-70-79,Female,25.0,Above average,never,1.0
-21-29,Male,20.0,Average,never,0.0
-60-69,Female,27.0,Average,never,1.0
-30-39,Male,29.0,Above average,never,1.0
-21-29,Male,,Average,never,0.0
-50-59,Female,26.0,Average,never,1.0
-50-59,Male,31.0,Average,ecig,1.0
-50-59,Female,25.0,Average,never,1.0
-50-59,Male,27.0,Average,never,0.0
-30-39,Male,46.0,Average,current,1.0
-40-49,Female,19.0,Above average,never,1.0
-50-59,Male,41.0,Average,never,1.0
-70-79,Male,44.0,Above average,never,1.0
-50-59,Female,19.0,Above average,never,0.0
-60-69,Male,23.0,Average,never,0.0
-50-59,Male,28.0,Average,never,1.0
-60-69,Female,18.0,Well above average,never,1.0
-50-59,Male,30.0,Well above average,never,1.0
-30-39,Female,22.0,Above average,former,1.0
-60-69,Male,23.0,Well above average,never,1.0
-70-79,Male,32.0,Above average,former,1.0
-40-49,Female,26.0,Average,never,1.0
-21-29,Female,17.0,Average,never,1.0
-21-29,Male,20.0,Average,never,1.0
-60-69,Male,25.0,Above average,former,1.0
-40-49,Female,25.0,Average,never,0.0
-30-39,Male,20.0,Average,former,0.0
-50-59,Male,27.0,Well above average,never,1.0
-40-49,Male,19.0,Above average,never,0.0
-18-20,Female,19.0,Average,never,0.0
-30-39,Female,24.0,Above average,never,1.0
-40-49,Male,25.0,Above average,former,1.0
-21-29,Female,25.0,Well above average,former,1.0
-30-39,Female,31.0,Above average,current,1.0
-50-59,Female,27.0,Above average,never,1.0
-21-29,Female,19.0,Average,former,0.0
-50-59,Male,25.0,Above average,never,1.0
-30-39,Male,29.0,Average,never,1.0
-30-39,Female,22.0,Above average,never,1.0
-50-59,Male,27.0,,never,1.0
-70-79,Male,31.0,Average,former,1.0
-30-39,Female,19.0,Average,current,0.0
-70-79,Female,32.0,Above average,never,1.0
-60-69,Male,25.0,Well above average,never,1.0
-50-59,Male,23.0,Well above average,never,1.0
-30-39,Female,24.0,Well above average,never,1.0
-50-59,Male,15.0,Above average,never,1.0
-50-59,Male,38.0,Average,former,1.0
-70-79,Male,23.0,Well above average,former,1.0
-50-59,Male,24.0,Above average,never,1.0
-40-49,Female,30.0,Above average,never,1.0
-70-79,Male,27.0,Above average,former,1.0
-60-69,Male,21.0,Well above average,never,1.0
-30-39,Female,22.0,Average,never,1.0
-50-59,Female,27.0,Average,never,0.0
-50-59,Male,33.0,Average,former,1.0
-40-49,Male,27.0,Above average,never,1.0
-30-39,Male,23.0,Above average,never,1.0
-40-49,Male,25.0,Above average,never,1.0
-40-49,Female,22.0,Average,never,1.0
-70-79,Male,22.0,Well above average,never,1.0
-40-49,Female,23.0,Above average,never,1.0
-70-79,Male,24.0,Above average,never,1.0
-40-49,Male,24.0,Above average,former,1.0
-70-79,Male,22.0,Above average,never,1.0
-40-49,Male,27.0,Above average,never,1.0
-60-69,Male,27.0,Above average,never,1.0
-30-39,Male,37.0,Below average,never,1.0
-40-49,Female,35.0,Average,never,0.0
-50-59,Female,24.0,Well above average,former,1.0
-30-39,Female,21.0,Above average,never,0.0
-40-49,Female,27.0,Average,never,0.0
-50-59,Male,30.0,Above average,never,0.0
-50-59,Male,25.0,Above average,never,1.0
-50-59,Male,25.0,Above average,never,1.0
-50-59,Female,27.0,Average,former,1.0
-70-79,Female,24.0,Well above average,former,1.0
-70-79,Male,28.0,Well above average,never,1.0
-70-79,Male,29.0,Below average,never,0.0
-40-49,Male,27.0,Above average,never,1.0
-21-29,Male,26.0,Above average,never,0.0
-70-79,Male,21.0,Above average,never,1.0
-50-59,Female,22.0,Above average,never,1.0
-70-79,Female,22.0,Well above average,former,1.0
-60-69,Male,27.0,Average,never,0.0
-80-older,Female,40.0,Above average,former,0.0
-60-69,Male,31.0,Above average,never,1.0
-30-39,Female,20.0,Well above average,never,1.0
-50-59,Female,25.0,Above average,former,1.0
-70-79,Male,21.0,Below average,never,1.0
-30-39,Female,23.0,Above average,never,1.0
-80-older,Male,27.0,Below average,never,0.0
-50-59,Female,28.0,Average,never,0.0
-40-49,Female,31.0,Well above average,never,0.0
-50-59,Male,26.0,Well above average,never,1.0
-40-49,Female,24.0,Above average,never,1.0
-70-79,Female,38.0,Average,never,0.0
-50-59,Female,30.0,Above average,never,1.0
-40-49,Female,33.0,Average,never,1.0
-40-49,Female,26.0,Average,current,1.0
-60-69,Female,27.0,Above average,never,0.0
-70-79,Male,22.0,Above average,never,1.0
-50-59,Female,27.0,Average,never,1.0
-50-59,Female,32.0,Well above average,never,0.0
-21-29,Female,22.0,Average,never,1.0
-40-49,Female,41.0,Below average,never,0.0
-50-59,Female,25.0,Above average,never,0.0
-60-69,Female,21.0,Above average,never,0.0
-60-69,Female,22.0,Above average,never,1.0
-40-49,Female,31.0,Above average,never,1.0
-40-49,Male,,Above average,never,1.0
-50-59,Female,20.0,Above average,never,1.0
-50-59,Female,38.0,Average,former,1.0
-60-69,Female,20.0,Average,never,0.0
-50-59,Female,,Above average,former,0.0
-60-69,Male,26.0,Well above average,never,0.0
-30-39,Female,22.0,Average,never,1.0
-30-39,Female,18.0,Average,never,0.0
-40-49,Female,20.0,Below average,never,0.0
-50-59,Female,46.0,Below average,never,0.0
-30-39,Male,24.0,Above average,never,0.0
-60-69,Female,21.0,Well above average,never,1.0
-50-59,Female,38.0,Below average,never,1.0
-21-29,Male,21.0,Well above average,never,1.0
-70-79,Male,27.0,Well above average,never,1.0
-30-39,Female,17.0,Well above average,never,1.0
-30-39,Female,25.0,Above average,never,1.0
-30-39,Male,25.0,Average,ecig,0.0
-30-39,Female,28.0,Average,former,1.0
-40-49,Male,32.0,Average,never,0.0
-21-29,Female,29.0,Above average,never,1.0
-21-29,Female,25.0,Above average,former,1.0
-50-59,Female,21.0,Well above average,never,1.0
-30-39,Female,27.0,Average,former,0.0
-30-39,Female,25.0,Above average,never,0.0
-50-59,Male,24.0,Well above average,never,1.0
-50-59,Female,21.0,Well above average,never,1.0
-50-59,Female,20.0,Well above average,never,1.0
-50-59,Female,24.0,Well below average,never,1.0
-60-69,Female,27.0,Well below average,former,0.0
-40-49,Female,,Average,never,1.0
-60-69,Male,23.0,Average,former,1.0
-40-49,Male,24.0,Above average,never,0.0
-50-59,Female,,Well above average,never,0.0
-21-29,Female,21.0,Above average,never,0.0
-50-59,Female,23.0,Above average,never,1.0
-30-39,Female,32.0,Above average,never,1.0
-21-29,Other,26.0,Below average,never,1.0
-40-49,Female,24.0,Average,never,0.0
-40-49,Male,23.0,Well above average,never,1.0
-40-49,Male,27.0,Above average,never,1.0
-40-49,Male,23.0,Average,former,0.0
-40-49,Female,25.0,Above average,never,1.0
-30-39,Male,24.0,Above average,never,1.0
-60-69,Male,26.0,Well above average,never,1.0
-50-59,Male,25.0,Above average,never,1.0
-70-79,Male,22.0,Above average,never,1.0
-60-69,Male,28.0,Above average,never,1.0
-40-49,Male,26.0,Above average,former,0.0
-30-39,Female,29.0,Above average,former,0.0
-60-69,Female,32.0,Above average,former,0.0
-60-69,Female,21.0,Well above average,never,1.0
-70-79,Female,24.0,Well above average,never,1.0
-30-39,Female,19.0,Above average,never,1.0
-30-39,Female,29.0,Above average,never,0.0
-30-39,Female,27.0,Average,never,1.0
-30-39,Male,33.0,Well above average,never,1.0
-40-49,Female,26.0,Well above average,never,1.0
-50-59,Male,32.0,Average,former,0.0
-40-49,Female,38.0,Below average,former,0.0
-60-69,Female,23.0,Above average,never,0.0
-40-49,Female,19.0,Above average,never,1.0
-40-49,Female,29.0,Well above average,never,1.0
-40-49,Female,37.0,Average,never,0.0
-50-59,Female,28.0,Above average,former,1.0
-18-20,Female,21.0,Well above average,never,1.0
-40-49,Female,28.0,Above average,never,1.0
-50-59,Female,29.0,Average,never,0.0
-50-59,Female,32.0,Average,never,1.0
-50-59,Male,22.0,Above average,never,1.0
-30-39,Female,23.0,Above average,never,1.0
-40-49,Male,29.0,Average,former,0.0
-21-29,Female,24.0,Average,never,1.0
-21-29,Female,20.0,Above average,never,1.0
-50-59,Female,35.0,Below average,former,0.0
-50-59,Male,25.0,Well above average,never,1.0
-60-69,Female,24.0,Above average,former,1.0
-50-59,Female,32.0,Above average,never,0.0
-21-29,Female,27.0,Average,never,1.0
-50-59,Female,23.0,Above average,never,0.0
-21-29,Female,39.0,Average,former,0.0
-21-29,Female,40.0,Above average,former,1.0
-50-59,Male,37.0,Average,never,0.0
-40-49,Female,21.0,Well above average,never,1.0
-40-49,Female,25.0,Well above average,never,1.0
-30-39,Female,25.0,Above average,former,0.0
-21-29,Female,23.0,Above average,never,0.0
-70-79,Female,,Well above average,never,1.0
-60-69,Male,28.0,Average,never,1.0
-60-69,Female,32.0,Above average,former,0.0
-40-49,Female,33.0,Below average,never,0.0
-60-69,Male,26.0,Above average,never,1.0
-50-59,Male,32.0,Above average,never,0.0
-50-59,Male,,Above average,never,1.0
-30-39,Female,31.0,Average,current,0.0
-50-59,Male,38.0,Average,never,0.0
-60-69,Female,26.0,Average,never,1.0
-50-59,Female,29.0,Average,never,0.0
-30-39,Female,22.0,Well above average,never,1.0
-30-39,Female,23.0,Average,former,1.0
-21-29,Female,20.0,Above average,never,1.0
-70-79,Male,25.0,Average,former,1.0
-30-39,Male,25.0,Above average,never,1.0
-40-49,Female,28.0,Well above average,current,0.0
-50-59,Male,31.0,Above average,former,1.0
-70-79,Female,29.0,Above average,former,1.0
-21-29,Male,20.0,Above average,never,0.0
-30-39,Male,33.0,Above average,never,1.0
-30-39,Female,23.0,Well above average,never,0.0
-40-49,Male,25.0,Average,never,1.0
-50-59,Male,23.0,Above average,never,1.0
-50-59,Female,21.0,Average,never,1.0
-50-59,Male,33.0,Above average,never,0.0
-30-39,Female,24.0,Well above average,never,1.0
-50-59,Female,38.0,Average,former,0.0
-30-39,Female,22.0,Average,never,0.0
-30-39,Female,32.0,Average,current,0.0
-50-59,Female,26.0,Average,former,0.0
-40-49,Male,36.0,Average,never,0.0
-30-39,Female,33.0,Above average,current,0.0
-30-39,Female,24.0,Average,current,0.0
-60-69,Female,34.0,Average,never,1.0
-30-39,Male,38.0,Average,never,0.0
-50-59,Female,51.0,Below average,never,0.0
-21-29,Male,29.0,Above average,current,0.0
-30-39,Female,27.0,Below average,current,0.0
-40-49,Male,19.0,Above average,current,1.0
-40-49,Female,22.0,Well above average,never,1.0
-30-39,Female,22.0,Above average,never,1.0
-70-79,Male,28.0,Above average,never,1.0
-60-69,Female,27.0,Average,former,0.0
-30-39,Female,34.0,Above average,former,0.0
-60-69,Female,33.0,Average,never,1.0
-50-59,Male,,Above average,current,0.0
-50-59,Female,20.0,Above average,never,1.0
-50-59,Female,31.0,Above average,never,0.0
-50-59,Male,19.0,Average,never,1.0
-40-49,Female,19.0,Above average,current,1.0
-30-39,Female,28.0,Average,never,0.0
-40-49,Female,21.0,Above average,current,1.0
-50-59,Male,27.0,Well above average,current,0.0
-50-59,Female,23.0,Well above average,former,1.0
-40-49,Female,28.0,Below average,current,0.0
-30-39,Female,21.0,Above average,current,1.0
-50-59,Female,21.0,Well above average,never,1.0
-30-39,Male,22.0,Above average,current,0.0
-40-49,Female,21.0,Above average,former,1.0
-21-29,Female,15.0,Well above average,never,1.0
-40-49,Male,32.0,Average,former,1.0
-30-39,Male,29.0,Well above average,never,1.0
-21-29,Male,27.0,Above average,never,1.0
-30-39,Male,32.0,Above average,never,1.0
-40-49,Female,23.0,Average,never,1.0
-40-49,Male,31.0,Above average,never,1.0
-40-49,Male,40.0,Average,ecig,1.0
-40-49,Male,41.0,Average,ecig,1.0
-70-79,Female,32.0,Below average,never,0.0
-21-29,Male,18.0,Above average,never,0.0
-21-29,Female,20.0,Well above average,never,0.0
-50-59,Male,34.0,Below average,current,0.0
-50-59,Female,15.0,Average,never,0.0
-40-49,Male,32.0,Above average,current,1.0
-21-29,Female,27.0,Above average,ecig,1.0
-50-59,Female,21.0,Average,never,1.0
-21-29,Male,24.0,Above average,ecig,0.0
-50-59,Female,30.0,Average,former,0.0
-30-39,Male,30.0,Below average,never,1.0
-40-49,Female,25.0,Above average,former,1.0
-60-69,Male,26.0,Above average,never,1.0
-40-49,Female,23.0,Well above average,never,1.0
-60-69,Male,32.0,Average,former,0.0
-21-29,Male,43.0,Average,never,0.0
-40-49,Male,22.0,Well above average,never,1.0
-40-49,Female,27.0,Above average,never,1.0
-60-69,Male,27.0,Above average,never,0.0
-40-49,Male,24.0,Above average,never,1.0
-21-29,Female,27.0,Average,never,0.0
-30-39,Male,25.0,Well above average,former,1.0
-21-29,Male,22.0,Average,never,0.0
-21-29,Female,22.0,Above average,never,1.0
-21-29,Male,27.0,Above average,never,1.0
-40-49,Male,35.0,Above average,former,0.0
-70-79,Female,21.0,Well above average,never,1.0
-21-29,Female,23.0,Average,current,0.0
-21-29,Male,28.0,Average,never,1.0
-50-59,Male,28.0,Above average,former,1.0
-40-49,Female,25.0,Above average,former,1.0
-30-39,Female,22.0,Above average,never,1.0
-21-29,Female,22.0,Above average,never,1.0
-50-59,Female,19.0,Average,current,1.0
-40-49,Female,22.0,Above average,never,1.0
-50-59,Female,26.0,Average,never,1.0
-50-59,Female,31.0,Below average,never,0.0
-70-79,Female,17.0,Average,former,1.0
-50-59,Female,19.0,Above average,never,1.0
-21-29,Male,18.0,Above average,never,1.0
-21-29,Female,21.0,Above average,never,0.0
-70-79,Male,26.0,Above average,never,1.0
-40-49,Female,29.0,Below average,never,1.0
-21-29,Male,21.0,Well above average,never,1.0
-18-20,Male,24.0,Well above average,never,1.0
-70-79,Female,29.0,Above average,former,1.0
-40-49,Male,28.0,Above average,never,1.0
-70-79,Male,25.0,Below average,never,1.0
-21-29,Female,22.0,Above average,never,1.0
-40-49,Male,24.0,Average,never,0.0
-70-79,Male,24.0,Well above average,never,1.0
-30-39,Female,50.0,Average,never,0.0
-40-49,Male,,Above average,never,1.0
-30-39,Female,66.0,Below average,current,0.0
-50-59,Female,32.0,Average,never,1.0
-60-69,Female,26.0,Above average,never,0.0
-60-69,Female,21.0,Average,former,0.0
-40-49,Female,19.0,Above average,never,1.0
-50-59,Female,20.0,Average,current,1.0
-70-79,Female,25.0,Above average,never,1.0
-70-79,Female,31.0,Below average,former,1.0
-40-49,Female,64.0,Below average,never,0.0
-40-49,Male,31.0,Average,never,1.0
-21-29,Female,33.0,Average,never,1.0
-60-69,Female,27.0,Well above average,never,1.0
-30-39,Female,21.0,Well above average,former,1.0
-80-older,Female,25.0,Above average,former,1.0
-40-49,Female,30.0,Above average,never,1.0
-80-older,Male,26.0,Average,former,0.0
-40-49,Female,23.0,Above average,never,1.0
-70-79,Female,24.0,Above average,former,1.0
-50-59,Female,39.0,Average,never,1.0
-60-69,Female,27.0,Above average,former,1.0
-50-59,Female,18.0,Above average,never,0.0
-40-49,Female,18.0,Well above average,never,1.0
-60-69,Female,23.0,Well above average,never,1.0
-70-79,Female,21.0,Above average,never,1.0
-21-29,Female,29.0,Average,never,1.0
-40-49,Female,24.0,Above average,never,1.0
-30-39,Female,22.0,Above average,never,1.0
-60-69,Male,24.0,Average,former,1.0
-50-59,Male,25.0,Average,never,1.0
-50-59,Female,25.0,Average,never,1.0
-30-39,Male,21.0,Above average,never,0.0
-21-29,Female,21.0,Above average,never,1.0
-30-39,Male,28.0,Average,former,0.0
-60-69,Male,25.0,Well above average,never,1.0
-60-69,Male,24.0,Well above average,never,1.0
-60-69,Female,29.0,Above average,never,1.0
-70-79,Male,28.0,Well above average,never,1.0
-40-49,Female,26.0,Above average,never,1.0
-70-79,Male,24.0,Well above average,former,1.0
-30-39,Male,26.0,Above average,former,0.0
-40-49,Female,20.0,Above average,former,0.0
-40-49,Female,22.0,Well above average,never,1.0
-70-79,Female,23.0,Above average,never,1.0
-21-29,Female,20.0,Above average,former,1.0
-70-79,Female,24.0,Above average,never,1.0
-50-59,Male,23.0,Well above average,never,1.0
-21-29,Male,30.0,Above average,former,1.0
-70-79,Female,26.0,Above average,never,1.0
-30-39,Male,24.0,Above average,current,1.0
-60-69,Male,20.0,Above average,never,1.0
-50-59,Male,27.0,Above average,never,1.0
-70-79,Female,25.0,Above average,former,0.0
-50-59,Female,20.0,Well above average,former,1.0
-21-29,Female,37.0,Well below average,current,0.0
-21-29,Female,21.0,Average,current,0.0
-70-79,Female,32.0,Average,never,1.0
-21-29,Female,22.0,Well above average,former,1.0
-21-29,Male,28.0,Above average,never,1.0
-60-69,Female,18.0,Well above average,never,1.0
-50-59,Female,19.0,Above average,never,1.0
-30-39,Female,28.0,Average,never,1.0
-50-59,Female,23.0,Well above average,former,1.0
-30-39,Female,26.0,Above average,former,1.0
-60-69,Female,27.0,Well above average,never,1.0
-60-69,Male,29.0,Average,never,1.0
-30-39,Female,21.0,Average,current,0.0
-60-69,Female,30.0,Below average,current,1.0
-80-older,Female,10.0,Well above average,former,1.0
-30-39,Male,26.0,Well above average,ecig,1.0
-80-older,Female,,Above average,never,1.0
-80-older,Male,24.0,Average,never,1.0
-21-29,Female,24.0,Average,never,0.0
-50-59,Female,32.0,Average,never,0.0
-50-59,Female,17.0,Average,never,1.0
-40-49,Female,30.0,Average,never,0.0
-50-59,Male,24.0,Above average,former,1.0
-50-59,Female,29.0,Average,ecig,1.0
-60-69,Female,40.0,Average,former,0.0
-21-29,Female,20.0,Average,former,1.0
-60-69,Female,25.0,Below average,current,0.0
-40-49,Female,34.0,Average,never,0.0
-40-49,Female,24.0,Above average,never,1.0
-50-59,Female,21.0,Above average,never,1.0
-70-79,Female,34.0,Above average,former,1.0
-40-49,Female,29.0,Below average,never,1.0
-40-49,Female,18.0,Average,current,1.0
-70-79,Male,26.0,Average,former,0.0
-18-20,Female,19.0,Average,current,1.0
-21-29,Male,27.0,Well above average,never,1.0
-40-49,Female,22.0,Well above average,never,1.0
-50-59,Male,28.0,Average,former,1.0
-50-59,Female,22.0,Above average,never,1.0
-60-69,Female,21.0,Well above average,former,1.0
-30-39,Female,25.0,Above average,never,1.0
-50-59,Male,30.0,Below average,never,1.0
-30-39,Female,33.0,Above average,never,1.0
-30-39,Female,30.0,Average,former,1.0
-60-69,Male,26.0,Above average,never,1.0
-50-59,Male,28.0,Above average,former,1.0
-70-79,Female,19.0,Well above average,never,1.0
-30-39,Female,22.0,Above average,never,1.0
-50-59,Female,22.0,Above average,former,0.0
-60-69,Male,37.0,Below average,never,1.0
-21-29,Female,24.0,Above average,ecig,0.0
-60-69,Female,18.0,Above average,former,1.0
-21-29,Female,33.0,Average,former,1.0
-50-59,Female,25.0,Above average,former,1.0
-50-59,Male,25.0,Above average,never,1.0
-30-39,Male,24.0,Above average,never,0.0
-60-69,Male,32.0,Below average,never,1.0
-40-49,Male,22.0,Well above average,never,1.0
-30-39,Female,27.0,Average,former,0.0
-50-59,Female,20.0,Above average,never,1.0
-40-49,Male,27.0,Above average,never,1.0
-60-69,Male,26.0,Above average,never,0.0
-21-29,Female,53.0,Average,never,0.0
-30-39,Female,20.0,Above average,ecig,1.0
-40-49,Female,37.0,Below average,never,0.0
-30-39,Female,36.0,Average,current,0.0
-60-69,Male,30.0,Average,never,0.0
-21-29,Female,19.0,Above average,never,1.0
-30-39,Female,20.0,Above average,former,0.0
-50-59,Male,33.0,Average,former,1.0
-30-39,Male,20.0,Above average,never,1.0
-60-69,Male,21.0,Above average,never,1.0
-50-59,Male,32.0,Average,former,0.0
-60-69,Female,26.0,Well above average,former,0.0
-60-69,Female,21.0,Well above average,never,1.0
-40-49,Female,22.0,Above average,never,1.0
-70-79,Female,22.0,Above average,never,1.0
-60-69,Female,30.0,Below average,never,0.0
-50-59,Male,24.0,Average,current,1.0
-50-59,Female,25.0,Well above average,never,1.0
-50-59,Male,24.0,Above average,never,1.0
-30-39,Female,33.0,Average,current,0.0
-60-69,Male,26.0,Below average,former,0.0
-30-39,Male,24.0,Well above average,never,0.0
-50-59,Male,33.0,Average,never,0.0
-30-39,Female,22.0,Well above average,never,1.0
-60-69,Female,27.0,Average,current,1.0
-70-79,Female,21.0,Above average,former,1.0
-40-49,Female,19.0,Well above average,former,1.0
-70-79,Female,21.0,Above average,former,1.0
-60-69,Male,27.0,Well above average,former,1.0
-60-69,Female,27.0,Above average,never,1.0
-70-79,Male,28.0,Above average,never,0.0
-50-59,Male,26.0,Average,never,1.0
-50-59,Male,37.0,Below average,former,1.0
-60-69,Male,28.0,Above average,never,1.0
-60-69,Male,27.0,Average,never,1.0
-40-49,Male,35.0,Average,never,0.0
-70-79,Female,24.0,Well above average,former,1.0
-40-49,Female,19.0,Above average,never,1.0
-60-69,Female,35.0,Average,never,1.0
-40-49,Male,22.0,Well above average,never,1.0
-40-49,Female,23.0,Average,never,0.0
-70-79,Female,22.0,Well above average,never,1.0
-50-59,Male,27.0,Well above average,never,1.0
-60-69,Female,,Above average,never,1.0
-50-59,Female,24.0,Well above average,never,1.0
-50-59,Female,23.0,Above average,never,1.0
-40-49,Female,19.0,Above average,current,0.0
-70-79,Male,,Well above average,former,1.0
-30-39,Male,22.0,Above average,never,1.0
-40-49,Male,27.0,Below average,never,1.0
-70-79,Male,23.0,Above average,never,1.0
-50-59,Female,23.0,Above average,former,1.0
-60-69,Female,20.0,Average,never,1.0
-21-29,Female,26.0,Average,never,1.0
-40-49,Male,22.0,Above average,former,1.0
-60-69,Male,24.0,Above average,never,1.0
-40-49,Female,23.0,Below average,ecig,0.0
-21-29,Male,31.0,Average,never,0.0
-60-69,Female,19.0,Above average,former,1.0
-50-59,Male,26.0,Above average,former,1.0
-50-59,Male,29.0,Above average,never,1.0
-21-29,Female,22.0,Above average,never,1.0
-50-59,Male,29.0,Above average,never,1.0
-30-39,Female,27.0,Above average,never,1.0
-50-59,Male,24.0,Above average,former,1.0
-80-older,Male,24.0,Well above average,former,1.0
-40-49,Female,26.0,Average,never,1.0
-30-39,Male,25.0,Average,never,0.0
-60-69,Female,20.0,Above average,never,1.0
-50-59,Female,23.0,Above average,never,1.0
-70-79,Male,24.0,Average,former,1.0
-50-59,Male,25.0,Above average,never,0.0
-30-39,Male,25.0,Above average,never,1.0
-18-20,Male,22.0,Above average,ecig,1.0
-50-59,Male,25.0,Above average,never,1.0
-40-49,Female,28.0,Average,former,0.0
-60-69,Female,27.0,Average,ecig,1.0
-40-49,Female,24.0,Above average,never,1.0
-40-49,Female,35.0,Above average,former,1.0
-40-49,Female,22.0,Above average,never,0.0
-50-59,Male,25.0,Above average,never,1.0
-30-39,Female,44.0,Below average,current,0.0
-60-69,Other,19.0,Average,former,1.0
-40-49,Female,31.0,Below average,never,0.0
-40-49,Female,30.0,Below average,former,0.0
-60-69,Female,28.0,Above average,never,1.0
-70-79,Female,19.0,Below average,former,1.0
-50-59,Male,36.0,Average,never,0.0
-50-59,Male,25.0,Above average,never,1.0
-50-59,Female,47.0,Average,never,0.0
-18-20,Female,43.0,Below average,ecig,0.0
-21-29,Female,30.0,Above average,never,0.0
-50-59,Female,,Above average,never,1.0
-50-59,Male,28.0,Well above average,current,1.0
-50-59,Female,33.0,Above average,never,0.0
-21-29,Female,22.0,Well above average,never,1.0
-21-29,Female,22.0,Average,former,0.0
-60-69,Female,20.0,Well above average,former,1.0
-30-39,Female,27.0,Above average,former,1.0
-30-39,Female,30.0,Above average,never,1.0
-50-59,Female,20.0,Above average,never,1.0
-40-49,Male,27.0,Average,never,0.0
-50-59,Female,22.0,Above average,current,1.0
-60-69,Female,26.0,Above average,never,1.0
-50-59,Female,61.0,Below average,never,0.0
-60-69,Female,22.0,Well above average,never,1.0
-30-39,Male,31.0,Average,never,1.0
-50-59,Male,32.0,Average,never,1.0
-40-49,Female,21.0,Above average,current,1.0
-30-39,Male,26.0,Above average,current,1.0
-18-20,Female,51.0,Average,never,0.0
-30-39,Female,14.0,Above average,ecig,1.0
-40-49,Female,25.0,Average,current,1.0
-21-29,Other,19.0,Above average,never,1.0
-50-59,Male,25.0,Well above average,never,1.0
-40-49,Female,21.0,Above average,current,1.0
-60-69,Female,35.0,Above average,current,1.0
-60-69,Male,27.0,Above average,never,1.0
-21-29,Female,24.0,Average,former,1.0
-50-59,Male,30.0,Above average,never,1.0
-50-59,Female,17.0,Above average,never,1.0
-60-69,Female,22.0,Well above average,never,1.0
-60-69,Male,22.0,Above average,never,1.0
-30-39,Male,32.0,Average,never,1.0
-40-49,Female,27.0,Above average,ecig,0.0
-30-39,Female,28.0,Above average,never,0.0
-50-59,Female,27.0,Average,former,1.0
-30-39,Female,23.0,Above average,never,1.0
-70-79,Male,25.0,Well above average,never,1.0
-21-29,Female,22.0,Above average,never,0.0
-60-69,Male,25.0,Average,current,0.0
-60-69,Male,20.0,Average,never,1.0
-30-39,Female,26.0,Average,never,0.0
-30-39,Female,42.0,Average,former,1.0
-30-39,Female,20.0,Well above average,never,1.0
-50-59,Female,19.0,Above average,former,1.0
-40-49,Female,25.0,Well above average,former,1.0
-30-39,Female,27.0,Average,never,1.0
-30-39,Female,29.0,Average,never,0.0
-40-49,Male,25.0,Well above average,never,1.0
-50-59,Male,26.0,Above average,former,1.0
-50-59,Female,33.0,Well above average,never,1.0
-50-59,Female,30.0,Average,never,1.0
-40-49,Female,25.0,Above average,never,1.0
-40-49,Female,34.0,Average,former,1.0
-60-69,Male,24.0,Average,former,0.0
-60-69,Male,27.0,Average,former,1.0
-40-49,Female,24.0,Above average,former,1.0
-30-39,Female,24.0,Average,current,0.0
-21-29,Female,23.0,Average,never,1.0
-60-69,Female,40.0,Average,ecig,0.0
-30-39,Female,26.0,Above average,never,0.0
-60-69,Male,26.0,Well above average,former,1.0
-30-39,Female,23.0,Above average,never,1.0
-40-49,Female,24.0,Above average,never,1.0
-60-69,Female,38.0,Average,never,1.0
-60-69,Female,39.0,Average,never,1.0
-60-69,Female,27.0,Average,never,0.0
-50-59,Male,26.0,Well above average,never,1.0
-30-39,Male,24.0,Above average,former,1.0
-50-59,Female,28.0,Average,current,0.0
-30-39,Female,34.0,Average,former,0.0
-30-39,Female,43.0,Average,former,1.0
-50-59,Female,33.0,Average,current,1.0
-40-49,Male,29.0,Below average,current,0.0
-40-49,Female,28.0,Average,never,1.0
-60-69,Male,26.0,Above average,current,1.0
-40-49,Female,23.0,Above average,former,1.0
-70-79,Female,27.0,Above average,former,0.0
-40-49,Female,23.0,Below average,ecig,1.0
-70-79,Male,24.0,Above average,former,1.0
-60-69,Female,22.0,Average,never,0.0
-40-49,Male,33.0,Average,former,1.0
-30-39,Female,22.0,Average,former,0.0
-40-49,Female,27.0,Average,current,1.0
-60-69,Female,27.0,Above average,never,1.0
-50-59,Female,25.0,Average,current,0.0
-40-49,Male,25.0,Average,never,1.0
-30-39,Female,21.0,Average,current,0.0
-70-79,Male,32.0,Above average,former,1.0
-60-69,Female,37.0,Average,former,1.0
-70-79,Male,27.0,Above average,never,0.0
-30-39,Female,21.0,Above average,never,0.0
-50-59,Male,25.0,Below average,never,0.0
-50-59,Female,23.0,Average,never,1.0
-50-59,Female,22.0,Average,never,1.0
-30-39,Male,24.0,Well above average,never,1.0
-21-29,Male,33.0,Above average,ecig,0.0
-40-49,Female,38.0,Average,ecig,1.0
-60-69,Male,25.0,Well above average,never,1.0
-40-49,Female,33.0,Above average,current,0.0
-60-69,Female,27.0,Average,never,0.0
-60-69,Female,24.0,Well above average,never,1.0
-70-79,Female,24.0,Above average,never,0.0
-70-79,Female,22.0,Above average,former,1.0
-30-39,Female,31.0,Average,current,0.0
-60-69,Female,21.0,Well above average,never,1.0
-40-49,Male,29.0,Above average,never,0.0
-30-39,Female,23.0,Average,never,0.0
-60-69,Male,34.0,Average,current,0.0
-60-69,Male,29.0,Average,former,1.0
-21-29,Female,25.0,Above average,never,1.0
-30-39,Male,28.0,Average,current,1.0
-21-29,Female,29.0,Average,never,1.0
-70-79,Female,29.0,Above average,former,1.0
-40-49,Male,38.0,Well above average,never,0.0
-40-49,Female,26.0,Above average,current,1.0
-50-59,Male,27.0,Average,never,1.0
-40-49,Male,37.0,Above average,former,0.0
-60-69,Male,23.0,Average,current,0.0
-70-79,Male,22.0,Above average,former,1.0
-30-39,Female,23.0,Above average,never,0.0
-30-39,Male,36.0,Average,former,0.0
-70-79,Female,29.0,Above average,never,0.0
-21-29,Female,17.0,Below average,never,0.0
-18-20,Female,20.0,Above average,never,0.0
-40-49,Female,22.0,Below average,never,0.0
-50-59,Female,26.0,Average,never,0.0
-60-69,Female,36.0,Above average,never,0.0
-70-79,Female,28.0,Above average,never,1.0
-30-39,Male,24.0,Average,never,0.0
-40-49,Female,21.0,Average,never,1.0
-40-49,Female,34.0,Average,never,1.0
-40-49,Female,44.0,Average,never,0.0
-30-39,Male,16.0,Well above average,never,1.0
-30-39,Female,19.0,Well above average,never,1.0
-30-39,Female,38.0,Below average,former,0.0
-40-49,Female,47.0,Average,current,0.0
-50-59,Female,39.0,Average,current,0.0
-21-29,Male,32.0,Below average,never,0.0
-50-59,Male,32.0,Above average,never,1.0
-21-29,Female,25.0,Below average,never,0.0
-50-59,Female,29.0,Average,current,0.0
-30-39,Male,33.0,Average,former,1.0
-60-69,Female,27.0,Above average,former,0.0
-50-59,Female,32.0,Average,never,0.0
-30-39,Female,21.0,Average,never,0.0
-40-49,Female,40.0,Average,never,0.0
-30-39,Female,38.0,Average,current,0.0
-50-59,Female,24.0,Average,never,1.0
-30-39,Female,33.0,Below average,never,0.0
-40-49,Female,28.0,Average,never,0.0
-50-59,Female,30.0,Above average,former,0.0
-60-69,Female,25.0,Above average,former,1.0
-30-39,Female,34.0,Average,never,0.0
-60-69,Female,34.0,Above average,never,1.0
-21-29,Female,35.0,Below average,current,0.0
-50-59,Male,26.0,Below average,current,0.0
-30-39,Female,24.0,Above average,never,1.0
-50-59,Female,26.0,Well below average,current,0.0
-40-49,Male,30.0,Average,former,0.0
-50-59,Female,27.0,Average,never,1.0
-50-59,Male,29.0,Average,never,0.0
-80-older,Male,26.0,Above average,former,1.0
-40-49,Male,31.0,Average,never,0.0
-50-59,Male,28.0,Average,never,0.0
-60-69,Male,29.0,Average,never,0.0
-18-20,Female,23.0,Above average,never,0.0
-40-49,Female,35.0,Below average,current,1.0
-50-59,Male,25.0,Above average,never,0.0
-21-29,Female,31.0,Average,current,1.0
-30-39,Male,37.0,Above average,former,1.0
-30-39,Female,23.0,Well above average,current,0.0
-40-49,Female,35.0,Above average,never,1.0
-40-49,Female,26.0,Average,current,1.0
-70-79,Female,27.0,Above average,former,1.0
-30-39,Female,49.0,Below average,never,0.0
-21-29,Male,23.0,Above average,former,1.0
-60-69,Male,28.0,Above average,never,0.0
-30-39,Male,22.0,Above average,never,1.0
-40-49,Female,22.0,Average,never,1.0
-30-39,Female,26.0,Average,never,0.0
-50-59,Female,27.0,Average,current,0.0
-50-59,Female,34.0,Above average,ecig,1.0
-40-49,Male,29.0,Well above average,never,1.0
-40-49,Male,27.0,Above average,never,0.0
-50-59,Female,31.0,Average,never,1.0
-40-49,Female,28.0,Average,former,0.0
-30-39,Female,40.0,Average,current,0.0
-60-69,Female,33.0,Above average,former,1.0
-50-59,Female,25.0,Well above average,former,1.0
-40-49,Female,30.0,Well above average,never,1.0
-60-69,Female,21.0,Average,former,1.0
-30-39,Female,24.0,Average,never,1.0
-40-49,Female,24.0,Average,current,0.0
-40-49,Female,30.0,Above average,never,0.0
-40-49,Male,33.0,Average,never,0.0
-30-39,Female,19.0,Above average,never,1.0
-50-59,Female,24.0,Above average,current,1.0
-60-69,Female,18.0,Average,current,0.0
-70-79,Female,19.0,Above average,former,1.0
-40-49,Male,25.0,Well above average,former,1.0
-50-59,Female,42.0,Average,never,1.0
-50-59,Male,27.0,Above average,former,1.0
-40-49,Female,30.0,Average,never,0.0
-40-49,Male,23.0,Above average,never,1.0
-60-69,Female,29.0,Average,never,0.0
-30-39,Female,23.0,Above average,never,1.0
-70-79,Other,26.0,Above average,former,0.0
-30-39,Female,38.0,Below average,never,0.0
-60-69,Female,21.0,Above average,never,1.0
-40-49,Female,23.0,Above average,never,1.0
-60-69,Female,29.0,Above average,former,1.0
-80-older,Male,25.0,Above average,never,0.0
-70-79,Male,25.0,Average,never,1.0
-40-49,Female,22.0,Average,never,0.0
-40-49,Female,20.0,Below average,never,1.0
-30-39,Female,28.0,Average,former,1.0
-70-79,Male,32.0,Above average,never,1.0
-50-59,Female,30.0,Above average,never,1.0
-50-59,Male,25.0,Above average,current,1.0
-60-69,Female,29.0,Above average,former,1.0
-30-39,Female,24.0,Above average,former,0.0
-30-39,Male,25.0,Well above average,current,0.0
-70-79,Male,36.0,Average,former,0.0
-40-49,Male,29.0,Average,former,1.0
-50-59,Male,39.0,Above average,never,0.0
-18-20,Male,24.0,Above average,ecig,1.0
-40-49,Female,34.0,Above average,former,1.0
-21-29,Male,29.0,Average,never,0.0
-21-29,Male,26.0,Average,current,1.0
-50-59,Female,24.0,Above average,never,1.0
-40-49,Male,37.0,Well above average,never,1.0
-60-69,Female,23.0,Above average,never,0.0
-30-39,Female,24.0,Average,ecig,1.0
-21-29,Female,24.0,Average,never,1.0
-30-39,Male,30.0,Average,former,0.0
-40-49,Male,34.0,Above average,former,1.0
-30-39,Male,,Well above average,never,1.0
-21-29,Female,23.0,Average,current,1.0
-21-29,Female,21.0,Above average,ecig,1.0
-21-29,Other,23.0,Below average,never,1.0
-50-59,Male,23.0,Average,current,0.0
-50-59,Male,26.0,Above average,current,1.0
-50-59,Female,32.0,Below average,never,0.0
-40-49,Male,23.0,Well above average,never,1.0
-40-49,Female,21.0,Average,never,1.0
-30-39,Female,53.0,Above average,current,0.0
-50-59,Female,26.0,Above average,former,0.0
-40-49,Male,25.0,Above average,never,1.0
-40-49,Male,32.0,Average,never,1.0
-40-49,Female,23.0,Average,current,0.0
-30-39,Female,22.0,Average,former,0.0
-30-39,Male,22.0,Above average,current,1.0
-40-49,Female,35.0,Below average,never,0.0
-50-59,Female,43.0,Below average,never,0.0
-40-49,Male,39.0,Below average,never,1.0
-70-79,Male,27.0,Above average,former,1.0
-70-79,Female,21.0,Above average,never,1.0
-60-69,Male,24.0,Above average,never,1.0
-30-39,Female,29.0,Average,current,1.0
-40-49,Female,24.0,Average,current,0.0
-30-39,Male,28.0,Above average,never,1.0
-30-39,Female,21.0,Above average,never,1.0
-50-59,Female,23.0,Well above average,never,0.0
-40-49,Female,23.0,Average,former,1.0
-30-39,Male,31.0,Average,ecig,0.0
-30-39,Female,31.0,Average,never,1.0
-40-49,Male,44.0,Average,former,0.0
-30-39,Female,32.0,Above average,never,1.0
-21-29,Female,21.0,Average,former,1.0
-40-49,Female,23.0,Average,former,1.0
-60-69,Female,27.0,Above average,former,0.0
-21-29,Female,22.0,Above average,former,1.0
-70-79,Female,23.0,Below average,former,0.0
-60-69,Female,23.0,Well above average,never,1.0
-40-49,Male,22.0,Well above average,former,1.0
-60-69,Female,36.0,Below average,ecig,0.0
-40-49,Female,23.0,Above average,never,0.0
-60-69,Male,38.0,Average,former,0.0
-30-39,Female,24.0,Above average,never,1.0
-40-49,Female,25.0,Average,former,1.0
-60-69,Female,23.0,Above average,never,1.0
-30-39,Female,20.0,Average,current,0.0
-30-39,Female,22.0,Well above average,never,0.0
-40-49,Male,23.0,Above average,never,0.0
-50-59,Female,19.0,Above average,never,1.0
-30-39,Female,48.0,Average,never,0.0
-40-49,Male,27.0,Average,current,1.0
-30-39,Female,26.0,Above average,former,1.0
-21-29,Female,43.0,Below average,never,0.0
-40-49,Female,25.0,Above average,never,1.0
-40-49,Female,22.0,Average,never,1.0
-30-39,Female,25.0,Well above average,never,1.0
-30-39,Male,25.0,Above average,never,
-50-59,Female,32.0,Average,former,1.0
-21-29,Female,19.0,Well above average,never,1.0
-40-49,Female,26.0,Average,former,1.0
-30-39,Male,22.0,Above average,never,0.0
-30-39,Female,52.0,Average,current,0.0
-50-59,Male,30.0,Average,never,0.0
-40-49,Female,24.0,Above average,never,1.0
-30-39,Female,22.0,Above average,never,0.0
-21-29,Female,27.0,Average,current,1.0
-40-49,Female,34.0,Above average,never,1.0
-40-49,Female,31.0,Above average,never,1.0
-50-59,Male,22.0,Above average,never,1.0
-40-49,Female,35.0,Average,never,0.0
-40-49,Female,26.0,Above average,never,1.0
-30-39,Female,25.0,Well above average,former,1.0
-30-39,Female,29.0,Above average,never,1.0
-21-29,Female,20.0,Above average,never,0.0
-70-79,Male,21.0,Average,former,1.0
-30-39,Male,25.0,Well above average,never,1.0
-40-49,Female,24.0,Average,former,1.0
-60-69,Female,28.0,Above average,never,1.0
-21-29,Male,38.0,Average,never,0.0
-60-69,Female,,Well above average,former,1.0
-50-59,Male,22.0,Average,never,0.0
-30-39,Male,22.0,Above average,current,1.0
-40-49,Male,30.0,Above average,former,1.0
-30-39,Female,26.0,Above average,never,1.0
-30-39,Female,22.0,Above average,never,1.0
-40-49,Female,26.0,Above average,never,1.0
-21-29,Female,34.0,Average,current,0.0
-50-59,Male,23.0,Above average,never,1.0
-40-49,Female,19.0,Well above average,former,1.0
-40-49,Female,29.0,Above average,never,1.0
-60-69,Female,20.0,Above average,former,1.0
-70-79,Female,27.0,Above average,former,1.0
-60-69,Male,32.0,Above average,never,1.0
-50-59,Male,32.0,Above average,never,1.0
-60-69,Female,,Average,former,0.0
-60-69,Female,25.0,Average,former,1.0
-60-69,Female,29.0,Above average,former,1.0
-21-29,Female,31.0,Average,current,0.0
-70-79,Male,30.0,Well above average,never,1.0
-70-79,Female,26.0,Above average,never,1.0
-70-79,Female,24.0,Above average,never,1.0
-30-39,Female,22.0,Average,ecig,0.0
-70-79,Female,36.0,Above average,never,0.0
-50-59,Male,23.0,Below average,current,0.0
-50-59,Male,29.0,Below average,former,0.0
-30-39,Female,30.0,Average,ecig,1.0
-70-79,Female,33.0,Above average,former,1.0
-30-39,Female,34.0,Below average,never,1.0
-21-29,Female,37.0,Average,never,1.0
-40-49,Female,22.0,Well above average,former,1.0
-40-49,Female,35.0,Average,never,0.0
-21-29,Male,19.0,Average,never,1.0
-30-39,Female,38.0,Below average,current,0.0
-40-49,Female,25.0,Well above average,current,1.0
-18-20,Female,35.0,Below average,never,1.0
-60-69,Female,22.0,Above average,never,1.0
-21-29,Female,21.0,Well above average,never,1.0
-50-59,Male,20.0,Below average,current,1.0
-60-69,Female,25.0,Above average,never,0.0
-60-69,Female,30.0,Average,former,0.0
-60-69,Male,26.0,Average,never,1.0
-50-59,Male,31.0,Average,ecig,1.0
-30-39,Female,33.0,Average,current,1.0
-50-59,Female,27.0,Average,never,1.0
-60-69,Female,24.0,Above average,never,1.0
-50-59,Female,48.0,Below average,former,0.0
-50-59,Female,38.0,Above average,current,1.0
-40-49,Female,36.0,Average,never,1.0
-40-49,Male,21.0,Average,former,0.0
-60-69,Female,24.0,Average,current,1.0
-50-59,Female,20.0,Average,ecig,1.0
-30-39,Female,37.0,Average,former,1.0
-70-79,Female,22.0,Above average,former,1.0
-50-59,Male,23.0,Average,former,1.0
-40-49,Female,29.0,Average,never,0.0
-60-69,Female,30.0,Below average,former,0.0
-80-older,Female,27.0,Well above average,never,1.0
-60-69,Female,34.0,Below average,never,1.0
-40-49,Female,42.0,Below average,current,0.0
-70-79,Female,23.0,Well above average,former,1.0
-60-69,Female,32.0,Average,former,1.0
-30-39,Male,22.0,Above average,never,1.0
-70-79,Female,22.0,Average,former,0.0
-40-49,Female,46.0,Below average,current,0.0
-40-49,Female,34.0,Above average,never,1.0
-30-39,Female,27.0,Average,current,0.0
-30-39,Male,29.0,Below average,former,0.0
-30-39,Female,29.0,Average,never,1.0
-50-59,Male,29.0,Above average,former,1.0
-30-39,Female,27.0,Above average,former,1.0
-50-59,Female,25.0,Well above average,never,1.0
-60-69,Female,24.0,Average,never,1.0
-30-39,Female,27.0,Average,current,0.0
-30-39,Female,23.0,Average,former,0.0
-50-59,Male,32.0,Average,former,1.0
-50-59,Male,26.0,Above average,never,1.0
-50-59,Female,19.0,Above average,never,1.0
-50-59,Female,25.0,Above average,never,0.0
-50-59,Female,25.0,Above average,never,1.0
-40-49,Male,34.0,Average,never,0.0
-50-59,Female,26.0,Average,never,1.0
-60-69,Female,20.0,Well below average,current,0.0
-30-39,Female,36.0,Average,ecig,0.0
-21-29,Female,27.0,Average,former,1.0
-50-59,Male,30.0,Average,never,1.0
-60-69,Male,30.0,Well above average,never,0.0
-60-69,Female,22.0,Average,never,1.0
-60-69,Female,42.0,Below average,former,0.0
-30-39,Female,25.0,Average,former,1.0
-60-69,Female,33.0,Above average,former,1.0
-50-59,Female,30.0,Average,former,1.0
-21-29,Female,20.0,Below average,current,0.0
-50-59,Male,24.0,Well above average,former,1.0
-60-69,Male,26.0,Above average,never,1.0
-21-29,Male,,,never,
-40-49,Male,33.0,Above average,ecig,0.0
-60-69,Female,33.0,Below average,never,0.0
-21-29,Female,24.0,Above average,never,0.0
-50-59,Female,29.0,Below average,never,0.0
-21-29,Female,27.0,Average,former,0.0
-70-79,Female,22.0,Well above average,never,1.0
-60-69,Female,18.0,Average,never,1.0
-40-49,Male,,Above average,never,0.0
-30-39,Male,19.0,Below average,ecig,0.0
-60-69,Female,43.0,Below average,never,1.0
-40-49,Male,28.0,Well above average,never,1.0
-30-39,Female,23.0,Average,former,1.0
-30-39,Female,33.0,Above average,former,1.0
-30-39,Female,23.0,Above average,current,1.0
-50-59,Female,21.0,Above average,former,1.0
-40-49,Male,22.0,Below average,current,0.0
-21-29,Female,34.0,Average,never,0.0
-60-69,Female,32.0,Below average,ecig,1.0
-21-29,Female,20.0,Above average,never,1.0
-21-29,Female,23.0,Average,current,0.0
-50-59,Female,33.0,Well above average,never,1.0
-40-49,Female,27.0,Above average,never,1.0
-70-79,Female,31.0,Above average,former,1.0
-30-39,Female,20.0,Average,current,0.0
-30-39,Male,36.0,Above average,former,1.0
-50-59,Female,21.0,Average,former,1.0
-40-49,Female,32.0,Average,never,0.0
-50-59,Male,26.0,Above average,former,1.0
-50-59,Female,28.0,Above average,former,1.0
-50-59,Female,32.0,Average,ecig,1.0
-60-69,Male,26.0,Above average,former,1.0
-50-59,Female,24.0,Below average,current,0.0
-60-69,Female,23.0,Above average,never,0.0
-21-29,Male,23.0,Well above average,never,1.0
-50-59,Male,20.0,Above average,former,1.0
-50-59,Male,27.0,Average,ecig,0.0
-30-39,Female,20.0,Above average,former,1.0
-50-59,Female,27.0,Average,former,1.0
-60-69,Female,21.0,Well above average,never,1.0
-40-49,Female,32.0,Average,ecig,0.0
-50-59,Female,25.0,Average,current,0.0
-60-69,Female,24.0,Below average,never,0.0
-40-49,Female,26.0,Average,former,0.0
-40-49,Female,20.0,Above average,former,1.0
-50-59,Male,22.0,Above average,never,1.0
-50-59,Female,22.0,Well above average,former,1.0
-21-29,Female,20.0,Average,current,0.0
-60-69,Male,41.0,Below average,never,0.0
-30-39,Male,50.0,Below average,ecig,0.0
-50-59,Female,19.0,Above average,never,1.0
-60-69,Female,23.0,Average,current,1.0
-50-59,Female,24.0,Well above average,former,1.0
-60-69,Female,24.0,Above average,never,1.0
-30-39,Male,44.0,Below average,never,1.0
-40-49,Female,49.0,Above average,current,0.0
-40-49,Male,23.0,Above average,never,1.0
-40-49,Male,21.0,Above average,never,1.0
-40-49,Female,25.0,Above average,never,1.0
-50-59,Female,21.0,Above average,former,1.0
-30-39,Female,26.0,Average,never,1.0
-40-49,Male,25.0,Above average,never,1.0
-40-49,Female,27.0,Above average,never,0.0
-18-20,Male,23.0,Well above average,former,1.0
-40-49,Female,31.0,Above average,current,0.0
-30-39,Female,21.0,Above average,former,0.0
-40-49,Female,23.0,Average,never,1.0
-50-59,Male,25.0,Above average,former,1.0
-40-49,Female,23.0,Above average,never,1.0
-70-79,Female,23.0,Well above average,never,1.0
-60-69,Male,34.0,Above average,former,1.0
-40-49,Female,22.0,Average,current,0.0
-60-69,Female,23.0,Above average,never,1.0
-60-69,Male,25.0,Well above average,never,1.0
-60-69,Male,20.0,Average,never,1.0
-60-69,Female,33.0,Average,current,1.0
-30-39,Female,19.0,Below average,never,1.0
-50-59,Female,23.0,Above average,current,1.0
-40-49,Male,27.0,Well above average,former,0.0
-60-69,Female,25.0,Average,never,0.0
-50-59,Female,20.0,Below average,current,1.0
-60-69,Female,30.0,Average,current,0.0
-50-59,Female,27.0,Average,never,1.0
-70-79,Female,,Above average,never,1.0
-70-79,Female,20.0,Below average,never,1.0
-50-59,Female,38.0,Average,never,0.0
-70-79,Female,24.0,Well above average,former,1.0
-50-59,Female,56.0,Average,former,0.0
-30-39,Female,37.0,Average,never,0.0
-60-69,Male,31.0,Above average,never,1.0
-40-49,Female,28.0,Above average,never,1.0
-50-59,Female,21.0,Above average,never,1.0
-30-39,Female,45.0,Average,current,0.0
-21-29,Male,24.0,Above average,never,1.0
-50-59,Female,24.0,Below average,former,1.0
-30-39,Male,25.0,Above average,never,1.0
-40-49,Male,24.0,Above average,never,0.0
-30-39,Female,19.0,Well below average,never,0.0
-50-59,Female,35.0,Average,former,0.0
-70-79,Female,22.0,Above average,former,1.0
-70-79,Male,33.0,Well above average,never,1.0
-50-59,Female,21.0,Above average,never,1.0
-70-79,Female,21.0,Above average,former,1.0
-50-59,Female,30.0,Average,never,1.0
-21-29,Male,30.0,Above average,never,0.0
-60-69,Female,27.0,Average,never,1.0
-50-59,Male,34.0,Above average,never,1.0
-70-79,Male,26.0,Above average,former,1.0
-60-69,Male,29.0,Above average,never,1.0
-21-29,Female,34.0,Average,former,0.0
-50-59,Female,32.0,Average,never,1.0
-50-59,Male,25.0,Well above average,never,1.0
-80-older,Female,25.0,Average,never,1.0
-60-69,Male,23.0,Above average,never,1.0
-50-59,Female,42.0,Above average,never,0.0
-50-59,Male,23.0,Well above average,never,1.0
-70-79,Female,20.0,Above average,never,1.0
-60-69,Female,28.0,Average,never,1.0
-70-79,Female,24.0,Above average,never,1.0
-60-69,Female,19.0,Well above average,never,1.0
-40-49,Male,33.0,Average,current,1.0
-21-29,Female,23.0,Well above average,never,1.0
-40-49,Female,23.0,Above average,never,1.0
-21-29,Male,23.0,Well above average,never,1.0
-40-49,Female,27.0,Above average,never,1.0
-60-69,Female,34.0,Below average,never,0.0
-40-49,Female,20.0,Above average,never,1.0
-40-49,Male,23.0,Well above average,never,1.0
-30-39,Female,30.0,Well above average,never,1.0
-50-59,Female,34.0,Average,never,1.0
-50-59,Female,22.0,Above average,never,1.0
-30-39,Female,26.0,Well above average,never,0.0
-30-39,Male,26.0,Well above average,never,1.0
-50-59,Female,25.0,Above average,never,1.0
-60-69,Female,24.0,Above average,never,1.0
-40-49,Female,29.0,Below average,former,0.0
-30-39,Female,42.0,Average,current,0.0
-50-59,Female,22.0,Above average,never,1.0
-21-29,Male,24.0,Well above average,never,1.0
-50-59,Female,24.0,Above average,former,1.0
-40-49,Male,33.0,Well below average,current,0.0
-40-49,Female,32.0,Average,never,0.0
-40-49,Male,30.0,Well above average,former,1.0
-70-79,Female,30.0,Above average,never,1.0
-60-69,Female,29.0,Above average,never,1.0
-50-59,Female,24.0,Below average,former,1.0
-40-49,Female,44.0,Below average,current,0.0
-40-49,Male,30.0,Average,never,1.0
-70-79,Male,21.0,Above average,never,1.0
-21-29,Female,23.0,Average,never,1.0
-40-49,Female,31.0,Below average,current,0.0
-40-49,Male,28.0,Average,former,1.0
-30-39,Female,25.0,Average,former,1.0
-50-59,Male,26.0,Average,current,1.0
-60-69,Male,30.0,Above average,never,1.0
-30-39,Male,25.0,Average,ecig,0.0
-60-69,Male,30.0,Well above average,never,0.0
-21-29,Female,22.0,Above average,never,1.0
-60-69,Female,23.0,Well above average,never,1.0
-40-49,Female,25.0,Average,current,1.0
-60-69,Female,24.0,Average,never,0.0
-40-49,Female,37.0,Average,former,0.0
-50-59,Female,21.0,Above average,former,0.0
-60-69,Male,27.0,Above average,former,1.0
-21-29,Female,21.0,Average,never,1.0
-40-49,Male,30.0,Average,never,0.0
-30-39,Male,33.0,Average,never,0.0
-40-49,Female,28.0,Average,current,0.0
-60-69,Female,25.0,Above average,never,1.0
-40-49,Female,26.0,Well above average,current,1.0
-60-69,Male,21.0,Well above average,never,1.0
-60-69,Female,21.0,Well below average,never,1.0
-50-59,Female,31.0,Below average,never,0.0
-30-39,Female,23.0,Above average,ecig,0.0
-40-49,Female,20.0,Average,current,1.0
-30-39,Female,27.0,Above average,never,0.0
-60-69,Female,27.0,Well above average,never,1.0
-60-69,Male,29.0,Average,never,1.0
-60-69,Female,31.0,Average,ecig,0.0
-50-59,Male,27.0,Average,never,1.0
-30-39,Female,27.0,Above average,never,1.0
-50-59,Female,28.0,Well below average,ecig,0.0
-21-29,Female,21.0,Average,never,1.0
-50-59,Female,53.0,Below average,never,0.0
-40-49,Female,32.0,Below average,former,0.0
-60-69,Female,24.0,Above average,never,0.0
-60-69,Male,17.0,Above average,never,1.0
-60-69,Female,20.0,Average,former,0.0
-30-39,Male,23.0,Above average,never,1.0
-60-69,Male,29.0,Above average,never,1.0
-21-29,Male,23.0,Above average,never,1.0
-50-59,Male,22.0,Well above average,former,1.0
-50-59,Female,23.0,Above average,never,0.0
-18-20,Female,25.0,Above average,never,0.0
-21-29,Female,20.0,Well above average,ecig,0.0
-70-79,Female,20.0,Well above average,former,1.0
-60-69,Male,23.0,Above average,former,1.0
-40-49,Female,27.0,Average,never,1.0
-70-79,Female,27.0,Above average,never,1.0
-60-69,Female,47.0,Below average,never,0.0
-40-49,Female,33.0,Average,never,1.0
-50-59,Female,25.0,Average,former,1.0
-70-79,Male,25.0,Well above average,former,1.0
-30-39,Female,30.0,Average,never,0.0
-50-59,Female,27.0,Average,former,1.0
-40-49,Male,27.0,Below average,never,0.0
-50-59,Female,36.0,Above average,never,1.0
-70-79,Male,33.0,Well above average,former,1.0
-40-49,Female,33.0,Average,current,1.0
-50-59,Female,29.0,Below average,never,0.0
-50-59,Female,28.0,Average,former,1.0
-60-69,Female,3.0,Average,never,1.0
-60-69,Female,27.0,Above average,never,0.0
-60-69,Male,29.0,Below average,former,0.0
-40-49,Female,23.0,Above average,never,1.0
-50-59,Female,22.0,Well above average,never,1.0
-70-79,Male,34.0,Above average,former,1.0
-21-29,Female,19.0,Average,never,1.0
-50-59,Male,70.0,Well above average,ecig,1.0
-70-79,Female,30.0,Above average,former,0.0
-40-49,Female,34.0,Above average,never,1.0
-70-79,Female,44.0,Above average,never,1.0
-40-49,Female,34.0,Average,never,0.0
-30-39,Female,17.0,Below average,former,0.0
-50-59,Male,21.0,Above average,never,1.0
-30-39,Female,26.0,Average,current,1.0
-50-59,Male,29.0,Above average,former,0.0
-40-49,Female,20.0,Above average,never,1.0
-30-39,Female,34.0,Average,current,0.0
-50-59,Female,21.0,Above average,never,1.0
-30-39,Female,37.0,Average,never,0.0
-50-59,Female,26.0,Average,current,1.0
-21-29,Female,19.0,Average,never,
-40-49,Female,31.0,Average,former,0.0
-40-49,Other,29.0,Average,never,1.0
-40-49,Female,31.0,Average,never,1.0
-50-59,Female,20.0,Below average,never,1.0
-60-69,Male,26.0,Above average,never,0.0
-21-29,Female,26.0,Average,never,1.0
-50-59,Female,25.0,Above average,former,1.0
-30-39,Female,22.0,Above average,never,1.0
-40-49,Female,27.0,Well above average,never,1.0
-50-59,Male,34.0,Well above average,never,1.0
-30-39,Female,23.0,Average,current,1.0
-60-69,Male,24.0,Below average,former,1.0
-50-59,Female,19.0,Well below average,never,1.0
-50-59,Male,31.0,Average,never,1.0
-50-59,Female,21.0,Well above average,former,1.0
-50-59,Female,27.0,Above average,never,1.0
-21-29,Female,21.0,Above average,never,1.0
-40-49,Male,26.0,Above average,current,0.0
-30-39,Female,42.0,Below average,former,0.0
-30-39,Female,22.0,Average,ecig,1.0
-70-79,Male,28.0,Above average,former,1.0
-40-49,Female,26.0,Average,never,0.0
-21-29,Other,32.0,Average,never,1.0
-40-49,Female,28.0,Average,current,0.0
-21-29,Female,27.0,Well above average,never,0.0
-50-59,Female,21.0,Average,never,1.0
-60-69,Male,38.0,Well above average,former,1.0
-40-49,Male,44.0,Average,former,0.0
-21-29,Female,26.0,Average,current,1.0
-60-69,Female,43.0,Average,never,0.0
-30-39,Male,21.0,Above average,current,1.0
-40-49,Female,21.0,Above average,former,1.0
-50-59,Female,23.0,Above average,never,0.0
-70-79,Female,23.0,Well above average,former,1.0
-18-20,Female,2.0,Well above average,never,1.0
-30-39,Male,26.0,Above average,former,0.0
-18-20,Male,22.0,Above average,never,1.0
-50-59,Female,47.0,Below average,former,0.0
-50-59,Female,25.0,Average,ecig,1.0
-30-39,Male,28.0,Average,former,0.0
-30-39,Female,29.0,Average,never,1.0
-50-59,Male,24.0,Well above average,ecig,1.0
-40-49,Female,34.0,Below average,never,
-70-79,Female,10.0,Well above average,former,1.0
-40-49,Female,30.0,Below average,former,0.0
-70-79,Male,34.0,Average,never,1.0
-60-69,Male,,Well above average,never,0.0
-30-39,Female,24.0,Average,never,0.0
-40-49,Male,29.0,Above average,former,0.0
-21-29,Female,27.0,Average,never,1.0
-60-69,Female,36.0,Average,never,0.0
-70-79,Female,31.0,Above average,never,1.0
-40-49,Female,30.0,Average,never,0.0
-30-39,Female,26.0,Below average,never,0.0
-60-69,Female,33.0,Above average,never,1.0
-30-39,Female,20.0,Average,current,1.0
-50-59,Female,25.0,Well above average,never,0.0
-40-49,Female,23.0,Above average,never,1.0
-40-49,Male,35.0,Above average,former,1.0
-60-69,Female,35.0,Average,never,1.0
-70-79,Male,27.0,Above average,former,0.0
-30-39,Female,21.0,Below average,current,1.0
-60-69,Female,39.0,Well above average,never,0.0
-30-39,Female,26.0,Average,never,0.0
-50-59,Male,28.0,Above average,never,0.0
-70-79,Female,21.0,Above average,never,1.0
-30-39,Female,46.0,Average,former,1.0
-30-39,Female,29.0,Average,never,1.0
-30-39,Female,32.0,Average,current,1.0
-30-39,Female,25.0,Above average,former,1.0
-60-69,Female,21.0,Below average,current,1.0
-50-59,Female,40.0,Average,former,0.0
-40-49,Female,21.0,Average,current,0.0
-50-59,Female,22.0,Above average,former,1.0
-30-39,Female,21.0,Average,current,0.0
-60-69,Female,20.0,Well below average,ecig,1.0
-50-59,Female,27.0,Average,never,1.0
-30-39,Female,25.0,Average,current,1.0
-60-69,Female,21.0,Average,former,1.0
-50-59,Male,31.0,Below average,former,0.0
-40-49,Male,22.0,Above average,former,0.0
-70-79,Male,,Average,never,0.0
-50-59,Female,40.0,Average,former,0.0
-21-29,Female,30.0,Average,current,0.0
-60-69,Male,28.0,Average,never,0.0
-40-49,Female,20.0,Above average,former,1.0
-60-69,Female,18.0,Well above average,never,1.0
-40-49,Female,32.0,Average,never,0.0
-40-49,Male,25.0,Average,current,1.0
-50-59,Female,37.0,Below average,never,0.0
-50-59,Female,23.0,Well above average,never,1.0
-50-59,Male,26.0,Above average,never,1.0
-50-59,Male,28.0,Above average,current,1.0
-40-49,Male,24.0,Well above average,never,1.0
-60-69,Female,34.0,Above average,never,1.0
-40-49,Male,29.0,Average,current,1.0
-40-49,Female,29.0,Above average,former,1.0
-40-49,Female,29.0,Above average,current,1.0
-60-69,Male,25.0,Average,never,0.0
-70-79,Female,21.0,Average,current,0.0
-40-49,Female,29.0,Average,never,1.0
-40-49,Female,38.0,Average,former,1.0
-50-59,Female,40.0,Well above average,former,0.0
-50-59,Female,25.0,Average,former,
-60-69,Female,32.0,Average,never,1.0
-50-59,Female,43.0,Below average,former,0.0
-21-29,Female,22.0,Average,former,1.0
-70-79,Female,26.0,Above average,never,1.0
-30-39,Female,40.0,Average,current,0.0
-50-59,Female,22.0,Well above average,never,1.0
-30-39,Female,24.0,Below average,ecig,0.0
-40-49,Female,27.0,Average,former,1.0
-21-29,Female,23.0,Well above average,never,0.0
-40-49,Female,25.0,Above average,never,1.0
-60-69,Female,29.0,Average,never,1.0
-60-69,Female,22.0,Average,never,1.0
-30-39,Male,20.0,Well above average,former,1.0
-40-49,Female,27.0,Above average,former,1.0
-40-49,Female,37.0,Average,former,0.0
-40-49,Female,35.0,Below average,ecig,0.0
-60-69,Female,25.0,Above average,never,1.0
-70-79,Male,32.0,Average,former,1.0
-50-59,Female,30.0,Above average,never,0.0
-60-69,Male,33.0,Below average,former,0.0
-30-39,Female,23.0,Above average,never,1.0
-30-39,Female,21.0,Above average,never,1.0
-70-79,Female,27.0,Average,former,1.0
-50-59,Female,22.0,Above average,former,1.0
-50-59,Female,27.0,Average,never,1.0
-70-79,Female,25.0,Above average,never,1.0
-30-39,Female,20.0,Below average,former,1.0
-21-29,Male,24.0,Average,current,0.0
-50-59,Male,38.0,Average,never,0.0
-50-59,Male,32.0,Average,never,1.0
-80-older,Female,22.0,Well above average,never,1.0
-30-39,Female,29.0,Average,current,0.0
-60-69,Female,17.0,Average,current,1.0
-60-69,Female,21.0,Below average,former,1.0
-50-59,Female,26.0,Above average,never,1.0
-50-59,Female,33.0,Average,former,0.0
-50-59,Female,31.0,Average,never,1.0
-21-29,Female,30.0,Below average,current,0.0
-60-69,Male,30.0,Above average,former,0.0
-50-59,Female,27.0,Average,current,1.0
-70-79,Female,28.0,Average,never,1.0
-50-59,Female,35.0,Average,never,0.0
-50-59,Female,40.0,Average,former,0.0
-50-59,Female,33.0,Average,former,1.0
-30-39,Female,23.0,Average,current,1.0
-60-69,Female,37.0,Below average,ecig,0.0
-50-59,Female,27.0,Average,current,1.0
-60-69,Female,19.0,Above average,never,1.0
-50-59,Female,34.0,Above average,never,0.0
-60-69,Female,39.0,Well above average,never,0.0
-50-59,Female,24.0,Average,current,0.0
-50-59,Female,32.0,Above average,ecig,0.0
-60-69,Female,26.0,Below average,never,0.0
-50-59,Female,26.0,Average,never,1.0
-40-49,Female,22.0,Average,former,0.0
-40-49,Male,20.0,Average,never,0.0
-21-29,Male,28.0,Well above average,current,1.0
-40-49,Female,22.0,Average,current,0.0
-50-59,Female,21.0,Above average,never,0.0
-40-49,Female,21.0,Well above average,never,1.0
-70-79,Female,24.0,Well above average,former,1.0
-50-59,Male,26.0,Well above average,never,1.0
-50-59,Female,32.0,Average,never,0.0
-30-39,Female,27.0,Below average,never,1.0
-70-79,Female,27.0,Average,never,1.0
-21-29,Female,24.0,Above average,former,1.0
-40-49,Female,27.0,Average,never,0.0
-30-39,Female,30.0,Below average,never,0.0
-60-69,Male,27.0,Above average,never,0.0
-40-49,Female,37.0,Average,never,0.0
-40-49,Male,22.0,Average,current,1.0
-40-49,Female,24.0,Well above average,never,1.0
-70-79,Female,23.0,Well above average,never,1.0
-50-59,Female,27.0,Average,current,0.0
-60-69,Male,30.0,Average,former,1.0
-70-79,Male,27.0,Above average,never,1.0
-40-49,Female,33.0,Average,never,1.0
-60-69,Female,31.0,Above average,current,0.0
-60-69,Female,43.0,Average,never,0.0
-60-69,Female,24.0,Above average,never,0.0
-60-69,Male,44.0,Average,current,0.0
-40-49,Male,25.0,Well below average,former,0.0
-50-59,Female,25.0,Above average,former,1.0
-30-39,Female,27.0,Above average,never,1.0
-30-39,Male,56.0,Average,former,0.0
-40-49,Male,26.0,Average,former,0.0
-60-69,Female,43.0,Average,never,0.0
-40-49,Female,21.0,Below average,never,0.0
-50-59,Female,37.0,Average,former,1.0
-21-29,Male,21.0,Above average,never,1.0
-40-49,Male,27.0,Average,never,0.0
-60-69,Female,18.0,Above average,never,0.0
-30-39,Female,24.0,Above average,current,0.0
-50-59,Male,34.0,Above average,former,1.0
-30-39,Female,22.0,Above average,current,0.0
-70-79,Male,29.0,Above average,never,1.0
-40-49,Female,35.0,Average,never,0.0
-60-69,Female,20.0,Above average,current,0.0
-50-59,Female,34.0,Below average,never,0.0
-40-49,Female,29.0,Average,current,1.0
-50-59,Male,22.0,Below average,current,0.0
-30-39,Male,21.0,Above average,never,1.0
-21-29,Male,21.0,Average,current,1.0
-50-59,Female,20.0,Above average,current,1.0
-70-79,Female,24.0,Above average,never,1.0
-18-20,Male,22.0,Well above average,never,1.0
-21-29,Female,26.0,Above average,never,1.0
-18-20,Male,22.0,Average,former,1.0
-60-69,Female,24.0,Above average,never,1.0
-60-69,Female,30.0,Above average,never,1.0
-50-59,Male,23.0,Well above average,never,1.0
-70-79,Female,32.0,Above average,former,1.0
-50-59,Female,21.0,Above average,current,1.0
-30-39,Female,28.0,Average,never,0.0
-70-79,Male,30.0,Average,former,0.0
-21-29,Female,34.0,Above average,never,0.0
-40-49,Male,30.0,Below average,former,1.0
-40-49,Female,21.0,Average,current,0.0
-50-59,Female,31.0,Average,never,0.0
-21-29,Female,25.0,Average,former,0.0
-40-49,Male,31.0,Above average,never,1.0
-60-69,Female,34.0,Average,never,1.0
-50-59,Female,30.0,Average,current,0.0
-50-59,Female,29.0,Above average,never,0.0
-40-49,Female,29.0,Average,never,0.0
-50-59,Male,29.0,Above average,never,1.0
-50-59,Female,33.0,Average,former,0.0
-60-69,Male,30.0,Average,never,1.0
-60-69,Female,47.0,Below average,never,0.0
-60-69,Female,20.0,Below average,former,0.0
-70-79,Male,24.0,Well above average,former,1.0
-70-79,Female,25.0,Above average,never,1.0
-50-59,Female,20.0,Average,never,1.0
-50-59,Female,29.0,Average,never,0.0
-50-59,Female,29.0,Average,former,0.0
-30-39,Female,27.0,Well above average,current,1.0
-50-59,Female,23.0,Average,current,1.0
-70-79,Female,32.0,Average,never,1.0
-70-79,Female,32.0,Average,never,1.0
-30-39,Female,22.0,Above average,current,1.0
-60-69,Male,24.0,Well above average,never,1.0
-30-39,Female,22.0,Above average,never,1.0
-30-39,Female,33.0,Well below average,ecig,0.0
-50-59,Female,26.0,Average,current,1.0
-50-59,Female,29.0,Well above average,former,1.0
-50-59,Female,20.0,Well above average,never,1.0
-80-older,Female,32.0,Above average,former,1.0
-50-59,Female,39.0,Average,current,0.0
-40-49,Female,35.0,Below average,never,0.0
-60-69,Female,33.0,Average,never,1.0
-40-49,Male,24.0,Above average,former,1.0
-50-59,Female,20.0,Well above average,never,1.0
-50-59,Female,27.0,Above average,never,1.0
-50-59,Female,42.0,Below average,never,1.0
-60-69,Male,25.0,Average,former,0.0
-50-59,Female,23.0,Well below average,former,0.0
-60-69,Female,50.0,Average,never,0.0
-70-79,Female,22.0,Well above average,never,1.0
-60-69,Male,23.0,Average,former,1.0
-50-59,Female,26.0,Below average,current,1.0
-70-79,Female,39.0,Average,never,0.0
-50-59,Male,27.0,Average,never,1.0
-70-79,Male,27.0,Above average,never,1.0
-50-59,Female,23.0,Above average,never,1.0
-50-59,Female,23.0,Above average,never,1.0
-40-49,Female,32.0,Average,ecig,1.0
-50-59,Female,26.0,Average,current,0.0
-21-29,Male,23.0,Average,former,1.0
-21-29,Female,53.0,Average,never,0.0
-30-39,Male,24.0,Well above average,former,1.0
-60-69,Female,26.0,Average,never,0.0
-70-79,Female,36.0,Well above average,former,0.0
-70-79,Female,38.0,Below average,never,0.0
-50-59,Female,25.0,Average,current,1.0
-30-39,Female,23.0,Above average,never,0.0
-60-69,Female,32.0,Well above average,never,1.0
-40-49,Female,32.0,Average,former,0.0
-40-49,Female,22.0,Above average,never,0.0
-60-69,Male,28.0,Above average,former,1.0
-30-39,Male,24.0,Above average,never,0.0
-60-69,Female,26.0,Average,former,0.0
-30-39,Male,26.0,Average,former,0.0
-21-29,Male,23.0,Well above average,ecig,1.0
-60-69,Male,26.0,Average,never,1.0
-60-69,Female,33.0,Well above average,ecig,0.0
-50-59,Female,23.0,Well above average,never,1.0
-60-69,Female,29.0,Below average,former,1.0
-40-49,Female,36.0,Average,never,0.0
-60-69,Female,29.0,Below average,former,1.0
-30-39,Female,34.0,Below average,never,0.0
-60-69,Male,31.0,Average,current,1.0
-60-69,Female,38.0,Average,never,0.0
-60-69,Female,25.0,Above average,former,1.0
-30-39,Female,20.0,Well above average,never,1.0
-50-59,Female,30.0,Average,current,1.0
-40-49,Male,,,former,
-60-69,Male,30.0,Average,former,1.0
-50-59,Female,23.0,Below average,current,1.0
-60-69,Female,27.0,Above average,never,0.0
-50-59,Female,27.0,Average,former,1.0
-40-49,Male,25.0,Above average,current,1.0
-30-39,Female,26.0,Above average,former,1.0
-50-59,Male,22.0,Well above average,never,1.0
-40-49,Female,20.0,Above average,never,1.0
-50-59,Male,21.0,Above average,former,1.0
-60-69,Female,45.0,Average,never,0.0
-30-39,Female,56.0,Average,current,0.0
-60-69,Female,26.0,Well above average,former,1.0
-50-59,Female,35.0,Average,never,1.0
-50-59,Female,28.0,Average,former,1.0
-40-49,Female,30.0,Average,never,0.0
-50-59,Male,25.0,Average,never,0.0
-50-59,Female,36.0,Above average,never,0.0
-21-29,Female,19.0,Below average,never,0.0
-60-69,Female,17.0,Above average,former,1.0
-70-79,Female,29.0,Above average,never,1.0
-60-69,Female,36.0,Above average,former,1.0
-30-39,Female,36.0,Average,never,0.0
-21-29,Female,21.0,Average,never,1.0
-70-79,Male,30.0,Above average,never,1.0
-40-49,Female,38.0,Above average,never,0.0
-50-59,Female,20.0,Above average,never,1.0
-70-79,Female,27.0,Above average,former,0.0
-40-49,Female,26.0,Average,never,1.0
-30-39,Female,21.0,Average,current,1.0
-50-59,Male,28.0,Average,current,0.0
-30-39,Female,31.0,Average,never,1.0
-40-49,Male,30.0,Average,current,1.0
-70-79,Female,35.0,Below average,never,0.0
-30-39,Female,26.0,Average,current,0.0
-40-49,Female,22.0,Above average,former,1.0
-60-69,Female,27.0,Above average,former,1.0
-40-49,Female,35.0,Above average,ecig,1.0
-60-69,Female,33.0,Average,former,0.0
-40-49,Female,19.0,Average,current,0.0
-40-49,Female,38.0,Average,former,1.0
-50-59,Female,20.0,Above average,never,1.0
-70-79,Female,36.0,Average,never,0.0
-50-59,Male,26.0,Above average,current,1.0
-40-49,Female,45.0,Below average,never,1.0
-50-59,Male,26.0,Above average,never,1.0
-50-59,Female,25.0,Above average,never,0.0
-50-59,Female,29.0,Average,former,1.0
-50-59,Female,26.0,Average,current,1.0
-30-39,Female,31.0,Above average,never,1.0
-40-49,Female,25.0,Above average,current,0.0
-60-69,Female,19.0,Above average,never,1.0
-50-59,Female,35.0,Average,never,0.0
-60-69,Female,23.0,Average,never,1.0
-30-39,Female,23.0,Average,never,1.0
-21-29,Female,29.0,Above average,never,1.0
-50-59,Female,30.0,Below average,current,0.0
-40-49,Female,20.0,Well above average,never,0.0
-60-69,Male,32.0,Average,current,1.0
-60-69,Male,26.0,Well above average,current,1.0
-30-39,Female,25.0,Above average,never,1.0
-50-59,Female,38.0,Average,former,0.0
-40-49,Male,23.0,Above average,never,1.0
-50-59,Female,32.0,Average,never,0.0
-40-49,Female,37.0,Average,former,0.0
-50-59,Female,32.0,Below average,former,1.0
-40-49,Female,29.0,Above average,never,1.0
-60-69,Female,32.0,Average,current,1.0
-30-39,Female,32.0,Average,current,0.0
-40-49,Male,23.0,Below average,never,0.0
-50-59,Female,22.0,Well above average,former,1.0
-30-39,Male,26.0,Average,current,1.0
-60-69,Female,25.0,Below average,never,0.0
-50-59,Female,22.0,Above average,never,1.0
-30-39,Female,19.0,Above average,never,1.0
-50-59,Female,24.0,Above average,former,1.0
-50-59,Female,21.0,Well below average,former,1.0
-40-49,Male,29.0,Average,current,1.0
-40-49,Female,34.0,Average,current,1.0
-50-59,Male,22.0,Below average,former,0.0
-40-49,Male,31.0,Average,never,0.0
-40-49,Female,24.0,Average,never,1.0
-30-39,Female,26.0,Above average,never,1.0
-50-59,Female,40.0,Average,current,0.0
-70-79,Female,26.0,Above average,never,0.0
-40-49,Female,38.0,Above average,never,0.0
-60-69,Female,32.0,Average,former,1.0
-30-39,Female,22.0,Above average,never,1.0
-60-69,Female,38.0,Average,never,0.0
-40-49,Female,25.0,Above average,never,1.0
-60-69,Female,23.0,Well below average,never,1.0
-40-49,Female,35.0,Above average,former,0.0
-40-49,Female,25.0,Average,former,0.0
-40-49,Female,38.0,Below average,current,0.0
-60-69,Female,26.0,Well above average,former,1.0
-30-39,Female,29.0,Average,former,0.0
-21-29,Female,28.0,Below average,never,1.0
-50-59,Male,33.0,Average,never,0.0
-60-69,Male,29.0,Above average,never,1.0
-80-older,Female,23.0,Above average,former,0.0
-50-59,Female,20.0,Average,never,1.0
-50-59,Female,35.0,Average,never,1.0
-40-49,Female,21.0,Well above average,former,1.0
-70-79,Male,36.0,Below average,never,1.0
-40-49,Male,25.0,Well above average,never,1.0
-60-69,Male,24.0,Well above average,never,1.0
-60-69,Female,26.0,Below average,never,0.0
-30-39,Female,39.0,Average,never,0.0
-30-39,Female,33.0,Above average,current,0.0
-60-69,Female,22.0,Well above average,never,1.0
-30-39,Male,30.0,Average,never,1.0
-80-older,Female,26.0,Above average,former,1.0
-40-49,Female,19.0,Below average,current,1.0
-70-79,Female,19.0,Above average,current,0.0
-40-49,Female,24.0,Above average,former,0.0
-70-79,Female,31.0,Below average,former,1.0
-40-49,Female,24.0,Average,current,0.0
-50-59,Female,34.0,Average,never,1.0
-60-69,Male,35.0,Above average,never,0.0
-30-39,Female,32.0,Above average,never,0.0
-30-39,Female,42.0,Above average,former,0.0
-50-59,Female,23.0,Above average,never,1.0
-60-69,Female,29.0,Below average,former,0.0
-30-39,Female,24.0,Average,current,0.0
-60-69,Female,28.0,Above average,current,0.0
-60-69,Female,23.0,Below average,current,1.0
-60-69,Male,30.0,Well below average,current,0.0
-50-59,Female,29.0,Above average,former,1.0
-60-69,Male,25.0,Above average,current,0.0
-50-59,Female,40.0,Well above average,never,1.0
-40-49,Female,28.0,Above average,ecig,0.0
-50-59,Female,32.0,Above average,never,0.0
-50-59,Female,38.0,Below average,ecig,0.0
-60-69,Female,26.0,Average,ecig,0.0
-70-79,Female,,Average,current,0.0
-50-59,Female,24.0,Above average,never,1.0
-70-79,Female,38.0,Well above average,never,0.0
-21-29,Female,25.0,Below average,never,1.0
-70-79,Female,22.0,Well above average,never,1.0
-50-59,Female,25.0,Average,never,1.0
-30-39,Female,41.0,Average,never,0.0
-60-69,Female,22.0,Above average,former,1.0
-60-69,Female,,Well below average,ecig,0.0
-40-49,Female,27.0,Below average,never,1.0
-21-29,Female,20.0,Average,never,1.0
-30-39,Male,29.0,Above average,never,1.0
-60-69,Female,34.0,Above average,former,1.0
-30-39,Male,24.0,Average,former,0.0
-30-39,Female,35.0,Average,never,0.0
-50-59,Female,22.0,Well above average,never,1.0
-60-69,Female,41.0,Average,current,0.0
-60-69,Male,44.0,Average,current,0.0
-80-older,Female,21.0,Average,never,0.0
-40-49,Female,40.0,Average,never,0.0
-60-69,Female,32.0,Average,never,1.0
-70-79,Female,34.0,Average,never,0.0
-30-39,Female,29.0,Average,never,1.0
-50-59,Female,23.0,Well below average,current,0.0
-70-79,Female,28.0,Average,never,0.0
-70-79,Female,33.0,Well above average,never,1.0
-70-79,Male,23.0,Below average,never,0.0
-40-49,Female,23.0,Well above average,never,1.0
-50-59,Female,22.0,,current,0.0
-70-79,Female,24.0,Above average,never,0.0
-60-69,Female,30.0,Average,never,0.0
-60-69,Male,34.0,Above average,former,0.0
-50-59,Female,50.0,Below average,current,0.0
-60-69,Male,40.0,Below average,former,0.0
-60-69,Female,27.0,Above average,never,0.0
-80-older,Female,27.0,Average,former,0.0
-50-59,Male,32.0,Average,former,0.0
-50-59,Male,30.0,Above average,ecig,0.0
-50-59,Female,29.0,Average,never,0.0
-60-69,Female,26.0,,never,0.0
-40-49,Male,33.0,Above average,never,1.0
-30-39,Female,21.0,Above average,never,1.0
-70-79,Female,25.0,Above average,never,1.0
-40-49,Female,50.0,Below average,former,0.0
-60-69,Female,26.0,Average,never,0.0
-70-79,Male,33.0,Below average,never,0.0
-70-79,Female,39.0,Average,former,1.0
-60-69,Female,24.0,Average,former,0.0
-60-69,Female,33.0,Above average,never,1.0
-60-69,Female,31.0,Well below average,former,1.0
-60-69,Female,34.0,Below average,current,0.0
-50-59,Female,27.0,Average,current,1.0
-60-69,Female,34.0,Average,former,0.0
-70-79,Female,30.0,Average,former,0.0
-60-69,Male,15.0,Well below average,former,0.0
-60-69,Male,31.0,Below average,former,1.0
-60-69,Female,21.0,Above average,former,1.0
-60-69,Female,27.0,Average,current,0.0
-60-69,Female,22.0,Above average,ecig,1.0
-60-69,Female,38.0,Below average,former,1.0
-60-69,Male,24.0,Average,current,0.0
-60-69,Female,29.0,Well below average,current,1.0
-40-49,Female,36.0,Average,current,1.0
-60-69,Male,25.0,Average,never,1.0
-60-69,Female,33.0,Below average,former,0.0
-60-69,Male,29.0,Above average,former,0.0
-60-69,Female,31.0,Below average,former,0.0
-50-59,Female,27.0,Below average,current,1.0
-60-69,Female,30.0,Average,current,0.0
-60-69,Male,34.0,Average,current,1.0
-60-69,Female,23.0,Below average,former,0.0
-60-69,Female,31.0,Above average,former,0.0
-60-69,Male,21.0,Well above average,never,0.0
-40-49,Female,34.0,Below average,never,0.0
-60-69,Female,22.0,Above average,never,0.0
-50-59,Female,30.0,Average,current,0.0
-60-69,Female,31.0,Average,former,0.0
-80-older,Male,27.0,Above average,former,0.0
-50-59,Female,31.0,Well above average,never,0.0
-40-49,Male,27.0,Average,current,0.0
-50-59,Female,22.0,Average,never,1.0
-30-39,Female,29.0,Average,current,0.0
-60-69,Female,28.0,Well below average,never,1.0
-60-69,Female,31.0,Average,never,0.0
-40-49,Female,33.0,Average,ecig,0.0
-70-79,Female,27.0,Average,never,0.0
-50-59,Female,36.0,Average,never,0.0
-50-59,Male,25.0,Well above average,former,1.0
-60-69,Female,26.0,Below average,ecig,1.0
-60-69,Female,24.0,Above average,never,1.0
-40-49,Female,27.0,Above average,former,0.0
-40-49,Male,36.0,Average,never,0.0
-60-69,Female,22.0,Average,current,1.0
-60-69,Female,23.0,Well above average,ecig,1.0
-40-49,Male,28.0,Average,never,1.0
-80-older,Male,20.0,Above average,never,1.0
-60-69,Female,37.0,Average,former,1.0
-50-59,Female,,Above average,never,1.0
-50-59,Male,20.0,Average,current,0.0
-60-69,Male,32.0,Average,former,1.0
-60-69,Female,40.0,Below average,never,0.0
-30-39,Female,29.0,Well above average,never,1.0
-60-69,Female,29.0,Above average,never,1.0
-50-59,Female,31.0,Average,former,1.0
-60-69,Male,31.0,Average,never,1.0
-30-39,Male,41.0,Average,never,0.0
-40-49,Female,53.0,Well below average,former,0.0
-40-49,Female,24.0,Below average,never,0.0
-50-59,Female,31.0,Well below average,former,0.0
-50-59,Male,23.0,Above average,never,1.0
-40-49,Female,28.0,Above average,never,1.0
-60-69,Female,25.0,Average,never,0.0
-60-69,Female,28.0,Above average,never,1.0
-40-49,Female,37.0,Well below average,never,0.0
-60-69,Female,29.0,Below average,current,1.0
-30-39,Female,26.0,Below average,current,1.0
-40-49,Female,19.0,Well above average,former,1.0
-50-59,Female,39.0,Below average,never,0.0
-40-49,Female,23.0,Below average,current,0.0
-30-39,Female,31.0,Average,former,1.0
-60-69,Female,31.0,Average,never,0.0
-40-49,Female,18.0,Above average,former,0.0
-50-59,Female,27.0,Above average,former,0.0
-40-49,Female,21.0,Below average,current,0.0
-50-59,Female,,Average,former,0.0
-30-39,Male,24.0,Well above average,never,1.0
-30-39,Male,24.0,Well above average,never,0.0
-30-39,Male,34.0,Below average,former,0.0
-60-69,Female,26.0,Above average,former,1.0
-50-59,Female,27.0,Above average,never,0.0
-60-69,Female,29.0,Average,former,0.0
-60-69,Female,29.0,Below average,never,0.0
-60-69,Female,40.0,Below average,never,0.0
-30-39,Female,23.0,Average,current,1.0
-30-39,Female,33.0,Above average,current,1.0
-60-69,Female,22.0,Average,current,0.0
-60-69,Female,28.0,Above average,former,0.0
-50-59,Female,26.0,Average,current,0.0
-30-39,Male,25.0,Average,former,1.0
-60-69,Female,22.0,Above average,never,1.0
-50-59,Female,30.0,Below average,never,1.0
-40-49,Female,35.0,Average,never,1.0
-50-59,Female,29.0,Below average,former,1.0
-30-39,Female,44.0,Average,current,0.0
-30-39,Female,31.0,Below average,never,0.0
-50-59,Female,34.0,Below average,former,0.0
-60-69,Female,20.0,Average,never,1.0
-50-59,Other,36.0,Below average,never,0.0
-50-59,Female,26.0,Well above average,former,1.0
-40-49,Female,38.0,Above average,never,0.0
-60-69,Female,49.0,Below average,former,0.0
-60-69,Female,23.0,Well above average,never,0.0
-50-59,Female,28.0,Average,never,0.0
-40-49,Female,21.0,Average,never,1.0
-50-59,Female,35.0,Average,former,1.0
-30-39,Female,28.0,Below average,former,0.0
-30-39,Female,22.0,Average,current,1.0
-30-39,Female,43.0,Above average,former,0.0
-70-79,Female,25.0,Average,current,0.0
-50-59,Female,45.0,Average,former,1.0
-40-49,Female,27.0,Average,former,0.0
-60-69,Female,45.0,Above average,never,1.0
-50-59,Female,53.0,Below average,never,0.0
-40-49,Female,26.0,Above average,never,1.0
-40-49,Male,29.0,Above average,never,1.0
-60-69,Female,42.0,Above average,former,0.0
-40-49,Female,46.0,Below average,never,0.0
-50-59,Female,24.0,Well above average,never,0.0
-40-49,Female,18.0,Above average,current,1.0
-50-59,Female,27.0,Average,current,0.0
-30-39,Female,32.0,Average,never,0.0
-50-59,Female,26.0,Average,never,1.0
-40-49,Female,27.0,Average,current,0.0
-50-59,Female,36.0,Average,never,0.0
-30-39,Female,27.0,Average,current,0.0
-30-39,Female,39.0,Below average,never,1.0
-30-39,Female,27.0,Above average,former,1.0
-30-39,Male,27.0,Below average,current,0.0
-50-59,Female,33.0,Average,current,0.0
-60-69,Female,31.0,Well above average,former,1.0
-30-39,Male,21.0,Average,current,1.0
-70-79,Male,26.0,Above average,former,1.0
-40-49,Female,22.0,Above average,never,0.0
-40-49,Female,32.0,Average,current,0.0
-40-49,Female,34.0,Above average,never,1.0
-40-49,Female,38.0,Average,current,0.0
-50-59,Female,25.0,Average,never,0.0
-70-79,Female,21.0,Above average,current,0.0
-70-79,Male,23.0,Above average,former,1.0
-50-59,Female,25.0,Below average,current,1.0
-40-49,Female,27.0,Above average,never,1.0
-80-older,Male,24.0,Above average,never,1.0
-50-59,Other,21.0,Average,current,1.0
-60-69,Female,35.0,Average,never,0.0
-30-39,Female,49.0,Above average,current,1.0
-40-49,Female,30.0,Below average,current,0.0
-30-39,Male,28.0,Above average,former,1.0
-50-59,Female,32.0,Below average,never,1.0
-80-older,Male,30.0,Average,former,0.0
-60-69,Female,35.0,Below average,current,1.0
-60-69,Male,26.0,Above average,former,1.0
-80-older,Female,21.0,Above average,former,1.0
+Purpose,Perigee_km,Apogee_km,Period_minutes,Type_of_Orbit
+Technology Development,770.0,787.0,100.42,
+Communications,35777.0,35794.0,1436.08,
+Communications,35785.0,35789.0,1436.13,
+Communications,35780.0,35793.0,1436.1,
+Communications,35780.0,35791.0,1436.06,
+Solar Physics,670.0,710.0,98.6,Sun-Synchronous
+Electronic Surveillance,35560.0,36013.0,1436.14,
+Electronic Surveillance,35589.0,35984.0,1436.1,
+Electronic Surveillance,35714.0,35937.0,1438.8,
+Electronic Surveillance,35500.0,35500.0,,
+Electronic Surveillance,35771.0,35805.0,23.94,
+Communications,35872.0,36103.0,1446.36,
+Communications,35700.0,35700.0,1306.29,
+Communications,35700.0,35700.0,1306.29,
+Technology Development,480.0,790.0,97.4,
+Technology Development,495.0,791.0,97.5,
+Technology Development,499.0,792.0,97.6,
+Technology Development,443.0,886.0,98.0,
+Technology Development,443.0,886.0,98.0,
+Communications,35764.0,35808.0,1436.08,
+Communications,35784.0,35787.0,1436.06,
+Communications,35770.0,35802.0,1436.09,
+Communications,35769.0,35802.0,1436.07,
+Scientific Research,510.0,534.0,95.1,
+Earth Science,570.0,583.0,96.2,
+Maritime Tracking/Technology Development,615.0,632.0,97.2,Sun-Synchronous
+Technology Development,599.0,626.0,96.9,
+Technology Development,558.0,582.0,96.06,
+Space Physics,264.0,5732.0,150.4,
+Technology Development,443.0,886.0,98.0,
+Communications/Technology Development,35786.0,35787.0,1436.09,
+Earth Observation,672.0,674.0,98.2,Sun-Synchronous
+Communications,35776.0,35797.0,1436.1,
+Communications,35767.0,35805.0,1436.08,
+Communications,35781.0,35791.0,1436.05,
+Communications,35772.0,35800.0,1436.1,
+Communications,35775.0,35797.0,1436.09,
+Communications,35774.0,35797.0,1436.07,
+Communications,35777.0,35795.0,1436.08,
+Communications,35780.0,35793.0,1436.1,
+Communications,35773.0,35800.0,1436.1,
+Communications,35774.0,35798.0,1436.1,
+Communications,35778.0,35793.0,1436.1,
+Communications,35777.0,35795.0,1436.08,
+Communications,35781.0,35791.0,1436.1,
+Communications,35777.0,35796.0,1436.1,
+Communications,35778.0,35795.0,1436.12,
+Communications,35773.0,35798.0,1436.08,
+Communications,35773.0,35798.0,1436.07,
+Communications,35773.0,35798.0,1436.08,
+Communications,35778.0,35794.0,1436.08,
+Communications,35783.0,35789.0,1436.1,
+Communications,35633.0,35796.0,1432.0,
+Communications,35595.0,36007.0,1436.08,
+Amateur Radio,1440.0,1459.0,114.9,Sun-Synchronous
+Communications,35778.0,35793.0,1436.08,
+Communications,35777.0,35795.0,1436.1,
+Communications,35781.0,35790.0,1436.08,
+Communications,35778.0,35794.0,1436.1,
+Communications,35773.0,35799.0,1436.08,
+Communications (experimental),696.0,764.0,99.4,Sun-Synchronous
+Communications (experimental),694.0,850.0,100.3,Sun-Synchronous
+Communications/Maritime Tracking,563.0,572.0,97.0,Sun-Synchronous
+Communications/Maritime Tracking,604.0,674.0,97.5,Sun-Synchronous
+Communications/Maritime Tracking,610.0,694.0,97.8,Sun-Synchronous
+Communications/Maritime Tracking,627.0,694.0,98.0,Sun-Synchronous
+Communications/Maritime Tracking,594.0,653.0,97.17,Sun-Synchronous
+Communications/Maritime Tracking,594.0,669.0,97.99,Sun-Synchronous
+Communications,35782.0,35795.0,1436.21,
+Communications,35779.0,35790.0,1436.03,
+Communications,35778.0,35794.0,1436.08,
+Communications,35864.0,35874.0,1440.31,
+Communications,35766.0,35805.0,1436.06,
+Communications,35778.0,35794.0,1436.09,
+Technology Development,410.0,415.0,92.81,Sun-Synchronous
+Communications/Research,35771.0,35803.0,1436.12,
+Communications,35780.0,35792.0,1436.07,
+Communications,35784.0,35789.0,1436.1,
+Communications,35778.0,35795.0,1436.11,
+Communications,35782.0,35793.0,1436.17,
+Communications,35773.0,35801.0,1436.15,
+Communications,35776.0,35795.0,1436.08,
+Communications,35774.0,35799.0,1436.13,
+Communications,35778.0,35797.0,1436.15,
+Communications,35780.0,35791.0,1436.08,
+Communications,35776.0,35794.0,1436.04,
+Communications,35766.0,35807.0,1436.1,
+Communications,35772.0,35798.0,1436.03,
+Communications,35804.0,35852.0,1438.2,
+Communications,35715.0,35780.0,1434.1,
+Communications,35776.0,35797.0,1436.12,
+Communications,35772.0,35801.0,1436.11,
+Communications,35768.0,35804.0,1436.12,
+Communications,35770.0,35802.0,1436.1,
+Communications,35781.0,35793.0,1436.12,
+Communications,35777.0,35795.0,1436.07,
+Communications,35770.0,35804.0,1436.07,
+Communications,35768.0,35806.0,1436.11,
+Communications,35778.0,35794.0,1436.08,
+Remote Sensing/Technology Development,984.0,1014.0,105.1,Sun-Synchronous
+Communications,35780.0,35791.0,1436.06,
+Communications,35834.0,35883.0,1439.76,
+Communications,35605.0,35623.0,1427.27,
+Communications,35768.0,35805.0,1436.1,
+Technology Development,709.0,718.0,99.0,Sun-Synchronous
+Technology Development,555.0,579.0,96.01,Sun-Synchronous
+Technology Development,554.0,581.0,96.01,Sun-Synchronous
+Earth Observation,681.0,703.0,98.6,Sun-Synchronous
+Remote Sensing/Technology Development,500.0,521.0,94.8,Sun-Synchronous
+Remote Sensing,503.0,507.0,94.7,
+Communications,35777.0,35795.0,1436.09,
+Communications,35776.0,35797.0,1436.11,
+Communications,35769.0,35803.0,1436.07,
+Communications,35772.0,35800.0,1436.09,
+Space Science,594.0,886.0,99.6,Sun-Synchronous
+Communications,35778.0,35794.0,1436.1,
+Communications,33066.0,35725.0,1365.61,
+Communications,35784.0,35787.0,1436.04,
+Technology Development,403.0,813.0,96.85,
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Remote Sensing,501.0,505.0,94.7,Sun-Synchronous
+Technology Development,609.0,629.0,97.1,Sun-Synchronous
+Space Science,771.0,783.0,100.3,Sun-Synchronous
+Technology Development,611.0,631.0,97.1,Sun-Synchronous
+Technology Development,500.0,506.0,94.67,Sun-Synchronous
+Remote Sensing,618.0,619.0,97.1,Sun-Synchronous
+Remote Sensing,632.0,635.0,97.4,Sun-Synchronous
+Remote Sensing,624.0,643.0,97.4,Sun-Synchronous
+Remote Sensing,622.0,645.0,97.4,Sun-Synchronous
+Earth Science,325.0,1486.0,103.11,
+Technology Development,538.0,544.0,95.5,
+Astrophysics,9999.0,138825.0,3808.92,Deep Highly Eccentric
+Communications,35777.0,35797.0,1436.1,
+Communications,729.0,748.0,99.6,Sun-Synchronous
+Earth Observation,785.0,804.0,98.5,Sun-Synchronous
+Earth Observation,784.0,804.0,100.7,Sun-Synchronous
+Technology Development,564.0,611.0,96.43,Sun-Synchronous
+Communications,35782.0,35788.0,1436.05,
+Space Science,484.0,791.0,97.4,Sun-Synchronous
+Space Science,594.0,731.0,98.0,Sun-Synchronous
+Space Science,594.0,747.0,98.0,Sun-Synchronous
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Navigation/Global Positioning,35768.0,35803.0,1436.05,
+Navigation/Global Positioning,35708.0,35864.0,1436.08,
+Navigation/Global Positioning,35776.0,35799.0,1436.15,
+Navigation/Global Positioning,35774.0,35797.0,1436.05,
+Navigation/Global Positioning,35764.0,35809.0,1436.1,
+Navigation/Global Positioning,35670.0,35893.0,1435.82,
+Navigation/Global Positioning,35775.0,35799.0,1436.11,
+Navigation/Global Positioning,35717.0,35817.0,1436.12,
+Navigation/Global Positioning,35693.0,37872.0,1435.93,
+Navigation/Global Positioning,35708.0,35879.0,1435.1,
+Navigation/Global Positioning,21519.0,21545.0,773.39,
+Navigation/Global Positioning,21460.0,21595.0,773.19,
+Navigation/Global Positioning,21452.0,21603.0,773.21,
+Navigation/Global Positioning,21462.0,21591.0,773.1,
+Navigation/Global Positioning,21477.0,21574.0,773.1,
+Earth Observation/Meteorology/Communications,35783.0,35791.0,1436.1,
+Communications,35773.0,35799.0,1436.1,
+Communications,35780.0,35794.0,1436.11,
+Earth/Space Science,820.0,841.0,101.5,Sun-Synchronous
+Remote Sensing,764.0,836.0,100.9,Sun-Synchronous
+Remote Sensing,769.0,831.0,100.9,Sun-Synchronous
+Remote Sensing,669.0,746.0,98.9,Sun-Synchronous
+Remote Sensing,751.0,849.0,100.9,Sun-Synchronous
+Remote Sensing,772.0,828.0,100.9,Sun-Synchronous
+Remote Sensing/Imaging,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,622.0,623.0,97.2,Sun-Synchronous
+Earth Observation,713.0,724.0,99.2,
+Technology Development,630.0,653.0,97.55,Sun-Synchronous
+Technology Development,594.0,715.0,97.8,Sun-Synchronous
+Technology Development,815.0,830.0,101.3,Sun-Synchronous
+Technology Development,678.0,703.0,98.6,Sun-Synchronous
+Technology Development,443.0,886.0,98.0,
+Technology Development,326.0,1465.0,102.89,
+Technology Development,814.0,829.0,101.3,Sun-Synchronous
+Technology Development,609.0,628.0,97.1,Sun-Synchronous
+Technology Development,326.0,1475.0,103.0,
+Earth Observation,661.0,662.0,98.0,Sun-Synchronous
+Technology Development,598.0,616.0,96.8,Sun-Synchronous
+Technology Development,594.0,780.0,98.5,Sun-Synchronous
+Communications,35785.0,35788.0,1436.1,
+Communications,35786.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.04,
+Communications,35778.0,35795.0,1436.1,
+Communications,35780.0,35792.0,1436.09,
+Communications,35773.0,35799.0,1436.08,
+Communications,35774.0,35797.0,1436.1,
+Communications,35777.0,35796.0,1436.1,
+Communications,35774.0,35798.0,1436.1,
+Earth Science,712.0,732.0,99.2,Sun-Synchronous
+Earth Science/Meteorology,845.0,855.0,101.93,Sun-Synchronous
+Earth Science/Meteorology,842.0,855.0,101.9,Sun-Synchronous
+Earth Science/Meteorology,837.0,851.0,101.8,Sun-Synchronous
+Earth Science/Meteorology,843.0,852.0,101.87,Sun-Synchronous
+Earth Science/Meteorology,842.0,855.0,101.89,Sun-Synchronous
+Earth Science/Meteorology,842.0,859.0,101.94,Sun-Synchronous
+Technology Development,559.0,582.0,96.08,Sun-Synchronous
+Technology Development,594.0,815.0,98.8,Sun-Synchronous
+Technology Development,594.0,815.0,98.8,Sun-Synchronous
+Technology Development,35775.0,35799.0,1436.12,
+Communications,35771.0,35802.0,1436.12,
+Communications,35760.0,35814.0,1436.1,
+Communications,35757.0,35817.0,1436.1,
+Communications,35706.0,35868.0,1436.13,
+Communications,35774.0,35799.0,1436.12,
+Communications,35718.0,35855.0,1436.1,
+Communications,35756.0,35817.0,1436.11,
+Communications,35784.0,35784.0,1436.1,
+Early Warning,35780.0,35800.0,1436.27,
+Early Warning,35897.0,35909.0,142.08,
+Early Warning,35765.0,35810.0,1436.14,
+Early Warning,35741.0,35832.0,1436.12,
+Earth Observation,662.0,680.0,98.2,Sun-Synchronous
+Earth Observation,585.0,603.0,96.56,Sun-Synchronous
+Technology Development,596.0,639.0,97.0,Sun-Synchronous
+Communications,35776.0,35795.0,1436.07,
+Communications,35780.0,35792.0,1436.0,
+Communications,35778.0,35793.0,1436.1,
+Communications,35782.0,35791.0,1436.11,
+Communications,35785.0,35789.0,1436.11,
+Communications,35789.0,35803.0,1436.57,
+Communications,35776.0,35796.0,1436.06,
+Communications,35781.0,35794.0,1436.13,
+Communications,35783.0,35790.0,1436.11,
+Communications,35775.0,35798.0,1436.12,
+Communications,35782.0,35789.0,1436.07,
+Communications,35783.0,35789.0,1436.1,
+Communications,35775.0,35797.0,1436.08,
+Communications,35773.0,35799.0,1436.1,
+Technology Development,639.0,694.0,98.1,Sun-Synchronous
+Meteorology,35323.0,35750.0,1423.35,
+Electronic Intelligence/Technology Development,675.0,692.0,98.43,Polar
+Electronic Intelligence/Technology Development,677.0,692.0,98.46,Polar
+Electronic Intelligence/Technology Development,675.0,692.0,98.43,Polar
+Electronic Intelligence/Technology Development,677.0,692.0,98.45,Polar
+Earth Observation/Research,678.0,690.0,98.4,Sun-Synchronous
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Remote Sensing,702.0,703.0,98.8,Sun-Synchronous
+Earth Observation,701.0,704.0,98.8,Sun-Synchronous
+Remote Sensing,530.0,547.0,95.4,Sun-Synchronous
+Remote Sensing,508.0,514.0,94.8,Sun-Synchronous
+Technology Development,306.0,1313.0,101.08,
+Technology Development,658.0,671.0,98.03,Sun-Synchronous
+Communications,35761.0,35810.0,1436.06,
+Communications,35776.0,35796.0,1436.09,
+Communications,35781.0,35822.0,1436.09,
+Communications,35768.0,35805.0,1436.1,
+Communications,35779.0,35795.0,1436.12,
+Communications,35762.0,35810.0,1436.1,
+Communications,35754.0,35817.0,1436.06,
+Communications,35772.0,35799.0,1436.1,
+Communications,35770.0,35802.0,1436.09,
+Communications,35725.0,35767.0,1434.03,
+Communications,35780.0,35790.0,1436.04,
+Communications,35788.0,35794.0,1436.1,
+Communications,35781.0,35790.0,1436.06,
+Communications,35766.0,35806.0,1436.08,
+Communications,35786.0,35787.0,1436.09,
+Communications,35778.0,35793.0,1436.08,
+Communications,35766.0,35806.0,1436.07,
+Communications,35784.0,35794.0,1436.21,
+Communications,35757.0,35815.0,1436.07,
+Communications,35777.0,35797.0,1436.12,
+Communications,35769.0,35805.0,1436.08,
+Communications,35774.0,35799.0,1436.09,
+Communications,35780.0,35800.0,1436.28,
+Communications,35769.0,35802.0,1436.07,
+Communications,35766.0,35806.0,1436.1,
+Communications,35775.0,35799.0,1436.1,
+Communications,35756.0,35815.0,1436.06,
+Communications,35759.0,35812.0,1436.06,
+Communications,35786.0,35787.0,1436.09,
+Communications,35714.0,35856.0,1436.01,
+Maritime Tracking,806.0,821.0,101.2,Sun-Synchronous
+Communications,35781.0,35790.0,1436.06,
+Communications,35783.0,35790.0,1436.11,
+Communications,35774.0,35798.0,1436.1,
+Communications,35785.0,35788.0,1436.1,
+Communications,35777.0,35795.0,1436.1,
+Communications,35782.0,35791.0,1436.1,
+Communications,35987.0,35995.0,1446.57,
+Communications,35420.0,35940.0,1430.6,
+Technology Development,538.0,540.0,95.4,
+Technology Development,627.0,654.0,97.54,Sun-Synchronous
+Technology Development,488.0,500.0,94.49,
+Technology Development,488.0,500.0,94.49,
+Earth Science,35777.0,35791.0,1436.0,
+Earth Science,35767.0,35803.0,1436.04,
+Earth Science,35760.0,35816.0,1436.19,
+Earth Science,820.0,835.0,101.5,Sun-Synchronous
+Earth Science,827.0,828.0,101.5,Sun-Synchronous
+Earth Science,827.0,828.0,101.45,
+Astrophysics,537.0,556.0,95.6,
+Reconnaissance,1101.0,1107.0,107.35,
+Reconnaissance,1068.0,1107.0,107.0,
+Reconnaissance,1066.0,1081.0,106.7,
+Space Science,443.0,886.0,98.0,
+Space Science,443.0,886.0,98.0,
+Earth Science,500.0,506.0,94.68,
+Communications,35745.0,35829.0,1436.13,
+Remote Sensing,890.0,893.0,102.8,Sun-Synchronous
+Earth Observation,790.0,823.0,101.0,Intermediate
+Communications,594.0,683.0,97.4,
+Communications,35785.0,35795.0,1436.11,
+Communications,35775.0,35796.0,1436.07,
+Communications,35781.0,35790.0,1436.07,
+Communications,35776.0,35795.0,1436.07,
+Communications,35776.0,35795.0,1436.07,
+Communications,35775.0,35798.0,1436.1,
+Communications,35774.0,35799.0,1436.1,
+Communications,35774.0,35798.0,1436.1,
+Communications,35776.0,35796.0,1436.1,
+Communications,35771.0,35801.0,1436.08,
+Communications,35778.0,35795.0,1436.11,
+Communications,35776.0,35794.0,1436.06,
+Communications,35775.0,35798.0,1436.1,
+Communications,35784.0,35788.0,1436.11,
+Navigation/Global Positioning,23242.0,23307.0,846.98,
+Navigation/Global Positioning,23240.0,23306.0,846.88,
+Navigation/Global Positioning,23214.0,23233.0,844.76,
+Navigation/Global Positioning,23217.0,23227.0,844.69,
+Remote Sensing,630.0,654.0,97.56,
+Communications,35782.0,35790.0,1436.1,
+Communications,35774.0,35801.0,1436.16,
+Technology Development,593.0,819.0,98.9,Sun-Synchronous
+Technology Development,522.0,569.0,95.6,
+Technology Development,508.0,586.0,95.6,
+Remote Sensing,671.0,686.0,98.3,Sun-Synchronous
+Space Physics,3905.0,104552.0,2474.83,Deep Highly Eccentric
+Earth Science,701.0,704.0,98.8,Sun-Synchronous
+Communications,1407.0,1412.0,114.0,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1406.0,1422.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1416.0,114.1,Intermediate
+Communications,900.0,1413.0,114.1,Intermediate
+Communications,1477.0,1478.0,114.1,Intermediate
+Communications,1411.0,1417.0,114.1,Intermediate
+Communications,1411.0,1416.0,114.1,Intermediate
+Communications,1415.0,1416.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1411.0,1416.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1411.0,1414.0,114.0,Intermediate
+Communications,1411.0,1416.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1412.0,1416.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.08,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1412.0,1415.0,114.1,Intermediate
+Communications,1459.0,1739.0,118.2,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1413.0,1415.0,114.1,Intermediate
+Communications,1413.0,1414.0,114.1,Intermediate
+Communications,1360.0,1400.0,113.35,Intermediate
+Communications,915.0,927.0,103.44,Intermediate
+Communications,1409.0,1418.0,114.08,Intermediate
+Communications,918.0,928.0,103.48,Intermediate
+Communications,1370.0,1391.0,113.96,Intermediate
+Navigation/Global Positioning,19116.0,19146.0,675.78,
+Navigation/Global Positioning,19134.0,19141.0,676.1,
+Navigation/Global Positioning,19118.0,19125.0,675.39,
+Navigation/Global Positioning,19130.0,19130.0,675.75,
+Navigation/Global Positioning,19130.0,19130.0,675.75,
+Navigation/Global Positioning,19130.0,19130.0,675.75,
+Navigation/Global Positioning,19094.0,19171.0,675.83,
+Navigation/Global Positioning,19124.0,19133.0,675.67,
+Navigation/Global Positioning,19142.0,19378.0,680.91,
+Navigation/Global Positioning,18981.0,19126.0,672.7,
+Navigation/Global Positioning,19147.0,19365.0,680.75,
+Navigation/Global Positioning,19092.0,19141.0,675.2,
+Navigation/Global Positioning,19134.0,19145.0,676.1,
+Navigation/Global Positioning,19136.0,19141.0,676.07,
+Navigation/Global Positioning,19112.0,19142.0,675.62,
+Navigation/Global Positioning,18922.0,19135.0,671.71,
+Navigation/Global Positioning,19132.0,19419.0,681.53,
+Navigation/Global Positioning,19119.0,19146.0,675.85,
+Navigation/Global Positioning,19131.0,19133.0,675.81,
+Navigation/Global Positioning,18864.0,19130.0,670.47,
+Navigation/Global Positioning,19098.0,19129.0,675.08,
+Navigation/Global Positioning,19128.0,19135.0,675.81,
+Navigation/Global Positioning,18909.0,19123.0,671.2,
+Navigation/Global Positioning,19116.0,19380.0,680.43,
+Navigation/Global Positioning,19079.0,19175.0,675.61,
+Navigation/Global Positioning,19126.0,19158.0,676.2,
+Navigation/Global Positioning,19142.0,19204.0,677.46,
+Navigation/Global Positioning,19150.0,19199.0,677.5,
+Navigation/Global Positioning,19139.0,19212.0,677.54,
+Navigation/Global Positioning,19130.0,19162.0,676.38,
+Navigation/Global Positioning,19087.0,19173.0,675.73,
+Earth Science/Meteorology,35768.0,35801.0,1436.0,
+Earth Science/Meteorology,35170.0,35170.0,1436.0,
+Earth Science/Meteorology,35786.0,35788.0,1436.14,
+Communications,35772.0,35800.0,1436.08,
+Earth Observation,669.0,690.0,98.35,Sun-Synchronous
+Communications,1398.0,1415.0,113.9,Intermediate
+Communications,1405.0,1415.0,114.0,Intermediate
+Communications,1408.0,1417.0,114.0,Intermediate
+Communications,1497.0,1510.0,116.1,Intermediate
+Communications,1478.0,1510.0,115.9,Intermediate
+Communications,1482.0,1507.0,115.86,
+Communications,1480.0,1511.0,115.9,Intermediate
+Communications,1493.0,1508.0,116.0,
+Communications,1494.0,1509.0,116.02,
+Earth Science,435.0,450.0,93.4,Polar
+Earth Science,434.0,451.0,93.4,Polar
+Earth Science,668.0,670.0,98.1,Sun-Synchronous
+Communications,35777.0,35795.0,1436.07,
+Communications,35761.0,35811.0,1436.1,
+Communications,35763.0,35810.0,1436.1,
+Communications/Technology Development,35776.0,35796.0,1436.07,
+Communications,35757.0,35814.0,1436.0,
+Communications/Navigation,35782.0,35796.0,1436.23,
+Meteorology,782.0,803.0,100.7,
+Meteorology,965.0,967.0,104.4,
+Communications,601.0,636.0,97.1,Sun-Synchronous
+Reconnaissance,681.0,683.0,98.0,Sun-Synchronous
+Reconnaissance,679.0,682.0,98.37,Sun-Synchronous
+Communications,35769.0,35803.0,1436.08,
+Astrophysics,535.0,551.0,95.5,Intermediate
+Solar Physics,670.0,696.0,98.4,
+Space Science,952.0,1155.0,106.27,
+Communications,35764.0,35808.0,1436.08,
+Communications,35764.0,35809.0,1436.11,
+Communications,35782.0,35786.0,1435.95,
+Remote Sensing,628.0,665.0,97.7,Polar
+Remote Sensing,621.0,673.0,97.7,Polar
+Remote Sensing,489.0,503.0,94.53,
+Radar Calibration,499.0,504.0,94.65,
+Communications,35777.0,35796.0,1436.1,
+Technology Development,650.0,669.0,97.9,Sun-Synchronous
+Astrophysics/Planetary Science,555.0,559.0,95.8,Intermediate
+Technology Development,590.0,640.0,96.9,Sun-Synchronous
+Communications,35770.0,35803.0,1436.07,
+Communications,35775.0,35799.0,1436.14,
+Technology Development,590.0,639.0,96.9,Sun-Synchronous
+Reconnaissance,485.0,491.0,94.36,Sun-Synchronous
+Reconnaissance,484.0,492.0,94.37,Sun-Synchronous
+Reconnaissance,484.0,492.0,94.37,Sun-Synchronous
+Reconnaissance,588.0,591.0,96.47,Sun-Synchronous
+Reconnaissance,512.0,514.0,94.89,Sun-Synchronous
+Reconnaissance,509.0,514.0,94.85,Sun-Synchronous
+Reconnaissance,,,,Sun-Synchronous
+Remote Sensing,678.0,680.0,98.3,Sun-Synchronous
+Electronic Surveillance,1111.0,37564.0,684.0,Molniya
+Electronic Surveillance,1112.0,37580.0,684.0,Molniya
+Remote Sensing,620.0,637.0,97.3,Sun-Synchronous
+Communications,35764.0,35808.0,1436.08,
+Communications,35763.0,35809.0,1436.1,
+Communications,35609.0,35642.0,1427.91,
+Communications,35769.0,35803.0,1436.07,
+Communications,35772.0,35799.0,1436.08,
+Communications,35773.0,35800.0,1436.11,
+Communications,35775.0,35798.0,1436.1,
+Communications,35784.0,35790.0,1436.13,
+Meteorology,35780.0,35793.0,1436.1,
+Communications,35764.0,35809.0,1436.1,
+Meteorology,35782.0,35791.0,1436.09,
+Communications/Earth Science,35765.0,35807.0,1436.08,
+Communications,35777.0,35796.0,1436.1,
+Communications,35760.0,35811.0,1436.08,
+Communications,37782.0,37791.0,1436.11,
+Space Physics,2284.0,152812.0,4032.86,Deep Highly Eccentric
+Communications,35776.0,35796.0,1436.08,
+Communications,35783.0,35789.0,1436.08,
+Communications,35778.0,35795.0,1436.1,
+Communications,35771.0,35800.0,1436.05,
+Communications,35776.0,35798.0,1436.12,
+Communications,35783.0,35791.0,1436.19,
+Communications,35770.0,35804.0,1436.12,
+Communications,35775.0,35797.0,1436.09,
+Communications,35768.0,35801.0,1436.01,
+Communications,35785.0,35788.0,1436.11,
+Communications,35780.0,35790.0,1436.03,
+Communications,35774.0,35811.0,1436.39,
+Communications,35781.0,35792.0,1436.11,
+Communications,35781.0,35797.0,1436.21,
+Communications,35778.0,35793.0,1436.1,
+Communications,35779.0,35794.0,1436.1,
+Communications,35774.0,35798.0,1436.09,
+Communications,35778.0,35795.0,1436.12,
+Communications,35775.0,35797.0,1436.09,
+Communications,35775.0,35797.0,1436.08,
+Communications,35776.0,35796.0,1436.1,
+Communications,35776.0,35795.0,1436.07,
+Communications,35774.0,35798.0,1436.08,
+Communications,35775.0,35797.0,1436.08,
+Communications,35782.0,35792.0,1436.14,
+Communications,35775.0,35798.0,1436.12,
+Communications,35775.0,35797.0,1436.1,
+Communications,35773.0,358802.0,1436.16,
+Communications,35782.0,35789.0,1436.07,
+Communications,35768.0,35805.0,1436.12,
+Communications,35775.0,35796.0,1436.07,
+Communications,35770.0,35803.0,1436.1,
+Communications,35769.0,35804.0,1436.11,
+Communications,35800.0,35892.0,1439.15,
+Scientific Research,401.0,422.0,92.8,Intermediate
+Space Physics,7000.0,320000.0,0.22,Deep Highly Eccentric
+Technology Development,469.0,890.0,98.3,
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,708.0,711.0,99.0,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,775.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,747.0,751.0,99.8,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,776.0,780.0,100.4,Polar
+Communications,744.0,753.0,99.8,Polar
+Communications,777.0,778.0,100.4,Polar
+Communications,773.0,782.0,100.4,Polar
+Communications,776.0,779.0,100.4,Polar
+Communications,745.0,754.0,99.8,Polar
+Communications,777.0,778.0,100.4,Polar
+Communications,748.0,750.0,99.8,Polar
+Space Science,620.0,664.0,97.5,Sun-Synchronous
+Navigation,35712.0,35872.0,1436.0,
+Remote Sensing,817.0,823.0,101.3,Sun-Synchronous
+Technology Development,710.0,721.0,99.1,Sun-Synchronous
+Earth Science,1332.0,1344.0,112.4,Intermediate
+Communications,35772.0,35801.0,1436.1,
+Communications,35784.0,35789.0,1436.11,
+Communications,35780.0,35791.0,1436.03,
+Communications,35778.0,35794.0,1436.09,
+Communications,35788.0,35794.0,1436.1,
+Communications,33782.0,37768.0,1435.52,
+Communications,35776.0,35797.0,1436.1,
+Communications,35780.0,35794.0,1436.12,
+Earth Observation,839.0,866.0,102.0,
+Meteorology,35783.0,35789.0,1436.08,
+Communications,35786.0,35788.0,1436.13,
+Reconnaissance,800.0,800.0,100.87,Sun-Synchronous
+Reconnaissance,202.0,1041.0,97.13,Sun-Synchronous
+Reconnaissance,264.0,1050.0,97.0,Sun-Synchronous
+Reconnaissance,200.0,1000.0,97.0,Sun-Synchronous
+Reconnaissance,257.0,997.0,97.25,Sun-Synchronous
+Technology Development,35778.0,35792.0,1436.04,
+Technology Development,35776.0,35796.0,1436.1,
+Technology Development,651.0,667.0,97.92,
+Earth Observation/Technology Development,676.0,698.0,98.5,Sun-Synchronous
+Earth Observation,679.0,696.0,98.5,Sun-Synchronous
+Earth Observation,535.0,552.0,95.5,Sun-Synchronous
+Reconnaissance,497.0,501.0,94.6,
+Communications,35780.0,35792.0,1436.1,
+Communications,35780.0,35794.0,1436.12,
+Remote Sensing,291.0,317.0,90.61,
+Technology Development,498.0,499.0,94.58,
+Surveillance,671.0,675.0,98.2,Intermediate
+Surveillance,574.0,676.0,97.21,Intermediate
+Surveillance,713.0,716.0,99.08,Intermediate
+Earth Science,702.0,703.0,98.8,Sun-Synchronous
+Earth Science,700.0,705.0,98.8,Sun-Synchronous
+Earth Observation/Technology Development,617.0,637.0,97.2,Sun-Synchronous
+Communications,610.0,668.0,97.5,Intermediate
+Communications,603.0,717.0,97.9,Intermediate
+Communications,35760.0,35812.0,1436.1,
+Reconnaissance,900.0,911.0,103.1,Sun-Synchronous
+Communications,35778.0,35793.0,1436.8,
+Communications,35772.0,35801.0,1436.09,
+Technology Development,984.0,1014.0,105.1,Sun-Synchronous
+Technology Development,305.0,1297.0,100.9,
+Technology Development,457.0,816.0,97.45,
+Technology Development,443.0,886.0,98.0,
+Communications,35782.0,35791.0,1436.12,
+Communications,35778.0,35794.0,1436.1,
+Communications,35728.0,35788.0,1434.6,
+Earth Science,853.0,868.0,102.2,
+Surveillance,35598.0,35976.0,1436.13,
+Surveillance,33674.0,37900.0,1436.12,
+Communications,961.0,39388.0,645.98,Molniya
+Communications,964.0,39396.0,717.88,Molniya
+Communications,1006.0,39362.0,718.04,Molniya
+Meteorology,818.0,820.0,101.3,Polar
+Earth Science/Meteorology,35784.0,35791.0,1436.15,
+Earth Science/Meteorology,35770.0,35797.0,1435.96,
+Earth Science/Meteorology,35781.0,35793.0,1436.1,
+Earth Science/Meteorology,35775.0,35795.0,1436.0,
+Earth Science/Meteorology,820.0,821.0,101.3,Polar
+Earth Science/Meteorology,819.0,822.0,101.3,Polar
+Communications,35784.0,35791.0,1436.16,
+Communications,35754.0,35819.0,1436.13,
+Communications,35765.0,35809.0,1436.13,
+Communications,35764.0,35768.0,1435.04,
+Communications,35753.0,35820.0,1436.12,
+Communications,35768.0,35806.0,1436.13,
+Earth Observation/Technology Development,1481.0,1510.0,115.9,
+Remote Sensing/Earth Science,805.0,821.0,101.2,Sun-Synchronous
+Astrophysics,817.0,832.0,101.4,Sun-Synchronous
+Technology Development,669.0,690.0,98.3,Sun-Synchronous
+Communications,35763.0,35809.0,1436.09,
+Communications,35776.0,35796.0,1436.09,
+Technology Development,500.0,525.0,94.9,Sun-Synchronous
+Meteorology/Navigation,35778.0,35796.0,1436.1,
+Meteorology,35776.0,35797.0,1436.1,
+Communications,35800.0,35800.0,1436.1,
+Communications,35800.0,35900.0,1436.1,
+Communications,654.0,659.0,97.9,Polar
+Communications/Technology Development,583.0,672.0,97.3,Polar
+Communications,35775.0,35795.0,1436.04,
+Navigation/Global Positioning,19781.0,20582.0,717.94,
+Navigation/Global Positioning,19959.0,20403.0,717.93,
+Navigation/Global Positioning,20120.0,20244.0,717.97,
+Navigation/Global Positioning,20104.0,20260.0,717.97,
+Navigation/Global Positioning,19986.0,20315.0,716.69,
+Navigation/Global Positioning,20080.0,20284.0,717.97,
+Navigation/Global Positioning,20134.0,20227.0,717.91,
+Navigation/Global Positioning,19912.0,20449.0,717.91,
+Navigation/Global Positioning,20109.0,20257.0,718.01,
+Navigation/Global Positioning,20188.0,20224.0,718.94,
+Navigation/Global Positioning,20451.0,20464.0,729.18,
+Navigation/Global Positioning,20174.0,20191.0,718.0,
+Navigation/Global Positioning,20184.0,20247.0,719.32,
+Navigation/Global Positioning,19963.0,20327.0,716.47,
+Navigation/Global Positioning,20089.0,20276.0,717.98,
+Navigation/Global Positioning,20072.0,20292.0,717.96,
+Navigation/Global Positioning,19938.0,20426.0,718.0,
+Navigation/Global Positioning,20123.0,20247.0,718.09,
+Navigation/Global Positioning,20096.0,20268.0,717.97,
+Navigation/Global Positioning,20133.0,20234.0,718.03,
+Navigation/Global Positioning,20184.0,20427.0,722.98,
+Navigation/Global Positioning,20177.0,20498.0,724.28,
+Navigation/Global Positioning,20104.0,20266.0,718.09,
+Navigation/Global Positioning,20155.0,20344.0,720.71,
+Navigation/Global Positioning,20063.0,20433.0,720.65,
+Navigation/Global Positioning,20142.0,20221.0,717.95,
+Navigation/Global Positioning,20020.0,20342.0,717.93,
+Navigation/Global Positioning,20206.0,20366.0,722.19,
+Navigation/Global Positioning,20149.0,20213.0,717.93,
+Navigation/Global Positioning,20150.0,20311.0,719.92,
+Navigation/Global Positioning,20135.0,20152.0,716.4,
+Navigation/Global Positioning,20160.0,20209.0,718.07,
+Space Observation,772.0,786.0,100.4,Sun-Synchronous
+Technology Development,398.0,405.0,97.6,
+Communications,35793.0,35795.0,1436.1,
+Earth Observation,691.0,705.0,98.7,Sun-Synchronous
+Earth Observation/Technology Development,661.0,696.0,98.3,Sun-Synchronous
+Communications,35764.0,35808.0,1436.08,
+Communications,35795.0,35813.0,1436.23,
+Communications,35779.0,35793.0,1436.08,
+Communications,35779.0,35794.0,1436.1,
+Communications,35700.0,35700.0,1436.1,
+Communications,35764.0,35809.0,1436.09,
+Earth Science/Meteorology,800.0,816.0,101.0,Sun-Synchronous
+Earth Science/Meteorology,842.0,857.0,101.9,Sun-Synchronous
+Meteorology,843.0,864.0,102.0,Sun-Synchronous
+Meteorology,845.0,864.0,102.0,Sun-Synchronous
+Meteorology,827.0,827.0,101.4,Polar
+Technology Development,499.0,502.0,94.63,Sun-Synchronous
+Communications,35778.0,35795.0,1436.1,
+Communications,35776.0,35798.0,1436.15,
+Communications,35779.0,35793.0,1436.08,
+Communications,35776.0,35796.0,1436.08,
+Communications,35776.0,35797.0,1436.12,
+Communications,35775.0,35798.0,1436.12,
+Communications,35773.0,35798.0,1436.08,
+Communications,35779.0,35794.0,1436.11,
+Communications,35784.0,35792.0,1436.17,
+Communications,35772.0,35799.0,1436.08,
+Space Science,613.0,632.0,97.2,
+Scientific Research,624.0,654.0,97.48,Sun-Synchronous
+Communications,8063.0,8069.0,287.93,
+Communications,8062.0,8069.0,287.93,
+Communications,8064.0,8068.0,287.94,
+Communications,8063.0,8069.0,287.93,
+Remote Sensing,722.0,724.0,99.2,Sun-Synchronous
+Astrophysics/Earth Science,569.0,573.0,96.1,Sun-Synchronous
+Remote Sensing/Reconnaissance,367.0,764.0,95.97,Retrograde
+Remote Sensing/Reconnaissance,340.0,576.0,93.75,
+Remote Sensing/Reconnaissance,343.0,589.0,93.91,
+Technology Development,594.0,797.0,98.7,Sun-Synchronous
+Communications,35773.0,35799.0,1436.08,
+Communications,35778.0,35796.0,1436.12,
+Communications,35774.0,35797.0,1436.08,
+Communications,35774.0,35799.0,1436.1,
+Communications,35775.0,35795.0,1436.04,
+Communications,770.0,776.0,100.3,Intermediate
+Communications,769.0,777.0,100.3,Intermediate
+Communications,770.0,776.0,100.3,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,789.0,794.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,789.0,794.0,100.7,Intermediate
+Communications,787.0,796.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,791.0,792.0,100.7,Intermediate
+Communications,789.0,793.0,100.7,Intermediate
+Communications,788.0,794.0,100.7,Intermediate
+Communications,788.0,794.0,100.7,Intermediate
+Communications,790.0,792.0,100.7,Intermediate
+Communications,788.0,796.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,786.0,796.0,100.7,Intermediate
+Communications,787.0,796.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,788.0,795.0,100.7,Intermediate
+Communications,768.0,838.0,100.9,Intermediate
+Communications,772.0,774.0,100.3,Intermediate
+Communications,772.0,774.0,100.3,Intermediate
+Communications,771.0,774.0,100.3,Intermediate
+Communications,768.0,778.0,100.3,Intermediate
+Communications,769.0,777.0,100.3,Intermediate
+Technology Development,499.0,504.0,94.6,Sun-Synchronous
+Technology Development,499.0,504.0,94.6,Sun-Synchronous
+Reconnaissance,396.0,410.0,92.62,
+Technology Development,499.0,504.0,94.6,Sun-Synchronous
+Earth Science,635.0,839.0,99.5,Sun-Synchronous
+Communications,35786.0,35800.0,1436.1,
+Communications,35784.0,35789.0,1436.13,
+Communications,35780.0,35792.0,1436.09,
+Communications,35786.0,35787.0,1436.12,
+Earth Science,692.0,694.0,98.6,Sun-Synchronous
+Navigation,949.0,1016.0,104.74,Intermediate
+Navigation,969.0,1016.0,105.0,Intermediate
+Navigation,967.0,1013.0,104.9,Intermediate
+Navigation,960.0,1008.0,104.8,Intermediate
+Navigation,961.0,1011.0,104.8,Intermediate
+Navigation,949.0,1008.0,104.7,Intermediate
+Navigation,907.0,968.0,103.8,Intermediate
+Navigation,954.0,1011.0,104.8,Intermediate
+Navigation,916.0,945.0,103.6,Intermediate
+Navigation,968.0,1022.0,105.0,Intermediate
+Technology Development/Communications,789.0,796.0,100.7,Intermediate
+Reconnaissance,714.0,733.0,99.2,Sun-Synchronous
+Technology Development,499.0,507.0,94.68,Sun-Synchronous
+Solar Physics,725.0,729.0,99.3,Sun-Synchronous
+Technology Development,410.0,414.0,92.81,Sun-Synchronous
+Earth Observation,697.0,699.0,98.7,Sun-Synchronous
+Earth Observation,678.0,691.0,98.45,Sun-Synchronous
+Earth Observation,600.0,627.0,97.0,Sun-Synchronous
+Technology Demonstration,553.0,676.0,96.98,Sun-Synchronous
+Technology Demonstration,708.0,728.0,99.2,Sun-Synchronous
+Earth Observation,813.0,820.0,101.21,Sun-Synchronous
+Technology Development,500.0,506.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,498.0,502.0,94.68,Sun-Synchronous
+Technology Development,589.0,640.0,96.9,Sun-Synchronous
+Communications,35774.0,35798.0,1436.09,Sun-Synchronous
+Earth Observation,448.0,450.0,93.6,Sun-Synchronous
+Navigation,32618.0,38950.0,1436.0,
+Earth Observation,791.0,793.0,100.7,Sun-Synchronous
+Amateur Radio,1885.0,2165.0,127.45,
+Communications,35612.0,35949.0,1435.79,
+Communications,35784.0,35788.0,1436.06,
+Communications,35777.0,35797.0,1436.13,
+Technology Development,1199.0,1202.0,109.42,Polar
+Earth Observation,613.0,646.0,97.3,
+Earth Observation,621.0,638.0,97.3,
+Earth Observation,621.0,637.0,97.3,
+Earth Observation,621.0,638.0,97.3,
+Earth Observation,617.0,642.0,97.3,
+Earth Observation,667.0,697.0,98.4,Sun-Synchronous
+Communications,35786.0,35787.0,1436.1,
+Remote Sensing,663.0,688.0,98.3,Intermediate
+Technology Development,595.0,638.0,97.0,Sun-Synchronous
+Earth Observation,817.0,823.0,101.3,Sun-Synchronous
+Earth Observation,564.0,571.0,96.0,
+Earth Observation,459.0,472.0,93.9,
+Surveillance,538.0,541.0,95.4,Sun-Synchronous
+Surveillance,415.0,427.0,41.2,
+Communications,1436.0,1448.0,114.7,Intermediate
+Communications,1480.0,1511.0,115.9,Intermediate
+Communications,1477.0,1509.0,115.8,Intermediate
+Communications,1478.0,1510.0,115.8,Intermediate
+Communications,1498.0,1509.0,116.0,Intermediate
+Communications,1482.0,1507.0,115.9,Intermediate
+Communications,1495.0,1506.0,116.0,Intermediate
+Communications,1493.0,1496.0,115.9,Intermediate
+Communications,1484.0,1505.0,115.9,Intermediate
+Communications,1481.0,1512.0,115.9,Intermediate
+Communications,1473.0,1516.0,115.86,Intermediate
+Communications,1473.0,1516.0,115.86,Intermediate
+Communications,1475.0,1514.0,115.86,Intermediate
+Communications,1478.0,1509.0,115.9,Intermediate
+Communications,1477.0,1507.0,115.8,Intermediate
+Communications,1482.0,1511.0,115.8,Intermediate
+Space Physics,17240.0,120715.0,3431.1,Deep Highly Eccentric
+Earth Observation/Research,702.0,704.0,98.8,Sun-Synchronous
+Earth Observation,653.0,655.0,97.8,Sun-Synchronous
+Space Physics,16809.0,120768.0,3418.2,Deep Highly Eccentric
+Space Physics,17007.0,120923.0,3430.28,Deep Highly Eccentric
+Space Observation,772.0,787.0,100.4,Sun-Synchronous
+Earth Science,782.0,785.0,100.53,Sun-Synchronous
+Surveillance,468.0,505.0,94.3,
+Surveillance,470.0,503.0,94.34,
+Surveillance,473.0,496.0,94.3,
+Surveillance,448.0,486.0,94.4,
+Surveillance,474.0,502.0,94.37,
+Communications,35777.0,35794.0,1436.08,
+Communications,35779.0,35792.0,1436.08,
+Communications,35776.0,35796.0,1436.1,
+Communications,35779.0,35795.0,1436.1,
+Technology Development,697.0,747.0,99.2,Sun-Synchronous
+Technology Development,696.0,780.0,99.6,Sun-Synchronous
+Communications,652.0,714.0,98.4,Sun-Synchronous
+Communications,649.0,746.0,98.7,Sun-Synchronous
+Communications,651.0,725.0,98.5,Sun-Synchronous
+Communications,648.0,758.0,98.8,Sun-Synchronous
+Communications,650.0,736.0,98.6,Sun-Synchronous
+Scientific Research,603.0,702.0,97.8,Intermediate
+Remote Sensing/Research,696.0,734.0,99.1,Sun-Synchronous
+Earth Observation/Research,656.0,677.0,98.1,
+Early Warning,35778.0,35795.0,1436.11,
+Early Warning,35770.0,35790.0,1436.11,
+Reconnaissance,538.0,541.0,95.43,
+Electronic Surveillance/Ocean,1100.0,1100.0,107.26,Intermediate
+Electronic Surveillance/Ocean,1100.0,1100.0,107.26,Intermediate
+Electronic Surveillance/Ocean,1013.0,1200.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1011.0,1202.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1016.0,1203.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1017.0,1203.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1015.0,1200.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1016.0,1201.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1014.0,1201.0,107.4,Intermediate
+Electronic Surveillance/Ocean,1019.0,1205.0,107.5,Intermediate
+Electronic Surveillance/Ocean,1012.0,1203.0,107.4,
+Electronic Surveillance/Ocean,1012.0,1203.0,107.4,
+Meteorology/Earth Observation,716.0,776.0,99.7,Intermediate
+Meteorology/Earth Observation,735.0,760.0,99.8,Intermediate
+Space Science,638.0,649.0,97.6,Intermediate
+Space Science,35779.0,35791.0,1436.03,
+Electronic Surveillance,35758.0,35815.0,1436.13,
+Communications,35761.0,35812.0,1436.1,
+Communications,500.0,39850.0,717.7,Molniya
+Communications,400.0,39966.0,718.0,Molniya
+Communications,35770.0,35803.0,14.36,
+Electronic Surveillance,35771.0,35805.0,23.94,
+Technology Development,661.0,673.0,98.1,Sun-Synchronous
+Technology Development,607.0,627.0,97.0,Sun-Synchronous
+Communications,35781.0,35793.0,1436.1,
+Communications,35778.0,35798.0,1436.19,
+Communications,35850.0,35852.0,1439.41,
+Communications,35781.0,35792.0,1436.1,
+Communications,35783.0,35791.0,1436.12,
+Communications,35757.0,35816.0,1436.09,
+Communications,35783.0,35790.0,1436.1,
+Communications,35777.0,35795.0,1436.07,
+Space Physics,686.0,703.0,98.7,Sun-Synchronous
+Technology Development,686.0,704.0,98.7,Sun-Synchronous
+Technology Development,688.0,703.0,98.7,Sun-Synchronous
+Technology Development,689.0,704.0,98.7,Sun-Synchronous
+Technology Development,583.0,601.0,96.5,Sun-Synchronous
+Technology Development,661.0,673.0,98.08,Sun-Synchronous
+Technology Development,599.0,616.0,96.85,Sun-Synchronous
+Space Physics,579.0,606.0,96.5,Sun-Synchronous
+Space Physics,587.0,598.0,96.5,Sun-Synchronous
+Space Physics,591.0,594.0,96.5,Sun-Synchronous
+Space Physics,594.0,595.0,96.6,Sun-Synchronous
+Space Physics,581.0,607.0,96.6,Sun-Synchronous
+Space Physics,578.0,603.0,96.5,Sun-Synchronous
+Reconnaissance,584.0,603.0,96.6,Sun-Synchronous
+Reconnaissance,586.0,602.0,96.6,Sun-Synchronous
+Space Physics,534.0,591.0,95.9,Sun-Synchronous
+Technology Development,623.0,650.0,97.44,
+Technology Development,624.0,651.0,97.46,
+Remote Sensing,586.0,601.0,96.6,Sun-Synchronous
+Remote Sensing/Research,785.0,803.0,100.8,Sun-Synchronous
+Remote Sensing/Research,784.0,802.0,100.7,Sun-Synchronous
+Remote Sensing/Research,739.0,755.0,99.7,
+Technology Development,668.0,672.0,98.15,Sun-Synchronous
+Earth Observation,684.0,701.0,98.6,Sun-Synchronous
+Communications,35769.0,35802.0,1436.06,
+Communications,35788.0,35802.0,1436.52,
+Communications/Research,681.0,703.0,98.6,Sun-Synchronous
+Communications,35794.0,35796.0,1436.1,
+Communications,23783.0,47100.0,1418.5,
+Communications,12849.0,47048.0,1148.43,
+Communications,6179.0,47086.0,994.83,
+Communications,35776.0,35795.0,1436.1,
+Communications,35774.0,35798.0,1436.0,
+Communications,35785.0,35791.0,1436.16,
+Communications,35779.0,35795.0,1436.12,
+Communications,35775.0,35797.0,1436.07,
+Communications,35774.0,35797.0,1436.06,
+Communications,35773.0,35801.0,1436.15,
+Communications,35771.0,35802.0,1436.1,
+Communications,35700.0,35803.0,1436.1,
+Communications,35770.0,35803.0,1436.1,
+Communications,35786.0,35793.0,1436.24,
+Remote Sensing,567.0,599.0,96.34,
+Communications,35782.0,35791.0,1436.09,
+Communications,1200.0,11600.0,240.0,
+Technology Development,495.0,791.0,97.5,
+Technology Development,483.0,789.0,97.4,
+Technology Development,443.0,886.0,98.0,
+Technology Development,443.0,886.0,98.0,
+Earth Observation,759.0,760.0,100.0,Sun-Synchronous
+Communications,443.0,886.0,98.0,
+Technology Development,657.0,665.0,98.0,Sun-Synchronous
+Astrophysics,600.0,633.0,97.0,Intermediate
+Communications,35785.0,35787.0,1436.1,
+Communications,35785.0,35787.0,1436.1,
+Communications,35785.0,35787.0,1436.1,
+Communications,35745.0,35826.0,1436.1,
+Astrophysics,1000.0,330000.0,0.22,
+Technology Development,608.0,35717.0,637.65,
+Technology Development,627.0,35697.0,637.64,
+Earth Observation,824.0,826.0,101.4,Sun-Synchronous
+Earth Observation,696.0,699.0,98.73,Sun-Synchronous
+Technology Development,850.0,868.0,102.1,
+Earth Observation,622.0,624.0,97.2,
+Communications,35783.0,35791.0,1436.12,
+Communications,35703.0,35778.0,1436.0,
+Communications,35776.0,35796.0,1436.1,
+Communications,35791.0,35848.0,1437.78,
+Remote Sensing,500.0,506.0,94.6,
+Technology Development,650.0,650.0,97.73,Sun-Synchronous
+Technology Development,497.0,507.0,94.66,
+Technology Development,772.0,783.0,100.4,Sun-Synchronous
+Communications,1417.0,1431.0,114.3,Intermediate
+Communications,1417.0,1425.0,114.2,Intermediate
+Communications,1415.0,1419.0,114.2,Intermediate
+Communications,1468.0,1506.0,115.7,Intermediate
+Communications,1466.0,1506.0,115.7,Intermediate
+Communications,1467.0,1503.0,115.7,Intermediate
+Communications,1465.0,1502.0,115.6,Intermediate
+Communications,1471.0,1495.0,115.5,Intermediate
+Communications,1474.0,1495.0,115.6,Intermediate
+Technology Development,298.0,1482.0,102.77,
+Technology Development,593.0,626.0,96.88,
+Technology Development,867.0,879.0,102.41,Sun-Synchronous
+Technology Development,1347.0,1352.0,112.68,
+Technology Development,1339.0,1351.0,112.58,
+Technology Development,614.0,634.0,97.2,Sun-Synchronous
+Communications,35778.0,35794.0,1436.1,
+Communications,35779.0,35793.0,1436.09,
+Communications,35781.0,35792.0,1436.12,
+Astrophysics,548.0,558.0,95.7,Intermediate
+Earth Science,473.0,476.0,93.9,Polar
+Earth Science,473.0,476.0,93.9,Polar
+Earth Science,486.0,496.0,94.0,Polar
+Astrophysics,571.0,590.0,96.3,Intermediate
+Technology Development,710.0,720.0,99.1,Sun-Synchronous
+Communications,35778.0,35792.0,1436.06,
+Communications,35772.0,35801.0,1436.09,
+Technology Development,658.0,11836.0,235.16,
+Technology Development,443.0,886.0,98.0,
+Earth Observation,507.0,510.0,94.8,Sun-Synchronous
+Space Physics,17313.0,120961.0,3442.0,Deep Highly Eccentric
+Communications,35768.0,35802.0,1436.04,
+Communications,35732.0,35844.0,1436.18,
+Communications,35780.0,35785.0,1435.88,
+Communications,35693.0,35878.0,1436.06,
+Communications,35773.0,35796.0,1436.99,
+Communications,35773.0,35787.0,1435.7,
+Communications,35767.0,35803.0,1436.04,
+Communications,35768.0,35808.0,1436.2,
+Communications,35768.0,35809.0,1436.11,
+Reconnaissance,405.0,580.0,94.5,
+Communications,35778.0,35796.0,1436.13,
+Communications,35781.0,35793.0,1436.1,
+Communications,35774.0,35801.0,1436.13,
+Communications,35773.0,35799.0,1436.09,
+Communications,35783.0,35791.0,1436.1,
+Communications,35778.0,35795.0,1436.1,
+Remote Sensing,507.0,509.0,94.8,
+Communications,35783.0,35791.0,1436.11,
+Remote Sensing/Reconnaissance,529.0,598.0,95.9,
+Technology Development,501.0,505.0,94.7,Sun-Synchronous
+Communications,35775.0,35798.0,1436.1,
+Communications,35777.0,35796.0,1436.1,
+Communications,35786.0,35796.0,1436.3,
+Space Physics,461.0,87304.0,1868.98,
+Space Physics,467.0,87260.0,1867.91,
+Space Physics,474.0,87526.0,1875.53,
+Earth Observation,824.0,826.0,101.4,Sun-Synchronous
+Communications,35777.0,35795.0,1436.07,
+Communications,35773.0,35798.0,1436.1,
+Communications,35779.0,35794.0,1436.1,
+Communications,35764.0,35807.0,1436.07,
+Communications,35766.0,35807.0,1436.1,
+Technology Development,464.0,475.0,94.0,
+Technology Development,360.0,361.0,91.8,
+Earth Observation,488.0,504.0,94.5,
+Earth Observation,485.0,505.0,94.5,
+Communications,35769.0,35813.0,1436.08,
+Communications,37778.0,37794.0,1436.1,
+Communications,35768.0,35802.0,1436.0,
+Technology Development,456.0,459.0,93.7,Sun-Synchronous
+Astrophysics,612.0,613.0,97.0,Intermediate
+Technology Development,611.0,631.0,97.1,Sun-Synchronous
+Communications,35773.0,35799.0,1436.07,
+Earth Observation/Technology Development,681.0,704.0,98.6,Sun-Synchronous
+Technology Development,594.0,764.0,98.1,Sun-Synchronous
+Earth Observation,400.0,400.0,92.6,Intermediate
+Electronic Surveillance,1210.0,38740.0,709.61,Molniya
+Electronic Surveillance,844.0,858.0,102.0,Intermediate
+Technology Development,770.0,784.0,100.3,Sun-Synchronous
+Communications,35778.0,35793.0,1436.06,
+Communications,35738.0,35834.0,1436.1,
+Communications,35786.0,35787.0,1436.1,
+Communications,35766.0,35807.0,1436.12,
+Communications,35763.0,35775.0,1435.22,
+Communications,35744.0,35829.0,1436.12,
+Communications,35738.0,35835.0,1436.11,
+Communications,35772.0,35794.0,1435.94,
+Earth Observation,660.0,662.0,98.0,Sun-Synchronous
+Scientific Research,696.0,795.0,99.7,Sun-Synchronous
+Scientific Research,504.0,640.0,97.0,Sun-Synchronous
+Early Warning,35696.0,35904.0,1436.39,
+Early Warning,542.0,39807.0,717.66,Molniya
+Early Warning,667.0,39697.0,717.9,Molniya
+Early Warning,563.0,39128.0,704.3,Molniya
+Communications,593.0,700.0,97.6,
+Earth Science,591.0,30534.0,539.06,
+Earth Science,595.0,30657.0,541.4,
+Technology Development,594.0,699.0,97.6,
+Communications,35777.0,35796.0,1436.1,
+Technology Development,494.0,504.0,94.6,Sun-Synchronous
+Communications/Maritime Tracking,847.0,867.0,102.1,Sun-Synchronous
+Communications/Maritime Tracking,479.0,490.0,94.3,Sun-Synchronous
+Communications,35775.0,35796.0,1436.09,
+Communications,35782.0,35791.0,1436.1,
+Communications,35742.0,35776.0,1434.69,
+Earth Observation,682.0,685.0,98.43,
+Remote Sensing,622.0,654.0,97.48,
+Communications,35783.0,35790.0,1436.1,
+Communications,35786.0,35787.0,1436.12,
+Communications,35785.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.1,
+Communications,35785.0,35786.0,1436.1,
+Communications,35776.0,35796.0,1436.1,
+Astrophysics,186.0,470310.0,19700.45,Cislunar
+Earth Observation,594.0,849.0,99.2,Sun-Synchronous
+Earth Observation,491.0,494.0,94.5,Sun-Synchronous
+Earth Observation,765.0,767.0,100.2,Sun-Synchronous
+Technology Development,593.0,640.0,97.3,Sun-Synchronous
+Technology Development,342.0,358.0,91.54,
+Technology Development,306.0,1261.0,100.5,
+Technology Development,489.0,501.0,94.51,
+Communications,35782.0,35790.0,1436.1,
+Communications,35784.0,35787.0,1436.09,
+Communications,35784.0,35789.0,1436.13,
+Communications,35785.0,35788.0,1436.11,
+Space Physics,7079.0,114027.0,2872.15,Deep Highly Eccentric
+Earth Observation,801.0,823.0,101.1,Sun-Synchronous
+Communications,35778.0,35792.0,1436.06,
+Communications,1193.0,1205.0,109.4,Sun-Synchronous
+Communications,35743.0,35823.0,1435.92,
+Communications,35780.0,35791.0,1436.07,
+Communications,35773.0,35800.0,1436.1,
+Communications,35774.0,35796.0,1436.06,
+Communications,35694.0,35866.0,1435.76,
+Communications,35784.0,35789.0,1436.11,
+Remote Sensing,625.0,628.0,97.2,Sun-Synchronous
+Remote Sensing,626.0,668.0,97.7,Sun-Synchronous
+Remote Sensing,487.0,496.0,94.4,Sun-Synchronous
+Remote Sensing,506.0,507.0,94.8,Sun-Synchronous
+Remote Sensing,469.0,481.0,94.1,Sun-Synchronous
+Remote Sensing,1201.0,1207.0,109.5,Sun-Synchronous
+Remote Sensing,1080.0,1089.0,106.93,Sun-Synchronous
+Remote Sensing,1079.0,1090.0,106.93,Sun-Synchronous
+Remote Sensing,1032.0,1081.0,106.33,Sun-Synchronous
+Remote Sensing,1076.0,1111.0,107.12,Sun-Synchronous
+Remote Sensing,1080.0,1111.0,107.13,Sun-Synchronous
+Remote Sensing,890.0,1112.0,105.14,Sun-Synchronous
+Remote Sensing,509.0,513.0,94.84,Sun-Synchronous
+Remote Sensing,1201.0,1207.0,109.51,Sun-Synchronous
+Remote Sensing,633.0,661.0,97.7,Sun-Synchronous
+Remote Sensing,625.0,627.0,97.2,Sun-Synchronous
+Remote Sensing,635.0,658.0,97.7,Sun-Synchronous
+Remote Sensing,440.0,450.0,93.5,Sun-Synchronous
+Remote Sensing,511.0,512.0,94.9,Sun-Synchronous
+Remote Sensing,628.0,665.0,97.7,Sun-Synchronous
+Remote Sensing,1192.0,1205.0,109.4,Sun-Synchronous
+Remote Sensing,1017.0,1164.0,107.1,Sun-Synchronous
+Remote Sensing,1017.0,1164.0,107.1,Sun-Synchronous
+Remote Sensing,1017.0,1164.0,107.1,Sun-Synchronous
+Scientific Research,802.0,824.0,101.2,Sun-Synchronous
+Technology Development,1479.0,1508.0,115.8,Intermediate
+Technology Development,594.0,683.0,94.4,Sun-Synchronous
+Remote Sensing,444.0,454.0,93.6,Sun-Synchronous
+Reconnaissance,555.0,606.0,96.3,Sun-Synchronous
+Scientific Research,619.0,653.0,97.4,Sun-Synchronous
+Scientific Research,620.0,653.0,97.5,Sun-Synchronous
+Communications,35775.0,35797.0,1436.05,
+Communications,35775.0,35803.0,1436.24,
+Communications,35759.0,35807.0,1435.92,
+Communications,35778.0,35796.0,1436.13,
+Communications,35773.0,35799.0,1436.05,
+Communications,35767.0,35807.0,1436.1,
+Communications,35781.0,35792.0,1436.09,
+Communications,35759.0,35812.0,1436.1,
+Earth Observation,763.0,773.0,100.2,Sun-Synchronous
+Earth Observation,500.0,504.0,94.7,Sun-Synchronous
