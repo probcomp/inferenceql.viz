@@ -12,11 +12,20 @@
  :table/set
  event-interceptors
  (fn [db [_ rows headers {:keys [virtual]}]]
-   (let [vec-maybe #(some-> % vec)] ; Casts a value to a vec if it is not nil.
+   (let [rows-order (mapv :inferenceql.viz.row/id__ rows)
+         rows-maps (zipmap rows-order rows)
+
+         ;; Casts a value to a vec if it is not nil.
+         vec-maybe #(some-> % vec)
+         ;; Remove special-columns from headers as we don't want to display
+         ;; them in the table.
+         headers (remove #{:inferenceql.viz.row/id__}
+                         headers)]
      (-> db
-         (assoc-in [:table-panel :rows] (vec-maybe rows))
-         (assoc-in [:table-panel :headers] (vec-maybe headers))
-         (util/assoc-or-dissoc-in [:table-panel :virtual] virtual)
+         (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
+         (assoc-in [:table-panel :physical-data :row-order] rows-order)
+         (assoc-in [:table-panel :physical-data :headers] (vec-maybe headers))
+         (util/assoc-or-dissoc-in [:table-panel :physical-data :virtual] virtual)
 
          ;; Clear all selections in all selection layers.
          (assoc-in [:table-panel :selection-layers] {})))))
@@ -26,7 +35,7 @@
  event-interceptors
  (fn [db [_]]
    (-> db
-       (update-in [:table-panel] dissoc :rows :headers :labels :scores)
+       (update-in [:table-panel] dissoc :physical-data)
        (assoc-in [:table-panel :selection-layers] {}))))
 
 ;; Checks if the selection in the current selection layer is valid.
@@ -109,8 +118,8 @@
         headers (mapv keyword (js->clj (.getColHeader hot)))
         row-maps (mapv #(zipmap headers %) rows)]
     (-> db
-        (assoc-in [:table-panel :visual-rows] row-maps)
-        (assoc-in [:table-panel :visual-headers] headers))))
+        (assoc-in [:table-panel :visual-data :rows] row-maps)
+        (assoc-in [:table-panel :visual-data :headers] headers))))
 
 (rf/reg-event-db
  :hot/after-column-move

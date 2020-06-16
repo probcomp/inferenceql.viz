@@ -12,12 +12,14 @@
   :query/parse-query
   event-interceptors
   (fn [{:keys [db]} [_ text]]
-    (let [rows (->> (table-db/dataset-rows db)
+    (let [rows-by-id (table-db/dataset-rows-by-id db)
+          row-order (table-db/dataset-row-order db)
+          rows (->> (map rows-by-id row-order)
                     (map #(medley/remove-vals nil? %)))
-          command (str/trim text)
+          query (str/trim text)
           models {:model (gpm/Multimixture model/spec)}]
       (try
-        (let [result (query/q command rows models)
+        (let [result (query/q query rows models)
               columns (:iql/columns (meta result))]
           ;; TODO: add flag for virtual data.
           {:dispatch [:table/set result columns {:virtual false}]})

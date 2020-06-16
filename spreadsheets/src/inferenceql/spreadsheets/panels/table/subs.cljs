@@ -151,13 +151,27 @@
 
 ;;; Subs related to populating tables with data.
 
-(rf/reg-sub :table/table-headers
+(rf/reg-sub :table/physical-headers
             (fn [db _]
-              (db/table-headers db)))
+              (db/physical-headers db)))
+
+(rf/reg-sub :table/physical-rows-by-id
+            (fn [db _]
+              (db/physical-rows-by-id db)))
+
+(rf/reg-sub :table/physical-row-order
+            (fn [db _]
+              (db/physical-row-order db)))
+
+(rf/reg-sub :table/physical-display-rows
+            :<- [:table/physical-rows-by-id]
+            :<- [:table/physical-row-order]
+            (fn [[rows rows-order]]
+              (map rows rows-order)))
 
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
-              {:rows (rf/subscribe [:table/table-rows])
+              {:rows (rf/subscribe [:table/physical-display-rows])
                :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])})
             (fn [{:keys [rows imputed-values conf-mode]}]
@@ -167,11 +181,6 @@
                   merge-imputed (mapv (fn [imputed-values-in-row row]
                                         (merge row imputed-values-in-row))
                                       imputed-values)))))
-
-(defn table-rows
-  [db _]
-  (db/table-rows db))
-(rf/reg-sub :table/table-rows table-rows)
 
 (defn- column-settings [headers]
   "Returns an array of objects that define settings for each column
@@ -188,11 +197,11 @@
 
 (rf/reg-sub :table/visual-headers
             (fn [db _]
-              (get-in db [:table-panel :visual-headers])))
+              (db/visual-headers db)))
 
 (rf/reg-sub :table/visual-rows
             (fn [db _]
-              (get-in db [:table-panel :visual-rows])))
+              (db/visual-rows db)))
 
 ;;; Subs related to settings and overall state of tables.
 
@@ -207,7 +216,7 @@
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
-              {:headers (rf/subscribe [:table/table-headers])
+              {:headers (rf/subscribe [:table/physical-headers])
                :rows    (rf/subscribe [:table/computed-rows])
                :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
@@ -218,7 +227,7 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/table-headers])})
+    :col-names (rf/subscribe [:table/physical-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -270,7 +279,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/table-headers])})
+    :computed-headers (rf/subscribe [:table/physical-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode
