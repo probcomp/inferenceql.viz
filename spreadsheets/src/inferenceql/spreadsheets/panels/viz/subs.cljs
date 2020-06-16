@@ -16,6 +16,23 @@
                 (.log js/console "spec: " spec)
                 spec)))
 
+(rf/reg-sub :viz/images
+            :<- [:table/selection-layers-list]
+            :<- [:table/computed-rows]
+            (fn [[selection-layers rows]]
+              (.log js/console "selection-layers: " selection-layers)
+              (let [columns (mapcat :selected-columns selection-layers)]
+                (when (contains? (set columns) :NORAD_Num)
+                  (let [new-rows (for [r rows]
+                                   (let [base-url "https://www.heavens-above.com/orbitdisplay.aspx?icon=default&width=50&height=50&mode=n&satid="
+                                         big-base-url "https://www.heavens-above.com/orbitdisplay.aspx?icon=default&width=500&height=500&mode=n&satid="
+                                         norad-id (get r :NORAD_Num)
+                                         url (when norad-id
+                                               (str base-url norad-id))
+                                         big-url (when norad-id
+                                                   (str big-base-url norad-id))]
+                                     (assoc r :url url :big-url big-url)))]
+                    (filter :url new-rows))))))
 
 (defn make-simulate-fn
   [col-to-sim row override-fns]

@@ -212,3 +212,32 @@ psuedo-class applied. */
   width: 100%;
   height: 400px;
 }
+
+.table { display: table; }
+.row { display: table-row; }
+.cell {
+  display: table-cell;
+  font-size: .875rem;
+  vertical-align: middle;
+  text-align: left;
+  width: 300px;
+  min-width: 300px;
+}
+.pic-cell {
+  display: table-cell;
+  vertical-align: middle;
+  min-height: 50px;
+  min-width: 50px;
+}
+
+.image-table {
+  margin-top: 5px;
+  margin-left: 50px;
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+
+.table-title {
+  text-align: center;
+  font-size: 12px;
+}
