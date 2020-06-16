@@ -241,3 +241,8 @@ psuedo-class applied. */
   text-align: center;
   font-size: 12px;
 }
+
+.cell a {
+    color: #333;
+    text-decoration: none;
+}

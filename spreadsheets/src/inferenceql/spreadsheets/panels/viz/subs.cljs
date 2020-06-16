@@ -26,12 +26,15 @@
                   (let [new-rows (for [r rows]
                                    (let [base-url "https://www.heavens-above.com/orbitdisplay.aspx?icon=default&width=50&height=50&mode=n&satid="
                                          big-base-url "https://www.heavens-above.com/orbitdisplay.aspx?icon=default&width=500&height=500&mode=n&satid="
+                                         base-info-url "https://www.heavens-above.com/SatInfo.aspx?satid="
                                          norad-id (get r :NORAD_Num)
                                          url (when norad-id
                                                (str base-url norad-id))
                                          big-url (when norad-id
-                                                   (str big-base-url norad-id))]
-                                     (assoc r :url url :big-url big-url)))]
+                                                   (str big-base-url norad-id))
+                                         info-url (when norad-id
+                                                    (str base-info-url norad-id))]
+                                     (assoc r :url url :big-url big-url :info-url info-url)))]
                     (filter :url new-rows))))))
 
 (defn make-simulate-fn

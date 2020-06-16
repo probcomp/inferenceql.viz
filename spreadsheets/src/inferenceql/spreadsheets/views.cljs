@@ -15,7 +15,8 @@
       ^{:key (:Name i)}
       [:div.row
        [:div.cell {:style {:background (when (get i "selected--") "palegoldenrod")}}
-        [:span (:Name i)]]
+        [:a {:href (:info-url i) :target "_blank"}
+         [:span (:Name i)]]]
        [:div.pic-cell
         [:a {:href (:big-url i) :target "_blank"}
          [:img {:src (:url i)}]]]])]])
