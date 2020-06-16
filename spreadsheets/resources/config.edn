@@ -1,4 +1,3 @@
 #or [#maybe-include "config.edn"
      {:data #csv "data.csv"
-      :bayes-db-export #export-json "data_models.json"
-      :model #model-edn "model.edn"}]
+      :model #model-edn "model.json"}]

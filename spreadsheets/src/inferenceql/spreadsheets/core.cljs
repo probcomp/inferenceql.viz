@@ -25,7 +25,10 @@
             [inferenceql.spreadsheets.components.highlight.events]
             [inferenceql.spreadsheets.components.highlight.subs]
             ;; Library functions for user-defined JS functions.
-            [inferenceql.user]))
+            [inferenceql.user]
+            [inferenceql.spreadsheets.model :as model]
+            [inferenceql.spreadsheets.data :as data]))
+
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
@@ -33,6 +36,9 @@
 (rf/dispatch-sync [:initialize-db])
 
 (viz.init/add-custom-vega-color-schemes)
+
+(.log js/console "model-spec: " model/spec)
+(.log js/console "data: " data/nyt-data)
 
 (defn ^:export -main
   []
