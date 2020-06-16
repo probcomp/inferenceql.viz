@@ -1,8 +1,8 @@
 (ns inferenceql.spreadsheets.panels.viz.subs
   (:require [re-frame.core :as rf]
             [metaprob.prelude :as mp]
-            [inferenceql.inference.multimixture :as mmix]
-            [inferenceql.inference.multimixture.search :as search]
+            [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
+            [inferenceql.inference.gpm.multimixture.search :as search]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.override.helpers :as co]
@@ -19,10 +19,10 @@
   [col-to-sim row override-fns]
   (let [override-map (select-keys override-fns [col-to-sim])
         override-insert-fn (co/gen-insert-fn override-map)
-        constraints (mmix/with-row-values {} (as-> row $
-                                               (select-keys $ (keys (:vars model/spec)))
-                                               (dissoc $ col-to-sim)
-                                               (medley/remove-vals nil? $)))
+        constraints (mm.utils/with-row-values {} (as-> row $
+                                                   (select-keys $ (keys (:vars model/spec)))
+                                                   (dissoc $ col-to-sim)
+                                                   (medley/remove-vals nil? $)))
         gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                            :observation-trace constraints))
         has-negative-vals? #(some (every-pred number? neg?) (vals %))]

@@ -1,9 +1,9 @@
 (ns inferenceql.search-by-example.api
   (:require [clojure.set :as set]
             [clojure.string :as str]
-            [inferenceql.inference.multimixture :as mmix]
-            [inferenceql.inference.multimixture.search :as search]
-            [inferenceql.inference.multimixture.specification :as spec]
+            [inferenceql.inference.gpm :as gpm]
+            [inferenceql.inference.gpm.multimixture.search :as search]
+            [inferenceql.inference.gpm.multimixture.specification :as spec]
             [inferenceql.spreadsheets.data :as data]
             [inferenceql.spreadsheets.model :as model]))
 
@@ -72,7 +72,7 @@
 (defn ^:export simulate
   "Simulates a row from the data table."
   []
-  (let [generate-row (mmix/row-generator model/spec)]
+  (let [generate-row (gpm/Multimixture model/spec)]
     (clj->js (generate-row))))
 
 (def ^:private n-models 1)

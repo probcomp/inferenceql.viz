@@ -1,7 +1,7 @@
 (ns inferenceql.spreadsheets.score
   (:require [inferenceql.spreadsheets.util :as util]
-            [inferenceql.inference.multimixture.search :as search]
-            [inferenceql.inference.multimixture :as mmix]
+            [inferenceql.inference.gpm.multimixture.search :as search]
+            [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
             [metaprob.prelude :as mp]
             [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]
@@ -91,7 +91,7 @@
 (defn impute-and-score-cell
   "Returns an imputed value of `key-to-impute` along with its score"
   [row-gen row key-to-impute]
-  (let [constraints (mmix/with-row-values {} row)
+  (let [constraints (mm.utils/with-row-values {} row)
         gen-fn #(-> (mp/infer-and-score :procedure row-gen
                                         :observation-trace constraints)
                     (first)
