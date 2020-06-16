@@ -123,6 +123,10 @@ div {
   border-color: #e7e7e7;
 }
 
+#vg-tooltip-element.vg-tooltip.custom-theme table {
+  font-size: .75rem;
+}
+
 /* --------------- styling for handsontables --------------- */
 
 #table-container {
