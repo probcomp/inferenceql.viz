@@ -165,8 +165,30 @@
                           {:row-id row-id :row-data row-data :col col-kw :new-val new-val}))]
 
       (es.before-change/assert-permitted-changes change-maps source)
-      ;; Returning unchanged db for now.
-      db)))
+
+      (let [change-maps-checked (es.before-change/validate-and-cast-changes change-maps)
+            valid-change-maps (filter :valid change-maps-checked)
+            invalid-change-maps (remove :valid change-maps-checked)
+
+            reduce-changes-for-id (fn [changes]
+                                    (let [simple-change-maps (for [change changes]
+                                                               {(:col change) (:new-val change)})]
+                                      (apply merge simple-change-maps)))
+            updates (->> valid-change-maps
+                      (group-by :row-id)
+                      (medley/map-vals reduce-changes-for-id))]
+
+        (doseq [c-map invalid-change-maps]
+          ;; Cancel invalid changes in Handsontable by mutating js-object `changes`.
+          (aset changes (:change-index c-map) nil)
+          ;; Print reasons why changes are invalid in error log.
+          (.error js/console (:error c-map)))
+
+        (-> db
+            ;; Update the currently displayed data in the table.
+            (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates updates)
+            ;; Update the original dataset.
+            (update-in [:table-panel :dataset :rows-by-id] es.before-change/merge-row-updates updates))))))
 
 (rf/reg-event-fx
  :hot/after-selection-end

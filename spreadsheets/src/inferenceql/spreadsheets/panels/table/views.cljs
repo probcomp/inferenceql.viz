@@ -56,7 +56,7 @@
                ;; functions.
                (js/Handsontable.hooks.add camel-key
                                           (fn [& args]
-                                            (rf/dispatch (into [key hot unique-id] args))
+                                            (rf/dispatch-sync (into [key hot unique-id] args))
                                             true)
                                           hot)))
            ;; set the atom to the hot object
