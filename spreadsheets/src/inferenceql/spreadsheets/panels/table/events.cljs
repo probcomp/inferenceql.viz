@@ -103,9 +103,17 @@
  :hot/after-selection-end
  event-interceptors
  (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
-   (let [selection-layers (.getSelected hot)
+   (let [selection-layers (js->clj (.getSelected hot))
+         physical-selection-layers (vec (for [[r1 c1 r2 c2] selection-layers]
+                                          (let [rp1 (.toPhysicalRow hot r1)
+                                                cp1 (.toPhysicalColumn hot c1)
+                                                rp2 (.toPhysicalRow hot r2)
+                                                cp2 (.toPhysicalColumn hot c2)]
+                                              [rp1 cp1 rp2 cp2])))
          color (control-db/selection-color db)]
-     {:db (assoc-in db [:table-panel :selection-layers color :coords] (js->clj selection-layers))
+     {:db (-> db
+            (assoc-in [:table-panel :selection-layers color :coords] selection-layers)
+            (assoc-in [:table-panel :selection-layers color :coords-physical] physical-selection-layers))
       :dispatch [:table/check-selection]})))
 
 (rf/reg-event-db
