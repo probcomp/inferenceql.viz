@@ -145,7 +145,6 @@
 
 ;;; Events that correspond to hooks in the Handsontable API
 
-;; Used to detect changes in the :real-data handsontable
 (rf/reg-event-db
  :hot/before-change
  event-interceptors
