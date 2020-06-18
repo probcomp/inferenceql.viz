@@ -11,7 +11,8 @@
 (s/def ::table-panel (s/keys :req-un [::dataset
                                       ::selection-layers]
                              :opt-un [::physical-data
-                                      ::visual-data]))
+                                      ::visual-data
+                                      ::sort-state]))
 
 ;;; Specs related to table data.
 
@@ -40,6 +41,15 @@
 
 (s/def ::visual-data (s/keys :req-un [::headers
                                       ::rows]))
+
+;;; Specs related to table sort state.
+
+(s/def ::column number?)
+(s/def ::sortOrder #{"asc" "desc"})
+(s/def ::column-sort-state (s/keys :req-un [::column
+                                            ::sortOrder]))
+;; The format of ::sort-state is determined by Handsontable.
+(s/def ::sort-state (s/coll-of ::column-sort-state :kind vector?))
 
 ;;; Specs related to selections within handsontable instances.
 

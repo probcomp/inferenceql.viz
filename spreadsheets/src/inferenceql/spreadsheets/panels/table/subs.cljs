@@ -203,6 +203,10 @@
             (fn [db _]
               (db/visual-rows db)))
 
+(rf/reg-sub :table/sort-state
+            (fn [db _]
+              (get-in db [:table-panel :sort-state])))
+
 (rf/reg-sub :table/show-table-controls
             :<- [:table/physical-row-order]
             ;; Returns value for css visibility property.

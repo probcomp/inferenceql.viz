@@ -47,7 +47,7 @@
 
 ;; These keywords refer to events in inferenceql.spreadsheets.panels.table.events.
 (def real-hot-hooks [:hot/after-selection-end :hot/after-on-cell-mouse-down :hot/before-change
-                     :hot/after-change])
+                     :hot/after-change :hot/after-column-sort])
 
 (def real-hot-settings (-> default-hot-settings
                            (assoc-in [:hooks] real-hot-hooks)

@@ -126,3 +126,11 @@
  event-interceptors
  (fn [db [_ hot _id _changes _source]]
    (assoc-visual-table-state db hot)))
+
+(rf/reg-event-db
+ :hot/after-column-sort
+ event-interceptors
+ (fn [db [_ hot _id _current-sort-config destination-sort-config]]
+   (assoc-in db [:table-panel :sort-state]
+             (js->clj destination-sort-config :keywordize-keys true))))
+
