@@ -232,20 +232,37 @@
 
 ;;; Subs related to settings and overall state of tables.
 
+(defn cells-fn
+  "Returns a function used by the :cells property in Handsontable's options."
+  [row col prop]
+  (this-as obj
+    (let [hot (.-instance obj)
+          ;; NOTE: The documentations claims that the cells function in called with physical cell coordinates for
+          ;; `row` and `col` but that does not seem to be the case. There might be some unusual calls made when
+          ;; sorting is done in table. Nevertheless, treating `row` and `col` as visual indices seems to work ok.
+          user-added (.getDataAtRowProp hot row (name :inferenceql.viz.row/user-added-row__))
+
+          label-column-cell (= prop (name :inferenceql.viz.row/label__))
+
+          classes-to-add (remove nil? [(when user-added "editable-cell") (when label-column-cell "label-cell")])
+          class-str (str/join " " classes-to-add)]
+      (when (or user-added label-column-cell)
+        (.setCellMeta hot row col "readOnly" false)
+        (.setCellMeta hot row col "className" class-str)))))
+
 (defn real-hot-props
-  [{:keys [headers rows cells-style-fn context-menu selections-coords]} _]
+  [{:keys [headers rows context-menu selections-coords]} _]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
       (assoc-in [:settings :columns] (column-settings headers))
-      (assoc-in [:settings :cells] cells-style-fn)
+      (assoc-in [:settings :cells] cells-fn)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
               {:headers (rf/subscribe [:table/computed-headers])
                :rows    (rf/subscribe [:table/computed-rows])
-               :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
                :selections-coords (rf/subscribe [:table/selections-coords])})
             real-hot-props)
