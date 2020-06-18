@@ -92,4 +92,6 @@
     ;; Changes should only be the result of user edits, copy paste, or drag and autofill.
     ;; This should be enforced by Hansontable settings.
     (assert (valid-change-sources source))))
+;; TODO: why doesn't this work with s/tuple for args? It appears args is coming in as a list not vector.
+;; Therefore s/tuple can't match it.?
 (s/fdef assert-permitted-changes :args (s/cat :changes ::change-maps :source string?))
