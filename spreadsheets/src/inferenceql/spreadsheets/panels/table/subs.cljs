@@ -203,6 +203,14 @@
             (fn [db _]
               (db/visual-rows db)))
 
+(rf/reg-sub :table/show-table-controls
+            :<- [:table/physical-row-order]
+            ;; Returns value for css visibility property.
+            (fn [rows-order]
+              (if (seq rows-order)
+                "visible"
+                "hidden")))
+
 ;;; Subs related to settings and overall state of tables.
 
 (defn real-hot-props
