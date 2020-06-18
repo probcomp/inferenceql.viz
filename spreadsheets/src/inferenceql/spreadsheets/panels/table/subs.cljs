@@ -196,7 +196,8 @@
   is presented."
   (let [settings-map (fn [attr]
                        (if (= attr hot/label-col-header)
-                         {:data attr :readOnly false} ; Make the score column user-editable.
+                         ;; Grabs the correct data for the label column and makes it user-editable.
+                         {:data (name :inferenceql.viz.row/label__) :readOnly false}
                          {:data attr}))]
     (map settings-map headers)))
 

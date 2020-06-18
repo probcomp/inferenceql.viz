@@ -19,9 +19,10 @@
 
          ;; Casts a value to a vec if it is not nil.
          vec-maybe #(some-> % vec)
-         ;; Remove special-columns from headers as we don't want to display
-         ;; them in the table.
-         headers (remove #{:inferenceql.viz.row/id__}
+         ;; Remove special-columns from headers
+         headers (remove #{:inferenceql.viz.row/user-added-row__
+                           :inferenceql.viz.row/id__
+                           :inferenceql.viz.row/label__}
                          headers)]
      (-> db
          (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
