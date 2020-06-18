@@ -2,7 +2,7 @@
 
 (def label-col-header
   "Header text for the column used for labeling rows as examples."
-  "🏷")
+  "label")
 (def score-col-header
   "Header text for the column that shows scores."
   "probability")
