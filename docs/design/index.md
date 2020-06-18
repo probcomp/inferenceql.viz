@@ -23,3 +23,7 @@ simple black-box interface, and can sometimes be built automatically from data, 
 Bayesian probabilistic program synthesis techniques (IQL-Auto-modeling).
 
 InferenceQL comes with a visualization language (IQL-Viz) which is intended to be suitable for applications in which end users have the domain knowledge needed to pose meaningful questions, but lack the time or expertise needed to design and implement models and inference algorithms themselves. InferenceQL also may help teach concepts of conditional probability to a broad audience.
+
+## Concepts and programming model for InferenceQL
+
+This section is in design/draft stage. Find the current draft [here](https://docs.google.com/document/d/14LnXWlDB07B4nyj8AyRvgQf7muJw6SJ1Ger2XhRPGhw/edit#heading=h.an7vxaeb4i0y).
