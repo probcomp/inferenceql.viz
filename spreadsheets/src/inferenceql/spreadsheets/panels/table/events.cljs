@@ -1,9 +1,11 @@
 (ns inferenceql.spreadsheets.panels.table.events
   (:require [re-frame.core :as rf]
+            [medley.core :as medley]
             [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.panels.control.db :as control-db]
+            [inferenceql.spreadsheets.panels.table.event-support.toggle-label-column :as es.toggle-label-column]
             [inferenceql.spreadsheets.util :as util]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
@@ -72,6 +74,20 @@
 
        :else
        db))))
+
+(rf/reg-event-db
+  :table/toggle-label-column
+  event-interceptors
+  (fn [db [_]]
+    (let [new-state (not (get-in db [:table-panel :label-column-show]))
+          shift-amount (if new-state 1 -1)]
+      (-> db
+          (assoc-in [:table-panel :label-column-show] new-state)
+          ;; :sort-state is not always present, hence the special update function.
+          (medley/update-existing-in [:table-panel :sort-state] es.toggle-label-column/shift-sort shift-amount)
+          (update-in [:table-panel :selection-layers] es.toggle-label-column/shift-selections shift-amount)
+          ;; Hack: This prevents a flicker in visualizations.
+          (update-in [:table-panel :visual-data :headers] es.toggle-label-column/adjust-headers shift-amount)))))
 
 ;;; Events that correspond to hooks in the Handsontable API
 

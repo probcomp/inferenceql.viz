@@ -6,13 +6,19 @@
   {:table-panel {:dataset {:headers (into [] (keys (first data/app-dataset)))
                            :rows-by-id data/app-dataset-indexed
                            :row-order data/app-dataset-order}
-                 :selection-layers {}}})
+                 :selection-layers {}
+                 :label-column-show false}})
 
 (s/def ::table-panel (s/keys :req-un [::dataset
-                                      ::selection-layers]
+                                      ::selection-layers
+                                      ::label-column-show]
                              :opt-un [::physical-data
                                       ::visual-data
                                       ::sort-state]))
+
+;;; Specs related to user-set labels on rows.
+
+(s/def ::label-column-show boolean?)
 
 ;;; Specs related to table data.
 

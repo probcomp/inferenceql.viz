@@ -169,6 +169,14 @@
             (fn [[rows rows-order]]
               (map rows rows-order)))
 
+(rf/reg-sub :table/computed-headers
+            :<- [:table/physical-headers]
+            :<- [:table/label-column-show]
+            (fn [[headers label-column-show]]
+              (when headers
+                (cond->> headers
+                  label-column-show (concat [hot/label-col-header])))))
+
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table/physical-display-rows])
@@ -207,6 +215,12 @@
             (fn [db _]
               (get-in db [:table-panel :sort-state])))
 
+;;; Subs related showing/hiding certain columns or table controls.
+
+(rf/reg-sub :table/label-column-show
+            (fn [db _]
+              (get-in db [:table-panel :label-column-show])))
+
 (rf/reg-sub :table/show-table-controls
             :<- [:table/physical-row-order]
             ;; Returns value for css visibility property.
@@ -228,7 +242,7 @@
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
             (fn [_ _]
-              {:headers (rf/subscribe [:table/physical-headers])
+              {:headers (rf/subscribe [:table/computed-headers])
                :rows    (rf/subscribe [:table/computed-rows])
                :cells-style-fn (rf/subscribe [:table/cells-style-fn])
                :context-menu (rf/subscribe [:table/context-menu])
@@ -239,7 +253,7 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/physical-headers])})
+    :col-names (rf/subscribe [:table/computed-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -291,7 +305,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/physical-headers])})
+    :computed-headers (rf/subscribe [:table/computed-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode
