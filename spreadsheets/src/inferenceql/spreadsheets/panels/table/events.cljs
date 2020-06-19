@@ -7,7 +7,9 @@
             [inferenceql.spreadsheets.panels.control.db :as control-db]
             [inferenceql.spreadsheets.panels.table.event-support.toggle-label-column :as es.toggle-label-column]
             [inferenceql.spreadsheets.util :as util]
-            [inferenceql.spreadsheets.data :as data]))
+            [inferenceql.spreadsheets.data :as data]
+            [inferenceql.spreadsheets.panels.table.event-support.before-change :as es.before-change]
+            [inferenceql.spreadsheets.panels.table.event-support.toggle-label-column :as es.toggle-label-column]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
@@ -146,10 +148,25 @@
 ;;; Events that correspond to hooks in the Handsontable API
 
 (rf/reg-event-db
- :hot/before-change
- event-interceptors
- (fn [db [_ hot id changes source]]
-   db))
+  :hot/before-change
+  event-interceptors
+  (fn [db [_ hot id changes source]]
+    (let [change-maps (for [[row col _prev-val new-val] changes]
+                        (let [p-row (.toPhysicalRow hot row)
+                              row-id (get-in db [:table-panel :physical-data :row-order p-row])
+                              row-data (get-in db [:table-panel :physical-data :rows-by-id row-id])
+
+                              ;; Handsontable does not save fully qualified names as column names.
+                              ;; The label column is the only column that we might change that we save as a
+                              ;; fully qualified keyword, so this is a special case for it.
+                              col-kw (if (= col (name :label__))
+                                         :inferenceql.viz.row/label__
+                                         (keyword col))]
+                          {:row-id row-id :row-data row-data :col col-kw :new-val new-val}))]
+
+      (es.before-change/assert-permitted-changes change-maps source)
+      ;; Returning unchanged db for now.
+      db)))
 
 (rf/reg-event-fx
  :hot/after-selection-end
