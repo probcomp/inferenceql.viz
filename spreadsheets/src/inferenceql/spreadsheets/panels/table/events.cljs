@@ -6,7 +6,8 @@
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.panels.control.db :as control-db]
             [inferenceql.spreadsheets.panels.table.event-support.toggle-label-column :as es.toggle-label-column]
-            [inferenceql.spreadsheets.util :as util]))
+            [inferenceql.spreadsheets.util :as util]
+            [inferenceql.spreadsheets.data :as data]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
@@ -89,6 +90,58 @@
           (update-in [:table-panel :selection-layers] es.toggle-label-column/shift-selections shift-amount)
           ;; Hack: This prevents a flicker in visualizations.
           (update-in [:table-panel :visual-data :headers] es.toggle-label-column/adjust-headers shift-amount)))))
+
+(rf/reg-event-db
+  :table/add-row
+  event-interceptors
+  (fn [db [_]]
+    (let [new-row-id (data/generate-row-id)
+          color (control-db/selection-color db)
+
+          new-row-num (count (get-in db [:table-panel :physical-data :row-order]))
+          ;; Selects the first cell of the new row we are adding.
+          new-selection [[new-row-num 0 new-row-num 0]]
+
+          new-row {:inferenceql.viz.row/user-added-row__ true
+                   :inferenceql.viz.row/id__             new-row-id}]
+      (-> db
+          ;; Update the currently displayed data in the table.
+          (update-in [:table-panel :physical-data :rows-by-id] assoc new-row-id new-row)
+          (update-in [:table-panel :physical-data :row-order] conj new-row-id)
+          ;; Update the original dataset.
+          (update-in [:table-panel :dataset :rows-by-id] assoc new-row-id new-row)
+          (update-in [:table-panel :dataset :row-order] conj new-row-id)
+
+          ;; TODO: scroll the viewport to this cell.
+          (assoc-in [:table-panel :selection-layers color :coords] new-selection)))))
+
+(rf/reg-event-db
+  :table/delete-row
+  event-interceptors
+  (fn [db [_]]
+    (let [color (control-db/selection-color db)
+          selections-coords (get-in db [:table-panel :selection-layers color :coords-physical])
+          [r1 _c1 r2 _c2] (first selections-coords)
+
+          row-id (get-in db [:table-panel :physical-data :row-order r1])
+          user-row-ids (db/user-added-row-ids db)]
+      ;; Only remove a row when there is only one selection rectangle and
+      ;; it is set on a single row. The number of columns spanned does not matter.
+      ;; The selected row must also be a user-added row.
+      (if (and (= 1 (count selections-coords))
+               (= r1 r2)
+               (contains? user-row-ids row-id))
+        (-> db
+            ;; Update the currently displayed data in the table.
+            (update-in [:table-panel :physical-data :rows-by-id] dissoc row-id)
+            (update-in [:table-panel :physical-data :row-order] (comp vec (partial remove #{row-id})))
+            ;; Update the original dataset.
+            (update-in [:table-panel :dataset :rows-by-id] dissoc row-id)
+            (update-in [:table-panel :dataset :row-order] (comp vec (partial remove #{row-id})))
+
+            ;; Update the selection to the first cell in the row before the deleted row.
+            (assoc-in [:table-panel :selection-layers color :coords] [[(dec r1) 0 (dec r1) 0]]))
+        db))))
 
 ;;; Events that correspond to hooks in the Handsontable API
 
