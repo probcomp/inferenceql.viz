@@ -1,4 +1,4 @@
-age,gender,BMI,health_status,smoker,exercise
+age,gender,bmi,health_status,smoker,exercise
 50-59,Male,23.0,Average,never,1.0
 60-69,Female,27.0,Average,never,1.0
 21-29,Female,19.0,Well above average,never,1.0
