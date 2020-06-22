@@ -13,10 +13,13 @@
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :table/set
  event-interceptors
- (fn [db [_ rows headers {:keys [virtual]}]]
+ ;; `rows` and `headers` are required arguments essentially, and
+ ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
+ ;; to be passed in a map.
+ (fn [{:keys [db]} [_ rows headers {:keys [virtual]}]]
    (let [rows-order (mapv :inferenceql.viz.row/id__ rows)
          rows-maps (zipmap rows-order rows)
 
@@ -26,23 +29,27 @@
          headers (remove #{:inferenceql.viz.row/user-added-row__
                            :inferenceql.viz.row/id__
                            :inferenceql.viz.row/label__}
-                         headers)]
-     (-> db
-         (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
-         (assoc-in [:table-panel :physical-data :row-order] rows-order)
-         (assoc-in [:table-panel :physical-data :headers] (vec-maybe headers))
-         (util/assoc-or-dissoc-in [:table-panel :physical-data :virtual] virtual)
+                         headers)
+         new-db (-> db
+                    (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
+                    (assoc-in [:table-panel :physical-data :row-order] rows-order)
+                    (assoc-in [:table-panel :physical-data :headers] (vec-maybe headers))
+                    (util/assoc-or-dissoc-in [:table-panel :physical-data :virtual] virtual)
 
-         ;; Clear all selections in all selection layers.
-         (assoc-in [:table-panel :selection-layers] {})))))
+                    ;; Clear all selections in all selection layers.
+                    (assoc-in [:table-panel :selection-layers] {}))]
+     {:db new-db
+      :dispatch [:viz/clear-pts-store]})))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :table/clear
  event-interceptors
- (fn [db [_]]
-   (-> db
-       (update-in [:table-panel] dissoc :physical-data)
-       (assoc-in [:table-panel :selection-layers] {}))))
+ (fn [{:keys [db]} [_]]
+   (let [new-db (-> db
+                    (update-in [:table-panel] dissoc :physical-data)
+                    (assoc-in [:table-panel :selection-layers] {}))]
+     {:db new-db
+      :dispatch [:viz/clear-pts-store]})))
 
 ;; Checks if the selection in the current selection layer is valid.
 ;; If it is not valid, the current selection layer is cleared.
@@ -230,7 +237,10 @@
   We use this visual state to along with selection coordinates to produce the data subset selected.
   This gets passed onto the visualization code--all via subscriptions."
   [db hot]
-  (let [rows (js->clj (.getData hot))
+  (let [raw-rows (js->clj (.getData hot))
+        rows (for [r raw-rows]
+               (let [remove-nan (fn [cell] (if (js/Number.isNaN cell) nil cell))]
+                 (mapv remove-nan r)))
         headers (mapv keyword (js->clj (.getColHeader hot)))
         row-maps (mapv #(zipmap headers %) rows)]
     (-> db

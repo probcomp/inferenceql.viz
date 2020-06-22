@@ -102,12 +102,13 @@
                    :selections (get-selections coords headers rows)
                    :row-at-selection-start (get-row-at-selection-start coords rows)))))
 
-(rf/reg-sub :table/selection-layers-raw
+(rf/reg-sub :table/selection-layer-coords
             (fn [db [_sub-name]]
-              (get-in db [:table-panel :selection-layers])))
+              (let [layers (get-in db [:table-panel :selection-layers])]
+                (medley/map-vals #(select-keys % [:coords]) layers))))
 
 (rf/reg-sub :table/selection-layers
-            :<- [:table/selection-layers-raw]
+            :<- [:table/selection-layer-coords]
             :<- [:table/visual-headers]
             :<- [:table/visual-rows]
             (fn [[selection-layers-raw visual-headers visual-rows]]
@@ -177,18 +178,29 @@
                 (cond->> headers
                   label-column-show (concat [hot/label-col-header])))))
 
+(rf/reg-sub :table/selected-row-flags
+            :<- [:table/table-rows]
+            :<- [:viz/pts-store-filter]
+            (fn [[rows pts-store-filter]]
+              (when pts-store-filter
+                (map pts-store-filter rows))))
+
 (rf/reg-sub :table/computed-rows
             (fn [_ _]
               {:rows (rf/subscribe [:table/physical-display-rows])
+               :selected-row-flags (rf/subscribe [:table/selected-row-flags])
                :imputed-values (rf/subscribe [:highlight/missing-cells-vals-above-thresh])
                :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])})
-            (fn [{:keys [rows imputed-values conf-mode]}]
+            (fn [{:keys [rows selected-row-flags imputed-values conf-mode]}]
               (let [merge-imputed (and (= conf-mode :cells-missing)
                                        (seq imputed-values))]
                 (cond->> rows
                   merge-imputed (mapv (fn [imputed-values-in-row row]
                                         (merge row imputed-values-in-row))
-                                      imputed-values)))))
+                                      imputed-values)
+                  selected-row-flags (mapv (fn [flag row]
+                                             (assoc row :selected__ flag))
+                                           selected-row-flags)))))
 
 (defn- column-settings [headers]
   "Returns an array of objects that define settings for each column
@@ -249,6 +261,15 @@
       (when (or user-added label-column-cell)
         (.setCellMeta hot row col "readOnly" false)
         (.setCellMeta hot row col "className" class-str)))))
+
+(defn cells-fn
+  "Returns a cells function to be given to Handsontable to style cells."
+  [row col _prop]
+  (this-as obj
+    (let [hot (.-instance obj)
+          selected (.getDataAtRowProp hot row (name :selected__))]
+      (when selected
+        (.setCellMeta hot row col "className" "selected-row")))))
 
 (defn real-hot-props
   [{:keys [headers rows context-menu selections-coords sort-state]} _]

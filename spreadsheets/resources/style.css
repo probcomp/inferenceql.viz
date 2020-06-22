@@ -163,6 +163,10 @@ div {
   background-color: #FAFCE4;
 }
 
+.handsontable .selected-row {
+  background-color: palegoldenrod;
+}
+
 .handsontable tr td.editable-cell {
   font-weight: 400;
   font-style: italic;
