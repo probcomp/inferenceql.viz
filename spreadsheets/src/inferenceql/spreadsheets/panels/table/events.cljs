@@ -132,7 +132,10 @@
   We use this visual state to along with selection coordinates to produce the data subset selected.
   This gets passed onto the visualization code--all via subscriptions."
   [db hot]
-  (let [rows (js->clj (.getData hot))
+  (let [raw-rows (js->clj (.getData hot))
+        rows (for [r raw-rows]
+               (let [remove-nan (fn [cell] (when-not (js/Number.isNaN cell) cell))]
+                 (mapv remove-nan r)))
         headers (mapv keyword (js->clj (.getColHeader hot)))
         row-maps (mapv #(zipmap headers %) rows)]
     (-> db
