@@ -179,7 +179,7 @@
                   label-column-show (concat [hot/label-col-header])))))
 
 (rf/reg-sub :table/selected-row-flags
-            :<- [:table/table-rows]
+            :<- [:table/physical-display-rows]
             :<- [:viz/pts-store-filter]
             (fn [[rows pts-store-filter]]
               (when pts-store-filter
@@ -255,21 +255,17 @@
           user-added (.getDataAtRowProp hot row (name :inferenceql.viz.row/user-added-row__))
 
           label-column-cell (= prop (name :inferenceql.viz.row/label__))
+          selected (.getDataAtRowProp hot row (name :selected__))
 
-          classes-to-add (remove nil? [(when user-added "editable-cell") (when label-column-cell "label-cell")])
+          classes-to-add (remove nil? [(when user-added "editable-cell")
+                                       (when label-column-cell "label-cell")
+                                       (when selected "selected-row")])
           class-str (str/join " " classes-to-add)]
-      (when (or user-added label-column-cell)
-        (.setCellMeta hot row col "readOnly" false)
-        (.setCellMeta hot row col "className" class-str)))))
 
-(defn cells-fn
-  "Returns a cells function to be given to Handsontable to style cells."
-  [row col _prop]
-  (this-as obj
-    (let [hot (.-instance obj)
-          selected (.getDataAtRowProp hot row (name :selected__))]
-      (when selected
-        (.setCellMeta hot row col "className" "selected-row")))))
+      (when (seq classes-to-add)
+        (.setCellMeta hot row col "className" class-str))
+      (when (or user-added label-column-cell)
+        (.setCellMeta hot row col "readOnly" false)))))
 
 (defn real-hot-props
   [{:keys [headers rows context-menu selections-coords sort-state]} _]
