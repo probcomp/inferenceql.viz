@@ -42,3 +42,7 @@
                                         (when (vega/simulatable? selections cols)
                                           (make-simulate-fn (first cols) row override-fns)))))
                    (medley/remove-vals nil?))))
+
+(rf/reg-sub :viz/pts-store
+  (fn [db _]
+    (get-in db [:viz-panel :pts-store])))
