@@ -46,3 +46,45 @@
 (rf/reg-sub :viz/pts-store
   (fn [db _]
     (get-in db [:viz-panel :pts-store])))
+
+;; Returns a function that checks whether a data row matches the filtering criteria in `:viz/pts-store`
+(rf/reg-sub :viz/pts-store-filter
+            :<- [:viz/pts-store]
+            (fn [pts-store]
+              (when (seq pts-store)
+                (let [;; A single entry in pts-store mostly consists of a sequence of field-maps and value
+                      ;; sequences. We are mostly combining the respective field maps with their values.
+                      join-field-vals (fn [store-entry]
+                                        (let [{:keys [fields values]} store-entry]
+                                          (for [[field-map vals-seq] (map vector fields values)]
+                                            (let [{:keys [field type]} field-map]
+                                              {:field (keyword field)
+                                               :type type
+                                               :vals vals-seq}))))
+                      ;; Some entries in pts-store contain a single field-map, vals-seq pair. Some contain multiple.
+                      ;; So we flatten them all down here with map cat.
+                      entries (mapcat join-field-vals pts-store)
+
+                      ;; Entity "E" typed selections can have multiple entries. This is most often due to selections
+                      ;; in choropleths. If this is the case we need to reduce these down to one filter map.
+                      groups (group-by (juxt :field :type) entries)
+
+                      filter-maps (for [[[field type] entries] groups]
+                                    (case type
+                                      ;; "R" Range typed selections should only have one entry.
+                                      "R" (do (assert (= 1 (count entries)))
+                                              (first entries))
+                                      ;; "E" Entity typed selections may have many entries and may need to be reduced.
+                                      "E" {:field field
+                                           :type  type
+                                           :vals (flatten (map :vals entries))}))]
+                  (fn [a-row]
+                    (let [;; Checks that `a-row` passes the filter represented by `filter-map`.
+                          passes-filter? (fn [filter-map]
+                                           (let [{:keys [type vals field]} filter-map
+                                                 row-val (get a-row field)]
+                                             (case type
+                                               "R" (let [[low high] (sort vals)]
+                                                     (<= low row-val high))
+                                               "E" (contains? (set vals) row-val))))]
+                      (every? true? (map passes-filter? filter-maps))))))))
