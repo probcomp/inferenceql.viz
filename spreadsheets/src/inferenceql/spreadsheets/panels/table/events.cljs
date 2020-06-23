@@ -15,8 +15,6 @@
    (let [rows-order (mapv :inferenceql.viz.row/id__ rows)
          rows-maps (zipmap rows-order rows)
 
-         ;; Casts a value to a vec if it is not nil.
-         vec-maybe #(some-> % vec)
          ;; Remove special-columns from headers as we don't want to display
          ;; them in the table.
          headers (remove #{:inferenceql.viz.row/id__}
@@ -24,8 +22,9 @@
      (-> db
          (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
          (assoc-in [:table-panel :physical-data :row-order] rows-order)
-         (assoc-in [:table-panel :physical-data :headers] (vec-maybe headers))
-         (util/assoc-or-dissoc-in [:table-panel :physical-data :virtual] virtual)
+         ;; We want to assoc nil here if headers is nil so an empty table is rendered.
+         (assoc-in [:table-panel :physical-data :headers] (some-> headers vec))
+         (assoc-in [:table-panel :physical-data :virtual] (boolean virtual))
 
          ;; Clear all selections in all selection layers.
          (assoc-in [:table-panel :selection-layers] {})))))

@@ -4,7 +4,7 @@
             [medley.core :as medley]))
 
 (def default-db
-  {:table-panel {:dataset {:headers (into [] (keys (first data/app-dataset)))
+  {:table-panel {:dataset {:headers (vec (keys (first data/app-dataset)))
                            :rows-by-id data/app-dataset-indexed
                            :row-order data/app-dataset-order}
                  :selection-layers {}}})
