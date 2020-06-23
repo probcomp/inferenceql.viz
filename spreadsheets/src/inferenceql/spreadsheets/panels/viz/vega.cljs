@@ -140,6 +140,9 @@
      :layer layers}))
 
 (defn gen-histogram [col selections]
+  "Generates a vega-lite spec for a histogram.
+  `selections` is a collection of maps representing data in selected rows and columns.
+  `col` is the key within each map in `selections` that is used to extract data for the histogram."
   {:data {:values selections}
    :layer [{:mark {:type "bar" 
                    :color default-table-color}
@@ -161,6 +164,12 @@
 
 
 (defn gen-choropleth [selections selected-columns]
+  "Generates a vega-lite spec for a choropleth.
+  `selections` is a collection of maps representing data in selected rows and columns.
+  `selected-columns` is a collection of selected column names.
+  `geo-id-column` from the app config is assumed to be among `selected-columns`.
+  The first column that is not `geo-id-column` in `selected-columns` is designated as the
+  color-by-col, the column whose data is used to color the geoshapes in the choropleth."
   ;; TODO: Add a spec for topojson config map.
   (when-let [geo-config (get config/config :geo)]
     (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
