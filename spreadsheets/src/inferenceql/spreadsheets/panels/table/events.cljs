@@ -8,29 +8,33 @@
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :table/set
  event-interceptors
  ;; `rows` and `headers` are required arguments essentially, and
  ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
  ;; to be passed in a map.
- (fn [db [_ rows headers {:keys [virtual]}]]
-   (let [vec-maybe #(some-> % vec)] ; Casts a value to a vec if it is not nil.
-     (-> db
-         (assoc-in [:table-panel :rows] (vec-maybe rows))
-         (assoc-in [:table-panel :headers] (vec-maybe headers))
-         (util/assoc-or-dissoc-in [:table-panel :virtual] virtual)
+ (fn [{:keys [db]} [_ rows headers {:keys [virtual]}]]
+   (let [vec-maybe #(some-> % vec) ; Casts a value to a vec if it is not nil.
+         new-db (-> db
+                    (assoc-in [:table-panel :rows] (vec-maybe rows))
+                    (assoc-in [:table-panel :headers] (vec-maybe headers))
+                    (util/assoc-or-dissoc-in [:table-panel :virtual] virtual)
 
-         ;; Clear all selections in all selection layers.
-         (assoc-in [:table-panel :selection-layers] {})))))
+                    ;; Clear all selections in all selection layers.
+                    (assoc-in [:table-panel :selection-layers] {}))]
+     {:db new-db
+      :dispatch [:viz/clear-pts-store]})))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :table/clear
  event-interceptors
- (fn [db [_]]
-   (-> db
-       (update-in [:table-panel] dissoc :rows :headers :labels :scores)
-       (assoc-in [:table-panel :selection-layers] {}))))
+ (fn [{:keys [db]} [_]]
+   (let [new-db (-> db
+                    (update-in [:table-panel] dissoc :rows :headers :labels :scores)
+                    (assoc-in [:table-panel :selection-layers] {}))]
+     {:db new-db
+      :dispatch [:viz/clear-pts-store]})))
 
 ;; Checks if the selection in the current selection layer is valid.
 ;; If it is not valid, the current selection layer is cleared.
@@ -128,7 +132,10 @@
   We use this visual state to along with selection coordinates to produce the data subset selected.
   This gets passed onto the visualization code--all via subscriptions."
   [db hot]
-  (let [rows (js->clj (.getData hot))
+  (let [raw-rows (js->clj (.getData hot))
+        rows (for [r raw-rows]
+               (let [remove-nan (fn [cell] (when-not (js/Number.isNaN cell) cell))]
+                 (mapv remove-nan r)))
         headers (mapv keyword (js->clj (.getColHeader hot)))
         row-maps (mapv #(zipmap headers %) rows)]
     (-> db
