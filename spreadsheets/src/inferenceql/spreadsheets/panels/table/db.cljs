@@ -1,6 +1,7 @@
 (ns inferenceql.spreadsheets.panels.table.db
   (:require [clojure.spec.alpha :as s]
-            [inferenceql.spreadsheets.data :as data]))
+            [inferenceql.spreadsheets.data :as data]
+            [medley.core :as medley]))
 
 (def default-db
   {:table-panel {:dataset {:headers (into [] (keys (first data/app-dataset)))
@@ -96,3 +97,15 @@
   [db]
   (get-in db [:table-panel :visual-data :rows]))
 
+;;; Special accessor functions
+
+(defn dataset-as-iql-query-rows
+  "Returns dataset as rows usable by inferenceql.query
+  This returns a collection of maps, where each map represents a row.
+  Each map is also filtered for nil values as inferenceql.query cannot
+  handle these nil values."
+  [db]
+  (let [rows-by-id (dataset-rows-by-id db)
+        row-order (dataset-row-order db)
+        rows (map rows-by-id row-order)]
+    (map #(medley/remove-vals nil? %) rows)))

@@ -12,10 +12,7 @@
   :query/parse-query
   event-interceptors
   (fn [{:keys [db]} [_ text]]
-    (let [rows-by-id (table-db/dataset-rows-by-id db)
-          row-order (table-db/dataset-row-order db)
-          rows (->> (map rows-by-id row-order)
-                    (map #(medley/remove-vals nil? %)))
+    (let [rows (table-db/dataset-as-iql-query-rows db)
           query (str/trim text)
           models {:model (gpm/Multimixture model/spec)}]
       (try
