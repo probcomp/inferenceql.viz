@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.table.event-support.toggle-label-column
+(ns inferenceql.spreadsheets.panels.table.eventsupport.toggle-label-column
   (:require [medley.core :as medley]))
 
 (defn shift-sort

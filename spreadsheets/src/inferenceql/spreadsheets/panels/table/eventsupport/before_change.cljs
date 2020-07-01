@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.table.event-support.before-change
+(ns inferenceql.spreadsheets.panels.table.eventsupport.before-change
   "Supporting functions for the :hot/before-change event"
   (:require [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.model :as model]

@@ -5,11 +5,11 @@
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.panels.control.db :as control-db]
-            [inferenceql.spreadsheets.panels.table.event-support.toggle-label-column :as es.toggle-label-column]
             [inferenceql.spreadsheets.util :as util]
             [inferenceql.spreadsheets.data :as data]
-            [inferenceql.spreadsheets.panels.table.event-support.before-change :as es.before-change]
-            [inferenceql.spreadsheets.panels.table.event-support.toggle-label-column :as es.toggle-label-column]))
+            [inferenceql.spreadsheets.panels.table.eventsupport.before-change :as es.before-change]
+            [inferenceql.spreadsheets.panels.table.eventsupport.toggle-label-column :as es.toggle-label-column]
+            [clojure.walk]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
