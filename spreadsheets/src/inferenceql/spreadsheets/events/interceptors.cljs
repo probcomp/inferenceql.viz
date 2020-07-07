@@ -4,7 +4,8 @@
             [re-frame.core :as rf]
             [re-frame.interceptor :refer [->interceptor get-coeffect]]
             [re-frame.loggers :refer [console]]
-            [inferenceql.spreadsheets.db :as db]))
+            [inferenceql.spreadsheets.db :as db]
+            [inferenceql.spreadsheets.config :as config]))
 
 (defn check-and-throw
   "Throws an exception if `db` doesn't match the Spec `a-spec`."
@@ -33,4 +34,6 @@
 
 (def event-interceptors
   "A default set of event interceptors to use within events across the app."
-  [rf/debug check-spec])
+  (if (get config/config :debug false)  ;; Pulling out the relevant application setting.
+    [rf/debug check-spec]
+    [log-name]))
