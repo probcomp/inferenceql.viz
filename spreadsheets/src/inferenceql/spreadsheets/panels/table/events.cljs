@@ -180,12 +180,13 @@
                               row-id (get-in db [:table-panel :physical-data :row-order p-row])
                               row-data (get-in db [:table-panel :physical-data :rows-by-id row-id])
 
-                              ;; Handsontable does not save fully qualified names as column names.
-                              ;; The label column is the only column that we might change that we save as a
-                              ;; fully qualified keyword, so this is a special case for it.
-                              col-kw (if (= col (name :label__))
-                                         :inferenceql.viz.row/label__
-                                         (keyword col))]
+                              ;; Our special row attrs are saved as fully qualified keywords in the app-db.
+                              ;; However, when they become column names in Handsontable, they are not fully qualified.
+                              ;; The label column is the only column that changes that refers to a special row attr,
+                              ;; so we have a special case here for referring to the correct fully qualified keyword.
+                              col-kw (if (= col (name :inferenceql.viz.row/label__)) ;; this becomes (= col "label__")
+                                       :inferenceql.viz.row/label__
+                                       (keyword col))]
                           {:row-id row-id :row-data row-data :col col-kw :new-val new-val}))]
 
       (es.before-change/assert-permitted-changes change-maps source)
