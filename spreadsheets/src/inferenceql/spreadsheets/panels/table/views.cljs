@@ -40,12 +40,13 @@
 
        :component-did-mount
        (fn [this]
-         (let [dom-node (dom/dom-node this)
-               hot (js/Handsontable. dom-node (clj->js (:settings props)))
-               unique-id (keyword (:name props))]
+         (let [{:keys [settings name hooks]} props
+               dom-node (dom/dom-node this)
+               hot (js/Handsontable. dom-node (clj->js settings))
+               unique-id (keyword name)]
 
            ;; add callbacks internal to hot object
-           (doseq [key (:hooks props)]
+           (doseq [key hooks]
              (let [camel-key (csk/->camelCase (clj->js key))]
                ;; Our hook functions call the associated re-frame event and then return true.  Some
                ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
@@ -65,16 +66,17 @@
        :component-did-update
        (fn [this old-argv]
          (when @hot-instance
-           (let [[_ old-attributes old-props] old-argv
-                 [_ new-attributes new-props] (reagent/argv this)]
-             (when (not= (:settings old-props) (:settings new-props))
-               (let [
-                     dataset-empty (and (empty? (get-in new-props [:settings :data]))
-                                        (empty? (get-in new-props [:settings :colHeaders])))
-                     dataset-size-changed (or (not= (count (get-in new-props [:settings :data]))
-                                                    (count (get-in old-props [:settings :data])))
-                                              (not= (count (get-in new-props [:settings :colHeaders]))
-                                                    (count (get-in old-props [:settings :colHeaders]))))]
+           (let [[_ _old-attributes old-props] old-argv
+                 [_ _new-attributes new-props] (reagent/argv this)
+                 {old-settings :settings old-selections-coords :selections-coords old-sort-state :sort-state} old-props
+                 {new-settings :settings new-selections-coords :selections-coords new-sort-state :sort-state} new-props
+                 {old-data :data old-col-headers :colHeaders} old-settings
+                 {new-data :data new-col-headers :colHeaders} new-settings]
+
+             (when (not= old-settings new-settings)
+               (let [dataset-empty (and (empty? new-data) (empty? new-col-headers))
+                     dataset-size-changed (or (not= (count new-data) (count old-data))
+                                              (not= (count new-col-headers) (count old-col-headers)))]
                  ;; Whenever we insert new data into the table, we sometimes deselect all cells
                  ;; before updating in order to prevent the following issues.
 
@@ -97,17 +99,17 @@
                  (when (or dataset-empty dataset-size-changed)
                    (.deselectCell @hot-instance))
 
-                 (update-hot! @hot-instance (clj->js (:settings new-props)))
+                 (update-hot! @hot-instance (clj->js new-settings))
 
                  ;; Maintain the same sort order as before the update or a new order if provided.
                  (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")]
-                   (when-let [config (clj->js (:sort-state new-props))]
+                   (when-let [config (clj->js new-sort-state)]
                      (.sort sorting-plugin config)))
 
                  ;; If we cleared selections because of a dataset-size change, apply the latest
                  ;; selection state from props.
                  (when dataset-size-changed
-                   (when-let [coords (clj->js (:selections-coords new-props))]
+                   (when-let [coords (clj->js new-selections-coords)]
                      (.selectCells @hot-instance coords false)))))
 
 
@@ -151,18 +153,18 @@
              ;; here performing an update triggered by the :hot/before-change event, which put a new
              ;; value in the db for the previously selected cell. This is main reason we only update
              ;; when we have explicitly passed a new value of :selections-coords through props.
-             (when (and (not= (:selections-coords new-props) (js->clj (.getSelected @hot-instance)))
-                        (not= (:selections-coords new-props) (:selections-coords old-props)))
-               (if-let [coords (clj->js (:selections-coords new-props))]
+             (when (and (not= new-selections-coords (js->clj (.getSelected @hot-instance)))
+                        (not= new-selections-coords old-selections-coords))
+               (if-let [coords (clj->js new-selections-coords)]
                  (.selectCells @hot-instance coords false)
                  ;; When coords is nil it means nothing should be selected in the table.
                  (.deselectCell @hot-instance)))
 
              (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")]
-               (when (and (not= (:sort-state new-props) (js->clj (.getSortConfig sorting-plugin)
-                                                                 :keywordize-keys true))
-                          (not= (:sort-state new-props) (:sort-state old-props)))
-                 (when-let [config (clj->js (:sort-state new-props))]
+               (when (and (not= new-sort-state (js->clj (.getSortConfig sorting-plugin)
+                                                        :keywordize-keys true))
+                          (not= new-sort-state old-sort-state))
+                 (when-let [config (clj->js new-sort-state)]
                    (.sort sorting-plugin config)))))))
 
        :component-will-unmount
