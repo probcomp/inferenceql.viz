@@ -13,7 +13,7 @@
                                       ::selection-layers
                                       ::label-column-show]
                              :opt-un [::physical-data
-                                      ::visual-data
+                                      ::visual-state
                                       ::sort-state
                                       ::hot-instance]))
 
@@ -50,8 +50,8 @@
                                         ::row-order
                                         ::virtual]))
 
-(s/def ::visual-data (s/keys :req-un [::headers
-                                      ::rows]))
+(s/def ::visual-state (s/keys :req-un [::headers
+                                       ::row-order]))
 
 ;;; Specs related to table sort state.
 
@@ -124,9 +124,9 @@
 
 (defn visual-headers
   [db]
-  (get-in db [:table-panel :visual-data :headers]))
+  (get-in db [:table-panel :visual-state :headers]))
 
-(defn visual-rows
+(defn visual-row-order
   [db]
-  (get-in db [:table-panel :visual-data :rows]))
+  (get-in db [:table-panel :visual-state :row-order]))
 

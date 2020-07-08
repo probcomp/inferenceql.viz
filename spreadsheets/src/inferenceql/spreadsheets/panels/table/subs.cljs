@@ -110,10 +110,9 @@
 (rf/reg-sub :table/selection-layers
             :<- [:table/selection-layer-coords]
             :<- [:table/visual-headers]
-            :<- [:table/visual-rows]
-            (fn [[selection-layers-raw visual-headers visual-rows]]
-              {:post [(s/valid? ::selection-layers %)]}
-              (medley/map-vals #(add-selection-data % visual-headers visual-rows)
+            :<- [:table/visual-display-rows]
+            (fn [[selection-layers-raw visual-headers visual-display-rows]]
+              (medley/map-vals #(add-selection-data % visual-headers visual-display-rows)
                                selection-layers-raw)))
 
 (rf/reg-sub :table/selection-layers-list
@@ -227,9 +226,15 @@
             (fn [db _]
               (db/visual-headers db)))
 
-(rf/reg-sub :table/visual-rows
+(rf/reg-sub :table/visual-row-order
             (fn [db _]
-              (db/visual-rows db)))
+              (db/visual-row-order db)))
+
+(rf/reg-sub :table/visual-display-rows
+            :<- [:table/visual-row-order]
+            :<- [:table/physical-rows-by-id]
+            (fn [[rows-order rows-by-id]]
+              (mapv rows-by-id rows-order)))
 
 (rf/reg-sub :table/sort-state
             (fn [db _]
