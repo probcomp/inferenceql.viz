@@ -159,7 +159,8 @@
                  (.deselectCell @hot-instance)))
 
              (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")]
-               (when (and (not= (:sort-state new-props) (js->clj (.getSortConfig sorting-plugin)))
+               (when (and (not= (:sort-state new-props) (js->clj (.getSortConfig sorting-plugin)
+                                                                 :keywordize-keys true))
                           (not= (:sort-state new-props) (:sort-state old-props)))
                  (when-let [config (clj->js (:sort-state new-props))]
                    (.sort sorting-plugin config)))))))
