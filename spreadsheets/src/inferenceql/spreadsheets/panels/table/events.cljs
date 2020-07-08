@@ -228,8 +228,8 @@
                                               [rp1 cp1 rp2 cp2])))
          color (control-db/selection-color db)]
      {:db (-> db
-            (assoc-in [:table-panel :selection-layers color :coords] selection-layers)
-            (assoc-in [:table-panel :selection-layers color :coords-physical] physical-selection-layers))
+              (assoc-in [:table-panel :selection-layers color :coords] selection-layers)
+              (assoc-in [:table-panel :selection-layers color :coords-physical] physical-selection-layers))
       :dispatch [:table/check-selection]})))
 
 (rf/reg-event-db
