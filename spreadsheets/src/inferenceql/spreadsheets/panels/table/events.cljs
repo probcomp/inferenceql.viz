@@ -11,6 +11,18 @@
             [inferenceql.spreadsheets.panels.table.eventsupport.toggle-label-column :as es.toggle-label-column]
             [clojure.walk]))
 
+(rf/reg-event-db
+ :table/set-hot-instance
+ event-interceptors
+ (fn [db [_ hot-instance]]
+   (assoc-in db [:table-panel :hot-instance] hot-instance)))
+
+(rf/reg-event-db
+ :table/unset-hot-instance
+ event-interceptors
+ (fn [db _]
+   (update-in db [:table-panel] dissoc :hot-instance)))
+
 ;;; Events that do not correspond to hooks in the Handsontable api.
 
 (rf/reg-event-fx

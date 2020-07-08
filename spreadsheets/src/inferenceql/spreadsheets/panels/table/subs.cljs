@@ -213,6 +213,13 @@
                          {:data attr}))]
     (map settings-map headers)))
 
+;;; Sub for getting the instance of Handsontable used within the Reagent component
+;;; representing the table.
+
+(rf/reg-sub :table/hot-instance
+            (fn [db _]
+              (get-in db [:table-panel :hot-instance])))
+
 ;;; Subs related to data as it appears to the user given column moves and column sorting performed
 ;;; by the user in Handsontable.
 

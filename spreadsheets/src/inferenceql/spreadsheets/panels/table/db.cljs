@@ -14,7 +14,8 @@
                                       ::label-column-show]
                              :opt-un [::physical-data
                                       ::visual-data
-                                      ::sort-state]))
+                                      ::sort-state
+                                      ::hot-instance]))
 
 ;;; Specs related to user-set labels on rows.
 
@@ -60,6 +61,10 @@
                                             ::sortOrder]))
 ;; The format of ::sort-state is determined by Handsontable.
 (s/def ::sort-state (s/coll-of ::column-sort-state :kind vector?))
+
+;;; Spec related to the handsontable instance itself.
+
+(s/def ::hot-instance some?)
 
 ;;; Specs related to selections within handsontable instances.
 
