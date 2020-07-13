@@ -5,6 +5,7 @@
             ;; Core
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
+            [inferenceql.spreadsheets.effects]
             [inferenceql.spreadsheets.views :as views]
             [inferenceql.spreadsheets.vega :as vega.init]
             ;; Control Panel
