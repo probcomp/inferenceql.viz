@@ -102,12 +102,13 @@
                    :selections (get-selections coords headers rows)
                    :row-at-selection-start (get-row-at-selection-start coords rows)))))
 
-(rf/reg-sub :table/selection-layers-raw
+(rf/reg-sub :table/selection-layer-coords
             (fn [db [_sub-name]]
-              (get-in db [:table-panel :selection-layers])))
+              (let [layers (get-in db [:table-panel :selection-layers])]
+                (medley/map-vals #(select-keys % [:coords]) layers))))
 
 (rf/reg-sub :table/selection-layers
-            :<- [:table/selection-layers-raw]
+            :<- [:table/selection-layer-coords]
             :<- [:table/visual-headers]
             :<- [:table/visual-rows]
             (fn [[selection-layers-raw visual-headers visual-rows]]
