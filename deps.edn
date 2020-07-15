@@ -13,9 +13,9 @@
         re-frame {:mvn/version "0.10.7"}
         reagent-forms {:mvn/version "0.5.43"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "9c9527bde1cb8476863aa9a2899e47d157a71572"}
+                                        :sha "16e34527e41593a1f33cec798d0baab9eaed1518"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
-                                    :sha "0547a348505aa387377a30021f10bcc3403a6cfd"}
+                                    :sha "b049858520106d3c80acf3cddeb6abcf78f5cef4"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"

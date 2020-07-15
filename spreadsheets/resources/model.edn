@@ -1,0 +1,20 @@
+{:latents {:alpha 1
+           :counts {:one 4 :two 2}
+           :y {0 :one
+               1 :one
+               2 :one
+               3 :one
+               4 :two
+               5 :two}}
+ :model {:hypers {:color {:alpha 1}
+                  :flip {:alpha 1}}}
+ :types {:color :categorical
+         :flip :categorical}
+ :options {:color ["red" "blue" "green"]
+           :flip ["yes" "no"]}
+ :data {0 {:color "red" :flip "yes"}
+        1 {:color "red" :flip "yes"}
+        2 {:color "red" :flip "yes"}
+        3 {:color "red" :flip "yes"}
+        4 {:color "blue" :flip "no"}
+        5 {:color "green" :flip "no"}}}

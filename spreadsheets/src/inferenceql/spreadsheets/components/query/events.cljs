@@ -70,7 +70,7 @@
   Returns a re-frame event map to be returned by a re-frame fx-event."
   [query rows]
   ;; Use inferenceql.query to process query.
-  (let [models {:model (gpm/Multimixture model/spec)}]
+  (let [models {:model (gpm/dpmm model/spec)}]
     (try
       (let [result (query/q query rows models)
             columns (:iql/columns (meta result))]
