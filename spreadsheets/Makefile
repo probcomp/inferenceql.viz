@@ -25,7 +25,7 @@ figwheel-public-dir := $(current-dir)/figwheel-target/public
 figwheel-resource-dir := $(figwheel-public-dir)/resources
 figwheel-index-file := $(figwheel-public-dir)/index.html
 
-all: $(model-edn-file) js
+all: js
 
 $(model-edn-file):
 	cd ..; bin/build-model-spec
@@ -40,7 +40,6 @@ clean:
 	rm -Rf $(output-dir)
 	rm -Rf $(figwheel-build-dir)
 	rm -Rf $(publish-dir)
-	rm -Rf $(model-edn-file)
 
 ### Compilation
 
@@ -98,7 +97,7 @@ $(figwheel-index-file): $(figwheel-public-dir)
 	## Copy static index.html file.
 	cp $(current-dir)/index.html $(figwheel-index-file)
 
-$(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource) $(model-edn-file)
+$(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource)
 	## Copy static resource files.
 	cp -r $(resource-dir) $(figwheel-resource-dir)
 
@@ -106,7 +105,6 @@ $(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource) $(model-edn
 .PHONY: figwheel-clean
 figwheel-clean:
 	rm -Rf $(figwheel-build-dir)
-	rm -Rf $(model-edn-file)
 
 # Deletes the static files in the figwheel build directory.
 .PHONY: figwheel-clean-static

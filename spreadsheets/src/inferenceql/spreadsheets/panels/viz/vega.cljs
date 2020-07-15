@@ -56,7 +56,7 @@
 (defn stat-type
   "Returns a multi-mixture stat-type given a column name from the data table."
   [col-name]
-  (get-in model/spec [:vars col-name]))
+  (get-in model/spec [:types col-name]))
 
 (defn present-in-model?
   "Returns whether `col-name` is present in the loaded model."
