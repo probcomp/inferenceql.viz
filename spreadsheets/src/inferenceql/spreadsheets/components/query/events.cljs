@@ -112,8 +112,7 @@
       ;; Perform query execution locally.
       (let [rows (->> (table-db/dataset-rows db)
                       (map #(medley/remove-vals nil? %)))
-            models {:model  model/spec}]
-            ; models {:model (gpm/Multimixture model/spec)}]
+            models {:model (gpm/dpmm model/spec)}]
         (execute-query-locally query rows models)))))
 
 (rf/reg-event-fx :query/parse-query event-interceptors parse-query)
