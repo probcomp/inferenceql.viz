@@ -1,4 +1,5 @@
 (ns inferenceql.spreadsheets.model
-  (:require [inferenceql.spreadsheets.config :as config]))
+  (:require [inferenceql.spreadsheets.config :as config]
+            [inferenceql.inference.gpm :as gpm]))
 
-(def spec (get config/config :model))
+(def spec (gpm/dpmm (get config/config :model)))

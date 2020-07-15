@@ -15,7 +15,7 @@
         day8.re-frame/http-fx {:mvn/version "v0.2.0"}
         cljs-ajax {:mvn/version "0.8.0"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "9c9527bde1cb8476863aa9a2899e47d157a71572"}
+                                        :sha "320dbd401ea17072d8de3cdb464bce86d15bc99c"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "d770ff2fb52a52c0e2509d9475a119055143137d"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
