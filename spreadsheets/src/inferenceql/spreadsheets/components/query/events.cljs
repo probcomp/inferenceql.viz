@@ -6,7 +6,12 @@
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.inference.gpm :as gpm]
+            [inferenceql.spreadsheets.config :as config]
             [medley.core :as medley]
+            [day8.re-frame.http-fx]
+            [ajax.core]
+            [ajax.edn]
+            [goog.string :refer [format]]
             [instaparse.core :as insta]))
 
 (defn errors-for-iql-query
@@ -88,13 +93,22 @@
   Effects returned:
     :dispatch [:table/set] -- If the query ran locally and successfully the table will be set with
       the result set.
+    :http-xhrio -- If the query is to be run remotely, a post request will be effected.
     :js/console-error -- If the query ran locally and failed, an error message will be output.
     :js/alert -- If the query ran locally and failed, an error message will be output."
   [{:keys [db]} [_ text]]
-  (let [query (str/trim text)]
-    (if false
-      ;; Currently a no-op when remote query webserver is specified.
-      {}
+  (let [{:keys [query-server-url]} config/config
+        query (str/trim text)]
+    (if query-server-url
+      ;; Use the query server as a remote query execution engine.
+      {:http-xhrio {:method          :post
+                    :uri             query-server-url
+                    :params          query
+                    :timeout         5000
+                    :format          (ajax.core/text-request-format)
+                    :response-format (ajax.edn/edn-response-format)
+                    :on-success      [:query/post-success]
+                    :on-failure      [:query/post-failure]}}
       ;; Perform query execution locally.
       (let [rows (->> (table-db/dataset-rows db)
                       (map #(medley/remove-vals nil? %)))
@@ -102,3 +116,54 @@
         (execute-query-locally query rows models)))))
 
 (rf/reg-event-fx :query/parse-query event-interceptors parse-query)
+
+(defn ^:event-fx post-success
+  "Uses the successful response from the query webserver to display query results.
+
+  Triggered when:
+    When the http-xhrio request in :query/parse-query returns successfully.
+
+  Params:
+    `result` (map) -- The result of the http request as returned by cljs-ajax.
+
+  Effects returned:
+    :dispatch [:table/set] -- Used to display the query resultset in the table."
+  [_ [_ result]]
+  (let [{result-rows :result metadata :metadata} result
+        {columns :iql/columns} metadata]
+    ;; TODO: add flag for virtual data.
+    {:dispatch [:table/set result-rows columns {:virtual false}]}))
+
+(rf/reg-event-fx :query/post-success event-interceptors post-success)
+
+(defn ^:event-fx post-failure
+  "Uses the failure response from the query webserver or cljs-ajax to display error messages.
+
+  Triggered when:
+    When the http-xhrio request in :query/parse-query fails.
+
+  Params:
+    `result` (map) -- The result of the http request as returned by cljs-ajax.
+
+  Effects returned:
+    :js/alert -- Alerts the user of an error.
+    :js/console-error -- Logs a more detailed error to the browser console."
+  [_ [_ result]]
+  (let [{:keys [status response]} result
+        default-errors {:alert-msg (str "Your query did not succeed. \n"
+                                        "Please see the browser console for more information.")
+                        :error-log-msg (str "Your query did not succeed. \n"
+                                            "Sorry, no further information is available.")}
+        errors (case status
+                 0 {:error-log-msg (str "Your request to query server failed. "
+                                        "Perhaps the server is not running.")}
+                 -1 {:error-log-msg "Your request to query server timed out."}
+                 500 {:error-log-msg (str "Your there was an error internal to the query "
+                                          "server while processing your query.")}
+                 400 (errors-for-iql-query response)
+                 {})
+        {:keys [error-log-msg alert-msg]} (merge default-errors errors)]
+    {:js/console-error error-log-msg
+     :js/alert alert-msg}))
+
+(rf/reg-event-fx :query/post-failure event-interceptors post-failure)
