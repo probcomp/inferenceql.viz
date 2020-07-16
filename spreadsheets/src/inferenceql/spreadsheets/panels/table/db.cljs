@@ -35,10 +35,11 @@
 (s/def :inferenceql.viz.row/id__ ::row-id)
 (s/def :inferenceql.viz.row/label__ string?)
 (s/def :inferenceql.viz.row/user-added-row__ boolean?)
+(s/def :inferenceql.viz.row/row-number__ number?)
 (s/def ::row-special (s/keys :req [:inferenceql.viz.row/id__]
                              :opt [:inferenceql.viz.row/label__
                                    :inferenceql.viz.row/user-added-row__
-                                   :inferenceql.viz.row/row_number__]))
+                                   :inferenceql.viz.row/row-number__]))
 (s/def ::row-with-special (s/merge ::row ::row-special))
 
 (s/def ::rows-by-id (s/map-of ::row-id ::row-with-special))
@@ -105,13 +106,6 @@
   (get-in db [:table-panel :dataset :row-order]))
 
 ;;; Accessor functions to :physical-data related paths.
-(defn user-added-row-ids
-  [db]
-  (->> (vals (dataset-rows-by-id db))
-    (filter (comp true? :inferenceql.viz.row/user-added-row__))
-    (map :inferenceql.viz.row/id__)
-    (set)))
-
 
 (defn physical-headers
   [db]
@@ -124,6 +118,14 @@
 (defn physical-row-order
   [db]
   (get-in db [:table-panel :physical-data :row-order] []))
+
+(defn user-added-row-ids
+  [db]
+  (->> (physical-rows-by-id db)
+       (vals)
+       (filter (comp true? :inferenceql.viz.row/user-added-row__))
+       (map :inferenceql.viz.row/id__)
+       (set)))
 
 ;;; Accessor functions to :visual-data related paths.
 

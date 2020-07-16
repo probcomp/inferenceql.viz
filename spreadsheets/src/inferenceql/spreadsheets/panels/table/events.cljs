@@ -124,22 +124,36 @@
     (let [new-row-id (data/generate-row-id)
           color (control-db/selection-color db)
 
-          new-row-num (count (get-in db [:table-panel :physical-data :row-order]))
-          ;; Selects the first cell of the new row we are adding.
-          new-selection [[new-row-num 0 new-row-num 0]]
+          new-row-coord (count (get-in db [:table-panel :physical-data :row-order]))
+          ;; Table coordinates of the first cell of the new row we are adding.
+          new-selection [[new-row-coord 0 new-row-coord 0]]
 
+          new-row-num (inc new-row-coord)
           new-row {:inferenceql.viz.row/user-added-row__ true
-                   :inferenceql.viz.row/id__             new-row-id}]
+                   :inferenceql.viz.row/id__ new-row-id
+                   :inferenceql.viz.row/row-number__ new-row-num}
+
+          staged-changes (-> (get-in db [:table-panel :physical-data :new-rows-staged]))]
+
       (-> db
           ;; Update the currently displayed data in the table.
           (update-in [:table-panel :physical-data :rows-by-id] assoc new-row-id new-row)
           (update-in [:table-panel :physical-data :row-order] conj new-row-id)
-          ;; Update the original dataset.
-          (update-in [:table-panel :dataset :rows-by-id] assoc new-row-id new-row)
-          (update-in [:table-panel :dataset :row-order] conj new-row-id)
+
+          ;; Incorporate staged changes.
+          (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
+          (update-in [:table-panel :physical-data] dissoc :new-rows-staged)
 
           ;; TODO: scroll the viewport to this cell.
           (assoc-in [:table-panel :selection-layers color :coords] new-selection)))))
+
+(defn update-row-numbers [rows-by-id row-number]
+  (medley/map-vals (fn [row]
+                     (if (> (:inferenceql.viz.row/row-number__ row)
+                            row-number)
+                       (update row :inferenceql.viz.row/row-number__ dec)
+                       row))
+                   rows-by-id))
 
 (rf/reg-event-db
   :table/delete-row
@@ -150,7 +164,15 @@
           [r1 _c1 r2 _c2] (first selections-coords)
 
           row-id (get-in db [:table-panel :physical-data :row-order r1])
-          user-row-ids (db/user-added-row-ids db)]
+          row (get-in db [:table-panel :physical-data :rows-by-id row-id])
+          row-number (get row :inferenceql.viz.row/row-number__)
+
+          user-row-ids (db/user-added-row-ids db)
+
+          staged-changes (-> (get-in db [:table-panel :physical-data :new-rows-staged])
+                             ;; Remove any staged changes related to the row we are removing.
+                             (dissoc row-id))]
+
       ;; Only remove a row when there is only one selection rectangle and
       ;; it is set on a single row. The number of columns spanned does not matter.
       ;; The selected row must also be a user-added row.
@@ -158,12 +180,16 @@
                (= r1 r2)
                (contains? user-row-ids row-id))
         (-> db
-            ;; Update the currently displayed data in the table.
+            ;; Remove the row from the dataset.
             (update-in [:table-panel :physical-data :rows-by-id] dissoc row-id)
             (update-in [:table-panel :physical-data :row-order] (comp vec (partial remove #{row-id})))
-            ;; Update the original dataset.
-            (update-in [:table-panel :dataset :rows-by-id] dissoc row-id)
-            (update-in [:table-panel :dataset :row-order] (comp vec (partial remove #{row-id})))
+
+            ;; Update row numbers for subsequent rows.
+            (update-in [:table-panel :physical-data :rows-by-id] update-row-numbers row-number)
+
+            ;; Incorporate staged changes.
+            (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
+            (update-in [:table-panel :physical-data] dissoc :new-rows-staged)
 
             ;; Update the selection to the first cell in the row before the deleted row.
             (assoc-in [:table-panel :selection-layers color :coords] [[(dec r1) 0 (dec r1) 0]]))
@@ -210,10 +236,8 @@
           (.error js/console (:error c-map)))
 
         (-> db
-            ;; Update the currently displayed data in the table.
-            (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates updates)
-            ;; Update the original dataset.
-            (update-in [:table-panel :dataset :rows-by-id] es.before-change/merge-row-updates updates))))))
+            ;; Stage the changes in the db. The Handsontable itself already has the updates.
+            (update-in [:table-panel :physical-data :new-rows-staged] es.before-change/merge-row-updates updates))))))
 
 (rf/reg-event-fx
  :hot/after-selection-end

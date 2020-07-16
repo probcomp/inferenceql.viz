@@ -14,9 +14,10 @@
 
 (def app-dataset
   "Dataset with row id's and other special attributes."
-  (mapv #(assoc % :inferenceql.viz.row/id__ (generate-row-id)
-                  :inferenceql.viz.row/user-added-row__ false)
-        nyt-data))
+  (vec (map-indexed (fn [idx row] (assoc row :inferenceql.viz.row/id__ (generate-row-id)
+                                             :inferenceql.viz.row/row-number__ (inc idx)
+                                             :inferenceql.viz.row/user-added-row__ false))
+                    nyt-data)))
 
 (def app-dataset-order
   "Ordering of dataset by row id's"
