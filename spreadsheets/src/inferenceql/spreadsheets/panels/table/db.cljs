@@ -28,13 +28,13 @@
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/coll-of ::row :kind vector?))
 
-(s/def :inferenceql.viz.row/id__ ::row-id)
-(s/def :inferenceql.viz.row/label__ string?)
-(s/def :inferenceql.viz.row/user-added-row__ boolean?)
+(s/def ::id__ ::row-id)
+(s/def ::label__ string?)
+(s/def ::user-added-row__ boolean?)
 ;; ::row-special specs out special attributes that get added onto rows.
-(s/def ::row-special (s/keys :req [:inferenceql.viz.row/id__]
-                             :opt [:inferenceql.viz.row/label__
-                                   :inferenceql.viz.row/user-added-row__]))
+(s/def ::row-special (s/keys :req_un [:id__]
+                             :opt_un [::label__
+                                      ::user-added-row__]))
 
 (s/def ::rows-by-id (s/map-of ::row-id (s/merge ::row ::row-special)))
 (s/def ::row-order (s/coll-of ::row-id))
@@ -98,8 +98,8 @@
 (defn user-added-row-ids
   [db]
   (->> (vals (dataset-rows-by-id db))
-    (filter (comp true? :inferenceql.viz.row/user-added-row__))
-    (map :inferenceql.viz.row/id__)
+    (filter (comp true? :user-added-row__))
+    (map :id__)
     (set)))
 
 

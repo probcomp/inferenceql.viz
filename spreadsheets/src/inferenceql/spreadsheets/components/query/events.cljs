@@ -36,11 +36,11 @@
 (defn make-example
   "Returns an example row built from `row` to be used in the search-by-label search implementation."
   [row]
-  (let [label-state (:inferenceql.viz.row/label__ row)
+  (let [label-state (:label__ row)
         clean-row (medley/remove-vals nil? (dissoc row
-                                                   :inferenceql.viz.row/id__
-                                                   :inferenceql.viz.row/user-added-row__
-                                                   :inferenceql.viz.row/label__))]
+                                                   :id__
+                                                   :user-added-row__
+                                                   :label__))]
     (merge clean-row {search-column label-state})))
 
 (defn perform-search-by-label
@@ -48,16 +48,16 @@
   Adds a new column, prob-label-true, to result rows to show resulting scores.
   Returns a re-frame event map to be returned by a re-frame fx-event."
   [rows-by-id row-order rows headers]
-  (let [rows-clean-label (map #(update % :inferenceql.viz.row/label__ label-set?) rows)
+  (let [rows-clean-label (map #(update % :label__ label-set?) rows)
 
-        labeled-rows (filter (comp some? :inferenceql.viz.row/label__) rows-clean-label)
-        labeled-scores (map (comp {true 1 false 0} :inferenceql.viz.row/label__) labeled-rows)
+        labeled-rows (filter (comp some? :label__) rows-clean-label)
+        labeled-scores (map (comp {true 1 false 0} :label__) labeled-rows)
         example-rows (map make-example labeled-rows)
 
-        unlabeled-rows (filter (comp nil? :inferenceql.viz.row/label__) rows-clean-label)
+        unlabeled-rows (filter (comp nil? :label__) rows-clean-label)
         unlabeled-scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params)
 
-        scores-map (zipmap (map :inferenceql.viz.row/id__ (concat unlabeled-rows labeled-rows))
+        scores-map (zipmap (map :id__ (concat unlabeled-rows labeled-rows))
                            (map #(hash-map :prob-label-true %) (concat unlabeled-scores labeled-scores)))
 
         display-headers (concat [:prob-label-true] headers)

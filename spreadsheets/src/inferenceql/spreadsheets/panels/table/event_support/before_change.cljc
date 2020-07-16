@@ -52,7 +52,7 @@
                                   ;; May contain key :error -- Error that caused validation to fail.
                                   ;; May contain key :new-val -- New value casted appropriately.
                                   ret (cond
-                                        (= col :inferenceql.viz.row/label__)
+                                        (= col :label__)
                                         {:valid true}
 
                                         (= col-type :gaussian)
@@ -86,8 +86,8 @@
     ;; Changes should only be happening in the label column or in user-added rows.
     ;; This should be enforced by Hansontable settings.
     (doseq [{:keys [col row-data]} changes]
-      (assert (or (= :inferenceql.viz.row/label__ col)
-                  (:inferenceql.viz.row/user-added-row__ row-data))))
+      (assert (or (= :label__ col)
+                  (:user-added-row__ row-data))))
 
     ;; Changes should only be the result of user edits, copy paste, or drag and autofill.
     ;; This should be enforced by Hansontable settings.

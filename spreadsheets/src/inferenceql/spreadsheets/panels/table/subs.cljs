@@ -197,7 +197,7 @@
   (let [settings-map (fn [attr]
                        (if (= attr hot/label-col-header)
                          ;; Grabs the correct data for the label column and makes it user-editable.
-                         {:data (name :inferenceql.viz.row/label__) :readOnly false}
+                         {:data (name :label__) :readOnly false}
                          {:data attr}))]
     (map settings-map headers)))
 
@@ -240,9 +240,9 @@
           ;; NOTE: The documentations claims that the cells function in called with physical cell coordinates for
           ;; `row` and `col` but that does not seem to be the case. There might be some unusual calls made when
           ;; sorting is done in table. Nevertheless, treating `row` and `col` as visual indices seems to work ok.
-          user-added (.getDataAtRowProp hot row (name :inferenceql.viz.row/user-added-row__))
+          user-added (.getDataAtRowProp hot row (name :user-added-row__))
 
-          label-column-cell (= prop (name :inferenceql.viz.row/label__))
+          label-column-cell (= prop (name :label__))
 
           classes-to-add (remove nil? [(when user-added "editable-cell") (when label-column-cell "label-cell")])
           class-str (str/join " " classes-to-add)]

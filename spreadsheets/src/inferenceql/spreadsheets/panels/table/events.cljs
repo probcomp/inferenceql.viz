@@ -17,15 +17,15 @@
  :table/set
  event-interceptors
  (fn [db [_ rows headers {:keys [virtual]}]]
-   (let [rows-order (mapv :inferenceql.viz.row/id__ rows)
+   (let [rows-order (mapv :id__ rows)
          rows-maps (zipmap rows-order rows)
 
          ;; Casts a value to a vec if it is not nil.
          vec-maybe #(some-> % vec)
          ;; Remove special-columns from headers
-         headers (remove #{:inferenceql.viz.row/user-added-row__
-                           :inferenceql.viz.row/id__
-                           :inferenceql.viz.row/label__}
+         headers (remove #{:user-added-row__
+                           :id__
+                           :label__}
                          headers)]
      (-> db
          (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
@@ -104,8 +104,8 @@
           ;; Selects the first cell of the new row we are adding.
           new-selection [[new-row-num 0 new-row-num 0]]
 
-          new-row {:inferenceql.viz.row/user-added-row__ true
-                   :inferenceql.viz.row/id__             new-row-id}]
+          new-row {:user-added-row__ true
+                   :id__             new-row-id}]
       (-> db
           ;; Update the currently displayed data in the table.
           (update-in [:table-panel :physical-data :rows-by-id] assoc new-row-id new-row)
@@ -160,8 +160,8 @@
                               ;; The label column is the only column that we might change that we save as a
                               ;; fully qualified keyword, so this is a special case for it.
                               col-kw (if (= col (name :label__))
-                                         :inferenceql.viz.row/label__
-                                         (keyword col))]
+                                       :label__
+                                       (keyword col))]
                           {:row-id row-id :row-data row-data :col col-kw :new-val new-val}))]
 
       (es.before-change/assert-permitted-changes change-maps source)
