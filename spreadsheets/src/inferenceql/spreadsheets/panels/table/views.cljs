@@ -28,7 +28,11 @@
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
   [hot-instance new-settings]
-  (.updateSettings hot-instance new-settings false))
+  (let [{:keys [data]} new-settings]
+    (if (= (keys new-settings) [:data])
+      ;; When data is the only updated setting, use a different update function.
+      (.loadData hot-instance (clj->js data))
+      (.updateSettings hot-instance (clj->js new-settings) false))))
 
 (defn handsontable
   ([props]
@@ -71,7 +75,12 @@
                  {old-settings :settings old-selections-coords :selections-coords old-sort-state :sort-state} old-props
                  {new-settings :settings new-selections-coords :selections-coords new-sort-state :sort-state} new-props
                  {old-data :data old-col-headers :colHeaders} old-settings
-                 {new-data :data new-col-headers :colHeaders} new-settings]
+                 {new-data :data new-col-headers :colHeaders} new-settings
+
+                 changed-settings (into {} (filter (fn [[setting-key new-setting-value]]
+                                                     (let [old-setting-value (get old-settings setting-key)]
+                                                       (not= new-setting-value old-setting-value)))
+                                                   new-settings))]
 
              (when (not= old-settings new-settings)
                (let [dataset-empty (and (empty? new-data) (empty? new-col-headers))
@@ -99,7 +108,7 @@
                  (when (or dataset-empty dataset-size-changed)
                    (.deselectCell @hot-instance))
 
-                 (update-hot! @hot-instance (clj->js new-settings))
+                 (update-hot! @hot-instance changed-settings)
 
                  ;; Maintain the same sort order as before the update or a new order if provided.
                  (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")]
