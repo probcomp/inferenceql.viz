@@ -74,18 +74,17 @@
                  [_ _new-attributes new-props] (reagent/argv this)
                  {old-settings :settings old-selections-coords :selections-coords old-sort-state :sort-state} old-props
                  {new-settings :settings new-selections-coords :selections-coords new-sort-state :sort-state} new-props
-                 {old-data :data old-col-headers :colHeaders} old-settings
                  {new-data :data new-col-headers :colHeaders} new-settings
 
                  changed-settings (into {} (filter (fn [[setting-key new-setting-value]]
                                                      (let [old-setting-value (get old-settings setting-key)]
                                                        (not= new-setting-value old-setting-value)))
-                                                   new-settings))]
+                                                   new-settings))
+                 {data-changed :data col-headers-changed :colHeaders} changed-settings]
 
              (when (not= old-settings new-settings)
                (let [dataset-empty (and (empty? new-data) (empty? new-col-headers))
-                     dataset-size-changed (or (not= (count new-data) (count old-data))
-                                              (not= (count new-col-headers) (count old-col-headers)))]
+                     dataset-size-changed (or data-changed col-headers-changed)]
                  ;; Whenever we insert new data into the table, we sometimes deselect all cells
                  ;; before updating in order to prevent the following issues.
 
