@@ -133,7 +133,7 @@
                    :inferenceql.viz.row/id__ new-row-id
                    :inferenceql.viz.row/row-number__ new-row-num}
 
-          staged-changes (-> (get-in db [:table-panel :physical-data :new-rows-staged]))]
+          staged-changes (get-in db [:table-panel :physical-data :staged-changes])]
 
       (-> db
           ;; Update the currently displayed data in the table.
@@ -142,7 +142,7 @@
 
           ;; Incorporate staged changes.
           (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
-          (update-in [:table-panel :physical-data] dissoc :new-rows-staged)
+          (update-in [:table-panel :physical-data] dissoc :staged-changes)
 
           ;; TODO: scroll the viewport to this cell.
           (assoc-in [:table-panel :selection-layers color :coords] new-selection)))))
@@ -169,7 +169,7 @@
 
           user-row-ids (db/user-added-row-ids db)
 
-          staged-changes (-> (get-in db [:table-panel :physical-data :new-rows-staged])
+          staged-changes (-> (get-in db [:table-panel :physical-data :staged-changes])
                              ;; Remove any staged changes related to the row we are removing.
                              (dissoc row-id))]
 
@@ -189,7 +189,7 @@
 
             ;; Incorporate staged changes.
             (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
-            (update-in [:table-panel :physical-data] dissoc :new-rows-staged)
+            (update-in [:table-panel :physical-data] dissoc :staged-changes)
 
             ;; Update the selection to the first cell in the row before the deleted row.
             (assoc-in [:table-panel :selection-layers color :coords] [[(dec r1) 0 (dec r1) 0]]))
@@ -237,7 +237,7 @@
 
         (-> db
             ;; Stage the changes in the db. The Handsontable itself already has the updates.
-            (update-in [:table-panel :physical-data :new-rows-staged] es.before-change/merge-row-updates updates))))))
+            (update-in [:table-panel :physical-data :staged-changes] es.before-change/merge-row-updates updates))))))
 
 (rf/reg-event-fx
  :hot/after-selection-end

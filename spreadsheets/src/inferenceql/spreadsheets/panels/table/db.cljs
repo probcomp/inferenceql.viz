@@ -13,8 +13,6 @@
                                       ::selection-layers
                                       ::label-column-show]
                              :opt-un [::physical-data
-                                      ::labels-staged
-                                      ::new-rows-staged
                                       ::visual-state
                                       ::sort-state
                                       ::hot-instance]))
@@ -44,6 +42,7 @@
 
 (s/def ::rows-by-id (s/map-of ::row-id ::row-with-special))
 (s/def ::row-order (s/coll-of ::row-id))
+(s/def ::staged-changes (s/map-of ::row-id ::row))
 (s/def ::virtual boolean?)
 
 (s/def ::dataset (s/keys :req-un [::headers
@@ -52,10 +51,8 @@
 (s/def ::physical-data (s/keys :req-un [::headers
                                         ::rows-by-id
                                         ::row-order
-                                        ::virtual]))
-;; TODO: make these specs more specific.
-(s/def ::labels-staged (s/map-of ::row-id ::row))
-(s/def ::new-rows-staged (s/map-of ::row-id ::row))
+                                        ::virtual]
+                               :opt-un [::staged-changes]))
 (s/def ::visual-state (s/keys :req-un [::headers
                                        ::row-order]))
 
