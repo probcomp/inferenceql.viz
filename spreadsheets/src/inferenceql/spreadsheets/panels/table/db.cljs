@@ -13,6 +13,8 @@
                                       ::selection-layers
                                       ::label-column-show]
                              :opt-un [::physical-data
+                                      ::labels-staged
+                                      ::new-rows-staged
                                       ::visual-state
                                       ::sort-state
                                       ::hot-instance]))
@@ -29,27 +31,30 @@
 (s/def ::row (s/map-of ::header any?))
 (s/def ::rows (s/coll-of ::row :kind vector?))
 
+;; ::row-special specs out special attributes that get added onto rows.
 (s/def :inferenceql.viz.row/id__ ::row-id)
 (s/def :inferenceql.viz.row/label__ string?)
 (s/def :inferenceql.viz.row/user-added-row__ boolean?)
-;; ::row-special specs out special attributes that get added onto rows.
 (s/def ::row-special (s/keys :req [:inferenceql.viz.row/id__]
                              :opt [:inferenceql.viz.row/label__
-                                   :inferenceql.viz.row/user-added-row__]))
+                                   :inferenceql.viz.row/user-added-row__
+                                   :inferenceql.viz.row/row_number__]))
+(s/def ::row-with-special (s/merge ::row ::row-special))
 
-(s/def ::rows-by-id (s/map-of ::row-id (s/merge ::row ::row-special)))
+(s/def ::rows-by-id (s/map-of ::row-id ::row-with-special))
 (s/def ::row-order (s/coll-of ::row-id))
 (s/def ::virtual boolean?)
 
 (s/def ::dataset (s/keys :req-un [::headers
                                   ::rows-by-id
                                   ::row-order]))
-
 (s/def ::physical-data (s/keys :req-un [::headers
                                         ::rows-by-id
                                         ::row-order
                                         ::virtual]))
-
+;; TODO: make these specs more specific.
+(s/def ::labels-staged (s/map-of ::row-id ::row))
+(s/def ::new-rows-staged (s/map-of ::row-id ::row))
 (s/def ::visual-state (s/keys :req-un [::headers
                                        ::row-order]))
 
