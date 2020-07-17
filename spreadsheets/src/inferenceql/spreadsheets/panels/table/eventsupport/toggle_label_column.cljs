@@ -14,8 +14,7 @@
                      [r1 (+ c1 amount) r2 (+ c2 amount)])
         shift-layer (fn [layer-map]
                       (-> layer-map
-                          (update :coords (partial mapv shift-cols))
-                          (update :coords-physical (partial mapv shift-cols))))]
+                          (update :coords (partial mapv shift-cols))))]
     (medley/map-vals shift-layer selection-layers)))
 
 (defn adjust-headers

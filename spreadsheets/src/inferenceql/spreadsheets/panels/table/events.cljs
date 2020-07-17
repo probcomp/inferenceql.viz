@@ -133,10 +133,7 @@
           selections-coords (get-in db [:table-panel :selection-layers color :coords])
           [r1 _c1 r2 _c2] (first selections-coords)
 
-          selections-coords-physical (get-in db [:table-panel :selection-layers color :coords-physical])
-          [r1p _c1p r2p _c2p] (first selections-coords-physical)
-
-          row-id (get-in db [:table-panel :physical-data :row-order r1p])
+          row-id (get-in db [:table-panel :visual-state :row-order r1])
           row (get-in db [:table-panel :physical-data :rows-by-id row-id])
           row-number (get row :inferenceql.viz.row/row-number__)
 
@@ -150,7 +147,7 @@
       ;; it is set on a single row. The number of columns spanned does not matter.
       ;; The selected row must also be a user-added row.
       (if (and (= 1 (count selections-coords))
-               (= r1p r2p)
+               (= r1 r2)
                (contains? user-row-ids row-id))
         (-> db
             ;; Remove the row from the dataset.
@@ -253,17 +250,10 @@
  (fn [db [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
    (let [color (control-db/selection-color db)
          selection-layers (js->clj (.getSelected hot))
-         physical-selection-layers (vec (for [[r1 c1 r2 c2] selection-layers]
-                                          (let [rp1 (.toPhysicalRow hot r1)
-                                                cp1 (.toPhysicalColumn hot c1)
-                                                rp2 (.toPhysicalRow hot r2)
-                                                cp2 (.toPhysicalColumn hot c2)]
-                                              [rp1 cp1 rp2 cp2])))
          num-rows (count (db/visual-row-order db))]
      (if (valid-selection? selection-layers num-rows)
        (-> db
-           (assoc-in [:table-panel :selection-layers color :coords] selection-layers)
-           (assoc-in [:table-panel :selection-layers color :coords-physical] physical-selection-layers))
+           (assoc-in [:table-panel :selection-layers color :coords] selection-layers))
        (-> db
            (update-in [:table-panel :selection-layers] dissoc color))))))
 

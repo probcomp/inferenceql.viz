@@ -77,15 +77,13 @@
 
 (s/def ::header-clicked boolean?)
 (s/def ::coords (s/coll-of ::selection-layer-coords))
-(s/def ::coords-physical (s/coll-of ::selection-layer-coords))
 (s/def ::selection-layer-coords (s/coll-of number? :kind vector? :count 4))
 
 ;;; Specs related to storing the selection state of both handsontables
 
 (s/def ::selection-color #{:blue :red :green})
 (s/def ::selection-state (s/keys :opt-un [::header-clicked
-                                          ::coords
-                                          ::coords-physical]))
+                                          ::coords]))
 (s/def ::selection-layers (s/map-of ::selection-color ::selection-state))
 
 ;;; Accessor functions to :dataset related paths.
