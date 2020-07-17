@@ -335,10 +335,3 @@
         (assoc-visual-row-order hot)
         (assoc-visual-headers hot))))
 
-(rf/reg-event-db
-  :hot/after-load-data
-  event-interceptors
-  (fn [db [_ hot _id _initial-load]]
-    (-> db
-        (assoc-visual-row-order hot)
-        (assoc-visual-headers hot))))
