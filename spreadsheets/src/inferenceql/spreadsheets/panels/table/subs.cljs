@@ -254,6 +254,12 @@
                 "visible"
                 "hidden")))
 
+;;; Subs related table behaviour.
+
+(rf/reg-sub :table/behaviour
+            (fn [db _]
+              (get-in db [:table-panel :behavior])))
+
 ;;; Subs related to settings and overall state of tables.
 
 (defn cells-fn
@@ -280,7 +286,7 @@
         (.setCellMeta hot row col "readOnly" false)))))
 
 (defn ^:sub real-hot-props
-  [[headers rows context-menu selections-coords sort-state]]
+  [[headers rows context-menu selections-coords sort-state behaviour]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
@@ -288,14 +294,15 @@
       (assoc-in [:settings :cells] cells-fn)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)
-      (assoc-in [:sort-state] sort-state)))
-
+      (assoc-in [:sort-state] sort-state)
+      (assoc-in [:behavior] behaviour)))
 (rf/reg-sub :table/real-hot-props
             :<- [:table/computed-headers]
             :<- [:table/computed-rows]
             :<- [:table/context-menu]
             :<- [:table/selections-coords]
             :<- [:table/sort-state]
+            :<- [:table/behaviour]
             real-hot-props)
 
 (rf/reg-sub

@@ -144,8 +144,8 @@
           (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
           (update-in [:table-panel :physical-data] dissoc :staged-changes)
 
-          ;; TODO: scroll the viewport to this cell.
-          (assoc-in [:table-panel :selection-layers color :coords] new-selection)))))
+          (assoc-in [:table-panel :selection-layers color :coords] new-selection)
+          (assoc-in [:table-panel :behavior :jump-to-selection] true)))))
 
 (defn update-row-numbers [rows-by-id row-number]
   (medley/map-vals (fn [row]
@@ -194,6 +194,12 @@
             ;; Update the selection to the first cell in the row before the deleted row.
             (assoc-in [:table-panel :selection-layers color :coords] [[(dec r1) 0 (dec r1) 0]]))
         db))))
+
+(rf/reg-event-db
+  :table/jump-to-selection-done
+  event-interceptors
+  (fn [db [_]]
+    (assoc-in db [:table-panel :behaviour :jump-to-selection] false)))
 
 ;;; Events that correspond to hooks in the Handsontable API
 
