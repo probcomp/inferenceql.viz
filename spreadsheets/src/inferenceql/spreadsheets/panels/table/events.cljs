@@ -207,7 +207,7 @@
   :table/jump-to-selection-done
   event-interceptors
   (fn [db [_]]
-    (assoc-in db [:table-panel :behaviour :jump-to-selection] false)))
+    (assoc-in db [:table-panel :behavior :jump-to-selection] false)))
 
 ;;; Events that correspond to hooks in the Handsontable API
 
