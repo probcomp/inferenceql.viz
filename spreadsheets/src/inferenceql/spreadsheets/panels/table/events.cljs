@@ -287,47 +287,58 @@
        ;; Otherwise just save whether a header was clicked or not.
        (assoc-in db [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
 
-(defn assoc-visual-table-state
-  "Associates data related to the displayed stated of `hot` into `db`.
-  The visual table state changes when the user filters, re-orders columns, or sorts columns.
-  We use this visual state to along with selection coordinates to produce the data subset selected.
+(defn assoc-visual-headers
+  "Associates the column headers as displayed by `hot` into `db`.
+  This data changes when the user re-orders columns.
+  We use this data to along with selection coordinates to produce the data subset selected.
   This all eventually gets passed onto the visualization code via subscriptions."
   [db hot]
-  (let [headers (mapv keyword (js->clj (.getColHeader hot)))
+  (let [headers (mapv keyword (js->clj (.getColHeader hot)))]
+    (-> db
+        (assoc-in [:table-panel :visual-state :headers] headers))))
 
-        num-rows-shown (.countRows hot)
+(defn assoc-visual-row-order
+  "Associates the order of rows as displayed by `hot` into `db`.
+  The data changes when the user filters, re-orders columns, or sorts columns.
+  We use this data to along with selection coordinates to produce the data subset selected.
+  This all eventually gets passed onto the visualization code via subscriptions."
+  [db hot]
+  (let [num-rows-shown (.countRows hot)
         physical-row-order-indices (map #(.toPhysicalRow hot %) (range num-rows-shown))
         physical-row-order (db/physical-row-order db)
         visual-row-order (mapv physical-row-order physical-row-order-indices)]
     (-> db
-        (assoc-in [:table-panel :visual-state :row-order] visual-row-order)
-        (assoc-in [:table-panel :visual-state :headers] headers))))
+        (assoc-in [:table-panel :visual-state :row-order] visual-row-order))))
 
 (rf/reg-event-db
  :hot/after-column-sort
  event-interceptors
  (fn [db [_ hot _id _current-sort-config destination-sort-config]]
    (-> db
-       (assoc-in [:table-panel :sort-config] (js->clj destination-sort-config :keywordize-keys true))
-       (assoc-visual-table-state hot))))
+       (assoc-in [:table-panel :sort-state] (js->clj destination-sort-config :keywordize-keys true))
+       (assoc-visual-row-order hot)
+       (assoc-visual-headers hot))))
 
 (rf/reg-event-db
   :hot/after-filter
   event-interceptors
   (fn [db [_ hot _id _conditions-stack]]
     (-> db
-        (assoc-visual-table-state hot))))
+        (assoc-visual-row-order hot)
+        (assoc-visual-headers hot))))
 
 (rf/reg-event-db
   :hot/after-column-move
   event-interceptors
   (fn [db [_ hot _id _columns _target]]
     (-> db
-        (assoc-visual-table-state hot))))
+        (assoc-visual-row-order hot)
+        (assoc-visual-headers hot))))
 
 (rf/reg-event-db
   :hot/after-load-data
   event-interceptors
   (fn [db [_ hot _id _initial-load]]
     (-> db
-        (assoc-visual-table-state hot))))
+        (assoc-visual-row-order hot)
+        (assoc-visual-headers hot))))
