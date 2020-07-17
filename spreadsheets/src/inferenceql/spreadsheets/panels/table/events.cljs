@@ -317,3 +317,9 @@
     (-> db
         (assoc-visual-table-state hot))))
 
+(rf/reg-event-db
+  :hot/after-load-data
+  event-interceptors
+  (fn [db [_ hot _id _initial-load]]
+    (-> db
+        (assoc-visual-table-state hot))))
