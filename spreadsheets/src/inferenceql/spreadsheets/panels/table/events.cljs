@@ -68,41 +68,6 @@
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))
 
-;; Checks if the selection in the current selection layer is valid.
-;; If it is not valid, the current selection layer is cleared.
-(rf/reg-event-db
- :table/check-selection
- event-interceptors
- (fn [db _]
-   (let [color (control-db/selection-color db)
-         selections-coords (get-in db [:table-panel :selection-layers color :coords])
-
-         num-rows (count (db/visual-row-order db))
-         ;; Takes a selection vector and returns true if that selection represents
-         ;; the selection of a single column.
-         column-selected (fn [[row-start col-start row-end col-end]]
-                           (let [last-row-index (- num-rows 1)]
-                             (and (= row-start 0)
-                                  (= row-end last-row-index)
-                                  (= col-start col-end))))]
-     (cond
-       ;; These next two cond sections sometimes deselect all cells in the selection layer in order
-       ;; to enforce our constraints on what sorts of selections are allowed in each selection layer.
-
-       ;; Deselect all cells in the current selection layer if it is made up of two selections that
-       ;; are not both single column selections.
-       (and (= (count selections-coords) 2)
-            (not-every? column-selected selections-coords))
-       (update-in db [:table-panel :selection-layers] dissoc color)
-
-       ;; Deselect all cells in the current selection layer if it is made up of more than
-       ;; two selections.
-       (> (count selections-coords) 2)
-       (update-in db [:table-panel :selection-layers] dissoc color)
-
-       :else
-       db))))
-
 (rf/reg-event-db
   :table/toggle-label-column
   event-interceptors
@@ -253,22 +218,54 @@
             ;; Stage the changes in the db. The Handsontable itself already has the updates.
             (update-in [:table-panel :physical-data :staged-changes] es.before-change/merge-row-updates updates))))))
 
-(rf/reg-event-fx
+(defn valid-selection?
+  "Checks if the selection in the current selection layer is valid."
+  ;; TODO: update comments.
+  [selections-coords num-rows]
+  (let [;; Takes a selection vector and returns true if that selection represents
+        ;; the selection of a single column.
+        column-selected? (fn [[row-start col-start row-end col-end]]
+                           (let [last-row-index (- num-rows 1)]
+                             (and (= row-start 0)
+                                  (= row-end last-row-index)
+                                  (= col-start col-end))))]
+    (cond
+      ;; These next two cond sections sometimes deselect all cells in the selection layer in order
+      ;; to enforce our constraints on what sorts of selections are allowed in each selection layer.
+
+      ;; Deselect all cells in the current selection layer if it is made up of two selections that
+      ;; are not both single column selections.
+      (and (= (count selections-coords) 2)
+           (not-every? column-selected? selections-coords))
+      false
+
+      ;; Deselect all cells in the current selection layer if it is made up of more than
+      ;; two selections.
+      (> (count selections-coords) 2)
+      false
+
+      :else
+      true)))
+
+(rf/reg-event-db
  :hot/after-selection-end
  event-interceptors
- (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
-   (let [selection-layers (js->clj (.getSelected hot))
+ (fn [db [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
+   (let [color (control-db/selection-color db)
+         selection-layers (js->clj (.getSelected hot))
          physical-selection-layers (vec (for [[r1 c1 r2 c2] selection-layers]
                                           (let [rp1 (.toPhysicalRow hot r1)
                                                 cp1 (.toPhysicalColumn hot c1)
                                                 rp2 (.toPhysicalRow hot r2)
                                                 cp2 (.toPhysicalColumn hot c2)]
                                               [rp1 cp1 rp2 cp2])))
-         color (control-db/selection-color db)]
-     {:db (-> db
-              (assoc-in [:table-panel :selection-layers color :coords] selection-layers)
-              (assoc-in [:table-panel :selection-layers color :coords-physical] physical-selection-layers))
-      :dispatch [:table/check-selection]})))
+         num-rows (count (db/visual-row-order db))]
+     (if (valid-selection? selection-layers num-rows)
+       (-> db
+           (assoc-in [:table-panel :selection-layers color :coords] selection-layers)
+           (assoc-in [:table-panel :selection-layers color :coords-physical] physical-selection-layers))
+       (-> db
+           (update-in [:table-panel :selection-layers] dissoc color))))))
 
 (rf/reg-event-db
  :hot/after-on-cell-mouse-down
