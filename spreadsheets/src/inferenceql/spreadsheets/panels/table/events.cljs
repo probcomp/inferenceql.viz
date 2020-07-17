@@ -164,10 +164,14 @@
   event-interceptors
   (fn [db [_]]
     (let [color (control-db/selection-color db)
-          selections-coords (get-in db [:table-panel :selection-layers color :coords-physical])
+
+          selections-coords (get-in db [:table-panel :selection-layers color :coords])
           [r1 _c1 r2 _c2] (first selections-coords)
 
-          row-id (get-in db [:table-panel :physical-data :row-order r1])
+          selections-coords-physical (get-in db [:table-panel :selection-layers color :coords-physical])
+          [r1p _c1p r2p _c2p] (first selections-coords-physical)
+
+          row-id (get-in db [:table-panel :physical-data :row-order r1p])
           row (get-in db [:table-panel :physical-data :rows-by-id row-id])
           row-number (get row :inferenceql.viz.row/row-number__)
 
@@ -181,7 +185,7 @@
       ;; it is set on a single row. The number of columns spanned does not matter.
       ;; The selected row must also be a user-added row.
       (if (and (= 1 (count selections-coords))
-               (= r1 r2)
+               (= r1p r2p)
                (contains? user-row-ids row-id))
         (-> db
             ;; Remove the row from the dataset.
