@@ -115,7 +115,7 @@
           (medley/update-existing-in [:table-panel :sort-state] es.toggle-label-column/shift-sort shift-amount)
           (update-in [:table-panel :selection-layers] es.toggle-label-column/shift-selections shift-amount)
           ;; Hack: This prevents a flicker in visualizations.
-          (update-in [:table-panel :visual-data :headers] es.toggle-label-column/adjust-headers shift-amount)))))
+          (update-in [:table-panel :visual-state :headers] es.toggle-label-column/adjust-headers shift-amount)))))
 
 (rf/reg-event-db
   :table/add-row
