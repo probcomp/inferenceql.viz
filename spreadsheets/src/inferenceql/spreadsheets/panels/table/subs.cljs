@@ -279,8 +279,8 @@
       (when (or user-added label-column-cell)
         (.setCellMeta hot row col "readOnly" false)))))
 
-(defn real-hot-props
-  [{:keys [headers rows context-menu selections-coords sort-state]} _]
+(defn ^:sub real-hot-props
+  [[headers rows context-menu selections-coords sort-state]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] headers)
@@ -289,13 +289,13 @@
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)
       (assoc-in [:sort-state] sort-state)))
+
 (rf/reg-sub :table/real-hot-props
-            (fn [_ _]
-              {:headers (rf/subscribe [:table/computed-headers])
-               :rows    (rf/subscribe [:table/computed-rows])
-               :context-menu (rf/subscribe [:table/context-menu])
-               :selections-coords (rf/subscribe [:table/selections-coords])
-               :sort-state (rf/subscribe [:table/sort-state])})
+            :<- [:table/computed-headers]
+            :<- [:table/computed-rows]
+            :<- [:table/context-menu]
+            :<- [:table/selections-coords]
+            :<- [:table/sort-state]
             real-hot-props)
 
 (rf/reg-sub
