@@ -144,8 +144,12 @@
           (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
           (update-in [:table-panel :physical-data] dissoc :staged-changes)
 
+          ;; Jump to and select the first cell in the newly created row.
           (assoc-in [:table-panel :selection-layers color :coords] new-selection)
-          (assoc-in [:table-panel :behavior :jump-to-selection] true)))))
+          (assoc-in [:table-panel :behavior :jump-to-selection] true)
+
+          ;; Remove any sorting the table may have had.
+          (update-in [:table-panel] dissoc :sort-state)))))
 
 (defn update-row-numbers [rows-by-id row-number]
   (medley/map-vals (fn [row]

@@ -122,8 +122,9 @@
 
                  ;; Maintain the same sort order as before the update or a new order if provided.
                  (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")]
-                   (when-let [config (clj->js new-sort-state)]
-                     (.sort sorting-plugin config)))
+                   (if-let [config (clj->js new-sort-state)]
+                     (.sort sorting-plugin config)
+                     (.clearSort sorting-plugin)))
 
                  ;; If we cleared selections because of a dataset-size change, apply the latest
                  ;; selection state from props.
