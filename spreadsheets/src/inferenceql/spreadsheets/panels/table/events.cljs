@@ -82,10 +82,23 @@
           ;; Hack: This prevents a flicker in visualizations.
           (update-in [:table-panel :visual-state :headers] es.toggle-label-column/adjust-headers shift-amount)))))
 
-(rf/reg-event-db
+(defn add-row
+  [[hot row]]
+  (let [row-number (:inferenceql.viz.row/row-number__ row)
+        values (for [[k v] row]
+                 (let [row-index (dec row-number)]
+                   [row-index k v]))]
+
+    (.removeHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))
+    (.setDataAtRowProp hot (clj->js values))
+    (.addHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))))
+
+(rf/reg-fx :hot/add-row add-row)
+
+(rf/reg-event-fx
   :table/add-row
   event-interceptors
-  (fn [db [_]]
+  (fn [{:keys [db]} [_]]
     (let [new-row-id (data/generate-row-id)
           color (control-db/selection-color db)
 
@@ -98,23 +111,26 @@
                    :inferenceql.viz.row/id__ new-row-id
                    :inferenceql.viz.row/row-number__ new-row-num}
 
-          staged-changes (get-in db [:table-panel :physical-data :staged-changes])]
+          staged-changes (get-in db [:table-panel :physical-data :staged-changes])
 
-      (-> db
-          ;; Update the currently displayed data in the table.
-          (update-in [:table-panel :physical-data :rows-by-id] assoc new-row-id new-row)
-          (update-in [:table-panel :physical-data :row-order] conj new-row-id)
+          hot (get-in db [:table-panel :hot-instance])]
+      #_(-> db
+            ;; Update the currently displayed data in the table.
+            (update-in [:table-panel :physical-data :rows-by-id] assoc new-row-id new-row)
+            (update-in [:table-panel :physical-data :row-order] conj new-row-id)
 
-          ;; Incorporate staged changes.
-          (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
-          (update-in [:table-panel :physical-data] dissoc :staged-changes)
+            ;; Incorporate staged changes.
+            (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
+            (update-in [:table-panel :physical-data] dissoc :staged-changes)
 
-          ;; Jump to and select the first cell in the newly created row.
-          (assoc-in [:table-panel :selection-layers color :coords] new-selection)
-          (assoc-in [:table-panel :behavior :jump-to-selection] true)
+            ;; Jump to and select the first cell in the newly created row.
+            (assoc-in [:table-panel :selection-layers color :coords] new-selection)
+            (assoc-in [:table-panel :behavior :jump-to-selection] true)
 
-          ;; Remove any sorting the table may have had.
-          (update-in [:table-panel] dissoc :sort-state)))))
+            ;; Remove any sorting the table may have had.
+            (update-in [:table-panel] dissoc :sort-state))
+
+      {:hot/add-row [hot new-row]})))
 
 (defn update-row-numbers [rows-by-id row-number]
   (medley/map-vals (fn [row]
@@ -191,7 +207,7 @@
                                        (keyword col))]
                           {:row-id row-id :row-data row-data :col col-kw :new-val new-val}))]
 
-      (es.before-change/assert-permitted-changes change-maps source)
+      ;(es.before-change/assert-permitted-changes change-maps source)
 
       (let [change-maps-checked (es.before-change/validate-and-cast-changes change-maps)
             valid-change-maps (filter :valid change-maps-checked)

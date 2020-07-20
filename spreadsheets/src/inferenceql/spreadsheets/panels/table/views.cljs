@@ -50,8 +50,8 @@
                unique-id (keyword name)]
 
            ;; add callbacks internal to hot object
-           (doseq [key hooks]
-             (let [camel-key (csk/->camelCase (clj->js key))]
+           (doseq [[hook-name hook-fn] hooks]
+             (let [camel-key (csk/->camelCase (clj->js hook-name))]
                ;; Our hook functions call the associated re-frame event and then return true.  Some
                ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
                ;; false in order to cancel the event. It is likely that this behaviour exists in
@@ -59,11 +59,7 @@
                ;; callback function can cause errors in handsontable plugins that also have
                ;; functions attached to that hook. Therefore, we are always returning true from hook
                ;; functions.
-               (js/Handsontable.hooks.add camel-key
-                                          (fn [& args]
-                                            (rf/dispatch-sync (into [key hot unique-id] args))
-                                            true)
-                                          hot)))
+               (js/Handsontable.hooks.add camel-key hook-fn hot)))
            ;; Save the hot object in the app db.
            (rf/dispatch [:table/set-hot-instance hot])))
 
