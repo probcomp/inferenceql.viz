@@ -12,10 +12,12 @@
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.7"}
         reagent-forms {:mvn/version "0.5.43"}
+        day8.re-frame/http-fx {:mvn/version "v0.2.0"}
+        cljs-ajax {:mvn/version "0.8.0"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "9c9527bde1cb8476863aa9a2899e47d157a71572"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
-                                    :sha "0547a348505aa387377a30021f10bcc3403a6cfd"}
+                                    :sha "d770ff2fb52a52c0e2509d9475a119055143137d"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"
