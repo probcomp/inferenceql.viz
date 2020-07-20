@@ -34,8 +34,8 @@ ways of communicating and making decisions.
 IQL-Viz helps this effort by allowing users to explore the results of probabilistic
 queries in an effortless and intuitive manner.  
 
+## Functional requirements for teaching:
 
-## Teaching Goals:
 #### 1. Communicate the concept of models as generative processes.
 - Ability to simulate whole rows. 
 - Ability to see a sampler generating values for a missing cell or existing cell.   
