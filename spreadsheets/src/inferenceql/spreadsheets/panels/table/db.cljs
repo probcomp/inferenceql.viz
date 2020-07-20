@@ -43,6 +43,7 @@
 (s/def ::rows-by-id (s/map-of ::row-id ::row-with-special))
 (s/def ::row-order (s/coll-of ::row-id))
 (s/def ::staged-changes (s/map-of ::row-id ::row))
+(s/def ::staged-row-order-for-new-rows (s/coll-of ::row-id))
 (s/def ::virtual boolean?)
 
 (s/def ::dataset (s/keys :req-un [::headers
@@ -52,7 +53,8 @@
                                         ::rows-by-id
                                         ::row-order
                                         ::virtual]
-                               :opt-un [::staged-changes]))
+                               :opt-un [::staged-changes
+                                        ::staged-row-order-for-new-rows]))
 (s/def ::visual-state (s/keys :req-un [::headers
                                        ::row-order]))
 
@@ -113,6 +115,19 @@
 (defn physical-row-order
   [db]
   (get-in db [:table-panel :physical-data :row-order] []))
+
+(defn physical-staged-changes
+  [db]
+  (get-in db [:table-panel :physical-data :staged-changes] []))
+
+(defn physical-staged-row-order-for-new-rows
+  [db]
+  (get-in db [:table-panel :physical-data :staged-row-order-for-new-rows] []))
+
+(defn physical-row-order-all
+  [db]
+  (vec (concat (physical-row-order db)
+               (physical-staged-row-order-for-new-rows db))))
 
 (defn user-added-row-ids
   [db]

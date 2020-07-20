@@ -6,7 +6,8 @@
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
             [inferenceql.spreadsheets.panels.table.db :as db]
-            [inferenceql.spreadsheets.panels.override.views :as modal]))
+            [inferenceql.spreadsheets.panels.override.views :as modal]
+            [inferenceql.spreadsheets.panels.table.eventsupport.before-change :as es.before-change]))
 
 ;;; Specs for validating the output of the :table/selection-layers sub.
 
@@ -230,11 +231,17 @@
             (fn [db _]
               (db/visual-row-order db)))
 
+(rf/reg-sub :table/physical-staged-changes
+            (fn [db _]
+              (db/physical-staged-changes db)))
+
 (rf/reg-sub :table/visual-display-rows
             :<- [:table/visual-row-order]
             :<- [:table/physical-rows-by-id]
-            (fn [[rows-order rows-by-id]]
-              (mapv rows-by-id rows-order)))
+            :<- [:table/physical-staged-changes]
+            (fn [[rows-order rows-by-id staged-changes]]
+              (let [updated-data (es.before-change/merge-row-updates rows-by-id staged-changes)]
+                (mapv updated-data rows-order))))
 
 (rf/reg-sub :table/sort-state
             (fn [db _]

@@ -83,15 +83,20 @@
           (update-in [:table-panel :visual-state :headers] es.toggle-label-column/adjust-headers shift-amount)))))
 
 (defn add-row
-  [[hot row]]
+  [[hot row new-selection sort-state]]
   (let [row-number (:inferenceql.viz.row/row-number__ row)
         values (for [[k v] row]
                  (let [row-index (dec row-number)]
                    [row-index k v]))]
 
+    #_(when (seq sort-state)
+        (let [sorting-plugin (.getPlugin hot "multiColumnSorting")]
+          (.clearSort sorting-plugin)))
+
     (.removeHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))
     (.setDataAtRowProp hot (clj->js values))
-    (.addHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))))
+    (.addHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))
+    #_(.selectCells hot (clj->js new-selection) true)))
 
 (rf/reg-fx :hot/add-row add-row)
 
@@ -102,7 +107,9 @@
     (let [new-row-id (data/generate-row-id)
           color (control-db/selection-color db)
 
-          new-row-coord (count (get-in db [:table-panel :physical-data :row-order]))
+          new-row-coord (+ (count (get-in db [:table-panel :physical-data :row-order]))
+                           (count (get-in db [:table-panel :physical-data :staged-row-order-for-new-rows])))
+
           ;; Table coordinates of the first cell of the new row we are adding.
           new-selection [[new-row-coord 0 new-row-coord 0]]
 
@@ -111,26 +118,23 @@
                    :inferenceql.viz.row/id__ new-row-id
                    :inferenceql.viz.row/row-number__ new-row-num}
 
-          staged-changes (get-in db [:table-panel :physical-data :staged-changes])
+          hot (get-in db [:table-panel :hot-instance])
+          sort-state (get-in db [:table-panel :sort-state])
 
-          hot (get-in db [:table-panel :hot-instance])]
-      #_(-> db
-            ;; Update the currently displayed data in the table.
-            (update-in [:table-panel :physical-data :rows-by-id] assoc new-row-id new-row)
-            (update-in [:table-panel :physical-data :row-order] conj new-row-id)
+          physical-row-order (get-in db [:table-panel :physical-data :row-order])]
+      {:hot/add-row [hot new-row new-selection sort-state]
+       :db (-> db
+               ;; Update staged data with the new row.
+               (update-in [:table-panel :physical-data :staged-changes] assoc new-row-id new-row)
+               (update-in [:table-panel :physical-data :staged-row-order-for-new-rows] conj new-row-id)
+               (assoc-in [:table-panel :visual-state :row-order] physical-row-order)
 
-            ;; Incorporate staged changes.
-            (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
-            (update-in [:table-panel :physical-data] dissoc :staged-changes)
+               ;; Jump to and select the first cell in the newly created row.
+               (assoc-in [:table-panel :selection-layers color :coords] new-selection)
+               (assoc-in [:table-panel :behavior :jump-to-selection] true))})))
+               ;; Remove any sorting the table may have had.
+               ;(update-in [:table-panel] dissoc :sort-state))})))
 
-            ;; Jump to and select the first cell in the newly created row.
-            (assoc-in [:table-panel :selection-layers color :coords] new-selection)
-            (assoc-in [:table-panel :behavior :jump-to-selection] true)
-
-            ;; Remove any sorting the table may have had.
-            (update-in [:table-panel] dissoc :sort-state))
-
-      {:hot/add-row [hot new-row]})))
 
 (defn update-row-numbers [rows-by-id row-number]
   (medley/map-vals (fn [row]
@@ -194,7 +198,7 @@
   event-interceptors
   (fn [db [_ hot id changes source]]
     (let [change-maps (for [[row col _prev-val new-val] changes]
-                        (let [p-row (.toPhysicalRow hot row)
+                        (let [p-row (.toPhysicalRow hot row) ;; TODO: Just grab this from visual row order.
                               row-id (get-in db [:table-panel :physical-data :row-order p-row])
                               row-data (get-in db [:table-panel :physical-data :rows-by-id row-id])
 
@@ -266,7 +270,11 @@
  (fn [db [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
    (let [color (control-db/selection-color db)
          selection-layers (js->clj (.getSelected hot))
-         num-rows (count (db/visual-row-order db))]
+         num-rows (+ (count (db/visual-row-order db))
+                     (count (db/physical-staged-row-order-for-new-rows db)))
+
+         _ (.log js/console :------num-rows num-rows)
+         _ (.log js/console :------valid? (valid-selection? selection-layers num-rows))]
      (if (valid-selection? selection-layers num-rows)
        (-> db
            (assoc-in [:table-panel :selection-layers color :coords] selection-layers))
@@ -308,7 +316,7 @@
   [db hot]
   (let [num-rows-shown (.countRows hot)
         physical-row-order-indices (map #(.toPhysicalRow hot %) (range num-rows-shown))
-        physical-row-order (db/physical-row-order db)
+        physical-row-order (db/physical-row-order-all db)
         visual-row-order (mapv physical-row-order physical-row-order-indices)]
     (-> db
         (assoc-in [:table-panel :visual-state :row-order] visual-row-order))))
