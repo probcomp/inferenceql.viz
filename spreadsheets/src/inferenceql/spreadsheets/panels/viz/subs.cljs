@@ -34,14 +34,7 @@
             :<- [:table/selection-layers]
             :<- [:override/column-override-fns]
             (fn [[layers override-fns]]
-              (->> layers
-                   (medley/map-vals (fn [layer]
-                                      (let [{selections :selections
-                                             cols :selected-columns
-                                             row :row-at-selection-start} layer]
-                                        (when (vega/simulatable? selections cols)
-                                          (make-simulate-fn (first cols) row override-fns)))))
-                   (medley/remove-vals nil?))))
+              nil))
 
 (rf/reg-sub :viz/pts-store
   (fn [db _]

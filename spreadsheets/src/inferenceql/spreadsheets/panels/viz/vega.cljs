@@ -424,7 +424,7 @@
                        (gen-choropleth selections cols)
 
                        (simulatable? selections cols)
-                       (gen-simulate-plot (first cols) row (name layer-name))
+                       nil
 
                        (= 1 (count cols)) ; One column selected.
                        (gen-histogram (first cols) selections)
@@ -434,7 +434,8 @@
              title {:title {:text (str (name layer-name) " " "selection")
                             :color (title-color layer-name)
                             :fontWeight 500}}]
-        (merge spec title)))))
+        (when spec
+          (merge spec title))))))
 
 (defn generate-spec [selection-layers]
   (when-let [spec-layers (seq (keep spec-for-selection-layer selection-layers))]
