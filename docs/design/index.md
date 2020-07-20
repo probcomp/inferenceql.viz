@@ -42,6 +42,12 @@ a capability is merged into master and can be demonstrated).
 - [ ] Find interactions between variables/columns.
 - [ ] Allow users to dynamically define boolean "events" as functions 
 
+## Concepts and programming model for InferenceQL
+
+This section is in design/draft stage. Find the current draft [here](https://docs.google.com/document/d/14LnXWlDB07B4nyj8AyRvgQf7muJw6SJ1Ger2XhRPGhw/edit#heading=h.an7vxaeb4i0y).
+
+
+
 #### Notes:
 1: We had a UI feature for this but disabled it (this needs to be supported by a IQL-Datalog and an IQL-SQL extension).
 
