@@ -89,14 +89,19 @@
                  (let [row-index (dec row-number)]
                    [row-index k v]))]
 
-    #_(when (seq sort-state)
-        (let [sorting-plugin (.getPlugin hot "multiColumnSorting")]
-          (.clearSort sorting-plugin)))
-
     (.removeHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))
-    (.setDataAtRowProp hot (clj->js values))
+    (.removeHook hot "afterSelectionEnd" (:hot/after-selection-end hot/real-hot-hooks))
+    (.removeHook hot "afterColumnSort" (:hot/after-column-sort hot/real-hot-hooks))
+
+    (when (seq sort-state)
+      (let [sorting-plugin (.getPlugin hot "multiColumnSorting")]
+        (.clearSort sorting-plugin)))
+    (.setDataAtRowProp hot (clj->js values) nil nil "add-row-event")
+    (.selectCells hot (clj->js new-selection) true)
+
     (.addHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))
-    #_(.selectCells hot (clj->js new-selection) true)))
+    (.addHook hot "afterSelectionEnd" (:hot/after-selection-end hot/real-hot-hooks))
+    (.addHook hot "afterColumnSort" (:hot/after-column-sort hot/real-hot-hooks))))
 
 (rf/reg-fx :hot/add-row add-row)
 
@@ -126,14 +131,13 @@
        :db (-> db
                ;; Update staged data with the new row.
                (update-in [:table-panel :physical-data :staged-changes] assoc new-row-id new-row)
-               (update-in [:table-panel :physical-data :staged-row-order-for-new-rows] conj new-row-id)
-               (assoc-in [:table-panel :visual-state :row-order] physical-row-order)
+               (update-in [:table-panel :physical-data :staged-row-order-for-new-rows] conj new-row-id))})))
 
                ;; Jump to and select the first cell in the newly created row.
-               (assoc-in [:table-panel :selection-layers color :coords] new-selection)
-               (assoc-in [:table-panel :behavior :jump-to-selection] true))})))
+               ;;(assoc-in [:table-panel :selection-layers color :coords] new-selection)
+               ;;(assoc-in [:table-panel :behavior :jump-to-selection] true))})))
                ;; Remove any sorting the table may have had.
-               ;(update-in [:table-panel] dissoc :sort-state))})))
+               ;;(update-in [:table-panel] dissoc :sort-state))})))
 
 
 (defn update-row-numbers [rows-by-id row-number]
@@ -271,10 +275,7 @@
    (let [color (control-db/selection-color db)
          selection-layers (js->clj (.getSelected hot))
          num-rows (+ (count (db/visual-row-order db))
-                     (count (db/physical-staged-row-order-for-new-rows db)))
-
-         _ (.log js/console :------num-rows num-rows)
-         _ (.log js/console :------valid? (valid-selection? selection-layers num-rows))]
+                     (count (db/physical-staged-row-order-for-new-rows db)))]
      (if (valid-selection? selection-layers num-rows)
        (-> db
            (assoc-in [:table-panel :selection-layers color :coords] selection-layers))
@@ -346,3 +347,10 @@
         (assoc-visual-row-order hot)
         (assoc-visual-headers hot))))
 
+(rf/reg-event-db
+  :hot/after-change
+  event-interceptors
+  (fn [db [_ hot _id _changes _source]]
+    (-> db
+        (assoc-visual-row-order hot)
+        (assoc-visual-headers hot))))

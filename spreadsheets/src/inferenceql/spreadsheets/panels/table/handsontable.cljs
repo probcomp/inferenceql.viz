@@ -48,7 +48,8 @@
 
 ;; These keywords refer to events in inferenceql.spreadsheets.panels.table.events.
 (def hook-names [:hot/after-selection-end :hot/after-on-cell-mouse-down :hot/before-change
-                 :hot/after-column-sort :hot/after-filter :hot/after-column-move])
+                 :hot/after-column-sort :hot/after-filter :hot/after-column-move
+                 :hot/after-change])
 
 (def real-hot-hooks (zipmap hook-names
                             (for [h-name hook-names]
