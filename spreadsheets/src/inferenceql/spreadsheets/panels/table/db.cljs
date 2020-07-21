@@ -131,7 +131,7 @@
 
 (defn user-added-row-ids
   [db]
-  (->> (physical-rows-by-id db)
+  (->> (physical-staged-changes db)
        (vals)
        (filter (comp true? :inferenceql.viz.row/user-added-row__))
        (map :inferenceql.viz.row/id__)
