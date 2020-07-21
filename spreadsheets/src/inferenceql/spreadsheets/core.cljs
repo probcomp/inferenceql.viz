@@ -14,6 +14,7 @@
             ;; Viz Panel
             [inferenceql.spreadsheets.panels.viz.events]
             [inferenceql.spreadsheets.panels.viz.subs]
+            [inferenceql.spreadsheets.panels.viz.subs-circle]
             ;; Table Panel
             [inferenceql.spreadsheets.panels.table.events]
             [inferenceql.spreadsheets.panels.table.subs]

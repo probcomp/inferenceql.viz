@@ -13,6 +13,7 @@
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         generators      @(rf/subscribe [:viz/generators])
         pts-store @(rf/subscribe [:viz/pts-store])
+        circle-spec @(rf/subscribe [:circle/spec])
         virtual @(rf/subscribe [:table/virtual])
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
@@ -20,4 +21,5 @@
      [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
      [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
+     [viz/vega-lite circle-spec {:actions false :mode "vega"} nil nil]
      [modal/modal]]))
