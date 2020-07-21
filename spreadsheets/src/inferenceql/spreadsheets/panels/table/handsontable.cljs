@@ -55,7 +55,7 @@
                             (for [h-name hook-names]
                                (fn [& args]
                                  (this-as hot
-                                   (rf/dispatch (into [h-name hot nil] args))
+                                   (rf/dispatch-sync (into [h-name hot nil] args))
                                    true)))))
 
 (def real-hot-settings (-> default-hot-settings
