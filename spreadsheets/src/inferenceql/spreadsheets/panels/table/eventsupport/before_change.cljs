@@ -32,10 +32,26 @@
         ;; in a row. This means the user has entered "" in the cell or has deleted the cell's value.
         ;; For these cases we want to remove these values and their corresponding keys
         ;; from the map representing the row.
-        filter-pred #(or (nil? %) (= "" %))
-        pairs (for [[row-id row] merged-rows]
-                [row-id (medley/remove-vals filter-pred row)])]
-    (into {} pairs)))
+        value-to-remove? #(or (nil? %) (= "" %))
+        keys-to-remove (->> (for [[row-id row] updates]
+                              [row-id (keep (fn [[k v]] (when (value-to-remove? v) k))
+                                            row)])
+                            (into {})
+                            (medley/filter-vals seq))
+
+        _ (.log js/console :------updates updates)
+        _ (.log js/console :------keys-to-remove keys-to-remove)
+
+        ;; TODO: Is there a better way to do this?
+        merged-rows (loop [mr merged-rows [kr & krs] keys-to-remove]
+                      (if-let [[row-id keys] kr]
+                        (let [updated-mr (apply update mr row-id dissoc keys)]
+                          (recur updated-mr krs))
+                        mr))
+
+        _ (.log js/console :------merged-rows merged-rows)]
+    merged-rows))
+
 (s/fdef merge-row-updates :args (s/cat :rows ::db/rows-by-id :updates ::db/rows-by-id)
         :ret ::db/rows-by-id)
 
