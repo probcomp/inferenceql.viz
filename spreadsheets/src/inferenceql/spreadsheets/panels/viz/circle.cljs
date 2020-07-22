@@ -1,35 +1,25 @@
 (ns inferenceql.spreadsheets.panels.viz.circle)
 
-(defn tree [num-nodes]
+(defn tree [node-names]
   (let [root-id -1
         root-node {:name "root" :id root-id :alpha 0.5 :beta 0}
 
-        other-nodes-ids (map inc (range num-nodes))
-        other-nodes-locs (map #(/ % num-nodes) (range num-nodes))
+        num-other-nodes (count node-names)
 
-        other-nodes (for [[id loc] (map vector other-nodes-ids other-nodes-locs)]
-                      (let [name (str "col-" id)]
-                        {:name name :id id :parent root-id :alpha loc :beta 1 :status nil}))]
+        other-nodes-ids (map inc (range num-other-nodes))
+        other-nodes-locs (map #(/ % num-other-nodes) (range num-other-nodes))
+
+        other-nodes (for [[name id loc] (map vector node-names other-nodes-ids other-nodes-locs)]
+                      {:name name :id id :parent root-id :alpha loc :beta 1 :status nil})]
     (concat [root-node] other-nodes)))
 
-(defn dependencies [tree-nodes]
-  (let [root-id -1
-        normal-nodes (remove (comp #{root-id} :id) tree-nodes)
-        num-edges (+ 5 (rand-int 100))]
-    (for [i (range num-edges)]
-      (let [[node-1 node-2] (take 2 (shuffle normal-nodes))
-            {name-1 :name id-1 :id} node-1
-            {name-2 :name id-2 :id} node-2]
-        {:source-id id-1
-         :target-id id-2
-         :source-name name-1
-         :target-name name-2
-         :edge-present true
-         :infected nil}))))
+(defn dependencies [dependencies]
+  (for [d dependencies]
+    (assoc d :edge-present true :infected nil)))
 
 (defn spec [tree dependencies]
   {:autosize "none",
-   :title {:text "Mutual Information"}
+   :title {:text "Mutual information"}
    :config { :title { :fontSize 14}}
    :legends [],
    :width 500,

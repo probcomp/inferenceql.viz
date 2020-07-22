@@ -3,25 +3,53 @@
             [medley.core :as medley]
             [inferenceql.spreadsheets.panels.viz.circle :as circle]))
 
-(rf/reg-sub :circle/num-nodes
+(rf/reg-sub :circle/threshold
             (fn [db]
-              (get-in db [:viz-panel :circle :num-nodes] 25)))
+              (get-in db [:viz-panel :circle :threshold] 0)))
+
+(rf/reg-sub :circle/col-names
+            :<- [:table/table-rows]
+            (fn [rows]
+              ;; XXX: Likely to be changed.
+              (seq (set (map (comp keyword :column-1) rows)))))
 
 (rf/reg-sub :circle/tree
-            :<- [:circle/num-nodes]
-            (fn [num-nodes]
-              (circle/tree num-nodes)))
+            :<- [:circle/col-names]
+            (fn [col-names]
+              (circle/tree col-names)))
+
 
 (rf/reg-sub :circle/dependencies
+            :<- [:table/table-rows]
             :<- [:circle/tree]
-            (fn [tree]
-              (circle/dependencies tree)))
+            :<- [:circle/threshold]
+            (fn [[rows tree threshold]]
+              (let [tree (remove (comp #(= % -1) :id) tree) ;; Remove the root node.
+                    col-ids (zipmap (map :name tree) (map :id tree))
+
+                    mi-vals (->> rows
+                                 (map (fn [row]
+                                        (let [{:keys [column-1 column-2 mi]} row
+                                              col-set (set (map keyword [column-1 column-2]))]
+                                          {col-set mi})))
+                                 (reduce merge)
+                                 (medley/filter-vals #(>= % threshold)))
+
+                    dependencies (for [[col-set mi] mi-vals]
+                                   (let [[col-1 col-2] (seq col-set)
+                                         col-2 (or col-2 col-1)]
+                                     {:source-id (get col-ids col-1)
+                                      :target-id (get col-ids col-2)
+                                      :source-name col-1
+                                      :target-name col-2
+                                      :edge-val mi}))]
+                (circle/dependencies dependencies))))
 
 (rf/reg-sub :circle/spec
-            :<- [:circle/dependencies]
             :<- [:circle/tree]
+            :<- [:circle/dependencies]
             :<- [:table/mi]
-            (fn [[dependencies tree mi]]
+            (fn [[tree dependencies mi]]
               (when mi
                 (let [spec (clj->js
                              (circle/spec tree dependencies))]

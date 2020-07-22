@@ -108,3 +108,6 @@
            [:div.flex-box-space-filler-20]
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
            [:div.flex-box-space-filler-20]]))})))
+
+
+;;; TODO add slider component.

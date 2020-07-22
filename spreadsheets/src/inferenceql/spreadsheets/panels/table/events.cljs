@@ -32,7 +32,7 @@
  event-interceptors
  (fn [{:keys [db]} [_]]
    (let [new-db (-> db
-                    (update-in [:table-panel] dissoc :rows :headers :labels :scores)
+                    (update-in [:table-panel] dissoc :rows :headers :labels :scores :virtual :mi)
                     (assoc-in [:table-panel :selection-layers] {}))]
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))

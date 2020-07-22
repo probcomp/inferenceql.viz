@@ -87,8 +87,6 @@
         conditions {}
 
         cols (keys (get-in model [:model :vars]))
-
-
         col-pairs-to-compute (for [col-1 cols col-2 cols]
                                #{col-1 col-2})
 
