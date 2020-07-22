@@ -150,6 +150,10 @@
             (fn [db _]
               (get-in db [:table-panel :virtual])))
 
+(rf/reg-sub :table/mi
+            (fn [db _]
+              (get-in db [:table-panel :mi])))
+
 ;;; Subs related to populating tables with data.
 
 (rf/reg-sub :table/table-headers

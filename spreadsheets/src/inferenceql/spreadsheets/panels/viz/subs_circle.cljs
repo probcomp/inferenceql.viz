@@ -20,7 +20,9 @@
 (rf/reg-sub :circle/spec
             :<- [:circle/dependencies]
             :<- [:circle/tree]
-            (fn [[dependencies tree]]
-              (let [spec (clj->js
-                           (circle/spec tree dependencies))]
-                spec)))
+            :<- [:table/mi]
+            (fn [[dependencies tree mi]]
+              (when mi
+                (let [spec (clj->js
+                             (circle/spec tree dependencies))]
+                  spec))))

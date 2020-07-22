@@ -103,8 +103,8 @@
    :signals
    [{:name "tension", :value 0.33}
     {:name "radius", :value 200}
-    {:name "extent", :value 360}
-    {:name "rotate", :value 0}
+    {:name "extent", :value 180}
+    {:name "rotate", :value 270}
     {:name "textSize", :value 12}
     {:name "textOffset", :value 2}
     {:name "layout", :value "cluster"}

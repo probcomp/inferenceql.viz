@@ -14,12 +14,13 @@
  ;; `rows` and `headers` are required arguments essentially, and
  ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
  ;; to be passed in a map.
- (fn [{:keys [db]} [_ rows headers {:keys [virtual]}]]
+ (fn [{:keys [db]} [_ rows headers {:keys [virtual mi]}]]
    (let [vec-maybe #(some-> % vec) ; Casts a value to a vec if it is not nil.
          new-db (-> db
                     (assoc-in [:table-panel :rows] (vec-maybe rows))
                     (assoc-in [:table-panel :headers] (vec-maybe headers))
                     (util/assoc-or-dissoc-in [:table-panel :virtual] virtual)
+                    (util/assoc-or-dissoc-in [:table-panel :mi] mi)
 
                     ;; Clear all selections in all selection layers.
                     (assoc-in [:table-panel :selection-layers] {}))]

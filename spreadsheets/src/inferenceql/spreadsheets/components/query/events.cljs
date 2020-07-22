@@ -78,6 +78,58 @@
         {:js/console-error error-log-msg
          :js/alert alert-msg}))))
 
+(def num-mi-samples 100)
+
+(defn execute-mi-query
+  [db query _rows models]
+  (let [{:keys [model]} models
+        ;; TODO make use of conditions
+        conditions {}
+
+        cols (keys (get-in model [:model :vars]))
+
+
+        col-pairs-to-compute (for [col-1 cols col-2 cols]
+                               #{col-1 col-2})
+
+        mi-vals (->> (for [pair-set col-pairs-to-compute]
+                       (let [[col-1 col-2] (seq pair-set)
+                             col-2 (or col-2 col-1)]
+                         [pair-set (gpm/mutual-information model [col-1] [col-2] conditions num-mi-samples)]))
+                     (into {}))
+
+        rows (for [col-1 cols col-2 cols]
+               (let [mi (get mi-vals #{col-1 col-2})]
+                 {:column-1 col-1 :column-2 col-2 :mi mi}))
+
+        columns [:column-1 :column-2 :mi]]
+    {:dispatch [:table/set rows columns {:virtual false :mi true}]}))
+
+(defn execute-predictive-cols-query
+  [query rows models]
+  (let [{:keys [model]} models
+        ;; TODO make use of conditions
+        specified-col :height
+        num-cols 3
+
+        other-cols (remove #{specified-col} (keys (get-in model [:model :vars])))
+        mi-vals (for [col other-cols]
+                  (let [mi (gpm/mutual-information model [specified-col] [col] {} num-mi-samples)]
+                    {:col col :mi mi}))
+        col-order (->> mi-vals
+                       (sort-by :mi >)
+                       (map :col)
+                       (take num-cols)
+                       (concat [specified-col]))]
+    {:dispatch [:table/set rows col-order {:virtual false}]}))
+
+(defn predictive-cols-query?
+  [query]
+  (= query "pc"))
+(defn mi-query?
+  [query]
+  (= query "mi"))
+
 (defn ^:event-fx parse-query
   "Executes the query represented by `text` on the default dataset and model.
 
@@ -113,7 +165,15 @@
       (let [rows (->> (table-db/dataset-rows db)
                       (map #(medley/remove-vals nil? %)))
             models {:model (gpm/Multimixture model/spec)}]
-        (execute-query-locally query rows models)))))
+        (cond
+          (mi-query? query)
+          (execute-mi-query db query rows models)
+
+          (predictive-cols-query? query)
+          (execute-predictive-cols-query query rows models)
+
+          :else
+          (execute-query-locally query rows models))))))
 
 (rf/reg-event-fx :query/parse-query event-interceptors parse-query)
 
