@@ -1,5 +1,6 @@
 (ns inferenceql.spreadsheets.panels.viz.events-circle
-  (:require [re-frame.core :as rf]))
+  (:require [re-frame.core :as rf]
+            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
 
 
 (rf/reg-event-db

@@ -118,13 +118,27 @@ div {
 
 #viz-container {
   display: flex;
-  border-top: solid;
-  border-width: 1px;
-  border-color: #e7e7e7;
 }
 
 #vg-tooltip-element.vg-tooltip.custom-theme table {
   font-size: .75rem;
+}
+
+#circle-viz-header {
+  display: flex;
+}
+
+.circle-viz-title {
+  font-size: 14px;
+  font-family: sans-serif;
+  font-weight: bold;
+  color: black
+}
+
+.edge-threshold-slider {
+  font-size: 14px;
+  font-family: sans-serif;
+  font-weight: normal;
 }
 
 /* --------------- styling for handsontables --------------- */
@@ -136,6 +150,10 @@ div {
   extends into the div instead of outside of it. This way the table will cover
   this border when it appears, thereby avoiding a double border. */
   box-shadow:inset 0px 1px 0px 0px #e7e7e7;
+
+  border-bottom: solid;
+  border-width: 1px;
+  border-color: #e7e7e7;
 }
 
 .ht_master tr td {

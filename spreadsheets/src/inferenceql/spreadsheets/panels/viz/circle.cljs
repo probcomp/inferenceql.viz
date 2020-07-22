@@ -19,8 +19,6 @@
 
 (defn spec [tree dependencies]
   {:autosize "none",
-   :title {:text "Mutual information"}
-   :config { :title { :fontSize 14}}
    :legends [],
    :width 500,
    :height 500,

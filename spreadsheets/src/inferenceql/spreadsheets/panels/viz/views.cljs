@@ -110,4 +110,30 @@
            [:div.flex-box-space-filler-20]]))})))
 
 
-;;; TODO add slider component.
+(defn edge-threshold-slider [cur-val min max step]
+  [:div.edge-threshold-slider
+   [:span "edge threshold: "]
+   [:input {:type :range :name :edge-threshold
+            :min min :max max :step step
+            :value cur-val
+            :on-change (fn [e]
+                         (let [new-val (js/parseFloat (-> e .-target .-value))]
+                           (rf/dispatch [:circle/set-threshold new-val])))}]
+   [:label cur-val]])
+
+
+(defn circle-viz [spec]
+  (let [mi @(rf/subscribe [:table/mi])
+        threshold @(rf/subscribe [:circle/threshold])
+        table-data @(rf/subscribe [:table/table-rows])
+        mi-vals (map :mi table-data)]
+    (when mi
+      [:div
+       [:div#circle-viz-header
+        [:div.flex-box-space-filler-20]
+        [:div {:style {:padding "10px"}}
+         [:span.circle-viz-title "Column pairs with high mutual information"]
+         [edge-threshold-slider threshold 0 (apply max mi-vals) 0.01]]
+        [:div.flex-box-space-filler-20]]
+
+       [vega-lite spec {:actions false :mode "vega"} nil nil]])))

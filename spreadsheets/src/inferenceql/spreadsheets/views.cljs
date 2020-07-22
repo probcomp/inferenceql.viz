@@ -21,5 +21,5 @@
      [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
      [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
-     [viz/vega-lite circle-spec {:actions false :mode "vega"} nil nil]
+     [viz/circle-viz circle-spec]
      [modal/modal]]))

@@ -33,6 +33,9 @@
                                               col-set (set (map keyword [column-1 column-2]))]
                                           {col-set mi})))
                                  (reduce merge)
+                                 ;; Only allow entries between two different columns.
+                                 (medley/filter-keys #(= 2 (count %)))
+                                 ;; Only allow entries above our edge threshold.
                                  (medley/filter-vals #(>= % threshold)))
 
                     dependencies (for [[col-set mi] mi-vals]
