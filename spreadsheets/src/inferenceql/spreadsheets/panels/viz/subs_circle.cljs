@@ -54,6 +54,9 @@
             :<- [:table/mi]
             (fn [[tree dependencies mi]]
               (when mi
-                (let [spec (clj->js
-                             (circle/spec tree dependencies))]
+                (let [[extent rotate] (if (<= (count tree) 10)
+                                          [180 270] ;; Half circle viz.
+                                          [360 0]) ;; Full circle viz.
+                      spec (clj->js
+                             (circle/spec tree dependencies extent rotate))]
                   spec))))

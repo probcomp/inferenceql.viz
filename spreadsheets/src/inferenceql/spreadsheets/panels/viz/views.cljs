@@ -133,7 +133,7 @@
         [:div.flex-box-space-filler-20]
         [:div {:style {:padding "10px"}}
          [:span.circle-viz-title "Column pairs with high mutual information"]
-         [edge-threshold-slider threshold 0 (apply max mi-vals) 0.01]]
+         [edge-threshold-slider threshold 0 1.5 0.01]]
         [:div.flex-box-space-filler-20]]
 
        [vega-lite spec {:actions false :mode "vega"} nil nil]])))

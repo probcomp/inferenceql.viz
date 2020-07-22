@@ -17,7 +17,7 @@
   (for [d dependencies]
     (assoc d :edge-present true :infected nil)))
 
-(defn spec [tree dependencies]
+(defn spec [tree dependencies extent rotate]
   {:autosize "none",
    :legends [],
    :width 500,
@@ -91,8 +91,8 @@
    :signals
    [{:name "tension", :value 0.33}
     {:name "radius", :value 200}
-    {:name "extent", :value 180}
-    {:name "rotate", :value 270}
+    {:name "extent", :value extent}
+    {:name "rotate", :value rotate}
     {:name "textSize", :value 12}
     {:name "textOffset", :value 2}
     {:name "layout", :value "cluster"}
