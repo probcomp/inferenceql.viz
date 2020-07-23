@@ -7,10 +7,18 @@
         num-other-nodes (count node-names)
 
         other-nodes-ids (map inc (range num-other-nodes))
-        other-nodes-locs (map #(/ % num-other-nodes) (range num-other-nodes))
+        other-nodes-locs (if (> num-other-nodes 10)
+                             (map #(* (/ 1 num-other-nodes)
+                                      (- % 0.5))
+                                  other-nodes-ids)
+                             (map #(* (/ 1 (dec num-other-nodes))
+                                      (- % 1))
+                                  other-nodes-ids))
+
 
         other-nodes (for [[name id loc] (map vector node-names other-nodes-ids other-nodes-locs)]
                       {:name name :id id :parent root-id :alpha loc :beta 1 :status nil})]
+
     (concat [root-node] other-nodes)))
 
 (defn dependencies [dependencies]
@@ -20,8 +28,8 @@
 (defn spec [tree dependencies extent rotate]
   {:autosize "none",
    :legends [],
-   :width 500,
-   :height 500,
+   :width 700,
+   :height 700,
    :scales
    [{:name "color",
      :type "ordinal",

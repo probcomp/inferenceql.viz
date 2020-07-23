@@ -79,7 +79,7 @@
         {:js/console-error error-log-msg
          :js/alert alert-msg}))))
 
-(def num-mi-samples 100)
+(def num-mi-samples 1)
 
 (defn execute-mi-query
   [db query _rows models]

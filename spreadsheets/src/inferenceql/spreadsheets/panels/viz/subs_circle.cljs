@@ -59,4 +59,5 @@
                                           [360 0]) ;; Full circle viz.
                       spec (clj->js
                              (circle/spec tree dependencies extent rotate))]
+                  (.log js/console :spec--- spec)
                   spec))))
