@@ -1,6 +1,7 @@
 (ns inferenceql.spreadsheets.panels.table.subs
   (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]
+            [clojure.edn :as edn]
             [re-frame.core :as rf]
             [medley.core :as medley]
             [inferenceql.spreadsheets.panels.table.renderers :as rends]
@@ -153,6 +154,27 @@
 (rf/reg-sub :table/mi
             (fn [db _]
               (get-in db [:table-panel :mi])))
+
+(rf/reg-sub :table/mi-range
+            :<- [:table/mi]
+            :<- [:table/table-rows]
+            (fn [[mi table-rows]]
+              (when mi
+                (let [mi-vals (map :mi table-rows)
+                      truncate-2-dec (fn [num] (->> num
+                                                    (str)
+                                                    (re-matches #"^(-?\d+(?:\.\d{0,2})?)\d*")
+                                                    (second)
+                                                    (edn/read-string)))
+
+                      min-mi (truncate-2-dec (apply min mi-vals))
+                      max-mi (-> (truncate-2-dec (apply max mi-vals))
+                                 (+ 0.01)
+                                 ;; The following steps are to deal with rounding error
+                                 ;; when adding 0.01.
+                                 (.toFixed 2)
+                                 (edn/read-string))]
+                  [min-mi max-mi]))))
 
 ;;; Subs related to populating tables with data.
 

@@ -124,16 +124,15 @@
 
 (defn circle-viz [spec]
   (let [mi @(rf/subscribe [:table/mi])
-        threshold @(rf/subscribe [:circle/threshold])
-        table-data @(rf/subscribe [:table/table-rows])
-        mi-vals (map :mi table-data)]
+        [min-mi max-mi] @(rf/subscribe [:table/mi-range])
+        threshold @(rf/subscribe [:circle/threshold])]
     (when mi
       [:div
        [:div#circle-viz-header
         [:div.flex-box-space-filler-20]
         [:div {:style {:padding "10px"}}
          [:span.circle-viz-title "Column pairs with high mutual information"]
-         [edge-threshold-slider threshold (apply min mi-vals) (apply max mi-vals) 0.01]]
+         [edge-threshold-slider threshold min-mi max-mi 0.01]]
         [:div.flex-box-space-filler-20]]
 
        [vega-lite spec {:actions false :mode "vega"} nil nil]])))
