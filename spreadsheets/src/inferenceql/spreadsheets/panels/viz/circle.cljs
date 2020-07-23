@@ -40,10 +40,13 @@
    [{:type "text",
      :from {:data "leaves"},
      :encode
-     {:enter {:text {:field "name"}, :baseline {:value "middle"}},
+     {:enter {:text {:field "name"},
+              :baseline {:value "middle"}},
+
       :update
       {:x {:field "x"},
        :y {:field "y"},
+       :limit {:value 120}
        :dx {:signal "textOffset * (datum.leftside ? -1 : 1)"},
        :angle
        {:signal "datum.leftside ? datum.angle - 180 : datum.angle"},
