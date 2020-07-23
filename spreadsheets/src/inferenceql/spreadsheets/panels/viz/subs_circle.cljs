@@ -5,7 +5,7 @@
 
 (rf/reg-sub :circle/threshold
             (fn [db]
-              (get-in db [:viz-panel :circle :threshold] 0)))
+              (get-in db [:viz-panel :circle :threshold] 0.20)))
 
 (rf/reg-sub :circle/col-names
             :<- [:table/table-rows]

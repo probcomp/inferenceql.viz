@@ -12,7 +12,8 @@
             [ajax.core]
             [ajax.edn]
             [goog.string :refer [format]]
-            [instaparse.core :as insta]))
+            [instaparse.core :as insta]
+            [clojure.edn :as edn]))
 
 (defn errors-for-iql-query
   "Produces errors strings given a `error-map` from inferenceql.query.
@@ -82,51 +83,74 @@
 
 (defn execute-mi-query
   [db query _rows models]
-  (let [{:keys [model]} models
-        ;; TODO make use of conditions
-        conditions {}
+  (let [conditions
+        (condp re-matches query
+          #"(?i)MUTUAL INFO OF \* WITH \* GIVEN ([A-Za-z][A-Za-z0-9_-]*)=(?:(?:\"(.+)\")|(.+)), ([A-Za-z][A-Za-z0-9_-]*)=(?:(?:\"(.+)\")|(.+));?" :>>
+          (fn [[_ col-1 val-1-quot val-1 col-2 val-2-quot val-2]]
+            {(keyword col-1) (or val-1-quot (edn/read-string val-1))
+             (keyword col-2) (or val-2-quot (edn/read-string val-2))})
 
-        cols (keys (get-in model [:model :vars]))
-        col-pairs-to-compute (for [col-1 cols col-2 cols]
-                               #{col-1 col-2})
+          #"(?i)MUTUAL INFO OF \* WITH \* GIVEN ([A-Za-z][A-Za-z0-9_-]*)=(?:(?:\"(.+)\")|(.+));?" :>>
+          (fn [[_ col-1 val-1-quot val-1]]
+            {(keyword col-1) (or val-1-quot (edn/read-string val-1))})
 
-        mi-vals (->> (for [pair-set col-pairs-to-compute]
-                       (let [[col-1 col-2] (seq pair-set)
-                             col-2 (or col-2 col-1)]
-                         [pair-set (gpm/mutual-information model [col-1] [col-2] conditions num-mi-samples)]))
-                     (into {}))
+          #"(?i)MUTUAL INFO OF \* WITH \*;?" :>>
+          (fn [_]
+            {})
 
-        rows (for [col-1 cols col-2 cols]
-               (let [mi (get mi-vals #{col-1 col-2})]
-                 {:column-1 col-1 :column-2 col-2 :mi mi}))
+          :else
+          nil)]
 
-        columns [:column-1 :column-2 :mi]]
-    {:dispatch [:table/set rows columns {:virtual false :mi true}]}))
+    (if (nil? conditions)
+      {:js/alert "There was an error parsing you query.\nPlease check you query."}
+      (let [{:keys [model]} models
+            _ (.log js/console :conditions----- conditions)
+
+            cols (keys (get-in model [:model :vars]))
+            col-pairs-to-compute (for [col-1 cols col-2 cols]
+                                   #{col-1 col-2})
+
+            mi-vals (->> (for [pair-set col-pairs-to-compute]
+                           (let [[col-1 col-2] (seq pair-set)
+                                 col-2 (or col-2 col-1)]
+                             [pair-set (gpm/mutual-information model [col-1] [col-2] conditions num-mi-samples)]))
+                         (into {}))
+
+            rows (for [col-1 cols col-2 cols]
+                   (let [mi (get mi-vals #{col-1 col-2})]
+                     {:column-1 col-1 :column-2 col-2 :mi mi}))
+
+            columns [:column-1 :column-2 :mi]]
+        {:dispatch [:table/set rows columns {:virtual false :mi true}]}))))
 
 (defn execute-predictive-cols-query
   [query rows models]
   (let [{:keys [model]} models
-        ;; TODO make use of conditions
-        specified-col :height
-        num-cols 3
+        matches (re-matches #"(?i)SELECT \(([0-9]+) PREDICTIVE COLUMNS FOR ([A-Za-z][A-Za-z0-9_-]*) UNDER model\).*" query)
+        [_whole-match num-cols specified-col] matches]
 
-        other-cols (remove #{specified-col} (keys (get-in model [:model :vars])))
-        mi-vals (for [col other-cols]
-                  (let [mi (gpm/mutual-information model [specified-col] [col] {} num-mi-samples)]
-                    {:col col :mi mi}))
-        col-order (->> mi-vals
-                       (sort-by :mi >)
-                       (map :col)
-                       (take num-cols)
-                       (concat [specified-col]))]
-    {:dispatch [:table/set rows col-order {:virtual false}]}))
+    (if (not (and num-cols specified-col))
+      {:js/alert "There was an error parsing you query.\nPlease check you query."}
+
+      (let [specified-col (keyword specified-col)
+            num-cols (edn/read-string num-cols)
+            other-cols (remove #{specified-col} (keys (get-in model [:model :vars])))
+            mi-vals (for [col other-cols]
+                      (let [mi (gpm/mutual-information model [specified-col] [col] {} num-mi-samples)]
+                        {:col col :mi mi}))
+            col-order (->> mi-vals
+                           (sort-by :mi >)
+                           (map :col)
+                           (take (dec num-cols))
+                           (concat [specified-col]))]
+        {:dispatch [:table/set rows col-order {:virtual false}]}))))
 
 (defn predictive-cols-query?
   [query]
-  (= query "pc"))
+  (some? (re-matches #"(?i).*PREDICTIVE COLUMNS.*" query)))
 (defn mi-query?
   [query]
-  (= query "mi"))
+  (some? (re-matches #"(?i)MUTUAL INFO OF(.*)" query)))
 
 (defn ^:event-fx parse-query
   "Executes the query represented by `text` on the default dataset and model.
