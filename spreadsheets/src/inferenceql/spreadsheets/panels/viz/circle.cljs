@@ -28,7 +28,7 @@
 (defn spec [tree dependencies extent rotate]
   {:legends [],
    :width 700,
-   :height 600,
+   :height 500,
    :padding 10,
 
    :scales [{:name "color",
