@@ -26,27 +26,27 @@
     (assoc d :edge-present true :infected nil)))
 
 (defn spec [tree dependencies extent rotate]
-  {:autosize "none",
-   :legends [],
+  {:legends [],
    :width 700,
    :height 600,
-   :scales
-   [{:name "color",
-     :type "ordinal",
-     :domain ["depends on" "imported by"],
-     :range [{:signal "colorIn"} {:signal "colorOut"}]}],
-   :padding 25,
+   :padding 10,
+
+   :scales [{:name "color",
+             :type "ordinal",
+             :domain ["depends on" "imported by"],
+             :range [{:signal "colorIn"} {:signal "colorOut"}]}],
+
    :marks
    [{:type "text",
+     :interactive true
      :from {:data "leaves"},
      :encode
      {:enter {:text {:field "name"},
               :baseline {:value "middle"}},
-
       :update
       {:x {:field "x"},
        :y {:field "y"},
-       :limit {:value 120}
+       :limit {:value 140}
        :dx {:signal "textOffset * (datum.leftside ? -1 : 1)"},
        :angle
        {:signal "datum.leftside ? datum.angle - 180 : datum.angle"},
@@ -69,13 +69,12 @@
         {:test "datum.status == 'source'",
          :value "red"}
         {:value "black"}]}}}
+
     {:type "group",
-     :from
-     {:facet {:name "path", :data "dependencies", :field "treepath"}},
-     :signals
-     [{:name "edgeClicked",
-       :push "outer",
-       :on [{:events "line:click", :update "parent"}]}],
+     :from {:facet {:name "path", :data "dependencies", :field "treepath"}},
+     :signals [{:name "edgeClicked",
+                :push "outer",
+                :on [{:events "line:click", :update "parent"}]}],
      :marks
      [{:type "line",
        :interactive true,
@@ -85,20 +84,22 @@
         :update
         {:stroke
          [{:test
-           "parent['source-id'] === activeSource && parent['target-id'] === activeTarget",
+           "parent['source-id'] === activeSource || parent['target-id'] === activeTarget",
            :signal "colorOut"}
           {:test "parent['infected']",
            :value "red"}
           {:value "steelblue"},]
          :strokeOpacity
          [{:test
-           "parent['source-id'] === activeSource && parent['target-id'] === activeTarget",
-           :value 1}
+           "parent['source-id'] === activeSource || parent['target-id'] === activeTarget",
+           :value 0.5}
           {:value 0.2}],
          :tension {:signal "tension"},
          :x {:field "x"},
          :y {:field "y"}}}}]}],
+
    :$schema "https://vega.github.io/schema/vega/v5.json",
+
    :signals
    [{:name "tension", :value 0.33}
     {:name "radius", :value 200}
@@ -119,14 +120,15 @@
     {:name "activeSource",
      :value nil,
      :update
-     "if( isObject(edgeClicked), edgeClicked['source-id'], null)"}
+     "active"}
     {:name "activeTarget",
      :value nil,
      :update
-     "if( isObject(edgeClicked), edgeClicked['target-id'], null)"}
+     "active"}
     {:name "edgeClicked"}
     {:name "edgeThreshold"}
     {:name "confidenceThreshold"}],
+
    :data
    [{:name "tree",
      :values tree
@@ -150,9 +152,11 @@
        :expr
        "originY + radius * datum.beta * sin(PI * datum.angle / 180)",
        :as "y"}]}
+
     {:name "leaves",
      :source "tree",
      :transform [{:type "filter", :expr "!datum.children"}]}
+
     {:name "dependencies",
      :values dependencies
      :transform
@@ -160,9 +164,10 @@
        :expr "treePath('tree', datum['source-id'], datum['target-id'])",
        :as "treepath",
        :initonly true}]}
+
     {:name "selected",
      :source "dependencies",
      :transform
      [{:type "filter",
        :expr
-       "datum['source-id'] === activeSource && datum['target-id'] === activeTarget"}]}]})
+       "datum['source-id'] === activeSource || datum['target-id'] === activeTarget"}]}]})
