@@ -194,12 +194,6 @@
             (assoc-in [:table-panel :selection-layers color :coords] [[(dec r1) 0 (dec r1) 0]]))
         db))))
 
-(rf/reg-event-db
-  :table/jump-to-selection-done
-  event-interceptors
-  (fn [db [_]]
-    (assoc-in db [:table-panel :behavior :jump-to-selection] false)))
-
 ;;; Events that correspond to hooks in the Handsontable API
 
 (rf/reg-event-db

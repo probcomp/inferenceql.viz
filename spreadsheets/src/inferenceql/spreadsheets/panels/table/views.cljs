@@ -75,15 +75,12 @@
 
                  {new-settings :settings
                   new-selections-coords :selections-coords
-                  new-sort-state :sort-state
-                  new-behaviour :behavior} new-props
+                  new-sort-state :sort-state} new-props
 
                  changed-settings (into {} (filter (fn [[setting-key new-setting-value]]
                                                      (let [old-setting-value (get old-settings setting-key)]
                                                        (not= new-setting-value old-setting-value)))
                                                    new-settings))
-
-                 {:keys [jump-to-selection] :or {jump-to-selection false}} new-behaviour
 
                  {data-changed :data col-headers-changed :colHeaders} changed-settings
                  {new-data :data new-col-headers :colHeaders} new-settings]
@@ -120,7 +117,7 @@
                  ;; selection state from props.
                  (when dataset-size-changed
                    (when-let [coords (clj->js new-selections-coords)]
-                     (.selectCells @hot-instance coords jump-to-selection)))))
+                     (.selectCells @hot-instance coords false)))))
 
 
              ;;; This next piece of code updates the selection state in handsontable depending on
@@ -166,7 +163,7 @@
              (when (and (not= new-selections-coords (js->clj (.getSelected @hot-instance)))
                         (not= new-selections-coords old-selections-coords))
                (if-let [coords (clj->js new-selections-coords)]
-                 (.selectCells @hot-instance coords jump-to-selection)
+                 (.selectCells @hot-instance coords false)
                  ;; When coords is nil it means nothing should be selected in the table.
                  (.deselectCell @hot-instance)))
 
@@ -175,10 +172,8 @@
                                                         :keywordize-keys true))
                           (not= new-sort-state old-sort-state))
                  (when-let [config (clj->js new-sort-state)]
-                   (.sort sorting-plugin config))))
+                   (.sort sorting-plugin config)))))))
 
-             (when jump-to-selection
-               (rf/dispatch [:table/jump-to-selection-done])))))
        :component-will-unmount
        (fn [this]
          (when-let [hot @hot-instance]
