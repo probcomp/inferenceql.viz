@@ -207,8 +207,11 @@
                    (contains? user-added-row-ids row-id))
         {} ;; Do nothing.
         (let [hot (get-in db [:table-panel :hot-instance])
+              ;; Update the selection to the first cell in the row before the deleted row.
               previous-row-selection [[(dec r1) 0 (dec r1) 0]]
 
+
+              ;; Remove the row-id from the row-order for new-rows.
               row-order-for-new-rows-updated (->> (get-in db [:table-panel :physical-data :row-order-for-new-rows])
                                                   (remove #{row-id})
                                                   (vec))
@@ -219,6 +222,7 @@
                                      ;; Update row numbers for subsequent rows.
                                      (update-row-numbers row-number row-order-for-new-rows-updated))
 
+              ;; Update visual-state row-order to no longer have the new row.
               ;; Using .lastIndexOf to search for #{row-id} from the back of vector. This will
               ;; improve performance in most instances-when the table is not sorted.
               visual-row-order-updated (let [rem-index (.lastIndexOf visual-row-order row-id)]
@@ -235,10 +239,8 @@
                    (assoc-in [:table-panel :physical-data :rows-by-id-with-changes] rows-by-id-updated)
                    (assoc-in [:table-panel :physical-data :row-order-for-new-rows] row-order-for-new-rows-updated)
 
-                   ;; Sets the table visual state to no longer have the new row.
                    (assoc-in [:table-panel :visual-state :row-order] visual-row-order-updated)
 
-                   ;; Update the selection to the first cell in the row before the deleted row.
                    (assoc-in [:table-panel :selection-layers color :coords] previous-row-selection))})))))
 
 ;;; Events that correspond to hooks in the Handsontable API
