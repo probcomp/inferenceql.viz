@@ -42,8 +42,8 @@
 
 (s/def ::rows-by-id (s/map-of ::row-id ::row-with-special))
 (s/def ::row-order (s/coll-of ::row-id))
-(s/def ::staged-changes (s/map-of ::row-id ::row))
-(s/def ::staged-row-order-for-new-rows (s/coll-of ::row-id))
+(s/def ::rows-by-id-with-changes (s/map-of ::row-id ::row))
+(s/def ::row-order-for-new-rows (s/coll-of ::row-id))
 (s/def ::virtual boolean?)
 
 (s/def ::dataset (s/keys :req-un [::headers
@@ -51,10 +51,10 @@
                                   ::row-order]))
 (s/def ::physical-data (s/keys :req-un [::headers
                                         ::rows-by-id
+                                        ::rows-by-id-with-changes
                                         ::row-order
                                         ::virtual]
-                               :opt-un [::staged-changes
-                                        ::staged-row-order-for-new-rows]))
+                               :opt-un [::row-order-for-new-rows]))
 (s/def ::visual-state (s/keys :req-un [::headers
                                        ::row-order]))
 
@@ -116,24 +116,25 @@
   [db]
   (get-in db [:table-panel :physical-data :row-order] []))
 
-(defn physical-staged-changes
+(defn physical-row-by-id-with-changes
   [db]
-  (get-in db [:table-panel :physical-data :staged-changes] []))
+  (get-in db [:table-panel :physical-data :rows-by-id-with-changes] []))
 
-(defn physical-staged-row-order-for-new-rows
+(defn physical-row-order-for-new-rows
   [db]
-  (get-in db [:table-panel :physical-data :staged-row-order-for-new-rows] []))
+  (get-in db [:table-panel :physical-data :row-order-for-new-rows] []))
 
 (defn physical-row-order-all
   [db]
   (vec (concat (physical-row-order db)
-               (physical-staged-row-order-for-new-rows db))))
+               (physical-row-order-for-new-rows db))))
 
 (defn user-added-row-ids
   [db]
-  (->> (physical-staged-changes db)
+  (->> (physical-row-by-id-with-changes db)
        (vals)
-       (filter (comp true? :inferenceql.viz.row/user-added-row__))
+       (filter (fn [row] (or (true? (:inferenceql.viz.row/user-added-row__ row))
+                             (some? (:inferenceql.viz.row/label__ row)))))
        (map :inferenceql.viz.row/id__)
        (set)))
 

@@ -52,6 +52,10 @@
                     (assoc-in [:table-panel :visual-state :row-order] rows-order)
                     (assoc-in [:table-panel :visual-state :headers] (vec-maybe headers))
 
+                    ;; We don't have any changes to the data yet, so :rows-by-id-with-changes
+                    ;; should just be the same as :rows-by-id.
+                    (assoc-in [:table-panel :physical-data :rows-by-id-with-changes] rows-maps)
+
                     ;; Clear all selections in all selection layers.
                     (assoc-in [:table-panel :selection-layers] {}))]
      {:db new-db
@@ -112,13 +116,10 @@
   :table/add-row
   event-interceptors
   (fn [{:keys [db]} [_]]
-    (let [new-row-id (data/generate-row-id)
-          color (control-db/selection-color db)
+    (let [selection-layer-color (control-db/selection-color db)
 
+          new-row-id (data/generate-row-id)
           new-row-coord (count (db/physical-row-order-all db))
-
-          ;; Table coordinates of the first cell of the new row we are adding.
-          new-selection [[new-row-coord 0 new-row-coord 0]]
 
           new-row-num (inc new-row-coord)
           new-row {:inferenceql.viz.row/user-added-row__ true
@@ -126,19 +127,22 @@
                    :inferenceql.viz.row/row-number__ new-row-num}
 
           hot (get-in db [:table-panel :hot-instance])
-          hot-sort-state (get-in db [:table-panel :sort-state])]
-
+          hot-sort-state (get-in db [:table-panel :sort-state])
+          ;; Table coordinates of the first cell of the new row we are adding.
+          new-selection [[new-row-coord 0 new-row-coord 0]]]
       {:hot/add-row [hot new-row new-selection hot-sort-state]
        :db (-> db
-               ;; Update staged data with the new row.
-               (update-in [:table-panel :physical-data :staged-changes] assoc new-row-id new-row)
-               (update-in [:table-panel :physical-data :staged-row-order-for-new-rows] (fnil conj []) new-row-id)
+               ;; Update data with the new row.
+               (update-in [:table-panel :physical-data :rows-by-id-with-changes] assoc new-row-id new-row)
+               (update-in [:table-panel :physical-data :row-order-for-new-rows] (fnil conj []) new-row-id)
 
                ;; Sets the table visual state to be the same as the new table physical data
-               ;; (including user-added staged rows).
+               ;; (including new rows).
                (assoc-in [:table-panel :visual-state :row-order] (conj (db/physical-row-order-all db) new-row-id))
 
-               (assoc-in [:table-panel :selection-layers color :coords] new-selection)
+               ;; Set the currrent selection and sort state so they are in sync with any changes the
+               ;; :hot/add-row effect may have caused.
+               (assoc-in [:table-panel :selection-layers selection-layer-color :coords] new-selection)
                (assoc-in [:table-panel :sort-state] []))})))
 
 (defn update-row-numbers [rows-by-id row-number]
@@ -164,7 +168,7 @@
 
           user-row-ids (db/user-added-row-ids db)
 
-          staged-changes (-> (get-in db [:table-panel :physical-data :staged-changes])
+          staged-changes (-> (get-in db [:table-panel :physical-data :rows-by-id-with-changes])
                              ;; Remove any staged changes related to the row we are removing.
                              (dissoc row-id))]
 
@@ -202,11 +206,10 @@
   :hot/before-change
   event-interceptors
   (fn [db [_ hot id changes source]]
-    (let [physical-rows-by-id-all (es.before-change/merge-row-updates (db/physical-rows-by-id db)
-                                                                      (db/physical-staged-changes db))
+    (let [rows-by-id (db/physical-row-by-id-with-changes db)
           change-maps (for [[row col _prev-val new-val] changes]
                         (let [row-id (get (db/visual-row-order db) row)
-                              row-data (get physical-rows-by-id-all row-id)
+                              row-data (get rows-by-id row-id)
 
                               ;; Our special row attrs are saved as fully qualified keywords in the app-db.
                               ;; However, when they become column names in Handsontable, they are not fully qualified.
@@ -239,7 +242,7 @@
 
         (-> db
             ;; Stage the changes in the db. The Handsontable itself already has the updates.
-            (update-in [:table-panel :physical-data :staged-changes] es.before-change/merge-row-updates updates))))))
+            (update-in [:table-panel :physical-data :rows-by-id-with-changes] es.before-change/merge-row-updates updates))))))
 
 (defn valid-selection?
   "Checks if the selection in the current selection layer is valid."
