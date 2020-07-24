@@ -129,15 +129,6 @@
   (vec (concat (physical-row-order db)
                (physical-row-order-for-new-rows db))))
 
-(defn user-added-row-ids
-  [db]
-  (->> (physical-row-by-id-with-changes db)
-       (vals)
-       (filter (fn [row] (or (true? (:inferenceql.viz.row/user-added-row__ row))
-                             (some? (:inferenceql.viz.row/label__ row)))))
-       (map :inferenceql.viz.row/id__)
-       (set)))
-
 ;;; Accessor functions to :visual-data related paths.
 
 (defn visual-headers
@@ -147,4 +138,3 @@
 (defn visual-row-order
   [db]
   (get-in db [:table-panel :visual-state :row-order]))
-

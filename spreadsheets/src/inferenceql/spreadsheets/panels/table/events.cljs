@@ -86,9 +86,9 @@
           ;; Hack: This prevents a flicker in visualizations.
           (update-in [:table-panel :visual-state :headers] es.toggle-label-column/adjust-headers shift-amount)))))
 
-(defn add-row
+(defn ^:effect add-row
   [[hot row new-selection sort-state]]
-  (let [row-number (:inferenceql.viz.row/row-number__ row)
+  (let [{row-number :inferenceql.viz.row/row-number__} row
         values (for [[k v] row]
                  (let [row-index (dec row-number)]
                    [row-index k v]))]
@@ -102,7 +102,7 @@
       (let [sorting-plugin (.getPlugin hot "multiColumnSorting")]
         (.clearSort sorting-plugin)))
     ;; Adding data for the new row.
-    (.setDataAtRowProp hot (clj->js values) nil nil "add-row-event")
+    (.setDataAtRowProp hot (clj->js values) nil nil "add-row-fx")
     ;; Jump to and select the first cell in the newly created row.
     (.selectCells hot (clj->js new-selection) true)
 
@@ -145,54 +145,101 @@
                (assoc-in [:table-panel :selection-layers selection-layer-color :coords] new-selection)
                (assoc-in [:table-panel :sort-state] []))})))
 
-(defn update-row-numbers [rows-by-id row-number]
-  (medley/map-vals (fn [row]
-                     (if (> (:inferenceql.viz.row/row-number__ row)
-                            row-number)
-                       (update row :inferenceql.viz.row/row-number__ dec)
-                       row))
-                   rows-by-id))
+(defn update-row-numbers [rows-by-id row-number user-added-row-ids]
+  (let [user-rows (select-keys rows-by-id user-added-row-ids)
+        updates (medley/map-vals (fn [row]
+                                   (if (> (:inferenceql.viz.row/row-number__ row)
+                                          row-number)
+                                     (update row :inferenceql.viz.row/row-number__ dec)
+                                     row))
+                                 user-rows)]
+    (merge rows-by-id updates)))
 
-(rf/reg-event-db
+(defn ^:effect delete-row
+  [[hot row-visual-index row-number-changes new-selection]]
+  (do
+    (.removeHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))
+    (.removeHook hot "afterSelectionEnd" (:hot/after-selection-end hot/real-hot-hooks))
+
+    ;; Remove the row.
+    (.alter hot "remove_row" row-visual-index 1 "delete-row-fx")
+    ;; Update row-numbers on subsequent rows.
+    (.setDataAtRowProp hot (clj->js row-number-changes) nil nil "delete-row-fx")
+    ;; Jump to and select the first cell in the previous row.
+    (.selectCells hot (clj->js new-selection) false)
+
+    (.addHook hot "beforeChange" (:hot/before-change hot/real-hot-hooks))
+    (.addHook hot "afterSelectionEnd" (:hot/after-selection-end hot/real-hot-hooks))))
+
+(rf/reg-fx :hot/delete-row delete-row)
+
+(defn row-num-updates-for-hot
+  [rows-by-id row-num-changed visual-row-order user-added-row-ids]
+  (let [user-rows (select-keys rows-by-id user-added-row-ids)
+        ;; Mapping from row-id to table visual index.
+        visual-index (zipmap visual-row-order (range))
+        tuples (for [[row-id row] user-rows]
+                 (let [{row-num :inferenceql.viz.row/row-number__} row]
+                   (when (>= row-num row-num-changed)
+                     [(get visual-index row-id) :inferenceql.viz.row/row-number__ row-num])))]
+    (remove nil? tuples)))
+
+(rf/reg-event-fx
   :table/delete-row
   event-interceptors
-  (fn [db [_]]
+  (fn [{:keys [db]} [_]]
     (let [color (control-db/selection-color db)
-
           selections-coords (get-in db [:table-panel :selection-layers color :coords])
           [r1 _c1 r2 _c2] (first selections-coords)
 
-          row-id (get-in db [:table-panel :visual-state :row-order r1])
-          row (get-in db [:table-panel :physical-data :rows-by-id row-id])
+          visual-row-order (db/visual-row-order db)
+          row-id (get visual-row-order r1)
+          row (get-in db [:table-panel :physical-data :rows-by-id-with-changes row-id])
           row-number (get row :inferenceql.viz.row/row-number__)
 
-          user-row-ids (db/user-added-row-ids db)
-
-          staged-changes (-> (get-in db [:table-panel :physical-data :rows-by-id-with-changes])
-                             ;; Remove any staged changes related to the row we are removing.
-                             (dissoc row-id))]
+          user-added-row-ids (set (db/physical-row-order-for-new-rows db))]
 
       ;; Only remove a row when there is only one selection rectangle and
       ;; it is set on a single row. The number of columns spanned does not matter.
       ;; The selected row must also be a user-added row.
-      (if (and (= 1 (count selections-coords))
-               (= r1 r2)
-               (contains? user-row-ids row-id))
-        (-> db
-            ;; Remove the row from the dataset.
-            (update-in [:table-panel :physical-data :rows-by-id] dissoc row-id)
-            (update-in [:table-panel :physical-data :row-order] (comp vec (partial remove #{row-id})))
+      (if-not (and (= 1 (count selections-coords))
+                   (= r1 r2)
+                   (contains? user-added-row-ids row-id))
+        {} ;; Do nothing.
+        (let [hot (get-in db [:table-panel :hot-instance])
+              previous-row-selection [[(dec r1) 0 (dec r1) 0]]
 
-            ;; Update row numbers for subsequent rows.
-            (update-in [:table-panel :physical-data :rows-by-id] update-row-numbers row-number)
+              row-order-for-new-rows-updated (->> (get-in db [:table-panel :physical-data :row-order-for-new-rows])
+                                                  (remove #{row-id})
+                                                  (vec))
 
-            ;; Incorporate staged changes.
-            (update-in [:table-panel :physical-data :rows-by-id] es.before-change/merge-row-updates staged-changes)
-            (update-in [:table-panel :physical-data] dissoc :staged-changes)
+              rows-by-id-updated (-> (get-in db [:table-panel :physical-data :rows-by-id-with-changes])
+                                     ;; Remove the row
+                                     (dissoc row-id)
+                                     ;; Update row numbers for subsequent rows.
+                                     (update-row-numbers row-number row-order-for-new-rows-updated))
 
-            ;; Update the selection to the first cell in the row before the deleted row.
-            (assoc-in [:table-panel :selection-layers color :coords] [[(dec r1) 0 (dec r1) 0]]))
-        db))))
+              ;; Using .lastIndexOf to search for #{row-id} from the back of vector. This will
+              ;; improve performance in most instances-when the table is not sorted.
+              visual-row-order-updated (let [rem-index (.lastIndexOf visual-row-order row-id)]
+                                          (vec (concat (subvec visual-row-order 0 rem-index)
+                                                       (subvec visual-row-order(inc rem-index)))))
+
+              row-num-updates (row-num-updates-for-hot rows-by-id-updated row-number
+                                                       visual-row-order-updated
+                                                       row-order-for-new-rows-updated)]
+
+          #_(.log js/console :fooo visual-row-order-updated row-num-updates)
+          {:hot/delete-row [hot r1 row-num-updates previous-row-selection]
+           :db (-> db
+                   (assoc-in [:table-panel :physical-data :rows-by-id-with-changes] rows-by-id-updated)
+                   (assoc-in [:table-panel :physical-data :row-order-for-new-rows] row-order-for-new-rows-updated)
+
+                   ;; Sets the table visual state to no longer have the new row.
+                   (assoc-in [:table-panel :visual-state :row-order] visual-row-order-updated)
+
+                   ;; Update the selection to the first cell in the row before the deleted row.
+                   (assoc-in [:table-panel :selection-layers color :coords] previous-row-selection))})))))
 
 ;;; Events that correspond to hooks in the Handsontable API
 
