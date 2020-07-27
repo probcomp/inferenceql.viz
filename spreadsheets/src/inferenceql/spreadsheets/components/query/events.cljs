@@ -7,6 +7,7 @@
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.spreadsheets.config :as config]
+            [inferenceql.spreadsheets.components.query.search :as search]
             [medley.core :as medley]
             [day8.re-frame.http-fx]
             [ajax.core]
@@ -110,10 +111,16 @@
                     :on-success      [:query/post-success]
                     :on-failure      [:query/post-failure]}}
       ;; Perform query execution locally.
-      (let [rows (->> (table-db/dataset-rows db)
+      (let [rows-by-id (table-db/dataset-rows-by-id db)
+            row-order (table-db/dataset-row-order db)
+            rows (->> (map rows-by-id row-order)
                       (map #(medley/remove-vals nil? %)))
+            headers (table-db/dataset-headers db)
+
             models {:model (gpm/Multimixture model/spec)}]
-        (execute-query-locally query rows models)))))
+        (if (= (str/lower-case query) (str/lower-case search/search-by-label-query))
+          (search/perform-search-by-label rows-by-id row-order rows headers)
+          (execute-query-locally query rows models))))))
 
 (rf/reg-event-fx :query/parse-query event-interceptors parse-query)
 
