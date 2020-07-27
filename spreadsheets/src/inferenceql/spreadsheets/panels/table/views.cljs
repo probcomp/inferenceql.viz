@@ -80,15 +80,9 @@
                  changed-settings (into {} (filter (fn [[setting-key new-setting-value]]
                                                      (let [old-setting-value (get old-settings setting-key)]
                                                        (not= new-setting-value old-setting-value)))
-                                                   new-settings))
-
-                 {data-changed :data col-headers-changed :colHeaders} changed-settings
-                 {new-data :data new-col-headers :colHeaders} new-settings]
-
-
-             (when (not= old-settings new-settings)
-               (let [dataset-empty (and (empty? new-data) (empty? new-col-headers))
-                     dataset-size-changed (or data-changed col-headers-changed)]
+                                                   new-settings))]
+             (when (seq changed-settings)
+               (let [{data-changed :data col-headers-changed :colHeaders} changed-settings]
                  ;; Whenever we insert new data into the table, we sometimes deselect all cells
                  ;; before updating in order to prevent the following issues.
 
@@ -108,14 +102,14 @@
                  ;; Doing this for example when updating the labels column can lead to a race condition.
                  ;; Hence the special conditions here. See the large comment below for more info on
                  ;; this case.
-                 (when (or dataset-empty dataset-size-changed)
+                 (when (or data-changed col-headers-changed)
                    (.deselectCell @hot-instance))
 
                  (update-hot! @hot-instance changed-settings)
 
                  ;; If we cleared selections because of a dataset-size change, apply the latest
                  ;; selection state from props.
-                 (when dataset-size-changed
+                 (when (or data-changed col-headers-changed)
                    (when-let [coords (clj->js new-selections-coords)]
                      (.selectCells @hot-instance coords false)))))
 
