@@ -81,7 +81,7 @@
   (cond (probability-column? col-name)
         "quantitative"
 
-        (contains? #{hot/label-col-header geo-id-col} col-name)
+        (contains? #{geo-id-col} col-name)
         "nominal"
 
         :else

@@ -1,8 +1,9 @@
-(ns inferenceql.spreadsheets.panels.table.handsontable)
+(ns inferenceql.spreadsheets.panels.table.handsontable
+  (:require [re-frame.core :as rf]))
 
 (def label-col-header
   "Header text for the column used for labeling rows as examples."
-  "🏷")
+  "label")
 (def score-col-header
   "Header text for the column that shows scores."
   "probability")
@@ -46,8 +47,16 @@
    :hooks []})
 
 ;; These keywords refer to events in inferenceql.spreadsheets.panels.table.events.
-(def real-hot-hooks [:hot/after-selection-end :hot/after-on-cell-mouse-down :hot/before-change
-                     :hot/after-column-move :hot/after-column-sort :hot/after-filter])
+(def hook-names [:hot/after-selection-end :hot/after-on-cell-mouse-down :hot/before-change
+                 :hot/after-column-sort :hot/after-filter :hot/after-column-move])
+
+
+(def real-hot-hooks (zipmap hook-names
+                            (for [h-name hook-names]
+                               (fn [& args]
+                                 (this-as hot
+                                   (rf/dispatch-sync (into [h-name hot nil] args))
+                                   true)))))
 
 (def real-hot-settings (-> default-hot-settings
                            (assoc-in [:hooks] real-hot-hooks)
