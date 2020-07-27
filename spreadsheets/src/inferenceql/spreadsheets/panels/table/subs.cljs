@@ -170,14 +170,6 @@
             (fn [[rows rows-order]]
               (map rows rows-order)))
 
-(rf/reg-sub :table/computed-headers
-            :<- [:table/physical-headers]
-            :<- [:table/label-column-show]
-            (fn [[headers label-column-show]]
-              (when headers
-                (cond->> headers
-                  label-column-show (concat [hot/label-col-header])))))
-
 (rf/reg-sub :table/selected-row-flags
             :<- [:table/physical-rows-by-id-with-changes]
             :<- [:viz/pts-store-filter]
@@ -199,16 +191,26 @@
                                         (merge row imputed-values-in-row))
                                       imputed-values)))))
 
-(defn- column-settings [headers]
+(defn- headers [physical-headers]
+  (when physical-headers
+    (let [make-nice (fn [header]
+                      (case header
+                        :inferenceql.viz.row/label__ hot/label-col-header
+                        :inferenceql.viz.row/row-number__ "row-number"
+                        header))]
+      (map make-nice physical-headers))))
+
+(defn- column-settings [physical-headers]
   "Returns an array of objects that define settings for each column
   in the table including which attribute from the underlying map for the row
   is presented."
-  (let [settings-map (fn [attr]
-                       (if (= attr hot/label-col-header)
-                         ;; Grabs the correct data for the label column and makes it user-editable.
-                         {:data (name :inferenceql.viz.row/label__) :readOnly false}
-                         {:data attr}))]
-    (map settings-map headers)))
+  (when physical-headers
+    (let [settings-map (fn [header]
+                         (if (= header :inferenceql.viz.row/label__)
+                           ;; Makes the label column user-editable.
+                           {:data header :readOnly false}
+                           {:data header}))]
+      (map settings-map physical-headers))))
 
 ;;; Sub for getting the instance of Handsontable used within the Reagent component
 ;;; representing the table.
@@ -287,21 +289,31 @@
             :<- [:table/selected-row-flags]
             cells)
 
+(rf/reg-sub :table/hidden-columns
+            :<- [:table/label-column-show]
+            (fn [label-column-show]
+              (if label-column-show
+                {}
+                {:columns [0]
+                 :indicators true})))
+
 (defn ^:sub real-hot-props
-  [[headers rows context-menu cells selections-coords sort-state]]
+  [[physical-headers rows context-menu cells hidden-columns selections-coords sort-state]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
-      (assoc-in [:settings :colHeaders] headers)
-      (assoc-in [:settings :columns] (column-settings headers))
+      (assoc-in [:settings :colHeaders] (headers physical-headers))
+      (assoc-in [:settings :columns] (column-settings physical-headers))
       (assoc-in [:settings :cells] cells)
+      (assoc-in [:settings :hiddenColumns] hidden-columns)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)
       (assoc-in [:sort-state] sort-state)))
 (rf/reg-sub :table/real-hot-props
-            :<- [:table/computed-headers]
+            :<- [:table/physical-headers]
             :<- [:table/computed-rows]
             :<- [:table/context-menu]
             :<- [:table/cells]
+            :<- [:table/hidden-columns]
             :<- [:table/selections-coords]
             :<- [:table/sort-state]
             real-hot-props)
@@ -310,7 +322,7 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/computed-headers])})
+    :col-names (rf/subscribe [:table/physical-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -362,7 +374,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/computed-headers])})
+    :computed-headers (rf/subscribe [:table/physical-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode

@@ -107,8 +107,6 @@
 
                  (update-hot! @hot-instance changed-settings)
 
-                 ;; If we cleared selections because of a dataset-size change, apply the latest
-                 ;; selection state from props.
                  (when (or data-changed col-headers-changed)
                    (when-let [coords (clj->js new-selections-coords)]
                      (.selectCells @hot-instance coords false)))))

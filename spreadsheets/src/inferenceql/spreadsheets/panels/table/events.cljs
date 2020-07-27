@@ -8,7 +8,6 @@
             [inferenceql.spreadsheets.util :as util]
             [inferenceql.spreadsheets.data :as data]
             [inferenceql.spreadsheets.panels.table.eventsupport.before-change :as es.before-change]
-            [inferenceql.spreadsheets.panels.table.eventsupport.toggle-label-column :as es.toggle-label-column]
             [clojure.walk]))
 
 (rf/reg-event-db
@@ -35,22 +34,25 @@
    (let [rows-order (mapv :inferenceql.viz.row/id__ rows)
          rows-maps (zipmap rows-order rows)
 
-         ;; Casts a value to a vec if it is not nil.
-         vec-maybe #(some-> % vec)
-         ;; Remove special-columns from headers
-         headers (remove #{:inferenceql.viz.row/user-added-row__
-                           :inferenceql.viz.row/id__
-                           :inferenceql.viz.row/label__}
-                         headers)
+         headers (some->> headers
+                          ;; Remove special-columns from headers.
+                          (remove #{:inferenceql.viz.row/user-added-row__
+                                    :inferenceql.viz.row/id__
+                                    :inferenceql.viz.row/label__
+                                    :inferenceql.viz.row/row-number__})
+                          ;; Place the label col and row-number col at the start of the table.
+                          (concat [:inferenceql.viz.row/label__
+                                   :inferenceql.viz.row/row-number__])
+                          (vec))
          new-db (-> db
                     (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
                     (assoc-in [:table-panel :physical-data :row-order] rows-order)
-                    (assoc-in [:table-panel :physical-data :headers] (vec-maybe headers))
+                    (assoc-in [:table-panel :physical-data :headers] headers)
                     (util/assoc-or-dissoc-in [:table-panel :physical-data :virtual] virtual)
 
                     ;; Sets the table visual state to be the same as the new table physical data.
                     (assoc-in [:table-panel :visual-state :row-order] rows-order)
-                    (assoc-in [:table-panel :visual-state :headers] (vec-maybe headers))
+                    (assoc-in [:table-panel :visual-state :headers] headers)
 
                     ;; We don't have any changes to the data yet, so :rows-by-id-with-changes
                     ;; should just be the same as :rows-by-id.
@@ -76,15 +78,9 @@
   :table/toggle-label-column
   event-interceptors
   (fn [db [_]]
-    (let [new-state (not (get-in db [:table-panel :label-column-show]))
-          shift-amount (if new-state 1 -1)]
+    (let [new-state (not (get-in db [:table-panel :label-column-show]))]
       (-> db
-          (assoc-in [:table-panel :label-column-show] new-state)
-          ;; :sort-state is not always present, hence the special update function.
-          (medley/update-existing-in [:table-panel :sort-state] es.toggle-label-column/shift-sort shift-amount)
-          (update-in [:table-panel :selection-layers] es.toggle-label-column/shift-selections shift-amount)
-          ;; Hack: This prevents a flicker in visualizations.
-          (update-in [:table-panel :visual-state :headers] es.toggle-label-column/adjust-headers shift-amount)))))
+          (assoc-in [:table-panel :label-column-show] new-state)))))
 
 (defn ^:effect add-row
   [[hot row new-selection sort-state]]
@@ -375,22 +371,19 @@
  (fn [db [_ hot _id _current-sort-config destination-sort-config]]
    (-> db
        (assoc-in [:table-panel :sort-state] (js->clj destination-sort-config :keywordize-keys true))
-       (assoc-visual-row-order hot)
-       (assoc-visual-headers hot))))
+       (assoc-visual-row-order hot))))
 
 (rf/reg-event-db
   :hot/after-filter
   event-interceptors
   (fn [db [_ hot _id _conditions-stack]]
     (-> db
-        (assoc-visual-row-order hot)
-        (assoc-visual-headers hot))))
+        (assoc-visual-row-order hot))))
 
 (rf/reg-event-db
   :hot/after-column-move
   event-interceptors
   (fn [db [_ hot _id _columns _target]]
     (-> db
-        (assoc-visual-row-order hot)
         (assoc-visual-headers hot))))
 
