@@ -297,14 +297,23 @@
                 {:columns [0]
                  :indicators true})))
 
+(defn ^:sub row-headers [hot]
+  (fn [row-physical-index]
+    (.getDataAtRowProp hot row-physical-index (name :inferenceql.viz.row/row-number__))))
+
+(rf/reg-sub :table/row-headers
+            :<- [:table/hot-instance]
+            row-headers)
+
 (defn ^:sub real-hot-props
-  [[physical-headers rows context-menu cells hidden-columns selections-coords sort-state]]
+  [[physical-headers rows context-menu cells hidden-columns row-headers selections-coords sort-state]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] (headers physical-headers))
       (assoc-in [:settings :columns] (column-settings physical-headers))
       (assoc-in [:settings :cells] cells)
       (assoc-in [:settings :hiddenColumns] hidden-columns)
+      (assoc-in [:settings :rowHeaders] row-headers)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)
       (assoc-in [:sort-state] sort-state)))
@@ -314,6 +323,7 @@
             :<- [:table/context-menu]
             :<- [:table/cells]
             :<- [:table/hidden-columns]
+            :<- [:table/row-headers]
             :<- [:table/selections-coords]
             :<- [:table/sort-state]
             real-hot-props)
