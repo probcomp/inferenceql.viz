@@ -205,6 +205,15 @@
 (rf/reg-sub :table/visual-rows
             (fn [db _]
               (get-in db [:table-panel :visual-rows])))
+;;; Subs related showing/hiding certain columns or table controls.
+
+(rf/reg-sub :table/show-table-controls
+            :<- [:table/physical-row-order]
+            ;; Returns value for css visibility property.
+            (fn [rows-order]
+              (if (seq rows-order)
+                "visible"
+                "hidden")))
 
 ;;; Subs related to settings and overall state of tables.
 

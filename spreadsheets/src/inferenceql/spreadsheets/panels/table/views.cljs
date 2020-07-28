@@ -5,6 +5,26 @@
             [reagent.core :as reagent]
             [reagent.dom :as dom]))
 
+(defn controls
+  "Controls for a handsontable instance."
+  [show-table-controls]
+  [:div#table-controls {:style {:visibility show-table-controls}}
+   [:button.table-button.pure-button
+    {:on-click (fn [e]
+                 (rf/dispatch [:table/toggle-label-column])
+                 (.blur (.-target e)))} ; Clear focus off of button after click.
+    "labels"]
+   [:button.table-button.pure-button
+    {:on-click (fn [e]
+                 (rf/dispatch [:table/add-row])
+                 (.blur (.-target e)))} ; Clear focus off of button after click.
+    "+row"]
+   [:button.table-button.pure-button
+    {:on-click (fn [e]
+                 (rf/dispatch [:table/delete-row])
+                 (.blur (.-target e)))} ; Clear focus off of button after click.
+    "-row"]])
+
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
   [hot-instance new-settings]

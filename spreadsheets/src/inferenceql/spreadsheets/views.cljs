@@ -14,9 +14,11 @@
         generators      @(rf/subscribe [:viz/generators])
         pts-store @(rf/subscribe [:viz/pts-store])
         virtual @(rf/subscribe [:table/virtual])
-        highlight-class @(rf/subscribe [:table/highlight-class])]
+        highlight-class @(rf/subscribe [:table/highlight-class])
+        show-table-controls @(rf/subscribe [:table/show-table-controls])]
     [:div
      [control/panel]
+     [table/controls show-table-controls]
      [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
      [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
