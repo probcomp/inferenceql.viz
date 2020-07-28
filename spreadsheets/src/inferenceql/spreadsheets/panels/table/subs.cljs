@@ -299,7 +299,8 @@
 
 (defn ^:sub row-headers [hot]
   (fn [row-physical-index]
-    (.getDataAtRowProp hot row-physical-index (name :inferenceql.viz.row/row-number__))))
+    (let [row-visual-index (.toVisualRow hot row-physical-index)]
+      (.getDataAtRowProp hot row-visual-index (name :inferenceql.viz.row/row-number__)))))
 
 (rf/reg-sub :table/row-headers
             :<- [:table/hot-instance]
