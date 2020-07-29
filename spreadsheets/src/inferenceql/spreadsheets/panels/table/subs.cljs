@@ -107,14 +107,19 @@
               (let [layers (get-in db [:table-panel :selection-layers])]
                 (medley/map-vals #(select-keys % [:coords]) layers))))
 
+
+(defn ^:sub selection-layers
+  "Merges in data pertaining to the selection-layer-coords"
+  [[selection-layer-coords visual-headers visual-display-rows]]
+  (medley/map-vals #(add-selection-data % visual-headers visual-display-rows)
+                   selection-layer-coords))
+(s/fdef selection-layers :ret ::selection-layers)
+
 (rf/reg-sub :table/selection-layers
             :<- [:table/selection-layer-coords]
             :<- [:table/visual-headers]
-            :<- [:table/visual-rows]
-            (fn [[selection-layers-raw visual-headers visual-rows]]
-              {:post [(s/valid? ::selection-layers %)]}
-              (medley/map-vals #(add-selection-data % visual-headers visual-rows)
-                               selection-layers-raw)))
+            :<- [:table/visual-display-rows]
+            selection-layers)
 
 (rf/reg-sub :table/selection-layers-list
             :<- [:table/selection-layers]
@@ -152,14 +157,23 @@
 
 ;;; Subs related to populating tables with data.
 
-(rf/reg-sub :table/table-headers
+(rf/reg-sub :table/physical-headers
             (fn [db _]
-              (db/table-headers db)))
+              (db/physical-headers db)))
 
-(defn table-rows
-  [db _]
-  (db/table-rows db))
-(rf/reg-sub :table/table-rows table-rows)
+(rf/reg-sub :table/physical-rows-by-id
+            (fn [db _]
+              (db/physical-rows-by-id db)))
+
+(rf/reg-sub :table/physical-row-order
+            (fn [db _]
+              (db/physical-row-order db)))
+
+(rf/reg-sub :table/physical-display-rows
+            :<- [:table/physical-rows-by-id]
+            :<- [:table/physical-row-order]
+            (fn [[rows rows-order]]
+              (map rows rows-order)))
 
 (defn- display-headers
   "Returns an sequence of strings for column name headers to display.
@@ -171,50 +185,83 @@
   ;; table like we want.
   (when headers
     (let [make-presentable (fn [header]
-                             header)] ;; no-op stub for now.
+                             (case header
+                               :iql.viz.row/label__ hot/label-col-header
+                               :iql.viz.row/row-number__ "row-number"
+                               header))]
       (map make-presentable headers))))
 
-(defn- column-settings [headers]
-  "Returns an array of objects that define settings for each column
-  in the table including which attribute from the underlying map for the row
-  is presented."
-  (let [settings-map (fn [attr]
-                       (if (= attr hot/label-col-header)
-                         {:data attr :readOnly false} ; Make the score column user-editable.
-                         {:data attr}))]
-    (map settings-map headers)))
+(defn- column-settings
+  "Returns an sequence of objects that define settings for each column in the table.
+  This includes which attribute from the underlying map for the row
+  is presented. To be used as the :columns setting for handsontable."
+  [headers]
+  (when headers
+    (let [settings-map (fn [header]
+                         (if (= header :iql.viz.row/label__)
+                           ;; Makes the label column user-editable.
+                           {:data header :readOnly false}
+                           {:data header}))]
+      (map settings-map headers))))
 
 ;;; Subs related to visual state of the table
+;;; (including table data with changes incorporated).
 
 (rf/reg-sub :table/visual-headers
             (fn [db _]
-              (get-in db [:table-panel :visual-headers])))
+              (db/visual-headers db)))
 
-(rf/reg-sub :table/visual-rows
+(rf/reg-sub :table/visual-row-order
             (fn [db _]
-              (get-in db [:table-panel :visual-rows])))
+              (db/visual-row-order db)))
+
+(rf/reg-sub :table/visual-display-rows
+            :<- [:table/visual-row-order]
+            :<- [:table/physical-rows-by-id-with-changes]
+            (fn [[rows-order rows-by-id]]
+              (mapv rows-by-id rows-order)))
+
+(rf/reg-sub :table/physical-rows-by-id-with-changes
+            (fn [db _]
+              (db/physical-rows-by-id-with-changes db)))
 
 (rf/reg-sub :table/selected-row-flags
-            :<- [:table/table-rows]
+            :<- [:table/physical-rows-by-id-with-changes]
             :<- [:viz/pts-store-filter]
-            (fn [[rows pts-store-filter]]
+            (fn [[rows-by-id pts-store-filter]]
               (when pts-store-filter
-                (map pts-store-filter rows))))
+                (medley/map-vals (fn [row] (pts-store-filter row))
+                                 rows-by-id))))
 
 ;;; Subs related to various table settings and state.
 
 (defn ^:sub cells
   "Returns a function used by the :cells property in Handsontable's options.
-  Provides special styling for rows selected through vega-lite visualizations."
+  Provides special styling for user-added-rows, the label column, and
+  row selected through vega-lite visualizations.
+  Also makes user-added-rows and the label column editable."
   [selected-row-flags]
-  (fn [row col _prop]
+  (fn [row col prop]
     (this-as obj
       (let [hot (.-instance obj)
-            physical-row-index (.toPhysicalRow hot row)
-            selected (when physical-row-index
-                       (nth selected-row-flags physical-row-index false))]
-        (when selected
-          (.setCellMeta hot row col "className" "selected-row"))))))
+            ;; NOTE: The documentations claims that the cells function in called with physical cell coordinates for
+            ;; `row` and `col` but that does not seem to be the case. There might be some unusual calls made when
+            ;; sorting is done in table. Nevertheless, treating `row` and `col` as visual indices seems to work ok.
+            row-id (.getDataAtRowProp hot row (name :iql.viz.row/id__))
+
+            user-added (.getDataAtRowProp hot row (name :iql.viz.row/user-added-row__))
+            label-column-cell (= prop (name :iql.viz.row/label__))
+            selected (get selected-row-flags row-id)
+
+            classes-to-add (remove nil? [(when user-added "editable-cell")
+                                         (when label-column-cell "label-cell")
+                                         (when selected "selected-row")])
+            class-str (str/join " " classes-to-add)]
+
+        (when (seq classes-to-add)
+          (.setCellMeta hot row col "className" class-str))
+        (when (or user-added label-column-cell)
+          (.setCellMeta hot row col "readOnly" false))))))
 
 (rf/reg-sub :table/cells
             :<- [:table/selected-row-flags]
@@ -230,8 +277,8 @@
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selections-coords)))
 (rf/reg-sub :table/real-hot-props
-            :<- [:table/table-headers]
-            :<- [:table/table-rows]
+            :<- [:table/physical-headers]
+            :<- [:table/physical-display-rows]
             :<- [:table/context-menu]
             :<- [:table/cells]
             :<- [:table/selections-coords]
@@ -241,7 +288,7 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/table-headers])})
+    :col-names (rf/subscribe [:table/physical-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -293,7 +340,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/table-headers])})
+    :computed-headers (rf/subscribe [:table/physical-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode

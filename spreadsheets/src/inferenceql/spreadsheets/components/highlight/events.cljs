@@ -10,15 +10,21 @@
  :highlight/compute-row-likelihoods
  event-interceptors
  (fn [db [_]]
-   (let [table-rows (table-db/table-rows db)
-         likelihoods (score/row-likelihoods model/spec table-rows)]
+   (let [rows-by-id (table-db/physical-rows-by-id-with-changes db)
+         row-order (table-db/physical-row-order-all db)
+         rows (map rows-by-id row-order)
+
+         likelihoods (score/row-likelihoods model/spec rows)]
      (assoc-in db [:highlight-component :row-likelihoods] likelihoods))))
 
 (rf/reg-event-db
  :highlight/compute-missing-cells
  event-interceptors
  (fn [db [_]]
-   (let [table-rows (table-db/table-rows db)
-         headers (table-db/table-headers db)
-         missing-cells (score/impute-missing-cells model/spec headers table-rows)]
+   (let [rows-by-id (table-db/physical-rows-by-id-with-changes db)
+         row-order (table-db/physical-row-order-all db)
+         rows (map rows-by-id row-order)
+         headers (table-db/physical-headers db)
+
+         missing-cells (score/impute-missing-cells model/spec headers rows)]
      (assoc-in db [:highlight-component :missing-cells] missing-cells))))

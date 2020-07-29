@@ -110,9 +110,15 @@
                     :on-success      [:query/post-success]
                     :on-failure      [:query/post-failure]}}
       ;; Perform query execution locally.
-      (let [rows (->> (table-db/dataset-rows db)
+      (let [rows-by-id (table-db/dataset-rows-by-id db)
+            row-order (table-db/dataset-row-order db)
+            rows (->> (map rows-by-id row-order)
                       (map #(medley/remove-vals nil? %)))
+            headers (table-db/dataset-headers db)
+
             models {:model (gpm/Multimixture model/spec)}]
+
+        ;; TODO: Change query string to require special column names.
         (execute-query-locally query rows models)))))
 
 (rf/reg-event-fx :query/parse-query event-interceptors parse-query)
@@ -132,6 +138,7 @@
   (let [{result-rows :result metadata :metadata} result
         {columns :iql/columns} metadata]
     ;; TODO: add flag for virtual data.
+    ;; TODO: Update to set data using new data format.
     {:dispatch [:table/set result-rows columns {:virtual false}]}))
 
 (rf/reg-event-fx :query/post-success event-interceptors post-success)
