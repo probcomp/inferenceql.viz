@@ -71,18 +71,3 @@
   [db]
   (get-in db [:table-panel :visual-rows]))
 
-(defn with-labels
-  [db labels]
-  (assoc-in db [:table-panel :labels] labels))
-
-(defn labels
-  [db]
-  (get-in db [:table-panel :labels]))
-
-(defn scores
-  [db]
-  (get-in db [:table-panel :scores]))
-
-(defn with-scores
-  [db scores]
-  (assoc-in db [:table-panel :scores] scores))

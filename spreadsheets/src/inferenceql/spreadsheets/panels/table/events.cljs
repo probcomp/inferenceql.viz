@@ -73,33 +73,6 @@
 
 ;;; Events that correspond to hooks in the Handsontable API
 
-;; Used to detect changes in the :real-data handsontable
-(rf/reg-event-db
- :hot/before-change
- event-interceptors
- (fn [db [_ hot id changes source]]
-   (let [change-maps (for [change changes]
-                       (let [[row col prev-val new-val] change
-                             p-row (.toPhysicalRow hot row)]
-                         {:row p-row :col col :prev-val prev-val :new-val new-val}))
-
-         label-col hot/label-col-header
-         ;; Changes should only be the result of user edits, copy paste, or drag and autofill.
-         valid-change-sources #{"edit" "CopyPaste.paste" "Autofill.fill"}]
-      ;; Changes should only be happening in the label column.
-      (assert (every? #{label-col} (map :col change-maps)))
-      (assert (valid-change-sources source))
-
-      (let [num-rows (count (db/table-rows db))
-            ;; Get the current vector of lables in the db or make new vector of nils.
-            default-labels (vec (repeat num-rows nil))
-            labels (or (db/labels db) default-labels)
-
-            row-new-vals (mapcat (juxt :row :new-val) change-maps)
-            ;; Apply the changes to the labels.
-            labels-changed (apply assoc labels row-new-vals)]
-        (db/with-labels db labels-changed)))))
-
 (rf/reg-event-fx
  :hot/after-selection-end
  event-interceptors
