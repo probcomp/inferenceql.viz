@@ -156,17 +156,23 @@
             (fn [db _]
               (db/table-headers db)))
 
-(rf/reg-sub :table/selected-row-flags
-            :<- [:table/table-rows]
-            :<- [:viz/pts-store-filter]
-            (fn [[rows pts-store-filter]]
-              (when pts-store-filter
-                (map pts-store-filter rows))))
-
 (defn table-rows
   [db _]
   (db/table-rows db))
 (rf/reg-sub :table/table-rows table-rows)
+
+(defn- display-headers
+  "Returns an sequence of strings for column name headers to display.
+  To be used as the :colHeaders setting for handsontable."
+  [headers]
+  ;; We guard for nil here beacuse we want to return nil if headers is nil.
+  ;; If we instead give handsontable an empty list for headers, there will be a tiny
+  ;; rectangle displayed in the top-left corner of the table instead of an empty
+  ;; table like we want.
+  (when headers
+    (let [make-presentable (fn [header]
+                             header)] ;; no-op stub for now.
+      (map make-presentable headers))))
 
 (defn- column-settings [headers]
   "Returns an array of objects that define settings for each column
@@ -178,8 +184,7 @@
                          {:data attr}))]
     (map settings-map headers)))
 
-;;; Subs related to data as it appears to the user given column moves and column sorting performed
-;;; by the user in Handsontable.
+;;; Subs related to visual state of the table
 
 (rf/reg-sub :table/visual-headers
             (fn [db _]
@@ -188,6 +193,13 @@
 (rf/reg-sub :table/visual-rows
             (fn [db _]
               (get-in db [:table-panel :visual-rows])))
+
+(rf/reg-sub :table/selected-row-flags
+            :<- [:table/table-rows]
+            :<- [:viz/pts-store-filter]
+            (fn [[rows pts-store-filter]]
+              (when pts-store-filter
+                (map pts-store-filter rows))))
 
 ;;; Subs related to various table settings and state.
 
@@ -212,7 +224,7 @@
   [[headers rows context-menu cells selections-coords]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
-      (assoc-in [:settings :colHeaders] headers)
+      (assoc-in [:settings :colHeaders] (display-headers headers))
       (assoc-in [:settings :columns] (column-settings headers))
       (assoc-in [:settings :cells] cells)
       (assoc-in [:settings :contextMenu] context-menu)
