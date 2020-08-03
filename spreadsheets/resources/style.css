@@ -27,14 +27,24 @@ div {
   min-width: 20px;
 }
 
+.no-select {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
 /* --------------- styling for the toolbar --------------- */
 
 #toolbar {
   display: flex;
-  margin-top: 5px;
+  margin-top: 10px;
   margin-bottom: 10px;
   margin-left: 10px;
-  margin-right: 10px;
+  margin-right: 14px;
 }
 /* --------------- styling for search input --------------- */
 
@@ -42,7 +52,6 @@ div {
   width: 100%;
   min-width: 350px;
   max-width: 1200px;
-  margin-top: 8px;
   font-size: .875rem;
 }
 
@@ -82,16 +91,16 @@ div {
 
 #color-selector {
   flex-shrink: 0;
-  width: 105px;
-  font-size: .875rem;
+  width: 80px;
+  font-size: .75rem;
   line-height: 16px;
 }
 
 #color-selector .list-group {
-  margin-left: 10px;
-  margin-top: 6px;
+  margin-left: 0px;
+  margin-top: 0px;
   margin-bottom: 0px;
-  width: 84px;
+  width: 80px;
 }
 
 #color-selector .list-group-item {
@@ -100,18 +109,25 @@ div {
 }
 
 #color-selector .list-group-item.active.blue {
-  background-color: #419be8;
-  border-color: #419be8;
+  background-color: #e8f0ff;
+  border-color: rgb(75, 137, 255);
+  color: #333;
 }
 
 #color-selector .list-group-item.active.green {
-  background-color: mediumseagreen;
-  border-color: mediumseagreen;
+  background-color: #effeeb;
+  border-color: rgb(75, 137, 255);
+  color: #333;
 }
 
 #color-selector .list-group-item.active.red {
-  background-color: tomato;
-  border-color: tomato;
+  background-color: rgb(255, 234, 232);
+  border-color: rgb(75, 137, 255);
+  color: #333;
+}
+
+.selection-layers-header {
+  font-size: .875rem;
 }
 
 /* --------------- styling for vega-vizualization --------------- */

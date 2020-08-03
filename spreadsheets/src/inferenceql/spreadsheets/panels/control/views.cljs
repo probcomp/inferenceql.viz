@@ -15,10 +15,11 @@
 (defn selection-color
   "A reagent component for a single select option in color-selection reagent component"
   [current-selection id text]
-  [:div.list-group-item
+  [:div.list-group-item.no-select
    {:key id
     ;; A css class gets attached that is the string portion of the `id` keyword.
     ;; For example: ":red" will become the ".red" css class.
+    :title (str text " selection layer")
     :class [(name id) (when (= current-selection id) "active")]
     :on-click #(rf/dispatch [:control/set-selection-color id])}
    text])
@@ -28,12 +29,10 @@
   []
   (let [cur-val @(rf/subscribe [:control/selection-color])]
     [:div#color-selector
-      [:span "Selection layers"]
-      [:br]
       [:div.list-group
-       [selection-color cur-val :blue "Blue"]
-       [selection-color cur-val :green "Green"]
-       [selection-color cur-val :red "Red"]]]))
+       [selection-color cur-val :blue "BLUE"]
+       [selection-color cur-val :green "GREEN"]
+       [selection-color cur-val :red "RED"]]]))
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
