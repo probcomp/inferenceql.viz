@@ -107,14 +107,18 @@
               (let [layers (get-in db [:table-panel :selection-layers])]
                 (medley/map-vals #(select-keys % [:coords]) layers))))
 
+(defn ^:sub selection-layers
+  "Merges in data pertaining to the selection-layer-coords"
+  [[selection-layer-coords visual-headers visual-display-rows]]
+  (medley/map-vals #(add-selection-data % visual-headers visual-display-rows)
+                   selection-layer-coords))
+(s/fdef selection-layers :ret ::selection-layers)
+
 (rf/reg-sub :table/selection-layers
             :<- [:table/selection-layer-coords]
             :<- [:table/visual-headers]
             :<- [:table/visual-rows]
-            (fn [[selection-layers-raw visual-headers visual-rows]]
-              {:post [(s/valid? ::selection-layers %)]}
-              (medley/map-vals #(add-selection-data % visual-headers visual-rows)
-                               selection-layers-raw)))
+            selection-layers)
 
 (rf/reg-sub :table/selection-layers-list
             :<- [:table/selection-layers]
