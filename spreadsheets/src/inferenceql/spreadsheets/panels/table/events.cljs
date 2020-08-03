@@ -99,36 +99,42 @@
        ;; Otherwise just save whether a header was clicked or not.
        (assoc-in db [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
 
-(defn assoc-visual-table-state
-  "Associates the displayed stated of `hot` into `db`.
-  The visual table state includes data changes caused by filtering, re-ordering columns, sorting columns, etc.
-  We use this visual state to along with selection coordinates to produce the data subset selected.
-  This gets passed onto the visualization code--all via subscriptions."
+(defn assoc-visual-headers
+  "Associates the column headers as displayed by `hot` into `db`.
+  This data changes when the user re-orders columns.
+  We use this data to along with selection coordinates to produce the data subset selected.
+  This all eventually gets passed onto the visualization code via subscriptions."
+  [db hot]
+  (let [headers (mapv keyword (js->clj (.getColHeader hot)))]
+    (assoc-in db [:table-panel :visual-headers] headers)))
+
+(defn assoc-visual-row-data
+  "Associates the actual row data as displayed by `hot` into `db`.
+  The data changes when the user filters or sorts columns.
+  We use this data to along with selection coordinates to produce the data subset selected.
+  This all eventually gets passed onto the visualization code via subscriptions."
   [db hot]
   (let [raw-rows (js->clj (.getData hot))
         rows (for [r raw-rows]
                (let [remove-nan (fn [cell] (when-not (js/Number.isNaN cell) cell))]
                  (mapv remove-nan r)))
-        headers (mapv keyword (js->clj (.getColHeader hot)))
         row-maps (mapv #(zipmap headers %) rows)]
-    (-> db
-        (assoc-in [:table-panel :visual-rows] row-maps)
-        (assoc-in [:table-panel :visual-headers] headers))))
+    (assoc-in db [:table-panel :visual-rows] row-maps)))
 
 (rf/reg-event-db
  :hot/after-column-move
  event-interceptors
  (fn [db [_ hot _id _columns _target]]
-   (assoc-visual-table-state db hot)))
+   (assoc-visual-headers db hot)))
 
 (rf/reg-event-db
  :hot/after-column-sort
  event-interceptors
- (fn [db [_ hot _id _current-sort-config _destination-sort-configs]]
-   (assoc-visual-table-state db hot)))
+ (fn [db [_ hot _id _current-sort-config _destination-sort-config]]
+   (assoc-visual-row-data db hot)))
 
 (rf/reg-event-db
  :hot/after-filter
  event-interceptors
  (fn [db [_ hot _id _conditions-stack]]
-   (assoc-visual-table-state db hot)))
+   (assoc-visual-row-data db hot)))
