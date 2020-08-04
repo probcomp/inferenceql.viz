@@ -118,6 +118,7 @@
         rows (for [r raw-rows]
                (let [remove-nan (fn [cell] (when-not (js/Number.isNaN cell) cell))]
                  (mapv remove-nan r)))
+        headers (mapv keyword (js->clj (.getColHeader hot)))
         row-maps (mapv #(zipmap headers %) rows)]
     (assoc-in db [:table-panel :visual-rows] row-maps)))
 
@@ -131,7 +132,9 @@
  :hot/after-column-sort
  event-interceptors
  (fn [db [_ hot _id _current-sort-config _destination-sort-config]]
-   (assoc-visual-row-data db hot)))
+   (-> db
+       (assoc-visual-row-data hot)
+       (assoc-visual-headers hot))))
 
 (rf/reg-event-db
  :hot/after-filter
