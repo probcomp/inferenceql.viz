@@ -14,6 +14,10 @@
        (catch FileNotFoundException _
          nil)))
 
+(defmethod aero/reader 'txt
+  [_ _ s]
+  (-> s (io/resource) (slurp)))
+
 (defmethod aero/reader 'csv
   [_ _ s]
   (-> s (io/resource) (slurp) (csv/read-csv) (vec)))
