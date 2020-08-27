@@ -22,14 +22,15 @@
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"
          "aide/src"
-         "aide/test"
          "cgpm/src"
-         "cgpm/test"
          "search-by-example/src"
-         "search-by-example/test"
          "spreadsheets/src"
          "spreadsheets/resources"]
- :aliases {:test {:extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
+ :aliases {:test {:extra-paths ["aide/test"
+                                "cgpm/test"
+                                "search-by-example/test"
+                                "spreadsheets/test"]
+                  :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
                                lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}

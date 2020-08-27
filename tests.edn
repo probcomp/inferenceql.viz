@@ -15,4 +15,9 @@
           :test-paths ["search-by-example/test"]}
          {:id :spreadsheets-clj
           :source-paths ["spreadsheets/src"]
+          :test-paths ["spreadsheets/test"]}
+         {:id :spreadsheets-cljs
+          :type :kaocha.type/cljs
+          :cljs/timeout 20000
+          :source-paths ["spreadsheets/src"]
           :test-paths ["spreadsheets/test"]}]}
