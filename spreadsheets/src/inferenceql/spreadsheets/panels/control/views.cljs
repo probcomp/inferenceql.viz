@@ -63,12 +63,20 @@
          [:button.toolbar-button.pure-button
           {:on-click (fn [e]
                        (rf/dispatch [:query/parse-query @input-text])
-                       (.blur (.-target e)))} ; Clear focus off of button after click.
+                       (.blur (.-target e)))}
           "Run InferenceQL"]
          [:button.toolbar-button.pure-button
           {:on-click (fn [e]
                         (rf/dispatch [:table/clear])
-                        (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Clear results"]]]
+                        (.blur (.-target e)))}
+          "Clear results"]
+        [:button.toolbar-button.pure-button
+         {:on-click (fn [e]
+                      (rf/dispatch [:upload/set-display true])
+                      (.blur (.-target e)))}
+         "Add data/model"]]]
+
+
+
      [:div.flex-box-space-filler-60]
      [selection-color-selector]]))

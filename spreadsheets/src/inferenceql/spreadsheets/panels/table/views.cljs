@@ -3,7 +3,7 @@
             [camel-snake-kebab.core :as csk]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
-            [reagent.dom :as dom]))
+            [reagent.dom :as rdom]))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
@@ -20,7 +20,7 @@
 
        :component-did-mount
        (fn [this]
-         (let [dom-node (dom/dom-node this)
+         (let [dom-node (rdom/dom-node this)
                hot (js/Handsontable. dom-node (clj->js (:settings props)))
                unique-id (keyword (:name props))]
 

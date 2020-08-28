@@ -3,7 +3,8 @@
             [inferenceql.spreadsheets.panels.override.views :as modal]
             [inferenceql.spreadsheets.panels.control.views :as control]
             [inferenceql.spreadsheets.panels.viz.views :as viz]
-            [inferenceql.spreadsheets.panels.table.views :as table]))
+            [inferenceql.spreadsheets.panels.table.views :as table]
+            [inferenceql.spreadsheets.panels.upload.views :as upload]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
 
@@ -20,4 +21,5 @@
      [:div#table-container {:class [highlight-class (when virtual "virtual")]}
        [table/handsontable {} real-hot-props]]
      [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
-     [modal/modal]]))
+     [modal/modal]
+     [upload/panel]]))

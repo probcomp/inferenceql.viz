@@ -1,7 +1,7 @@
 (ns inferenceql.spreadsheets.core
   (:require [goog.dom :as dom]
             [re-frame.core :as rf]
-            [reagent.core :as reagent]
+            [reagent.dom :as rdom]
             ;; Core
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
@@ -20,6 +20,9 @@
             ;; Override Panel
             [inferenceql.spreadsheets.panels.override.events]
             [inferenceql.spreadsheets.panels.override.subs]
+            ;; Upload Panel
+            [inferenceql.spreadsheets.panels.upload.events]
+            [inferenceql.spreadsheets.panels.upload.subs]
             ;; Query Component
             [inferenceql.spreadsheets.components.query.events]
             ;; Highlight Component
@@ -37,4 +40,5 @@
 
 (defn ^:export -main
   []
-  (reagent/render [views/app] (dom/$ "app")))
+  (rdom/render [views/app] (dom/$ "app")))
+
