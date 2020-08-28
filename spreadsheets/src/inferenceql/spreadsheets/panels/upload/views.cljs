@@ -23,7 +23,8 @@
                                         :on-change   #(swap! form-data assoc :dataset-name %)
                                         :placeholder "Enter name for dataset"
                                         :class       "form-control"
-                                        :attr        {:id "dataset-name-input"}]]]
+                                        :attr        {:id "dataset-name-input"}]
+                                       [:input {:type "file" :multiple "false" :accept ".csv"}]]]
                            [v-box
                             :class    "form-group"
                             :children [[:label {:for "model-name"} "Model"]
@@ -32,7 +33,8 @@
                                         :on-change   #(swap! form-data assoc :model-name %)
                                         :placeholder "Enter name for model"
                                         :class       "form-control"
-                                        :attr        {:id "model-name-input"}]]]
+                                        :attr        {:id "model-name-input"}]
+                                       [:input {:type "file" :multiple "true" :accept ".edn"}]]]
                            [line :color "#ddd" :style {:margin "10px 0 10px"}]
                            [h-box
                             :gap      "12px"
