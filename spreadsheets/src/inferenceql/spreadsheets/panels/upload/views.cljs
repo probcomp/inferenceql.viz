@@ -5,7 +5,10 @@
 
 (defn panel-content []
   (let [form-data (r/atom {:dataset-name nil
-                           :model-name nil})]
+                           :dataset-file nil
+                           :model-name nil
+                           :model-file nil})]
+
     (fn []
       [border
        :border "1px solid #eee"
@@ -19,29 +22,33 @@
                             :class    "form-group"
                             :children [[:label {:for "dataset-file-select"} "Dataset"]
                                        [input-text
-                                        :model       (:email @form-data)
+                                        :model       (:dataset-name @form-data)
                                         :on-change   #(swap! form-data assoc :dataset-name %)
                                         :placeholder "Enter name for dataset"
                                         :class       "form-control"
                                         :attr        {:id "dataset-name-input"}]
-                                       [:input {:type "file" :multiple "false" :accept ".csv"}]]]
+                                       [:input {:type "file" :multiple false :accept ".csv"
+                                                :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
+                                                              (swap! form-data assoc :dataset-file file))}]]]
                            [v-box
                             :class    "form-group"
                             :children [[:label {:for "model-name"} "Model"]
                                        [input-text
-                                        :model       (:password @form-data)
+                                        :model       (:model-name @form-data)
                                         :on-change   #(swap! form-data assoc :model-name %)
                                         :placeholder "Enter name for model"
                                         :class       "form-control"
                                         :attr        {:id "model-name-input"}]
-                                       [:input {:type "file" :multiple "true" :accept ".edn"}]]]
+                                       [:input {:type "file" :multiple false :accept ".edn"
+                                                :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
+                                                              (swap! form-data assoc :model-file file))}]]]
                            [line :color "#ddd" :style {:margin "10px 0 10px"}]
                            [h-box
                             :gap      "12px"
                             :children [[button
                                         :label "Submit"
                                         :class "btn-primary"
-                                        :on-click #(do nil)]
+                                        :on-click #(rf/dispatch [:upload/read-files @form-data])]
                                        [button
                                         :label "Cancel"
                                         :on-click #(rf/dispatch [:upload/set-display false])]]]]]])))

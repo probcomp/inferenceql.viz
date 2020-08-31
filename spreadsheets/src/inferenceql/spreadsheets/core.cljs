@@ -23,6 +23,7 @@
             ;; Upload Panel
             [inferenceql.spreadsheets.panels.upload.events]
             [inferenceql.spreadsheets.panels.upload.subs]
+            [inferenceql.spreadsheets.panels.upload.effects]
             ;; Query Component
             [inferenceql.spreadsheets.components.query.events]
             ;; Highlight Component
