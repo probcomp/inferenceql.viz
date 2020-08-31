@@ -14,6 +14,7 @@
         reagent-forms {:mvn/version "0.5.43"}
         day8.re-frame/http-fx {:mvn/version "v0.2.0"}
         cljs-ajax {:mvn/version "0.8.0"}
+        cljstache {:mvn/version "2.0.6"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "5169be4c15fbed41a65971b84ffacfbd7e25df37"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
@@ -29,7 +30,8 @@
  :aliases {:test {:extra-paths ["aide/test"
                                 "cgpm/test"
                                 "search-by-example/test"
-                                "spreadsheets/test"]
+                                "spreadsheets/test"
+                                "spreadsheets/test-resources"]
                   :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
                                lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
