@@ -13,26 +13,17 @@
  :upload/read-files
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [{:keys [dataset-name dataset-file model-name model-file]} form-data]
+   (let [{:keys [dataset-name dataset-file model-name model-file]} form-data
+         dataset-name (keyword dataset-name)
+         model-name (keyword model-name)
+         schema nil]
      {:upload/read [{:file dataset-file
-                     :on-success [:upload/store-dataset dataset-name]
+                     :on-success [:store/dataset dataset-name schema model-name]
                      :on-failure [:upload/read-failed dataset-name]}
                     {:file model-file
-                     :on-success [:upload/store-model model-name]
+                     :on-success [:store/model model-name]
                      :on-failure [:upload/read-failed model-name]}]
       :dispatch [:upload/set-display false]})))
-
-(rf/reg-event-db
-  :upload/store-dataset
-  event-interceptors
-  (fn [db [_ dataset-name dataset-data]]
-    (assoc-in db [:datasets (keyword dataset-name)] dataset-data)))
-
-(rf/reg-event-db
- :upload/store-model
- event-interceptors
- (fn [db [_ model-name model-data]]
-   (assoc-in db [:models (keyword model-name)] model-data)))
 
 (rf/reg-event-fx
   :upload/read-failed

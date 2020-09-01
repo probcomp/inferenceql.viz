@@ -8,7 +8,6 @@
                            :dataset-file nil
                            :model-name nil
                            :model-file nil})]
-
     (fn []
       [border
        :border "1px solid #eee"

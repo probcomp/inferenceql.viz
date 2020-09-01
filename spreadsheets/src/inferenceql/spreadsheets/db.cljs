@@ -5,7 +5,9 @@
             [inferenceql.spreadsheets.panels.table.db :as table-panel]
             [inferenceql.spreadsheets.panels.viz.db :as viz-panel]
             [inferenceql.spreadsheets.panels.upload.db :as upload-panel]
-            [inferenceql.spreadsheets.components.highlight.db :as highlight-component]))
+            [inferenceql.spreadsheets.components.highlight.db :as highlight-component]
+            [inferenceql.spreadsheets.components.query.db :as query-component]
+            [inferenceql.spreadsheets.components.store.db :as store-component]))
 
 ;;; Primary DB spec.
 
@@ -14,7 +16,9 @@
                              ::table-panel/table-panel
                              ::viz-panel/viz-panel
                              ::upload-panel/upload-panel
-                             ::highlight-component/highlight-component]))
+                             ::highlight-component/highlight-component
+                             ::query-component/query-component
+                             ::store-component/store-component]))
 
 (def default-general-db
   "This db map is meant to contain keys and values not specific to
@@ -32,5 +36,7 @@
              table-panel/default-db
              viz-panel/default-db
              upload-panel/default-db
-             highlight-component/default-db]]
+             highlight-component/default-db
+             query-component/default-db
+             store-component/default-db]]
     (apply merge dbs)))
