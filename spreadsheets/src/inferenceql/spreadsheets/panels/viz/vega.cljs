@@ -432,7 +432,10 @@
 
 (defn generate-spec [selection-layers schema model]
   (binding [vega-type (vega-type-fn schema)]
-    (when-let [spec-layers (seq (keep #(spec-for-selection-layer model %) selection-layers))]
+    ;; We need to use doall to force the lazy seq because the dynamic bindings
+    ;; are not captured by the lazy sequences.
+    (when-let [spec-layers (seq (doall (keep #(spec-for-selection-layer model %)
+                                             selection-layers)))]
       {:$schema default-vega-lite-schema
        :hconcat spec-layers
        :resolve {:legend {:size "independent"

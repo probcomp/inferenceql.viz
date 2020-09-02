@@ -21,7 +21,6 @@
                           (dissoc $ col-to-sim)
                           (medley/remove-vals nil? $))
         targets #{col-to-sim}
-        _ (.log js/console :constraints constraints)
         gen-fn #(first (gpm/simulate model targets constraints 1))
 
         has-negative-vals? #(some (every-pred number? neg?) (vals %))
@@ -29,8 +28,6 @@
         override-insert-fn (co/gen-insert-fn override-map)]
     ;; returns the first result of gen-fn that doesn't have a negative salary
     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
-    (.log js/console :foo model)
-    (.log js/console :foo (gen-fn))
     #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))
 
 (rf/reg-sub :viz/generators
