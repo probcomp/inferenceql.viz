@@ -13,7 +13,7 @@
  :upload/read-files
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [{:keys [dataset-name dataset-file model-name model-file]} form-data
+   (let [{:keys [dataset-name dataset-file dataset-schema-file model-name model-file]} form-data
          dataset-name (keyword dataset-name)
          model-name (keyword model-name)
          schema nil]

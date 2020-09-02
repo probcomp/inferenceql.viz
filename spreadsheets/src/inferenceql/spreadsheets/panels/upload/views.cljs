@@ -6,6 +6,7 @@
 (defn panel-content []
   (let [form-data (r/atom {:dataset-name nil
                            :dataset-file nil
+                           :dataset-schema-file nil
                            :model-name nil
                            :model-file nil})]
     (fn []
@@ -14,30 +15,37 @@
        :child  [v-box
                 :min-height "500px"
                 :min-width "800px"
-                :padding  "10px"
+                :padding "10px 40px 40px 40px"
+                :gap "35px"
                 :style    {:background-color "cornsilk"}
-                :children [[title :label "Add a new dataset and model" :level :level2]
+                :children [[title :label "Add a dataset and model" :level :level1]
                            [v-box
                             :class    "form-group"
-                            :children [[:label {:for "dataset-file-select"} "Dataset"]
+                            :children [[title :label "New dataset" :level :level2]
+                                       [title :label "Name" :level :level4]
                                        [input-text
                                         :model       (:dataset-name @form-data)
                                         :on-change   #(swap! form-data assoc :dataset-name %)
-                                        :placeholder "Enter name for dataset"
                                         :class       "form-control"
                                         :attr        {:id "dataset-name-input"}]
+                                       [title :label "Dataset (.csv)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".csv"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
-                                                              (swap! form-data assoc :dataset-file file))}]]]
+                                                              (swap! form-data assoc :dataset-file file))}]
+                                       [title :label "Schema (.edn)" :level :level4]
+                                       [:input {:type "file" :multiple false :accept ".edn"
+                                                :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
+                                                              (swap! form-data assoc :dataset-schema-file file))}]]]
                            [v-box
                             :class    "form-group"
-                            :children [[:label {:for "model-name"} "Model"]
+                            :children [[title :label "New model" :level :level2]
+                                       [title :label "Name" :level :level4]
                                        [input-text
                                         :model       (:model-name @form-data)
                                         :on-change   #(swap! form-data assoc :model-name %)
-                                        :placeholder "Enter name for model"
                                         :class       "form-control"
                                         :attr        {:id "model-name-input"}]
+                                       [title :label "Model (.edn)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".edn"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                                               (swap! form-data assoc :model-file file))}]]]
@@ -60,6 +68,7 @@
      [modal-panel
       :backdrop-color   "grey"
       :backdrop-opacity 0.6
-      :child [panel-content]]]))
+      :child [panel-content]
+      :wrap-nicely? false]]))
 
 
