@@ -3,7 +3,6 @@
             [metaprob.prelude :as mp]
             [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
             [inferenceql.inference.gpm.multimixture.search :as search]
-            [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.override.helpers :as co]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
@@ -11,36 +10,42 @@
 
 (rf/reg-sub :viz/vega-lite-spec
             :<- [:table/selection-layers-list]
-            (fn [selection-layers]
+            :<- [:query/schema]
+            :<- [:query/model]
+            (fn [[selection-layers schema model]]
               (clj->js
-                (vega/generate-spec selection-layers))))
+                (vega/generate-spec selection-layers schema model))))
 
 (defn make-simulate-fn
-  [col-to-sim row override-fns]
-  (let [override-map (select-keys override-fns [col-to-sim])
+  [col-to-sim row override-fns model]
+  (let [model-schema (get-in model [:model :vars])
+        override-map (select-keys override-fns [col-to-sim])
         override-insert-fn (co/gen-insert-fn override-map)
         constraints (mm.utils/with-row-values {} (as-> row $
-                                                   (select-keys $ (keys (:vars model/spec)))
+                                                   (select-keys $ (keys model-schema))
                                                    (dissoc $ col-to-sim)
                                                    (medley/remove-vals nil? $)))
-        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
+        ;; TODO: Can I use something else to generate virtual data.
+        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model)
                                            :observation-trace constraints))
         has-negative-vals? #(some (every-pred number? neg?) (vals %))]
     ;; returns the first result of gen-fn that doesn't have a negative salary
     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
-    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))
+    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))
+    #(take 1 (repeat {:age 3 :gender "female" :height 3}))))
 
 (rf/reg-sub :viz/generators
             :<- [:table/selection-layers]
             :<- [:override/column-override-fns]
-            (fn [[layers override-fns]]
+            :<- [:query/model]
+            (fn [[layers override-fns model]]
               (->> layers
                    (medley/map-vals (fn [layer]
                                       (let [{selections :selections
                                              cols :selected-columns
                                              row :row-at-selection-start} layer]
-                                        (when (vega/simulatable? selections cols)
-                                          (make-simulate-fn (first cols) row override-fns)))))
+                                        (when (vega/simulatable? selections cols model)
+                                          (make-simulate-fn (first cols) row override-fns model)))))
                    (medley/remove-vals nil?))))
 
 (rf/reg-sub :viz/pts-store

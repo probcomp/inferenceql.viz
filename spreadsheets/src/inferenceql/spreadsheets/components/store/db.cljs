@@ -7,23 +7,25 @@
             [inferenceql.spreadsheets.csv :as csv-utils]
             [inferenceql.inference.gpm :as gpm]))
 
-(def compiled-in-model (gpm/Multimixture (get config/config :model)))
+;;; Compiled-in elements to store
 
-(def compiled-in-schema
-  (get-in config/config [:model :vars]))
+(def compiled-in-model (get config/config :model))
+
+(def compiled-in-schema (get-in config/config [:model :vars]))
 
 (def compiled-in-dataset
-  (let [csv-data (get config/config :data)]
-    (csv-utils/csv-data->clean-maps compiled-in-schema csv-data {:keywordize-cols true})))
+  (let [dataset (get config/config :data)]
+    (csv-utils/csv-data->clean-maps compiled-in-schema dataset {:keywordize-cols true})))
+
+;;; Setting up store component db
 
 (def default-db
   {:store-component {:datasets {:data {:rows compiled-in-dataset
                                        :schema compiled-in-schema
                                        :default-model :model}}
-                     :models {:model compiled-in-model}}})
+                     :models {:model (gpm/Multimixture compiled-in-model)}}})
 
 (s/def ::store-component (s/keys :req-un [::datasets
                                           ::models]))
-
 
 ;; TODO: add more specs
