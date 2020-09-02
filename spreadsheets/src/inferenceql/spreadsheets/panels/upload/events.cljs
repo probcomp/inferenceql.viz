@@ -18,7 +18,8 @@
      {:upload/read [{:file dataset-schema-file
                      :on-success [:upload/read-other-files form-data]
                      :on-failure [:upload/read-failed "schema-file"]}]
-      :dispatch [:upload/set-display false]})))
+      :dispatch-n [[:upload/set-display false]
+                   [:table/clear]]})))
 
 (rf/reg-event-fx
  :upload/read-other-files
