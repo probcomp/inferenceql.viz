@@ -11,6 +11,7 @@
    (assoc-in db [:upload-panel :display] new-val)))
 
 (rf/reg-event-fx
+ ;; TODO: change name to read-files-phase-1
  :upload/read-schema-file
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
@@ -22,6 +23,7 @@
                    [:table/clear]]})))
 
 (rf/reg-event-fx
+ ;; TODO: change name to read-files-phase-2
  :upload/read-other-files
  event-interceptors
  (fn [{:keys [_db]} [_ form-data schema-data]]
@@ -29,6 +31,7 @@
          dataset-name (keyword dataset-name)
          model-name (keyword model-name)
          schema (edn/read-string schema-data)]
+         ;; TODO: handle exception if edn parsing fails.
      {:upload/read [{:file dataset-file
                      :on-success [:store/dataset dataset-name schema model-name]
                      :on-failure [:upload/read-failed dataset-name]}

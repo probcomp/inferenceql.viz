@@ -29,10 +29,8 @@
                                         :class       "form-control"
                                         :disabled?   true
                                         :attr        {:id "dataset-name-input"
-                                                      :autoComplete "my-search-field"
-                                                      :autoCorrect "off"
-                                                      :autoCapitalize "none"
-                                                      :spellCheck "false"}]
+                                                      :auto-complete "dummy-value"
+                                                      :spell-check "false"}]
                                        [gap :size "5px"]
                                        [title :label "Dataset (.csv)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".csv"
@@ -53,10 +51,8 @@
                                         :class       "form-control"
                                         :disabled?   true
                                         :attr        {:id "model-name-input"
-                                                      :autoComplete "my-search-field"
-                                                      :autoCorrect "off"
-                                                      :autoCapitalize "none"
-                                                      :spellCheck "false"}]
+                                                      :auto-complete "dummy-value"
+                                                      :spell-check "false"}]
                                        [gap :size "5px"]
                                        [title :label "Model (.edn)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".edn"
