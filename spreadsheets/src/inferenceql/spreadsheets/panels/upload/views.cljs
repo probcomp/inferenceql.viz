@@ -18,11 +18,11 @@
                 :padding "30px"
                 :gap "30px"
                 :style    {:background-color "cornsilk"}
-                :children [[title :label "Add a dataset and model" :level :level1]
+                :children [[title :label "Change dataset and model" :level :level1]
                            [v-box
                             :class    "form-group"
                             :children [[title :label "New dataset" :level :level2]
-                                       [title :label "Name" :level :level4]
+                                       [title :label "Name – not editable" :level :level4]
                                        [input-text
                                         :model       (:dataset-name @form-data)
                                         :on-change   #(swap! form-data assoc :dataset-name %)
@@ -44,7 +44,7 @@
                            [v-box
                             :class    "form-group"
                             :children [[title :label "New model" :level :level2]
-                                       [title :label "Name" :level :level4]
+                                       [title :label "Name - not editable" :level :level4]
                                        [input-text
                                         :model       (:model-name @form-data)
                                         :on-change   #(swap! form-data assoc :model-name %)

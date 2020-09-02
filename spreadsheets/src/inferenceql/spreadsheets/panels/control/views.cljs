@@ -76,7 +76,7 @@
          {:on-click (fn [e]
                       (rf/dispatch [:upload/set-display true])
                       (.blur (.-target e)))}
-         "Add data/model"]]]
+         "Change data/model"]]]
 
 
 
