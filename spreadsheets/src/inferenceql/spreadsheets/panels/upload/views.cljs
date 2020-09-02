@@ -1,7 +1,7 @@
 (ns inferenceql.spreadsheets.panels.upload.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
-            [re-com.core :refer [border title v-box h-box line button input-text modal-panel]]))
+            [re-com.core :refer [border title v-box h-box line button gap input-text modal-panel]]))
 
 (defn panel-content []
   (let [form-data (r/atom {:dataset-name "data"
@@ -33,10 +33,12 @@
                                                       :autoCorrect "off"
                                                       :autoCapitalize "none"
                                                       :spellCheck "false"}]
+                                       [gap :size "5px"]
                                        [title :label "Dataset (.csv)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".csv"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                                               (swap! form-data assoc :dataset-file file))}]
+                                       [gap :size "5px"]
                                        [title :label "Schema (.edn)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".edn"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
@@ -55,6 +57,7 @@
                                                       :autoCorrect "off"
                                                       :autoCapitalize "none"
                                                       :spellCheck "false"}]
+                                       [gap :size "5px"]
                                        [title :label "Model (.edn)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".edn"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
