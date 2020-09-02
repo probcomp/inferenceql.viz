@@ -4,10 +4,10 @@
             [re-com.core :refer [border title v-box h-box line button input-text modal-panel]]))
 
 (defn panel-content []
-  (let [form-data (r/atom {:dataset-name nil
+  (let [form-data (r/atom {:dataset-name "data"
                            :dataset-file nil
                            :dataset-schema-file nil
-                           :model-name nil
+                           :model-name "model"
                            :model-file nil})]
     (fn []
       [border
@@ -15,8 +15,8 @@
        :child  [v-box
                 :min-height "500px"
                 :min-width "800px"
-                :padding "10px 40px 40px 40px"
-                :gap "35px"
+                :padding "30px"
+                :gap "30px"
                 :style    {:background-color "cornsilk"}
                 :children [[title :label "Add a dataset and model" :level :level1]
                            [v-box
@@ -27,7 +27,12 @@
                                         :model       (:dataset-name @form-data)
                                         :on-change   #(swap! form-data assoc :dataset-name %)
                                         :class       "form-control"
-                                        :attr        {:id "dataset-name-input"}]
+                                        :disabled?   true
+                                        :attr        {:id "dataset-name-input"
+                                                      :autoComplete "my-search-field"
+                                                      :autoCorrect "off"
+                                                      :autoCapitalize "none"
+                                                      :spellCheck "false"}]
                                        [title :label "Dataset (.csv)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".csv"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
@@ -44,7 +49,12 @@
                                         :model       (:model-name @form-data)
                                         :on-change   #(swap! form-data assoc :model-name %)
                                         :class       "form-control"
-                                        :attr        {:id "model-name-input"}]
+                                        :disabled?   true
+                                        :attr        {:id "model-name-input"
+                                                      :autoComplete "my-search-field"
+                                                      :autoCorrect "off"
+                                                      :autoCapitalize "none"
+                                                      :spellCheck "false"}]
                                        [title :label "Model (.edn)" :level :level4]
                                        [:input {:type "file" :multiple false :accept ".edn"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
@@ -55,7 +65,7 @@
                             :children [[button
                                         :label "Submit"
                                         :class "btn-primary"
-                                        :on-click #(rf/dispatch [:upload/read-files @form-data])]
+                                        :on-click #(rf/dispatch [:upload/read-schema-file @form-data])]
                                        [button
                                         :label "Cancel"
                                         :on-click #(rf/dispatch [:upload/set-display false])]]]]]])))
