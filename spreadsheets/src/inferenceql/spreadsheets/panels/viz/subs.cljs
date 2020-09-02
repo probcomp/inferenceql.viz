@@ -1,11 +1,8 @@
 (ns inferenceql.spreadsheets.panels.viz.subs
   (:require [re-frame.core :as rf]
-            [metaprob.prelude :as mp]
-            [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
-            [inferenceql.inference.gpm.multimixture.search :as search]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.override.helpers :as co]
-            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
+            [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]))
 
 (rf/reg-sub :viz/vega-lite-spec
@@ -19,20 +16,22 @@
 (defn make-simulate-fn
   [col-to-sim row override-fns model]
   (let [model-schema (get-in model [:model :vars])
+        constraints (as-> row $
+                          (select-keys $ (keys model-schema))
+                          (dissoc $ col-to-sim)
+                          (medley/remove-vals nil? $))
+        targets #{col-to-sim}
+        _ (.log js/console :constraints constraints)
+        gen-fn #(first (gpm/simulate model targets constraints 1))
+
+        has-negative-vals? #(some (every-pred number? neg?) (vals %))
         override-map (select-keys override-fns [col-to-sim])
-        override-insert-fn (co/gen-insert-fn override-map)
-        constraints (mm.utils/with-row-values {} (as-> row $
-                                                   (select-keys $ (keys model-schema))
-                                                   (dissoc $ col-to-sim)
-                                                   (medley/remove-vals nil? $)))
-        ;; TODO: Can I use something else to generate virtual data.
-        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model)
-                                           :observation-trace constraints))
-        has-negative-vals? #(some (every-pred number? neg?) (vals %))]
+        override-insert-fn (co/gen-insert-fn override-map)]
     ;; returns the first result of gen-fn that doesn't have a negative salary
     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
-    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))
-    #(take 1 (repeat {:age 3 :gender "female" :height 3}))))
+    (.log js/console :foo model)
+    (.log js/console :foo (gen-fn))
+    #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))
 
 (rf/reg-sub :viz/generators
             :<- [:table/selection-layers]
