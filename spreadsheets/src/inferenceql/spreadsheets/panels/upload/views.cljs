@@ -1,27 +1,39 @@
 (ns inferenceql.spreadsheets.panels.upload.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
-            [re-com.core :refer [border title v-box h-box line button gap input-text modal-panel]]))
+            [re-com.core :refer [border title v-box h-box line button gap input-text modal-panel
+                                 horizontal-bar-tabs
+                                 horizontal-tabs]]))
 
 (defn panel-content []
   (let [form-data (r/atom {:dataset-name "data"
                            :dataset-file nil
                            :dataset-schema-file nil
                            :model-name "model"
-                           :model-file nil})]
+                           :model-file nil})
+        tab-options [{:id ::web-url :label "Web url"}
+                     {:id ::local-file :label "Local files"}]
+        selected-tab-id (r/atom ::web-url)
+        update-selected-tab #(reset! selected-tab-id %)]
     (fn []
       [border
        :border "1px solid #eee"
        :child  [v-box
                 :min-height "500px"
                 :min-width "800px"
-                :padding "30px"
-                :gap "30px"
+                :padding "10px 30px 30px 30px"
                 :style    {:background-color "cornsilk"}
                 :children [[title :label "Change dataset and model" :level :level1]
+                           [gap :size "20px"]
+                           [v-box
+                            :children [[title :label "Method" :level :level3]
+                                       [horizontal-bar-tabs :tabs tab-options
+                                                            :model selected-tab-id
+                                                            :on-change update-selected-tab]]]
+                           [gap :size "70px"]
                            [v-box
                             :class    "form-group"
-                            :children [[title :label "New dataset" :level :level2]
+                            :children [[title :label "New dataset" :level :level3 :margin-bottom "1px"]
                                        [title :label "Name – not editable" :level :level4]
                                        [input-text
                                         :model       (:dataset-name @form-data)
@@ -41,9 +53,10 @@
                                        [:input {:type "file" :multiple false :accept ".edn"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                                               (swap! form-data assoc :dataset-schema-file file))}]]]
+                           [gap :size "30px"]
                            [v-box
                             :class    "form-group"
-                            :children [[title :label "New model" :level :level2]
+                            :children [[title :label "New model" :level :level3 :margin-bottom "1px"]
                                        [title :label "Name - not editable" :level :level4]
                                        [input-text
                                         :model       (:model-name @form-data)
@@ -58,7 +71,9 @@
                                        [:input {:type "file" :multiple false :accept ".edn"
                                                 :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                                               (swap! form-data assoc :model-file file))}]]]
-                           [line :color "#ddd" :style {:margin "10px 0 10px"}]
+                           [gap :size "30px"]
+                           [line :color "#ddd" :style {:margin "10px 0px 0px"}]
+                           [gap :size "30px"]
                            [h-box
                             :gap      "12px"
                             :children [[button
@@ -78,6 +93,5 @@
       :backdrop-color   "grey"
       :backdrop-opacity 0.6
       :child [panel-content]
-      :wrap-nicely? false]]))
-
-
+      :wrap-nicely? false
+      :backdrop-on-click #(rf/dispatch [:upload/set-display false])]]))
