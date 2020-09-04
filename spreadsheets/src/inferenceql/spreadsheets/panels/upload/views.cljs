@@ -90,7 +90,7 @@
         :children [[button
                     :label "Submit"
                     :class "btn-primary"
-                    :on-click #(rf/dispatch [:upload/read-schema-file @form-data])]
+                    :on-click #(rf/dispatch [:upload/read-files @form-data])]
                    [button
                     :label "Cancel"
                     :on-click #(rf/dispatch [:upload/set-display false])]]]])))

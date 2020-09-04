@@ -1,8 +1,11 @@
 (ns inferenceql.spreadsheets.panels.upload.events
    "Contains events related to the upload panel."
-  (:require [re-frame.core :as rf]
+  (:require [clojure.edn :as edn]
+            [re-frame.core :as rf]
+            [goog.labs.format.csv :as csv]
+            [inferenceql.inference.gpm :as gpm]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [clojure.edn :as edn]))
+            [inferenceql.spreadsheets.csv :as csv-utils]))
 
 (rf/reg-event-db
  :upload/set-display
@@ -11,35 +14,44 @@
    (assoc-in db [:upload-panel :display] new-val)))
 
 (rf/reg-event-fx
- :upload/read-schema-file
+ :upload/read-files
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [{:keys [dataset-schema-file]} form-data]
-     {:upload/read [{:file dataset-schema-file
-                     :on-success [:upload/read-other-files form-data]
-                     :on-failure [:upload/read-failed "schema-file"]}]
-      :js/console-warn "reading schema file."
+   (let [file-objs (select-keys form-data [:dataset-file :dataset-schema-file :model-file])]
+     {:upload/read {:files file-objs
+                    :on-success [:upload/process-files form-data]
+                    :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
 
 (rf/reg-event-fx
- :upload/read-other-files
+ :upload/read-web-url
  event-interceptors
- (fn [{:keys [_db]} [_ form-data schema-data]]
-   (let [{:keys [dataset-name dataset-file _dataset-schema-file model-name model-file]} form-data
+ (fn [{:keys [_db]} [_ form-data]]
+   {}))
+
+(rf/reg-event-fx
+ :upload/process-files
+ event-interceptors
+ (fn [{:keys [_db]} [_ form-data file-data]]
+   (let [{:keys [dataset-name model-name]} form-data
          dataset-name (keyword dataset-name)
          model-name (keyword model-name)
-         schema (edn/read-string schema-data)]
-     ;; TODO: handle exception if edn parsing fails.
-     {:upload/read [{:file dataset-file
-                     :on-success [:store/dataset dataset-name schema model-name]
-                     :on-failure [:upload/read-failed dataset-name]}
-                    {:file model-file
-                     :on-success [:store/model model-name]
-                     :on-failure [:upload/read-failed model-name]}]})))
+
+         {:keys [dataset-file dataset-schema-file model-file]} file-data
+         schema (edn/read-string dataset-schema-file)
+         dataset-csv (csv/parse dataset-file)
+         dataset (csv-utils/csv-data->clean-maps schema dataset-csv {:keywordize-cols true})
+
+         model (gpm/Multimixture (edn/read-string model-file))]
+     ;; TODO: catch converrsion errors
+     (if true
+       {:dispatch-n [[:store/dataset dataset-name dataset schema model-name]
+                     [:store/model model-name model]]}
+       {:dispatch [:upload/read-failed "TODO: write error message for conversion."]}))))
 
 (rf/reg-event-fx
   :upload/read-failed
   event-interceptors
-  (fn [{:keys [_db]} [_ name error]]
-    {:js/console-error (str "error: could not read " name "\n" error)}))
+  (fn [{:keys [_db]} [_ error]]
+    {:js/console-error error}))
