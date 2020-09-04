@@ -10,6 +10,13 @@
 
 (rf/reg-fx :js/console-error console-error)
 
+(defn console-warn
+  "Prints a string `msg` to the browser console warn log."
+  [msg]
+  (.warn js/console msg))
+
+(rf/reg-fx :js/console-warn console-warn)
+
 (defn alert
   "Displays a string `msg` in a js alert popup."
   [msg]
