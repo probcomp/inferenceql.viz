@@ -11,17 +11,15 @@
   (.updateSettings hot-instance new-settings false))
 
 (defn handsontable
-  ([props]
-   (handsontable {} props))
   ([attributes props]
-   (let [hot-instance (reagent/atom nil)]
+   (let [hot-instance (reagent/atom nil)
+         dom-nodes (reagent/atom {})]
      (reagent/create-class
       {:display-name "handsontable-reagent"
 
        :component-did-mount
        (fn [this]
-         (let [dom-node (dom/dom-node this)
-               hot (js/Handsontable. dom-node (clj->js (:settings props)))
+         (let [hot (js/Handsontable. (:table-div @dom-nodes) (clj->js (:settings props)))
                unique-id (keyword (:name props))]
 
            ;; add callbacks internal to hot object
@@ -143,4 +141,5 @@
 
        :reagent-render
        (fn [attributes props]
-         [:div attributes])}))))
+         [:div#table-container attributes
+           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))

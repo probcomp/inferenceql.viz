@@ -17,7 +17,6 @@
         highlight-class @(rf/subscribe [:table/highlight-class])]
     [:div
      [control/panel]
-     [:div#table-container {:class [highlight-class (when virtual "virtual")]}
-       [table/handsontable {} real-hot-props]]
+     [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
      [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
      [modal/modal]]))
