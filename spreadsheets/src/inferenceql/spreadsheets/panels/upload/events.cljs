@@ -2,7 +2,7 @@
    "Contains events related to the upload panel."
   (:require [re-frame.core :as rf]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-           [clojure.edn :as edn]))
+            [clojure.edn :as edn]))
 
 (rf/reg-event-db
  :upload/set-display

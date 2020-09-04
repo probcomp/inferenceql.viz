@@ -1,7 +1,7 @@
 (ns inferenceql.spreadsheets.panels.upload.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
-            [re-com.core :refer [border title v-box h-box line button gap input-text modal-panel
+            [re-com.core :refer [border title v-box p h-box line button gap input-text modal-panel
                                  horizontal-bar-tabs
                                  horizontal-tabs]]))
 
@@ -115,6 +115,7 @@
                                        [horizontal-bar-tabs :tabs tab-options
                                         :model selected-tab-id
                                         :on-change update-selected-tab]]]
+                           ;;[p "This will ...."]
                            [gap :size "70px"]
                            (case @selected-tab-id
                              ::web-url [web-url-form]
