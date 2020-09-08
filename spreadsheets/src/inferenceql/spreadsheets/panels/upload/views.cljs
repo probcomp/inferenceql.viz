@@ -11,7 +11,9 @@
       [:<>
        [v-box
         :class    "form-group"
-        :children [[title :label "url" :level :level4]
+        :children [[title :label "All files" :level :level3 :margin-bottom "1px"]
+                   [p "Specifing a url here will pull all needed files..."]
+                   [title :label "url" :level :level4]
                    [input-text
                     :model       (:web-url @form-data)
                     :on-change   #(swap! form-data assoc :web-url %)
@@ -21,8 +23,8 @@
                     :attr        {:id "dataset-name-input"
                                   :auto-complete "dummy-value"
                                   :spell-check "false"}]]]
-       [gap :size "30px"]
-       [line :color "#ddd" :style {:margin "10px 0px 0px"}]
+       [gap :size "50px"]
+       [line :color "#ddd" :style {:margin "0px 0px 0px"}]
        [gap :size "30px"]
        [h-box
         :gap      "12px"
@@ -44,13 +46,15 @@
       [:<>
        [v-box
         :class    "form-group"
-        :children [[title :label "New dataset" :level :level3 :margin-bottom "1px"]
+        :children [[title :label "Dataset-related" :level :level3 :margin-bottom "1px"]
                    [title :label "Name – not editable" :level :level4]
                    [input-text
                     :model       (:dataset-name @form-data)
                     :on-change   #(swap! form-data assoc :dataset-name %)
                     :class       "form-control"
                     :disabled?   true
+                    :height      "25px"
+                    :width       "190px"
                     :attr        {:id "dataset-name-input"
                                   :auto-complete "dummy-value"
                                   :spell-check "false"}]
@@ -67,13 +71,15 @@
        [gap :size "30px"]
        [v-box
         :class    "form-group"
-        :children [[title :label "New model" :level :level3 :margin-bottom "1px"]
+        :children [[title :label "Model-related" :level :level3 :margin-bottom "1px"]
                    [title :label "Name - not editable" :level :level4]
                    [input-text
                     :model       (:model-name @form-data)
                     :on-change   #(swap! form-data assoc :model-name %)
                     :class       "form-control"
                     :disabled?   true
+                    :height      "25px"
+                    :width       "190px"
                     :attr        {:id "model-name-input"
                                   :auto-complete "dummy-value"
                                   :spell-check "false"}]
