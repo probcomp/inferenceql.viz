@@ -56,16 +56,10 @@
         config-read (async/chan)
 
         file-reads (async/chan)
-        file-reads-batched (async/into [] (async/take 3 file-reads))
-
-        auth-string (b64/encodeString (str  username ":" password))
-        _ (.log js/console :auth-string auth-string)]
-
+        file-reads-batched (async/into [] (async/take 3 file-reads))]
     (ajax.core/ajax-request
       {:uri config-edn-url
        :method :get
-       :headers {"Authorization" (str "Basic" " " auth-string)}
-       :with-credentials true
        :handler #(put! config-read %)
        :response-format (ajax.core/text-response-format)})
 
