@@ -14,7 +14,8 @@
         re-frame {:mvn/version "1.1.1"}
         reagent-forms {:mvn/version "0.5.44"}
         day8.re-frame/http-fx {:mvn/version "v0.2.0"}
-        cljs-ajax {:mvn/version "0.8.0"}
+        cljs-ajax {:mvn/version "0.8.1"}
+        lambdaisland/uri {:mvn/version "1.4.54"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "5169be4c15fbed41a65971b84ffacfbd7e25df37"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"

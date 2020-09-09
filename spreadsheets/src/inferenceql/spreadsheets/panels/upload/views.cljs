@@ -5,24 +5,44 @@
                                  horizontal-bar-tabs
                                  horizontal-tabs]]))
 
-(defn web-url-form []
-  (let [form-data (r/atom {:web-url ""})]
+(defn url-form []
+  (let [form-data (r/atom {:url ""
+                           :username nil
+                           :password nil})]
     (fn []
       [:<>
        [v-box
         :class    "form-group"
-        :children [[title :label "All files" :level :level3 :margin-bottom "1px"]
-                   [p "Specifing a url here will pull all needed files..."]
-                   [title :label "url" :level :level4]
+        :children [[title :label "Url" :level :level3]
+                   [p {:style {:color "#777"}}
+                    "This will pull all needed files from the folder specified by the url. "]
                    [input-text
-                    :model       (:web-url @form-data)
-                    :on-change   #(swap! form-data assoc :web-url %)
+                    :model       (:url @form-data)
+                    :on-change   #(swap! form-data assoc :url %)
                     :class       "form-control"
                     :width       "500px"
                     :placeholder "http:// ..."
-                    :attr        {:id "dataset-name-input"
-                                  :auto-complete "dummy-value"
-                                  :spell-check "false"}]]]
+                    :attr        {:spell-check "false"}]
+                   [gap :size "30px"]
+                   [p {:style {:color "#777"}}
+                    "Add credentials if your url is password protected."]
+                   [title :label "Username" :level :level4]
+                   [input-text
+                    :model       (:username @form-data)
+                    :on-change   #(swap! form-data assoc :username %)
+                    :class       "form-control"
+                    :width       "150px"
+                    :height      "30px"
+                    :attr        {:spell-check "false"}]
+
+                   [title :label "Password" :level :level4]
+                   [input-text
+                    :model       (:password @form-data)
+                    :on-change   #(swap! form-data assoc :password %)
+                    :class       "form-control"
+                    :width       "150px"
+                    :height      "30px"
+                    :attr        {:spell-check "false"}]]]
        [gap :size "50px"]
        [line :color "#ddd" :style {:margin "0px 0px 0px"}]
        [gap :size "30px"]
@@ -31,7 +51,7 @@
         :children [[button
                     :label "Submit"
                     :class "btn-primary"
-                    :on-click #(rf/dispatch [:upload/read-web-url (:web-url @form-data)])]
+                    :on-click #(rf/dispatch [:upload/read-url @form-data])]
                    [button
                     :label "Cancel"
                     :on-click #(rf/dispatch [:upload/set-display false])]]]])))
@@ -102,9 +122,9 @@
                     :on-click #(rf/dispatch [:upload/set-display false])]]]])))
 
 (defn panel-content []
-  (let [tab-options [{:id ::web-url :label "Web url"}
+  (let [tab-options [{:id ::url :label "Web url"}
                      {:id ::local-file :label "Local files"}]
-        selected-tab-id (r/atom ::web-url)
+        selected-tab-id (r/atom ::url)
         update-selected-tab #(reset! selected-tab-id %)]
     (fn []
       [border
@@ -124,7 +144,7 @@
                            ;;[p "This will ...."]
                            [gap :size "70px"]
                            (case @selected-tab-id
-                             ::web-url [web-url-form]
+                             ::url [url-form]
                              ::local-file [local-file-form])]]])))
 
 (defn panel

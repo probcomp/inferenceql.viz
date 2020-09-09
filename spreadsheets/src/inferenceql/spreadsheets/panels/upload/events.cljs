@@ -5,7 +5,8 @@
             [goog.labs.format.csv :as csv]
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.csv :as csv-utils]))
+            [inferenceql.spreadsheets.csv :as csv-utils]
+            [clojure.set :as set]))
 
 (rf/reg-event-db
  :upload/set-display
@@ -17,33 +18,44 @@
  :upload/read-files
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [file-objs (select-keys form-data [:dataset-file :dataset-schema-file :model-file])]
-     {:upload/read {:files file-objs
-                    :on-success [:upload/process-files form-data]
-                    :on-failure [:upload/read-failed]}
+   (let [file-objs (-> form-data
+                       (select-keys [:dataset-file :dataset-schema-file :model-file])
+                       (set/rename-keys {:dataset-file :dataset
+                                         :dataset-schema-file :dataset-schema
+                                         :model-file :model}))]
+     {:upload/read-files-effect {:files file-objs
+                                 :on-success [:upload/process-files form-data]
+                                 :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
 
 (rf/reg-event-fx
- :upload/read-web-url
+ :upload/read-url
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   {}))
+   (let [{:keys [url username password]} form-data]
+     {:upload/read-url-effect {:url url
+                               :username username
+                               :password password
+                               :on-success [:upload/process-files]
+                               :on-failure [:upload/read-failed]}
+      :dispatch-n [[:upload/set-display false]
+                   [:table/clear]]})))
 
 (rf/reg-event-fx
  :upload/process-files
  event-interceptors
- (fn [{:keys [_db]} [_ form-data file-data]]
-   (let [{:keys [dataset-name model-name]} form-data
+ (fn [{:keys [_db]} [_ names raw-file-data]]
+   (let [{:keys [dataset-name model-name]} names
          dataset-name (keyword dataset-name)
          model-name (keyword model-name)
 
-         {:keys [dataset-file dataset-schema-file model-file]} file-data
-         schema (edn/read-string dataset-schema-file)
-         dataset-csv (csv/parse dataset-file)
+         {:keys [dataset dataset-schema model]} raw-file-data
+         schema (edn/read-string dataset-schema)
+         dataset-csv (csv/parse dataset)
          dataset (csv-utils/csv-data->clean-maps schema dataset-csv {:keywordize-cols true})
 
-         model (gpm/Multimixture (edn/read-string model-file))]
+         model (gpm/Multimixture (edn/read-string model))]
      ;; TODO: catch converrsion errors
      (if true
        {:dispatch-n [[:store/dataset dataset-name dataset schema model-name]

@@ -2,9 +2,14 @@
   (:require [re-frame.core :as rf]
             [cljs.core.async :as async :refer [go put! <!]]
             [goog.string :as gstring]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ajax.core]
+            [ajax.edn]
+            [lambdaisland.uri :as uri]
+            [clojure.edn :as edn]
+            [goog.crypt.base64 :as b64]))
 
-(defn read [params]
+(defn read-files-effect [params]
   (let [{:keys [files on-success on-failure]} params
         file-reads (async/chan)
         file-reads-batched (async/into [] (async/take (count files) file-reads))]
@@ -43,5 +48,59 @@
                                      (str/join "\n"))]
            (rf/dispatch (conj on-failure failure-messages))))))))
 
-(rf/reg-fx :upload/read read)
+(rf/reg-fx :upload/read-files-effect read-files-effect)
 
+(defn read-url-effect [params]
+  (let [{:keys [url username password on-success on-failure]} params
+        config-edn-url (uri/join url "config.edn")
+        config-read (async/chan)
+
+        file-reads (async/chan)
+        file-reads-batched (async/into [] (async/take 3 file-reads))
+
+        auth-string (b64/encodeString (str  username ":" password))
+        _ (.log js/console :auth-string auth-string)]
+
+    (ajax.core/ajax-request
+      {:uri config-edn-url
+       :method :get
+       :headers {"Authorization" (str "Basic" " " auth-string)}
+       :with-credentials true
+       :handler #(put! config-read %)
+       :response-format (ajax.core/text-response-format)})
+
+    (go
+     (let [[status data] (<! config-read)]
+       (if (false? status)
+         (let [failure-msg (str "Could not read config.edn at " config-edn-url)]
+           (rf/dispatch (conj on-failure failure-msg)))
+
+         (let [config (edn/read-string data)
+               data-to-fetch (select-keys config [:model :dataset :dataset-schema])]
+           (doseq [[key filename] data-to-fetch]
+             (let [file-url (uri/join url filename)]
+               (ajax.core/ajax-request
+                {:uri file-url
+                 :method :get
+                 :handler (fn [[status data]]
+                            (put! file-reads [status key data]))
+                 :response-format (ajax.core/text-response-format)})))))))
+
+    (go
+     (let [reads (<! file-reads-batched)
+           success? #(true? (first %))]
+       (if (every? success? reads)
+         (let [;; Create a map of file name to contents.
+               name-map  {:dataset-name "data" :model-name "model"}
+               raw-data-map (zipmap (map #(nth % 1) reads)
+                                    (map #(nth % 2) reads))]
+           (rf/dispatch (conj on-success name-map raw-data-map)))
+         (let [failure? #(false? (first %))
+               failures (filter failure? reads)
+               failure-messages (->> (for [[_ f-name error] failures]
+                                       (gstring/format "Failed reading %s." f-name))
+                                     (str/join "\n"))]
+           (rf/dispatch (conj on-failure failure-messages))))))))
+
+
+(rf/reg-fx :upload/read-url-effect read-url-effect)
