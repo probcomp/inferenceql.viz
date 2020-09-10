@@ -14,7 +14,6 @@
   (let [file-reads-batched (async/into [] (async/take num-reads file-reads))]
     (go
      (let [reads (<! file-reads-batched)]
-       (.log js/console :reads reads)
        (if (every? :success reads)
          (let [reads (medley/index-by :file-key reads)]
            (rf/dispatch (conj on-success reads)))

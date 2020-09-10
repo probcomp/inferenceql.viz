@@ -6,7 +6,9 @@
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.csv :as csv-utils]
-            [clojure.set :as set]))
+            [inferenceql.spreadsheets.bayesdb-import :as bayesdb-import]
+            [clojure.set :as set]
+            [clojure.string :as str]))
 
 (rf/reg-event-db
  :upload/set-display
@@ -52,18 +54,20 @@
          dataset-name (keyword dataset-name)
          model-name (keyword model-name)
 
-         dataset (get-in raw-file-data [:dataset :data])
+         dataset-raw (get-in raw-file-data [:dataset :data])
          dataset-schema (get-in raw-file-data [:dataset-schema :data])
-         model (get-in raw-file-data [:model :data])
-         model-filename (get-in raw-file-data [:model :filename])
+         model-raw (get-in raw-file-data [:model :data])
+         model-extension (last (str/split (get-in raw-file-data [:model :filename]) #"\."))
 
          schema (edn/read-string dataset-schema)
-         dataset-csv (csv/parse dataset)
+         dataset-csv (csv/parse dataset-raw)
          dataset (csv-utils/csv-data->clean-maps schema dataset-csv {:keywordize-cols true})
 
-         ;; TODO convert the model differently if it is a json file.
-         model (gpm/Multimixture (edn/read-string model))]
-     ;; TODO: catch converrsion errors
+         model (case model-extension
+                 "edn" (gpm/Multimixture (edn/read-string model-raw))
+                 ;; TODO: Fix bayesdb-import code by adding a cljs gamma function.
+                 "json" (gpm/Multimixture (bayesdb-import/multimix-spec model-raw dataset-csv)))]
+     ;; TODO: catch conversion errors.
      (if true
        {:dispatch-n [[:store/dataset dataset-name dataset schema model-name]
                      [:store/model model-name model]]}
