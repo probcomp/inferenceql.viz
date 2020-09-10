@@ -18,13 +18,14 @@
  :upload/read-files
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [file-objs (-> form-data
+   (let [names (select-keys form-data [:dataset-name :model-name])
+         file-objs (-> form-data
                        (select-keys [:dataset-file :dataset-schema-file :model-file])
                        (set/rename-keys {:dataset-file :dataset
                                          :dataset-schema-file :dataset-schema
                                          :model-file :model}))]
      {:upload/read-files-effect {:files file-objs
-                                 :on-success [:upload/process-files form-data]
+                                 :on-success [:upload/process-files names]
                                  :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
@@ -33,11 +34,12 @@
  :upload/read-url
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [{:keys [url username password]} form-data]
+   (let [{:keys [url username password]} form-data
+         names {:dataset-name "data" :model-name "model"}]
      {:upload/read-url-effect {:url url
                                :username username
                                :password password
-                               :on-success [:upload/process-files]
+                               :on-success [:upload/process-files names]
                                :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
