@@ -67,17 +67,17 @@
        [v-box
         :class    "form-group"
         :children [[title :label "Dataset-related" :level :level3 :margin-bottom "1px"]
-                   [title :label "Name – not editable" :level :level4]
-                   [input-text
-                    :model       (:dataset-name @form-data)
-                    :on-change   #(swap! form-data assoc :dataset-name %)
-                    :class       "form-control"
-                    :disabled?   true
-                    :height      "25px"
-                    :width       "190px"
-                    :attr        {:id "dataset-name-input"
-                                  :auto-complete "dummy-value"
-                                  :spell-check "false"}]
+                   #_[title :label "Name – not editable" :level :level4]
+                   #_[input-text
+                      :model       (:dataset-name @form-data)
+                      :on-change   #(swap! form-data assoc :dataset-name %)
+                      :class       "form-control"
+                      :disabled?   true
+                      :height      "25px"
+                      :width       "190px"
+                      :attr        {:id "dataset-name-input"
+                                    :auto-complete "dummy-value"
+                                    :spell-check "false"}]
                    [gap :size "5px"]
                    [title :label "Dataset (.csv)" :level :level4]
                    [:input {:type "file" :multiple false :accept ".csv"
@@ -92,20 +92,20 @@
        [v-box
         :class    "form-group"
         :children [[title :label "Model-related" :level :level3 :margin-bottom "1px"]
-                   [title :label "Name - not editable" :level :level4]
-                   [input-text
-                    :model       (:model-name @form-data)
-                    :on-change   #(swap! form-data assoc :model-name %)
-                    :class       "form-control"
-                    :disabled?   true
-                    :height      "25px"
-                    :width       "190px"
-                    :attr        {:id "model-name-input"
-                                  :auto-complete "dummy-value"
-                                  :spell-check "false"}]
+                   #_[title :label "Name - not editable" :level :level4]
+                   #_[input-text
+                      :model       (:model-name @form-data)
+                      :on-change   #(swap! form-data assoc :model-name %)
+                      :class       "form-control"
+                      :disabled?   true
+                      :height      "25px"
+                      :width       "190px"
+                      :attr        {:id "model-name-input"
+                                    :auto-complete "dummy-value"
+                                    :spell-check "false"}]
                    [gap :size "5px"]
-                   [title :label "Model (.edn)" :level :level4]
-                   [:input {:type "file" :multiple false :accept ".edn"
+                   [title :label "Model (.edn or .json)" :level :level4]
+                   [:input {:type "file" :multiple false :accept ".edn,.json"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                           (swap! form-data assoc :model-file file))}]]]
        [gap :size "30px"]

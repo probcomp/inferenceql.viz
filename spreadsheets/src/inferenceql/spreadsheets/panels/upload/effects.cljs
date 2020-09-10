@@ -7,7 +7,8 @@
             [ajax.edn]
             [lambdaisland.uri :as uri]
             [clojure.edn :as edn]
-            [goog.crypt.base64 :as b64]))
+            [goog.crypt.base64 :as b64]
+            [medley.core :as medley]))
 
 (defn read-files-effect [params]
   (let [{:keys [files on-success on-failure]} params
@@ -77,22 +78,22 @@
                 {:uri file-url
                  :method :get
                  :handler (fn [[status data]]
-                            (put! file-reads [status key data]))
+                            (put! file-reads {:success status
+                                              :file-key key
+                                              :filename filename
+                                              :file-url file-url
+                                              :data data})) ;; May be file data or failure data.
                  :response-format (ajax.core/text-response-format)})))))))
 
     (go
-     (let [reads (<! file-reads-batched)
-           success? #(true? (first %))]
-       (if (every? success? reads)
-         (let [;; Create a map of file name to contents.
-               name-map  {:dataset-name "data" :model-name "model"}
-               raw-data-map (zipmap (map #(nth % 1) reads)
-                                    (map #(nth % 2) reads))]
-           (rf/dispatch (conj on-success name-map raw-data-map)))
-         (let [failure? #(false? (first %))
-               failures (filter failure? reads)
-               failure-messages (->> (for [[_ f-name error] failures]
-                                       (gstring/format "Failed reading %s." f-name))
+     (let [reads (<! file-reads-batched)]
+       (if (every? :success reads)
+         (let [name-map  {:dataset-name "data" :model-name "model"}
+               reads (medley/index-by :file-key reads)]
+           (rf/dispatch (conj on-success name-map reads)))
+         (let [failures (remove :success reads)
+               failure-messages (->> (for [{:keys [file-key filename data]} failures]
+                                       (gstring/format "Failed reading %s -- %s." file-key filename))
                                      (str/join "\n"))]
            (rf/dispatch (conj on-failure failure-messages))))))))
 

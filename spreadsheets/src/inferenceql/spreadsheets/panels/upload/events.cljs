@@ -50,11 +50,16 @@
          dataset-name (keyword dataset-name)
          model-name (keyword model-name)
 
-         {:keys [dataset dataset-schema model]} raw-file-data
+         dataset (get-in raw-file-data [:dataset :data])
+         dataset-schema (get-in raw-file-data [:dataset-schema :data])
+         model (get-in raw-file-data [:model :data])
+         model-filename (get-in raw-file-data [:model :filename])
+
          schema (edn/read-string dataset-schema)
          dataset-csv (csv/parse dataset)
          dataset (csv-utils/csv-data->clean-maps schema dataset-csv {:keywordize-cols true})
 
+         ;; TODO convert the model differently if it is a json file.
          model (gpm/Multimixture (edn/read-string model))]
      ;; TODO: catch converrsion errors
      (if true
