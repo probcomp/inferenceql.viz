@@ -1,5 +1,6 @@
 (ns inferenceql.spreadsheets.views
   (:require [re-frame.core :as rf]
+            [re-com.core :refer [v-box]]
             [inferenceql.spreadsheets.panels.override.views :as modal]
             [inferenceql.spreadsheets.panels.control.views :as control]
             [inferenceql.spreadsheets.panels.viz.views :as viz]
@@ -16,10 +17,10 @@
         pts-store @(rf/subscribe [:viz/pts-store])
         virtual @(rf/subscribe [:table/virtual])
         highlight-class @(rf/subscribe [:table/highlight-class])]
-    [:div
-     [control/panel]
-     [:div#table-container {:class [highlight-class (when virtual "virtual")]}
-       [table/handsontable {} real-hot-props]]
-     [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
-     [modal/modal]
-     [upload/panel]]))
+    [v-box
+     :children [[control/panel]
+                [:div#table-container {:class [highlight-class (when virtual "virtual")]}
+                 [table/handsontable {} real-hot-props]]
+                [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
+                [modal/modal]
+                [upload/panel]]]))
