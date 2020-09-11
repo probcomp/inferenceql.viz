@@ -23,7 +23,7 @@
            (* theta
               (- (- 1 y))  ; If just -y, then returns Gamma(1 - p) variable, contrary to literature.
               (Math/log u3)))
-         (gamma-simulate {:k k :theta theta})))
+         (recur {:k k :theta theta})))
      (let [theta         (if-not theta 1 theta)
            frac-k        (- k (int k))
            gamma-floor-k (- (reduce + (repeatedly
@@ -33,6 +33,14 @@
        (* theta (+ gamma-floor-k gamma-frac-k)))))
   ([n parameters]
    (repeatedly n #(gamma-simulate parameters))))
+
+(defn gamma-simulate
+  "Generates a sample from a gamma distribution with shape parameter `k` and scale parameter `theta`.
+  Based on Section 3 of 'Generating Gamma and Beta Random Variables with Non-Integral Shape Parameters'
+  by J Whittaker, found at https://www.jstor.org/stable/pdf/2347003.pdf?seq=1 .
+  Generates `n` samples, if specified."
+  ([{:keys [k theta]}]
+   0.5))
 
 (defn infql-type
   "Converts from the column types in a BayesDB export and the types in an InferenceQL model.edn"
@@ -191,4 +199,4 @@
 (defn multimix-spec [bdb-models data]
   (let [rows (csv-utils/csv-data->clean-maps (column-types bdb-models) data)
         specs (generate-specs-from-json bdb-models rows)]
-   (first (keywordize-columns specs))))
+   (keywordize-columns (first specs))))
