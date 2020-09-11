@@ -25,6 +25,23 @@
             :<- [:store/datasets]
             dataset)
 
+(defn ^:sub geo-id-col
+  "Returns the geo-id-col associated with the dataset referenced in the query text."
+  [dataset]
+  (keyword (:geo-id-col dataset)))
+(rf/reg-sub :query/geo-id-col
+            :<- [:query/dataset]
+            geo-id-col)
+
+(defn ^:sub geodata
+  "Returns the geodata associated with the dataset referenced in the query text."
+  [[dataset geodata]]
+  (get geodata (:geodata-name dataset)))
+(rf/reg-sub :query/geodata
+            :<- [:query/dataset]
+            :<- [:store/geodata]
+            geodata)
+
 (defn ^:sub model
   "Returns the model referenced in the query text."
   [[model-name models]]

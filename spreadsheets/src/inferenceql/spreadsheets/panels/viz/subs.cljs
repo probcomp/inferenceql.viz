@@ -9,9 +9,11 @@
             :<- [:table/selection-layers-list]
             :<- [:query/schema]
             :<- [:query/model]
-            (fn [[selection-layers schema model]]
+            :<- [:query/geodata]
+            :<- [:query/geo-id-col]
+            (fn [[selection-layers schema model geodata geo-id-col]]
               (clj->js
-                (vega/generate-spec selection-layers schema model))))
+                (vega/generate-spec selection-layers schema model geodata geo-id-col))))
 
 (defn make-simulate-fn
   [col-to-sim row override-fns model]

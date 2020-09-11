@@ -7,6 +7,11 @@
    (get-in db [:store-component :datasets])))
 
 (rf/reg-sub
+ :store/geodata
+ (fn [db _]
+   (get-in db [:store-component :geodata])))
+
+(rf/reg-sub
  :store/models
  (fn [db _]
    (get-in db [:store-component :models])))
