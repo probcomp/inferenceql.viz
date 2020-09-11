@@ -10,6 +10,7 @@
             [goog.crypt.base64 :as b64]
             [medley.core :as medley]))
 
+
 (defn handle-reads [file-reads num-reads on-success on-failure]
   (let [file-reads-batched (async/into [] (async/take num-reads file-reads))]
     (go
@@ -21,6 +22,18 @@
                failure-messages (->> (for [{:keys [file-key filename data]} failures]
                                        (gstring/format "Failed reading %s -- %s." file-key filename))
                                      (str/join "\n"))]
+           (rf/dispatch (conj on-failure failure-messages))))))))
+
+(defn handle-reads-2 [file-reads num-reads config on-success on-failure]
+  (let [file-reads-batched (async/into [] (async/take num-reads file-reads))]
+    (go
+     (let [reads (<! file-reads-batched)]
+       (if (every? :success reads)
+         (rf/dispatch (conj on-success reads config))
+         (let [failures (remove :success reads)
+               failure-messages (->> (for [{:keys [filename file-url]} failures]
+                                       (gstring/format "Failed reading %s at %s." filename file-url))
+                                  (str/join "\n"))]
            (rf/dispatch (conj on-failure failure-messages))))))))
 
 (defn read-files-effect [params]
@@ -75,19 +88,34 @@
            (rf/dispatch (conj on-failure failure-msg)))
 
          (let [config (edn/read-string data)
-               data-to-fetch (select-keys config [:model :dataset :dataset-schema])]
-           (doseq [[file-key filename] data-to-fetch]
+
+               data-to-fetch (-> (for [category [:datasets :models :geodata]]
+                                   (let [items-in-category (get config category)]
+                                     (for [[item-key item] items-in-category]
+                                       (case category
+                                         :datasets [{:path [category item-key :data]
+                                                     :filename (:filename item)}
+                                                    ;; Datasets have this extra path for the schema
+                                                    ;; that we have to fetch.
+                                                    {:path [category item-key :schema]
+                                                     :filename (:schema-filename item)}]
+                                         {:path [category item-key :data]
+                                          :filename (:filename item)}))))
+                                 (flatten))]
+
+           (doseq [{:keys [path filename]} data-to-fetch]
              (let [file-url (uri/join url filename)]
                (ajax.core/ajax-request
                 {:uri file-url
                  :method :get
                  :handler (fn [[status data]]
                             (put! file-reads {:success status
-                                              :file-key file-key
+                                              :config-path path
                                               :filename filename
                                               :file-url file-url
                                               :data data})) ;; May be file data or failure data.
-                 :response-format (ajax.core/text-response-format)})))))))
-    (handle-reads file-reads 3 on-success on-failure)))
+                 :response-format (ajax.core/text-response-format)})))
+
+           (handle-reads-2 file-reads (count data-to-fetch) config on-success on-failure)))))))
 
 (rf/reg-fx :upload/read-url-effect read-url-effect)

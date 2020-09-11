@@ -29,14 +29,14 @@
 (def geodata-db-entries
   (if (nil? (:geodata config/config))
     {}
-    {:store-component {:datasets {:data {:geodata-name :default-geo
+    {:store-component {:datasets {:data {:geodata-name :default
                                          :geo-id-col (get-in config/config [:geodata :geo-id-col])}}
-                       :geodata {:default-geo {:data (get-in config/config [:geodata :data])
-                                               :filetype (get-in config/config [:geodata :filetype])
-                                               :feature (get-in config/config [:geodata :feature])
-                                               :id-prop (get-in config/config [:geodata :id-prop])
-                                               :id-prop-code-length (get-in config/config [:geodata :id-prop-code-length])
-                                               :projection-type (get-in config/config [:geodata :projection-type])}}}}))
+                       :geodata {:default {:data (get-in config/config [:geodata :data])
+                                           :filetype (get-in config/config [:geodata :filetype])
+                                           :feature (get-in config/config [:geodata :feature])
+                                           :id-prop (get-in config/config [:geodata :id-prop])
+                                           :id-prop-code-length (get-in config/config [:geodata :id-prop-code-length])
+                                           :projection-type (get-in config/config [:geodata :projection-type])}}}}))
 
 (def default-db (medley/deep-merge default-db-base geodata-db-entries))
 

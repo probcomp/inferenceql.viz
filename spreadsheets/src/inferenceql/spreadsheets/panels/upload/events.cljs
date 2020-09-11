@@ -8,7 +8,8 @@
             [inferenceql.spreadsheets.csv :as csv-utils]
             [inferenceql.spreadsheets.bayesdb-import :as bayesdb-import]
             [clojure.set :as set]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [medley.core :as medley]))
 
 (rf/reg-event-db
  :upload/set-display
@@ -36,12 +37,11 @@
  :upload/read-url
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [{:keys [url username password]} form-data
-         names {:dataset-name "data" :model-name "model"}]
+   (let [{:keys [url username password]} form-data]
      {:upload/read-url-effect {:url url
                                :username username
                                :password password
-                               :on-success [:upload/process-files names]
+                               :on-success [:upload/process-files-from-url]
                                :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
@@ -65,12 +65,51 @@
 
          model (case model-extension
                  "edn" (gpm/Multimixture (edn/read-string model-raw))
-                 ;; TODO: Fix bayesdb-import code by adding a cljs gamma function.
-                 "json" (gpm/Multimixture (bayesdb-import/multimix-spec model-raw dataset-csv)))]
+                 "json" (gpm/Multimixture (bayesdb-import/multimix-spec (js->clj (.parse js/JSON model-raw))
+                                                                        dataset-csv)))]
      ;; TODO: catch conversion errors.
      (if true
        {:dispatch-n [[:store/dataset dataset-name dataset schema model-name]
                      [:store/model model-name model]]}
+       {:dispatch [:upload/read-failed "TODO: write error message for conversion."]}))))
+
+(rf/reg-event-fx
+ :upload/process-files-from-url
+ event-interceptors
+ (fn [{:keys [_db]} [_ file-reads config]]
+   (let [config (loop [[fr & frs] file-reads new-config config]
+                  (if-let [{:keys [config-path data]} fr]
+                    (recur frs (assoc-in new-config config-path data))
+                    new-config))
+
+         datasets (medley/map-vals (fn [dataset]
+                                     (let [schema (edn/read-string (:schema dataset))
+                                           csv-data (csv/parse (:data dataset))
+                                           rows (csv-utils/csv-data->clean-maps schema csv-data {:keywordize-cols true})]
+                                       (merge dataset {:schema schema
+                                                       :csv-data csv-data
+                                                       :rows rows})))
+                                   (:datasets config))
+
+         models (medley/map-vals (fn [model]
+                                   (let [model-extension (last (str/split (:filename model) #"\."))
+                                         csv-data (get-in datasets [(:dataset model) :csv-data])
+                                         model-obj (case model-extension
+                                                     "edn" (gpm/Multimixture (edn/read-string (:data model)))
+                                                     "json" (gpm/Multimixture (bayesdb-import/multimix-spec (js->clj (.parse js/JSON (:data model)))
+                                                                                                            csv-data)))]
+                                     (assoc model :model-obj model-obj)))
+                                 (:models config))
+
+         geodata (medley/map-vals (fn [geodatum] (update geodatum :data #(.parse js/JSON %)))
+                                  (:geodata config))]
+
+
+     ;; TODO: catch conversion errors.
+     (if true
+       {:dispatch-n [[:store/datasets datasets]
+                     [:store/models models]
+                     [:store/geodata geodata]]}
        {:dispatch [:upload/read-failed "TODO: write error message for conversion."]}))))
 
 (rf/reg-event-fx

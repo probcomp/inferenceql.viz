@@ -1,9 +1,38 @@
 (ns inferenceql.spreadsheets.bayesdb-import
   (:require [inferenceql.spreadsheets.csv :as csv-utils]
             [inferenceql.inference.utils :as utils]
-            [inferenceql.inference.distributions :as iqldist]
             [metaprob.distributions :as mpdist]
             [medley.core :as medley]))
+
+(defn gamma-simulate
+  "Generates a sample from a gamma distribution with shape parameter `k` and scale parameter `theta`.
+  Based on Section 3 of 'Generating Gamma and Beta Random Variables with Non-Integral Shape Parameters'
+  by J Whittaker, found at https://www.jstor.org/stable/pdf/2347003.pdf?seq=1 .
+  Generates `n` samples, if specified."
+  ([{:keys [k theta]}]
+   (if (< k 1)
+     (let [u1 (rand)
+           u2 (rand)
+           u3 (rand)
+           s1 (Math/pow u1 k)
+           s2 (Math/pow u2 (- 1 k))
+           theta (if-not theta 1 theta)]
+       (if (<= (+ s1 s2) 1)
+         (let [y (/ s1
+                    (+ s1 s2))]
+           (* theta
+              (- (- 1 y))  ; If just -y, then returns Gamma(1 - p) variable, contrary to literature.
+              (Math/log u3)))
+         (gamma-simulate {:k k :theta theta})))
+     (let [theta         (if-not theta 1 theta)
+           frac-k        (- k (int k))
+           gamma-floor-k (- (reduce + (repeatedly
+                                        (int k)
+                                        #(Math/log (rand)))))
+           gamma-frac-k  (if (zero? frac-k) 0 (gamma-simulate {:k frac-k}))]
+       (* theta (+ gamma-floor-k gamma-frac-k)))))
+  ([n parameters]
+   (repeatedly n #(gamma-simulate parameters))))
 
 (defn infql-type
   "Converts from the column types in a BayesDB export and the types in an InferenceQL model.edn"
@@ -76,7 +105,7 @@
 (defn nig-normal-sampler
   "Generates samples given column hyperparameters."
   [{m :m r :r s :s nu :nu}]
-  (let [gamma #?(:cljs iqldist/gamma-dist
+  (let [gamma #?(:cljs (fn [k theta] (gamma-simulate {:k k :theta theta}))
                  :clj mpdist/gamma)
         rho (gamma (/ nu 2.0) (/ 2.0 s))
         sigma (Math/pow (* rho r) -0.5)
