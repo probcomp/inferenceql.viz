@@ -1,6 +1,7 @@
 (ns inferenceql.spreadsheets.bayesdb-import
   (:require [inferenceql.spreadsheets.csv :as csv-utils]
             [inferenceql.inference.utils :as utils]
+            [inferenceql.inference.distributions :as iqldist]
             [metaprob.distributions :as mpdist]
             [medley.core :as medley]))
 
@@ -75,7 +76,9 @@
 (defn nig-normal-sampler
   "Generates samples given column hyperparameters."
   [{m :m r :r s :s nu :nu}]
-  (let [rho (mpdist/gamma (/ nu 2.0) (/ 2.0 s))
+  (let [gamma #?(:cljs iqldist/gamma-dist
+                 :clj mpdist/gamma)
+        rho (gamma (/ nu 2.0) (/ 2.0 s))
         sigma (Math/pow (* rho r) -0.5)
         mu (mpdist/gaussian m (Math/pow (* rho r) -0.5))]
     (mpdist/gaussian mu (Math/pow rho -0.5))))
