@@ -10,72 +10,65 @@
             [goog.crypt.base64 :as b64]
             [medley.core :as medley]))
 
-(defn handle-reads [file-reads num-reads on-success on-failure]
-  (let [file-reads-batched (async/into [] (async/take num-reads file-reads))]
-    (go
-     (let [reads (<! file-reads-batched)]
-       (if (every? :success reads)
-         (let [reads (medley/index-by :file-key reads)]
-           (rf/dispatch (conj on-success reads)))
-         (let [failures (remove :success reads)
-               failure-messages (->> (for [{:keys [file-key filename data]} failures]
-                                       (gstring/format "Failed reading %s -- %s." file-key filename))
-                                     (str/join "\n"))]
-           (rf/dispatch (conj on-failure failure-messages))))))))
-
-(defn handle-reads-2 [file-reads num-reads config on-success on-failure]
+(defn handle-reads
+  "TODO: Write me"
+  [file-reads num-reads config on-success on-failure]
   (let [file-reads-batched (async/into [] (async/take num-reads file-reads))]
     (go
      (let [reads (<! file-reads-batched)]
        (if (every? :success reads)
          (rf/dispatch (conj on-success reads config))
          (let [failures (remove :success reads)
-               failure-messages (->> (for [{:keys [filename file-url]} failures]
-                                       (gstring/format "Failed reading %s at %s." filename file-url))
-                                  (str/join "\n"))]
+               failure-messages (->> (for [{:keys [filename config-path file-url]} failures]
+                                       (str (gstring/format "Failed reading %s at the config path %s." filename config-path)
+                                            (when file-url (gstring/format " (using url %s" file-url))))
+                                     (str/join "\n"))]
            (rf/dispatch (conj on-failure failure-messages))))))))
 
-(defn read-files-effect [params]
-  (let [{:keys [files on-success on-failure]} params
-        file-reads (async/chan)]
+(defn ^:effect read-files-effect
+  "TODO: Write me"
+  [params]
+  (let [{:keys [files dataset-name model-name on-success on-failure]} params
+        {:keys [dataset-file dataset-schema-file model-file]} files
+        required-files [dataset-file dataset-schema-file model-file]]
+    (if-not (every? #(instance? js/File %) required-files)
+      (rf/dispatch (conj on-failure "Not all required files were specified."))
+      (let [[dataset-name model-name] (map keyword [dataset-name model-name])
+            mock-config {:datasets {dataset-name {:filename (.-name dataset-file)
+                                                  :schema-filename (.-name dataset-schema-file)
+                                                  :default-model model-name}}
+                         :models {model-name {:filename (.-name model-file)
+                                              :dataset dataset-name}}}
+            mock-config-paths [[:datasets :data :data]
+                               [:datasets :data :schema]
+                               [:models :model :data]]
+            file-reads (async/chan)]
+        (doseq [[config-path file-obj] (map vector mock-config-paths required-files)]
+          (let [put-map {:config-path config-path
+                         :filename (.-name file-obj)
+                         :file-type (.-type file-obj)
+                         :success nil ; To be set.
+                         :data nil} ; To be set.
+                rdr (js/FileReader.)
+                on-load (fn [_]
+                          (this-as this
+                            (let [contents (.-result this)]
+                              (put! file-reads (merge put-map {:success true
+                                                               :data contents})))))
+                on-error (fn [error]
+                           (this-as this
+                             (put! file-reads (merge put-map {:success false
+                                                              :data error}))))]
+            (set! (.-onload rdr) on-load)
+            (set! (.-onerror rdr) on-error)
+            (.readAsText rdr file-obj)))
 
-
-    ;; TODO: add a fake config file here.
-    ;; TODO: create a map form :file-keys to :config-path in fake config
-
-    (doseq [[file-key file-obj] files]
-      (let [put-map {:file-key file-key
-                     :filename (.-name file-obj)
-                     :file-type (.-type file-obj)
-                     :success nil ; To be set.
-                     :data nil} ; To be set.
-
-            ;; TODO we need to deal with :config-path instead of :file-key
-
-            rdr (js/FileReader.)
-            on-load (fn [_]
-                      (this-as this
-                        (let [contents (.-result this)]
-                          (put! file-reads (merge put-map {:success true
-                                                           :data contents})))))
-            on-error (fn [error]
-                       (this-as this
-                         (put! file-reads (merge put-map {:success false
-                                                          :data error}))))]
-        (set! (.-onload rdr) on-load)
-        (set! (.-onerror rdr) on-error)
-
-        (try
-          (.readAsText rdr file-obj)
-          (catch js/Error error
-            ;; This catches when no file has been selected.
-            (put! file-reads (merge put-map {:success false
-                                             :data error}))))))
-    (handle-reads file-reads (count files) on-success on-failure)))
-
+        (handle-reads file-reads (count files) mock-config on-success on-failure)))))
 (rf/reg-fx :upload/read-files-effect read-files-effect)
 
-(defn read-url-effect [params]
+(defn ^:effect read-url-effect
+  "TODO: write me"
+  [params]
   (let [{:keys [url username password on-success on-failure]} params
         config-read (async/chan)
         config-edn-url (uri/join url "config.edn")]
@@ -88,9 +81,6 @@
 
     (go
      (let [[status data] (<! config-read)]
-
-       ;; TODO: maybe put this config file on the reads channel as well.
-
        (if (false? status)
          (let [failure-msg (str "Could not read config.edn at " config-edn-url)]
            (rf/dispatch (conj on-failure failure-msg)))
@@ -125,6 +115,5 @@
                                               :data data})) ;; May be file data or failure data.
                  :response-format (ajax.core/text-response-format)})))
 
-           (handle-reads-2 file-reads (count data-to-fetch) config on-success on-failure)))))))
-
+           (handle-reads file-reads (count data-to-fetch) config on-success on-failure)))))))
 (rf/reg-fx :upload/read-url-effect read-url-effect)

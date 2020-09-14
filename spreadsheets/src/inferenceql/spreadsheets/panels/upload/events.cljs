@@ -21,14 +21,12 @@
  :upload/read-files
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [names (select-keys form-data [:dataset-name :model-name])
-         file-objs (-> form-data
-                       (select-keys [:dataset-file :dataset-schema-file :model-file])
-                       (set/rename-keys {:dataset-file :dataset
-                                         :dataset-schema-file :dataset-schema
-                                         :model-file :model}))]
+   (let [{:keys [dataset-name model-name]} form-data
+         file-objs (select-keys form-data [:dataset-file :dataset-schema-file :model-file])]
      {:upload/read-files-effect {:files file-objs
-                                 :on-success [:upload/process-files names]
+                                 :dataset-name dataset-name
+                                 :model-name model-name
+                                 :on-success [:upload/process-files]
                                  :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
@@ -41,40 +39,13 @@
      {:upload/read-url-effect {:url url
                                :username username
                                :password password
-                               :on-success [:upload/process-files-from-url]
+                               :on-success [:upload/process-files]
                                :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
 
 (rf/reg-event-fx
  :upload/process-files
- event-interceptors
- (fn [{:keys [_db]} [_ names raw-file-data]]
-   (let [{:keys [dataset-name model-name]} names
-         dataset-name (keyword dataset-name)
-         model-name (keyword model-name)
-
-         dataset-raw (get-in raw-file-data [:dataset :data])
-         dataset-schema (get-in raw-file-data [:dataset-schema :data])
-         model-raw (get-in raw-file-data [:model :data])
-         model-extension (last (str/split (get-in raw-file-data [:model :filename]) #"\."))
-
-         schema (edn/read-string dataset-schema)
-         dataset-csv (csv/parse dataset-raw)
-         dataset (csv-utils/csv-data->clean-maps schema dataset-csv {:keywordize-cols true})
-
-         model (case model-extension
-                 "edn" (gpm/Multimixture (edn/read-string model-raw))
-                 "json" (gpm/Multimixture (bayesdb-import/multimix-spec (js->clj (.parse js/JSON model-raw))
-                                                                        dataset-csv)))]
-     ;; TODO: catch conversion errors.
-     (if true
-       {:dispatch-n [[:store/dataset dataset-name dataset schema model-name]
-                     [:store/model model-name model]]}
-       {:dispatch [:upload/read-failed "TODO: write error message for conversion."]}))))
-
-(rf/reg-event-fx
- :upload/process-files-from-url
  event-interceptors
  (fn [{:keys [_db]} [_ file-reads config]]
    (let [config (loop [[fr & frs] file-reads new-config config]
@@ -103,7 +74,6 @@
 
          geodata (medley/map-vals (fn [geodatum] (update geodatum :data #(.parse js/JSON %)))
                                   (:geodata config))]
-
 
      ;; TODO: catch conversion errors.
      (if true
