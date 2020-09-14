@@ -35,6 +35,9 @@
 
 (vega.init/add-custom-vega-color-schemes)
 
+;; Use highlight.js to automatically syntax highlight code inside <pre><code></code></pre> tags.
+(.initHighlightingOnLoad js/hljs)
+
 (defn ^:export -main
   []
   (reagent/render [views/app] (dom/$ "app")))
