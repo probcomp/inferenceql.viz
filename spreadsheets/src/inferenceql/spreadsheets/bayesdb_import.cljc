@@ -23,7 +23,7 @@
            (* theta
               (- (- 1 y))  ; If just -y, then returns Gamma(1 - p) variable, contrary to literature.
               (Math/log u3)))
-         (recur {:k k :theta theta})))
+         (gamma-simulate {:k k :theta theta})))
      (let [theta         (if-not theta 1 theta)
            frac-k        (- k (int k))
            gamma-floor-k (- (reduce + (repeatedly

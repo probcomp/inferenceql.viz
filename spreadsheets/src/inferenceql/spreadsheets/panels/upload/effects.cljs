@@ -10,7 +10,6 @@
             [goog.crypt.base64 :as b64]
             [medley.core :as medley]))
 
-
 (defn handle-reads [file-reads num-reads on-success on-failure]
   (let [file-reads-batched (async/into [] (async/take num-reads file-reads))]
     (go
@@ -40,12 +39,19 @@
   (let [{:keys [files on-success on-failure]} params
         file-reads (async/chan)]
 
+
+    ;; TODO: add a fake config file here.
+    ;; TODO: create a map form :file-keys to :config-path in fake config
+
     (doseq [[file-key file-obj] files]
       (let [put-map {:file-key file-key
                      :filename (.-name file-obj)
                      :file-type (.-type file-obj)
                      :success nil ; To be set.
                      :data nil} ; To be set.
+
+            ;; TODO we need to deal with :config-path instead of :file-key
+
             rdr (js/FileReader.)
             on-load (fn [_]
                       (this-as this
@@ -72,7 +78,6 @@
 (defn read-url-effect [params]
   (let [{:keys [url username password on-success on-failure]} params
         config-read (async/chan)
-        file-reads (async/chan)
         config-edn-url (uri/join url "config.edn")]
 
     (ajax.core/ajax-request
@@ -83,34 +88,38 @@
 
     (go
      (let [[status data] (<! config-read)]
+
+       ;; TODO: maybe put this config file on the reads channel as well.
+
        (if (false? status)
          (let [failure-msg (str "Could not read config.edn at " config-edn-url)]
            (rf/dispatch (conj on-failure failure-msg)))
 
          (let [config (edn/read-string data)
-
                data-to-fetch (-> (for [category [:datasets :models :geodata]]
                                    (let [items-in-category (get config category)]
                                      (for [[item-key item] items-in-category]
                                        (case category
-                                         :datasets [{:path [category item-key :data]
+                                         :datasets [{:config-path [category item-key :data]
                                                      :filename (:filename item)}
                                                     ;; Datasets have this extra path for the schema
                                                     ;; that we have to fetch.
-                                                    {:path [category item-key :schema]
+                                                    {:config-path [category item-key :schema]
                                                      :filename (:schema-filename item)}]
-                                         {:path [category item-key :data]
+                                         {:config-path [category item-key :data]
                                           :filename (:filename item)}))))
-                                 (flatten))]
+                                 (flatten))
 
-           (doseq [{:keys [path filename]} data-to-fetch]
+               file-reads (async/chan)]
+
+           (doseq [{:keys [config-path filename]} data-to-fetch]
              (let [file-url (uri/join url filename)]
                (ajax.core/ajax-request
                 {:uri file-url
                  :method :get
                  :handler (fn [[status data]]
                             (put! file-reads {:success status
-                                              :config-path path
+                                              :config-path config-path
                                               :filename filename
                                               :file-url file-url
                                               :data data})) ;; May be file data or failure data.
