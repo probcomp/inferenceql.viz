@@ -17,7 +17,12 @@
     (go
      (let [reads (<! file-reads-batched)]
        (if (every? :success reads)
-         (rf/dispatch (conj on-success reads config))
+         (let [config-with-data (reduce (fn [acc r]
+                                          (let [{:keys [config-path data]} r]
+                                            (assoc-in acc config-path data)))
+                                        config
+                                        reads)]
+           (rf/dispatch (conj on-success config-with-data)))
          (let [failures (remove :success reads)
                failure-messages (->> (for [{:keys [filename config-path file-url]} failures]
                                        (str (gstring/format "Failed reading %s at the config path %s." filename config-path)

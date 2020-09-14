@@ -66,7 +66,7 @@
       [:<>
        [v-box
         :class    "form-group"
-        :children [[title :label "Dataset-related" :level :level3 :margin-bottom "1px"]
+        :children [[title :label "Dataset" :level :level3 :margin-bottom "1px"]
                    #_[title :label "Name – not editable" :level :level4]
                    #_[input-text
                       :model       (:dataset-name @form-data)
@@ -91,7 +91,7 @@
        [gap :size "30px"]
        [v-box
         :class    "form-group"
-        :children [[title :label "Model-related" :level :level3 :margin-bottom "1px"]
+        :children [[title :label "Model" :level :level3 :margin-bottom "1px"]
                    #_[title :label "Name - not editable" :level :level4]
                    #_[input-text
                       :model       (:model-name @form-data)

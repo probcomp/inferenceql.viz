@@ -26,7 +26,7 @@
      {:upload/read-files-effect {:files file-objs
                                  :dataset-name dataset-name
                                  :model-name model-name
-                                 :on-success [:upload/process-files]
+                                 :on-success [:upload/process-config]
                                  :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
@@ -39,21 +39,16 @@
      {:upload/read-url-effect {:url url
                                :username username
                                :password password
-                               :on-success [:upload/process-files]
+                               :on-success [:upload/process-config]
                                :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]
                    [:table/clear]]})))
 
 (rf/reg-event-fx
- :upload/process-files
+ :upload/process-config
  event-interceptors
- (fn [{:keys [_db]} [_ file-reads config]]
-   (let [config (loop [[fr & frs] file-reads new-config config]
-                  (if-let [{:keys [config-path data]} fr]
-                    (recur frs (assoc-in new-config config-path data))
-                    new-config))
-
-         datasets (medley/map-vals (fn [dataset]
+ (fn [{:keys [_db]} [_ config]]
+   (let [datasets (medley/map-vals (fn [dataset]
                                      (let [schema (edn/read-string (:schema dataset))
                                            csv-data (csv/parse (:data dataset))
                                            rows (csv-utils/csv-data->clean-maps schema csv-data {:keywordize-cols true})]
