@@ -21,6 +21,7 @@
      :children [[control/panel]
                 [:div#table-container {:class [highlight-class (when virtual "virtual")]}
                  [table/handsontable {} real-hot-props]]
-                [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
+                (when vega-lite-spec
+                  [viz/vega-lite vega-lite-spec {:actions false} generators pts-store])
                 [modal/modal]
                 [upload/panel]]]))
