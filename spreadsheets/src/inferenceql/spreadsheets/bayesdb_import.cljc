@@ -75,7 +75,11 @@
     (map #(xcat-model data stat-types categories %) json-models)))
 
 (defn xcat
-  "`bdb-export` is a clojure map"
+  "Returns a xcat model given a BayesDB export of the model.
+  `bdb-export` is a clojure map representing the BayesDB export. It does not have to be keywordized.
+  `rows` is a collection of maps representing dataset rows used to build the model.
+  Keys in `rows` should be keywordized. And values in `rows` should be cast according to the
+  datasets' schema."
   [bdb-export rows]
   (first (xcat-gpms bdb-export rows)))
 

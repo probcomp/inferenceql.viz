@@ -60,7 +60,7 @@
 
          models (medley/map-vals (fn [model]
                                    (let [model-extension (last (str/split (:filename model) #"\."))
-                                         csv-data (get-in datasets [(:dataset model) :csv-data])
+                                         csv-data (get-in datasets [(:dataset model) :rows])
                                          model-obj (case model-extension
                                                      "edn"
                                                      (gpm/Multimixture (edn/read-string (:data model)))
@@ -68,6 +68,8 @@
                                                      (bayesdb-import/xcat
                                                       (js->clj (.parse js/JSON (:data model)))
                                                       csv-data))]
+                                     (.log js/console :model--------------see-next-line)
+                                     (.log js/console model-obj)
                                      (assoc model :model-obj model-obj)))
                                  (:models config))
 
