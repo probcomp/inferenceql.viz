@@ -51,6 +51,7 @@
             :<- [:store/models]
             model)
 
+;; TODO: perhaps this should always just return the dataset schema.
 (defn ^:sub schema
   "Returns a schema for the query whose results are currently displayed.
   If we are displaying virtual data, the schema from the model used is returned.
@@ -65,6 +66,7 @@
             :<- [:query/virtual]
             schema)
 
+;; TODO: remove this.
 (defn ^:sub model-schema
   "Returns a schema for the model used by the query whose results are currently displayed."
   [model]

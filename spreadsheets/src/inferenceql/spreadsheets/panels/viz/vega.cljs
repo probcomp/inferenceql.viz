@@ -89,11 +89,10 @@
 
 (defn simulatable?
   "Checks if `selections` and `cols` are valid for simulation"
-  [selections cols model]
-  (let [model-schema (get-in model [:model :vars])]
-    (and (= 1 (count selections)) ; Single row selected.
-         (= 1 (count cols)) ; Single column selected.
-         (some? (get model-schema (first cols)))))) ;; Selected column contained in model
+  [selections cols schema]
+  (and (= 1 (count selections)) ; Single row selected.
+       (= 1 (count cols)) ; Single column selected.
+       (some? (get schema (first cols))))) ;; Selected column is said to be modeled.
 
 (defn gen-simulate-plot
   "Generates a vega-lite spec for a histogram of simulated values for a cell.
@@ -402,7 +401,7 @@
            #{"nominal"} (table-bubble-plot selections cols)
            #{"quantitative" "nominal"} (strip-plot selections cols))))
 
-(defn- spec-for-selection-layer [model geodata geo-id-col selection-layer]
+(defn- spec-for-selection-layer [schema geodata geo-id-col selection-layer]
   (let [{layer-name :id
          selections :selections
          cols :selected-columns
@@ -413,7 +412,7 @@
       (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
                        (gen-choropleth geodata geo-id-col selections cols)
 
-                       (simulatable? selections cols model)
+                       (simulatable? selections cols schema)
                        (gen-simulate-plot (first cols) row (name layer-name))
 
                        (= 1 (count cols)) ; One column selected.
@@ -426,11 +425,11 @@
                             :fontWeight 500}}]
         (merge spec title)))))
 
-(defn generate-spec [selection-layers schema model geodata geo-id-col]
+(defn generate-spec [selection-layers schema geodata geo-id-col]
   (binding [vega-type (vega-type-fn schema)]
     ;; We need to use doall to force the lazy seq because the dynamic bindings
     ;; are not captured by the lazy sequences.
-    (when-let [spec-layers (seq (doall (keep #(spec-for-selection-layer model geodata geo-id-col %)
+    (when-let [spec-layers (seq (doall (keep #(spec-for-selection-layer schema geodata geo-id-col %)
                                              selection-layers)))]
       {:$schema default-vega-lite-schema
        :hconcat spec-layers

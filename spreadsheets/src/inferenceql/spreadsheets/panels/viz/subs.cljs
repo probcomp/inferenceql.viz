@@ -8,24 +8,23 @@
 (rf/reg-sub :viz/vega-lite-spec
             :<- [:table/selection-layers-list]
             :<- [:query/schema]
-            :<- [:query/model]
             :<- [:query/geodata]
             :<- [:query/geo-id-col]
-            (fn [[selection-layers schema model geodata geo-id-col]]
+            (fn [[selection-layers schema geodata geo-id-col]]
               (clj->js
-                (vega/generate-spec selection-layers schema model geodata geo-id-col))))
+                (vega/generate-spec selection-layers schema geodata geo-id-col))))
 
 (defn make-simulate-fn
-  [col-to-sim row override-fns model]
-  (let [model-schema (get-in model [:model :vars])
+  [col-to-sim row override-fns schema model]
+  (let [simulatable-columns (keys schema)
         constraints (as-> row $
-                          (select-keys $ (keys model-schema))
+                          (select-keys $ simulatable-columns)
                           (dissoc $ col-to-sim)
                           (medley/remove-vals nil? $))
         targets #{col-to-sim}
-        gen-fn #(first (gpm/simulate model targets constraints 1))
-
+        gen-fn #(gpm/simulate model targets constraints)
         has-negative-vals? #(some (every-pred number? neg?) (vals %))
+
         override-map (select-keys override-fns [col-to-sim])
         override-insert-fn (co/gen-insert-fn override-map)]
     ;; returns the first result of gen-fn that doesn't have a negative salary
@@ -35,15 +34,16 @@
 (rf/reg-sub :viz/generators
             :<- [:table/selection-layers]
             :<- [:override/column-override-fns]
+            :<- [:query/schema]
             :<- [:query/model]
-            (fn [[layers override-fns model]]
+            (fn [[layers override-fns schema model]]
               (->> layers
                    (medley/map-vals (fn [layer]
                                       (let [{selections :selections
                                              cols :selected-columns
                                              row :row-at-selection-start} layer]
-                                        (when (vega/simulatable? selections cols model)
-                                          (make-simulate-fn (first cols) row override-fns model)))))
+                                        (when (vega/simulatable? selections cols schema)
+                                          (make-simulate-fn (first cols) row override-fns schema model)))))
                    (medley/remove-vals nil?))))
 
 (rf/reg-sub :viz/pts-store

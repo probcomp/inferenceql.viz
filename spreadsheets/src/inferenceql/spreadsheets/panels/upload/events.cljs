@@ -51,7 +51,8 @@
    (let [datasets (medley/map-vals (fn [dataset]
                                      (let [schema (edn/read-string (:schema dataset))
                                            csv-data (csv/parse (:data dataset))
-                                           rows (csv-utils/csv-data->clean-maps schema csv-data {:keywordize-cols true})]
+                                           rows (csv-utils/csv-data->clean-maps
+                                                 schema csv-data {:keywordize-cols true})]
                                        (merge dataset {:schema schema
                                                        :csv-data csv-data
                                                        :rows rows})))
@@ -61,9 +62,12 @@
                                    (let [model-extension (last (str/split (:filename model) #"\."))
                                          csv-data (get-in datasets [(:dataset model) :csv-data])
                                          model-obj (case model-extension
-                                                     "edn" (gpm/Multimixture (edn/read-string (:data model)))
-                                                     "json" (gpm/Multimixture (bayesdb-import/multimix-spec (js->clj (.parse js/JSON (:data model)))
-                                                                                                            csv-data)))]
+                                                     "edn"
+                                                     (gpm/Multimixture (edn/read-string (:data model)))
+                                                     "json"
+                                                     (bayesdb-import/xcat
+                                                      (js->clj (.parse js/JSON (:data model)))
+                                                      csv-data))]
                                      (assoc model :model-obj model-obj)))
                                  (:models config))
 
