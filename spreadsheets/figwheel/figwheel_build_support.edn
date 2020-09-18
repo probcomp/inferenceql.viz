@@ -2,5 +2,5 @@
 ;; Used to set watch dirs and hooks.
 
 ^{:watch-dirs ["spreadsheets/src"]
-  :css-dirs ["spreadsheets/resources"]}
+  :css-dirs ["spreadsheets/figwheel-target/public/resources"]}
 {}
