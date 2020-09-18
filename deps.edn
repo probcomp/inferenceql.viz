@@ -17,7 +17,7 @@
         cljs-ajax {:mvn/version "0.8.1"}
         lambdaisland/uri {:mvn/version "1.4.54"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "66cf3de820d07821902fb3d632a270273302745c"}
+                                        :sha "dd7c79fcf899b6745dead51f0d6cd135dc77ed50"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "52655a522d6c39b36b4d46ce7f322cfd29ebd872"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"

@@ -108,18 +108,37 @@
                            file-data))
 ;; ------------------------------------
 
+;; Testing simple model as edn
+
+(comment
+  (require '[clojure.data.json :as json])
+  (require '[clojure.data.csv :as csv])
+
+  (def bdb-export (-> "/Users/harishtella/Desktop/toy dataset/data_models.json"
+                      (slurp)
+                      (json/read-str)
+                      (walk/keywordize-keys)))
+
+  (def data (let [cols (column-types bdb-export)
+                  raw-str (csv/read-csv (slurp "/Users/harishtella/Desktop/toy dataset/data.csv"))]
+              (csv-utils/csv-data->clean-maps cols raw-str {:keywordize-cols true})))
+
+  (def my-gpm (xcat bdb-export data))
+  (def cols (set (keys (get-in my-gpm [:latents :z]))))
+  (gpm/simulate my-gpm cols {})
+  (spit "/Users/harishtella/Desktop/model.xcat.edn" (gpm.crosscat/xcat->mmix my-gpm)))
+
+
 ;; Generating data from model-0 gives an error.
 ;; model-1 and  model-2 seem fine though.
 
-;; Original folder.
-(def beat19-xcat-model-orig (xcat-from-file
-                             (slurp "/Users/harishtella/Repos/probcomp/clojurecat-models/models/beat19/xcat/model-1.edn")))
-;; New folder with xcat extensions.
-(def beat19-xcat-model (xcat-from-file
-                        (slurp "/Users/harishtella/Repos/probcomp/clojurecat-models/models/beat19/xcat/model-1.xcat")))
-(:latents beat19-xcat-model)
-(def beat19-cols (set (keys (get-in beat19-xcat-model [:latents :z]))))
-(gpm/simulate beat19-xcat-model beat19-cols {})
+(comment
+  ;; Original folder.
+  (def beat19-xcat-model (xcat-from-file
+                          (slurp "/Users/harishtella/Repos/probcomp/clojurecat-models/models/beat19/xcat/model-1.edn")))
+  (:latents beat19-xcat-model)
+  (def beat19-cols (set (keys (get-in beat19-xcat-model [:latents :z]))))
+  (gpm/simulate beat19-xcat-model beat19-cols {}))
 
 ;;(.printStackTrace *e)
 
