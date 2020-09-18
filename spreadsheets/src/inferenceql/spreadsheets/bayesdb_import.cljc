@@ -2,7 +2,12 @@
   (:require [inferenceql.spreadsheets.csv :as csv-utils]
             [medley.core :as medley]
             [clojure.walk :as walk]
-            [inferenceql.inference.gpm.crosscat :as crosscat]
+            [inferenceql.inference.gpm.crosscat :as gpm.crosscat]
+            [inferenceql.inference.gpm.view :as gpm.view]
+            [inferenceql.inference.gpm.column :as gpm.column]
+            [inferenceql.inference.gpm.primitive-gpms.categorical :as gpm.categorical]
+            [inferenceql.inference.gpm.primitive-gpms.gaussian :as gpm.gaussian]
+            [inferenceql.inference.gpm.primitive-gpms.bernoulli :as gpm.bernoulli]
             [inferenceql.inference.gpm :as gpm]
             [clojure.pprint :as pprint]))
 
@@ -53,9 +58,9 @@
 
          spec {:views view-specs
                :types stat-types}
-         latents {:global {:alpha 0.6}
+         latents {:global {:alpha 0.5}
                   :local local-latents}]
-    (crosscat/construct-xcat-from-latents spec latents data {:options categories})))
+    (gpm.crosscat/construct-xcat-from-latents spec latents data {:options categories})))
 
 (defn keywordize-column-partition-names [models]
   (let [keywordize #(if (string? %) (keyword %) %)]
@@ -83,7 +88,40 @@
   [bdb-export rows]
   (first (xcat-gpms bdb-export rows)))
 
+
+(defn xcat-from-file
+  "`data` is raw file data"
+  [file-data]
+  (clojure.edn/read-string {:readers {'inferenceql.inference.gpm.crosscat.XCat gpm.crosscat/map->XCat
+                                      'inferenceql.inference.gpm.view.View gpm.view/map->View
+                                      'inferenceql.inference.gpm.column.Column gpm.column/map->Column
+                                      'inferenceql.inference.gpm.primitive_gpms.categorical.Categorical gpm.categorical/map->Categorical
+                                      'inferenceql.inference.gpm.primitive_gpms.gaussian.Gaussian gpm.gaussian/map->Gaussian
+                                      'inferenceql.inference.gpm.primitive_gpms.bernoulli.Bernoulli gpm.bernoulli/map->Bernoulli}}
+                           file-data))
+
+
+(defn xcat-spec-from-file
+  "`data` is raw file data"
+  [file-data]
+  (clojure.edn/read-string {:default (fn [tag value] [tag value])}
+                           file-data))
 ;; ------------------------------------
+
+;; Generating data from model-0 gives an error.
+;; model-1 and  model-2 seem fine though.
+
+;; Original folder.
+(def beat19-xcat-model-orig (xcat-from-file
+                             (slurp "/Users/harishtella/Repos/probcomp/clojurecat-models/models/beat19/xcat/model-1.edn")))
+;; New folder with xcat extensions.
+(def beat19-xcat-model (xcat-from-file
+                        (slurp "/Users/harishtella/Repos/probcomp/clojurecat-models/models/beat19/xcat/model-1.xcat")))
+(:latents beat19-xcat-model)
+(def beat19-cols (set (keys (get-in beat19-xcat-model [:latents :z]))))
+(gpm/simulate beat19-xcat-model beat19-cols {})
+
+;;(.printStackTrace *e)
 
 ;; Testing code
 
