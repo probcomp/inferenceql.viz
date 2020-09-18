@@ -56,6 +56,16 @@
                     :label "Cancel"
                     :on-click #(rf/dispatch [:upload/set-display false])]]]])))
 
+(defn file-info [file]
+  (let [type (.-type file)
+        type-string (if (= type "") "unknown" type)
+        date-string (.toLocaleString (.-lastModifiedDate file))]
+    [v-box
+     :gap "2px"
+     :margin "5px 8px 0px 8px"
+     :children [[:div (str "Size: " (.-size file) " bytes")]
+                [:div (str "Last modified: " date-string)]]]))
+
 (defn local-file-form []
   (let [form-data (r/atom {:dataset-name "data"
                            :dataset-file nil
@@ -83,11 +93,15 @@
                    [:input {:type "file" :multiple false :accept ".csv"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                           (swap! form-data assoc :dataset-file file))}]
+                   (when-let [file (:dataset-file @form-data)]
+                     [file-info file])
                    [gap :size "5px"]
                    [title :label "Schema (.edn)" :level :level4]
                    [:input {:type "file" :multiple false :accept ".edn"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
-                                          (swap! form-data assoc :dataset-schema-file file))}]]]
+                                          (swap! form-data assoc :dataset-schema-file file))}]
+                   (when-let [file (:dataset-schema-file @form-data)]
+                    [file-info file])]]
        [gap :size "30px"]
        [v-box
         :class    "form-group"
@@ -107,7 +121,9 @@
                    [title :label "Model (.edn or .json)" :level :level4]
                    [:input {:type "file" :multiple false :accept ".edn,.json"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
-                                          (swap! form-data assoc :model-file file))}]]]
+                                          (swap! form-data assoc :model-file file))}]
+                   (when-let [file (:model-file @form-data)]
+                    [file-info file])]]
        [gap :size "30px"]
        [line :color "#ddd" :style {:margin "10px 0px 0px"}]
        [gap :size "30px"]
