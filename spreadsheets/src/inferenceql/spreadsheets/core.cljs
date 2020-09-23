@@ -26,7 +26,10 @@
             [inferenceql.spreadsheets.components.highlight.events]
             [inferenceql.spreadsheets.components.highlight.subs]
             ;; Library functions for user-defined JS functions.
-            [inferenceql.user]))
+            [inferenceql.user]
+            ;; highlight.js dependency
+            [cljsjs.highlight]
+            [cljsjs.highlight.langs.javascript]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
@@ -34,6 +37,9 @@
 (rf/dispatch-sync [:initialize-db])
 
 (vega.init/add-custom-vega-color-schemes)
+
+;; Use highlight.js to automatically syntax highlight code inside <pre><code></code></pre> tags.
+(.initHighlightingOnLoad js/hljs)
 
 (defn ^:export -main
   []
