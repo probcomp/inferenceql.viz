@@ -8,7 +8,7 @@ node-modules-dir := $(current-dir)/../node_modules
 output-to	 := $(output-dir)/main.js
 
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
-hot-css-resource := $(resource-dir)/handsontable.full.css
+hot-css-resource := $(resource-dir)/css/handsontable.full.css
 
 model-edn-file := $(resource-dir)/model.edn
 
@@ -62,7 +62,9 @@ $(node-modules-dir):
 $(hot-css-file): $(node-modules-dir)
 
 $(hot-css-resource): $(hot-css-file)
-	cp $(hot-css-file) $(resource-dir)
+	## This copies the Handsontable CSS file from the Handsontable NPM dependency to the
+	## app's css folder.
+	cp $(hot-css-file) $(resource-dir)/css
 
 ### Publishing
 
