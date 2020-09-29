@@ -3,18 +3,6 @@
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
 
 (rf/reg-event-db
- :override/set-modal
- event-interceptors
- (fn [db [_ data]]
-   (assoc-in db [:override-panel :modal] data)))
-
-(rf/reg-event-db
- :override/clear-modal
- event-interceptors
- (fn [db [_]]
-   (assoc-in db [:override-panel :modal] {:child nil})))
-
-(rf/reg-event-db
  :override/set-column-function
  event-interceptors
  (fn [db [_ col-name source-text]]

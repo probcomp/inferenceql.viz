@@ -1,6 +1,5 @@
 (ns inferenceql.spreadsheets.views
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.panels.override.views :as modal]
             [inferenceql.spreadsheets.panels.control.views :as control]
             [inferenceql.spreadsheets.panels.viz.views :as viz]
             [inferenceql.spreadsheets.panels.table.views :as table]))
@@ -18,5 +17,4 @@
     [:div
      [control/panel]
      [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
-     [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
-     [modal/modal]]))
+     [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]]))
