@@ -75,6 +75,9 @@
   "TODO: write me"
   [params]
   (let [{:keys [url username password on-success on-failure]} params
+        cors-proxy-url "https://whispering-taiga-62040.herokuapp.com/"
+        url (str cors-proxy-url url)
+
         config-read (async/chan)
         config-edn-url (uri/join url "config.edn")]
 
