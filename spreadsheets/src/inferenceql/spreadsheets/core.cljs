@@ -1,7 +1,7 @@
 (ns inferenceql.spreadsheets.core
   (:require [goog.dom :as dom]
             [re-frame.core :as rf]
-            [reagent.core :as reagent]
+            [reagent.dom :as rdom]
             ;; Core
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.subs]
@@ -43,4 +43,4 @@
 
 (defn ^:export -main
   []
-  (reagent/render [views/app] (dom/$ "app")))
+  (rdom/render [views/app] (dom/$ "app")))
