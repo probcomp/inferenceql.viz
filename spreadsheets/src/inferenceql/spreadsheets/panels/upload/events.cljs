@@ -6,8 +6,7 @@
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.csv :as csv-utils]
-            [inferenceql.spreadsheets.bayesdb-import :as bayesdb-import]
-            [clojure.set :as set]
+            [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
             [clojure.string :as str]
             [medley.core :as medley]))
 
@@ -64,9 +63,10 @@
                                                      "edn"
                                                      (gpm/Multimixture (edn/read-string (:data model)))
                                                      "json"
-                                                     (bayesdb-import/xcat
-                                                      (js->clj (.parse js/JSON (:data model)))
-                                                      csv-data))]
+                                                     (let [gpms (bayesdb-import/xcat-gpms
+                                                                  (js->clj (.parse js/JSON (:data model)))
+                                                                  csv-data)]
+                                                       (first gpms)))]
                                      (.log js/console :model--------------see-next-line)
                                      (.log js/console model-obj)
                                      (assoc model :model-obj model-obj)))
