@@ -2,20 +2,19 @@
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
             [re-com.core :refer [border title v-box p h-box line button gap input-text modal-panel
-                                 horizontal-bar-tabs
-                                 horizontal-tabs]]))
+                                 checkbox horizontal-bar-tabs horizontal-tabs]]))
 
-(defn url-form []
+(defn magic-url-form []
   (let [form-data (r/atom {:url ""
-                           :username nil
-                           :password nil})]
+                           :use-creds false})]
     (fn []
       [:<>
        [v-box
         :class    "form-group"
-        :children [[title :label "Url" :level :level3]
-                   [p {:style {:color "#777"}}
-                    "This will pull all needed files from the folder specified by the url. "]
+        :children [[p {:style {:color "#777"}}
+                    "Submit a url which will be used to pull all needed files for loading a particular demo."]
+                   [gap :size "70px"]
+                   [title :label "Magic Url" :level :level3]
                    [input-text
                     :model       (:url @form-data)
                     :on-change   #(swap! form-data assoc :url %)
@@ -24,25 +23,14 @@
                     :placeholder "http:// ..."
                     :attr        {:spell-check "false"}]
                    [gap :size "30px"]
-                   [p {:style {:color "#777"}}
-                    "Add credentials if your url is password protected."]
-                   [title :label "Username" :level :level4]
-                   [input-text
-                    :model       (:username @form-data)
-                    :on-change   #(swap! form-data assoc :username %)
-                    :class       "form-control"
-                    :width       "150px"
-                    :height      "30px"
-                    :attr        {:spell-check "false"}]
+                   [checkbox :label "Use with credentials?"
+                             :model (:use-creds @form-data)
+                             :on-change #(swap! form-data assoc :use-creds %)]
+                   [gap :size "5px"]
+                   [p {:style {:color "#777"
+                               :padding-left "21px"}}
+                    "Check this if your url is password protected. "]]]
 
-                   [title :label "Password" :level :level4]
-                   [input-text
-                    :model       (:password @form-data)
-                    :on-change   #(swap! form-data assoc :password %)
-                    :class       "form-control"
-                    :width       "150px"
-                    :height      "30px"
-                    :attr        {:spell-check "false"}]]]
        [gap :size "50px"]
        [line :color "#ddd" :style {:margin "0px 0px 0px"}]
        [gap :size "30px"]
@@ -75,9 +63,12 @@
                            :model-file nil})]
     (fn []
       [:<>
+       [p {:style {:color "#777"}}
+        "Select local files to upload into the app."]
+       [gap :size "70px"]
        [v-box
         :class    "form-group"
-        :children [[title :label "Dataset" :level :level3 :margin-bottom "1px"]
+        :children [#_[title :label "Dataset" :level :level3 :margin-bottom "1px"]
                    #_[title :label "Name – not editable" :level :level4]
                    #_[input-text
                       :model       (:dataset-name @form-data)
@@ -90,13 +81,13 @@
                                     :auto-complete "dummy-value"
                                     :spell-check "false"}]
                    [gap :size "5px"]
-                   [title :label "Dataset (.csv)" :level :level4]
+                   [title :label "Dataset (.csv)" :level :level3]
                    [:input {:type "file" :multiple false :accept ".csv"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                           (swap! form-data assoc :dataset-file file))}]
                    [file-info (:dataset-file @form-data)]
                    [gap :size "5px"]
-                   [title :label "Schema (.edn)" :level :level4]
+                   [title :label "Schema (.edn)" :level :level3]
                    [:input {:type "file" :multiple false :accept ".edn"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                           (swap! form-data assoc :dataset-schema-file file))}]
@@ -104,7 +95,7 @@
        [gap :size "30px"]
        [v-box
         :class    "form-group"
-        :children [[title :label "Model" :level :level3 :margin-bottom "1px"]
+        :children [#_[title :label "Model" :level :level3 :margin-bottom "1px"]
                    #_[title :label "Name - not editable" :level :level4]
                    #_[input-text
                       :model       (:model-name @form-data)
@@ -117,7 +108,7 @@
                                     :auto-complete "dummy-value"
                                     :spell-check "false"}]
                    [gap :size "5px"]
-                   [title :label "Model (.edn or .json)" :level :level4]
+                   [title :label "Model (.edn or .json)" :level :level3]
                    [:input {:type "file" :multiple false :accept ".edn,.json"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                           (swap! form-data assoc :model-file file))}]
@@ -137,9 +128,9 @@
                     :on-click #(rf/dispatch [:upload/set-display false])]]]])))
 
 (defn panel-content []
-  (let [tab-options [{:id ::url :label "Web url"}
+  (let [tab-options [{:id ::magic-url :label "Magic url"}
                      {:id ::local-file :label "Local files"}]
-        selected-tab-id (r/atom ::url)
+        selected-tab-id (r/atom ::magic-url)
         update-selected-tab #(reset! selected-tab-id %)]
     (fn []
       [border
@@ -156,10 +147,9 @@
                                        [horizontal-bar-tabs :tabs tab-options
                                         :model selected-tab-id
                                         :on-change update-selected-tab]]]
-                           ;;[p "This will ...."]
-                           [gap :size "70px"]
+                           [gap :size "10px"]
                            (case @selected-tab-id
-                             ::url [url-form]
+                             ::magic-url [magic-url-form]
                              ::local-file [local-file-form])]]])))
 
 (defn panel
