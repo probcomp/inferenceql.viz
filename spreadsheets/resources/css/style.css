@@ -20,11 +20,13 @@ div {
 .flex-box-space-filler-60 {
   flex: auto;
   min-width: 60px;
+  z-index: -1;
 }
 
 .flex-box-space-filler-20 {
   flex: auto;
   min-width: 20px;
+  z-index: -1;
 }
 
 .no-select {
@@ -41,6 +43,7 @@ div {
 
 #toolbar {
   display: flex;
+  min-height: 90px;
   margin-top: 10px;
   margin-bottom: 10px;
   margin-left: 10px;
@@ -57,8 +60,8 @@ div {
 
 #search-buttons {
   margin-top: 5px;
-  margin-right: 1px;
-  float: right;
+  /* This positions #search-buttons so that more-menu-icon hangs off of #search-input. */
+  margin-right: -29px;
 }
 
 #search-input {
@@ -84,7 +87,43 @@ div {
 .toolbar-button {
   align-self: center;
   margin-left: 6px;
-  padding: .3em .8em
+  padding: 4px .8em
+}
+
+/* --------------- styling for more button and menu --------------- */
+
+.toolbar-button.more-button {
+  padding: 0px;
+  border: 0px;
+  border-radius: 24px;
+  height: 24px;
+  width: 24px;
+  background-color: white;
+}
+
+.more-icon {
+  height: 24px;
+  width: 24px;
+  pointer-events: none;
+  /* Color settings for the icon are inside the icon svg file itself. */
+}
+
+.more-menu {
+  width: 200px;
+  box-shadow: 1px 1px 8px 0px #BBB;
+}
+
+.more-menu-item {
+  justify-content: center;
+  width: 100%;
+  height: 30px;
+  font-size: 14px;
+  padding-left: 20px;
+  padding-right: 15px;
+}
+
+.more-menu-item:hover {
+  background-color: #C8C8C9
 }
 
 /* --------------- styling for selection color selector --------------- */

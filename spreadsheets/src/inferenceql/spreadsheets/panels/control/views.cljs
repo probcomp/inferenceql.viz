@@ -1,6 +1,8 @@
 (ns inferenceql.spreadsheets.panels.control.views
   (:require [re-frame.core :as rf]
-            [reagent-forms.core :as forms]))
+            [reagent-forms.core :as forms]
+            [re-com.core :refer [h-box]]
+            [inferenceql.spreadsheets.panels.more.views :as more]))
 
 (def reagent-forms-function-map
   "Function map that allows a reagent-forms template
@@ -37,7 +39,8 @@
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
   []
-  (let [input-text (rf/subscribe [:control/query-string])]
+  (let [input-text (rf/subscribe [:control/query-string])
+        show-menu (rf/subscribe [:more/show-menu])]
     [:div#toolbar
      [:div#search-section
        [:textarea#search-input {:on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
@@ -59,16 +62,19 @@
                                 ;; HTML5 attr, browser support limited.
                                 :spellCheck "false"
                                 :value @input-text}]
-       [:div#search-buttons
-         [:button.toolbar-button.pure-button
-          {:on-click (fn [e]
-                       (rf/dispatch [:query/parse-query @input-text])
-                       (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Run InferenceQL"]
-         [:button.toolbar-button.pure-button
-          {:on-click (fn [e]
-                        (rf/dispatch [:table/clear])
-                        (.blur (.-target e)))} ; Clear focus off of button after click.
-          "Clear results"]]]
+       [h-box
+        :attr {:id "search-buttons"}
+        :justify :end
+        :children [[:button.toolbar-button.pure-button
+                    {:on-click (fn [e]
+                                 (rf/dispatch [:query/parse-query @input-text])
+                                 (.blur (.-target e)))}
+                    "Run InferenceQL"]
+                   [:button.toolbar-button.pure-button
+                    {:on-click (fn [e]
+                                  (rf/dispatch [:table/clear])
+                                  (.blur (.-target e)))}
+                    "Clear results"]
+                   [more/menu show-menu]]]]
      [:div.flex-box-space-filler-60]
      [selection-color-selector]]))
