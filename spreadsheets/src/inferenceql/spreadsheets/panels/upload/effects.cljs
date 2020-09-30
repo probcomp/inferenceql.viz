@@ -71,12 +71,21 @@
         (handle-reads file-reads (count files) mock-config on-success on-failure)))))
 (rf/reg-fx :upload/read-files-effect read-files-effect)
 
+(defn end-with-slash
+  "TODO: This is needed so that"
+  [url]
+  (if (not= "/" (last (seq url))) ;; Last character is not a slash
+    (str url "/")
+    url))
+
 (defn ^:effect read-url-effect
   "TODO: write me"
   [params]
   (let [{:keys [url use-creds on-success on-failure]} params
         cors-proxy-url "https://whispering-taiga-62040.herokuapp.com/"
-        url (str cors-proxy-url url)
+        url (->> url
+                 (end-with-slash)
+                 (str cors-proxy-url))
 
         config-read (async/chan)
         config-edn-url (uri/join url "config.edn")]
