@@ -35,10 +35,9 @@
  :upload/read-url
  event-interceptors
  (fn [{:keys [_db]} [_ form-data]]
-   (let [{:keys [url username password]} form-data]
+   (let [{:keys [url use-creds]} form-data]
      {:upload/read-url-effect {:url url
-                               :username username
-                               :password password
+                               :use-creds use-creds
                                :on-success [:upload/process-config]
                                :on-failure [:upload/read-failed]}
       :dispatch-n [[:upload/set-display false]

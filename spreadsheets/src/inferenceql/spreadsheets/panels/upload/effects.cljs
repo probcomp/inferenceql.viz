@@ -74,7 +74,7 @@
 (defn ^:effect read-url-effect
   "TODO: write me"
   [params]
-  (let [{:keys [url username password on-success on-failure]} params
+  (let [{:keys [url use-creds on-success on-failure]} params
         cors-proxy-url "https://whispering-taiga-62040.herokuapp.com/"
         url (str cors-proxy-url url)
 
@@ -84,6 +84,7 @@
     (ajax.core/ajax-request
       {:uri config-edn-url
        :method :get
+       :with-credentials use-creds
        :handler #(put! config-read %)
        :response-format (ajax.core/text-response-format)})
 
@@ -115,6 +116,7 @@
                (ajax.core/ajax-request
                 {:uri file-url
                  :method :get
+                 :with-credentials use-creds
                  :handler (fn [[status data]]
                             (put! file-reads {:success status
                                               :config-path config-path
