@@ -68,19 +68,7 @@
        [gap :size "50px"]
        [v-box
         :class    "form-group"
-        :children [#_[title :label "Dataset" :level :level3 :margin-bottom "1px"]
-                   #_[title :label "Name – not editable" :level :level4]
-                   #_[input-text
-                      :model       (:dataset-name @form-data)
-                      :on-change   #(swap! form-data assoc :dataset-name %)
-                      :class       "form-control"
-                      :disabled?   true
-                      :height      "25px"
-                      :width       "190px"
-                      :attr        {:id "dataset-name-input"
-                                    :auto-complete "dummy-value"
-                                    :spell-check "false"}]
-                   [gap :size "5px"]
+        :children [[gap :size "5px"]
                    [title :label "Dataset (.csv)" :level :level3]
                    [:input {:type "file" :multiple false :accept ".csv"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
@@ -95,19 +83,7 @@
        [gap :size "30px"]
        [v-box
         :class    "form-group"
-        :children [#_[title :label "Model" :level :level3 :margin-bottom "1px"]
-                   #_[title :label "Name - not editable" :level :level4]
-                   #_[input-text
-                      :model       (:model-name @form-data)
-                      :on-change   #(swap! form-data assoc :model-name %)
-                      :class       "form-control"
-                      :disabled?   true
-                      :height      "25px"
-                      :width       "190px"
-                      :attr        {:id "model-name-input"
-                                    :auto-complete "dummy-value"
-                                    :spell-check "false"}]
-                   [gap :size "5px"]
+        :children [[gap :size "5px"]
                    [title :label "Model (.edn or .json)" :level :level3]
                    [:input {:type "file" :multiple false :accept ".edn,.json"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
