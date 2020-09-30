@@ -6,9 +6,7 @@
             [ajax.core]
             [ajax.edn]
             [lambdaisland.uri :as uri]
-            [clojure.edn :as edn]
-            [goog.crypt.base64 :as b64]
-            [medley.core :as medley]))
+            [clojure.edn :as edn]))
 
 (defn handle-reads
   "TODO: Write me"
