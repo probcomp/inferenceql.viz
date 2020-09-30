@@ -13,7 +13,7 @@
         :class    "form-group"
         :children [[p {:style {:color "#777"}}
                     "Submit a url which will be used to pull all needed files for loading a particular demo."]
-                   [gap :size "70px"]
+                   [gap :size "50px"]
                    [title :label "Magic Url" :level :level3]
                    [input-text
                     :model       (:url @form-data)
@@ -65,7 +65,7 @@
       [:<>
        [p {:style {:color "#777"}}
         "Select local files to upload into the app."]
-       [gap :size "70px"]
+       [gap :size "50px"]
        [v-box
         :class    "form-group"
         :children [#_[title :label "Dataset" :level :level3 :margin-bottom "1px"]
@@ -136,7 +136,7 @@
       [border
        :border "1px solid #eee"
        :child  [v-box
-                :min-height "777px"
+                :min-height "650px"
                 :min-width "800px"
                 :padding "10px 30px 30px 30px"
                 :style    {:background-color "cornsilk"}
