@@ -4,7 +4,11 @@
             [re-com.core :refer [border title v-box p h-box line button gap input-text modal-panel
                                  checkbox horizontal-bar-tabs horizontal-tabs]]))
 
-(defn magic-url-form []
+(defn magic-url-form
+  "A form for submiting a magic-url for pulling all needed files for a demo.
+
+  Returns: A reagent component."
+  []
   (let [form-data (r/atom {:url ""
                            :use-creds false})]
     (fn []
@@ -43,10 +47,16 @@
                     :label "Cancel"
                     :on-click #(rf/dispatch [:upload/set-display false])]]]])))
 
-(defn file-info [file]
+(defn file-info
+  "Displays basic information about a file.
+
+  Args:
+    `file` - A Javascript File object.
+
+  Returns: A reagent component."
+  [file]
   (when file
     (let [type (.-type file)
-          type-string (if (= type "") "unknown" type)
           date-string (.toLocaleString (.-lastModifiedDate file))]
       [v-box
        :gap "2px"
@@ -54,7 +64,13 @@
        :children [[:div (str "Size: " (.-size file) " bytes")]
                   [:div (str "Last modified: " date-string)]]])))
 
-(defn local-file-form []
+(defn local-file-form
+  "A form for selecting files for changing the dataset, schema, and model.
+
+  The new files selected replace the default :data dataset and :model model.
+
+  Returns: A reagent component."
+  []
   (let [form-data (r/atom {:dataset-name "data"
                            :dataset-file nil
                            :dataset-schema-file nil
@@ -87,8 +103,7 @@
                    [:input {:type "file" :multiple false :accept ".edn,.json"
                             :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                           (swap! form-data assoc :model-file file))}]
-                   (when-let [file (:model-file @form-data)]
-                    [file-info file])]]
+                   [file-info (:model-file @form-data)]]]
        [gap :size "30px"]
        [line :color "#ddd" :style {:margin "10px 0px 0px"}]
        [gap :size "30px"]
@@ -102,7 +117,13 @@
                     :label "Cancel"
                     :on-click #(rf/dispatch [:upload/set-display false])]]]])))
 
-(defn panel-content []
+(defn panel-content
+  "A panel that allows multiple methods of changing the app's dataset and model.
+
+  This is intended to be set as the contents of a modal.
+
+  Returns: A reagent component."
+  []
   (let [tab-options [{:id ::magic-url :label "Magic url"}
                      {:id ::local-file :label "Local files"}]
         selected-tab-id (r/atom ::magic-url)

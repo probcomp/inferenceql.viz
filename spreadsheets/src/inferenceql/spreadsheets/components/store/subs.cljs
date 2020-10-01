@@ -1,19 +1,23 @@
 (ns inferenceql.spreadsheets.components.store.subs
   (:require [re-frame.core :as rf]))
 
-(rf/reg-sub
- :store/datasets
- (fn [db _]
-   (get-in db [:store-component :datasets])))
+(defn ^:sub datasets
+  "Returns a map of all datasets."
+  [db _]
+  (get-in db [:store-component :datasets]))
+(rf/reg-sub :store/datasets
+            datasets)
 
-(rf/reg-sub
- :store/geodata
- (fn [db _]
-   (get-in db [:store-component :geodata])))
+(defn ^:sub models
+  "Returns a map of all models."
+  [db _]
+  (get-in db [:store-component :models]))
+(rf/reg-sub :store/models
+            models)
 
-(rf/reg-sub
- :store/models
- (fn [db _]
-   (get-in db [:store-component :models])))
-
-
+(defn ^:sub geodata
+  "Returns a map of all geodata."
+  [db _]
+  (get-in db [:store-component :geodata]))
+(rf/reg-sub :store/geodata
+            geodata)

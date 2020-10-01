@@ -1,7 +1,7 @@
 (ns inferenceql.spreadsheets.components.store.db
   "Contains the initial state of the db corresponding to the store component
   The store component is esentially a part of the app-db where datasets and
-  models are stored."
+  models and geodata are stored."
   (:require [clojure.spec.alpha :as s]
             [inferenceql.spreadsheets.config :as config]
             [inferenceql.spreadsheets.csv :as csv-utils]
@@ -37,13 +37,13 @@
 (def default-db (medley/deep-merge default-db-basic
                                    (or default-db-geodata {})))
 
-;;  Specs for the store-db
+;;;  Specs for the store-db
 
 (s/def ::store-component (s/keys :req-un [::datasets
                                           ::models]
                                  :opt-un [::geodata]))
 
-;; Specs for :datasets.
+;;; Specs for :datasets.
 
 (s/def ::datasets (s/map-of ::dataset-name ::dataset))
 (s/def ::dataset-name keyword?)
@@ -60,15 +60,17 @@
 (s/def ::stat-type #{:gaussian :categorical})
 (s/def ::model-name keyword?)
 (s/def ::default-model ::model-name)
+;; This is the name of the column in the dataset that is joined against entity
+;; ids in geodata files.
 (s/def ::geo-id-col string?)
 (s/def ::column-name keyword?)
 
-;; Specs for :models.
+;;; Specs for :models.
 
 (s/def ::models (s/map-of ::model-name ::model))
 (s/def ::model gpm/gpm?)
 
-;; Specs for :geodata.
+;;; Specs for :geodata.
 
 (s/def ::geodata (s/map-of ::geodata-name ::geodatum))
 (s/def ::geodata-name keyword?)
@@ -79,9 +81,20 @@
                                    ::fips-code-length
                                    ::projection-type]))
 
-(s/def ::data object?) ; ::data is stored as a JS object.
+;; The actual geodata file data is stored as a JS object.
+(s/def ::data object?)
 (s/def ::filetype #{:topojson :geojson})
-(s/def ::id-prop string?)
+;; This is the key for the collection of objects in the topojson to use for
+;; matching with rows. This is only present for :topojson files.
 (s/def ::feature string?)
+;; This is the property of each object in the geodata file that is matched
+;; with the :geo-id-col column in a dataset.
+(s/def ::id-prop string?)
+;; This is the expected length of the ids pointed to by :id-prop.
+;; If items in the data table's :geo-id-col column are not the
+;; proper length they will be 0-padded so they match this length.
 (s/def ::fips-code-length integer?)
-(s/def ::projection-type #{"albersUsa" "mercator"})
+;; This is the type of d3-geo projection to use when rendering the geodata
+;; data. See here for more info:
+;; https://vega.github.io/vega-lite/docs/projection.html#projection-types
+(s/def ::projection-type #{"albers" "albersUsa" "mercator" "identity"})
