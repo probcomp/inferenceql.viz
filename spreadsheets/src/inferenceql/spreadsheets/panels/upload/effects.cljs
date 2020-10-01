@@ -97,7 +97,7 @@
             (set! (.-onerror rdr) on-error)
             (.readAsText rdr file-obj)))
 
-        (handle-reads file-reads (count files) mock-config on-success on-failure)))))
+        (handle-reads file-reads (count required-files) mock-config on-success on-failure)))))
 (rf/reg-fx :upload/read-files-effect
            read-files-effect)
 
@@ -109,17 +109,16 @@
     url))
 
 (defn ^:effect read-url-effect
-  "Uses a magic-url to make https requests for obtaining many files for loading a demo.
+  "Uses a magic-url to make https requests obtaining many files for loading a demo.
 
-  TODO -----
-
-  This reads the specified files and places them in a mock config map which will passed to the
-  :on-success event specified.
+  This first makes a requests for a config.edn file. Based on the data in that config.edn file,
+  many other http requests will be made for datasets, scheme files, models, and geodata files.
 
   Args:
     `params` -- A map of parameters with the following keys.
-      :url -- (string)
-      :use-creds -- (bool)
+      :url -- (string) The url which will be used as the base url for making http requests for
+        files.
+      :use-creds -- (bool) Whether to used http basic authentication for the http requests.
       :on-success -- (vector) A reframe event vector to dispatch on success.
       :on-failure -- (vector) A reframe event vector to dispatch on failure.
 
