@@ -4,7 +4,6 @@
             [inferenceql.spreadsheets.panels.override.db :as override-panel]
             [inferenceql.spreadsheets.panels.table.db :as table-panel]
             [inferenceql.spreadsheets.panels.viz.db :as viz-panel]
-            [inferenceql.spreadsheets.panels.jsmodel.db :as jsmodel-panel]
             [inferenceql.spreadsheets.panels.more.db :as more-panel]
             [inferenceql.spreadsheets.components.highlight.db :as highlight-component]))
 
@@ -14,7 +13,6 @@
                              ::override-panel/override-panel
                              ::table-panel/table-panel
                              ::viz-panel/viz-panel
-                             ::jsmodel-panel/jsmodel-panel
                              ::more-panel/more-panel
                              ::highlight-component/highlight-component]))
 
@@ -33,7 +31,6 @@
              override-panel/default-db
              table-panel/default-db
              viz-panel/default-db
-             jsmodel-panel/default-db
              more-panel/default-db
              highlight-component/default-db]]
     (apply merge dbs)))
