@@ -83,7 +83,8 @@
      (if true
        {:dispatch-n [[:store/datasets datasets-to-store]
                      [:store/models models-to-store]
-                     [:store/geodata geodata]]}
+                     (when geodata
+                       [:store/geodata geodata])]}
        {:dispatch [:upload/read-failed "TODO: write error message for conversion."]}))))
 
 (rf/reg-event-fx
