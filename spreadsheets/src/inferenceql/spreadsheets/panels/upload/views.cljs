@@ -34,8 +34,8 @@
                    [p {:style {:color "#777"
                                :padding-left "21px"}}
                     "Check this if your url is password protected. "]]]
-       [gap :size "50px"]
-       [line :color "#ddd" :style {:margin "0px 0px 0px"}]
+       [gap :size "30px"]
+       [line :color "#ddd" :style {:margin "10px 0px 0px"}]
        [gap :size "30px"]
        [h-box
         :gap      "12px"
