@@ -27,7 +27,7 @@
 
 (s/def ::dataset-name keyword?)
 (s/def ::model-name keyword?)
-(s/def ::virtual keyword?)
+(s/def ::virtual boolean?)
 
 ;; Accessor functions for indexing into parts of the control-panel's db.
 

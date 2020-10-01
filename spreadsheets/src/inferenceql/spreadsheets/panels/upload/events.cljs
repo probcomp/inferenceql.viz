@@ -63,22 +63,26 @@
                                                      "edn"
                                                      (gpm/Multimixture (edn/read-string (:data model)))
                                                      "json"
-                                                     (let [gpms (bayesdb-import/xcat-gpms
-                                                                  (js->clj (.parse js/JSON (:data model)))
-                                                                  csv-data)]
-                                                       (first gpms)))]
-                                     (.log js/console :model--------------see-next-line)
-                                     (.log js/console model-obj)
+                                                     (first
+                                                      (bayesdb-import/xcat-gpms
+                                                        (js->clj (.parse js/JSON (:data model)))
+                                                        csv-data)))]
                                      (assoc model :model-obj model-obj)))
                                  (:models config))
 
          geodata (medley/map-vals (fn [geodatum] (update geodatum :data #(.parse js/JSON %)))
-                                  (:geodata config))]
+                                  (:geodata config))
 
+         ;; Filtering out the relevent keys before storing.
+         datasets-to-store (medley/map-vals
+                            #(select-keys % [:rows :schema :default-model
+                                             :geodata-name :geo-id-col])
+                            datasets)
+         models-to-store (medley/map-vals :model-obj models)]
      ;; TODO: catch conversion errors.
      (if true
-       {:dispatch-n [[:store/datasets datasets]
-                     [:store/models models]
+       {:dispatch-n [[:store/datasets datasets-to-store]
+                     [:store/models models-to-store]
                      [:store/geodata geodata]]}
        {:dispatch [:upload/read-failed "TODO: write error message for conversion."]}))))
 

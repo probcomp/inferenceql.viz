@@ -20,26 +20,68 @@
 
 ;;; Setting up store component db
 
-(def default-db-base
+(def default-db-basic
+  "Portions of the store-db related to the compiled-in model and dataset."
   {:store-component {:datasets {:data {:rows compiled-in-dataset
                                        :schema compiled-in-schema
                                        :default-model :model}}
                      :models {:model (gpm/Multimixture compiled-in-model)}}})
 
-(def geodata-db-entries
-  (if (nil? (:geodata config/config))
-    {}
+(def default-db-geodata
+  "Portions of the store-db related to any included geodata and geodata settings."
+  (when (:geodata config/config)
     {:store-component {:datasets {:data {:geodata-name :default
                                          :geo-id-col (get-in config/config [:geodata :geo-id-col])}}
-                       :geodata {:default {:data (get-in config/config [:geodata :data])
-                                           :filetype (get-in config/config [:geodata :filetype])
-                                           :feature (get-in config/config [:geodata :feature])
-                                           :id-prop (get-in config/config [:geodata :id-prop])
-                                           :id-prop-code-length (get-in config/config [:geodata :id-prop-code-length])
-                                           :projection-type (get-in config/config [:geodata :projection-type])}}}}))
+                       :geodata {:default (get-in config/config [:geodata])}}}))
 
-(def default-db (medley/deep-merge default-db-base geodata-db-entries))
+(def default-db (medley/deep-merge default-db-basic
+                                   (or default-db-geodata {})))
 
-;; TODO: add more specs
+;;  Specs for the store-db
+
 (s/def ::store-component (s/keys :req-un [::datasets
-                                          ::models]))
+                                          ::models]
+                                 :opt-un [::geodata]))
+
+;; Specs for :datasets.
+
+(s/def ::datasets (s/map-of ::dataset-name ::dataset))
+(s/def ::dataset-name keyword?)
+(s/def ::dataset (s/keys :req-un [::rows
+                                  ::schema
+                                  ::default-model]
+                         :opt-un [::geodata-name
+                                  ::geo-id-col]))
+
+
+(s/def ::rows (s/coll-of ::row))
+(s/def ::row (s/map-of ::column-name any?))
+(s/def ::schema (s/map-of ::column-name ::stat-type))
+(s/def ::stat-type #{:gaussian :categorical})
+(s/def ::model-name keyword?)
+(s/def ::default-model ::model-name)
+(s/def ::geo-id-col string?)
+(s/def ::column-name keyword?)
+
+;; Specs for :models.
+
+(s/def ::models (s/map-of ::model-name ::model))
+(s/def ::model gpm/gpm?)
+
+;; Specs for :geodata.
+
+(s/def ::geodata (s/map-of ::geodata-name ::geodatum))
+(s/def ::geodata-name keyword?)
+(s/def ::geodatum (s/keys :req-un [::data
+                                   ::filetype
+                                   ::id-prop]
+                          :opt-un [::feature
+                                   ::fips-code-length
+                                   ::projection-type]))
+
+(s/def ::data object?) ; ::data is stored as a JS object.
+(s/def ::filetype #{:topojson :geojson})
+(s/def ::id-prop string?)
+(s/def ::feature string?)
+(s/def ::fips-code-length integer?)
+(s/def ::projection-type #{"albersUsa" "mercator"})
