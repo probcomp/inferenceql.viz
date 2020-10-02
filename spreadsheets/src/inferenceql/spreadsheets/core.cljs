@@ -23,6 +23,9 @@
             ;; Override Panel
             [inferenceql.spreadsheets.panels.override.events]
             [inferenceql.spreadsheets.panels.override.subs]
+            ;; Modal Panel
+            [inferenceql.spreadsheets.panels.modal.events]
+            [inferenceql.spreadsheets.panels.modal.subs]
             ;; Query Component
             [inferenceql.spreadsheets.components.query.events]
             ;; Highlight Component
