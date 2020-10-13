@@ -2,7 +2,8 @@
   "Reagent components related to displaying a more icon and menu."
   (:require [re-frame.core :as rf]
             [re-com.core :refer [button box h-box v-box gap]]
-            [re-com.popover :refer [popover-anchor-wrapper popover-content-wrapper]]))
+            [re-com.popover :refer [popover-anchor-wrapper popover-content-wrapper]]
+            [inferenceql.spreadsheets.panels.jsmodel.views :as jsmodel.views]))
 
 (defn more-button
   "An icon that when clicked will open the more menu.
@@ -48,7 +49,8 @@
   [v-box
    :class "more-menu"
    :children [[gap :size "10px"]
-              [menu-item "Show JS Model" #(do)]
+              [menu-item "Show JS Model" #(rf/dispatch
+                                           [:modal/set-content [jsmodel.views/display]])]
               [menu-item "Load Data and Model" #(do)]
               [gap :size "10px"]]])
 

@@ -278,6 +278,23 @@ psuedo-class applied. */
   opacity: 0.1;
 }
 
+/* --------------- styling for js-model code view --------------- */
+
+#program-display {
+  height: 700px;
+  width: 940px;
+  padding: 5px;
+  font-size: .875rem;
+  background-color: #f8f8f8;
+}
+
+#program-display code {
+  background-color: #f8f8f8;
+  border: none;
+  padding: 0px;
+  font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
 /* --------------- styling for js-function entry modal popup --------------- */
 
 .js-function-entry-modal {
