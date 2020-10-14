@@ -2,8 +2,7 @@
   (:require [yarn.handsontable]
             [camel-snake-kebab.core :as csk]
             [re-frame.core :as rf]
-            [reagent.core :as reagent]
-            [reagent.dom :as dom]))
+            [reagent.core :as reagent]))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."

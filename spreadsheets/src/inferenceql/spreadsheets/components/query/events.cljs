@@ -4,8 +4,6 @@
             [inferenceql.query :as query]
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.model :as model]
-            [inferenceql.inference.gpm :as gpm]
             [inferenceql.spreadsheets.config :as config]
             [medley.core :as medley]
             [day8.re-frame.http-fx]
