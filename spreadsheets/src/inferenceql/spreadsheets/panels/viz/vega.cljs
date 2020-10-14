@@ -10,10 +10,6 @@
             [goog.string :as gstring]
             [medley.core :as medley]))
 
-;; These are defs related to choropleth related columns in the dataset.
-;; See spreadsheets/resources/config.edn for more info.
-(def ^:private geo-id-col (keyword (get-in config/config [:geo :table-geo-id-col])))
-
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
   700)
@@ -58,37 +54,30 @@
                           c))
        s))
 
+(declare ^{:dynamic true :doc "Todo: write docstring"} vega-type)
+
 (defn probability-column? [col-name]
   "Returns whether a `col-name` was the result of probability-of statement.
   `col-name` is the name of the column."
   (when col-name
     (some? (re-matches #"^prob[\w\-]*$" (name col-name)))))
 
-(defn stat-type
-  "Returns a multi-mixture stat-type given a column name from the data table."
-  [col-name]
-  (get-in model/spec [:vars col-name]))
-
-(defn present-in-model?
-  "Returns whether `col-name` is present in the loaded model."
-  [col-name]
-  (some? (stat-type col-name)))
-
-(defn vega-type
-  "Returns a vega-lite type given `col-name`, a column name from the data table.
+(defn vega-type-fn
+  "TODO: Updated this. Returns a vega-lite type given `col-name`, a column name from the data table.
   May return nil if multi-mix stat-type for `col-name` can`t be found."
-  [col-name]
-  (cond (probability-column? col-name)
-        "quantitative"
+  [schema]
+  (fn [col-name]
+    (cond (probability-column? col-name)
+          "quantitative"
 
-        (contains? #{hot/label-col-header geo-id-col} col-name)
-        "nominal"
+          (contains? #{hot/label-col-header} col-name)
+          "nominal"
 
-        :else
-        ;; Mapping from multi-mix stat-types to vega-lite data-types.
-        (let [mapping {:gaussian "quantitative"
-                       :categorical "nominal"}]
-          (get mapping (stat-type col-name)))))
+          :else
+          ;; Mapping from multi-mix stat-types to vega-lite data-types.
+          (let [mapping {:gaussian "quantitative"
+                         :categorical "nominal"}]
+            (get mapping (get schema col-name))))))
 
 (defn should-bin?
   "Returns whether data for a certain column should be binned in a vega-lite spec."
@@ -100,10 +89,10 @@
 
 (defn simulatable?
   "Checks if `selections` and `cols` are valid for simulation"
-  [selections cols]
+  [selections cols schema]
   (and (= 1 (count selections)) ; Single row selected.
        (= 1 (count cols)) ; Single column selected.
-       (present-in-model? (first cols))))
+       (some? (get schema (first cols))))) ;; Selected column is said to be modeled.
 
 (defn gen-simulate-plot
   "Generates a vega-lite spec for a histogram of simulated values for a cell.
@@ -163,25 +152,24 @@
                            :type "quantitative"}}}]})
 
 
-(defn gen-choropleth [selections selected-columns]
+(defn gen-choropleth [geodata geo-id-col selections selected-columns]
   "Generates a vega-lite spec for a choropleth.
   `selections` is a collection of maps representing data in selected rows and columns.
   `selected-columns` is a collection of selected column names.
   `geo-id-column` from the app config is assumed to be among `selected-columns`.
   The first column that is not `geo-id-column` in `selected-columns` is designated as the
   color-by-col, the column whose data is used to color the geoshapes in the choropleth."
-  ;; TODO: Add a spec for topojson config map.
-  (when-let [geo-config (get config/config :geo)]
+  (when geodata
     (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
                                       selected-columns))
 
-          pad-fips (fn [v] (left-pad v (get geo-config :fips-code-length) \0))
+          pad-fips (fn [v] (left-pad v (get geodata :id-prop-code-length) \0))
           rows-cleaned (cond->> selections
                                 (probability-column? color-by-col)
                                 ;; Remove rows with probability values of 1.
                                 (remove #(= 1.0 (get % color-by-col)))
 
-                                (some? (get geo-config :fips-code-length))
+                                (some? (get geodata :id-prop-code-length))
                                 ;; Add padding to fips codes.
                                 (mapv #(medley/update-existing % geo-id-col pad-fips))
 
@@ -192,10 +180,10 @@
                                 ;; Adding this dummy attribute makes it so this data is not shared with other plots.
                                 (mapv #(assoc % :geo "[...]")))
 
-          data-format (case (get geo-config :filetype)
+          data-format (case (get geodata :filetype)
                         :geojson {:property "features"}
                         :topojson {:type "topojson"
-                                   :feature (get geo-config :feature)})
+                                   :feature (get geodata :feature)})
 
           ;; We are doing a join within this spec between geodata and rowdata.
           ;; This is done in vega-lite instead of CLJS because vega-lite can easily
@@ -204,13 +192,13 @@
           spec {:$schema default-vega-lite-schema
                 :width vega-map-width
                 :height vega-map-height
-                :data {:values (get geo-config :data)
+                :data {:values (get geodata :data)
                        :format data-format}
                 :transform [;; We join the geodata entities with the rows in our dataset.
                             ;; The row data gets joined as a new attribute called row which
                             ;; will contain the row object. This object is used to show the
                             ;; tooltip data.
-                            {:lookup (get geo-config :prop)
+                            {:lookup (get geodata :id-prop)
                              :from {:data {:values rows-cleaned}
                                     :key geo-id-col}
                              :as "row"}
@@ -221,12 +209,12 @@
                             ;; each geodata entity--except for keys that conflict with data already in the geojson
                             ;; entity. These flattened row key-values are used by selections across plots to
                             ;; filter data.
-                            {:lookup (get geo-config :prop)
+                            {:lookup (get geodata :id-prop)
                              :from {:data {:values rows-cleaned}
                                     :key geo-id-col
                                     :fields (remove #{:type :properties :geometry}
                                                     (keys (first rows-cleaned)))}}]
-                :projection {:type (get geo-config :projection-type)}
+                :projection {:type (get geodata :projection-type)}
                 :layer [{:mark {:type "geoshape"
                                 :color "#eee"
                                 :stroke "#757575"
@@ -413,17 +401,18 @@
            #{"nominal"} (table-bubble-plot selections cols)
            #{"quantitative" "nominal"} (strip-plot selections cols))))
 
-(defn- spec-for-selection-layer [selection-layer]
+(defn- spec-for-selection-layer [schema geodata geo-id-col selection-layer]
   (let [{layer-name :id
          selections :selections
          cols :selected-columns
          row :row-at-selection-start} selection-layer]
-    ;; Only produce a spec when we can find a vega-type for all selected columns.
-    (when (every? some? (map vega-type cols))
-      (let [spec (cond (some #{geo-id-col} cols) ; Fips column selected.
-                       (gen-choropleth selections cols)
+    ;; Only produce a spec when we can find a vega-type for all selected columns
+    ;; except the geo-id-col which we handle specially.
+    (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
+      (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
+                       (gen-choropleth geodata geo-id-col selections cols)
 
-                       (simulatable? selections cols)
+                       (simulatable? selections cols schema)
                        (gen-simulate-plot (first cols) row (name layer-name))
 
                        (= 1 (count cols)) ; One column selected.
@@ -436,10 +425,15 @@
                             :fontWeight 500}}]
         (merge spec title)))))
 
-(defn generate-spec [selection-layers]
-  (when-let [spec-layers (seq (keep spec-for-selection-layer selection-layers))]
-    {:$schema default-vega-lite-schema
-     :hconcat spec-layers
-     :resolve {:legend {:size "independent"
-                        :color "independent"}
-               :scale {:color "independent"}}}))
+(defn generate-spec [selection-layers schema geodata geo-id-col]
+  ;; TODO move this binding into spec-for-selection-layer.
+  (binding [vega-type (vega-type-fn schema)]
+    ;; We need to use doall to force the lazy seq because the dynamic bindings
+    ;; are not captured by the lazy sequences.
+    (when-let [spec-layers (seq (doall (keep #(spec-for-selection-layer schema geodata geo-id-col %)
+                                             selection-layers)))]
+      {:$schema default-vega-lite-schema
+       :hconcat spec-layers
+       :resolve {:legend {:size "independent"
+                          :color "independent"}
+                 :scale {:color "independent"}}})))

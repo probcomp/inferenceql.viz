@@ -1,31 +1,32 @@
 (ns inferenceql.spreadsheets.panels.viz.subs
   (:require [re-frame.core :as rf]
-            [metaprob.prelude :as mp]
-            [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
-            [inferenceql.inference.gpm.multimixture.search :as search]
-            [inferenceql.spreadsheets.model :as model]
             [inferenceql.spreadsheets.panels.viz.vega :as vega]
             [inferenceql.spreadsheets.panels.override.helpers :as co]
-            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
+            [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]))
 
 (rf/reg-sub :viz/vega-lite-spec
             :<- [:table/selection-layers-list]
-            (fn [selection-layers]
+            :<- [:query/schema]
+            :<- [:query/geodata]
+            :<- [:query/geo-id-col]
+            (fn [[selection-layers schema geodata geo-id-col]]
               (clj->js
-                (vega/generate-spec selection-layers))))
+                (vega/generate-spec selection-layers schema geodata geo-id-col))))
 
 (defn make-simulate-fn
-  [col-to-sim row override-fns]
-  (let [override-map (select-keys override-fns [col-to-sim])
-        override-insert-fn (co/gen-insert-fn override-map)
-        constraints (mm.utils/with-row-values {} (as-> row $
-                                                   (select-keys $ (keys (:vars model/spec)))
-                                                   (dissoc $ col-to-sim)
-                                                   (medley/remove-vals nil? $)))
-        gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
-                                           :observation-trace constraints))
-        has-negative-vals? #(some (every-pred number? neg?) (vals %))]
+  [col-to-sim row override-fns schema model]
+  (let [simulatable-columns (keys schema)
+        constraints (as-> row $
+                          (select-keys $ simulatable-columns)
+                          (dissoc $ col-to-sim)
+                          (medley/remove-vals nil? $))
+        targets #{col-to-sim}
+        gen-fn #(gpm/simulate model targets constraints)
+        has-negative-vals? #(some (every-pred number? neg?) (vals %))
+
+        override-map (select-keys override-fns [col-to-sim])
+        override-insert-fn (co/gen-insert-fn override-map)]
     ;; returns the first result of gen-fn that doesn't have a negative salary
     ;; TODO: (remove negative-vals? ...) is a hack for StrangeLoop2019
     #(take 1 (map override-insert-fn (remove has-negative-vals? (repeatedly gen-fn))))))
@@ -33,14 +34,16 @@
 (rf/reg-sub :viz/generators
             :<- [:table/selection-layers]
             :<- [:override/column-override-fns]
-            (fn [[layers override-fns]]
+            :<- [:query/schema]
+            :<- [:query/model]
+            (fn [[layers override-fns schema model]]
               (->> layers
                    (medley/map-vals (fn [layer]
                                       (let [{selections :selections
                                              cols :selected-columns
                                              row :row-at-selection-start} layer]
-                                        (when (vega/simulatable? selections cols)
-                                          (make-simulate-fn (first cols) row override-fns)))))
+                                        (when (vega/simulatable? selections cols schema)
+                                          (make-simulate-fn (first cols) row override-fns schema model)))))
                    (medley/remove-vals nil?))))
 
 (rf/reg-sub :viz/pts-store
