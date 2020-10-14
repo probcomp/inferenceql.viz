@@ -96,7 +96,7 @@
     :http-xhrio -- If the query is to be run remotely, a post request will be effected.
     :js/console-error -- If the query ran locally and failed, an error message will be output.
     :js/alert -- If the query ran locally and failed, an error message will be output."
-  [{:keys [db]} [_ text]]
+  [{:keys [db]} [_ text datasets models]]
   (let [{:keys [query-server-url]} config/config
         query (str/trim text)]
     (if query-server-url
@@ -110,9 +110,10 @@
                     :on-success      [:query/post-success]
                     :on-failure      [:query/post-failure]}}
       ;; Perform query execution locally.
-      (let [rows (->> (table-db/dataset-rows db)
-                      (map #(medley/remove-vals nil? %)))
-            models {:model (gpm/Multimixture model/spec)}]
+      ;; TODO: Use new query as edn features to determine which dataset is referenced.
+      ;; TODO: Update relevant portions of query component app-db accordingly.
+      (let [rows (->> (get-in datasets [:data :rows])
+                      (map #(medley/remove-vals nil? %)))]
         (execute-query-locally query rows models)))))
 
 (rf/reg-event-fx :query/parse-query event-interceptors parse-query)

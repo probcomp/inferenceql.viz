@@ -40,7 +40,9 @@
   "A reagant component. Acts as control and input panel for the app."
   []
   (let [input-text (rf/subscribe [:control/query-string])
-        show-menu (rf/subscribe [:more/show-menu])]
+        show-menu (rf/subscribe [:more/show-menu])
+        datasets (rf/subscribe [:store/datasets])
+        models (rf/subscribe [:store/models])]
     [:div#toolbar
      [:div#search-section
        [:textarea#search-input {:on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
@@ -49,7 +51,7 @@
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (not (.-shiftKey e)))
                                                         (do
                                                           (.preventDefault e)
-                                                          (rf/dispatch [:query/parse-query @input-text]))))
+                                                          (rf/dispatch [:query/parse-query @input-text @datasets @models]))))
                                 :placeholder (str "Write a query here.\n"
                                                   "  [shift-enter] - inserts a newline\n"
                                                   "  [enter] - executes query")
@@ -67,7 +69,7 @@
         :justify :end
         :children [[:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                 (rf/dispatch [:query/parse-query @input-text])
+                                 (rf/dispatch [:query/parse-query @input-text @datasets @models])
                                  (.blur (.-target e)))}
                     "Run InferenceQL"]
                    [:button.toolbar-button.pure-button
