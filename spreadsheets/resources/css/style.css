@@ -61,7 +61,7 @@ div {
 #search-buttons {
   margin-top: 5px;
   /* This positions #search-buttons so that more-menu-icon hangs off of #search-input. */
-  margin-right: -29px;
+  margin-right: -30px;
 }
 
 #search-input {
