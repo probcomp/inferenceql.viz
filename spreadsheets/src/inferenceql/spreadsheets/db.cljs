@@ -6,7 +6,8 @@
             [inferenceql.spreadsheets.panels.viz.db :as viz-panel]
             [inferenceql.spreadsheets.panels.more.db :as more-panel]
             [inferenceql.spreadsheets.panels.modal.db :as modal-panel]
-            [inferenceql.spreadsheets.components.highlight.db :as highlight-component]))
+            [inferenceql.spreadsheets.components.highlight.db :as highlight-component]
+            [inferenceql.spreadsheets.components.store.db :as store-component]))
 
 ;;; Primary DB spec.
 
@@ -16,7 +17,8 @@
                              ::viz-panel/viz-panel
                              ::more-panel/more-panel
                              ::modal-panel/modal-panel
-                             ::highlight-component/highlight-component]))
+                             ::highlight-component/highlight-component
+                             ::store-component/store-component]))
 
 (def default-general-db
   "This db map is meant to contain keys and values not specific to
@@ -35,5 +37,6 @@
              viz-panel/default-db
              more-panel/default-db
              modal-panel/default-db
-             highlight-component/default-db]]
+             highlight-component/default-db
+             store-component/default-db]]
     (apply merge dbs)))
