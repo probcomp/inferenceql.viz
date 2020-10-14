@@ -25,6 +25,9 @@
             ;; Modal Panel
             [inferenceql.spreadsheets.panels.modal.events]
             [inferenceql.spreadsheets.panels.modal.subs]
+            ;; Upload Panel
+            [inferenceql.spreadsheets.panels.upload.events]
+            [inferenceql.spreadsheets.panels.upload.effects]
             ;; Query Component
             [inferenceql.spreadsheets.components.query.events]
             [inferenceql.spreadsheets.components.query.subs]
