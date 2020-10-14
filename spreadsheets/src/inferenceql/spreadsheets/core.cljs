@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.core
+(ns ^:figwheel-hooks inferenceql.spreadsheets.core
   (:require [goog.dom :as dom]
             [re-frame.core :as rf]
             [reagent.dom :as rdom]
@@ -37,10 +37,21 @@
 (enable-console-print!)
 (set! *warn-on-infer* true)
 
-(rf/dispatch-sync [:initialize-db])
-
 (vega.init/add-custom-vega-color-schemes)
 
-(defn ^:export -main
+(defn ^:after-load render-app
+  "Renders the primary reagent component for the app onto the DOM element, #app
+
+  Tagged with :after-load so that figwheel will call this function after every hot-reload."
   []
   (rdom/render [views/app] (dom/$ "app")))
+
+(defn ^:export -main
+  "The main entry point for the app.
+
+  Called from javascript in resources/index.html on initial page load."
+  []
+  ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
+  ;; not reset the state of the app.
+  (rf/dispatch-sync [:initialize-db])
+  (render-app))
