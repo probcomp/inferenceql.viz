@@ -71,6 +71,7 @@
    :position :below-center
    :anchor [more-button @show-menu]
    :popover  [popover-content-wrapper
+              :padding "0px"
               :arrow-length 0
               :arrow-gap 0
               :arrow-width 0
