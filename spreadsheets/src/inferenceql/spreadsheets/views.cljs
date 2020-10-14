@@ -20,5 +20,6 @@
     [v-box
      :children [[control/panel]
                 [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
-                [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
+                (when vega-lite-spec
+                  [viz/vega-lite vega-lite-spec {:actions false} generators pts-store])
                 [modal/modal modal-content]]]))
