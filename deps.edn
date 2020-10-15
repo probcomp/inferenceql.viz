@@ -14,13 +14,16 @@
         re-frame/re-frame {:mvn/version "1.1.1"}
         reagent-forms/reagent-forms {:mvn/version "0.5.44"}
         day8.re-frame/http-fx {:mvn/version "v0.2.0"}
-        cljs-ajax/cljs-ajax {:mvn/version "0.8.0"}
+        cljs-ajax/cljs-ajax {:mvn/version "0.8.1"}
         cljstache/cljstache {:mvn/version "2.0.6"}
+        lambdaisland/uri {:mvn/version "1.4.54"}
         cljsjs/highlight {:mvn/version "9.12.0-2"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "34a35b01fdfd5987ccbc234c89cb4d669af0d2aa"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "34efe84636cc99455201ea1985cd359a595ac968"}
+        probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
+                                            :sha "c882fd1e619472f5aefdd7ba75a95c904449d90a"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"
