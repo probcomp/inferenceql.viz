@@ -22,7 +22,7 @@ jobs: # basic units of work in a run
             - "2b:84:62:54:6a:af:90:8d:41:79:c7:aa:de:6e:8d:7a"
       - run:
           name: Download dependencies
-          command: clojure -Stree
+          command: clojure -P
       - run:
           name: Build
           command: make
