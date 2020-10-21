@@ -68,8 +68,8 @@
         {:name (name param-key)
          :last (= index num-params)
          :gaussian true
-         :mu (:mu param-vals)
-         :sigma (:sigma param-vals)}))))
+         :mu (format "%.2f" (:mu param-vals))
+         :sigma (format "%.2f" (:sigma param-vals))}))))
 
 (defn views-section
   "Returns data for the views section of the js-model-template."
@@ -78,7 +78,9 @@
         views (get-in spec [:views])]
     (for [[view-num view] (map vector range-1 views)]
       {:num view-num
-       :cluster-probs (str/join ", " (map :probability view))
+       :cluster-probs (str/join ", " (map (comp #(format "%.2f" %)
+                                                :probability)
+                                          view))
        :clusters (for [[cluster-num cluster] (map vector range-1 view)]
                    {:first (= cluster-num 1)
                     :num cluster-num
