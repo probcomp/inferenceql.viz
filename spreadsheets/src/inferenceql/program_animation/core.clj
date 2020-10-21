@@ -46,7 +46,7 @@
     (fs/mkdirs svg-dir)
     (fs/mkdirs jpeg-dir)))
 
-(defn main []
+(defn -main []
   (clean-output-dirs)
 
   (doseq [[i p] (map-indexed vector programs)]
@@ -66,6 +66,3 @@
     (println "Resizing jpegs.")
     (sh "mogrify" "-gravity" "NorthWest" "-extent" max-size "-background" "white"
         "-border" "20x20" "-bordercolor" "white" "-colorspace" "RGB" file-name-wildcard)))
-
-;; Run this.
-#_(main)

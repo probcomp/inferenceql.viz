@@ -34,7 +34,8 @@
          "search-by-example/src"
          "spreadsheets/src"
          "spreadsheets/resources"]
- :aliases {:test {:extra-paths ["aide/test"
+ :aliases {:make-program-images {:main-opts ["-m" "inferenceql.program-animation.core"]}
+           :test {:extra-paths ["aide/test"
                                 "cgpm/test"
                                 "search-by-example/test"
                                 "spreadsheets/test"
