@@ -14,7 +14,7 @@
        :doc "This is a function that is intended to be rebinded at runtime. This function
             maps from column names to vega-lite data type. It is used by many of the vega-lite
             spec producing functions below."}
-      vega-type
+      *vega-type*
       (fn [col-name] nil))
 
 (def vega-map-width
@@ -92,7 +92,7 @@
 (defn should-bin?
   "Returns whether data for a certain column should be binned in a vega-lite spec."
   [col-name]
-  (case (vega-type col-name)
+  (case (*vega-type* col-name)
     "quantitative" true
     "nominal" false
     false))
@@ -121,7 +121,7 @@
         simulations-layer {:mark {:type "bar" :color default-table-color}
                            :encoding {:x {:bin (should-bin? col-name)
                                           :field col-kw
-                                          :type (vega-type col-name)}
+                                          :type (*vega-type* col-name)}
                                       :y {:aggregate "count"
                                           :type "quantitative"
                                           :axis y-axis
@@ -132,7 +132,7 @@
                         :mark {:type "rule"
                                :color "red"}
                         :encoding {:x {:field col-kw
-                                       :type (vega-type col-name)}}}
+                                       :type (*vega-type* col-name)}}}
         layers (cond-> [simulations-layer]
                  col-val (conj observed-layer))]
     {:data {:name dataset-name}
@@ -147,7 +147,7 @@
                    :color default-table-color}
             :encoding {:x {:bin (should-bin? col)
                            :field col
-                           :type (vega-type col)}
+                           :type (*vega-type* col)}
                        :y {:aggregate "count"
                            :type "quantitative"}}
             :selection {:pts {:type "interval" :encodings ["x"] :empty "none"}}}
@@ -157,7 +157,7 @@
                    :color selection-color}
             :encoding {:x {:bin (should-bin? col)
                            :field col
-                           :type (vega-type col)}
+                           :type (*vega-type* col)}
                        :y {:aggregate "count", 
                            :type "quantitative"}}}]})
 
@@ -253,7 +253,7 @@
                             ["#f2f2f2" "#deebf7","#bdd7e7","#6baed6","#2171b5"]
                             ["#f2f2f2" "#f4e5d2" "#fed79c" "#fca52a" "#ff6502"])
               reverse-scale (probability-column? color-by-col)
-              scale (case (vega-type color-by-col)
+              scale (case (*vega-type* color-by-col)
                       "quantitative" {:type "quantize"
                                       :range color-range
                                       :reverse reverse-scale}
@@ -261,7 +261,7 @@
                                  :scheme {:name vega.init/nyt-color-scheme}})
 
               color-spec {:field (str "row." (name color-by-col))
-                          :type (vega-type color-by-col)
+                          :type (*vega-type* color-by-col)
                           :scale scale
                           :legend {:title color-by-col}}]
           (assoc-in spec [:encoding :color] color-spec))))))
@@ -321,9 +321,9 @@
               :mark {:type "boxplot"
                      :extent "min-max"}
               :encoding {:x {:field col-1
-                             :type (vega-type col-1)}
+                             :type (*vega-type* col-1)}
                          :y {:field col-2
-                             :type (vega-type col-2)}
+                             :type (*vega-type* col-2)}
                          :color {:aggregate "count"
                                  :type "quantitative"}}}]
     (if facet-column
@@ -333,7 +333,7 @@
 (defn- strip-plot-size-helper
   "Return a vega-lite height/width size setting given `col-name` a column name from the table"
   [col-name]
-  (case (vega-type col-name)
+  (case (*vega-type* col-name)
         "quantitative" vega-strip-plot-quant-size
         "nominal" {:step vega-strip-plot-step-size}))
 
@@ -346,12 +346,12 @@
         ;; NOTE: This is a temporary hack to that forces the x-channel in the plot to be "numerical"
         ;; and the y-channel to be "nominal". The rest of the code remains nuetral to the order so that
         ;; it can be used by the iql-viz query language later regardless of column type order.
-        first-col-nominal (= "nominal" (vega-type (first cols-to-draw)))
+        first-col-nominal (= "nominal" (*vega-type* (first cols-to-draw)))
         cols-to-draw (cond->> (take 2 cols-to-draw)
                        first-col-nominal (reverse))
 
         [x-field y-field] cols-to-draw
-        [x-type y-type] (map vega-type cols-to-draw)
+        [x-type y-type] (map *vega-type* cols-to-draw)
         quant-dimension (if (= x-type "quantitative") :x :y)
         [width height] (map strip-plot-size-helper cols-to-draw)]
     {:width width
@@ -405,21 +405,21 @@
                                 :type "quantitative"}}}]}))
 
 (defn gen-comparison-plot [cols selections]
-  (let [cols-types (set (doall (map vega-type cols)))]
+  (let [cols-types (set (doall (map *vega-type* cols)))]
     (condp = cols-types
            #{"quantitative"} (scatter-plot selections cols)
            #{"nominal"} (table-bubble-plot selections cols)
            #{"quantitative" "nominal"} (strip-plot selections cols))))
 
 (defn- spec-for-selection-layer [schema simulatable-cols geodata geo-id-col selection-layer]
-  (binding [vega-type (vega-type-fn schema)]
+  (binding [*vega-type* (vega-type-fn schema)]
     (let [{layer-name :id
            selections :selections
            cols :selected-columns
            row :row-at-selection-start} selection-layer]
       ;; Only produce a spec when we can find a vega-type for all selected columns
       ;; except the geo-id-col which we handle specially.
-      (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
+      (when (every? some? (map *vega-type* (remove #{geo-id-col} cols)))
         (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
                          (gen-choropleth geodata geo-id-col selections cols)
 
