@@ -32,7 +32,23 @@
   "A reagant component for displaying a Crossscat visualization."
   []
   (let [option @(rf/subscribe [:crosscat/option])
-        spec (get specs option)]
+        spec (get specs option)
+
+        model @(rf/subscribe [:query/model])
+        dataset @(rf/subscribe [:query/dataset])
+        visual-headers @(rf/subscribe [:table/visual-headers])
+        visual-rows @(rf/subscribe [:table/visual-rows])
+        selection-layers @(rf/subscribe [:table/selection-layers])]
+
+    ;; Logging various subs for learning purposes.
+    (.log js/console "------------Logging Misc Subs--------------------")
+    (.log js/console :model model)
+    (.log js/console :dataset dataset)
+    (.log js/console :visual-headers visual-headers)
+    (.log js/console :visual-rows visual-rows)
+    (.log js/console :selection-layers selection-layers)
+
+    ;; The actual component returned.
     [v-box
      :gap "10px"
      :margin "10px 10px 10px 10px"
