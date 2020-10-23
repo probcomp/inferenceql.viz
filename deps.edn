@@ -19,7 +19,7 @@
         lambdaisland/uri {:mvn/version "1.4.54"}
         cljsjs/highlight {:mvn/version "9.12.0-2"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "34a35b01fdfd5987ccbc234c89cb4d669af0d2aa"}
+                                        :sha "b0847cd50d9d457e956280f6691c43049cc52be7"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "34efe84636cc99455201ea1985cd359a595ac968"}
         probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
