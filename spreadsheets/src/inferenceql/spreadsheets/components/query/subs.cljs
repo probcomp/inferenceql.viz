@@ -31,6 +31,46 @@
             :<- [:store/datasets]
             dataset)
 
+(defn ^:sub geo-id-col
+  "Returns the geo-id-col associated with the dataset referenced in the query text."
+  [dataset]
+  (keyword (:geo-id-col dataset)))
+(rf/reg-sub :query/geo-id-col
+            :<- [:query/dataset]
+            geo-id-col)
+
+(defn ^:sub geodata
+  "Returns the geodata associated with the dataset referenced in the query text."
+  [[dataset geodata]]
+  (get geodata (:geodata-name dataset)))
+(rf/reg-sub :query/geodata
+            :<- [:query/dataset]
+            :<- [:store/geodata]
+            geodata)
+
+(defn ^:sub model
+  "Returns the model referenced in the query text."
+  [[model-name models]]
+  (get models model-name))
+(rf/reg-sub :query/model
+            :<- [:query/model-name]
+            :<- [:store/models]
+            model)
+
+(defn ^:sub simulatable-cols
+  "Returns a set of column names that are simulatable.
+
+  These are columns that apppear in the dataset's schema and therefore they are
+  assumed to be modeled."
+  [dataset]
+  (-> dataset
+      (:schema)
+      (keys)
+      (set)))
+(rf/reg-sub :query/simulatable-cols
+            :<- [:query/dataset]
+            simulatable-cols)
+
 (defn ^:sub column-renames
   "Returns a map of columns that have been renamed as a result of executing the last query.
 
