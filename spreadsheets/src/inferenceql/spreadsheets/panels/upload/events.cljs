@@ -36,6 +36,31 @@
                  event-interceptors
                  read-files)
 
+(defn ^:event-fx read-url
+  "Starts the processing of a form for submitting a magic-url which will load a new demo
+
+  A loading a demo means loading all datasets, models, and geodata related to a particular demo.
+
+  Args:
+    `form-data` - A map of data entered in the form.
+
+  Triggered when:
+    The user submits the form.
+
+  Effects returned:
+    :upload/read-url-effect -- Continues the processing of the submitted url.
+    :dispatch [:upload/set-display] -- Clears the display of the form.
+    :dispatch [:table/clear] -- Clears all data displayed in the table."
+  [{:keys [_db]} [_ form-data]]
+  (let [{:keys [url use-creds]} form-data]
+    {:upload/read-url-effect {:url url
+                              :use-creds use-creds
+                              :on-success [:upload/process-config]
+                              :on-failure [:upload/read-failed]}}))
+(rf/reg-event-fx :upload/read-url
+                 event-interceptors
+                 read-url)
+
 (defn ^:event-fx process-config
   "Processes a config map that contains datasets, models, and geodata and stores them.
 
