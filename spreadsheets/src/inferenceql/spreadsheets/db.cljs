@@ -7,6 +7,7 @@
             [inferenceql.spreadsheets.panels.more.db :as more-panel]
             [inferenceql.spreadsheets.panels.modal.db :as modal-panel]
             [inferenceql.spreadsheets.components.highlight.db :as highlight-component]
+            [inferenceql.spreadsheets.components.query.db :as query-component]
             [inferenceql.spreadsheets.components.store.db :as store-component]))
 
 ;;; Primary DB spec.
@@ -18,6 +19,7 @@
                              ::more-panel/more-panel
                              ::modal-panel/modal-panel
                              ::highlight-component/highlight-component
+                             ::query-component/query-component
                              ::store-component/store-component]))
 
 (def default-general-db
@@ -38,5 +40,6 @@
              more-panel/default-db
              modal-panel/default-db
              highlight-component/default-db
+             query-component/default-db
              store-component/default-db]]
     (apply merge dbs)))
