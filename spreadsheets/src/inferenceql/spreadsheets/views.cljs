@@ -4,7 +4,8 @@
             [inferenceql.spreadsheets.panels.control.views :as control]
             [inferenceql.spreadsheets.panels.viz.views :as viz]
             [inferenceql.spreadsheets.panels.table.views :as table]
-            [inferenceql.spreadsheets.panels.modal.views :as modal]))
+            [inferenceql.spreadsheets.panels.modal.views :as modal]
+            [inferenceql.spreadsheets.panels.crosscat.views :as crosscat]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
 
@@ -20,6 +21,7 @@
     [v-box
      :children [[control/panel]
                 [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
+                [crosscat/viz]
                 (when vega-lite-spec
                   [viz/vega-lite vega-lite-spec {:actions false} generators pts-store])
                 [modal/modal modal-content]]]))

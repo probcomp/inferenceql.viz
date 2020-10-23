@@ -6,6 +6,7 @@
             [inferenceql.spreadsheets.panels.viz.db :as viz-panel]
             [inferenceql.spreadsheets.panels.more.db :as more-panel]
             [inferenceql.spreadsheets.panels.modal.db :as modal-panel]
+            [inferenceql.spreadsheets.panels.crosscat.db :as crosscat-panel]
             [inferenceql.spreadsheets.components.highlight.db :as highlight-component]
             [inferenceql.spreadsheets.components.query.db :as query-component]
             [inferenceql.spreadsheets.components.store.db :as store-component]))
@@ -18,6 +19,7 @@
                              ::viz-panel/viz-panel
                              ::more-panel/more-panel
                              ::modal-panel/modal-panel
+                             ::crosscat-panel/crosscat-panel
                              ::highlight-component/highlight-component
                              ::query-component/query-component
                              ::store-component/store-component]))
@@ -39,6 +41,7 @@
              viz-panel/default-db
              more-panel/default-db
              modal-panel/default-db
+             crosscat-panel/default-db
              highlight-component/default-db
              query-component/default-db
              store-component/default-db]]

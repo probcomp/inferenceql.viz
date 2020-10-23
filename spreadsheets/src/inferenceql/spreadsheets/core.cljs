@@ -30,6 +30,9 @@
             [inferenceql.spreadsheets.panels.upload.effects]
             ;; JSmodel Panel
             [inferenceql.spreadsheets.panels.jsmodel.subs]
+            ;; Crosscat Panel
+            [inferenceql.spreadsheets.panels.crosscat.events]
+            [inferenceql.spreadsheets.panels.crosscat.subs]
             ;; Query Component
             [inferenceql.spreadsheets.components.query.events]
             [inferenceql.spreadsheets.components.query.subs]
