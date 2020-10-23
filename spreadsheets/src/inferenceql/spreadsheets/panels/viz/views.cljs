@@ -28,6 +28,12 @@
   [spec opt generators pts-store]
   (let [run (atom 0)
         dom-nodes (r/atom {})
+        vega-embed-result (r/atom nil)
+
+        free-resources (fn [] (swap! run inc) ; Turn off any running generators.
+                              (when @vega-embed-result
+                                ; Free resources used by vega-embed.
+                                ((.-finalize @vega-embed-result))))
 
         ;; Uses generator functions in map `generators` to generate new rows and
         ;; insert them into `vega-instance`.
@@ -43,7 +49,8 @@
                                         (resize)
                                         (run))))))
         embed (fn [this spec opt generators pts-store]
-                (when spec
+                (if-not (:vega-node @dom-nodes)
+                  (free-resources)
                   (let [spec (clj->js spec)
                         opt (clj->js (merge default-vega-embed-options
                                             opt))]
@@ -78,6 +85,9 @@
                                                        (fn [_ds-name data]
                                                          (rf/dispatch [:viz/set-pts-store data]))
                                                        150))))))
+                      ;; Store the result of vega-embed.
+                      (.then (fn [res]
+                               (reset! vega-embed-result res)))
                       (.catch (fn [err]
                                 (js/console.error err)))))))]
     (r/create-class
@@ -99,11 +109,12 @@
 
       :component-will-unmount
       (fn [this]
-        (swap! run inc))
+        (free-resources))
 
       :reagent-render
       (fn [spec opt generators pts-store]
-        [:div.viz-container
-         [:div.flex-box-space-filler-20]
-         [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
-         [:div.flex-box-space-filler-20]])})))
+        (when spec
+          [:div.viz-container
+           [:div.flex-box-space-filler-20]
+           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
+           [:div.flex-box-space-filler-20]]))})))
