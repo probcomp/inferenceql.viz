@@ -3,19 +3,23 @@
   The store component is esentially a part of the app-db where datasets and
   models and geodata are stored."
   (:require [clojure.spec.alpha :as s]
+            [inferenceql.auto-modeling.bayesdb-import :as bdb.import]
             [inferenceql.spreadsheets.config :as config]
             [inferenceql.spreadsheets.csv :as csv-utils]
             [inferenceql.inference.gpm :as gpm]))
 
 ;;; Compiled-in elements to store
 
-(def compiled-in-model (get config/config :model))
-
-(def compiled-in-schema (get-in config/config [:model :vars]))
+(def compiled-in-schema (get config/config :schema))
 
 (def compiled-in-dataset
-  (let [dataset (get config/config :data)]
-    (csv-utils/csv-data->clean-maps compiled-in-schema dataset {:keywordize-cols true})))
+  (csv-utils/csv-data->clean-maps (get config/config :schema)
+                                  (get config/config :data)
+                                  {:keywordize-cols true}))
+
+;; NOTE: Currently, we just take the first model in the bayes-db-export as our model.
+(def compiled-in-model (first (bdb.import/xcat-gpms (get config/config :bayes-db-export)
+                                                    compiled-in-dataset)))
 
 ;;; Setting up store component db
 
@@ -27,7 +31,7 @@
   {:store-component {:datasets {:data {:rows compiled-in-dataset
                                        :schema compiled-in-schema
                                        :default-model :model}}
-                     :models {:model (gpm/Multimixture compiled-in-model)}}})
+                     :models {:model compiled-in-model}}})
 
 (def default-db
   "The initial store db including any geodata and geodata settings included with the appp."
