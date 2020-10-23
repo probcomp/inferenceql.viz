@@ -1,15 +1,10 @@
 (ns inferenceql.spreadsheets.panels.table.db
-  (:require [clojure.spec.alpha :as s]
-            [inferenceql.spreadsheets.data :refer [nyt-data]]))
+  (:require [clojure.spec.alpha :as s]))
 
 (def default-db
-  {:table-panel {:dataset-headers (into [] (keys (first nyt-data)))
-                 :dataset-rows nyt-data
-                 :selection-layers {}}})
+  {:table-panel {:selection-layers {}}})
 
-(s/def ::table-panel (s/keys :req-un [::dataset-headers
-                                      ::dataset-rows
-                                      ::selection-layers]
+(s/def ::table-panel (s/keys :req-un [::selection-layers]
                              :opt-un [::headers
                                       ::rows
                                       ::visual-headers
@@ -24,8 +19,6 @@
 (s/def ::headers (s/coll-of ::header :kind vector?))
 (s/def ::visual-rows (s/coll-of ::row :kind vector?))
 (s/def ::visual-headers (s/coll-of ::header :kind vector?))
-(s/def ::dataset-rows (s/coll-of ::row :kind vector?))
-(s/def ::dataset-headers (s/coll-of ::header :kind vector?))
 (s/def ::virtual boolean?)
 
 ;;; Specs related to selections within handsontable instances.
@@ -54,14 +47,6 @@
 (defn table-rows
   [db]
   (get-in db [:table-panel :rows] []))
-
-(defn dataset-headers
-  [db]
-  (get-in db [:table-panel :dataset-headers]))
-
-(defn dataset-rows
-  [db]
-  (get-in db [:table-panel :dataset-rows]))
 
 (defn visual-headers
   [db]
