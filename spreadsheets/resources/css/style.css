@@ -171,7 +171,7 @@ div {
 
 /* --------------- styling for vega-vizualization --------------- */
 
-#viz-container {
+.viz-container {
   display: flex;
 }
 
