@@ -2,7 +2,10 @@
   (:require [re-frame.core :as rf]
             [re-com.core :refer [box h-box v-box gap single-dropdown button]]
             [inferenceql.spreadsheets.panels.viz.views :refer [vega-lite]]
+            [inferenceql.query :as query]
+            [reagent.core :as reagent]
             [inferenceql.inference.gpm :as gpm]
+            [clojure.string :as string]
             ))
 
 ;;; Vega-lite specs.
@@ -93,10 +96,10 @@
                                    (map (fn [exploded-row] {
                                                             :row_id (get exploded-row :row_id) 
                                                             :metric (get exploded-row :metric) 
-                                                            :probabilityValue (get exploded-row :probabilityValue) ;; probability density, not raw data value
+                                                            :probabilityValue (get exploded-row :probabilityValue)
                                                             :dataValue (get exploded-row :dataValue) 
                                                             :percentRank (get exploded-row :percentRank) 
-                                                            :averageProbability averageProbability ;; TODO: average the probability values in a clusterRow
+                                                            :averageProbability averageProbability
                                                             }) explodedRows)
                                    ))  clusterRows)
       ]
@@ -208,29 +211,28 @@
 
 ;;; Main reagent component for Crosscat Viz.
 
-(defn viz
-  "A reagent component for displaying a Crosscat visualization."
+(defn viz-render
   []
   (let [option @(rf/subscribe [:crosscat/option])
-        ;; spec (get specs option)
 
         model @(rf/subscribe [:query/model])
         dataset @(rf/subscribe [:query/dataset])
+
         visual-headers @(rf/subscribe [:table/visual-headers])
         visual-rows @(rf/subscribe [:table/visual-rows])
         selection-layers @(rf/subscribe [:table/selection-layers])
-        
+
         views (vals (get model :views))
-        spec (make-crosscat-vega-spec views)
+        spec (make-crosscat-vega-spec views)        
         ]
 
     ;; Logging various subs for learning purposes.
     (.log js/console "------------Logging Misc Subs Test--------------------")
-    
+
     ;; Having a hard time getting the clusters out of model
     ;; https://github.com/probcomp/inferenceql.inference/blob/9c9527bde1cb8476863aa9a2899e47d157a71572/src/inferenceql/inference/gpm/multimixture/search/enumerative.cljc
     (.log js/console :model model)
-    (.log js/console :views views )
+    (.log js/console :views views)
     ;; (.log js/console :views (type views) )
     ;; (.log js/console :views (keys (first views)))
     ;; (.log js/console :views (get (first views) :latents) )
@@ -258,4 +260,52 @@
                 [button
                  :label "Set option to :gamma"
                  :on-click #(rf/dispatch [:crosscat/set-option :gamma])]
-                [vega-lite spec {:actions false} nil nil]]]))
+                [vega-lite spec {:actions false} nil nil]]])
+)
+
+
+(defn viz-old
+  "A reagent component for displaying a Crosscat visualization."
+  []
+  viz-render)
+
+;; Trying to approximate JS template literals.
+;; // https://andersmurphy.com/2019/01/15/clojure-string-interpolation.html
+(defn replace-several [s & {:as replacements}]
+  (reduce (fn [s [match replacement]]
+            (string/replace s match replacement))
+          s replacements))
+
+
+;; Converted to lifecycle method because we need data fetching on component mount. 
+(defn viz
+  []
+  (let [
+        ;; Data for probability density query
+        datasets (rf/subscribe [:store/datasets])
+        models (rf/subscribe [:store/models])
+        model @(rf/subscribe [:query/model])
+      ]
+           
+    (reagent/create-class                 ;; <-- expects a map of functions 
+     {:display-name  "crosscat-viz"      ;; for more helpful warnings & errors
+
+      :component-did-mount               ;; the name of a lifecycle function
+      (fn [this]
+        (let [
+              headers (keys (-> model :latents :z))
+              probabilitySubQueries (string/join ", " (map (fn [header] (replace-several "(PROBABILITY OF $header UNDER model AS $header)"
+                                                                          "$header" (name header) ;; name instead of str because this is a clojure keyword
+                                                                       ) 
+                                           ) headers ))
+              probabilityQuery (str "SELECT " probabilitySubQueries " FROM data;" ) ;; TODO: build a SQL query, trigger data fetching, get it into probability-density. 
+              ]
+          
+                  ;; (println "component-did-mount") ;; data fetching
+          (.log js/console "------------Component Mounted--------------------")
+          (rf/dispatch [:query/parse-query probabilityQuery @datasets @models])) ;; your implementation
+         )
+
+      :reagent-render
+      viz-render
+    })))
