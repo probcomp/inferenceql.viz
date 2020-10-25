@@ -21,11 +21,31 @@
                 :mark "bar",
                 :encoding {:x {:field "a", :type "nominal", :axis {:labelAngle 0}},
                            :y {:field "b", :type "quantitative"}}})
-                           
+
 (defn probability-density
   [row_id, column_name]
-  (rand) ;; TODO: return something that looks up a real data value with IQL
+  (rand) ;; TODO: how to run an IQL query? or batch fill this in at the beginning?
   )
+
+(defn percent-rank
+  "arr: number[]
+   value: number
+   
+   Return percentile of value within arr
+   "
+  [arr, value]
+  (let [
+        ;; https://clojuredocs.org/clojure.core/compare
+        numBelow (count (filter (fn [arrValue] (= -1 (compare value arrValue))) arr))
+        numEqual (count (filter (fn [arrValue] (= 0 (compare value arrValue))) arr))
+        numerator (* 100 (+ numBelow (* 0.5 numEqual)))
+        denominator (count arr)
+        rank (/ numerator denominator)
+        ]
+    ;; (.log js/console value)
+    rank
+    )
+)
 
 ;; expand each assignment row to have 1 row/1 metric
 ;; assumes there is at least 1 row in assignments
@@ -34,14 +54,33 @@
   [assignment-rows]
   (let [headers (keys (first (first assignment-rows))) ;; this assumes every row in assignment-rows has the same schema.
         ]
-    ;; JS flatmap
-    (mapcat (fn [[csvRow, metadataRow]] (map  (fn [header] (let [rowId (first (get metadataRow :row-ids))
-                                                                 rowValue (probability-density rowId header)]
+    ;; JS equivalent to flatmap
+    (mapcat (fn [[csvRow, metadataRow, probabilityDensityRow, percentileRankRow]] (map  (fn [header] (let [
+                                                                ;; (.log js/console :metadataRow metadataRow) ;; is it possible to have more than 1 row id per row??
+                                                                 rowId (first (get metadataRow :row-ids))
+                                                                 dataValue (get csvRow header)
+                                                                 probabilityValue (get probabilityDensityRow header)
+                                                                 percentRank (get percentileRankRow header)
+                                                                 ]
                                                              {:row_id rowId 
-                                                              :metric header 
-                                                              :value rowValue} ;; TODO: figure out if header needs to turn to string.
+                                                              :metric header             ;; does this need to be stringified, or fine to leave like this?
+                                                              :probabilityValue probabilityValue ;; probabilityDensity, from IQL 
+                                                              :dataValue dataValue ;; actual underlying data value!
+                                                              :percentRank percentRank ;; actual underlying data value!
+                                                              }
                                                              )) headers))
             assignment-rows)))
+
+
+(defn get-row-average-probability
+  [[csvRow, metadataRow, probabilityDensityRow, percentileRankRow]]
+  (let [headers (keys probabilityDensityRow)
+        numHeaders (count headers)
+        sumHeaders (reduce + (map (fn [header] (get probabilityDensityRow header)) headers))
+      ]
+    (/ sumHeaders numHeaders)
+   )
+  )
 
 
 (defn make-vega-layer-for-cluster
@@ -49,20 +88,21 @@
   (let [
       mappedValues (mapcat (fn [clusterRow] (let [
                                     explodedRows (explode-assignment-rows [clusterRow])
+                                    averageProbability (get-row-average-probability clusterRow)
                                   ]
-                                  ;; (.log js/console :metadataRow metadataRow) ;; is it possible to have more than 1 row id per row??
                                    (map (fn [exploded-row] {
                                                             :row_id (get exploded-row :row_id) 
                                                             :metric (get exploded-row :metric) 
-                                                            :value (get exploded-row :value) ;; probability density, not raw data value
-                                                            :percentRank 0 ;; TODO: make this a part of the assignment row higher in the call chain
-                                                            :averageProbability 0 ;; TODO: average the values in explodedRows
+                                                            :probabilityValue (get exploded-row :probabilityValue) ;; probability density, not raw data value
+                                                            :dataValue (get exploded-row :dataValue) 
+                                                            :percentRank (get exploded-row :percentRank) 
+                                                            :averageProbability averageProbability ;; TODO: average the probability values in a clusterRow
                                                             }) explodedRows)
                                    ))  clusterRows)
       ]
     
-   (.log js/console :clusterRows clusterRows)
-   (.log js/console :mappedValues mappedValues)
+  ;;  (.log js/console :clusterRows clusterRows)
+  ;;  (.log js/console :mappedValues mappedValues)
   {
     :data {
       :values mappedValues
@@ -75,9 +115,9 @@
                                               
                        }
                    :x {:field "metric"
-                       :type "nominal" :sort {:op "mean" :field "value" :order "descending"}}
+                       :type "nominal" :sort {:op "mean" :field "averageProbability" :order "descending"}}
                     :y {:field "row_id"
-                        :type "nominal" :sort {:op "sum" :field "value" :order "descending"}}
+                        :type "nominal" :sort {:op "sum" :field "averageProbability" :order "descending"}}
       }
     :mark {
            :type "rect",
@@ -89,20 +129,61 @@
 )
 
 
-
-
 (defn make-vega-layer-for-gpm-view
   "Given array of Views from an XCat model (see crosscat/construct-xcat-from-latents)"
   [view]
   (let [;; nested property access: https://stackoverflow.com/a/15639446/5129731
         clusterIds (keys (-> view :latents :counts))
         assignments (get view :assignments)
+        headers (keys (first (first assignments))) ;; assume every row is same
+        ;; do some pre filtering for percentile calculation
+        
+        metricValueArrayMap (zipmap
+                             headers
+                             (map (fn [header] (map (fn [[csvRow, metadataRow]] (get csvRow header)) assignments)) headers))
+        
+        
+        ;; Insert probability densities into each row as 3rd uple of every entry
+        assignmentsWithProbabilities (map (fn [[csvRow, metadataRow]]
+                                            (let [
+                                                rowId (first (get metadataRow :row-ids))
+                                                probabilityDensityRow (zipmap
+                                                                       headers
+                                                                       (map (fn [header] (probability-density rowId header)) headers))
+                                              ]
+                                             ;; create copies to prevent mutation, unlike in JS version.
+                                             [
+                                              csvRow
+                                              metadataRow
+                                              probabilityDensityRow
+                                              ]
+                                            ))
+                                      assignments)
+        
+        ;; Lastly, lets add percentile rank for every node
+        ;; Can't compute this until now because probability density was not available earlier.
+        metricValueArrayMap (zipmap
+                             headers
+                             (map (fn [header] (map (fn [[csvRow, metadataRow, probabilityDensityRow]] (get probabilityDensityRow header)) assignmentsWithProbabilities)) headers))
+        
+        assignmentsWithPercentileRanks (map (fn [[csvRow, metadataRow, probabilityDensityRow]]
+                                            (let [rowId (first (get metadataRow :row-ids))
+                                                  percentileRankRow (zipmap
+                                                                     headers
+                                                                     (map (fn [header] (percent-rank (get metricValueArrayMap header)
+                                                                                                     (get probabilityDensityRow header))) headers))]
+                                              [csvRow
+                                               metadataRow
+                                               probabilityDensityRow
+                                               percentileRankRow
+                                               ]))
+                                          assignmentsWithProbabilities)
 
         rowsByCluster (map (fn [clusterId] (filter (fn [[csvRow, metadataRow]] (let []
                                                                (not= nil (get (get metadataRow :categories) clusterId))))
-                                                   assignments)) clusterIds)]
+                                                   assignmentsWithPercentileRanks)) clusterIds)]
     (.log js/console :view view)
-    (.log js/console :assign (explode-assignment-rows assignments))
+    ;; (.log js/console :exploded (explode-assignment-rows assignmentsWithProbabilities))
     ;; (.log js/console :clusterIds clusterIds)
     ;; (.log js/console :assignments assignments)
     ;; (.log js/console :rowsByCluster rowsByCluster)
