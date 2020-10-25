@@ -18,8 +18,15 @@
                                   {:keywordize-cols true}))
 
 ;; NOTE: Currently, we just take the first model in the bayes-db-export as our model.
-(def compiled-in-model (first (bdb.import/xcat-gpms (get config/config :bayes-db-export)
-                                                    compiled-in-dataset)))
+;; (def compiled-in-model (first (bdb.import/xcat-gpms (get config/config :bayes-db-export)
+;;                                                     compiled-in-dataset)))
+
+
+;; Loaded second model by default since it generates 2 views in the 50 row tests dataset,
+;; better for debugging
+;; Remove before merging.
+(def compiled-in-model (first (rest (bdb.import/xcat-gpms (get config/config :bayes-db-export)
+                                                    compiled-in-dataset)) )  )
 
 ;;; Setting up store component db
 
