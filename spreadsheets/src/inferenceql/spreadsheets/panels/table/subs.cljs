@@ -198,12 +198,20 @@
             (fn [db _]
               (get-in db [:table-panel :visual-rows])))
 
+
+;; crosscat needs to read this independent of sort order
+;; (rf/reg-sub :table/table-rows
+;;             (fn [db _]
+;;               (get-in db [:table-panel :table-rows])))
+
+
 (rf/reg-sub :table/selected-row-flags
             :<- [:table/table-rows]
             :<- [:viz/pts-store-filter]
             (fn [[rows pts-store-filter]]
               (when pts-store-filter
                 (map pts-store-filter rows))))
+
 
 ;;; Subs related to various table settings and state.
 

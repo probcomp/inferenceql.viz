@@ -18,6 +18,7 @@
         virtual @(rf/subscribe [:table/virtual])
         highlight-class @(rf/subscribe [:table/highlight-class])
         modal-content @(rf/subscribe [:modal/content])]
+    
     [v-box
      :children [[control/panel]
                 [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
