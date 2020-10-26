@@ -2,11 +2,13 @@
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
             [inferenceql.query :as query]
+            [inferenceql.query.parse-tree :as tree]
+            [inferenceql.spreadsheets.components.query.util :as util]
+            [inferenceql.spreadsheets.config :as config]
             [inferenceql.spreadsheets.panels.table.db :as table-db]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.model :as model]
             [inferenceql.inference.gpm :as gpm]
-            [inferenceql.spreadsheets.config :as config]
             [medley.core :as medley]
             [day8.re-frame.http-fx]
             [ajax.core]
@@ -62,9 +64,8 @@
   (try
     (let [result (query/q query rows models)
           columns (:iql/columns (meta result))]
-      ;; TODO: add flag for virtual data.
-      ;; This is a map of a re-frame effect to be executed by re-frame.
-      {:dispatch [:table/set result columns {:virtual false}]})
+      {:fx [[:dispatch [:table/set result columns {:virtual false}]]
+            [:dispatch [:query/set-details query]]]})
     (catch ExceptionInfo e
       (let [error-messages (if (:cognitect.anomalies/category (ex-data e))
                              ;; This case is for a proper iql.query exception.
@@ -107,7 +108,7 @@
                     :timeout         5000
                     :format          (ajax.core/text-request-format)
                     :response-format (ajax.edn/edn-response-format)
-                    :on-success      [:query/post-success]
+                    :on-success      [:query/post-success query]
                     :on-failure      [:query/post-failure]}}
       ;; Perform query execution locally.
       ;; NOTE: We currently assume the ':data' dataset is always being
@@ -129,11 +130,11 @@
 
   Effects returned:
     :dispatch [:table/set] -- Used to display the query resultset in the table."
-  [_ [_ result]]
+  [_ [_ query result]]
   (let [{result-rows :result metadata :metadata} result
         {columns :iql/columns} metadata]
-    ;; TODO: add flag for virtual data.
-    {:dispatch [:table/set result-rows columns {:virtual false}]}))
+    {:fx [[:dispatch [:table/set result-rows columns {:virtual false}]]
+          [:dispatch [:query/set-details query]]]}))
 
 (rf/reg-event-fx :query/post-success event-interceptors post-success)
 
@@ -168,3 +169,22 @@
      :js/alert alert-msg}))
 
 (rf/reg-event-fx :query/post-failure event-interceptors post-failure)
+
+(defn ^:event-db set-details
+  "Stores additional information extracted from `query`.
+
+  Saves datatypes for new-columns generated as a result of the query,
+  column renamings, and whether the query resultset represents virtual data.
+
+  Triggered when:
+    A query has successfully exectued and the resultset is being stored.
+
+  Params:
+    `query` (string) -- The query to extract details from."
+  [db [_ query]]
+  (-> db
+      (assoc-in [:query-component :column-details] (util/column-details query))
+      (assoc-in [:query-component :virtual] (util/virtual-data? query))))
+(rf/reg-event-db :query/set-details
+                 event-interceptors
+                 set-details)

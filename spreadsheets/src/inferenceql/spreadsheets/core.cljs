@@ -27,6 +27,7 @@
             [inferenceql.spreadsheets.panels.modal.subs]
             ;; Query Component
             [inferenceql.spreadsheets.components.query.events]
+            [inferenceql.spreadsheets.components.query.subs]
             ;; Highlight Component
             [inferenceql.spreadsheets.components.highlight.events]
             [inferenceql.spreadsheets.components.highlight.subs]
