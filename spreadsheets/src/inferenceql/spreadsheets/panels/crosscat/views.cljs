@@ -109,6 +109,8 @@
   ;;  (.log js/console :clusterRows clusterRows)
   ;;  (.log js/console :mappedValues mappedValues)
   {
+    :width { :step 15 }
+    :height { :step 10 }
     :data {
       :values mappedValues
       }
@@ -138,12 +140,35 @@
 )
 
 
+
+
+(defn explode-assignments
+  "maintain previous invariant from synthetics data that assumed that every assignment had just 1 row_id.
+   
+   A future rewrite should instead rewrite downstream code to work with 
+   a multiple-row-ids instead rather than duplicating data"
+  [assignments]
+  
+  (let []
+    ;; JS equivalent to flatmap
+    (mapcat (fn [[csvRow, metadataRow]] (map (fn [rowId] 
+                                                             [
+                                                              csvRow,
+                                                              {
+                                                               :categories (get metadataRow :categories),
+                                                               :row-ids [rowId]
+                                                              }]
+                                                             ) (get metadataRow :row-ids)))
+            assignments))
+  )
+
 (defn make-vega-layer-for-gpm-view
   "Given array of Views from an XCat model (see crosscat/construct-xcat-from-latents)"
   [[view probabilities]]
   (let [;; nested property access: https://stackoverflow.com/a/15639446/5129731
         clusterIds (keys (-> view :latents :counts))
-        assignments (get view :assignments)
+        assignments (explode-assignments (get view :assignments))
+        ;; explodedAssignments  assignments)
         headers (keys (first (first assignments))) ;; assume every row is same
         ;; do some pre filtering for percentile calculation
         
@@ -196,7 +221,11 @@
                 
         ]
     
+    ;; (.log js/console "----------- Explosion test --------------------")
+
+    
     (.log js/console :view view)
+    ;; (.log js/console :explodedAssignment explodedAssignments)
     ;; (.log js/console :exploded (explode-assignment-rows assignmentsWithProbabilities))
     ;; (.log js/console :clusterIds clusterIds)
     ;; (.log js/console :assignments assignments)
@@ -209,7 +238,7 @@
    {:$schema "https://vega.github.io/schema/vega-lite/v4.json"
     :description "A crosscat visualization"
     :config {:axisX {:grid false :labels false :ticks false :title nil}
-             :axisY {:title nil}}
+             :axisY {:title nil :labelFontSize 8 :labelOverlap true }}
     :hconcat (map make-vega-layer-for-gpm-view (map (fn [view] [view probabilities]) views)) ;; TODO: this is a hacky way to do prop drilling for "probabilities".
     }
   )
@@ -265,7 +294,7 @@
                 ;; [button
                 ;;  :label "Set option to :gamma"
                 ;;  :on-click #(rf/dispatch [:crosscat/set-option :gamma])]
-                [vega-lite spec {:actions false} nil nil]]])
+                [vega-lite spec {:actions false :renderer "canvas"} nil nil]]])
 )
 
 (defn viz-old
