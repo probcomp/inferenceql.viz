@@ -249,6 +249,13 @@
 ;;             :gamma (assoc-in base-spec [:data :values] [{:a "A" :b 99}
 ;;                                                         {:a "B" :b 300}])})
 
+;; Trying to approximate JS template literals.
+;; // https://andersmurphy.com/2019/01/15/clojure-string-interpolation.html
+(defn replace-several [s & {:as replacements}]
+  (reduce (fn [s [match replacement]]
+            (string/replace s match replacement))
+          s replacements))
+
 ;;; Main reagent component for Crosscat Viz.
 
 (defn viz-render
@@ -264,7 +271,20 @@
         selection-layers @(rf/subscribe [:table/selection-layers])
 
         views (vals (get model :views))
-        spec (make-crosscat-vega-spec views visual-rows) ;; TODO: what to do if user changes their query to something else?       
+        ;; Only show the viz when we have visual rows.
+        spec (when (seq visual-rows) (make-crosscat-vega-spec views visual-rows)) ;; TODO: what to do if user changes their query to something else?
+
+        ;-----
+
+        headers (keys (-> model :latents :z))
+        probabilitySubQueries (string/join ", " (map (fn [header] (replace-several "(PROBABILITY OF $header UNDER model AS $header)"
+                                                                          "$header" (name header) ;; name instead of str because this is a clojure keyword
+                                                                       )
+                                           ) headers ))
+        probabilityQuery (str "SELECT " probabilitySubQueries " FROM data;" )
+        datasets @(rf/subscribe [:store/datasets])
+        models @(rf/subscribe [:store/models])
+
         ]
 
     ;; Logging various subs for learning purposes.
@@ -291,9 +311,9 @@
                 ;;  :model     option
                 ;;  :width     "100px"
                 ;;  :on-change #(rf/dispatch [:crosscat/set-option %])]
-                ;; [button
-                ;;  :label "Set option to :gamma"
-                ;;  :on-click #(rf/dispatch [:crosscat/set-option :gamma])]
+                [button
+                 :label "Run probability query"
+                 :on-click #(rf/dispatch [:query/parse-query probabilityQuery datasets models])]
                 [vega-lite spec {:actions false :renderer "canvas"} nil nil]]])
 )
 
@@ -302,15 +322,7 @@
   []
   viz-render)
 
-;; Trying to approximate JS template literals.
-;; // https://andersmurphy.com/2019/01/15/clojure-string-interpolation.html
-(defn replace-several [s & {:as replacements}]
-  (reduce (fn [s [match replacement]]
-            (string/replace s match replacement))
-          s replacements))
-
-
-;; Converted to lifecycle method because we need data fetching on component mount. 
+;; Converted to lifecycle method because we need data fetching on component mount.
 (defn viz
   []
   (let [
@@ -325,22 +337,6 @@
       
       ;; https://purelyfunctional.tv/guide/re-frame-lifecycle/#shouldComponentUpdate
       ;; :should-component-update (fn [this old-argv new-argv] false ) ;; TODO: revise this later. For now, prevent table interactions from causing random jumps.
-
-      :component-did-mount               ;; the name of a lifecycle function
-      (fn [this]
-        (let [
-              headers (keys (-> model :latents :z))
-              probabilitySubQueries (string/join ", " (map (fn [header] (replace-several "(PROBABILITY OF $header UNDER model AS $header)"
-                                                                          "$header" (name header) ;; name instead of str because this is a clojure keyword
-                                                                       ) 
-                                           ) headers ))
-              probabilityQuery (str "SELECT " probabilitySubQueries " FROM data;" )
-              ]
-          
-                  ;; (println "component-did-mount") ;; data fetching
-          (.log js/console "------------Component Mounted--------------------")
-          (rf/dispatch [:query/parse-query probabilityQuery @datasets @models])) ;; your implementation
-         )
 
       :reagent-render
       viz-render
