@@ -278,14 +278,12 @@
 
         headers (keys (-> model :latents :z))
         probabilitySubQueries (string/join ", " (map (fn [header] (replace-several "(PROBABILITY OF $header UNDER model AS $header)"
-                                                                          "$header" (name header) ;; name instead of str because this is a clojure keyword
-                                                                       )
-                                           ) headers ))
+                                                                                   "$header"
+                                                                                   (name header))) ;; name instead of str because this is a clojure keyword
+                                                     headers))
         probabilityQuery (str "SELECT " probabilitySubQueries " FROM data;" )
         datasets @(rf/subscribe [:store/datasets])
-        models @(rf/subscribe [:store/models])
-
-        ]
+        models @(rf/subscribe [:store/models])]
 
     ;; Logging various subs for learning purposes.
     (.log js/console "------------Logging Misc Subs Test--------------------")
