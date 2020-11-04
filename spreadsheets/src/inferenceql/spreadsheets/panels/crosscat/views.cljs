@@ -311,7 +311,9 @@
                 ;;  :on-change #(rf/dispatch [:crosscat/set-option %])]
                 [button
                  :label "Run probability query"
-                 :on-click #(rf/dispatch [:query/parse-query probabilityQuery datasets models])]
+                 :on-click #(do
+                              (rf/dispatch [:control/set-query-string probabilityQuery])
+                              (rf/dispatch [:query/parse-query probabilityQuery datasets models]))]
                 [vega-lite spec {:actions false :renderer "canvas"} nil nil]]])
 )
 
