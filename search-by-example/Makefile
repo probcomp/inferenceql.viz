@@ -9,7 +9,7 @@ clean:
 	rm -Rf $(output-dir)
 
 $(output-to):
-	cd ..; clojure -m cljs.main \
+	cd ..; clojure -M -m cljs.main \
 		-co $(compile-opts) \
 		-d $(output-dir) \
 		-o $(output-to) \

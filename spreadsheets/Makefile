@@ -34,7 +34,7 @@ js: $(output-to)
 
 .PHONY: watch
 watch: $(hot-css-resource)
-	cd ..; clojure -m cljs.main -w $(src-dir) $(cljs-main-opts)
+	cd ..; clojure -M -m cljs.main -w $(src-dir) $(cljs-main-opts)
 
 clean:
 	rm -Rf $(output-dir)
@@ -54,7 +54,7 @@ cljs-main-opts := \
 		-c $(main-ns)
 
 $(output-to): $(hot-css-resource)
-	cd ..; clojure -m cljs.main $(cljs-main-opts)
+	cd ..; clojure -M -m cljs.main $(cljs-main-opts)
 
 $(node-modules-dir):
 	cd ..; $(MAKE) node_modules
@@ -73,7 +73,7 @@ publish-dir: $(model-edn-file) js $(publish-dir)
 
 $(publish-dir):
 	mkdir -p $(publish-dir)
- 	## Copy static index.html file.
+	## Copy static index.html file.
 	cp $(current-dir)/index.html $(publish-dir)
 	## Copy static resource files.
 	cp -r $(resource-dir) $(publish-dir)
@@ -127,9 +127,9 @@ figwheel-static: figwheel-clean-static $(figwheel-public-dir) $(figwheel-resourc
 ## Starts the spreadsheets app using Figwheel.
 .PHONY: figwheel
 figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	cd .. && clojure -A:figwheel
+	cd .. && clojure -M:figwheel
 
 ## Starts the spreadsheets app using Figwheel and Re-frame-10x.
 .PHONY: figwheel-10x
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	cd .. && clojure -A:figwheel:10x
+	cd .. && clojure -M:figwheel:10x
