@@ -69,11 +69,6 @@
   [col-name]
   (get-in model/spec [:vars col-name]))
 
-(defn present-in-model?
-  "Returns whether `col-name` is present in the loaded model."
-  [col-name]
-  (some? (stat-type col-name)))
-
 (defn vega-type
   "Returns a vega-lite type given `col-name`, a column name from the data table.
   May return nil if multi-mix stat-type for `col-name` can`t be found."
@@ -99,11 +94,11 @@
     false))
 
 (defn simulatable?
-  "Checks if `selections` and `cols` are valid for simulation"
-  [selections cols]
+  "Checks if `selections` and `selected-cols` are valid for simulation"
+  [selections selected-cols simulatable-cols]
   (and (= 1 (count selections)) ; Single row selected.
-       (= 1 (count cols)) ; Single column selected.
-       (present-in-model? (first cols))))
+       (= 1 (count selected-cols)) ; Single column selected.
+       (contains? simulatable-cols (first selected-cols)))) ;; Selected column is modeled.
 
 (defn gen-simulate-plot
   "Generates a vega-lite spec for a histogram of simulated values for a cell.
@@ -413,7 +408,7 @@
            #{"nominal"} (table-bubble-plot selections cols)
            #{"quantitative" "nominal"} (strip-plot selections cols))))
 
-(defn- spec-for-selection-layer [selection-layer]
+(defn- spec-for-selection-layer [schema simulatable-cols geodata geo-id-col selection-layer]
   (let [{layer-name :id
          selections :selections
          cols :selected-columns
@@ -423,7 +418,7 @@
       (let [spec (cond (some #{geo-id-col} cols) ; Fips column selected.
                        (gen-choropleth selections cols)
 
-                       (simulatable? selections cols)
+                       (simulatable? selections cols simulatable-cols)
                        (gen-simulate-plot (first cols) row (name layer-name))
 
                        (= 1 (count cols)) ; One column selected.
@@ -436,8 +431,9 @@
                             :fontWeight 500}}]
         (merge spec title)))))
 
-(defn generate-spec [selection-layers]
-  (when-let [spec-layers (seq (keep spec-for-selection-layer selection-layers))]
+(defn generate-spec [schema simulatable-cols geodata geo-id-col selection-layers]
+  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema simulatable-cols geodata geo-id-col %)
+                                    selection-layers))]
     {:$schema default-vega-lite-schema
      :hconcat spec-layers
      :resolve {:legend {:size "independent"
