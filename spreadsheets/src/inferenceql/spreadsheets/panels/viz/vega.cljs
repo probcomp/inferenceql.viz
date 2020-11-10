@@ -64,31 +64,35 @@
   (when col-name
     (some? (re-matches #"^prob[\w\-]*$" (name col-name)))))
 
-(defn stat-type
-  "Returns a multi-mixture stat-type given a column name from the data table."
-  [col-name]
-  (get-in model/spec [:vars col-name]))
+(defn vega-type-fn
+  "Given a `schema`, returns a vega-type function.
 
-(defn vega-type
-  "Returns a vega-lite type given `col-name`, a column name from the data table.
-  May return nil if multi-mix stat-type for `col-name` can`t be found."
-  [col-name]
-  (cond (probability-column? col-name)
-        "quantitative"
+  Args:
+    schema: (map) Mapping from column name to iql stat-type.
 
-        (contains? #{hot/label-col-header geo-id-col} col-name)
-        "nominal"
+  Returns: (a function) Which returns a vega-lite type given `col-name`, a column name
+    from the data table. Returns nil if vega-lite type can't be deterimend."
+  [schema]
+  (fn [col-name]
+    (cond (probability-column? col-name)
+          "quantitative"
 
-        :else
-        ;; Mapping from multi-mix stat-types to vega-lite data-types.
-        (let [mapping {:gaussian "quantitative"
-                       :categorical "nominal"}]
-          (get mapping (stat-type col-name)))))
+          (contains? #{hot/label-col-header} col-name)
+          "nominal"
+
+          :else
+          ;; Mapping from multi-mix stat-types to vega-lite data-types.
+          (let [mapping {:gaussian "quantitative"
+                         :categorical "nominal"}]
+            (get mapping (get schema col-name))))))
 
 (defn should-bin?
-  "Returns whether data for a certain column should be binned in a vega-lite spec."
-  [col-name]
-  (case (vega-type col-name)
+  "Returns whether data for a certain column should be binned in a vega-lite spec.
+
+  Args:
+    col-type: A vega-lite column type."
+  [col-type]
+  (case col-type
     "quantitative" true
     "nominal" false
     false))
@@ -106,18 +110,19 @@
   data representing the row our cell is in.
   This spec itself does not perform the simulation. An other function must update
   the `data` dataset via the vega-lite API."
-  [col-name row dataset-name]
+  [col-name row dataset-name vega-type]
   (let [col-kw (keyword col-name)
         col-val (get row col-name)
+        col-type (vega-type col-name)
         y-axis {:title "Distribution of Probable Values"
                 :grid false
                 :labels false
                 :ticks false}
         y-scale {:nice false}
         simulations-layer {:mark {:type "bar" :color default-table-color}
-                           :encoding {:x {:bin (should-bin? col-name)
+                           :encoding {:x {:bin (should-bin? col-type)
                                           :field col-kw
-                                          :type (vega-type col-name)}
+                                          :type col-type}
                                       :y {:aggregate "count"
                                           :type "quantitative"
                                           :axis y-axis
@@ -128,41 +133,45 @@
                         :mark {:type "rule"
                                :color "red"}
                         :encoding {:x {:field col-kw
-                                       :type (vega-type col-name)}}}
+                                       :type col-type}}}
         layers (cond-> [simulations-layer]
                  col-val (conj observed-layer))]
     {:data {:name dataset-name}
      :layer layers}))
 
-(defn gen-histogram [col selections]
+(defn gen-histogram [col selections vega-type]
   "Generates a vega-lite spec for a histogram.
   `selections` is a collection of maps representing data in selected rows and columns.
-  `col` is the key within each map in `selections` that is used to extract data for the histogram."
-  {:data {:values selections}
-   :layer [{:mark {:type "bar" 
-                   :color default-table-color}
-            :encoding {:x {:bin (should-bin? col)
-                           :field col
-                           :type (vega-type col)}
-                       :y {:aggregate "count"
-                           :type "quantitative"}}
-            :selection {:pts {:type "interval" :encodings ["x"] :empty "none"}}}
+  `col` is the key within each map in `selections` that is used to extract data for the histogram.
+  `vega-type` is a function that takes a column name and returns an vega datatype."
+  (let [col-type (vega-type col)
+        bin-flag (should-bin? col-type)]
+    {:data {:values selections}
+     :layer [{:mark {:type "bar"
+                     :color default-table-color}
+              :encoding {:x {:bin bin-flag
+                             :field col
+                             :type col-type}
+                         :y {:aggregate "count"
+                             :type "quantitative"}}
+              :selection {:pts {:type "interval" :encodings ["x"] :empty "none"}}}
 
-           {:transform [{:filter {:selection "pts"}}],
-            :mark {:type "bar",
-                   :color selection-color}
-            :encoding {:x {:bin (should-bin? col)
-                           :field col
-                           :type (vega-type col)}
-                       :y {:aggregate "count", 
-                           :type "quantitative"}}}]})
+             {:transform [{:filter {:selection "pts"}}],
+              :mark {:type "bar",
+                     :color selection-color}
+              :encoding {:x {:bin bin-flag
+                             :field col
+                             :type col-type}
+                         :y {:aggregate "count",
+                             :type "quantitative"}}}]}))
 
 
-(defn gen-choropleth [selections selected-columns]
+(defn gen-choropleth [selections selected-columns vega-type]
   "Generates a vega-lite spec for a choropleth.
   `selections` is a collection of maps representing data in selected rows and columns.
   `selected-columns` is a collection of selected column names.
   `geo-id-column` from the app config is assumed to be among `selected-columns`.
+  `vega-type` is a function that takes a column name and returns an vega datatype.
   The first column that is not `geo-id-column` in `selected-columns` is designated as the
   color-by-col, the column whose data is used to color the geoshapes in the choropleth."
   ;; TODO: Add a spec for topojson config map.
@@ -311,7 +320,7 @@
 (defn- box-and-line-plot
   "Generates vega-lite spec for a box-and-line plot.
   Useful for comparing quantitative-nominal data."
-  [data cols-to-draw facet-column]
+  [data cols-to-draw facet-column vega-type]
   (let [[col-1 col-2] cols-to-draw
         spec {:$schema v3-vega-lite-schema
               :data {:values data}
@@ -328,16 +337,19 @@
       spec)))
 
 (defn- strip-plot-size-helper
-  "Return a vega-lite height/width size setting given `col-name` a column name from the table"
-  [col-name]
-  (case (vega-type col-name)
+  "Returns a vega-lite height/width size.
+
+  Args:
+    `col-type` - A vega-lite column type."
+  [col-type]
+  (case col-type
         "quantitative" vega-strip-plot-quant-size
         "nominal" {:step vega-strip-plot-step-size}))
 
 (defn- strip-plot
   "Generates vega-lite spec for a strip plot.
   Useful for comparing quantitative-nominal data."
-  [data cols-to-draw]
+  [data cols-to-draw vega-type]
   (let [zoom-control-name (keyword (gensym "zoom-control")) ; Random id so pan/zoom is independent.
 
         ;; NOTE: This is a temporary hack to that forces the x-channel in the plot to be "numerical"
@@ -350,7 +362,7 @@
         [x-field y-field] cols-to-draw
         [x-type y-type] (map vega-type cols-to-draw)
         quant-dimension (if (= x-type "quantitative") :x :y)
-        [width height] (map strip-plot-size-helper cols-to-draw)]
+        [width height] (map (comp strip-plot-size-helper vega-type) cols-to-draw)]
     {:width width
      :height height
      :data {:values data}
@@ -401,31 +413,33 @@
                          :size {:aggregate "count"
                                 :type "quantitative"}}}]}))
 
-(defn gen-comparison-plot [cols selections]
+(defn gen-comparison-plot [cols selections vega-type]
   (let [cols-types (set (doall (map vega-type cols)))]
     (condp = cols-types
            #{"quantitative"} (scatter-plot selections cols)
            #{"nominal"} (table-bubble-plot selections cols)
-           #{"quantitative" "nominal"} (strip-plot selections cols))))
+           #{"quantitative" "nominal"} (strip-plot selections cols vega-type))))
 
 (defn- spec-for-selection-layer [schema simulatable-cols geodata geo-id-col selection-layer]
-  (let [{layer-name :id
+  (let [vega-type (vega-type-fn schema)
+        {layer-name :id
          selections :selections
          cols :selected-columns
          row :row-at-selection-start} selection-layer]
-    ;; Only produce a spec when we can find a vega-type for all selected columns.
-    (when (every? some? (map vega-type cols))
-      (let [spec (cond (some #{geo-id-col} cols) ; Fips column selected.
-                       (gen-choropleth selections cols)
+    ;; Only produce a spec when we can find a vega-type for all selected columns
+    ;; except the geo-id-col which we handle specially.
+    (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
+      (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
+                       (gen-choropleth selections cols vega-type)
 
                        (simulatable? selections cols simulatable-cols)
-                       (gen-simulate-plot (first cols) row (name layer-name))
+                       (gen-simulate-plot (first cols) row (name layer-name) vega-type)
 
                        (= 1 (count cols)) ; One column selected.
-                       (gen-histogram (first cols) selections)
+                       (gen-histogram (first cols) selections vega-type)
 
                        :else ; Two or more columns selected.
-                       (gen-comparison-plot (take 2 cols) selections))
+                       (gen-comparison-plot (take 2 cols) selections vega-type))
              title {:title {:text (str (name layer-name) " " "selection")
                             :color (title-color layer-name)
                             :fontWeight 500}}]
