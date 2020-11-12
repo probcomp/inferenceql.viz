@@ -10,10 +10,6 @@
             [goog.string :as gstring]
             [medley.core :as medley]))
 
-;; These are defs related to choropleth related columns in the dataset.
-;; See spreadsheets/resources/config.edn for more info.
-(def ^:private geo-id-col (keyword (get-in config/config [:geo :table-geo-id-col])))
-
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
   700)
@@ -166,26 +162,29 @@
                              :type "quantitative"}}}]}))
 
 
-(defn gen-choropleth [selections selected-columns vega-type]
+(defn gen-choropleth [geodata geo-id-col selections selected-columns vega-type]
   "Generates a vega-lite spec for a choropleth.
-  `selections` is a collection of maps representing data in selected rows and columns.
-  `selected-columns` is a collection of selected column names.
-  `geo-id-column` from the app config is assumed to be among `selected-columns`.
-  `vega-type` is a function that takes a column name and returns an vega datatype.
+
+  Args:
+    `geodata` - a map that includes geodata settings and geodata.
+    `geo-id-column` - column that holds geodata ids, assumed to be among `selected-columns`.
+    `selections` - a collection of maps representing data in selected rows and columns.
+    `selected-columns` - a collection of selected column names.
+    `vega-type` - a function that takes a column name and returns an vega datatype.
+
   The first column that is not `geo-id-column` in `selected-columns` is designated as the
   color-by-col, the column whose data is used to color the geoshapes in the choropleth."
-  ;; TODO: Add a spec for topojson config map.
-  (when-let [geo-config (get config/config :geo)]
+  (when geodata
     (let [color-by-col (first (filter #(not= geo-id-col %) ; The other column selected, if any.
                                       selected-columns))
 
-          pad-fips (fn [v] (left-pad v (get geo-config :fips-code-length) \0))
+          pad-fips (fn [v] (left-pad v (get geodata :id-prop-code-length) \0))
           rows-cleaned (cond->> selections
                                 (probability-column? color-by-col)
                                 ;; Remove rows with probability values of 1.
                                 (remove #(= 1.0 (get % color-by-col)))
 
-                                (some? (get geo-config :fips-code-length))
+                                (some? (get geodata :id-prop-code-length))
                                 ;; Add padding to fips codes.
                                 (mapv #(medley/update-existing % geo-id-col pad-fips))
 
@@ -196,10 +195,10 @@
                                 ;; Adding this dummy attribute makes it so this data is not shared with other plots.
                                 (mapv #(assoc % :geo "[...]")))
 
-          data-format (case (get geo-config :filetype)
+          data-format (case (get geodata :filetype)
                         :geojson {:property "features"}
                         :topojson {:type "topojson"
-                                   :feature (get geo-config :feature)})
+                                   :feature (get geodata :feature)})
 
           ;; We are doing a join within this spec between geodata and rowdata.
           ;; This is done in vega-lite instead of CLJS because vega-lite can easily
@@ -208,13 +207,13 @@
           spec {:$schema default-vega-lite-schema
                 :width vega-map-width
                 :height vega-map-height
-                :data {:values (get geo-config :data)
+                :data {:values (get geodata :data)
                        :format data-format}
                 :transform [;; We join the geodata entities with the rows in our dataset.
                             ;; The row data gets joined as a new attribute called row which
                             ;; will contain the row object. This object is used to show the
                             ;; tooltip data.
-                            {:lookup (get geo-config :prop)
+                            {:lookup (get geodata :id-prop)
                              :from {:data {:values rows-cleaned}
                                     :key geo-id-col}
                              :as "row"}
@@ -225,12 +224,12 @@
                             ;; each geodata entity--except for keys that conflict with data already in the geojson
                             ;; entity. These flattened row key-values are used by selections across plots to
                             ;; filter data.
-                            {:lookup (get geo-config :prop)
+                            {:lookup (get geodata :id-prop)
                              :from {:data {:values rows-cleaned}
                                     :key geo-id-col
                                     :fields (remove #{:type :properties :geometry}
                                                     (keys (first rows-cleaned)))}}]
-                :projection {:type (get geo-config :projection-type)}
+                :projection {:type (get geodata :projection-type)}
                 :layer [{:mark {:type "geoshape"
                                 :color "#eee"
                                 :stroke "#757575"
@@ -430,7 +429,7 @@
     ;; except the geo-id-col which we handle specially.
     (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
       (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
-                       (gen-choropleth selections cols vega-type)
+                       (gen-choropleth geodata geo-id-col selections cols vega-type)
 
                        (simulatable? selections cols simulatable-cols)
                        (gen-simulate-plot (first cols) row (name layer-name) vega-type)
