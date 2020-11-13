@@ -49,7 +49,7 @@
   [v-box
    :class "more-menu"
    :children [[gap :size "10px"]
-              [menu-item "Show JS Model" #(rf/dispatch
+              [menu-item "Show JS model" #(rf/dispatch
                                            [:modal/set-content [jsmodel.views/display]])]
               [menu-item "Load Data and Model" #(do)]
               [gap :size "10px"]]])
