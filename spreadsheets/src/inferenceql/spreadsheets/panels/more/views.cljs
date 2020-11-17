@@ -3,7 +3,8 @@
   (:require [re-frame.core :as rf]
             [re-com.core :refer [button box h-box v-box gap]]
             [re-com.popover :refer [popover-anchor-wrapper popover-content-wrapper]]
-            [inferenceql.spreadsheets.panels.jsmodel.views :as jsmodel.views]))
+            [inferenceql.spreadsheets.panels.jsmodel.views :as jsmodel.views]
+            [inferenceql.spreadsheets.panels.upload.views :as upload.views]))
 
 (defn more-button
   "An icon that when clicked will open the more menu.
@@ -51,7 +52,8 @@
    :children [[gap :size "10px"]
               [menu-item "Show JS model" #(rf/dispatch
                                            [:modal/set-content [jsmodel.views/display]])]
-              [menu-item "Load Data and Model" #(do)]
+              [menu-item "Change data and model" #(rf/dispatch
+                                                   [:modal/set-content [upload.views/panel-contents]])]
               [gap :size "10px"]]])
 
 (defn menu
