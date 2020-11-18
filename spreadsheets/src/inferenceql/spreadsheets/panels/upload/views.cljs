@@ -51,7 +51,7 @@
   (let [[type obj] @model
         model-to-display (when (= type :file) obj)]
     [v-box
-     :children [[:input {:type "file" :multiple false :accept (:accept accept)
+     :children [[:input {:type "file" :multiple false :accept accept
                          :on-change #(let [^js/File file (-> % .-target .-files (aget 0))]
                                        (reset! model [:file file]))}]
                 [file-info model-to-display]]]))
