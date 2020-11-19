@@ -19,11 +19,13 @@
   (let [filename (case type
                    :filename obj
                    :url (last (str/split obj #"/"))
-                   :file (.-name obj))
-        file-ext (last (str/split filename #"\."))]
+                   :file (.-name obj)
+                   nil)
+        file-ext (when filename (last (str/split filename #"\.")))]
     (case file-ext
       "edn" :multimix
-      "json" :bayes-db-export)))
+      "json" :bayes-db-export
+       nil)))
 
 (defmulti put-read
   "Reads data given a read-map and puts the completed read-map onto `chan`.
