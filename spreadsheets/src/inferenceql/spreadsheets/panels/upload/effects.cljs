@@ -58,26 +58,25 @@
     (.readAsText rdr (:target read))))
 
 (defn take-reads
-  "Takes a number of file reads from a channel and dispatches a success event with the reads.
+  "Takes a number of read-maps from a channel and dispatches a success event with the reads.
 
   If any of the reads has failed, the failure event is dispatched with an error message.
 
   Args:
-    `file-reads` -- (core.async channel)
-    `num-reads` -- (int) number of items to take from `file-reads`.
+    `chan` -- (core.async channel) Used to take an unknown number of read-maps. The
+      read-maps will not be taken until this channel has been closed.
     `on-success` -- (vector) a reframe event vector for dispatching on success.
     `on-failure` -- (vector) a reframe event vector for dispatching on failure."
-  [file-reads num-reads on-success on-failure]
-  (let [file-reads-batched (async/into [] (async/take num-reads file-reads))]
-    (go
-     (let [reads (<! file-reads-batched)]
-       (if (every? :success reads)
-         (rf/dispatch (conj on-success reads))
-         (let [failures (remove :success reads)
-               failure-messages (for [{:keys [read-type target] :as failed-read} failures]
-                                  (case read-type
-                                    :file (str "Failed reading local file " (.-name target))
-                                    :url (str "Failed reading url " target)
-                                    :else (str "Failed reading the item with the follow read-map " failed-read)))]
-           (rf/dispatch (conj on-failure (str/join "\n" failure-messages)))))))))
+  [chan on-success on-failure]
+  (go
+   (let [reads (<! (async/into [] chan))]
+     (if (every? :success reads)
+       (rf/dispatch (conj on-success reads))
+       (let [failures (remove :success reads)
+             failure-messages (for [{:keys [read-type target] :as failed-read} failures]
+                                (case read-type
+                                  :file (str "Failed reading local file " (.-name target))
+                                  :url (str "Failed reading url " target)
+                                  :else (str "Failed reading the item with the follow read-map " failed-read)))]
+         (rf/dispatch (conj on-failure (str/join "\n" failure-messages))))))))
 
