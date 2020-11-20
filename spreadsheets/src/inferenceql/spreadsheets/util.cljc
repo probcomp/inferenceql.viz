@@ -1,5 +1,6 @@
 (ns inferenceql.spreadsheets.util
-  (:require [medley.core :as medley]))
+  (:require [medley.core :as medley]
+            [lambdaisland.uri :refer [query-map]]))
 
 (defn filter-nil-kvs [a-map]
   (into {} (remove (comp nil? val) a-map)))
@@ -16,3 +17,10 @@
   (if (some? v)
     (assoc-in m ks v)
     (medley/dissoc-in m ks)))
+
+(defn query-string-params
+  "Returns a map of the app's query parameters as specified in the app's URL."
+  []
+  (let [app-url #?(:cljs (.-location js/window)
+                   :clj nil)]
+    (query-map app-url {:multikeys :never})))
