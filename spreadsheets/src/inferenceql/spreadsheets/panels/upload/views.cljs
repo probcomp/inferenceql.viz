@@ -126,8 +126,7 @@
                                :label "Submit"
                                :class "btn-primary"
                                :on-click #(do
-                                            ;; TODO: This log will be replaced by a real event.
-                                            (.log js/console :upload/read-form @form-data)
+                                            (rf/dispatch [:upload/read-form @form-data])
                                             (rf/dispatch [:modal/clear])
                                             (rf/dispatch [:table/clear]))]
                               [button

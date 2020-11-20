@@ -80,3 +80,57 @@
                                   :else (str "Failed reading the item with the follow read-map " failed-read)))]
          (rf/dispatch (conj on-failure (str/join "\n" failure-messages))))))))
 
+(defn ^:effect read-form-effect
+  "Reads files selected as part of form for adding a new dataset and model.
+
+  This reads the specified files or urls and passes them to the :on-success event specified.
+  It does by creating a number of readmaps and passing them to the `put-read` function, which
+  does the actually reading.
+
+  Args:
+    `params` -- A map of parameters with the following keys.
+      :dataset -- A vector with two elements. A read-type and a file object
+        or url specifiying a dataset.
+      :schema -- A vector with two elements. A read-type and a file object
+        or url specifiying a schema for the dataset.
+      :model -- A vector with two elements. A read-type and a file object
+        or url specifiying a model.
+      :on-success -- (vector) A reframe event vector to dispatch on success.
+      :on-failure -- (vector) A reframe event vector to dispatch on failure.
+
+  Dispatched by:
+    The re-frame event :upload/read-form, which was dispatched when the form was originally
+      submitted."
+  [params]
+  (let [{:keys [dataset schema model on-success on-failure]} params
+        ;; Accessors functions
+        read-type first
+        target second
+
+        ;; Will be used to put all file reads.
+        file-reads (async/chan)
+        items-to-fetch [;; Schema read.
+                        {:read-type (read-type schema)
+                         :kind :schema
+                         :id :data
+                         :target (target schema)}
+                        ;; Dataset read.
+                        {:read-type (read-type dataset)
+                         :kind :dataset
+                         :id :data
+                         :target (target dataset)
+                         :details {:default-model :model}}
+                        ;; Model read.
+                        {:read-type (read-type model)
+                         :kind :model
+                         :id :model
+                         :target (target model)
+                         :model-type (apply model-type model)
+                         :dataset :data}]]
+    (doseq [item items-to-fetch]
+      (put-read item file-reads))
+    (let [closing-chan (async/take (count items-to-fetch) file-reads)]
+      (take-reads closing-chan on-success on-failure))))
+(rf/reg-fx :upload/read-form-effect
+           read-form-effect)
+
