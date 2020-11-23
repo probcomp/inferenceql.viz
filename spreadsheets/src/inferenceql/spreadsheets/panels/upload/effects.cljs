@@ -134,3 +134,44 @@
 (rf/reg-fx :upload/read-form-effect
            read-form-effect)
 
+(defn ^:effect read-individual-urls-effect
+  "Reads a number of urls for loading a particular demo configuration of the app.
+
+  This will read urls for a dataset, schema, and model. When the reads are completed,
+  they will be dispatched to the `on-success` event.
+
+  Args:
+    `params` -- A map of parameters with the following keys.
+      :schema-url -- (string) The url used to fetch a schema file.
+      :data-url -- (string) The url used to fetch a dataset file.
+      :model-url -- (string) The url used to fetch a model file.
+      :on-success -- (vector) A reframe event vector to dispatch on success.
+      :on-failure -- (vector) A reframe event vector to dispatch on failure.
+
+  Dispatched by:
+    The re-frame event :upload/read-query-string-params."
+  [params]
+  (let [{:keys [schema-url data-url model-url on-success on-failure]} params
+        items-to-fetch [{:read-type :url
+                         :kind :schema
+                         :id :data
+                         :target schema-url}
+                        {:read-type :url
+                         :kind :dataset
+                         :id :data
+                         :target data-url
+                         :details {:default-model :model}}
+                        {:read-type :url
+                         :kind :model
+                         :id :model
+                         :target model-url
+                         :model-type (model-type :url model-url)
+                         :dataset :data}]
+        ;; Used to put all file reads.
+        file-reads (async/chan)]
+    (doseq [item items-to-fetch]
+      (put-read item file-reads))
+    (let [closing-chan (async/take (count items-to-fetch) file-reads)]
+      (take-reads closing-chan on-success on-failure))))
+(rf/reg-fx :upload/read-individual-urls-effect
+           read-individual-urls-effect)

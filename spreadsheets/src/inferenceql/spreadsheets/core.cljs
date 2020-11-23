@@ -3,6 +3,7 @@
             [re-frame.core :as rf]
             [reagent.dom :as rdom]
             ;; Core
+            [inferenceql.spreadsheets.util :refer [query-string-params]]
             [inferenceql.spreadsheets.events]
             [inferenceql.spreadsheets.effects]
             [inferenceql.spreadsheets.views :as views]
@@ -60,4 +61,5 @@
   ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
   ;; not reset the state of the app.
   (rf/dispatch-sync [:initialize-db])
+  (rf/dispatch-sync [:upload/read-query-string-params (query-string-params)])
   (render-app))

@@ -35,6 +35,42 @@
                  event-interceptors
                  read-form)
 
+(defn ^:event-fx read-query-string-params
+  "Starts the processing of query string parameters that specify urls to load.
+
+  Args:
+    `query-params` - A map of query string parameters that specify urls to load.
+     Should look like {:data some-url :schema some-url :model some-url} when the user
+     actually specifies all the urls correctly. May also be an empty map when the app is started
+     without any query parameters.
+
+  Triggered when:
+    The entire app starts up.
+
+  Effects returned:
+    :upload/read-individual-urls-effect -- Continues the processing of the various urls."
+  [_ [_ query-params]]
+  (let [{:keys [schema data model]} query-params]
+    (cond
+      (every? some? [schema data model])
+      {:fx [[:upload/read-individual-urls-effect {:schema-url schema
+                                                  :data-url data
+                                                  :model-url model
+                                                  :on-success [:upload/process-reads]
+                                                  :on-failure [:upload/read-failed]}]]}
+      (some some? [schema data model])
+      {:fx [[:dispatch [:upload/read-failed
+                        (str "Error processing query string parameters: \n"
+                             "Not all required parameters were specified.\n"
+                             "Please specify a url for the dataset, schema, "
+                             "and model parameters.")]]]}
+
+      :else
+      {})))
+(rf/reg-event-fx :upload/read-query-string-params
+                 event-interceptors
+                 read-query-string-params)
+
 (defn ^:event-fx process-reads
   "Processes a collection of file-reads and stores them in the app-db.
 
