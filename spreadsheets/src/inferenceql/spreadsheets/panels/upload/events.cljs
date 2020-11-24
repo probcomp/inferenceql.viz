@@ -40,18 +40,28 @@
 
   Args:
     `query-params` - A map of query string parameters that specify urls to load.
-     Should look like {:data some-url :schema some-url :model some-url} when the user
-     actually specifies all the urls correctly. May also be an empty map when the app is started
-     without any query parameters.
+       Should look like {:data some-url :schema some-url :model some-url} when the user
+       is specifying urls for individual files.
+
+       Should look like {:config some-url} when the user is specifying a config url.
+
+       May also be an empty map when the app is started without any query parameters.
 
   Triggered when:
     The entire app starts up.
 
   Effects returned:
-    :upload/read-individual-urls-effect -- Continues the processing of the various urls."
+    :upload/read-config-url-effect -- Continues the processing of the config url.
+    :upload/read-individual-urls-effect -- Continues the processing of the data, schema,
+      and model urls."
   [_ [_ query-params]]
-  (let [{:keys [schema data model]} query-params]
+  (let [{:keys [schema data model config]} query-params]
     (cond
+      (some? config) ; A url for a config.edn was specified. Prefer this.
+      {:fx [[:upload/read-config-url-effect {:config-url config
+                                             :on-success [:upload/process-reads]
+                                             :on-failure [:upload/read-failed]}]]}
+
       (every? some? [schema data model])
       {:fx [[:upload/read-individual-urls-effect {:schema-url schema
                                                   :data-url data

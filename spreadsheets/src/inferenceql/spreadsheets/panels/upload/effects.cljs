@@ -134,6 +134,86 @@
 (rf/reg-fx :upload/read-form-effect
            read-form-effect)
 
+(defn ^:effect read-config-url-effect
+  "Reads a config url and many other urls for loading a particular demo configuration of the app.
+
+  This first makes a request for a config.edn file. Based on the data in that config.edn file,
+  many other http requests will be made for datasets, schema files, models, and geodata files.
+  When the reads are completed, they will be dispatched to the `on-success` event.
+
+  Args:
+    `params` -- A map of parameters with the following keys.
+      :config-url -- (string) The url used to fetch a config.edn file. It will also be used
+        to obtain the base url for making http requests for other files.
+      :on-success -- (vector) A reframe event vector to dispatch on success.
+      :on-failure -- (vector) A reframe event vector to dispatch on failure.
+
+  Dispatched by:
+    The re-frame event :upload/read-query-string-params."
+  [params]
+  (let [{:keys [config-url on-success on-failure]} params
+        [_ base-url] (re-matches #"^(.*/).*$" config-url)
+
+        ;; Used to build urls for additional files we have to fetch.
+        url-for (fn [filename] (str base-url filename))
+
+        ;; Will be used to put the config.edn file read.
+        config-read (async/chan)]
+
+    (ajax.core/ajax-request
+      {:uri config-url
+       :method :get
+       :handler #(put! config-read %)
+       :response-format (ajax.core/text-response-format)})
+
+    (go
+     (let [[status data] (<! config-read)]
+       (if (false? status)
+         (let [failure-msg (str "Could not read config.edn at " config-url)]
+           (rf/dispatch (conj on-failure failure-msg)))
+
+         (let [config (edn/read-string data)
+
+               ;; Will be used to put all the additional file reads.
+               file-reads (async/chan)
+
+               items-to-fetch (flatten
+                               (for [category [:datasets :models :geodata]]
+                                 (let [items-in-category (get config category)]
+                                   (for [[item-key item] items-in-category]
+                                     (case category
+                                       :datasets [{:read-type :url
+                                                   :kind :dataset
+                                                   :id item-key
+                                                   :target (str base-url (:filename item))
+                                                   :details (select-keys item [:default-model :geodata-name :geo-id-col])}
+
+                                                  ;; Datasets also have a schema that we have
+                                                  ;; to fetch.
+                                                  {:read-type :url
+                                                   :kind :schema
+                                                   :id item-key
+                                                   :target (url-for (:schema-filename item))}]
+
+                                       :models  {:read-type :url
+                                                 :kind :model
+                                                 :id item-key
+                                                 :target (url-for (:filename item))
+                                                 :model-type (model-type :filename (:filename item))
+                                                 :dataset (:dataset item)}
+
+                                       :geodata {:read-type :url
+                                                 :kind :geodata
+                                                 :id item-key
+                                                 :target (url-for (:filename item))
+                                                 :details (select-keys item [:filetype :id-prop :projection-type])})))))]
+           (doseq [item items-to-fetch]
+             (put-read item file-reads))
+           (let [closing-chan (async/take (count items-to-fetch) file-reads)]
+             (take-reads closing-chan on-success on-failure))))))))
+(rf/reg-fx :upload/read-config-url-effect
+           read-config-url-effect)
+
 (defn ^:effect read-individual-urls-effect
   "Reads a number of urls for loading a particular demo configuration of the app.
 
