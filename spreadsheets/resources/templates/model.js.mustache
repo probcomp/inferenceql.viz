@@ -13,7 +13,7 @@ function view_{{num}}_model () {
 {{/first}}
     ret_val = {
 {{#parameters}}
-     "{{name}}": {{#gaussian}}gaussian({{mu}}, {{sigma}}){{/gaussian}}{{#categorical}}{{name}}_categories(categorical([{{weights}}])){{/categorical}}{{^last}},{{/last}}
+     "{{name}}": {{#gaussian}}gaussian({{mu}}, {{sigma}}){{/gaussian}}{{#categorical}}categorical([{{weights}}]){{/categorical}}{{^last}},{{/last}}
 {{/parameters}}
     };{{/clusters}}
   }
