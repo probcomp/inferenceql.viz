@@ -17,13 +17,26 @@
             [clojure.java.shell :refer [sh]]
             [me.raynes.fs :as fs]))
 
+(def low-index 10)
+(def high-index 20)
+
 (def csv (csv/read-csv (slurp "raw-data/data.csv")))
-(def schema (edn/read-string (slurp "raw-data/schema.edn")))
 (def model-dir "raw-data/models/")
-(def model-filenames (for [i (drop 1 (range 100))]
+
+(def model-filenames (for [i (range low-index high-index)]
                        (let [pad-i (format "%04d" i)]
                          (str model-dir "model-t-" pad-i  ".json"))))
 (def bayesdb-dumps (map #(json/read-str (slurp %)) model-filenames))
+
+(defn get-schema [bdb-dump]
+  (let [bdb-types (get bdb-dump "column-statistical-types")
+
+        columns (map keyword (keys bdb-types))
+        iql-type {"numerical" :gaussian
+                  "nominal" :categorical}
+        iql-types (map iql-type (vals bdb-types))]
+    (zipmap columns iql-types)))
+(def schema (get-schema (first bayesdb-dumps)))
 
 ;; Not needed
 (def rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
@@ -48,8 +61,7 @@
 
 (defn -main []
   (clean-output-dirs)
-
-  (doseq [[i p] (map-indexed vector programs)]
+  (doseq [[i p] (map vector (range low-index high-index) programs)]
     (let [i (inc i)]
       (println (str "Writing model: " i))
       (let [svg-file (str "images-svg/model-" i ".svg")
