@@ -10,8 +10,6 @@ output-to	 := $(output-dir)/main.js
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/css/handsontable.full.css
 
-model-edn-file := $(resource-dir)/model.edn
-
 ### Definitions for publishing.
 
 publish-dir := $(current-dir)/.publish
@@ -25,10 +23,7 @@ figwheel-public-dir := $(current-dir)/figwheel-target/public
 figwheel-resource-dir := $(figwheel-public-dir)/resources
 figwheel-index-file := $(figwheel-public-dir)/index.html
 
-all: $(model-edn-file) js
-
-$(model-edn-file):
-	cd ..; bin/build-model-spec
+all: js
 
 js: $(output-to)
 
@@ -40,7 +35,6 @@ clean:
 	rm -Rf $(output-dir)
 	rm -Rf $(figwheel-build-dir)
 	rm -Rf $(publish-dir)
-	rm -Rf $(model-edn-file)
 
 ### Compilation
 
@@ -69,7 +63,7 @@ $(hot-css-resource): $(hot-css-file)
 ### Publishing
 
 .PHONY: publish-dir
-publish-dir: $(model-edn-file) js $(publish-dir)
+publish-dir: js $(publish-dir)
 
 $(publish-dir):
 	mkdir -p $(publish-dir)
@@ -100,15 +94,14 @@ $(figwheel-index-file): $(figwheel-public-dir)
 	## Copy static index.html file.
 	cp $(current-dir)/index.html $(figwheel-index-file)
 
-$(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource) $(model-edn-file)
+$(figwheel-resource-dir): $(figwheel-public-dir) $(hot-css-resource)
 	## Copy static resource files.
 	cp -r $(resource-dir) $(figwheel-resource-dir)
 
-# Deletes the entire figwheel build directory and also the model file.
+# Deletes the entire figwheel build directory.
 .PHONY: figwheel-clean
 figwheel-clean:
 	rm -Rf $(figwheel-build-dir)
-	rm -Rf $(model-edn-file)
 
 # Deletes the static files in the figwheel build directory.
 .PHONY: figwheel-clean-static
