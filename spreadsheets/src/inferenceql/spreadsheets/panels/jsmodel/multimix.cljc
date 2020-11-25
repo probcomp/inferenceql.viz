@@ -62,7 +62,7 @@
          :last (= index num-params)
          :categorical true
          ;; We need to produce a string of the category weights in a consistent order.
-         :weights (str/join ", " (map param-vals (get categorical-col-vals param-key)))}
+         :weights (str/join ", " (map #(format "%.2f" %) (map param-vals (get categorical-col-vals param-key))))}
 
         false ;; Guassian variable.
         {:name (name param-key)
