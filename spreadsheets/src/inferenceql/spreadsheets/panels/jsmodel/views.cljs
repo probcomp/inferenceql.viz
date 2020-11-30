@@ -1,6 +1,5 @@
 (ns inferenceql.spreadsheets.panels.jsmodel.views
-  (:require [inferenceql.spreadsheets.panels.jsmodel.model :as model]
-            [re-com.core :refer [border v-box title button gap]]
+  (:require [re-com.core :refer [border v-box title button gap]]
             [reagent.core :as r]
             [re-frame.core :as rf]
             [cljsjs.highlight]
@@ -34,13 +33,14 @@
   Intended to be set as the contents of a modal dialog.
   Returns: A reagent component. "
   []
-  [border
-   :border "1px solid #eee"
-   :child  [v-box
-            :min-height "777px"
-            :min-width "800px"
-            :padding "10px 30px 30px 30px"
-            :style    {:background-color "cornsilk"}
-            :children [[title :label "Javascript model export" :level :level1]
-                       [gap :size "10px"]
-                       [js-code-block model/source-code]]]])
+  (let [source-code @(rf/subscribe [:jsmodel/source-code])]
+    [border
+     :border "1px solid #eee"
+     :child  [v-box
+              :min-height "777px"
+              :min-width "800px"
+              :padding "10px 30px 30px 30px"
+              :style    {:background-color "cornsilk"}
+              :children [[title :label "Javascript model export" :level :level1]
+                         [gap :size "10px"]
+                         [js-code-block source-code]]]]))
