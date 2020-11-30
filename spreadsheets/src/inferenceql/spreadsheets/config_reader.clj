@@ -7,12 +7,6 @@
             [clojure.java.io :as io]
             [aero.core :as aero]))
 
-(defmethod aero/reader 'maybe-include
-  [_ _ s]
-  (try (aero.core/read-config s {:resolver aero/root-resolver})
-       (catch FileNotFoundException _
-         nil)))
-
 (defmethod aero/reader 'txt
   [_ _ s]
   (-> s (io/resource) (slurp)))
