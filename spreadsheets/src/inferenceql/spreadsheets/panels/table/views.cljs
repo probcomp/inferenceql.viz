@@ -3,7 +3,8 @@
             [camel-snake-kebab.core :as csk]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
-            [reagent.dom :as dom]))
+            [reagent.dom :as dom]
+            [inferenceql.spreadsheets.panels.table.selections :as selections]))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
@@ -128,12 +129,14 @@
            ;; here performing an update triggered by the :hot/before-change event, which put a new
            ;; value in the db for the previously selected cell. This is main reason we only update
            ;; when we have explicitly passed a new value of :selections-coords through props.
-           (when (and (not= (:selections-coords new-props) (js->clj (.getSelected @hot-instance)))
-                      (not= (:selections-coords new-props) (:selections-coords old-props)))
-             (if-let [coords (clj->js (:selections-coords new-props))]
-               (.selectCells @hot-instance coords false)
-               ;; When coords is nil it means nothing should be selected in the table.
-               (.deselectCell @hot-instance)))))
+           (let [current-selection (selections/normalize
+                                    (js->clj (.getSelected @hot-instance)))]
+             (when (and (not= (:selections-coords new-props) current-selection)
+                        (not= (:selections-coords new-props) (:selections-coords old-props)))
+               (if-let [coords (clj->js (:selections-coords new-props))]
+                 (.selectCells @hot-instance coords false)
+                 ;; When coords is nil it means nothing should be selected in the table.
+                 (.deselectCell @hot-instance))))))
 
        :component-will-unmount
        (fn [this]

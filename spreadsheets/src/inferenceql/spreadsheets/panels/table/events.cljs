@@ -2,6 +2,7 @@
   (:require [re-frame.core :as rf]
             [inferenceql.spreadsheets.panels.table.db :as db]
             [inferenceql.spreadsheets.panels.table.handsontable :as hot]
+            [inferenceql.spreadsheets.panels.table.selections :as selections]
             [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
             [inferenceql.spreadsheets.panels.control.db :as control-db]
             [inferenceql.spreadsheets.util :as util]))
@@ -77,9 +78,9 @@
  :hot/after-selection-end
  event-interceptors
  (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
-   (let [selection-layers (.getSelected hot)
+   (let [selection-coords (selections/normalize (js->clj (.getSelected hot)))
          color (control-db/selection-color db)]
-     {:db (assoc-in db [:table-panel :selection-layers color :coords] (js->clj selection-layers))
+     {:db (assoc-in db [:table-panel :selection-layers color :coords] selection-coords)
       :dispatch [:table/check-selection]})))
 
 (rf/reg-event-db
@@ -125,7 +126,7 @@
 (rf/reg-event-db
  :hot/after-column-move
  event-interceptors
- (fn [db [_ hot _id _columns _target]]
+ (fn [db [_ hot _id _moved-columns _final-index _drop-index _move-possible _order-changed]]
    (assoc-visual-headers db hot)))
 
 (rf/reg-event-db

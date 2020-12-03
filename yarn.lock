@@ -411,6 +411,11 @@ detective@^4.0.0:
     acorn "^5.2.1"
     defined "^1.0.0"
 
+dompurify@^2.1.1:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.2.2.tgz#cb8c2b1a2f3c8a0b565127504ae4eedec176a972"
+  integrity sha512-BsGR4nDLaC5CNBnyT5I+d5pOeaoWvgVeg6Gq/aqmKYWMPR07131u60I80BvExLAJ0FQEIBQ1BTicw+C5+jOyrg==
+
 duplexer2@^0.1.2, duplexer2@~0.1.0:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/duplexer2/-/duplexer2-0.1.4.tgz#8b12dab878c0d69e3e7891051662a32fc6bddcc1"
@@ -488,13 +493,14 @@ graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
   integrity sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
 
-handsontable@^7.4.0:
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-7.4.0.tgz#4d9477cd837c421bbe0eddd7d06e5a6510d47f70"
-  integrity sha512-N1IZN+I1VCcjrind8/4j0EUgAnb8ViyGWWzZ4VTnGx6ZxLoAIuroFx9UhrxbWV8PTr8f+vAIkJNF2AjcnyjChA==
+handsontable@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-8.2.0.tgz#ce7b0bbb3f117517e19571f7a718e764570cda59"
+  integrity sha512-YlA943kkcplQAnFHRkDt/iwbTTEUnVkadsjZflNdnusaTuOSigS0DrZZB92Had6BQYay9oabgz3hrm8CGEd88w==
   dependencies:
     "@types/pikaday" "1.7.4"
     core-js "^3.0.0"
+    dompurify "^2.1.1"
     hot-formula-parser "^3.0.1"
     moment "2.24.0"
     numbro "2.1.2"
