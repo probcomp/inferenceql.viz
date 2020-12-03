@@ -1,2 +1,0 @@
-{:main "inferenceql.search-by-example.api"
- :optimizations :advanced}

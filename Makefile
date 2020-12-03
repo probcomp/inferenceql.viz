@@ -1,11 +1,9 @@
-search-by-example-dir := search-by-example
 spreadsheets-dir      := spreadsheets
 node-modules-dir      := node_modules
 out-dir               := out
 
 module-dirs := \
 	$(spreadsheets-dir) \
-	$(search-by-example-dir)
 
 .PHONY: all
 all:
