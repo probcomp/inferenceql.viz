@@ -214,11 +214,13 @@
   (fn [row col _prop]
     (this-as obj
       (let [hot (.-instance obj)
-            physical-row-index (.toPhysicalRow hot row)
-            selected (when physical-row-index
-                       (nth selected-row-flags physical-row-index false))]
+            v-row (.toVisualRow hot row)
+            v-col (.toVisualColumn hot col)
+
+            selected (when row
+                       (nth selected-row-flags row false))]
         (when selected
-          (.setCellMeta hot row col "className" "selected-row"))))))
+          (.setCellMeta hot v-row v-col "className" "selected-row"))))))
 
 (rf/reg-sub :table/cells
             :<- [:table/selected-row-flags]
