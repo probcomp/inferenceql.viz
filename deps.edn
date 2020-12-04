@@ -33,8 +33,7 @@
                   :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
                                lambdaisland/kaocha {:mvn/version "1.0.732"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}
-                               lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
-                               cheshire/cheshire {:mvn/version "5.8.1"}}}
+                               lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}}}
            :figwheel {:extra-paths ["figwheel-target"]
                       :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.11"}
                                    com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}}
