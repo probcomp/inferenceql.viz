@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.table.handsontable)
+(ns inferenceql.viz.panels.table.handsontable)
 
 (def label-col-header
   "Header text for the column used for labeling rows as examples."
@@ -45,7 +45,7 @@
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
 
-;; These keywords refer to events in inferenceql.spreadsheets.panels.table.events.
+;; These keywords refer to events in inferenceql.viz.panels.table.events.
 (def real-hot-hooks [:hot/after-selection-end :hot/after-on-cell-mouse-down
                      :hot/after-column-move :hot/after-column-sort :hot/after-filter])
 

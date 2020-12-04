@@ -1,7 +1,7 @@
-(ns inferenceql.spreadsheets.events
+(ns inferenceql.viz.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.db :as db]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.viz.db :as db]
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
 (rf/reg-event-db
  :initialize-db

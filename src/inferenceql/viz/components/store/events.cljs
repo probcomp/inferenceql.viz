@@ -1,7 +1,7 @@
-(ns inferenceql.spreadsheets.components.store.events
+(ns inferenceql.viz.components.store.events
   "Contains events related to the store panel."
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
 (defn ^:event-db datasets
   "Stores datasets.

@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.more.subs
+(ns inferenceql.viz.panels.more.subs
   (:require [re-frame.core :as rf]))
 
 (defn ^:sub show-menu

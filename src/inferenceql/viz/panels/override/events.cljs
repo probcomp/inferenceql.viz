@@ -1,6 +1,6 @@
-(ns inferenceql.spreadsheets.panels.override.events
+(ns inferenceql.viz.panels.override.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
 (rf/reg-event-db
  :override/set-column-function

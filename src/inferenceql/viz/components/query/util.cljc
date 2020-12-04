@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.components.query.util
+(ns inferenceql.viz.components.query.util
   "Utility functions for manipulating and extracting info from iql.query parse trees."
   (:require [instaparse.core :as insta]
             [inferenceql.query :as query]

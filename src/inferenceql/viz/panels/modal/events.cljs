@@ -1,6 +1,6 @@
-(ns inferenceql.spreadsheets.panels.modal.events
+(ns inferenceql.viz.panels.modal.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
 (defn ^:event-db set-content
   "Set the content of the modal panel.

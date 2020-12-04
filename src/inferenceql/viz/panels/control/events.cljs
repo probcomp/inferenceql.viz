@@ -1,8 +1,8 @@
-(ns inferenceql.spreadsheets.panels.control.events
+(ns inferenceql.viz.panels.control.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.panels.control.db :as db]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.components.highlight.db :as highlight-db]))
+            [inferenceql.viz.panels.control.db :as db]
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]
+            [inferenceql.viz.components.highlight.db :as highlight-db]))
 
 (defn query-for-conf-options [type threshold]
   (case type

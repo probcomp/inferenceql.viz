@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.modal.subs
+(ns inferenceql.viz.panels.modal.subs
   (:require [re-frame.core :as rf]))
 
 (defn ^:sub content

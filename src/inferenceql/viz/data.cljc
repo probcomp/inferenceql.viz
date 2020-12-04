@@ -1,6 +1,6 @@
-(ns inferenceql.spreadsheets.data
-  (:require [inferenceql.spreadsheets.csv :as csv-utils]
-            [inferenceql.spreadsheets.config :as config]))
+(ns inferenceql.viz.data
+  (:require [inferenceql.viz.csv :as csv-utils]
+            [inferenceql.viz.config :as config]))
 
 (def nyt-data
   (let [column-types (get-in config/config [:model :vars])

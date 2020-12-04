@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.model)
+(ns inferenceql.viz.model)
 
 ;; TODO: remove this namespace.
 ;; Currently code in the score component and inferenceql.search-by-example reference spec.

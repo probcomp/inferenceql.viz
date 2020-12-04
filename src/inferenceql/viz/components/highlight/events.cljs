@@ -1,10 +1,10 @@
-(ns inferenceql.spreadsheets.components.highlight.events
+(ns inferenceql.viz.components.highlight.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.db :as db]
-            [inferenceql.spreadsheets.panels.table.db :as table-db]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.score :as score]))
+            [inferenceql.viz.db :as db]
+            [inferenceql.viz.panels.table.db :as table-db]
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]
+            [inferenceql.viz.model :as model]
+            [inferenceql.viz.score :as score]))
 
 (rf/reg-event-db
  :highlight/compute-row-likelihoods

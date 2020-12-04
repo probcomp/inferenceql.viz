@@ -1,8 +1,8 @@
-(ns inferenceql.spreadsheets.panels.jsmodel.subs
+(ns inferenceql.viz.panels.jsmodel.subs
   (:require [cljstache.core :refer [render]]
-            [inferenceql.spreadsheets.config :refer [config]]
-            [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.panels.jsmodel.multimix :as multimix]
+            [inferenceql.viz.config :refer [config]]
+            [inferenceql.viz.model :as model]
+            [inferenceql.viz.panels.jsmodel.multimix :as multimix]
             [re-frame.core :as rf]))
 
 (defn ^:sub source-code

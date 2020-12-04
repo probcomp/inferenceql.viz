@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.table.selections
+(ns inferenceql.viz.panels.table.selections
   "Items related to selections in Handsontable")
 
 (defn normalize

@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.override.helpers
+(ns inferenceql.viz.panels.override.helpers
   (:require [clojure.string :as str]))
 
 (defn- get-args

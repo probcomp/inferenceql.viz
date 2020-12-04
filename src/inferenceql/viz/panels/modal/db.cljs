@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.modal.db
+(ns inferenceql.viz.panels.modal.db
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db

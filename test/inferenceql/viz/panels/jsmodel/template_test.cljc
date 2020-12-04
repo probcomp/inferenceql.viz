@@ -1,8 +1,8 @@
-(ns inferenceql.spreadsheets.panels.jsmodel.template-test
+(ns inferenceql.viz.panels.jsmodel.template-test
     (:require [clojure.test :refer [deftest is testing]]
               [cljstache.core :refer [render]]
               [metaprob.distributions]
-              [inferenceql.spreadsheets.config :refer [config]]))
+              [inferenceql.viz.config :refer [config]]))
 
 (def demo-mustache-template-data
   "Template data to be passed to the js-model mustache template."

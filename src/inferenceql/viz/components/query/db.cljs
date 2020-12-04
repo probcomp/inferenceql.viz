@@ -1,8 +1,8 @@
-(ns inferenceql.spreadsheets.components.query.db
+(ns inferenceql.viz.components.query.db
   "Contains the initial state of the db corresponding to the query component
   along with related specs."
   (:require [clojure.spec.alpha :as s]
-            [inferenceql.spreadsheets.components.store.db :as store]))
+            [inferenceql.viz.components.store.db :as store]))
 
 (def default-db
   ;; NOTE: We currently assume the dataset and model referenced

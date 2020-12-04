@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.vega
+(ns inferenceql.viz.vega
   "Code for initializing vega"
   (:require [yarn.vega-embed]))
 

@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.upload.views
+(ns inferenceql.viz.panels.upload.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
             [re-com.core :refer [border title v-box p h-box line button gap input-text

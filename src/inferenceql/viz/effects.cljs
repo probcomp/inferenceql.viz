@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.effects
+(ns inferenceql.viz.effects
   "A set of re-frame effects used across the whole application.
   These effects are generally related to browser APIs."
   (:require [re-frame.core :as rf]))

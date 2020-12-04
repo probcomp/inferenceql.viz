@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.components.highlight.db
+(ns inferenceql.viz.components.highlight.db
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db

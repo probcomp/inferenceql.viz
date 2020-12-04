@@ -1,7 +1,7 @@
-(ns inferenceql.spreadsheets.panels.viz.events
+(ns inferenceql.viz.panels.viz.events
   "Contains events related to the viz panel and its portion of the db."
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
 (rf/reg-event-db
   :viz/set-pts-store

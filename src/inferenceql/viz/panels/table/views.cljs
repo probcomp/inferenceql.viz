@@ -1,10 +1,10 @@
-(ns inferenceql.spreadsheets.panels.table.views
+(ns inferenceql.viz.panels.table.views
   (:require [yarn.handsontable]
             [camel-snake-kebab.core :as csk]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]
-            [inferenceql.spreadsheets.panels.table.selections :as selections]))
+            [inferenceql.viz.panels.table.selections :as selections]))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."

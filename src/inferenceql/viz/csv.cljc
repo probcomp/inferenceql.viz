@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.csv
+(ns inferenceql.viz.csv
   "Functions for processing csv data files."
   (:require [clojure.string :as str]
             [clojure.walk :as walk]

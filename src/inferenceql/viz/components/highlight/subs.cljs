@@ -1,8 +1,8 @@
-(ns inferenceql.spreadsheets.components.highlight.subs
+(ns inferenceql.viz.components.highlight.subs
   (:require [clojure.spec.alpha :as s]
             [re-frame.core :as rf]
             [medley.core :as medley]
-            [inferenceql.spreadsheets.components.highlight.db :as db]))
+            [inferenceql.viz.components.highlight.db :as db]))
 
 ;;; Specs related to subscriptions for missing cell values
 

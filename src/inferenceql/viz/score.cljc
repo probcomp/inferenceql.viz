@@ -1,5 +1,5 @@
-(ns inferenceql.spreadsheets.score
-  (:require [inferenceql.spreadsheets.util :as util]
+(ns inferenceql.viz.score
+  (:require [inferenceql.viz.util :as util]
             [inferenceql.inference.gpm.multimixture.search :as search]
             [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
             [metaprob.prelude :as mp]

@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.upload.effects
+(ns inferenceql.viz.panels.upload.effects
   (:require [re-frame.core :as rf]
             [cljs.core.async :as async :refer [go put! <!]]
             [clojure.string :as str]

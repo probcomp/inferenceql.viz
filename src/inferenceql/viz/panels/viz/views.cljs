@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.viz.views
+(ns inferenceql.viz.panels.viz.views
   "Views for displaying vega-lite specs"
   (:require [yarn.vega-embed]
             [reagent.core :as r]

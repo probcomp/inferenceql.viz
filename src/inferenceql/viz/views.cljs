@@ -1,10 +1,10 @@
-(ns inferenceql.spreadsheets.views
+(ns inferenceql.viz.views
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box]]
-            [inferenceql.spreadsheets.panels.control.views :as control]
-            [inferenceql.spreadsheets.panels.viz.views :as viz]
-            [inferenceql.spreadsheets.panels.table.views :as table]
-            [inferenceql.spreadsheets.panels.modal.views :as modal]))
+            [inferenceql.viz.panels.control.views :as control]
+            [inferenceql.viz.panels.viz.views :as viz]
+            [inferenceql.viz.panels.table.views :as table]
+            [inferenceql.viz.panels.modal.views :as modal]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
 

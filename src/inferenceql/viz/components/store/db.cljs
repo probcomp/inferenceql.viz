@@ -1,11 +1,11 @@
-(ns inferenceql.spreadsheets.components.store.db
+(ns inferenceql.viz.components.store.db
   "Contains the initial state of the db corresponding to the store component
   The store component is esentially a part of the app-db where datasets and
   models and geodata are stored."
   (:require [clojure.spec.alpha :as s]
             [inferenceql.auto-modeling.bayesdb-import :as bdb.import]
-            [inferenceql.spreadsheets.config :as config]
-            [inferenceql.spreadsheets.csv :as csv-utils]
+            [inferenceql.viz.config :as config]
+            [inferenceql.viz.csv :as csv-utils]
             [inferenceql.inference.gpm :as gpm]))
 
 ;;; Compiled-in elements to store

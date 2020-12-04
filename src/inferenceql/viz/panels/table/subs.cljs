@@ -1,12 +1,12 @@
-(ns inferenceql.spreadsheets.panels.table.subs
+(ns inferenceql.viz.panels.table.subs
   (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [re-frame.core :as rf]
             [medley.core :as medley]
-            [inferenceql.spreadsheets.panels.table.renderers :as rends]
-            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
-            [inferenceql.spreadsheets.panels.table.db :as db]
-            [inferenceql.spreadsheets.panels.override.views :as modal]))
+            [inferenceql.viz.panels.table.renderers :as rends]
+            [inferenceql.viz.panels.table.handsontable :as hot]
+            [inferenceql.viz.panels.table.db :as db]
+            [inferenceql.viz.panels.override.views :as modal]))
 
 ;;; Specs for validating the output of the :table/selection-layers sub.
 

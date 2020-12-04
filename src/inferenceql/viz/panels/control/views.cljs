@@ -1,8 +1,8 @@
-(ns inferenceql.spreadsheets.panels.control.views
+(ns inferenceql.viz.panels.control.views
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]
             [re-com.core :refer [h-box]]
-            [inferenceql.spreadsheets.panels.more.views :as more]))
+            [inferenceql.viz.panels.more.views :as more]))
 
 (def reagent-forms-function-map
   "Function map that allows a reagent-forms template

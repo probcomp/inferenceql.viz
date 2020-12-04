@@ -1,11 +1,11 @@
-(ns inferenceql.spreadsheets.panels.table.events
+(ns inferenceql.viz.panels.table.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.panels.table.db :as db]
-            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
-            [inferenceql.spreadsheets.panels.table.selections :as selections]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.panels.control.db :as control-db]
-            [inferenceql.spreadsheets.util :as util]))
+            [inferenceql.viz.panels.table.db :as db]
+            [inferenceql.viz.panels.table.handsontable :as hot]
+            [inferenceql.viz.panels.table.selections :as selections]
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]
+            [inferenceql.viz.panels.control.db :as control-db]
+            [inferenceql.viz.util :as util]))
 
 ;;; Events that do not correspond to hooks in the Handsontable api.
 

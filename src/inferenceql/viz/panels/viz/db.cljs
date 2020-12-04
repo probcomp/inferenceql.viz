@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.viz.db
+(ns inferenceql.viz.panels.viz.db
   "Contains the initial state of the db corresponding to the viz-panel
   along with related specs."
   (:require [clojure.spec.alpha :as s]))

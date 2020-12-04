@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.components.store.subs
+(ns inferenceql.viz.components.store.subs
   (:require [re-frame.core :as rf]))
 
 (defn ^:sub datasets

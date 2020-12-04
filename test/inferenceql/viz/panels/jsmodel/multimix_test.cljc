@@ -1,6 +1,6 @@
-(ns inferenceql.spreadsheets.panels.jsmodel.multimix-test
+(ns inferenceql.viz.panels.jsmodel.multimix-test
     (:require [clojure.test :refer [deftest is testing]]
-              [inferenceql.spreadsheets.panels.jsmodel.multimix :as multimix]))
+              [inferenceql.viz.panels.jsmodel.multimix :as multimix]))
 
 (def spec
   "A generic multimix model spec."

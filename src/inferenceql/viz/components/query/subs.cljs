@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.components.query.subs
+(ns inferenceql.viz.components.query.subs
   (:require [re-frame.core :as rf]
             [medley.core :as medley]))
 

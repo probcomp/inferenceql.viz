@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.override.views
+(ns inferenceql.viz.panels.override.views
   (:require [reagent.core :as r]
             [re-frame.core :as rf]))
 

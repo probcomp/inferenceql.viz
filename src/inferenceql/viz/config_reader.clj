@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.config-reader
+(ns inferenceql.viz.config-reader
   (:refer-clojure :exclude [read])
   (:import [java.io FileNotFoundException])
   (:require [clojure.data.csv :as csv]

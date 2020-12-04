@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.util
+(ns inferenceql.viz.util
   (:require [medley.core :as medley]
             [lambdaisland.uri :refer [query-map]]))
 

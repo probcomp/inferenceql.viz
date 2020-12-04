@@ -1,11 +1,11 @@
-(ns inferenceql.spreadsheets.panels.upload.events
+(ns inferenceql.viz.panels.upload.events
    "Contains events related to the upload panel."
   (:require [clojure.edn :as edn]
             [re-frame.core :as rf]
             [goog.labs.format.csv :as csv]
             [inferenceql.inference.gpm :as gpm]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]
-            [inferenceql.spreadsheets.csv :as csv-utils]
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]
+            [inferenceql.viz.csv :as csv-utils]
             [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
             [medley.core :refer [index-by map-vals find-first]]))
 

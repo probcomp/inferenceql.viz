@@ -1,45 +1,45 @@
-(ns ^:figwheel-hooks inferenceql.spreadsheets.core
+(ns ^:figwheel-hooks inferenceql.viz.core
   (:require [goog.dom :as dom]
             [re-frame.core :as rf]
             [reagent.dom :as rdom]
             ;; Core
-            [inferenceql.spreadsheets.util :refer [query-string-params]]
-            [inferenceql.spreadsheets.events]
-            [inferenceql.spreadsheets.effects]
-            [inferenceql.spreadsheets.views :as views]
-            [inferenceql.spreadsheets.vega :as vega.init]
+            [inferenceql.viz.util :refer [query-string-params]]
+            [inferenceql.viz.events]
+            [inferenceql.viz.effects]
+            [inferenceql.viz.views :as views]
+            [inferenceql.viz.vega :as vega.init]
             ;; Control Panel
-            [inferenceql.spreadsheets.panels.control.events]
-            [inferenceql.spreadsheets.panels.control.subs]
+            [inferenceql.viz.panels.control.events]
+            [inferenceql.viz.panels.control.subs]
             ;; Viz Panel
-            [inferenceql.spreadsheets.panels.viz.events]
-            [inferenceql.spreadsheets.panels.viz.subs]
+            [inferenceql.viz.panels.viz.events]
+            [inferenceql.viz.panels.viz.subs]
             ;; Table Panel
-            [inferenceql.spreadsheets.panels.table.events]
-            [inferenceql.spreadsheets.panels.table.subs]
+            [inferenceql.viz.panels.table.events]
+            [inferenceql.viz.panels.table.subs]
             ;; More Panel
-            [inferenceql.spreadsheets.panels.more.events]
-            [inferenceql.spreadsheets.panels.more.subs]
+            [inferenceql.viz.panels.more.events]
+            [inferenceql.viz.panels.more.subs]
             ;; Override Panel
-            [inferenceql.spreadsheets.panels.override.events]
-            [inferenceql.spreadsheets.panels.override.subs]
+            [inferenceql.viz.panels.override.events]
+            [inferenceql.viz.panels.override.subs]
             ;; Modal Panel
-            [inferenceql.spreadsheets.panels.modal.events]
-            [inferenceql.spreadsheets.panels.modal.subs]
+            [inferenceql.viz.panels.modal.events]
+            [inferenceql.viz.panels.modal.subs]
             ;; Upload Panel
-            [inferenceql.spreadsheets.panels.upload.events]
-            [inferenceql.spreadsheets.panels.upload.effects]
+            [inferenceql.viz.panels.upload.events]
+            [inferenceql.viz.panels.upload.effects]
             ;; JSmodel Panel
-            [inferenceql.spreadsheets.panels.jsmodel.subs]
+            [inferenceql.viz.panels.jsmodel.subs]
             ;; Query Component
-            [inferenceql.spreadsheets.components.query.events]
-            [inferenceql.spreadsheets.components.query.subs]
+            [inferenceql.viz.components.query.events]
+            [inferenceql.viz.components.query.subs]
             ;; Highlight Component
-            [inferenceql.spreadsheets.components.highlight.events]
-            [inferenceql.spreadsheets.components.highlight.subs]
+            [inferenceql.viz.components.highlight.events]
+            [inferenceql.viz.components.highlight.subs]
             ;; Store Component
-            [inferenceql.spreadsheets.components.store.events]
-            [inferenceql.spreadsheets.components.store.subs]
+            [inferenceql.viz.components.store.events]
+            [inferenceql.viz.components.store.subs]
             ;; Library functions for user-defined JS functions.
             [inferenceql.user]))
 

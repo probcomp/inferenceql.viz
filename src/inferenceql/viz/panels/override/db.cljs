@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.override.db
+(ns inferenceql.viz.panels.override.db
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db

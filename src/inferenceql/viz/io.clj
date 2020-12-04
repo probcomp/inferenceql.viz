@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.io
+(ns inferenceql.viz.io
   (:require [clojure.java.io :as io]))
 
 (defmacro inline-resource

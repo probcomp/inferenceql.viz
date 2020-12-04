@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.modal.views
+(ns inferenceql.viz.panels.modal.views
   (:require [re-frame.core :as rf]
             [re-com.core :refer [modal-panel]]))
 

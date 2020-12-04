@@ -1,6 +1,6 @@
-(ns inferenceql.spreadsheets.panels.more.events
+(ns inferenceql.viz.panels.more.events
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.events.interceptors :refer [event-interceptors]]))
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
 (defn ^:event-db toggle-show-menu
   "Toggles whether the more menu is displayed or not.

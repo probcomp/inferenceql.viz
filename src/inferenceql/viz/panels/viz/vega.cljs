@@ -1,12 +1,12 @@
-(ns inferenceql.spreadsheets.panels.viz.vega
+(ns inferenceql.viz.panels.viz.vega
   "Code related to generating vega-lite specs"
   (:require [clojure.walk :as walk]
             [clojure.string :as string]
-            [inferenceql.spreadsheets.model :as model]
-            [inferenceql.spreadsheets.panels.table.handsontable :as hot]
-            [inferenceql.spreadsheets.panels.table.db :as table-db]
-            [inferenceql.spreadsheets.config :as config]
-            [inferenceql.spreadsheets.vega :as vega.init]
+            [inferenceql.viz.model :as model]
+            [inferenceql.viz.panels.table.handsontable :as hot]
+            [inferenceql.viz.panels.table.db :as table-db]
+            [inferenceql.viz.config :as config]
+            [inferenceql.viz.vega :as vega.init]
             [goog.string :as gstring]
             [medley.core :as medley]))
 

@@ -1,4 +1,4 @@
-(ns inferenceql.spreadsheets.panels.jsmodel.multimix
+(ns inferenceql.viz.panels.jsmodel.multimix
   "Functions for transforming a multimix model spec into template data for passing to
   a mustache template that displays a javascript representation of the model spec."
   (:require [clojure.string :as str]

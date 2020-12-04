@@ -1,7 +1,7 @@
-(ns inferenceql.spreadsheets.panels.viz.subs
+(ns inferenceql.viz.panels.viz.subs
   (:require [re-frame.core :as rf]
-            [inferenceql.spreadsheets.panels.viz.vega :as vega]
-            [inferenceql.spreadsheets.panels.override.helpers :as co]
+            [inferenceql.viz.panels.viz.vega :as vega]
+            [inferenceql.viz.panels.override.helpers :as co]
             [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]))
 

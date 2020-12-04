@@ -1,10 +1,10 @@
-(ns inferenceql.spreadsheets.panels.more.views
+(ns inferenceql.viz.panels.more.views
   "Reagent components related to displaying a more icon and menu."
   (:require [re-frame.core :as rf]
             [re-com.core :refer [button box h-box v-box gap]]
             [re-com.popover :refer [popover-anchor-wrapper popover-content-wrapper]]
-            [inferenceql.spreadsheets.panels.jsmodel.views :as jsmodel.views]
-            [inferenceql.spreadsheets.panels.upload.views :as upload.views]))
+            [inferenceql.viz.panels.jsmodel.views :as jsmodel.views]
+            [inferenceql.viz.panels.upload.views :as upload.views]))
 
 (defn more-button
   "An icon that when clicked will open the more menu.
