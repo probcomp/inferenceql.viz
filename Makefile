@@ -40,7 +40,7 @@ clean:
 ### Compilation
 
 compile-opts := $(current-dir)/build.edn
-main-ns      := inferenceql.spreadsheets.core
+main-ns      := inferenceql.viz.core
 
 cljs-main-opts := \
 		-co $(compile-opts) \
