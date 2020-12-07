@@ -38,8 +38,8 @@
                                 "spreadsheets/test"
                                 "spreadsheets/test-resources"]
                   :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
-                               lambdaisland/kaocha {:mvn/version "0.0-529"}
-                               lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
+                               lambdaisland/kaocha {:mvn/version "1.0.732"}
+                               lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}
                                cheshire/cheshire {:mvn/version "5.8.1"}}}
            :figwheel {:extra-paths ["spreadsheets/figwheel-target"]
