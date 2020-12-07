@@ -3,16 +3,7 @@
 /node_modules/
 /out/
 
-/multimixture/out/
+/.publish/
+/figwheel-target/
+/resources/css/handsontable.full.css
 
-/search-by-example/out/
-
-/spreadsheets/.publish/
-/spreadsheets/out/
-/spreadsheets/figwheel-target
-/spreadsheets/resources/css/handsontable.full.css
-/spreadsheets/resources/model.edn
-/spreadsheets/src/inferdb/spreadsheets/pfcas.cljc
-
-*/out/*
-*.sw*
