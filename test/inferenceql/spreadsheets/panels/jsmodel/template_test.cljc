@@ -32,7 +32,7 @@
 (deftest mustache-for-jsmodel
   (let [mustache-template (:js-model-template config)
         program-text (render mustache-template demo-mustache-template-data)]
-    #?(:clj (let [correct-program-text (slurp "spreadsheets/test-resources/jsmodel/program.txt")]
+    #?(:clj (let [correct-program-text (slurp "test-resources/jsmodel/program.txt")]
               (testing "generates valid source"
                 (is (= program-text correct-program-text)))))
     #?(:cljs (do
