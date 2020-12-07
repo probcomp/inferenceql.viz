@@ -16,12 +16,12 @@ fi
 readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 readonly IQL_DIR="$(dirname "$SCRIPT_DIR")"
-readonly PUB_DIR="$IQL_DIR/spreadsheets/.publish"
+readonly PUB_DIR="$IQL_DIR/.publish"
 readonly AUTH_FILE="$PUB_DIR/AUTH"
 
 ## Abort if publish directory is not present.
 if [[ ! -d "$PUB_DIR" ]] ; then
-    echo "spreadsheets/.publish directory does not exist. Script can not publish."
+    echo ".publish directory does not exist. Script can not publish."
     exit 1
 fi
 
