@@ -1,4 +1,4 @@
-(ns inferenceql.user
+(ns inferenceql.viz.user
   "Functions to be used within user-defined, Javascript, column override functions.")
 
 (defn ^:export gaussianNoise
