@@ -1,4 +1,4 @@
-# Compile the spreadsheets app
+# Compiling iql.viz
 
 ### Configure GitHub SSH keys
 
@@ -59,10 +59,9 @@ Those are all the dependencies you need.
 
 ### Compile the app
 
-Then go into the project directory and compile the project with the following.
+In the project root directory, compile the project with the following.
 
 ```
-cd inferenceql/spreadsheets
 make clean
 make
 ```
@@ -75,14 +74,16 @@ You can then open the app by running `open index.html` at the command line or by
 
 After it is done, you can pluck things from the project directory to form your own js bundle without all the unnecessary source files. This is optional, as you can already open the app just fine with out this step.
 
-In the `inferenceql/spreadsheets/` dir you will find the `index.html` file, the `resources` dir, and the compiled `out` dir. All three go together to form the compiled javascript app. However, the `out` dir was the only thing compiled when you ran `make`.
+In the `inferenceql/` dir you will find the `index.html` file, the `resources` dir, and the compiled `out` dir. All three go together to form the compiled javascript app. However, the `out` dir was the only thing compiled when you ran `make`.
 
-Just bundle these three things together and you will have your own js-bundle.
+Just bundle these three things together, and you will have your own js-bundle.
 
-# Using the spreadsheets app with different data and models
+# Using the iql.viz with different data and models
 
 * First you will need to produce a new model file using a BayesDB notebook.
-* Then you will re-compile InferenceQL with your new data file and new model file included.
+* Then you will re-compile InferenceQL with your new data file and new model file included. 
+
+**(Note: this last step is no longer necessary. You can upload your new model via the change dataset/model panel within the app.)**
 
 ## Create a new model file using a BayesDB notebook
 
@@ -141,7 +142,6 @@ Download `data_models.json` and the original csv that you used to produce the mo
 
 ### Copy your model file and csv file over to the InferenceQL source tree
 
-Copy both of the model file and csv file to `inferenceql/spreadsheets/resources` directory within the InferenceQL source tree. Be sure to rename your csv file as `data.csv`. You will be replacing the existing `data_models.json` and `data.csv` files.
+Copy both of the model file and csv file to `inferenceql/resources` directory within the InferenceQL source tree. Be sure to rename your csv file as `data.csv`. You will be replacing the existing `data_models.json` and `data.csv` files.
 
 Now you are ready to compile the app with your new model and dataset.
-

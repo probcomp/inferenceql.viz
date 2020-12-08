@@ -1,4 +1,4 @@
-= InferenceQL
+= inferenceql.viz
 
 ifdef::env-github[]
 :tip-caption: :bulb:
@@ -13,25 +13,26 @@ image:https://img.shields.io/badge/stability-experimental-orange.svg[]
 --
 
 == Usage
-InferenceQL is comprised of a number of separate modules, each of which can be used separately or together.
 
-|===
-| Module | Type | Description
+Note: Setting up ssh keys for git and installing other dependencies may be required. link:README_compiling.md[See this document] for more detailed steps.
 
-| aide              | Library     | An algorithm for measuring the accuracy of probabilistic inference algorithms.
-| search-by-example | Library     | A collection of functions for searching tabular data.
-| spreadsheets      | Application | A web application demonstrating InferenceQL's search capabilities.
-|===
+Run the following at the command line to build the app.
+----
+make clean
+make
+----
 
-See the `README` files in their respective subdirectories for more information.
+Open the app in the browser.
+
+----
+open index.html
+----
 
 == Contributing
 WARNING: InferenceQL is only accepting contributors from members of the MIT Probabilistic Computing Project.
 
-=== Building
-The modules can be collectively built by running `make` at the project root.
 
-=== Testing
+== Testing
 One the project has been built the tests can be run either https://cljdoc.org/d/lambdaisland/kaocha/0.0-418/doc/4-running-kaocha-cli[from the command-line]
 
 [source,bash]
