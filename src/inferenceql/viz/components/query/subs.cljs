@@ -26,36 +26,40 @@
   "Returns the dataset referenced in the query text."
   [[dataset-name datasets]]
   (get datasets dataset-name))
-(rf/reg-sub :query/dataset
-            :<- [:query/dataset-name]
-            :<- [:store/datasets]
-            dataset)
+(rf/reg-sub
+  :query/dataset
+  :<- [:query/dataset-name]
+  :<- [:store/datasets]
+  dataset)
 
 (defn ^:sub geo-id-col
   "Returns the geo-id-col associated with the dataset referenced in the query text."
   [dataset]
   (keyword (:geo-id-col dataset)))
-(rf/reg-sub :query/geo-id-col
-            :<- [:query/dataset]
-            geo-id-col)
+(rf/reg-sub
+  :query/geo-id-col
+  :<- [:query/dataset]
+  geo-id-col)
 
 (defn ^:sub geodata
   "Returns the geodata associated with the dataset referenced in the query text."
   [[dataset geodata]]
   (get geodata (:geodata-name dataset)))
-(rf/reg-sub :query/geodata
-            :<- [:query/dataset]
-            :<- [:store/geodata]
-            geodata)
+(rf/reg-sub
+  :query/geodata
+  :<- [:query/dataset]
+  :<- [:store/geodata]
+  geodata)
 
 (defn ^:sub model
   "Returns the model referenced in the query text."
   [[model-name models]]
   (get models model-name))
-(rf/reg-sub :query/model
-            :<- [:query/model-name]
-            :<- [:store/models]
-            model)
+(rf/reg-sub
+  :query/model
+  :<- [:query/model-name]
+  :<- [:store/models]
+  model)
 
 (defn ^:sub simulatable-cols
   "Returns a set of column names that are simulatable.
@@ -67,9 +71,10 @@
       (:schema)
       (keys)
       (set)))
-(rf/reg-sub :query/simulatable-cols
-            :<- [:query/dataset]
-            simulatable-cols)
+(rf/reg-sub
+  :query/simulatable-cols
+  :<- [:query/dataset]
+  simulatable-cols)
 
 (defn ^:sub column-renames
   "Returns a map of columns that have been renamed as a result of executing the last query.
@@ -81,9 +86,10 @@
        (filter #(= (:detail-type %) :rename))
        (map (juxt :old-name :new-name))
        (into {})))
-(rf/reg-sub :query/column-renames
-            :<- [:query/column-details]
-            column-renames)
+(rf/reg-sub
+  :query/column-renames
+  :<- [:query/column-details]
+  column-renames)
 
 (defn ^:sub new-columns-schema
   "Returns a schema for new columns that were created as a result of executing the last query.
@@ -94,9 +100,10 @@
        (filter #(= (:detail-type %) :new-column-schema))
        (map (juxt :name :stat-type))
        (into {})))
-(rf/reg-sub :query/new-columns-schema
-            :<- [:query/column-details]
-            new-columns-schema)
+(rf/reg-sub
+  :query/new-columns-schema
+  :<- [:query/column-details]
+  new-columns-schema)
 
 (defn ^:sub schema
   "Returns a schema for the query whose results are currently displayed.
@@ -107,8 +114,9 @@
   (let [schema (:schema dataset)
         schema-with-renames (medley/map-keys #(get column-renames % %) schema)]
     (merge new-columns-schema schema-with-renames)))
-(rf/reg-sub :query/schema
-            :<- [:query/dataset]
-            :<- [:query/column-renames]
-            :<- [:query/new-columns-schema]
-            schema)
+(rf/reg-sub
+  :query/schema
+  :<- [:query/dataset]
+  :<- [:query/column-renames]
+  :<- [:query/new-columns-schema]
+  schema)

@@ -116,8 +116,10 @@
       (let [rows (->> (get-in datasets [:data :rows])
                       (map #(medley/remove-vals nil? %)))]
         (execute-query-locally query rows models)))))
-
-(rf/reg-event-fx :query/parse-query event-interceptors parse-query)
+(rf/reg-event-fx
+  :query/parse-query
+  event-interceptors
+  parse-query)
 
 (defn ^:event-fx post-success
   "Uses the successful response from the query webserver to display query results.
@@ -135,8 +137,10 @@
         {columns :iql/columns} metadata]
     {:fx [[:dispatch [:table/set result-rows columns {:virtual false}]]
           [:dispatch [:query/set-details query]]]}))
-
-(rf/reg-event-fx :query/post-success event-interceptors post-success)
+(rf/reg-event-fx
+  :query/post-success
+  event-interceptors
+  post-success)
 
 (defn ^:event-fx post-failure
   "Uses the failure response from the query webserver or cljs-ajax to display error messages.
@@ -167,8 +171,10 @@
         {:keys [error-log-msg alert-msg]} (merge default-errors errors)]
     {:js/console-error error-log-msg
      :js/alert alert-msg}))
-
-(rf/reg-event-fx :query/post-failure event-interceptors post-failure)
+(rf/reg-event-fx
+  :query/post-failure
+  event-interceptors
+  post-failure)
 
 (defn ^:event-db set-details
   "Stores additional information extracted from `query`.
@@ -185,6 +191,7 @@
   (-> db
       (assoc-in [:query-component :column-details] (util/column-details query))
       (assoc-in [:query-component :virtual] (util/virtual-data? query))))
-(rf/reg-event-db :query/set-details
-                 event-interceptors
-                 set-details)
+(rf/reg-event-db
+  :query/set-details
+  event-interceptors
+  set-details)
