@@ -31,7 +31,7 @@
  :aliases {:test {:extra-paths ["test"
                                 "test-resources"]
                   :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
-                               lambdaisland/kaocha {:mvn/version "1.0.732"}
+                               lambdaisland/kaocha {:mvn/version "1.0-612"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}}}
            :figwheel {:extra-paths ["figwheel-target"]
