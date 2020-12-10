@@ -73,16 +73,13 @@
     false))
 
 (defn add-selection-data
-  "Augments `selection-layer` with derived data computed off the :coords in `selection-layer`."
-  [selection-layer headers rows]
-  (let [coords (:coords selection-layer)]
-    ;; We don't want to compute and assoc-in derived data if the bounds of the coords
-    ;; are beyond the data we currently have.
-    (cond-> selection-layer
-            (valid-coords? coords (count headers) (count rows))
-            (assoc :selected-columns (get-selected-columns coords headers)
-                   :selections (get-selections coords headers rows)
-                   :row-at-selection-start (get-row-at-selection-start coords rows)))))
+  "Returns a map of derived data computed off of `coords`."
+  [coords headers rows]
+  (when (valid-coords? coords (count headers) (count rows))
+    {:coords coords
+     :selected-columns (get-selected-columns coords headers)
+     :selections (get-selections coords headers rows)
+     :row-at-selection-start (get-row-at-selection-start coords rows)}))
 
 (defn selection-layers
   "Merges in data pertaining to the selection-layer-coords

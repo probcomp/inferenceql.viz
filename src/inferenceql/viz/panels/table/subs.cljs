@@ -23,9 +23,7 @@
 
 (rf/reg-sub :table/selection-layer-coords
             (fn [db [_sub-name]]
-              (let [layers (get-in db [:table-panel :selection-layers])]
-                (medley/map-vals #(select-keys % [:coords]) layers))))
-
+              (get-in db [:table-panel :selection-layer-coords])))
 
 (rf/reg-sub :table/selection-layers
             :<- [:table/selection-layer-coords]
@@ -54,16 +52,11 @@
 
 ;;; Subs related to selections within the active selection layer.
 
-(rf/reg-sub :table/selection-layer-active
+(rf/reg-sub :table/selection-coords-active
             :<- [:control/selection-color]
-            :<- [:table/selection-layers]
-            (fn [[color selection-layers]]
-              (get selection-layers color)))
-
-(rf/reg-sub :table/selections-coords
-            :<- [:table/selection-layer-active]
-            (fn [selection-state]
-              (get selection-state :coords)))
+            :<- [:table/selection-layer-coords]
+            (fn [[color selection-layer-coords]]
+              (get selection-layer-coords color)))
 
 ;;; Subs related to the type of data in the table.
 
@@ -144,20 +137,20 @@
             cells)
 
 (defn ^:sub real-hot-props
-  [[headers rows context-menu cells selections-coords]]
+  [[headers rows context-menu cells selection-coords-active]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] (display-headers headers))
       (assoc-in [:settings :columns] (column-settings headers))
       (assoc-in [:settings :cells] cells)
       (assoc-in [:settings :contextMenu] context-menu)
-      (assoc-in [:selections-coords] selections-coords)))
+      (assoc-in [:selections-coords] selection-coords-active)))
 (rf/reg-sub :table/real-hot-props
             :<- [:table/table-headers]
             :<- [:table/table-rows]
             :<- [:table/context-menu]
             :<- [:table/cells]
-            :<- [:table/selections-coords]
+            :<- [:table/selection-coords-active]
             real-hot-props)
 
 (rf/reg-sub
