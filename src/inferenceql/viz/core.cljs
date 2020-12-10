@@ -17,6 +17,7 @@
             ;; Table Panel
             [inferenceql.viz.panels.table.events]
             [inferenceql.viz.panels.table.subs]
+            [inferenceql.viz.panels.table.handsontable-events]
             ;; More Panel
             [inferenceql.viz.panels.more.events]
             [inferenceql.viz.panels.more.subs]
