@@ -9,7 +9,11 @@
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
   [hot-instance new-settings]
-  (.updateSettings hot-instance new-settings false))
+  (let [{:keys [data]} new-settings]
+    (if (= (keys new-settings) [:data])
+      ;; When data is the only updated setting, use a different update function.
+      (.loadData hot-instance (clj->js data))
+      (.updateSettings hot-instance (clj->js new-settings) false))))
 
 (defn handsontable
   ([attributes props]
@@ -44,8 +48,22 @@
        :component-did-update
        (fn [this old-argv]
          (let [[_ old-attributes old-props] old-argv
-               [_ new-attributes new-props] (reagent/argv this)]
-           (when (not= (:settings old-props) (:settings new-props))
+               [_ new-attributes new-props] (reagent/argv this)
+
+               {old-settings :settings
+                old-selections-coords :selections-coords
+                old-sort-state :sort-state} old-props
+
+               {new-settings :settings
+                new-selections-coords :selections-coords
+                new-sort-state :sort-state} new-props
+
+               changed-settings (into {} (filter (fn [[setting-key new-setting-value]]
+                                                   (let [old-setting-value (get old-settings setting-key)]
+                                                     (not= new-setting-value old-setting-value)))
+                                                 new-settings))]
+
+           (when (seq changed-settings)
              (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
                    sort-config (.getSortConfig sorting-plugin)
 
@@ -77,7 +95,7 @@
                (when (or dataset-empty dataset-size-changed)
                  (.deselectCell @hot-instance))
 
-               (update-hot! @hot-instance (clj->js (:settings new-props)))
+               (update-hot! @hot-instance changed-settings)
 
                ;; Maintain the same sort order as before the update
                (.sort sorting-plugin sort-config)
