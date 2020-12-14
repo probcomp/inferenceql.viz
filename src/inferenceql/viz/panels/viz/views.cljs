@@ -79,13 +79,17 @@
                                      (.data view-obj "pts_store" (clj->js pts-store))
                                      (.run view-obj))
 
+                                   (.addEventListener view-obj "mouseup"
+                                                      (fn [_event _item]
+                                                        (rf/dispatch [:viz/set-pts-store])))
+
                                    ;; Listen to future updates to pts_store that come from interactions
                                    ;; in the visualization itself.
                                    (.addDataListener view-obj "pts_store"
                                                      (gfn/debounce
                                                        (fn [_ds-name data]
-                                                         (rf/dispatch [:viz/set-pts-store data]))
-                                                       150))))))
+                                                         (rf/dispatch [:viz/stage-pts-store data]))
+                                                       50))))))
                       ;; Store the result of vega-embed.
                       (.then (fn [res]
                                (reset! vega-embed-result res)))

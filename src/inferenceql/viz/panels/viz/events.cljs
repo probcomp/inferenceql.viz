@@ -7,6 +7,13 @@
   :viz/set-pts-store
   event-interceptors
   (fn [db [_ new-val]]
+    (let [staged-val (get-in db [:viz-panel :pts-store-staged])]
+      (assoc-in db [:viz-panel :pts-store] staged-val))))
+
+(rf/reg-event-db
+  :viz/stage-pts-store
+  event-interceptors
+  (fn [db [_ new-val]]
       (let [new-pts-store (js->clj new-val :keywordize-keys true)
             cleaned-pts-store (when new-pts-store
                                 (for [store-elem new-pts-store]
@@ -17,7 +24,7 @@
                                   ;; when in fact only this "getter" attribute has changed.
                                   (let [clean-fields (fn [fields] (mapv #(dissoc % :getter) fields))]
                                     (update store-elem :fields clean-fields))))]
-        (assoc-in db [:viz-panel :pts-store] cleaned-pts-store))))
+        (assoc-in db [:viz-panel :pts-store-staged] cleaned-pts-store))))
 
 (rf/reg-event-db
   :viz/clear-pts-store
