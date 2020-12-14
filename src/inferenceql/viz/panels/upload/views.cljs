@@ -109,10 +109,7 @@
                   [v-box
                    :class    "form-group"
                    :children [[gap :size "5px"]
-                              [file-input "Dataset (.csv)" (r/cursor form-data [:dataset]) {:accept ".csv"}]
-                              [gap :size "5px"]
-                              [file-input "Schema (.edn)" (r/cursor form-data [:schema]) {:accept ".edn"}]]]
-                  [gap :size "30px"]
+                              [file-input "Dataset (.csv)" (r/cursor form-data [:dataset]) {:accept ".csv"}]]]
                   [v-box
                    :class    "form-group"
                    :children [[gap :size "5px"]

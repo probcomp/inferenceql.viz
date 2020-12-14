@@ -21,16 +21,15 @@
   Effects returned:
     :upload/read-form-effect -- Continues the processing of the submitted files."
   [{:keys [_db]} [_ form-data]]
-  (let [{:keys [dataset schema model]} form-data]
-    (if (every? some? [dataset schema model])
+  (let [{:keys [dataset model]} form-data]
+    (if (every? some? [dataset model])
       {:fx [[:upload/read-form-effect {:dataset dataset
-                                       :schema schema
                                        :model model
                                        :on-success [:upload/process-reads]
                                        :on-failure [:upload/read-failed]}]]}
       {:fx [[:dispatch [:upload/read-failed
                         (str "Error processing form: Not all files were specified.\n"
-                             "Please specify a dataset, schema, and model.")]]]})))
+                             "Please specify a dataset and model.")]]]})))
 (rf/reg-event-fx :upload/read-form
                  event-interceptors
                  read-form)
@@ -55,24 +54,23 @@
     :upload/read-individual-urls-effect -- Continues the processing of the data, schema,
       and model urls."
   [_ [_ query-params]]
-  (let [{:keys [schema data model config]} query-params]
+  (let [{:keys [data model config]} query-params]
     (cond
       (some? config) ; A url for a config.edn was specified. Prefer this.
       {:fx [[:upload/read-config-url-effect {:config-url config
                                              :on-success [:upload/process-reads]
                                              :on-failure [:upload/read-failed]}]]}
 
-      (every? some? [schema data model])
-      {:fx [[:upload/read-individual-urls-effect {:schema-url schema
-                                                  :data-url data
+      (every? some? [data model])
+      {:fx [[:upload/read-individual-urls-effect {:data-url data
                                                   :model-url model
                                                   :on-success [:upload/process-reads]
                                                   :on-failure [:upload/read-failed]}]]}
-      (some some? [schema data model])
+      (some some? [data model])
       {:fx [[:dispatch [:upload/read-failed
                         (str "Error processing query string parameters: \n"
                              "Not all required parameters were specified.\n"
-                             "Please specify a url for the dataset, schema, "
+                             "Please specify a url for the dataset and, "
                              "and model parameters.")]]]}
 
       :else

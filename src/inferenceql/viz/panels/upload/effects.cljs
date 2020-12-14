@@ -102,19 +102,14 @@
     The re-frame event :upload/read-form, which was dispatched when the form was originally
       submitted."
   [params]
-  (let [{:keys [dataset schema model on-success on-failure]} params
+  (let [{:keys [dataset model on-success on-failure]} params
         ;; Accessors functions
         read-type first
         target second
 
         ;; Will be used to put all file reads.
         file-reads (async/chan)
-        items-to-fetch [;; Schema read.
-                        {:read-type (read-type schema)
-                         :kind :schema
-                         :id :data
-                         :target (target schema)}
-                        ;; Dataset read.
+        items-to-fetch [;; Dataset read.
                         {:read-type (read-type dataset)
                          :kind :dataset
                          :id :data
@@ -182,18 +177,11 @@
                                  (let [items-in-category (get config category)]
                                    (for [[item-key item] items-in-category]
                                      (case category
-                                       :datasets [{:read-type :url
-                                                   :kind :dataset
-                                                   :id item-key
-                                                   :target (str base-url (:filename item))
-                                                   :details (select-keys item [:default-model :geodata-name :geo-id-col])}
-
-                                                  ;; Datasets also have a schema that we have
-                                                  ;; to fetch.
-                                                  {:read-type :url
-                                                   :kind :schema
-                                                   :id item-key
-                                                   :target (url-for (:schema-filename item))}]
+                                       :datasets {:read-type :url
+                                                  :kind :dataset
+                                                  :id item-key
+                                                  :target (str base-url (:filename item))
+                                                  :details (select-keys item [:default-model :geodata-name :geo-id-col])}
 
                                        :models  {:read-type :url
                                                  :kind :model
@@ -231,12 +219,8 @@
   Dispatched by:
     The re-frame event :upload/read-query-string-params."
   [params]
-  (let [{:keys [schema-url data-url model-url on-success on-failure]} params
+  (let [{:keys [data-url model-url on-success on-failure]} params
         items-to-fetch [{:read-type :url
-                         :kind :schema
-                         :id :data
-                         :target schema-url}
-                        {:read-type :url
                          :kind :dataset
                          :id :data
                          :target data-url
