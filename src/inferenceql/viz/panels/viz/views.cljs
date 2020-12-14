@@ -79,28 +79,33 @@
                                      (.data view-obj "pts_store" (clj->js pts-store))
                                      (.run view-obj))
 
-                                   (.addEventListener view-obj "mouseup"
-                                                      (fn [_event _item]
-                                                        (rf/dispatch [:viz/set-pts-store])))
+                                   (.addEventListener view-obj "wheel"
+                                                      (gfn/debounce
+                                                       (fn [_event item]
+                                                         (when (= "pts_brush" (.. item -mark -name))
+                                                           (rf/dispatch [:viz/set-pts-store])))
+                                                       500))
 
                                    ;; Listen to future updates to pts_store that come from interactions
                                    ;; in the visualization itself.
                                    (.addDataListener view-obj "pts_store"
-                                                     (gfn/debounce
-                                                       (fn [_ds-name data]
-                                                         (rf/dispatch [:viz/stage-pts-store data]))
-                                                       50))))))
+                                                     (fn [_ds-name data]
+                                                       (rf/dispatch [:viz/stage-pts-store data])))))))
                       ;; Store the result of vega-embed.
                       (.then (fn [res]
                                (reset! vega-embed-result res)))
                       (.catch (fn [err]
-                                (js/console.error err)))))))]
+                                (js/console.error err)))))))
+
+        mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))]
     (r/create-class
      {:display-name "vega-lite"
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt generators pts-store))
+        (embed this spec opt generators pts-store)
+        ;; Add global listener for mouseup.
+        (.addEventListener js/window "mouseup" mouseup-handler))
 
       :component-did-update
       (fn [this old-argv]
@@ -114,7 +119,9 @@
 
       :component-will-unmount
       (fn [this]
-        (free-resources))
+        (free-resources)
+        ;; Remove global listener for mouseup.
+        (.removeEventListener js/window "mouseup" mouseup-handler))
 
       :reagent-render
       (fn [spec opt generators pts-store]
