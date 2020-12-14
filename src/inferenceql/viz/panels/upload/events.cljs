@@ -7,7 +7,7 @@
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.csv :as csv-utils]
             [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
-            [medley.core :refer [index-by map-vals find-first]]))
+            [medley.core :refer [index-by map-vals map-kv find-first]]))
 
 (defn ^:event-fx read-form
   "Starts the processing of a form for uploading a new dataset and model.
@@ -97,31 +97,39 @@
     :dispatch [:upload/read-failed] -- Outputs an error message about the failure."
   [{:keys [_db]} [_ reads]]
   (try
-    (let [;; Process reads of datasets and schemas together.
-          dataset-related? (fn [read] (contains? #{:dataset :schema} (:kind read)))
-          dataset-read-pairs (->> reads
-                                  (filter dataset-related?)
-                                  (group-by :id))
+    (let [
 
-          ;; Check that we actually have pairs.
-          _ (assert (every? #(= (count %) 2) (vals dataset-read-pairs)))
+          ;; Extract out the schemas from the models first
+          model-reads (->> reads
+                        (filter #(= (:kind %) :model))
+                        (index-by :id))
 
-          datasets (map-vals (fn [read-pair]
-                               (let [schema-read (find-first #(= (:kind %) :schema) read-pair)
-                                     dataset-read (find-first #(= (:kind %) :dataset) read-pair)
+          schemas (map-kv (fn [_ model-read]
+                            (let [schema (case (:model-type model-read)
+                                           :multimix
+                                           (:vars (edn/read-string (:raw-data model-read)))
+                                           :bayes-db-export
+                                           (let [bdb-export
+                                                 (bayesdb-import/keywordize-bdb-export
+                                                  (js->clj (.parse js/JSON (:raw-data model-read))))]
+                                             (bayesdb-import/stat-types bdb-export)))]
+                              [(:dataset model-read) schema]))
+                          model-reads)
 
-                                     schema (edn/read-string (:raw-data schema-read))
+          dataset-reads (->> reads
+                             (filter #(= (:kind %) :dataset))
+                             (index-by :id))
+
+          datasets (map-vals (fn [dataset-read]
+                               (let [schema (get schemas (:id dataset-read))
                                      csv-data (csv/parse (:raw-data dataset-read))
                                      rows (csv-utils/csv-data->clean-maps
                                            schema csv-data {:keywordize-cols true})]
 
                                  (merge (:details dataset-read)
                                         {:schema schema :rows rows})))
-                             dataset-read-pairs)
+                             dataset-reads)
 
-          model-reads (->> reads
-                           (filter #(= (:kind %) :model))
-                           (index-by :id))
 
           models (map-vals (fn [model-read]
                              (case (:model-type model-read)
