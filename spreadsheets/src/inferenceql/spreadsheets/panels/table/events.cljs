@@ -41,8 +41,7 @@
                                     :inferenceql.viz.row/label__
                                     :inferenceql.viz.row/row-number__})
                           ;; Place the label col and row-number col at the start of the table.
-                          (concat [:inferenceql.viz.row/label__
-                                   :inferenceql.viz.row/row-number__])
+                          (concat [:inferenceql.viz.row/label__])
                           (vec))
          new-db (-> db
                     (assoc-in [:table-panel :physical-data :rows-by-id] rows-maps)
