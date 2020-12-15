@@ -33,12 +33,19 @@
 (defn make-example
   "Returns an example row built from `row` to be used in the search-by-label search implementation."
   [row]
-  (let [label-state (:inferenceql.viz.row/label__ row)
-        clean-row (medley/remove-vals nil? (dissoc row
-                                                   :inferenceql.viz.row/id__
-                                                   :inferenceql.viz.row/user-added-row__
-                                                   :inferenceql.viz.row/label__))]
-    (merge clean-row {search-column label-state})))
+  (let [label-state (:inferenceql.viz.row/label__ row)]
+    (merge row {search-column label-state})))
+
+(defn clean
+  [row]
+  (as-> row $
+        (dissoc $
+                :inferenceql.viz.row/id__
+                :inferenceql.viz.row/user-added-row__
+                :inferenceql.viz.row/label__
+                :inferenceql.viz.row/row-number__
+                :inferenceql.viz.row/id__)
+        (medley/remove-vals nil? $)))
 
 (defn perform-search-by-label
   "Performs a search by label query over `rows`.
@@ -55,18 +62,29 @@
 
         ;;-------------------------------------
 
-        rows-clean-label (map #(update % :inferenceql.viz.row/label__ label-set?) rows)
+        rows (map #(update % :inferenceql.viz.row/label__ label-set?) rows)
 
-        labeled-rows (filter (comp some? :inferenceql.viz.row/label__) rows-clean-label)
+        labeled-rows (->> rows
+                          (filter (comp some? :inferenceql.viz.row/label__)))
+        labeled-ids (map :inferenceql.viz.row/id__ labeled-rows)
         labeled-scores (map (comp {true 1 false 0} :inferenceql.viz.row/label__) labeled-rows)
-        example-rows (map make-example labeled-rows)
 
-        unlabeled-rows (filter (comp nil? :inferenceql.viz.row/label__) rows-clean-label)
-        unlabeled-scores (search/search model/spec search-column example-rows unlabeled-rows n-models beta-params)
+        unlabeled-rows (->> rows
+                            (filter (comp nil? :inferenceql.viz.row/label__)))
+        unlabeled-ids (map :inferenceql.viz.row/id__ unlabeled-rows)
+        unlabeled-scores (search/search model/spec search-column
+                                        (map #(clean (make-example %)) labeled-rows)
+                                        (map clean unlabeled-rows)
+                                        n-models beta-params)
 
-        scores-map (zipmap (map :inferenceql.viz.row/id__ (concat unlabeled-rows labeled-rows))
-                           (map #(hash-map :prob-label-true %) (concat unlabeled-scores labeled-scores)))
+        _ (.log js/console :labeled-rows-------- (map #(clean (make-example %)) labeled-rows))
+        _ (.log js/console :unlabeled-rows-------- (map clean unlabeled-rows))
 
+        ids (concat labeled-ids unlabeled-ids)
+        scores (for [score (concat labeled-scores unlabeled-scores)]
+                 {:prob-label-true score})
+
+        scores-map (zipmap ids scores)
         display-headers (concat [:prob-label-true] headers)
         display-rows-map (merge-with merge rows-by-id scores-map)
         display-rows (map display-rows-map row-order)]
