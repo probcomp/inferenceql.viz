@@ -23,6 +23,8 @@
                                                    (select-keys $ (keys (:vars model/spec)))
                                                    (dissoc $ col-to-sim)
                                                    (medley/remove-vals nil? $)))
+        _ (.log js/console :col-to-sim col-to-sim)
+        _ (.log js/console :constraints constraints)
         gen-fn #(first (mp/infer-and-score :procedure (search/optimized-row-generator model/spec)
                                            :observation-trace constraints))
         has-negative-vals? #(some (every-pred number? neg?) (vals %))]
