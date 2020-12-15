@@ -2,7 +2,8 @@
   (:require [medley.core :as medley]
             [clojure.string :as str]
             [inferenceql.spreadsheets.model :as model]
-            [inferenceql.inference.gpm.multimixture.search :as search]))
+            [inferenceql.inference.gpm.multimixture.search :as search]
+            [inferenceql.spreadsheets.panels.table.db :as table-db]))
 
 (def search-by-label-query
   "The query used to trigger search-by-label."
@@ -43,8 +44,18 @@
   "Performs a search by label query over `rows`.
   Adds a new column, prob-label-true, to result rows to show resulting scores.
   Returns a re-frame event map to be returned by a re-frame fx-event."
-  [rows-by-id row-order rows headers]
-  (let [rows-clean-label (map #(update % :inferenceql.viz.row/label__ label-set?) rows)
+  [db]
+  (let [rows-by-id (table-db/physical-row-by-id-with-changes db)
+        row-order (table-db/physical-row-order-all db)
+        rows (->> row-order
+                  (map rows-by-id)
+                  (map #(medley/remove-vals nil? %)))
+        ;;headers (conj (table-db/dataset-headers db) :inferenceql.viz.row/label__)
+        headers (table-db/dataset-headers db)
+
+        ;;-------------------------------------
+
+        rows-clean-label (map #(update % :inferenceql.viz.row/label__ label-set?) rows)
 
         labeled-rows (filter (comp some? :inferenceql.viz.row/label__) rows-clean-label)
         labeled-scores (map (comp {true 1 false 0} :inferenceql.viz.row/label__) labeled-rows)

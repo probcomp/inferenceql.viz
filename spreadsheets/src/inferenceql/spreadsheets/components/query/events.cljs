@@ -119,7 +119,7 @@
 
             models {:model (gpm/Multimixture model/spec)}]
         (if (= (str/lower-case query) (str/lower-case search/search-by-label-query))
-          (search/perform-search-by-label rows-by-id row-order rows headers)
+          (search/perform-search-by-label db)
           (execute-query-locally query rows models))))))
 
 (rf/reg-event-fx :query/parse-query event-interceptors parse-query)
