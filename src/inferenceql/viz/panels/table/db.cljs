@@ -9,7 +9,8 @@
                                       ::rows
                                       ::visual-headers
                                       ::visual-rows
-                                      ::virtual]))
+                                      ::virtual
+                                      ::hot-instance]))
 
 ;;; Specs related to table data.
 
@@ -34,6 +35,10 @@
 
 (s/def ::selection-color #{:blue :red :green})
 (s/def ::selection-layer-coords (s/map-of ::selection-color ::coords-seq))
+
+;;; Spec related to the handsontable instance itself.
+
+(s/def ::hot-instance some?)
 
 ;;; Accessor functions to portions of the table-panel db.
 
