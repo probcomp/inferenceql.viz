@@ -41,7 +41,7 @@
  event-interceptors
  (fn [db _]
    (let [color (control-db/selection-color db)
-         selections-coords (get-in db [:table-panel :selection-layers color :coords])
+         selections-coords (get-in db [:table-panel :selection-layer-coords color])
 
          num-rows (count (db/visual-rows db))
          ;; Takes a selection vector and returns true if that selection represents
@@ -59,12 +59,12 @@
        ;; are not both single column selections.
        (and (= (count selections-coords) 2)
             (not-every? column-selected selections-coords))
-       (update-in db [:table-panel :selection-layers] dissoc color)
+       (update-in db [:table-panel :selection-layer-coords] dissoc color)
 
        ;; Deselect all cells in the current selection layer if it is made up of more than
        ;; two selections.
        (> (count selections-coords) 2)
-       (update-in db [:table-panel :selection-layers] dissoc color)
+       (update-in db [:table-panel :selection-layer-coords] dissoc color)
 
        :else
        db))))

@@ -2,9 +2,9 @@
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db
-  {:table-panel {:selection-layers {}}})
+  {:table-panel {:selection-layer-coords {}}})
 
-(s/def ::table-panel (s/keys :req-un [::selection-layers]
+(s/def ::table-panel (s/keys :req-un [::selection-layer-coords]
                              :opt-un [::headers
                                       ::rows
                                       ::visual-headers
@@ -27,16 +27,13 @@
 (s/def ::row-index ::index)
 (s/def ::column-index ::index)
 
-(s/def ::header-clicked boolean?)
-(s/def ::coords (s/coll-of ::selection-layer-coords))
-(s/def ::selection-layer-coords (s/coll-of number? :kind vector? :count 4))
+(s/def ::coords-seq (s/coll-of ::coords))
+(s/def ::coords (s/coll-of number? :kind vector? :count 4))
 
 ;;; Specs related to storing the selection state of both handsontables
 
 (s/def ::selection-color #{:blue :red :green})
-(s/def ::selection-state (s/keys :opt-un [::header-clicked
-                                          ::coords]))
-(s/def ::selection-layers (s/map-of ::selection-color ::selection-state))
+(s/def ::selection-layer-coords (s/map-of ::selection-color ::coords-seq))
 
 ;;; Accessor functions to portions of the table-panel db.
 

@@ -8,28 +8,22 @@
 (rf/reg-event-fx
  :hot/after-selection-end
  event-interceptors
- (fn [{:keys [db]} [_ hot id row-index _col _row2 _col2 _selection-layer-level]]
+ (fn [{:keys [db]} [_ hot _id _row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-coords (selections/normalize (js->clj (.getSelected hot)))
          color (control-db/selection-color db)]
-     {:db (assoc-in db [:table-panel :selection-layers color :coords] selection-coords)
+     {:db (assoc-in db [:table-panel :selection-layer-coords color] selection-coords)
       :dispatch [:table/check-selection]})))
 
 (rf/reg-event-db
- :hot/after-on-cell-mouse-down
- event-interceptors
- (fn [db [_ hot id mouse-event coords _TD]]
-   (let [;; Stores whether the user clicked on one of the column headers.
-         header-clicked-flag (= -1 (.-row coords))
-
-         ;; Stores whether the user held alt during the click.
-         alt-key-pressed (.-altKey mouse-event)
-         color (control-db/selection-color db)]
-
-     (if alt-key-pressed
-       ; Deselect all cells in selection layer on alt-click.
-       (update-in db [:table-panel :selection-layers] dissoc color)
-       ;; Otherwise just save whether a header was clicked or not.
-       (assoc-in db [:table-panel :selection-layers color :header-clicked] header-clicked-flag)))))
+  :hot/after-on-cell-mouse-down
+  event-interceptors
+  (fn [db [_ _hot _id mouse-event _coords _TD]]
+    (let [alt-key-pressed (.-altKey mouse-event) ;; User held alt during last click.
+          color (control-db/selection-color db)]
+      (cond-> db
+        alt-key-pressed
+        ;; Deselect all cells in selection layer on alt-click.
+        (update-in [:table-panel :selection-layer-coords] dissoc color)))))
 
 (defn assoc-visual-headers
   "Associates the column headers as displayed by `hot` into `db`.
