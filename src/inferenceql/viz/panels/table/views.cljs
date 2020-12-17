@@ -145,4 +145,4 @@
        :reagent-render
        (fn [attributes props]
          [:div#table-container attributes
-           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
+          [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
