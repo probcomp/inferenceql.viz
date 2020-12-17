@@ -64,7 +64,7 @@
   (try
     (let [result (query/q query rows models)
           columns (:iql/columns (meta result))]
-      {:fx [[:dispatch [:table/set result columns {:virtual false}]]
+      {:fx [[:dispatch [:table/set result columns]]
             [:dispatch [:query/set-details query]]]})
     (catch ExceptionInfo e
       (let [error-messages (if (:cognitect.anomalies/category (ex-data e))
@@ -133,7 +133,7 @@
   [_ [_ query result]]
   (let [{result-rows :result metadata :metadata} result
         {columns :iql/columns} metadata]
-    {:fx [[:dispatch [:table/set result-rows columns {:virtual false}]]
+    {:fx [[:dispatch [:table/set result-rows columns]]
           [:dispatch [:query/set-details query]]]}))
 
 (rf/reg-event-fx :query/post-success event-interceptors post-success)
