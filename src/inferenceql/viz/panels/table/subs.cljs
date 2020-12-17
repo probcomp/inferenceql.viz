@@ -121,16 +121,11 @@
   "Returns a function used by the :cells property in Handsontable's options.
   Provides special styling for rows selected through vega-lite visualizations."
   [selected-row-flags]
-  (fn [row col _prop]
-    (this-as obj
-      (let [hot (.-instance obj)
-            v-row (.toVisualRow hot row)
-            v-col (.toVisualColumn hot col)
-
-            selected (when row
-                       (nth selected-row-flags row false))]
-        (when selected
-          (.setCellMeta hot v-row v-col "className" "selected-row"))))))
+  (fn [row _col _prop]
+    (let [selected (when row (nth selected-row-flags row))]
+      (if selected
+        #js {:className "selected-row"}
+        #js {:className ""}))))
 
 (rf/reg-sub :table/cells
             :<- [:table/selected-row-flags]
