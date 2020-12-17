@@ -14,7 +14,7 @@
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         generators      @(rf/subscribe [:viz/generators])
         pts-store @(rf/subscribe [:viz/pts-store])
-        virtual @(rf/subscribe [:table/virtual])
+        virtual @(rf/subscribe [:query/virtual])
         highlight-class @(rf/subscribe [:table/highlight-class])
         modal-content @(rf/subscribe [:modal/content])]
     [v-box
