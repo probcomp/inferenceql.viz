@@ -1,35 +1,40 @@
 (ns inferenceql.viz.panels.table.events
   "Re-frame events related to data and selections in Handsontable"
+  (:refer-clojure :exclude [set])
   (:require [re-frame.core :as rf]
             [inferenceql.viz.panels.table.db :as db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.util :as util]))
 
-(rf/reg-event-fx
- :table/set
- event-interceptors
- ;; `rows` and `headers` are required arguments essentially, and
- ;; `scores`, 'labels`, and 'virtual' are optional, and they are meant
- ;; to be passed in a map.
- (fn [{:keys [db]} [_ rows headers {:keys [virtual]}]]
-   (let [vec-maybe #(some-> % vec) ; Casts a value to a vec if it is not nil.
-         new-db (-> db
-                    (assoc-in [:table-panel :rows] (vec-maybe rows))
-                    (assoc-in [:table-panel :headers] (vec-maybe headers))
-                    (util/assoc-or-dissoc-in [:table-panel :virtual] virtual)
+(defn set
+  "Sets data in the table.
+  To be used as a re-frame event-fx.
 
-                    ;; Clear all selections in all selection layers.
-                    (assoc-in [:table-panel :selection-layers] {}))]
-     {:db new-db
-      :dispatch [:viz/clear-pts-store]})))
+  Args:
+    `rows`: A collection of maps to be set as rows in the table.
+    `headers`: The attributes of the maps in `rows` to display in the table."
+  [{:keys [db]} [_ rows headers {:keys [virtual]}]]
+  (let [new-db (-> db
+                   (assoc-in [:table-panel :rows] (vec rows))
+                   (assoc-in [:table-panel :headers] (vec headers))
+                   (assoc-in [:table-panel :virtual] virtual)
+                   ;; Clear all selections in all selection layers.
+                   (assoc-in [:table-panel :selection-layers] {}))]
+    {:db new-db
+     ;; Clear previous selections made in vega-lite plots.
+     :dispatch [:viz/clear-pts-store]}))
+
+(rf/reg-event-fx :table/set
+                 event-interceptors
+                 set)
 
 (rf/reg-event-fx
  :table/clear
  event-interceptors
  (fn [{:keys [db]} [_]]
    (let [new-db (-> db
-                    (update-in [:table-panel] dissoc :rows :headers :labels :scores)
+                    (update-in [:table-panel] dissoc :rows :headers)
                     (assoc-in [:table-panel :selection-layers] {}))]
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))
