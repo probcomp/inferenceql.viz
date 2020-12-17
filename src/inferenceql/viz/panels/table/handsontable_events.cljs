@@ -22,7 +22,7 @@
           color (control-db/selection-color db)]
       (cond-> db
         alt-key-pressed
-        ; Deselect all cells in selection layer on alt-click.
+        ;; Deselect all cells in selection layer on alt-click.
         (update-in [:table-panel :selection-layer-coords] dissoc color)))))
 
 (defn assoc-visual-headers
