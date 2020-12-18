@@ -6,7 +6,8 @@
 (def default-db
   {:viz-panel {}})
 
-(s/def ::viz-panel (s/keys :opt-un [::pts-store]))
+(s/def ::viz-panel (s/keys :opt-un [::pts-store
+                                    ::pts-store-staged]))
 
 ;; This holds the vega dataset, "pts-store".
 ;; This dataset corresponds to the vega-lite selection named "pts".
@@ -14,6 +15,10 @@
 ;; See for more info: https://github.com/vega/vega-lite/issues/1830
 ;; We use this to store data representing the selections within vega-lite plots.
 (s/def ::pts-store (s/coll-of ::store-elem))
+
+;; This is a staged value for ::pts-store
+(s/def ::pts-store-staged (s/coll-of ::store-elem))
+
 (s/def ::store-elem (s/keys :req-un [::fields
                                      ::values]))
 
