@@ -4,12 +4,48 @@
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]
-            [inferenceql.viz.panels.table.selections :as selections]))
+            [inferenceql.viz.panels.table.selections :as selections]
+            [medley.core :refer [filter-kv]]))
+
+(defn- sort-state-applicable
+  "Determines whether `sort-config` can be applied to the columns.
+  Args:
+    columns: A vector of column names.
+    sort-config: (js-object) A sort config returned by Handsontable.
+  Returns:
+    A boolean if `sort-config` is applicable."
+  [columns sort-config]
+  (let [col-nums-refed (map :column (js->clj sort-config :keywordize-keys true))
+        num-cols (count columns)]
+    (every? #(< % num-cols) col-nums-refed)))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
-  [hot-instance new-settings]
-  (.updateSettings hot-instance new-settings false))
+  [hot-instance new-settings current-selection]
+  (let [;; Stores whether settings that determine the data displayed have changed.
+        table-changed (some new-settings [:data :colHeaders])
+        sorting-plugin (.getPlugin hot-instance "multiColumnSorting")
+        sort-config (.getSortConfig sorting-plugin)]
+
+    (when table-changed
+      (.deselectCell hot-instance))
+
+    ;; When data is the only updated setting, use a different, potentially faster update function.
+    (if (= (keys new-settings) [:data])
+      (.loadData hot-instance (clj->js (:data new-settings)))
+      (.updateSettings hot-instance (clj->js new-settings)))
+
+    (when table-changed
+      ;; Maintain the same sort order as before the update.
+      ;; If colHeaders hasn't change we can apply the sort state. Or if the sort-state is
+      ;; applicable to the current columns.
+      (when (or (nil? (:colHeaders new-settings))
+                (sort-state-applicable (:colHeaders new-settings) sort-config))
+        (.sort sorting-plugin sort-config))
+
+      ;; If we cleared selections because of the table-changed, reapply selections
+      (when-let [coords (clj->js current-selection)]
+        (.selectCells hot-instance coords false)))))
 
 (defn handsontable
   ([attributes props]
@@ -44,92 +80,20 @@
 
        :component-did-update
        (fn [this old-argv]
-         (let [[_ old-attributes old-props] old-argv
-               [_ new-attributes new-props] (reagent/argv this)]
-           (when (not= (:settings old-props) (:settings new-props))
-             (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
-                   sort-config (.getSortConfig sorting-plugin)
+         (let [[_ _old-attributes old-props] old-argv
+               [_ _new-attributes new-props] (reagent/argv this)
 
-                   dataset-empty (and (empty? (get-in new-props [:settings :data]))
-                                      (empty? (get-in new-props [:settings :colHeaders])))
-                   dataset-size-changed (or (not= (count (get-in new-props [:settings :data]))
-                                                  (count (get-in old-props [:settings :data])))
-                                            (not= (count (get-in new-props [:settings :colHeaders]))
-                                                  (count (get-in old-props [:settings :colHeaders]))))]
-               ;; Whenever we insert new data into the table, we sometimes deselect all cells
-               ;; before updating in order to prevent the following issues.
+               {old-settings :settings} old-props
+               {new-settings :settings} new-props
+               changed-settings (filter-kv (fn [setting-key new-val]
+                                             (not= (get old-settings setting-key) new-val))
+                                           new-settings)]
 
-               ;; 1. When the table data is updated with an empty set of rows and the table previously
-               ;; had rows and a selection in it, there will be a small rectangle element left over
-               ;; in the DOM that is the top-left corner of the table even though the table should
-               ;; be completely gone from the DOM. Clearing all selections before updating prevents
-               ;; this.
+           ;; Update settings.
+           (when (seq changed-settings)
+             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))
 
-               ;; 2. When the table data is updated with fewer rows than previously set and there
-               ;; was a selection on the previously set data that was larger in the number of row and
-               ;; columns that can be accomodated in new data, Handsontable will make a new smaller
-               ;; selection on the new data. Deselecting all cells before updating, prevents this as
-               ;; well.
-
-               ;; We do not always want to perform this deselecting all and restoring behaviour.
-               ;; Doing this for example when updating the labels column can lead to a race condition.
-               ;; Hence the special conditions here. See the large comment below for more info on
-               ;; this case.
-               (when (or dataset-empty dataset-size-changed)
-                 (.deselectCell @hot-instance))
-
-               (update-hot! @hot-instance (clj->js (:settings new-props)))
-
-               ;; Maintain the same sort order as before the update
-               (.sort sorting-plugin sort-config)
-
-               ;; If we cleared selections because of a dataset-size change, apply the latest
-               ;; selection state from props.
-               (when dataset-size-changed
-                 (when-let [coords (clj->js (:selections-coords new-props))]
-                   (.selectCells @hot-instance coords false)))))
-
-
-           ;;; This next piece of code updates the selection state in handsontable depending on
-           ;;; :selections-coords passed in via new-props to the reagent component. The conditions under
-           ;;; which we perform the update are tricky. These notes are meant the clarify the reasoning
-           ;;; for the conditions chosen.
-
-           ;; We of course only want to update the selection state in the table if it differs from
-           ;; (:selections-coords new-props) as to prevent unneeded emmissions of the
-           ;; :hot/after-selection-end event.
-
-           ;; However, sometimes the table selection state (.getSelected @hot-instance) will be out
-           ;; of sync with current selection as specified by (:selections-coords new-props) but we
-           ;; do not want to update the selection unless we have explicitly passed in a new
-           ;; selection state, hence the second condition of
-           ;; (not= (:selections-coords new-props) (:selections-coords old-props))
-
-           ;; The reason for the table selection state getting out of sync is that the handsontable
-           ;; instance might at any point change its selection due to a number of  different
-           ;; factors. We don't want to undo that. Eventually an :hot/after-selection-end event will be
-           ;; emitted by handsontable for this change and that will update the value of
-           ;; :selections-coords in the db, and then there will be nothing to update here.
-
-           ;; Here are the reasons table selection state might be out of sync with our current
-           ;; selection as specified by (:selections-coords new-props).
-
-           ;; 1. We inserted new data into the table that is smaller in size that the current selection.
-           ;; Handsontable will simply make a new smaller selection for us in that case and emit an
-           ;; :hot/after-selection-end event.
-
-           ;; 2. We inserted an empty data set into handsontable. Handsontable will clear the selection
-           ;; state and emit an :after-deselect event (which we are not listenting to).
-
-           ;; Both 1 & 2 we avoid by performing a (.deselectCell @hot-instance) before updating.
-           ;; See the large comment block above.
-
-           ;; 3. Clicking out of a cell after inserting a new value in it--specifically in the
-           ;; labels column. The new cell we clicked on will be the current selection state in the
-           ;; table but the :hot/after-selection-end event for it may not have run yet when we are
-           ;; here performing an update triggered by the :hot/before-change event, which put a new
-           ;; value in the db for the previously selected cell. This is main reason we only update
-           ;; when we have explicitly passed a new value of :selections-coords through props.
+           ;; Update selections.
            (let [current-selection (selections/normalize
                                     (js->clj (.getSelected @hot-instance)))]
              (when (and (not= (:selections-coords new-props) current-selection)
