@@ -2,9 +2,11 @@
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db
-  {:table-panel {:selection-layer-coords {}}})
+  {:table-panel {:selection-layer-coords {}
+                 :show-label-column false}})
 
-(s/def ::table-panel (s/keys :req-un [::selection-layer-coords]
+(s/def ::table-panel (s/keys :req-un [::selection-layer-coords
+                                      ::show-label-column]
                              :opt-un [::headers
                                       ::rows
                                       ::visual-headers
@@ -22,6 +24,7 @@
 (s/def ::headers (s/coll-of ::header :kind vector?))
 (s/def ::visual-rows (s/coll-of ::row :kind vector?))
 (s/def ::visual-headers (s/coll-of ::header :kind vector?))
+(s/def ::show-label-column boolean?)
 
 ;;; Specs related to selections within handsontable instances.
 

@@ -16,11 +16,17 @@
     `headers`: The attributes of the maps in `rows` to display in the table. :rowid must be among
       these attributes as it will be used as the row ids in Handsontable."
   [{:keys [db]} [_ rows headers]]
-  (let [new-db (-> db
+  (let [headers (->> headers
+                     ;; :rowid should not be displayed in the table. Instead it extracted
+                     ;; from the rows using the Handsontable rowHeaders function.
+                     (remove #{:rowid})
+                     ;; The first column should always be the :label column, which will get hidden
+                     ;; and shown by the :table/show-label-column event.
+                     (into [:label]))
+
+        new-db (-> db
                    (assoc-in [:table-panel :rows] (vec rows))
-                   ;; :rowid should not be displayed in the table. Instead it extracted
-                   ;; from the rows using the Handsontable rowHeaders function.
-                   (assoc-in [:table-panel :headers] (vec (remove #{:rowid} headers)))
+                   (assoc-in [:table-panel :headers] headers)
                    ;; Clear all selections in all selection layers.
                    (assoc-in [:table-panel :selection-layer-coords] {}))]
     {:db new-db
@@ -93,3 +99,8 @@
 (rf/reg-event-db :table/unset-hot-instance
                  event-interceptors
                  unset-hot-instance)
+
+(rf/reg-event-db :table/toggle-label-column
+                 event-interceptors
+                 (fn [db [_]]
+                   (update-in db [:table-panel :show-label-column] not)))

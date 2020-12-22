@@ -124,6 +124,24 @@
             :<- [:table/table-rows]
             show-table-controls)
 
+(rf/reg-sub :table/show-label-column
+            (fn [db _]
+              (get-in db [:table-panel :show-label-column])))
+
+(defn hidden-columns
+  "Returns a value for the Handsontable hiddenColumns setting.
+  Hides the first column when `label-column-show` is false.
+  To be used as a re-frame subscriptions."
+  [show-label-column]
+  (if show-label-column
+    {}
+    {:columns [0]
+     :indicators true}))
+
+(rf/reg-sub :table/hidden-columns
+            :<- [:table/show-label-column]
+            hidden-columns)
+
 ;;; Subs related to various table settings and state.
 
 (defn ^:sub cells
@@ -153,7 +171,7 @@
             row-headers)
 
 (defn ^:sub real-hot-props
-  [[table-headers row-headers rows context-menu cells selection-coords-active]]
+  [[table-headers row-headers rows context-menu cells hidden-columns selection-coords-active]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
       (assoc-in [:settings :colHeaders] (display-headers table-headers))
@@ -161,6 +179,7 @@
       (assoc-in [:settings :rowHeaders] row-headers)
       (assoc-in [:settings :cells] cells)
       (assoc-in [:settings :contextMenu] context-menu)
+      (assoc-in [:settings :hiddenColumns] hidden-columns)
       (assoc-in [:selections-coords] selection-coords-active)))
 (rf/reg-sub :table/real-hot-props
             :<- [:table/table-headers]
@@ -168,6 +187,7 @@
             :<- [:table/table-rows]
             :<- [:table/context-menu]
             :<- [:table/cells]
+            :<- [:table/hidden-columns]
             :<- [:table/selection-coords-active]
             real-hot-props)
 
