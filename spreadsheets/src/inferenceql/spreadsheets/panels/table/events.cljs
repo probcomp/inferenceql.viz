@@ -56,6 +56,8 @@
                     ;; We don't have any changes to the data yet, so :rows-by-id-with-changes
                     ;; should just be the same as :rows-by-id.
                     (assoc-in [:table-panel :physical-data :rows-by-id-with-changes] rows-maps)
+                    (update-in [:table-panel :physical-data] dissoc :row-order-for-new-rows)
+
 
                     ;; Clear all selections in all selection layers.
                     (assoc-in [:table-panel :selection-layers] {}))]
