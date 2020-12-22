@@ -58,6 +58,8 @@
                     (assoc-in [:table-panel :physical-data :rows-by-id-with-changes] rows-maps)
                     (update-in [:table-panel :physical-data] dissoc :row-order-for-new-rows)
 
+                    ;; Clear the sort state
+                    (assoc-in [:table-panel :sort-state] [])
 
                     ;; Clear all selections in all selection layers.
                     (assoc-in [:table-panel :selection-layers] {}))]
