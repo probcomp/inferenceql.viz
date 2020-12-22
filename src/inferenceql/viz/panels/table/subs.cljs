@@ -230,3 +230,12 @@
      :cells-missing
      (fn [& args]
        (rends/missing-cell-wise-likelihood-threshold-renderer args missing-cells-flagged computed-headers)))))
+
+(defn hot-instance
+  "Returns the instance of Handsontable used to display the table.
+  To be used as a re-frame subscription."
+  [db _]
+  (get-in db [:table-panel :hot-instance]))
+
+(rf/reg-sub :table/hot-instance
+            hot-instance)
