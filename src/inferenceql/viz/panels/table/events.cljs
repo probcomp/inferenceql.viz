@@ -20,7 +20,7 @@
                    (assoc-in [:table-panel :headers] (vec headers))
                    (assoc-in [:table-panel :virtual] virtual)
                    ;; Clear all selections in all selection layers.
-                   (assoc-in [:table-panel :selection-layers] {}))]
+                   (assoc-in [:table-panel :selection-layer-coords] {}))]
     {:db new-db
      ;; Clear previous selections made in vega-lite plots.
      :dispatch [:viz/clear-pts-store]}))
@@ -35,7 +35,7 @@
  (fn [{:keys [db]} [_]]
    (let [new-db (-> db
                     (update-in [:table-panel] dissoc :rows :headers)
-                    (assoc-in [:table-panel :selection-layers] {}))]
+                    (assoc-in [:table-panel :selection-layer-coords] {}))]
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))
 
