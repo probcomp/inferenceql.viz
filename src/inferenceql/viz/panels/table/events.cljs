@@ -68,3 +68,21 @@
 
        :else
        db))))
+
+(defn set-hot-instance
+  "To be used as re-frame event-db."
+  [db [_ hot-instance]]
+  (assoc-in db [:table-panel :hot-instance] hot-instance))
+
+(rf/reg-event-db :table/set-hot-instance
+                 event-interceptors
+                 set-hot-instance)
+
+(defn unset-hot-instance
+  "To be used as re-frame event-db."
+  [db _]
+  (update-in db [:table-panel] dissoc :hot-instance))
+
+(rf/reg-event-db :table/unset-hot-instance
+                 event-interceptors
+                 unset-hot-instance)
