@@ -87,9 +87,7 @@
   in the table including which attribute from the underlying map for the row
   is presented."
   (let [settings-map (fn [attr]
-                       (if (= attr hot/label-col-header)
-                         {:data attr :readOnly false} ; Make the score column user-editable.
-                         {:data attr}))]
+                       {:data attr})]
     (map settings-map headers)))
 
 ;;; Subs related to visual state of the table

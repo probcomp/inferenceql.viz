@@ -1,20 +1,5 @@
 (ns inferenceql.viz.panels.table.handsontable)
 
-(def label-col-header
-  "Header text for the column used for labeling rows as examples."
-  "🏷")
-(def score-col-header
-  "Header text for the column that shows scores."
-  "probability")
-
-(defn freeze-col-1-2-fn [columns-moving target]
-  "Prevents the movement of the first two columns in the table.
-  Also prevents other columns from moving into those frist two spots."
-  (let [first-unfrozen-index 2
-        first-col-moving (first (js->clj columns-moving))]
-    (not (or (< first-col-moving first-unfrozen-index)
-             (< target first-unfrozen-index)))))
-
 (def default-hot-settings
   {:settings {:data                []
               :colHeaders          []
@@ -22,7 +7,6 @@
               :rowHeaders          true
               :multiColumnSorting  true
               :manualColumnMove    true
-              :beforeColumnMove    freeze-col-1-2-fn
               :manualColumnResize  true
               :autoWrapCol         false
               :autoWrapRow         false
