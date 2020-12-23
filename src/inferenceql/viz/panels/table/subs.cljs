@@ -129,11 +129,16 @@
   "Returns a function used by the :cells property in Handsontable's options.
   Provides special styling for rows selected through vega-lite visualizations."
   [selected-row-flags]
-  (fn [row _col _prop]
-    (let [selected (when row (nth selected-row-flags row))]
-      (if selected
-        #js {:className "selected-row"}
-        #js {:className ""}))))
+  (fn [row _col prop]
+    (let [selected (when row (nth selected-row-flags row))
+          label-column-cell (= prop (name :label))
+
+          class-names [(when selected "selected-row")
+                       (when label-column-cell "label-cell")]
+          class-names-string (str/join ", " (remove nil? class-names))]
+      #js {:className class-names-string
+           ;; Make cells in the :label column editable
+           :readOnly (not label-column-cell)})))
 
 (rf/reg-sub :table/cells
             :<- [:table/selected-row-flags]
