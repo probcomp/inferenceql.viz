@@ -3,16 +3,19 @@
   (:require [re-frame.core :as rf]
             [inferenceql.viz.panels.table.selections :as selections]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.viz.panels.control.db :as control-db]))
+            [inferenceql.viz.panels.control.db :as control-db]
+            [inferenceql.viz.panels.table.db :as table-db]))
 
-(rf/reg-event-fx
+(rf/reg-event-db
  :hot/after-selection-end
  event-interceptors
- (fn [{:keys [db]} [_ hot _id _row-index _col _row2 _col2 _selection-layer-level]]
+ (fn [db [_ hot _id _row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-coords (selections/normalize (js->clj (.getSelected hot)))
-         color (control-db/selection-color db)]
-     {:db (assoc-in db [:table-panel :selection-layer-coords color] selection-coords)
-      :dispatch [:table/check-selection]})))
+         color (control-db/selection-color db)
+         num-rows (count (table-db/visual-rows db))]
+     (if (selections/valid-selection? selection-coords num-rows)
+       (assoc-in db [:table-panel :selection-layer-coords color] selection-coords)
+       (update-in db [:table-panel :selection-layer-coords] dissoc color)))))
 
 (rf/reg-event-db
   :hot/after-on-cell-mouse-down
