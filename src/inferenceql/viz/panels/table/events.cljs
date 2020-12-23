@@ -52,41 +52,6 @@
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))
 
-;; Checks if the selection in the current selection layer is valid.
-;; If it is not valid, the current selection layer is cleared.
-(rf/reg-event-db
- :table/check-selection
- event-interceptors
- (fn [db _]
-   (let [color (control-db/selection-color db)
-         selections-coords (get-in db [:table-panel :selection-layer-coords color])
-
-         num-rows (count (db/visual-row-order db))
-         ;; Takes a selection vector and returns true if that selection represents
-         ;; the selection of a single column.
-         column-selected (fn [[row-start col-start row-end col-end]]
-                           (let [last-row-index (- num-rows 1)]
-                             (and (= row-start 0)
-                                  (= row-end last-row-index)
-                                  (= col-start col-end))))]
-     (cond
-       ;; These next two cond sections sometimes deselect all cells in the selection layer in order
-       ;; to enforce our constraints on what sorts of selections are allowed in each selection layer.
-
-       ;; Deselect all cells in the current selection layer if it is made up of two selections that
-       ;; are not both single column selections.
-       (and (= (count selections-coords) 2)
-            (not-every? column-selected selections-coords))
-       (update-in db [:table-panel :selection-layer-coords] dissoc color)
-
-       ;; Deselect all cells in the current selection layer if it is made up of more than
-       ;; two selections.
-       (> (count selections-coords) 2)
-       (update-in db [:table-panel :selection-layer-coords] dissoc color)
-
-       :else
-       db))))
-
 (defn set-hot-instance
   "To be used as re-frame event-db."
   [db [_ hot-instance]]

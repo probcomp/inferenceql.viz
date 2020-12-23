@@ -109,3 +109,36 @@
   (let [fix-selection-rect (fn [[r1 c1 r2 c2]]
                              [(max r1 0) (max c1 0) r2 c2])]
     (not-empty (mapv fix-selection-rect coords))))
+
+(defn valid-selection?
+  "Checks if a selection passes our constraints on the types of selections allowed.
+  Only certain types of selections are allowed in each selection layer in order to
+  make the translation from selections to visualization more sensible.
+
+  Args:
+    coords: A sequence of selection rectangles.
+    num-rows: Number of rows in the table.
+  Returns:
+    A boolean true if the selection is valid."
+  [coords num-rows]
+  (let [;; Takes a selection rectangle and returns true if that selection represents
+        ;; the selection of a single column.
+        column-selected? (fn [[row-start col-start row-end col-end]]
+                           (let [last-row-index (- num-rows 1)]
+                             (and (= row-start 0)
+                                  (= row-end last-row-index)
+                                  (= col-start col-end))))]
+    (cond
+      ;; Deselect all cells in the current selection layer if it is made up of two selections that
+      ;; are not both single column selections.
+      (and (= (count coords) 2)
+           (not-every? column-selected? coords))
+      false
+
+      ;; Deselect all cells in the current selection layer if it is made up of more than
+      ;; two selections.
+      (> (count coords) 2)
+      false
+
+      :else
+      true)))
