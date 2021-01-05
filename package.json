@@ -3,7 +3,7 @@
     "@cljs-oss/module-deps": "^1.1.1",
     "handsontable": "^8.2.0",
     "isomorphic-ws": "^4.0.1",
-    "vega": "^5.13.0",
+    "vega": "^5.17.3",
     "vega-embed": "^6.8.0",
     "vega-lite": "^4.13.0",
     "vega-tooltip": "^0.23.0",
