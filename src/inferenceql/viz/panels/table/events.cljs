@@ -14,11 +14,10 @@
   Args:
     `rows`: A collection of maps to be set as rows in the table.
     `headers`: The attributes of the maps in `rows` to display in the table."
-  [{:keys [db]} [_ rows headers {:keys [virtual]}]]
+  [{:keys [db]} [_ rows headers]]
   (let [new-db (-> db
                    (assoc-in [:table-panel :rows] (vec rows))
                    (assoc-in [:table-panel :headers] (vec headers))
-                   (assoc-in [:table-panel :virtual] virtual)
                    ;; Clear all selections in all selection layers.
                    (assoc-in [:table-panel :selection-layer-coords] {}))]
     {:db new-db

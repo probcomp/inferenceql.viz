@@ -9,7 +9,6 @@
                                       ::rows
                                       ::visual-headers
                                       ::visual-rows
-                                      ::virtual
                                       ::hot-instance]))
 
 ;;; Specs related to table data.
@@ -20,7 +19,6 @@
 (s/def ::headers (s/coll-of ::header :kind vector?))
 (s/def ::visual-rows (s/coll-of ::row :kind vector?))
 (s/def ::visual-headers (s/coll-of ::header :kind vector?))
-(s/def ::virtual boolean?)
 
 ;;; Specs related to selections within handsontable instances.
 

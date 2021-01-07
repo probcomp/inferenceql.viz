@@ -58,12 +58,6 @@
             (fn [[color selection-layer-coords]]
               (get selection-layer-coords color)))
 
-;;; Subs related to the type of data in the table.
-
-(rf/reg-sub :table/virtual
-            (fn [db _]
-              (get-in db [:table-panel :virtual])))
-
 ;;; Subs related to populating tables with data.
 
 (rf/reg-sub :table/table-headers
