@@ -3,22 +3,19 @@
 {{#views}}
 function view_{{num}}_model () {
   var cluster_id = categorical([{{cluster-probs}}]) + 1;
-  var ret_val;
 
 {{#clusters}}
 {{#first}}  if (cluster_id == {{num}}) {
-    ret_val = {
+    return {
 {{#parameters}}
       "{{name}}": {{#gaussian}}gaussian({{mu}}, {{sigma}}){{/gaussian}}{{#categorical}}categorical([{{weights}}]){{/categorical}}{{^last}},{{/last}}
 {{/parameters}}
     };
 {{/first}}
 {{^first}}  } else if (cluster_id == {{num}}) {
-    ret_val = { /* generate virtual row... */ };
+    return { /* a virtual row... */ };
 {{/first}}
 {{/clusters}}  }
-
-  return ret_val;
 }
 
 {{/views}}
