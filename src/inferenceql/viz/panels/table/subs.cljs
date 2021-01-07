@@ -109,6 +109,20 @@
               (when pts-store-filter
                 (map pts-store-filter rows))))
 
+;;; Subs related showing/hiding certain columns or table controls.
+
+(defn show-table-controls
+  "Returns a value for the css visibility property.
+  To be used as re-frame subscription."
+  [rows]
+  (if (seq rows)
+    "visible"
+    "hidden"))
+
+(rf/reg-sub :table/show-table-controls
+            :<- [:table/table-rows]
+            show-table-controls)
+
 ;;; Subs related to various table settings and state.
 
 (defn ^:sub cells

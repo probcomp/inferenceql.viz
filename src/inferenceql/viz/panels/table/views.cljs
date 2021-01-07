@@ -149,3 +149,23 @@
        (fn [attributes props]
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
+
+(defn controls
+  "Controls for a handsontable instance."
+  [show-table-controls]
+  [:div#table-controls {:style {:visibility show-table-controls}}
+   [:button.table-button.pure-button
+    {:on-click (fn [e]
+                 (rf/dispatch [:table/toggle-label-column])
+                 (.blur (.-target e)))}
+    "labels"]
+   [:button.table-button.pure-button
+    {:on-click (fn [e]
+                 (rf/dispatch [:table/add-row])
+                 (.blur (.-target e)))}
+    "+row"]
+   [:button.table-button.pure-button
+    {:on-click (fn [e]
+                 (rf/dispatch [:table/delete-row])
+                 (.blur (.-target e)))}
+    "-row"]])
