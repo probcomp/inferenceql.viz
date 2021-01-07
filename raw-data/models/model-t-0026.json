@@ -1,83 +1,449 @@
 {
   "column-statistical-types": {
-    "column_a": "numerical",
-    "column_b": "numerical",
-    "column_c": "numerical",
-    "column_d": "numerical"
+    "Country_of_Operator": "nominal",
+    "Operator_Owner": "nominal",
+    "Users": "nominal",
+    "Purpose": "nominal",
+    "Class_of_Orbit": "nominal",
+    "Type_of_Orbit": "nominal",
+    "Contractor": "nominal",
+    "Country_of_Contractor": "nominal",
+    "Launch_Site": "nominal",
+    "Launch_Vehicle": "nominal",
+    "Source_Used_for_Orbital_Data": "nominal",
+    "Perigee_km": "numerical",
+    "Apogee_km": "numerical",
+    "Eccentricity": "numerical",
+    "Period_minutes": "numerical",
+    "Launch_Mass_kg": "numerical",
+    "Dry_Mass_kg": "numerical",
+    "Power_watts": "numerical",
+    "Date_of_Launch": "numerical",
+    "Anticipated_Lifetime": "numerical",
+    "longitude_radians_of_geo": "numerical",
+    "Inclination_radians": "numerical"
   },
-  "categories": {},
+  "categories": {
+    "Country_of_Operator": [
+      "Algeria",
+      "Argentina",
+      "Azerbaijan",
+      "Brazil",
+      "Canada",
+      "China (PR)",
+      "Denmark",
+      "ESA",
+      "International",
+      "Israel",
+      "Italy",
+      "Japan",
+      "Luxembourg",
+      "Malaysia",
+      "Multinational",
+      "Norway",
+      "Pakistan",
+      "Russia",
+      "Spain",
+      "UK/ESA",
+      "USA",
+      "USA/Argentina"
+    ],
+    "Operator_Owner": [
+      "1Worldspace",
+      "APT Satellite Holdings Ltd.",
+      "Aalborg University",
+      "Aerospace Corporation",
+      "Amsat-NA",
+      "Aprize Satellite/Latin Trade Satellite",
+      "Aprize Satellites Argentina",
+      "Arab Satellite Communications Org. (ASCO)",
+      "Asia Broadcast Satellite",
+      "Asia Broadcasting Satellite",
+      "Asia Satellite Telecommunications Co. Ltd. (SES [Soci\u008et\u008e Europ\u008eenne des Satellites (SES)])",
+      "Center for Atmospheric Sciences, Hampton University/NASA",
+      "Centre National des Techniques Spatiales (CNTS)",
+      "Department of Homeland Security",
+      "European Space Agency",
+      "European Telecommunications Satellite Consortium (EUTELSAT)",
+      "Hispamar (subsidiary of Hispasat - Spain)",
+      "Hispasat",
+      "INMARSAT, Ltd./European Space Agency",
+      "Institute of Space and Aeronautical Science, University of Tokyo",
+      "Israel Aircraft Industries",
+      "Italian Space Agency",
+      "Kongsberg Satellite Services (KSAT)",
+      "MEASAT Satellite Systems Sdn. Bhd.",
+      "Ministry of Communications and Information Technologies",
+      "NASA Goddard Space Flight Center, Jet Propulsion Laboratory",
+      "NanoSatisfi Inc.",
+      "National Reconnaissance Office (NRO)",
+      "Pakistan Space and Upper Atmosphere Research Commission (SUPARCO)",
+      "SES (Soci\u008et\u008e Europ\u008eenne des Satellites (SES))",
+      "Samara State Aerospace University, SGAU",
+      "Space-Communication Ltd",
+      "Telesat Canada Ltd. (BCE, Inc.)",
+      "US Air Force",
+      "US Air Force Institute of Technology"
+    ],
+    "Users": [
+      "Civil",
+      "Commercial",
+      "Commercial/Government",
+      "Government",
+      "Government/Military",
+      "Military",
+      "Military/Commercial"
+    ],
+    "Purpose": [
+      "Amateur Radio",
+      "Communications",
+      "Communications (experimental)",
+      "Communications/Maritime Tracking",
+      "Communications/Research",
+      "Communications/Technology Development",
+      "Earth Observation",
+      "Earth Science",
+      "Electronic Surveillance",
+      "Maritime Tracking/Technology Development",
+      "Remote Sensing/Technology Development",
+      "Scientific Research",
+      "Solar Physics",
+      "Space Physics",
+      "Technology Development"
+    ],
+    "Class_of_Orbit": [
+      "Elliptical",
+      "GEO",
+      "LEO"
+    ],
+    "Type_of_Orbit": [
+      "Sun-Synchronous"
+    ],
+    "Contractor": [
+      "Aalborg University",
+      "Aerospace Corporation",
+      "Alcatel Space Industries",
+      "Alenia Spazio",
+      "Amsat-NA",
+      "Aprize Satellite",
+      "Astrium",
+      "Astrium/Thales Alenia Space",
+      "Boeing Satellite Systems",
+      "Carlo\u00caGavazzi\u00caSpace",
+      "EADS Astrium",
+      "Hughes",
+      "Institute of Space and Aeronautical Science, University of Tokyo",
+      "Israel Aircraft Industries (IAI)",
+      "Kongsberg Seatex AS/University of Toronto Institute for Aerospace Studies",
+      "Lockheed Martin",
+      "Lockheed Martin Astro Space",
+      "Lockheed Martin Commercial Space Systems",
+      "Lockheed Martin Missiles and Space",
+      "Lockheed Martin Space Systems",
+      "Lockheed Martin/Spar Aerospace",
+      "Matra Marconi Space-France",
+      "NanoSatisfi, Inc.",
+      "National Reconnaissance Laboratory (?)",
+      "National Reconnaissance Laboratory(?)",
+      "OAO ISS",
+      "Orbital Sciences Corp.",
+      "Pakistan Space and Upper Atmosphere Research Commission (SUPARCO)",
+      "Samara State Aerospace University, SGAU",
+      "Space Systems/Loral",
+      "SpaceQuest",
+      "TRW Space and Electronics",
+      "Thales Alenia Space",
+      "TsSKB Progress",
+      "US Air Force Institute of Technology",
+      "University of Southern California"
+    ],
+    "Country_of_Contractor": [
+      "Argentina",
+      "Canada",
+      "Denmark",
+      "France",
+      "France/Italy",
+      "France/UK/Germany",
+      "France/UK/Germany/Spain",
+      "Israel",
+      "Italy",
+      "Japan",
+      "Pakistan",
+      "Russia",
+      "USA",
+      "USA/Canada"
+    ],
+    "Launch_Site": [
+      "Baikonur Cosmodrome",
+      "Cape Canaveral",
+      "Dombarovsky Launch Facility",
+      "Guiana Space Center",
+      "ISS",
+      "Plesetsk Cosmodrome",
+      "Satish Dhawan Space Center",
+      "Sriharikota Launch Station",
+      "Uchinoura Space Center",
+      "Vandenberg AFB",
+      "Xichang Satellite Launch Center"
+    ],
+    "Launch_Vehicle": [
+      "Ariane",
+      "Ariane 42L",
+      "Ariane 42P",
+      "Ariane 44L",
+      "Ariane 44LP",
+      "Ariane 5",
+      "Ariane 5 ECA",
+      "Ariane 5G",
+      "Atlas 2 AS",
+      "Atlas 2A",
+      "Atlas 3",
+      "Atlas 3B",
+      "Atlas 5",
+      "Breeze M",
+      "Delta 2",
+      "Delta 2310",
+      "Delta 4 Heavy",
+      "Dnepr",
+      "Dnepr 1",
+      "JSSOD",
+      "Long March 3",
+      "Long March 3B",
+      "Long March CZ3B",
+      "Mu 3S2",
+      "PSLV",
+      "PSLV C8",
+      "Pegasus XL",
+      "Proton",
+      "Proton D",
+      "Proton K",
+      "Proton M",
+      "Soyuz 2-1A",
+      "Soyuz 2-1B",
+      "Soyuz-Fregat",
+      "Taurus",
+      "Titan IV",
+      "Titan IVA",
+      "Zenit 2",
+      "Zenit 2SB",
+      "Zenit 3SLB"
+    ],
+    "Source_Used_for_Orbital_Data": [
+      "CalSky",
+      "JM/10/09",
+      "JM/12_08",
+      "JM/12_09",
+      "JM/1_12",
+      "JMSatcat304",
+      "SC - ASCR",
+      "SC - ASCR 1/09",
+      "SC - ASCR 9/11",
+      "ZARYA",
+      "ZARYA estimated",
+      "www.satellitedebris.net 12/12"
+    ]
+  },
   "models": [
     {
       "column-partition": [
         [
-          "column_b",
-          "column_a",
-          "column_d",
-          "column_c"
+          "Apogee_km",
+          "Anticipated_Lifetime",
+          "Period_minutes",
+          "Launch_Mass_kg",
+          "Perigee_km",
+          "Inclination_radians",
+          "Class_of_Orbit",
+          "Purpose",
+          "Users",
+          "Launch_Site",
+          "Power_watts",
+          "Contractor",
+          "Date_of_Launch",
+          "Operator_Owner",
+          "Dry_Mass_kg",
+          "Launch_Vehicle",
+          "longitude_radians_of_geo",
+          "Source_Used_for_Orbital_Data"
+        ],
+        [
+          "Country_of_Contractor",
+          "Country_of_Operator",
+          "Eccentricity",
+          "Type_of_Orbit"
         ]
       ],
       "cluster-crp-hyperparameters": [
-        0.3330459408091321
+        0.3562247890262444,
+        0.05555555555555554
       ],
       "clusters": [
         [
           [
             1,
             2,
-            5,
-            9,
-            10,
-            12,
-            14,
-            21,
-            22,
-            24,
-            26
-          ],
-          [
-            0,
             3,
             4,
             6,
             7,
             8,
+            9,
             11,
+            12,
             13,
+            19,
+            20,
+            21,
+            22
+          ],
+          [
+            0,
+            5,
+            14,
+            15,
+            16,
+            17,
+            18,
+            23,
+            24,
+            25,
+            26
+          ],
+          [
+            10
+          ]
+        ],
+        [
+          [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
             15,
             16,
             17,
             18,
             19,
             20,
+            21,
+            22,
             23,
-            25
+            24,
+            25,
+            26
           ]
         ]
       ],
       "column-hypers": {
-        "column_a": {
-          "m": 7.002059546836699,
-          "r": 1.364408702640074,
-          "s": 0.5298316906283708,
-          "nu": 1.906642661893268
+        "Country_of_Operator": {
+          "alpha": 1.3738237958832629
         },
-        "column_b": {
-          "m": 5.31757597583632,
-          "r": 0.7688050166297915,
-          "s": 0.010000000000000004,
-          "nu": 1.0
+        "Operator_Owner": {
+          "alpha": 1.1721022975334803
         },
-        "column_c": {
-          "m": 6.799990544390076,
-          "r": 0.5,
-          "s": 0.03039195382313199,
-          "nu": 1.6918723112109335
+        "Users": {
+          "alpha": 1.0826367338740543
         },
-        "column_d": {
-          "m": 5.491252621692452,
-          "r": 0.5,
-          "s": 0.03039195382313199,
-          "nu": 1.0
+        "Purpose": {
+          "alpha": 1.0826367338740543
+        },
+        "Class_of_Orbit": {
+          "alpha": 1.4873521072935114
+        },
+        "Type_of_Orbit": {
+          "alpha": 1.0
+        },
+        "Contractor": {
+          "alpha": 4.520353656360244
+        },
+        "Country_of_Contractor": {
+          "alpha": 1.1721022975334803
+        },
+        "Launch_Site": {
+          "alpha": 1.0
+        },
+        "Launch_Vehicle": {
+          "alpha": 1.2689610031679222
+        },
+        "Source_Used_for_Orbital_Data": {
+          "alpha": 1.0826367338740543
+        },
+        "Perigee_km": {
+          "m": 30945.862068965518,
+          "r": 0.10725745801190409,
+          "s": 22929289.986224163,
+          "nu": 5.226390452669853
+        },
+        "Apogee_km": {
+          "m": 34800.48275862069,
+          "r": 0.0909090909090909,
+          "s": 23076087.37274682,
+          "nu": 6.166262899841587
+        },
+        "Eccentricity": {
+          "m": 0.0,
+          "r": 4.078228676064739,
+          "s": 0.010000374940400004,
+          "nu": 10.12704156695049
+        },
+        "Period_minutes": {
+          "m": 284.14482758620693,
+          "r": 0.11721022975334806,
+          "s": 27805.767156888887,
+          "nu": 5.29831690628371
+        },
+        "Launch_Mass_kg": {
+          "m": 863.5931034482758,
+          "r": 0.10725745801190409,
+          "s": 462115.62041714025,
+          "nu": 2.4831961057962353
+        },
+        "Dry_Mass_kg": {
+          "m": 1619.6206896551726,
+          "r": 0.734236535802898,
+          "s": 2098366.503653874,
+          "nu": 6.0
+        },
+        "Power_watts": {
+          "m": 1795.0,
+          "r": 0.3498181755814721,
+          "s": 4508714.405780082,
+          "nu": 2.6873536832763194
+        },
+        "Date_of_Launch": {
+          "m": 41119.24137931035,
+          "r": 2.4831961057962353,
+          "s": 8247857.194574628,
+          "nu": 1.5119953758433395
+        },
+        "Anticipated_Lifetime": {
+          "m": 6.896551724137931,
+          "r": 0.16337461736268483,
+          "s": 7.846554472625578,
+          "nu": 4.3763178586437395
+        },
+        "longitude_radians_of_geo": {
+          "m": 1.003320266965517,
+          "r": 4.9091148934186775,
+          "s": 3.169256151043177,
+          "nu": 4.5509103720328525
+        },
+        "Inclination_radians": {
+          "m": 0.0,
+          "r": 3.456618013632979,
+          "s": 0.07598643701287204,
+          "nu": 3.182301300466455
         }
       }
     }
