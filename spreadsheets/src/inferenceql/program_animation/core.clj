@@ -62,12 +62,11 @@
 (defn -main []
   (clean-output-dirs)
   (doseq [[i p] (map vector (range low-index high-index) programs)]
-    (let [i (inc i)]
-      (println (str "Writing model: " i))
-      (let [svg-file (str "images-svg/model-" i ".svg")
-            jpg-file (str "images-jpeg/model-" i ".jpg")]
-        (spit svg-file (clygments/highlight p :js :svg {:style "xcode"}))
-        (sh "svgexport" svg-file jpg-file "pad" "2x" "100%"))))
+    (println (str "Writing model: " i))
+    (let [svg-file (str "images-svg/model-" i ".svg")
+          jpg-file (str "images-jpeg/model-" i ".jpg")]
+      (spit svg-file (clygments/highlight p :js :svg {:style "xcode"}))
+      (sh "svgexport" svg-file jpg-file "pad" "2x" "100%")))
 
   ;; Resize all images to the max width and height between all of them.
   (let [file-name-wildcard "images-jpeg/model-*.jpg"
