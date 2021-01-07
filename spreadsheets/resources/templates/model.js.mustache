@@ -4,19 +4,19 @@
 function view_{{num}}_model () {
   var cluster_id = categorical([{{cluster-probs}}]) + 1;
   var ret_val;
+
 {{#clusters}}
-{{#first}}
-  if (cluster_id == {{num}}) {
-{{/first}}
-{{^first}}
-  } else if (cluster_id == {{num}}) {
-{{/first}}
+{{#first}}  if (cluster_id == {{num}}) {
     ret_val = {
 {{#parameters}}
-     "{{name}}": {{#gaussian}}gaussian({{mu}}, {{sigma}}){{/gaussian}}{{#categorical}}categorical([{{weights}}]){{/categorical}}{{^last}},{{/last}}
+      "{{name}}": {{#gaussian}}gaussian({{mu}}, {{sigma}}){{/gaussian}}{{#categorical}}categorical([{{weights}}]){{/categorical}}{{^last}},{{/last}}
 {{/parameters}}
-    };{{/clusters}}
-  }
+    };
+{{/first}}
+{{^first}}  } else if (cluster_id == {{num}}) {
+    ret_val = { /* generate virtual row... */ };
+{{/first}}
+{{/clusters}}  }
 
   return ret_val;
 }
