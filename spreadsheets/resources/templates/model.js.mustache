@@ -1,7 +1,7 @@
 /* Views */
 
 {{#views}}
-function view_{{num}}_model () {
+function view_{{num}}() {
   var cluster_id = categorical([{{cluster-probs}}]) + 1;
 
 {{#clusters}}
@@ -24,7 +24,7 @@ function view_{{num}}_model () {
 {{#model}}
 function model() {
   {{#view-fn-nums}}
-  var view_{{.}} = view_{{.}}_model();
+  var view_{{.}} = view_{{.}}();
   {{/view-fn-nums}}
 
   return {{{#splats}}{{^last}}...view_{{num}}, {{/last}}{{#last}}...view_{{num}}{{/last}}{{/splats}}};
