@@ -13,18 +13,19 @@
 (defn parse-float
   "Returns `s` as a float if it can be parsed, otherwise `nil`."
   [s]
-  #?(:clj (try (Float/parseFloat s)
-               (catch NumberFormatException _
-                 nil))
-     :cljs (let [n (js/parseFloat s)]
-             (when-not (js/Number.isNaN n)
-               n))))
+  (when s
+    #?(:clj (Float/parseFloat s)
+       :cljs (let [n (js/parseFloat s)]
+               (if (.isNaN js/Number n)
+                 (throw (ex-info "Could not parse float. Likely numerical value a data csv is incorrect."
+                                 s))
+                 n)))))
 
 (defn- cast-items-in-row [column-types row]
   "Casts vals in a map `row` based on their type as defined by `column-types`."
   (medley/map-kv (fn [k v]
                    (let [type (get column-types k)]
-                     (if (and (= type :gaussian) (numerical-string? v))
+                     (if (= type :gaussian)
                        [k (parse-float v)]
                        [k v])))
                  row))
