@@ -18,9 +18,17 @@
             [me.raynes.fs :as fs]
             [clojure.pprint :refer [pprint]]))
 
+;; Starting number in model filenames.
 (def low-index 10)
+;; One above the final number in model filnames.
 (def high-index 100)
 
+;; How many rows from the dataset to incorporate into each model based on the model number.
+;; (Difference between the number of rows to incorporate and the model number)
+;;
+;; For example model-10 will have 11 rows from the dataset incorporated when rows-offset is 1.
+;; And model-11 will have 12 rows incorporated...etc.
+;; Normally this should just be set to 0. But my models were a little offset in that way.
 (def rows-offset 1)
 
 ;---------------------------
