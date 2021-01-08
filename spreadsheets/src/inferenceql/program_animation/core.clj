@@ -21,6 +21,10 @@
 (def low-index 10)
 (def high-index 100)
 
+(def rows-offset 1)
+
+;---------------------------
+
 (def csv (csv/read-csv (slurp "raw-data/data.csv")))
 (def model-dir "raw-data/models/")
 
@@ -39,13 +43,18 @@
     (zipmap columns iql-types)))
 
 (def schema (get-schema (first bayesdb-dumps)))
-(def rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
+(def all-rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
 
-(def programs (->> bayesdb-dumps
-                   (map #(bayesdb-import/xcat-gpms % rows))
-                   (map first)
-                   (map crosscat/xcat->mmix)
-                   (map #(render (:js-model-template config) (multimix/template-data %)))))
+(def rows-for-models (for [i (range low-index high-index)]
+                       (let [num-rows (+ i rows-offset)]
+                         (take num-rows all-rows))))
+
+(def programs (for [[bdb-dump rows] (map vector bayesdb-dumps rows-for-models)]
+                (->> (bayesdb-import/xcat-gpms bdb-dump rows)
+                     (first)
+                     (crosscat/xcat->mmix)
+                     (multimix/template-data)
+                     (render (:js-model-template config)))))
 
 (defn clean-output-dirs
   "Make clean output directories."
@@ -79,12 +88,15 @@
         "-border" "20x20" "-bordercolor" "white" "-colorspace" "RGB" file-name-wildcard)))
 
 
+#_(defn -main []
+    (doall programs))
+
 ;-------------------------
 
 ;; Holds two XCat records. One from model 27 and one from model 28.
-(def xcat-recs (->> bayesdb-dumps
-                    (map #(bayesdb-import/xcat-gpms % csv))
-                    (map first)))
+#_(def xcat-recs (->> bayesdb-dumps
+                      (map #(bayesdb-import/xcat-gpms % csv))
+                      (map first)))
 
 ;; Dumping out the Xcat records to .edn files to inspect by hand.
 #_(for [[i program] (map vector [27 28] xcat-recs)]
@@ -107,11 +119,31 @@
 
   (def bayesdb-dump (#(json/read-str (slurp %)) model))
 
+  (def schema (get-schema bayesdb-dump))
+  (def rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
+
   (def xcat (-> bayesdb-dump
-                (bayesdb-import/xcat-gpms csv)
+                (bayesdb-import/xcat-gpms rows)
                 (first)))
 
   (crosscat/xcat->mmix xcat))
 
+
+(comment
+ (def csv (csv/read-csv (slurp "raw-data/data.csv")))
+ (def model "raw-data/models/model-t-0010.json")
+
+ (def bayesdb-dump (#(json/read-str (slurp %)) model))
+
+ (def schema (get-schema bayesdb-dump))
+
+ (def rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
+ (def rows (take 11 rows))
+
+ (def xcat (-> bayesdb-dump
+               (bayesdb-import/xcat-gpms rows)
+               (first)))
+
+ (crosscat/xcat->mmix xcat))
 
 
