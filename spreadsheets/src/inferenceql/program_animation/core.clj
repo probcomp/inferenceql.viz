@@ -37,13 +37,12 @@
                   "nominal" :categorical}
         iql-types (map iql-type (vals bdb-types))]
     (zipmap columns iql-types)))
-(def schema (get-schema (first bayesdb-dumps)))
 
-;; Not needed
+(def schema (get-schema (first bayesdb-dumps)))
 (def rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
 
 (def programs (->> bayesdb-dumps
-                   (map #(bayesdb-import/xcat-gpms % csv))
+                   (map #(bayesdb-import/xcat-gpms % rows))
                    (map first)
                    (map crosscat/xcat->mmix)
                    (map #(render (:js-model-template config) (multimix/template-data %)))))
