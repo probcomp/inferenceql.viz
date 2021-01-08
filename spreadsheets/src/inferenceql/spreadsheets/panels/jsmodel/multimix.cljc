@@ -2,7 +2,8 @@
   "Functions for transforming a multimix model spec into template data for passing to
   a mustache template that displays a javascript representation of the model spec."
   (:require [clojure.string :as str]
-            [medley.core :as medley]))
+            [medley.core :as medley]
+            [clojure.pprint :refer [pprint]]))
 
 (def range-1
   "Infinite list of natural numbers."
@@ -19,12 +20,16 @@
   "Returns a map of categorical cols and their values given a multimix `spec`.
   The map returned maps from col name to a sequence of col values for that category."
   [spec]
-  (let [first-cluster (get-in spec [:views 0 0 :parameters])
+  (let [first-clusters (map first (get-in spec [:views])) ; The first cluster in every view.
+
+        ;; Hodge-podge of parameter values from multiple clusters. Used just to extract
+        ;; possible values for categorical variables.
+        all-cols (apply merge (map :parameters first-clusters))
         categorical-cols (keys (medley/filter-vals #(= % :categorical)
                                                    (get-in spec [:vars])))]
     (into {}
       (for [col categorical-cols]
-        (let [cat-values (keys (get first-cluster col))]
+        (let [cat-values (keys (get all-cols col))]
           [col cat-values])))))
 
 (defn categories-section
