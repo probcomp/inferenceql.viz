@@ -18,8 +18,8 @@
             [me.raynes.fs :as fs]
             [clojure.pprint :refer [pprint]]))
 
-(def low-index 27)
-(def high-index 29)
+(def low-index 10)
+(def high-index 100)
 
 (def csv (csv/read-csv (slurp "raw-data/data.csv")))
 (def model-dir "raw-data/models/")
@@ -88,9 +88,9 @@
                     (map first)))
 
 ;; Dumping out the Xcat records to .edn files to inspect by hand.
-(for [[i program] (map vector [27 28] xcat-recs)]
-  (let [program-nice (with-out-str (pprint (into {} program)))]
-    (spit (str "program_" i ".edn") program-nice)))
+#_(for [[i program] (map vector [27 28] xcat-recs)]
+    (let [program-nice (with-out-str (pprint (into {} program)))]
+      (spit (str "program_" i ".edn") program-nice)))
 
 ;; Model 27 converts to multi mix just fine.
 (crosscat/xcat->mmix (first xcat-recs))
