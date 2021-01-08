@@ -93,9 +93,16 @@
         views (get-in spec [:views])]
     (for [[view-num view] (map vector range-1 views)]
       {:num view-num
-       :cluster-probs (str/join ", " (map (comp #(format "%.2f" %)
-                                                :probability)
-                                          view))
+       :cluster-probs (let [weight-strings (map (comp #(format "%.2f" %) :probability)
+                                                view)
+
+                            num-not-included (- (count weight-strings) 3)
+                            rem-string (when (pos? num-not-included)
+                                         (format "/* and %s other values... */ " num-not-included))
+
+                            weight-strings (cond-> (take 3 weight-strings)
+                                             rem-string (concat [rem-string]))]
+                        (str/join ", " weight-strings))
        :clusters (for [[cluster-num cluster] (map vector range-1 view)]
                    {:first (= cluster-num 1)
                     :num cluster-num
