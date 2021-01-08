@@ -17,8 +17,8 @@
             [clojure.java.shell :refer [sh]]
             [me.raynes.fs :as fs]))
 
-(def low-index 10)
-(def high-index 20)
+(def low-index 28)
+(def high-index 29)
 
 (def csv (csv/read-csv (slurp "raw-data/data.csv")))
 (def model-dir "raw-data/models/")
@@ -77,3 +77,22 @@
     (println "Resizing jpegs.")
     (sh "mogrify" "-gravity" "NorthWest" "-extent" max-size "-background" "white"
         "-border" "20x20" "-bordercolor" "white" "-colorspace" "RGB" file-name-wildcard)))
+
+
+;-------------------------
+
+(def program (->> bayesdb-dumps
+                  (map #(bayesdb-import/xcat-gpms % csv))
+                  (map first)
+                  (first)))
+
+(crosscat/xcat->mmix program)
+
+*e
+
+
+
+
+
+
+
