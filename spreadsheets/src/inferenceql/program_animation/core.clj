@@ -93,13 +93,26 @@
       (spit (str "program_" i ".edn") program-nice)))
 
 ;; Model 27 converts to multi mix just fine.
-(crosscat/xcat->mmix (first xcat-recs))
+#_(crosscat/xcat->mmix (first xcat-recs))
 
 ;; Model 28 fails however.
 #_(crosscat/xcat->mmix (second xcat-recs))
 
+;;-------------------------
 
+;; Trying original model.
 
+(comment
+  (def csv (csv/read-csv (slurp "raw-data-2/data.csv")))
+  (def model "raw-data-2/data_models.json")
+
+  (def bayesdb-dump (#(json/read-str (slurp %)) model))
+
+  (def xcat (-> bayesdb-dump
+                (bayesdb-import/xcat-gpms csv)
+                (first)))
+
+  (crosscat/xcat->mmix xcat))
 
 
 
