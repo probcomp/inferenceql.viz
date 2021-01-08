@@ -15,9 +15,10 @@
             [clojure.edn :as edn]
             [clygments.core :as clygments]
             [clojure.java.shell :refer [sh]]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [clojure.pprint :refer [pprint]]))
 
-(def low-index 28)
+(def low-index 27)
 (def high-index 29)
 
 (def csv (csv/read-csv (slurp "raw-data/data.csv")))
@@ -81,15 +82,21 @@
 
 ;-------------------------
 
-(def program (->> bayesdb-dumps
-                  (map #(bayesdb-import/xcat-gpms % csv))
-                  (map first)
-                  (first)))
+;; Holds two XCat records. One from model 27 and one from model 28.
+(def xcat-recs (->> bayesdb-dumps
+                    (map #(bayesdb-import/xcat-gpms % csv))
+                    (map first)))
 
-(crosscat/xcat->mmix program)
+;; Dumping out the Xcat records to .edn files to inspect by hand.
+(for [[i program] (map vector [27 28] xcat-recs)]
+  (let [program-nice (with-out-str (pprint (into {} program)))]
+    (spit (str "program_" i ".edn") program-nice)))
 
-*e
+;; Model 27 converts to multi mix just fine.
+(crosscat/xcat->mmix (first xcat-recs))
 
+;; Model 28 fails however.
+#_(crosscat/xcat->mmix (second xcat-recs))
 
 
 
