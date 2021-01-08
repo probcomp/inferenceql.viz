@@ -21,7 +21,7 @@
         clygments {:mvn/version "2.0.1"}
         me.raynes/fs {:mvn/version "1.4.6"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "02ab23757d96b3de7d579f1249c7d120e316ddbe"}
+                                        :sha "f3dcee470a913db8ef7c3679d6fb63a5e0818730"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "34efe84636cc99455201ea1985cd359a595ac968"}
         probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
