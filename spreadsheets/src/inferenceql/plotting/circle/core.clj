@@ -53,7 +53,7 @@
         jpeg-filename (format "%s/%s.jpg" jpeg-dir filename-base)]
     (spit spec-filename (json/write-str spec))
     (sh "vg2png" spec-filename png-filename)
-    (sh "magick" "convert" png-filename
+    (sh "convert" png-filename
         "-background" "white" "-flatten" "-alpha" "off" "-quality" "100"
         jpeg-filename)))
 
