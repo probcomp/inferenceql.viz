@@ -12,6 +12,7 @@
         reagent {:mvn/version "0.8.1"}
         re-frame {:mvn/version "0.10.7"}
         reagent-forms {:mvn/version "0.5.43"}
+        me.raynes/fs {:mvn/version "1.4.6"}
         day8.re-frame/http-fx {:mvn/version "v0.2.0"}
         cljs-ajax {:mvn/version "0.8.0"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
