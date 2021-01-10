@@ -30,7 +30,8 @@
          "search-by-example/test"
          "spreadsheets/src"
          "spreadsheets/resources"]
- :aliases {:test {:extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
+ :aliases {:make-circle-viz-images {:main-opts ["-m" "inferenceql.plotting.circle.core"]}
+           :test {:extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
                                lambdaisland/kaocha {:mvn/version "0.0-529"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-40"}
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}

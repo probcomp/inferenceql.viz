@@ -4,44 +4,57 @@
             [clojure.data.csv :as csv]
             [clojure.data.json :as json]
             [clojure.java.shell :refer [sh]]
-            [me.raynes.fs :as fs]))
+            [clojure.java.io :as io]
+            [me.raynes.fs :as fs]
+            [clojure.string :as str]))
 
-;; TODO: read all the files in the raw-data folder.
+(def data-dir "raw-data")
+(def data-filenames (mapv str (filter #(.isFile %) (file-seq (clojure.java.io/file data-dir)))))
 
-(def edges (-> (slurp "raw-data/edges.txt")
-               (csv/read-csv)))
+(def spec-dir "output/vega-specs")
+(def png-dir "output/images-png")
+(def jpeg-dir "output/images-jpeg")
 
-(def node-names (->> edges
-                     (flatten)
-                     (distinct)
-                     (map keyword)))
-(def tree (circle/tree node-names))
+;-----------------------------------
 
-(def edges-clean
-  (let [edges (for [edge edges]
-                (set (map keyword edge)))]
-    (->> edges
-         (remove #(= (count %) 1))
-         (distinct))))
+(defn circle-viz-spec [filename]
+  (let [edges (-> (slurp filename)
+                  (csv/read-csv))
 
-(def dependencies
-  (let [tree (remove (comp #(= % -1) :id) tree) ;; Remove the root node.
-        col-ids (zipmap (map :name tree) (map :id tree))
-        proto-dependencies (for [[node-1 node-2] (map seq edges-clean)]
-                             {:source-id (get col-ids node-1)
-                              :target-id (get col-ids node-2)
-                              :source-name node-1
-                              :target-name node-2
-                              :edge-val nil})]
-    (circle/dependencies proto-dependencies)))
+        node-names (->> edges
+                        (flatten)
+                        (distinct)
+                        (map keyword))
+        tree (circle/tree node-names)
 
-(def spec (circle/spec tree dependencies 360 0))
+        edges-clean (let [edges (for [edge edges]
+                                  (set (map keyword edge)))]
+                      (->> edges
+                           (remove #(= (count %) 1))
+                           (distinct)))
 
-(spit "output/vega-specs/edges.vg.json" (json/write-str spec))
+        dependencies (let [tree (remove (comp #(= % -1) :id) tree) ;; Remove the root node.
+                           col-ids (zipmap (map :name tree) (map :id tree))
+                           proto-dependencies (for [[node-1 node-2] (map seq edges-clean)]
+                                                {:source-id (get col-ids node-1)
+                                                 :target-id (get col-ids node-2)
+                                                 :source-name node-1
+                                                 :target-name node-2
+                                                 :edge-val nil})]
+                       (circle/dependencies proto-dependencies))]
+    (circle/spec tree dependencies 360 0)))
 
-(sh "vg2png" "output/vega-specs/edges.vg.json" "output/images-png/edges.png")
+(defn make-jpeg-image [spec filename-base]
+  (let [spec-filename (format "%s/%s.vg.json" spec-dir filename-base)
+        png-filename (format "%s/%s.png" png-dir filename-base)
+        jpeg-filename (format "%s/%s.jpg" jpeg-dir filename-base)]
+    (spit spec-filename (json/write-str spec))
+    (sh "vg2png" spec-filename png-filename)
+    (sh "magick" "convert" png-filename
+        "-background" "white" "-flatten" "-alpha" "off" "-quality" "100"
+        jpeg-filename)))
 
-(defn clear-output-dirs []
+(defn clean-output-dirs []
   (let [output-dirs ["output/images-png/" "output/images-jpeg" "output/vega-specs"]]
     (doseq [dir output-dirs]
       ;; Delete dirs if the exist.
@@ -50,4 +63,14 @@
       (fs/mkdirs dir))))
 
 (defn -main []
-  (clear-output))
+  (clean-output-dirs)
+  (doseq [filename data-filenames]
+    (println (str "converting: " filename))
+    (let [spec (circle-viz-spec filename)
+          filename-base (-> (.getName (io/file filename))
+                            (str/split #"\.")
+                            (first))]
+      (make-jpeg-image spec filename-base)))
+  ;; Deals with program hanging due to futures.
+  ;; https://clojuredocs.org/clojure.java.shell/sh
+  (System/exit 0))
