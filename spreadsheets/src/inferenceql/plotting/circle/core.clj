@@ -8,8 +8,10 @@
             [me.raynes.fs :as fs]
             [clojure.string :as str]))
 
-(def data-dir "raw-data")
-(def data-filenames (mapv str (filter #(.isFile %) (file-seq (clojure.java.io/file data-dir)))))
+(def nodes-dir "raw-data/nodes")
+(def edges-dir "raw-data/edges")
+
+(def nodes-filenames (mapv str (filter #(.isFile %) (file-seq (clojure.java.io/file nodes-dir)))))
 
 (def spec-dir "output/vega-specs")
 (def png-dir "output/images-png")
@@ -17,15 +19,18 @@
 
 ;-----------------------------------
 
-(defn circle-viz-spec [filename]
-  (let [edges (-> (slurp filename)
-                  (csv/read-csv))
-
-        node-names (->> edges
-                        (flatten)
+(defn circle-viz-spec [nodes-filename filename-base]
+  (println nodes-filename)
+  (let [node-names (->> (slurp nodes-filename)
+                        (str/split-lines)
                         (distinct)
                         (map keyword))
+        _ (println node-names)
         tree (circle/tree node-names)
+
+        edges-filename (format "%s/%s.edges.txt" edges-dir filename-base)
+        edges (-> (slurp edges-filename)
+                  (csv/read-csv))
 
         edges-clean (let [edges (for [edge edges]
                                   (set (map keyword edge)))]
@@ -64,13 +69,14 @@
 
 (defn -main []
   (clean-output-dirs)
-  (doseq [filename data-filenames]
-    (println (str "converting: " filename))
-    (let [spec (circle-viz-spec filename)
-          filename-base (-> (.getName (io/file filename))
+  (doseq [filename nodes-filenames]
+    (let [filename-base (-> (.getName (io/file filename))
                             (str/split #"\.")
                             (first))]
-      (make-jpeg-image spec filename-base)))
+      (println (str "converting: " filename-base))
+
+      (let [spec (circle-viz-spec filename filename-base)]
+        (make-jpeg-image spec filename-base))))
   ;; Deals with program hanging due to futures.
   ;; https://clojuredocs.org/clojure.java.shell/sh
   (System/exit 0))
