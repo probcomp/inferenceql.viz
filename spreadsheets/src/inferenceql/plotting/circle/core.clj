@@ -20,12 +20,10 @@
 ;-----------------------------------
 
 (defn circle-viz-spec [nodes-filename filename-base]
-  (println nodes-filename)
   (let [node-names (->> (slurp nodes-filename)
                         (str/split-lines)
                         (distinct)
                         (map keyword))
-        _ (println node-names)
         tree (circle/tree node-names)
 
         edges-filename (format "%s/%s.edges.txt" edges-dir filename-base)
