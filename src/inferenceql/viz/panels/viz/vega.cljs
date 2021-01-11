@@ -73,9 +73,6 @@
     (cond (probability-column? col-name)
           "quantitative"
 
-          (contains? #{hot/label-col-header} col-name)
-          "nominal"
-
           :else
           ;; Mapping from multi-mix stat-types to vega-lite data-types.
           (let [mapping {:gaussian "quantitative"
