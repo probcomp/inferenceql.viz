@@ -8,8 +8,7 @@
 (s/def ::table-panel (s/keys :req-un [::selection-layer-coords
                                       ::show-label-column]
                              :opt-un [::physical-data
-                                      ::visual-headers
-                                      ::visual-rows
+                                      ::visual-state
                                       ::hot-instance]))
 
 ;;; Specs related to table data.
@@ -26,8 +25,7 @@
 (s/def ::rows-by-id (s/map-of ::rowid ::row-with-id))
 (s/def ::physical-data (s/keys :opt-un [::headers ::row-order ::rows-by-id]))
 
-(s/def ::visual-rows (s/coll-of ::row :kind vector?))
-(s/def ::visual-headers (s/coll-of ::header :kind vector?))
+(s/def ::visual-state (s/keys :opt-un [::headers ::row-order]))
 (s/def ::show-label-column boolean?)
 
 ;;; Specs related to selections within handsontable instances.
@@ -54,17 +52,17 @@
   [db]
   (get-in db [:table-panel :physical-data  :headers]))
 
+(defn physical-row-order
+  [db]
+  (get-in db [:table-panel :physical-data  :row-order]))
+
 (defn physical-rows
   [db]
-  (let [row-order (get-in db [:table-panel :physical-data :row-order])
+  (let [row-order (physical-row-order db)
         rows-by-id (get-in db [:table-panel :physical-data :rows-by-id])]
     (map rows-by-id row-order)))
 
-(defn visual-headers
+(defn visual-row-order
   [db]
-  (get-in db [:table-panel :visual-headers]))
-
-(defn visual-rows
-  [db]
-  (get-in db [:table-panel :visual-rows]))
+  (get-in db [:table-panel :visual-state :row-order]))
 

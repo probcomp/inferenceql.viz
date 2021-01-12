@@ -47,7 +47,7 @@
  event-interceptors
  (fn [{:keys [db]} [_]]
    (let [new-db (-> db
-                    (update-in [:table-panel] dissoc :physical-data)
+                    (update-in [:table-panel] dissoc :physical-data :visual-state)
                     (assoc-in [:table-panel :selection-layer-coords] {}))]
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))
@@ -61,7 +61,7 @@
    (let [color (control-db/selection-color db)
          selections-coords (get-in db [:table-panel :selection-layer-coords color])
 
-         num-rows (count (db/visual-rows db))
+         num-rows (count (db/visual-row-order db))
          ;; Takes a selection vector and returns true if that selection represents
          ;; the selection of a single column.
          column-selected (fn [[row-start col-start row-end col-end]]

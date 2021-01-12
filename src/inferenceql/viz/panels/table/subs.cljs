@@ -108,13 +108,25 @@
 
 ;;; Subs related to visual state of the table
 
-(rf/reg-sub :table/visual-headers
+(rf/reg-sub :table/visual-state
             (fn [db _]
-              (get-in db [:table-panel :visual-headers])))
+              (get-in db [:table-panel :visual-state])))
+
+(rf/reg-sub :table/visual-headers
+            :<- [:table/visual-state]
+            (fn [visual-state]
+              (get visual-state :headers)))
+
+(rf/reg-sub :table/visual-row-order
+            :<- [:table/visual-state]
+            (fn [visual-state]
+              (get visual-state :row-order)))
 
 (rf/reg-sub :table/visual-rows
-            (fn [db _]
-              (get-in db [:table-panel :visual-rows])))
+            :<- [:table/visual-row-order]
+            :<- [:table/physical-rows-by-id]
+            (fn [[row-order rows-by-id]]
+              (mapv rows-by-id row-order)))
 
 (rf/reg-sub :table/selected-row-flags
             :<- [:table/physical-rows]
