@@ -15,7 +15,10 @@
 
 (s/def ::header keyword?)
 (s/def ::row (s/map-of ::header any?))
-(s/def ::rows (s/coll-of ::row :kind vector?))
+(s/def ::rowid integer?)
+(s/def ::row-with-id (s/merge ::row (s/keys :req-un [::rowid])))
+
+(s/def ::rows (s/coll-of ::row-with-id :kind vector?))
 (s/def ::headers (s/coll-of ::header :kind vector?))
 (s/def ::visual-rows (s/coll-of ::row :kind vector?))
 (s/def ::visual-headers (s/coll-of ::header :kind vector?))

@@ -125,17 +125,31 @@
             :<- [:table/selected-row-flags]
             cells)
 
+(defn row-headers
+  "Returns a function to be used as the rowHeaders option in Handsontable.
+  To be used as a re-frame subscription."
+  [hot]
+  (fn [row-physical-index]
+    (let [v-row (.toVisualRow hot row-physical-index)]
+      (.getDataAtRowProp hot v-row (name :rowid)))))
+
+(rf/reg-sub :table/row-headers
+            :<- [:table/hot-instance]
+            row-headers)
+
 (defn ^:sub real-hot-props
-  [[headers rows context-menu cells selection-coords-active]]
+  [[table-headers row-headers rows context-menu cells selection-coords-active]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
-      (assoc-in [:settings :colHeaders] (display-headers headers))
-      (assoc-in [:settings :columns] (column-settings headers))
+      (assoc-in [:settings :colHeaders] (display-headers table-headers))
+      (assoc-in [:settings :columns] (column-settings table-headers))
+      (assoc-in [:settings :rowHeaders] row-headers)
       (assoc-in [:settings :cells] cells)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:selections-coords] selection-coords-active)))
 (rf/reg-sub :table/real-hot-props
             :<- [:table/table-headers]
+            :<- [:table/row-headers]
             :<- [:table/table-rows]
             :<- [:table/context-menu]
             :<- [:table/cells]

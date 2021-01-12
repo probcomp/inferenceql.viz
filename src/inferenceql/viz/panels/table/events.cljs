@@ -13,11 +13,14 @@
 
   Args:
     `rows`: A collection of maps to be set as rows in the table.
-    `headers`: The attributes of the maps in `rows` to display in the table."
+    `headers`: The attributes of the maps in `rows` to display in the table. :rowid must be among
+      these attributes as it will be used as the row ids in Handsontable."
   [{:keys [db]} [_ rows headers]]
   (let [new-db (-> db
                    (assoc-in [:table-panel :rows] (vec rows))
-                   (assoc-in [:table-panel :headers] (vec headers))
+                   ;; :rowid should not be displayed in the table. Instead it extracted
+                   ;; from the rows using the Handsontable rowHeaders function.
+                   (assoc-in [:table-panel :headers] (vec (remove #{:rowid} headers)))
                    ;; Clear all selections in all selection layers.
                    (assoc-in [:table-panel :selection-layer-coords] {}))]
     {:db new-db
