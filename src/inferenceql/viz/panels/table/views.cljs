@@ -4,12 +4,52 @@
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]
-            [inferenceql.viz.panels.table.selections :as selections]))
+            [inferenceql.viz.panels.table.selections :as selections]
+            [medley.core :refer [filter-kv]]))
+
+(defn- sort-state-applicable
+  "Determines whether `sort-config` can be applied to the columns.
+
+  This simply checks column numbers referenced `sort-config` are applicable to the number for
+  `columns` present.
+
+  Args:
+    columns: A vector of column names.
+    sort-config: (js-object) A sort config returned by Handsontable.
+  Returns:
+    A boolean if `sort-config` is applicable."
+  [columns sort-config]
+  (let [col-nums-refed (map :column (js->clj sort-config :keywordize-keys true))
+        num-cols (count columns)]
+    (every? #(< % num-cols) col-nums-refed)))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
-  [hot-instance new-settings]
-  (.updateSettings hot-instance new-settings false))
+  [hot-instance new-settings current-selection]
+  (let [;; Stores whether settings that determine the data displayed have changed.
+        table-changed (some new-settings [:data :colHeaders])
+        sorting-plugin (.getPlugin hot-instance "multiColumnSorting")
+        sort-config (.getSortConfig sorting-plugin)]
+
+    (when table-changed
+      (.deselectCell hot-instance))
+
+    ;; When data is the only updated setting, use a different, potentially faster update function.
+    (if (= (keys new-settings) [:data])
+      (.loadData hot-instance (clj->js (:data new-settings)))
+      (.updateSettings hot-instance (clj->js new-settings)))
+
+    (when table-changed
+      ;; Maintain the same sort order as before the update.
+      ;; If colHeaders hasn't changed, we can apply the previous sort state.
+      ;; Or if the sort-state is applicable to the current columns, we can as well.
+      (when (or (nil? (:colHeaders new-settings))
+                (sort-state-applicable (:colHeaders new-settings) sort-config))
+        (.sort sorting-plugin sort-config))
+
+      ;; Reapply selections present before the update.
+      (when-let [coords (clj->js current-selection)]
+        (.selectCells hot-instance coords false)))))
 
 (defn handsontable
   ([attributes props]
@@ -44,33 +84,20 @@
 
        :component-did-update
        (fn [this old-argv]
-         (let [[_ old-attributes old-props] old-argv
-               [_ new-attributes new-props] (reagent/argv this)]
-           (when (not= (:settings old-props) (:settings new-props))
-             (let [sorting-plugin (.getPlugin @hot-instance "multiColumnSorting")
-                   sort-config (.getSortConfig sorting-plugin)
+         (let [[_ _old-attributes old-props] old-argv
+               [_ _new-attributes new-props] (reagent/argv this)
 
-                   dataset-empty (and (empty? (get-in new-props [:settings :data]))
-                                      (empty? (get-in new-props [:settings :colHeaders])))
-                   dataset-size-changed (or (not= (count (get-in new-props [:settings :data]))
-                                                  (count (get-in old-props [:settings :data])))
-                                            (not= (count (get-in new-props [:settings :colHeaders]))
-                                                  (count (get-in old-props [:settings :colHeaders]))))]
+               old-settings (:settings old-props)
+               new-settings (:settings new-props)
+               changed-settings (filter-kv (fn [setting-key new-val]
+                                             (not= (get old-settings setting-key) new-val))
+                                           new-settings)]
 
-               (when (or dataset-empty dataset-size-changed)
-                 (.deselectCell @hot-instance))
+           ;; Update settings.
+           (when (seq changed-settings)
+             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))
 
-               (update-hot! @hot-instance (clj->js (:settings new-props)))
-
-               ;; Maintain the same sort order as before the update
-               (.sort sorting-plugin sort-config)
-
-               ;; If we cleared selections because of a dataset-size change, apply the latest
-               ;; selection state from props.
-               (when dataset-size-changed
-                 (when-let [coords (clj->js (:selections-coords new-props))]
-                   (.selectCells @hot-instance coords false)))))
-
+           ;; Update selections.
            (let [current-selection (selections/normalize
                                     (js->clj (.getSelected @hot-instance)))]
              (when (and (not= (:selections-coords new-props) current-selection)
