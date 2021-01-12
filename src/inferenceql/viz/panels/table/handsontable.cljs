@@ -31,7 +31,8 @@
 
 ;; These keywords refer to events in inferenceql.viz.panels.table.events.
 (def real-hot-hooks [:hot/after-selection-end :hot/after-on-cell-mouse-down
-                     :hot/after-column-move :hot/after-column-sort :hot/after-filter])
+                     :hot/after-column-move :hot/after-column-sort :hot/after-filter
+                     :hot/before-change])
 
 (def real-hot-settings (-> default-hot-settings
                            (assoc-in [:hooks] real-hot-hooks)

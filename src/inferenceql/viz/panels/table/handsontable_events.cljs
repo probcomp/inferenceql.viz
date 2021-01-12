@@ -70,3 +70,28 @@
  event-interceptors
  (fn [db [_ hot _id _conditions-stack]]
    (assoc-visual-row-order db hot)))
+
+(defn valid-source?
+  [source]
+  ;; Changes should only be the result of user edits, copy paste, or drag and autofill.
+  ;; This should be enforced by Hansontable settings.
+  (let [valid-change-sources #{"edit" "CopyPaste.paste" "Autofill.fill"}]
+    (some? (valid-change-sources source))))
+
+(rf/reg-event-db
+  :hot/before-change
+  event-interceptors
+  (fn [db [_ hot id changes source]]
+    (assert (valid-source? source))
+    (let [updates (reduce (fn [acc change]
+                            (let [[row col _prev-val new-val] change
+                                  row-id (get (table-db/visual-row-order db) row)
+                                  col (keyword col)]
+                              ;; Changes should only occur in the label column.
+                              (assert (= col :label))
+                              (assoc-in acc [row-id col] new-val)))
+                          {}
+                          changes)
+          merge-op (fnil (partial merge-with merge) {} {})]
+      ;; Stage the changes in the db. The Handsontable itself already has the updates.
+      (update-in db [:table-panel :changes :existing] merge-op updates))))
