@@ -60,14 +60,30 @@
 
 ;;; Subs related to populating tables with data.
 
-(rf/reg-sub :table/table-headers
+(rf/reg-sub :table/physical-data
             (fn [db _]
-              (db/table-headers db)))
+              (get-in db [:table-panel :physical-data])))
 
-(defn table-rows
-  [db _]
-  (db/table-rows db))
-(rf/reg-sub :table/table-rows table-rows)
+(rf/reg-sub :table/physical-headers
+            :<- [:table/physical-data]
+            (fn [physical-data]
+              (get physical-data :headers)))
+
+(rf/reg-sub :table/physical-row-order
+            :<- [:table/physical-data]
+            (fn [physical-data]
+              (get physical-data :row-order)))
+
+(rf/reg-sub :table/physical-rows-by-id
+            :<- [:table/physical-data]
+            (fn [physical-data]
+              (get physical-data :rows-by-id)))
+
+(rf/reg-sub :table/physical-rows
+            :<- [:table/physical-row-order]
+            :<- [:table/physical-rows-by-id]
+            (fn [[row-order rows-by-id]]
+              (mapv rows-by-id row-order)))
 
 (defn- display-headers
   "Returns an sequence of strings for column name headers to display.
@@ -101,7 +117,7 @@
               (get-in db [:table-panel :visual-rows])))
 
 (rf/reg-sub :table/selected-row-flags
-            :<- [:table/table-rows]
+            :<- [:table/physical-rows]
             :<- [:viz/pts-store-filter]
             (fn [[rows pts-store-filter]]
               (when pts-store-filter
@@ -119,7 +135,7 @@
     "hidden"))
 
 (rf/reg-sub :table/show-table-controls
-            :<- [:table/table-rows]
+            :<- [:table/physical-rows]
             show-table-controls)
 
 (rf/reg-sub :table/show-label-column
@@ -180,9 +196,9 @@
       (assoc-in [:settings :hiddenColumns] hidden-columns)
       (assoc-in [:selections-coords] selection-coords-active)))
 (rf/reg-sub :table/real-hot-props
-            :<- [:table/table-headers]
+            :<- [:table/physical-headers]
             :<- [:table/row-headers]
-            :<- [:table/table-rows]
+            :<- [:table/physical-rows]
             :<- [:table/context-menu]
             :<- [:table/cells]
             :<- [:table/hidden-columns]
@@ -193,7 +209,7 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/table-headers])})
+    :col-names (rf/subscribe [:table/physical-headers])})
  (fn [{:keys [col-overrides col-names]}]
    (let [set-function-fn (fn [key selection click-event]
                            (this-as hot
@@ -245,7 +261,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/table-headers])})
+    :computed-headers (rf/subscribe [:table/physical-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode

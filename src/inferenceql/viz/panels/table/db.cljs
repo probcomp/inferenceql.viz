@@ -7,8 +7,7 @@
 
 (s/def ::table-panel (s/keys :req-un [::selection-layer-coords
                                       ::show-label-column]
-                             :opt-un [::headers
-                                      ::rows
+                             :opt-un [::physical-data
                                       ::visual-headers
                                       ::visual-rows
                                       ::hot-instance]))
@@ -22,6 +21,11 @@
 
 (s/def ::rows (s/coll-of ::row-with-id :kind vector?))
 (s/def ::headers (s/coll-of ::header :kind vector?))
+
+(s/def ::row-order (s/coll-of ::rowid :kind vector?))
+(s/def ::rows-by-id (s/map-of ::rowid ::row-with-id))
+(s/def ::physical-data (s/keys :opt-un [::headers ::row-order ::rows-by-id]))
+
 (s/def ::visual-rows (s/coll-of ::row :kind vector?))
 (s/def ::visual-headers (s/coll-of ::header :kind vector?))
 (s/def ::show-label-column boolean?)
@@ -46,13 +50,15 @@
 
 ;;; Accessor functions to portions of the table-panel db.
 
-(defn table-headers
+(defn physical-headers
   [db]
-  (get-in db [:table-panel :headers]))
+  (get-in db [:table-panel :physical-data  :headers]))
 
-(defn table-rows
+(defn physical-rows
   [db]
-  (get-in db [:table-panel :rows] []))
+  (let [row-order (get-in db [:table-panel :physical-data :row-order])
+        rows-by-id (get-in db [:table-panel :physical-data :rows-by-id])]
+    (map rows-by-id row-order)))
 
 (defn visual-headers
   [db]

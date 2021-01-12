@@ -5,7 +5,8 @@
             [inferenceql.viz.panels.table.db :as db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.util :as util]))
+            [inferenceql.viz.util :as util]
+            [medley.core :as medley]))
 
 (defn set
   "Sets data in the table.
@@ -16,7 +17,10 @@
     `headers`: The attributes of the maps in `rows` to display in the table. :rowid must be among
       these attributes as it will be used as the row ids in Handsontable."
   [{:keys [db]} [_ rows headers]]
-  (let [headers (->> headers
+  (let [row-order (mapv :rowid rows)
+        rows-by-id (medley/index-by :rowid rows)
+
+        headers (->> headers
                      ;; :rowid should not be displayed in the table. Instead it extracted
                      ;; from the rows using the Handsontable rowHeaders function.
                      (remove #{:rowid})
@@ -25,8 +29,9 @@
                      (into [:label]))
 
         new-db (-> db
-                   (assoc-in [:table-panel :rows] (vec rows))
-                   (assoc-in [:table-panel :headers] headers)
+                   (assoc-in [:table-panel :physical-data :row-order] row-order)
+                   (assoc-in [:table-panel :physical-data :rows-by-id] rows-by-id)
+                   (assoc-in [:table-panel :physical-data :headers] headers)
                    ;; Clear all selections in all selection layers.
                    (assoc-in [:table-panel :selection-layer-coords] {}))]
     {:db new-db
@@ -42,7 +47,7 @@
  event-interceptors
  (fn [{:keys [db]} [_]]
    (let [new-db (-> db
-                    (update-in [:table-panel] dissoc :rows :headers)
+                    (update-in [:table-panel] dissoc :physical-data)
                     (assoc-in [:table-panel :selection-layer-coords] {}))]
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))
