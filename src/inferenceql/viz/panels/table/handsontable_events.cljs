@@ -101,10 +101,10 @@
             {}
             merged-rows)))
 
-(rf/reg-event-db
+(rf/reg-event-fx
   :hot/before-change
   event-interceptors
-  (fn [db [_ hot id changes source]]
+  (fn [{:keys [db]} [_ hot id changes source]]
     (assert (valid-source? source))
     (let [updates (reduce (fn [acc change]
                             (let [[row col _prev-val new-val] change
@@ -114,6 +114,9 @@
                               (assert (= col :label))
                               (assoc-in acc [row-id col] new-val)))
                           {}
-                          changes)]
+                          changes)
+          merged-updates (merge-row-updates (get-in db [:table-panel :changes :existing])
+                                            updates)]
       ;; Stage the changes in the db. The Handsontable itself already has the updates.
-      (update-in db [:table-panel :changes :existing] merge-row-updates updates))))
+      {:db (assoc-in db [:table-panel :changes :existing] merged-updates)
+       :fx [[:dispatch [:control/update-query-string merged-updates]]]})))

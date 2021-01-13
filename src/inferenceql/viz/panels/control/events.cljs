@@ -74,3 +74,13 @@
  event-interceptors
  (fn [db [_ value]]
    (assoc-in db [:control-panel :selection-color] value)))
+
+(defn query-string-with-changes
+  [query-string changes]
+  "")
+
+(rf/reg-event-db
+  :control/update-query-string
+  event-interceptors
+  (fn [db [_ changes-existing]]
+    (update-in db [:control-panel :query-string] query-string-with-changes changes-existing)))

@@ -135,6 +135,12 @@
               (when pts-store-filter
                 (map pts-store-filter rows))))
 
+;;; Subs related to changes in the table data.
+
+(rf/reg-sub :table/changes-existing
+            (fn [db _]
+              (get-in db [:table-panel :changes :existing])))
+
 ;;; Subs related showing/hiding certain columns or table controls.
 
 (defn show-table-controls
