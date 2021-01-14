@@ -1,7 +1,6 @@
 (ns inferenceql.viz.panels.jsmodel.subs
   (:require [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
-            [inferenceql.viz.model :as model]
             [inferenceql.viz.panels.jsmodel.multimix :as multimix]
             [inferenceql.inference.gpm.crosscat :as crosscat]
             [re-frame.core :as rf]))

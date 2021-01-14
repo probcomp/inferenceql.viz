@@ -2,7 +2,6 @@
   "Code related to generating vega-lite specs"
   (:require [clojure.walk :as walk]
             [clojure.string :as string]
-            [inferenceql.viz.model :as model]
             [inferenceql.viz.panels.table.handsontable :as hot]
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.config :as config]
