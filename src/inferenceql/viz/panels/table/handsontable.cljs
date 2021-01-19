@@ -1,5 +1,16 @@
 (ns inferenceql.viz.panels.table.handsontable)
 
+(defn freeze-label-col-pos
+  "Keeps the position of the label column fixed in the table.
+  The label column is meant to always be in the 0-th position.
+  This function is intended to be used as the value of the :beforeColumnMove setting for
+  Handsontable.
+
+  Returns: (bool) Whether to allow the column move or not."
+  [moved-columns _final-index drop-index _move-possible]
+  (and (not-any? #{0} moved-columns) ; The label column is not being moved.
+       (not= drop-index 0))) ; We are not trying to move anything in front of the label column.
+
 (def default-hot-settings
   {:settings {:data                []
               :colHeaders          []
@@ -7,6 +18,7 @@
               :rowHeaders          true
               :multiColumnSorting  true
               :manualColumnMove    true
+              :beforeColumnMove    freeze-label-col-pos
               :manualColumnResize  true
               :autoWrapCol         false
               :autoWrapRow         false
