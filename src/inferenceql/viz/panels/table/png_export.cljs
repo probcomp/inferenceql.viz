@@ -2,27 +2,54 @@
   (:require [re-frame.core :as rf]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.util :as util]))
+            [inferenceql.viz.util :as util]
+            [clojure.core.async :refer [go-loop <! put! chan]]))
 
 (defn render-table-pngs []
-  (rf/dispatch-sync [:table/set
-                     [{:foo 3 :bar 3} {:foo 4 :bar 4}]
-                     [:foo :bar]])
-  ;;(rf/dispatch-sync [:table/export-png])
-  (let [table (.querySelector js/document "#table-container")]
-    (.log js/console :foo table)
-    (doto (js/html2canvas table)
-      (.then (fn [canvas]
-               (let [save-fn (fn [blob]
-                               (js/saveAs blob "image.png"))]
-                 (.toBlob canvas save-fn))))))
+  ;; Not sure why I have to use dispatch and dispatch-sync.
+  (doseq [i (range 5)]
+    (let [filename (str "image" i ".png")
+          data (repeat i {:foo i :bar i})]
+      (rf/dispatch-sync [:table/set data [:foo :bar]])
 
- #_(fn [_ [_]]
-     (let [node (.getElementById js/document "table-container")]
-       (doto (.toPng js/domtoimage node)
-         (.then (fn [data-url]
-                  (let [img (js/Image.)]
-                    (set! (.-src img) data-url
-                           (.appendChild (.-body js/document) img)))))
-         (.catch (fn [res]))))
-     {}))
+      (let [table (.querySelector js/document "#table-container")]
+        (doto (js/html2canvas table)
+          (.then (fn [canvas]
+                   (let [save-fn (fn [blob]
+                                   (js/saveAs blob filename))]
+                     (.toBlob canvas save-fn))))))))
+
+
+(defn render-table-pngs []
+  (go-loop [idxs (range 5)]
+    (let [[i & ixs] idxs
+          filename (str "image" i ".png")
+          data (repeat i {:foo i :bar i})]
+      (rf/dispatch-sync [:table/set data [:foo :bar]])
+
+      (let [table (.querySelector js/document "#table-container")
+            canvas (<! (js/html2canvas table))
+            blob-channel (chan)] ;; fix this
+        (.toBlob canvas #(put! blob-channel %))))))
+
+(let [blob (<! blob-channel)]
+  (js/saveAs blob filename))
+
+  #_(js/setTimeout (fn []
+                     (rf/dispatch-sync [:table/export-png])
+                     (.log js/console :here2))
+                   0))
+
+(rf/reg-event-fx
+ :table/export-png
+ event-interceptors
+ (fn [{:keys [db]} [_ filename]]
+   (let [table (.querySelector js/document "#table-container")]
+     (doto (js/html2canvas table)
+       (.then (fn [canvas]
+                (let [save-fn (fn [blob]
+                                (js/saveAs blob filename))]
+                  (.toBlob canvas save-fn))))))
+   ;; noop map
+   {}))
+
