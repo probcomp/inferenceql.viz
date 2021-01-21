@@ -2,9 +2,11 @@
   "Re-frame events related to data and selections in Handsontable"
   (:refer-clojure :exclude [set])
   (:require [re-frame.core :as rf]
+            [re-frame.std-interceptors :refer [after]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.util :as util]))
+            [inferenceql.viz.util :as util]
+            [inferenceql.viz.panels.table.png-export :refer [table-set-done]]))
 
 (defn set
   "Sets data in the table.
@@ -28,7 +30,7 @@
      :dispatch [:viz/clear-pts-store]}))
 
 (rf/reg-event-fx :table/set
-                 event-interceptors
+                 (after table-set-done)
                  set)
 
 (rf/reg-event-fx

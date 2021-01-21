@@ -3,27 +3,38 @@
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.util :as util]
-            [clojure.core.async :refer [go-loop <! put! chan]]
+            [clojure.core.async :refer [go-loop go <! >! put! chan close!]]
             [cljs.core.async.interop :refer-macros [<p!]]))
+
+(defn timeout [ms]
+  (let [c (chan)]
+    (js/setTimeout (fn [] (close! c)) ms)
+    c))
+
+(def table-set (chan))
+
+(defn table-set-done []
+  (put! table-set true))
 
 (defn render-table-pngs []
   (go-loop [indicies (range 1 5)]
-    (let [[i & i-rest] indicies
-          filename (str "image" i ".png")
-          data (repeat i {:foo i :bar i})]
+    (when (seq indicies)
+      (let [[i & i-rest] indicies
+            filename (str "foo" i ".png")
+            data (repeat i {:foo i :bar i})]
 
-      (rf/dispatch-sync [:table/set data [:foo :bar]])
+        (rf/dispatch [:table/set data [:foo :bar]])
 
-      ;; TODO move this to an event??
-      ;; not sure that will work.
-      (let [table (.querySelector js/document "#table-container")
-            canvas (<p! (js/html2canvas table))
-            _ (.log js/console :canvas canvas)
-            blob-channel (chan)] ;; fix this
-        (.toBlob canvas #(put! blob-channel %))
-        (let [blob (<! blob-channel)
-              _ (.log js/console :blob blob)]
-          (js/saveAs blob filename))))))
+        (<! table-set)
+        (.render js/table)
+        (<! (timeout 500))
 
+        (let [table (.querySelector js/document "#table-container")
+              canvas (<p! (js/html2canvas table))
+              blob-channel (chan)] ;; fix this
+          (.toBlob canvas #(put! blob-channel %))
+          (let [blob (<! blob-channel)]
+            (js/saveAs blob filename)))
+        (recur i-rest)))))
 
 
