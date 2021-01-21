@@ -14,5 +14,18 @@
                  :provides ["yarn.vega-embed"]}
                 {:file "node_modules/handsontable/dist/handsontable.full.js"
                  :file-min "node_modules/handsontable/dist/handsontable.min.js"
-                 :provides ["yarn.handsontable"]}]
+                 :provides ["yarn.handsontable"]}
+                {:file "node_modules/html2canvas/dist/html2canvas.js"
+                 :file-min "node_modules/html2canvas/dist/html2canvas.min.js"
+                 :provides ["yarn.html2canvas"]}
+                {:file "node_modules/file-saver/dist/FileSaver.js"
+                 :file-min "node_modules/file-saver/dist/FileSaver.min.js"
+                 :provides ["yarn.file-saver"]}]
  :optimizations :none}
+
+
+#_{:file "node_modules/dom-to-image/src/dom-to-image.js"
+   :file-min "node_modules/dom-to-image/dist/dom-to-image.min.js"
+   :provides ["yarn.dom-to-image"]}
+#_{:file "node_modules/changedpi/dist/index.js"
+   :provides ["yarn.change-dpi"]}

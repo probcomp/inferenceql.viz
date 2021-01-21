@@ -42,7 +42,9 @@
             [inferenceql.viz.components.store.events]
             [inferenceql.viz.components.store.subs]
             ;; Library functions for user-defined JS functions.
-            [inferenceql.viz.user]))
+            [inferenceql.viz.user]
+            [yarn.html2canvas]
+            [yarn.file-saver]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)

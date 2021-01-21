@@ -77,6 +77,11 @@
                                   (rf/dispatch [:table/clear])
                                   (.blur (.-target e)))}
                     "Clear results"]
+                   [:button.toolbar-button.pure-button
+                    {:on-click (fn [e]
+                                 (rf/dispatch [:table/render-png])
+                                 (.blur (.-target e)))}
+                    "Render table PNG"]
                    [more/menu show-menu]]]]
      [:div.flex-box-space-filler-60]
      [selection-color-selector]]))
