@@ -23,12 +23,11 @@
             filename (str "foo" i ".png")
             data (repeat i {:foo i :bar i})]
 
-        (rf/dispatch [:table/set data [:foo :bar]])
+        (rf/dispatch-sync [:table/set data [:foo :bar]])
 
         (<! table-set)
-        (.render js/table)
-        (<! (timeout 500))
 
+        (.log js/console :after)
         (let [table (.querySelector js/document "#table-container")
               canvas (<p! (js/html2canvas table))
               blob-channel (chan)] ;; fix this

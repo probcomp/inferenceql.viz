@@ -4,11 +4,13 @@
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]
-            [inferenceql.viz.panels.table.selections :as selections]))
+            [inferenceql.viz.panels.table.selections :as selections]
+            [inferenceql.viz.panels.table.png-export :refer [table-set-done]]))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
   [hot-instance new-settings]
+  (.log js/console :doing-update)
   (.updateSettings hot-instance new-settings false))
 
 (defn handsontable
@@ -80,8 +82,9 @@
                  (.selectCells @hot-instance coords false)
                  ;; When coords is nil it means nothing should be selected in the table.
                  (.deselectCell @hot-instance)))))
-         (.log js/console :here)
-         (.render @hot-instance))
+         (.render @hot-instance)
+         (table-set-done)
+         (.log js/console :here))
 
        :component-will-unmount
        (fn [this]

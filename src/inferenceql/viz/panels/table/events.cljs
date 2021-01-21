@@ -5,8 +5,7 @@
             [re-frame.std-interceptors :refer [after]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.util :as util]
-            [inferenceql.viz.panels.table.png-export :refer [table-set-done]]))
+            [inferenceql.viz.util :as util]))
 
 (defn set
   "Sets data in the table.
@@ -30,7 +29,7 @@
      :dispatch [:viz/clear-pts-store]}))
 
 (rf/reg-event-fx :table/set
-                 (after table-set-done)
+                 event-interceptors
                  set)
 
 (rf/reg-event-fx
