@@ -14,12 +14,16 @@
 
       (rf/dispatch-sync [:table/set data [:foo :bar]])
 
+      ;; TODO move this to an event??
+      ;; not sure that will work.
       (let [table (.querySelector js/document "#table-container")
             canvas (<p! (js/html2canvas table))
+            _ (.log js/console :canvas canvas)
             blob-channel (chan)] ;; fix this
-        (.toBlob canvas #(put! blob-channel %)
-          (let [blob (<! blob-channel)]
-            (js/saveAs blob filename)))))))
+        (.toBlob canvas #(put! blob-channel %))
+        (let [blob (<! blob-channel)
+              _ (.log js/console :blob blob)]
+          (js/saveAs blob filename))))))
 
 
 
