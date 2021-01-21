@@ -10,7 +10,6 @@
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
   [hot-instance new-settings]
-  (.log js/console :doing-update)
   (.updateSettings hot-instance new-settings false))
 
 (defn handsontable
@@ -83,8 +82,7 @@
                  ;; When coords is nil it means nothing should be selected in the table.
                  (.deselectCell @hot-instance)))))
          (.render @hot-instance)
-         (table-set-done)
-         (.log js/console :here))
+         (table-set-done))
 
        :component-will-unmount
        (fn [this]

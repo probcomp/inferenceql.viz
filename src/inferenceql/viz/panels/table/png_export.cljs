@@ -27,7 +27,6 @@
 
         (<! table-set)
 
-        (.log js/console :after)
         (let [table (.querySelector js/document "#table-container")
               canvas (<p! (js/html2canvas table))
               blob-channel (chan)] ;; fix this
