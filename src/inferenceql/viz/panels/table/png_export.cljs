@@ -3,6 +3,7 @@
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.util :as util]
+            [inferenceql.viz.config :as config]
             [clojure.core.async :refer [go-loop go <! >! put! chan close!]]
             [cljs.core.async.interop :refer-macros [<p!]]))
 
@@ -17,9 +18,11 @@
   (put! table-set true))
 
 (defn render-table-pngs []
-  (go-loop [indicies (range 1 5)]
-    (when (seq indicies)
-      (let [[i & i-rest] indicies
+  (go-loop [tables (:tables config)]
+    (when (seq tables)
+      (let [[table & tables-rest] tables
+
+            ;; TODO
             filename (str "foo" i ".png")
             data (repeat i {:foo i :bar i})]
 
@@ -33,6 +36,6 @@
           (.toBlob canvas #(put! blob-channel %))
           (let [blob (<! blob-channel)]
             (js/saveAs blob filename)))
-        (recur i-rest)))))
+        (recur tables-rest)))))
 
 

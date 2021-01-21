@@ -1,0 +1,8 @@
+[{:columns [:foo :bar]
+  :rows [{:foo 1 :bar 1}
+         {:foo 1 :bar 1}
+         {:foo 1 :bar 1}
+         {:foo 1 :bar 1}]}
+ {:columns [:zip :zap :zoo]
+  :rows [{:zip 1 :zap 2 :zoo 3}
+         {:zip 1 :zap 2 :zoo 3}]}]
