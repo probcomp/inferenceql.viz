@@ -40,7 +40,8 @@
                                             true)
                                           hot)))
            ;; Save the hot object in the app db.
-           (rf/dispatch [:table/set-hot-instance hot])))
+           (rf/dispatch [:table/set-hot-instance hot])
+           (set! js/table hot)))
 
        :component-did-update
        (fn [this old-argv]
@@ -78,7 +79,9 @@
                (if-let [coords (clj->js (:selections-coords new-props))]
                  (.selectCells @hot-instance coords false)
                  ;; When coords is nil it means nothing should be selected in the table.
-                 (.deselectCell @hot-instance))))))
+                 (.deselectCell @hot-instance)))))
+         (.log js/console :here)
+         (.render @hot-instance))
 
        :component-will-unmount
        (fn [this]
