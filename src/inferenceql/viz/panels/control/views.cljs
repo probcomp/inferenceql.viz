@@ -2,7 +2,8 @@
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]
             [re-com.core :refer [h-box]]
-            [inferenceql.viz.panels.more.views :as more]))
+            [inferenceql.viz.panels.more.views :as more]
+            [inferenceql.viz.panels.table.png-export :refer [render-table-pngs]]))
 
 (def reagent-forms-function-map
   "Function map that allows a reagent-forms template
@@ -79,7 +80,7 @@
                     "Clear results"]
                    [:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                 (rf/dispatch [:table/render-png])
+                                 (render-table-pngs)
                                  (.blur (.-target e)))}
                     "Render table PNG"]
                    [more/menu show-menu]]]]

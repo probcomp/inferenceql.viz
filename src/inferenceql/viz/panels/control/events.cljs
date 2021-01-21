@@ -74,19 +74,3 @@
  event-interceptors
  (fn [db [_ value]]
    (assoc-in db [:control-panel :selection-color] value)))
-
-(rf/reg-event-fx
-  :table/render-png
-  event-interceptors
-  (fn [_ [_]]
-    (let [node (.getElementById js/document "table-container")]
-      (doto (.toPng js/domtoimage node)
-        (.then (fn [data-url]
-                 (let [img (js/Image.)]
-                    (set! (.-src img) data-url)
-                    (.appendChild (.-body js/document) img))))
-        (.catch (fn [res]))))
-
-
-
-    {}))
