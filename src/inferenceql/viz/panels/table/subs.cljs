@@ -133,7 +133,7 @@
   (if show-label-column
     {}
     {:columns [0]
-     :indicators true}))
+     :indicators false}))
 
 (rf/reg-sub :table/hidden-columns
             :<- [:table/show-label-column]
