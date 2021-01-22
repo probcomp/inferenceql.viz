@@ -35,8 +35,7 @@
               :selectionMode       :multiple
               :outsideClickDeselects false
               :readOnly            true
-              ;;:height              "50vh"
-              ;;:width               "100vw"
+              :height              "1000px"
               :stretchH            "none"
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
