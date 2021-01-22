@@ -26,4 +26,12 @@
          {:age 77 :gender "male" :height 200}
          {:age 77 :gender "male" :height 200}
          {:age 77 :gender "male" :height 200}
-         {:age 77 :gender "male" :height 200}]}]
+         {:age 77 :gender "male" :height 200}]}
+
+ ;; table 4
+ {:column-names [:age :gender :height]
+  ;; no values for column :height.
+  ;; mising values for gender.
+  :rows [{:age 77 :gender "male"}
+         {:age 77}
+         {:age 77 :gender nil}]}]
