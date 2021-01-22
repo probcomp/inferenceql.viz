@@ -19,8 +19,4 @@
         modal-content @(rf/subscribe [:modal/content])
         show-table-controls @(rf/subscribe [:table/show-table-controls])]
     [v-box
-     :children [[control/panel]
-                [table/controls show-table-controls]
-                [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
-                [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
-                [modal/modal modal-content]]]))
+     :children [[table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]]]))
