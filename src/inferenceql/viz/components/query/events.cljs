@@ -7,7 +7,6 @@
             [inferenceql.viz.config :as config]
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.viz.model :as model]
             [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]
             [day8.re-frame.http-fx]
