@@ -130,3 +130,15 @@ figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 .PHONY: figwheel-10x
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
 	clojure -M:figwheel:10x
+
+### Related to creating static images of tables.
+
+table-png-dir := $(current-dir)/table-pngs
+
+clean-table-pngs:
+	rm -Rf $(output-dir)
+	rm -Rf $(table-png-dir)/*.png
+
+.PHONY: table-pngs
+table-pngs: clean-table-pngs js
+	node download-table-pngs.js
