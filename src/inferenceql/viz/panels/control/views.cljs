@@ -70,16 +70,6 @@
         :justify :end
         :children [[:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                 (rf/dispatch [:query/parse-query @input-text @datasets @models])
-                                 (.blur (.-target e)))}
-                    "Run InferenceQL"]
-                   [:button.toolbar-button.pure-button
-                    {:on-click (fn [e]
-                                  (rf/dispatch [:table/clear])
-                                  (.blur (.-target e)))}
-                    "Clear results"]
-                   [:button.toolbar-button.pure-button
-                    {:on-click (fn [e]
                                  (render-table-pngs)
                                  (.blur (.-target e)))}
                     "Render table PNG"]
