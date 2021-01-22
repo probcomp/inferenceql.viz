@@ -33,6 +33,7 @@
                   filename (format "table%03d.png" (inc table-idx))]
               (.toBlob canvas #(put! blob-channel %))
               (js/saveAs (<! blob-channel) filename))
+              ;;(set! js/blob (<! blob-channel)))
             (recur tables-rest))))))
 
 
