@@ -44,7 +44,8 @@
             ;; Library functions for user-defined JS functions.
             [inferenceql.viz.user]
             [yarn.html2canvas]
-            [yarn.file-saver]))
+            [yarn.file-saver]
+            [inferenceql.viz.panels.table.png-export :refer [render-table-pngs]]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
@@ -67,4 +68,5 @@
   ;; not reset the state of the app.
   (rf/dispatch-sync [:initialize-db])
   (rf/dispatch-sync [:upload/read-query-string-params (query-string-params)])
-  (render-app))
+  (render-app)
+  (render-table-pngs))
