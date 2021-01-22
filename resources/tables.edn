@@ -1,8 +1,29 @@
-[{:columns [:foo :bar]
+[
+ ;; table 1
+ {:column-names [:foo :bar]
   :rows [{:foo 1 :bar 1}
          {:foo 1 :bar 1}
          {:foo 1 :bar 1}
          {:foo 1 :bar 1}]}
- {:columns [:zip :zap :zoo]
+
+ ;; table 2
+ {:column-names [:zip :zap :zoo]
   :rows [{:zip 1 :zap 2 :zoo 3}
-         {:zip 1 :zap 2 :zoo 3}]}]
+         {:zip 1 :zap 2 :zoo 3}]}
+
+ ;; table 3
+ {:column-names [:age :gender :height]
+  :rows [{:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}
+         {:age 77 :gender "male" :height 200}]}]
