@@ -30,7 +30,7 @@
             (let [table (.querySelector js/document "#table-container")
                   canvas (<p! (js/html2canvas table))
                   blob-channel (chan)
-                  filename (format "table%03d.png" table-idx)]
+                  filename (format "table%03d.png" (inc table-idx))]
               (.toBlob canvas #(put! blob-channel %))
               (js/saveAs (<! blob-channel) filename))
             (recur tables-rest))))))
