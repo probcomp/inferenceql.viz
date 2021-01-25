@@ -7,8 +7,11 @@ var png_path = 'table-pngs/';
   const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   await page.setViewport({
-    width: 1000,
-    height: 1000,
+    // Adjust these dimensions of there is clipping on the tables. 
+    width: 5000,
+    height: 10000,
+    // Adjust this to increase or decrease quality of table images. 
+    // Multiples of 2 are best. 
     deviceScaleFactor: 2,
   });
 
