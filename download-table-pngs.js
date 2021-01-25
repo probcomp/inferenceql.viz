@@ -12,7 +12,7 @@ var png_path = 'table-pngs/';
     height: 10000,
     // Adjust this to increase or decrease quality of table images. 
     // Multiples of 2 are best. 
-    deviceScaleFactor: 2,
+    deviceScaleFactor: 1,
   });
 
   await page._client.send('Page.setDownloadBehavior', {
@@ -20,7 +20,7 @@ var png_path = 'table-pngs/';
     downloadPath: png_path
   })
 
-  // what is networkidle2
   await page.goto(iql_app_path, {waitUntil: 'networkidle2'});
+  await page.waitForFunction('downloads_done == true', {'timeout': 0});
   await browser.close();
 })();

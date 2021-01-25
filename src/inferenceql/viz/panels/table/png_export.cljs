@@ -19,8 +19,12 @@
   (put! table-set true))
 
 (defn render-table-pngs []
+
+  ;; So puppeteer stays open.
+  (set! js/downloads_done false)
+
   (go (loop [tables (map-indexed vector (:tables config))]
-        (when (seq tables)
+        (if (seq tables)
           (let [[[table-idx table] & tables-rest] tables
                 {:keys [column-names rows]} table]
 
@@ -34,6 +38,12 @@
               (.toBlob canvas #(put! blob-channel %))
               (js/saveAs (<! blob-channel) filename))
               ;;(set! js/blob (<! blob-channel)))
-            (recur tables-rest))))))
+            (recur tables-rest))
+
+          (do
+            ;; Wait 5 seconds
+            (<! (timeout 5000))
+            ;; Allow puppeteer to close.
+            (set! js/downloads_done true))))))
 
 
