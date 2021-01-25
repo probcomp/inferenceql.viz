@@ -1,8 +1,5 @@
-(ns inferenceql.viz.panels.table.png-export
+(ns inferenceql.table-export.png
   (:require [re-frame.core :as rf]
-            [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.util :as util]
             [inferenceql.viz.config :refer [config]]
             [clojure.core.async :refer [go-loop go <! >! put! chan close!]]
             [cljs.core.async.interop :refer-macros [<p!]]

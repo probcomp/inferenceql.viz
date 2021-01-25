@@ -1,4 +1,4 @@
-(ns inferenceql.viz.resize-images
+(ns inferenceql.table-export.resize-images
   (:require [clojure.java.shell :refer [sh]]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as str]))

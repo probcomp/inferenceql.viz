@@ -45,7 +45,7 @@
             [inferenceql.viz.user]
             [yarn.html2canvas]
             [yarn.file-saver]
-            [inferenceql.viz.panels.table.png-export :refer [render-table-pngs]]))
+            [inferenceql.table-export.png :refer [render-table-pngs]]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)

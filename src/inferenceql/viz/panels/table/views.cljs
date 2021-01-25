@@ -5,7 +5,7 @@
             [reagent.core :as reagent]
             [reagent.dom :as dom]
             [inferenceql.viz.panels.table.selections :as selections]
-            [inferenceql.viz.panels.table.png-export :refer [table-set-done]]))
+            [inferenceql.table-export.png :refer [table-set-done]]))
 
 (defn- update-hot!
   "A helper function for updating the settings in a handsontable."
