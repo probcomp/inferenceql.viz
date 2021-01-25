@@ -28,7 +28,8 @@
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"
          "resources"]
- :aliases {:test {:extra-paths ["test"
+ :aliases {:resize-images {:main-opts ["-m" "inferenceql.viz.resize-images"]}
+           :test {:extra-paths ["test"
                                 "test-resources"]
                   :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
                                lambdaisland/kaocha {:mvn/version "1.0-612"}

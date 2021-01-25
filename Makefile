@@ -142,3 +142,4 @@ clean-table-pngs:
 .PHONY: table-pngs
 table-pngs: clean-table-pngs js
 	node download-table-pngs.js
+	clojure -M:resize-images
