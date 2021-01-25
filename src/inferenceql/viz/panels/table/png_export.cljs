@@ -6,7 +6,20 @@
             [inferenceql.viz.config :refer [config]]
             [clojure.core.async :refer [go-loop go <! >! put! chan close!]]
             [cljs.core.async.interop :refer-macros [<p!]]
-            [goog.string :refer [format]]))
+            [goog.string :refer [format]]
+            [medley.core :as medley]))
+
+(defn clean
+  "Rounds all non-integer numbers to 2 decimals and removes symbols."
+  [row]
+  (medley/map-vals (fn [val]
+                     (cond
+                       (string? val) val
+                       (integer? val) val
+                       (symbol? val) nil
+                       (float? val) (format "%.2f" val)
+                       :else val))
+                   row))
 
 (defn timeout [ms]
   (let [c (chan)]
@@ -19,14 +32,14 @@
   (put! table-set true))
 
 (defn render-table-pngs []
-
   ;; So puppeteer stays open.
   (set! js/downloads_done false)
 
   (go (loop [tables (map-indexed vector (:tables config))]
         (if (seq tables)
           (let [[[table-idx table] & tables-rest] tables
-                {:keys [column-names rows]} table]
+                {:keys [column-names rows]} table
+                rows (mapv clean rows)]
 
             (rf/dispatch-sync [:table/set rows column-names])
             (<! table-set)
