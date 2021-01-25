@@ -7,9 +7,9 @@ var png_path = 'table-pngs/';
   const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   await page.setViewport({
-    width: 1680,
+    width: 1000,
     height: 1000,
-    deviceScaleFactor: 1,
+    deviceScaleFactor: 2,
   });
 
   await page._client.send('Page.setDownloadBehavior', {

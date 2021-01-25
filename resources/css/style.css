@@ -197,16 +197,7 @@ div {
 
 #table-container {
   background: #f5f5f5;
-
-  /* This is like setting a border-top of 1px width expect that this border
-  extends into the div instead of outside of it. This way the table will cover
-  this border when it appears, thereby avoiding a double border. */
-  box-shadow:inset 0px 1px 0px 0px #e7e7e7;
-
-  border-bottom: solid;
-  border-width: 1px;
-  border-color: #e7e7e7;
-  width: 800px;
+  width: 1800px;
 }
 
 .ht_master tr td {
