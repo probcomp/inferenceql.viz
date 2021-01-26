@@ -1,0 +1,117 @@
+{
+  "column-statistical-types": {
+    "overall_res_visit_1": "nominal",
+    "ecog_visit_1": "nominal",
+    "psa_visit_1": "numerical",
+    "pk_visit_1": "numerical",
+    "age": "numerical",
+    "bmi": "numerical",
+    "gender": "nominal"
+  },
+  "categories": {
+    "overall_res_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "overall_res_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_3": [
+      "0.0",
+      "1.0"
+    ],
+    "gender": [
+      "0.0",
+      "1.0"
+    ]
+  },
+  "models": [
+    {
+      "column-partition": [
+        [
+          "pk_visit_1",
+          "ecog_visit_1",
+          "psa_visit_1",
+          "overall_res_visit_1",
+          "gender"
+        ],
+        [
+          "age",
+          "bmi"
+        ]
+      ],
+      "cluster-crp-hyperparameters": [
+        0.6111081254223446,
+        0.7874020718992893
+      ],
+      "clusters": [
+        [
+          [
+            0,
+            2,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ],
+        [
+          [
+            4
+          ],
+          [
+            0,
+            1,
+            2,
+            3
+          ]
+        ]
+      ],
+      "column-hypers": {
+        "overall_res_visit_1": {
+          "alpha": 1.0
+        },
+        "ecog_visit_1": {
+          "alpha": 1.0
+        },
+        "psa_visit_1": {
+          "m": 7.341152869549006,
+          "r": 1.240004045662587,
+          "s": 0.018873918221350976,
+          "nu": 1.3644087026400742
+        },
+        "pk_visit_1": {
+          "m": 7.030172049438938,
+          "r": 0.6349995991170713,
+          "s": 0.03562247890262443,
+          "nu": 1.8616111078399704
+        },
+        "age": {
+          "m": 5.380764938242841,
+          "r": 0.9763817547182219,
+          "s": 0.10826367338740543,
+          "nu": 1.1003260089454083
+        },
+        "bmi": {
+          "m": 5.40356991613299,
+          "r": 0.7688050166297915,
+          "s": 0.013738237958832639,
+          "nu": 1.6128979635153649
+        },
+        "gender": {
+          "alpha": 1.0
+        }
+      }
+    }
+  ]
+}

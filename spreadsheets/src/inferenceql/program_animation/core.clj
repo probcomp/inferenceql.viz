@@ -19,9 +19,14 @@
             [clojure.pprint :refer [pprint]]))
 
 ;; Starting number in model filenames.
-(def low-index 10)
+;(def meta-csv (csv/read-csv (slurp "raw-data/meta-data.csv")))
+;(def low-index  (int (first (second meta-csv))))
+;(def high-index (int (second (second meta-csv))))
 ;; One above the final number in model filnames.
-(def high-index 100)
+;; Starting number in model filenames.
+(def low-index 1)
+;; One above the final number in model filnames.
+(def high-index 15)
 
 ;; How many rows from the dataset to incorporate into each model based on the model number.
 ;; (Difference between the number of rows to incorporate and the model number)
@@ -37,7 +42,7 @@
 (def model-dir "raw-data/models/")
 
 (def model-filenames (for [i (range low-index high-index)]
-                       (let [pad-i (format "%04d" i)]
+                       (let [pad-i (format "%03d" i)]
                          (str model-dir "model-t-" pad-i  ".json"))))
 (def bayesdb-dumps (map #(json/read-str (slurp %)) model-filenames))
 
@@ -56,6 +61,17 @@
 (def rows-for-models (for [i (range low-index high-index)]
                        (let [num-rows (+ i rows-offset)]
                          (take num-rows all-rows))))
+
+(println "")
+(println "")
+(println "")
+(println "rows-for-models")
+(println rows-for-models)
+(println "first bayesdb-dumps")
+(println (first bayesdb-dumps))
+(println "")
+(println "")
+(println "")
 
 (def programs (for [[bdb-dump rows] (map vector bayesdb-dumps rows-for-models)]
                 (->> (bayesdb-import/xcat-gpms bdb-dump rows)

@@ -1,0 +1,107 @@
+{
+  "column-statistical-types": {
+    "overall_res_visit_1": "nominal",
+    "ecog_visit_1": "nominal",
+    "psa_visit_1": "numerical",
+    "pk_visit_1": "numerical",
+    "age": "numerical",
+    "bmi": "numerical",
+    "gender": "nominal"
+  },
+  "categories": {
+    "overall_res_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "overall_res_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_3": [
+      "0.0",
+      "1.0"
+    ],
+    "gender": [
+      "0.0",
+      "1.0"
+    ]
+  },
+  "models": [
+    {
+      "column-partition": [
+        [
+          "ecog_visit_1",
+          "age",
+          "psa_visit_1",
+          "pk_visit_1",
+          "overall_res_visit_1"
+        ],
+        [
+          "gender",
+          "bmi"
+        ]
+      ],
+      "cluster-crp-hyperparameters": [
+        1.0,
+        1.0241895602489972
+      ],
+      "clusters": [
+        [
+          [
+            0,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ]
+        ]
+      ],
+      "column-hypers": {
+        "overall_res_visit_1": {
+          "alpha": 1.0
+        },
+        "ecog_visit_1": {
+          "alpha": 1.0
+        },
+        "psa_visit_1": {
+          "m": 7.168739076445558,
+          "r": 0.5,
+          "s": 0.013738237958832639,
+          "nu": 1.3644087026400742
+        },
+        "pk_visit_1": {
+          "m": 6.857758256335489,
+          "r": 1.906642661893268,
+          "s": 0.5298316906283708,
+          "nu": 1.3974131491568424
+        },
+        "age": {
+          "m": 5.380764938242841,
+          "r": 1.4312159587211128,
+          "s": 0.10826367338740543,
+          "nu": 1.4658364433839237
+        },
+        "bmi": {
+          "m": 5.40356991613299,
+          "r": 1.6519132559793048,
+          "s": 0.010000000000000004,
+          "nu": 1.0241895602489972
+        },
+        "gender": {
+          "alpha": 1.0
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "column-statistical-types": {
+    "overall_res_visit_1": "nominal",
+    "ecog_visit_1": "nominal",
+    "psa_visit_1": "numerical",
+    "pk_visit_1": "numerical",
+    "age": "numerical",
+    "bmi": "numerical",
+    "gender": "nominal"
+  },
+  "categories": {
+    "overall_res_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "overall_res_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_3": [
+      "0.0",
+      "1.0"
+    ],
+    "gender": [
+      "0.0",
+      "1.0"
+    ]
+  },
+  "models": [
+    {
+      "column-partition": [
+        [
+          "overall_res_visit_1",
+          "ecog_visit_1",
+          "bmi",
+          "gender"
+        ],
+        [
+          "psa_visit_1",
+          "age"
+        ],
+        [
+          "pk_visit_1"
+        ]
+      ],
+      "cluster-crp-hyperparameters": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "clusters": [
+        [
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ]
+        ]
+      ],
+      "column-hypers": {
+        "overall_res_visit_1": {
+          "alpha": 1.0
+        },
+        "ecog_visit_1": {
+          "alpha": 1.0
+        },
+        "psa_visit_1": {
+          "m": 7.685980455755903,
+          "r": 0.6660918816182642,
+          "s": 0.018873918221350976,
+          "nu": 1.2699991982341425
+        },
+        "pk_visit_1": {
+          "m": 6.5129306701285925,
+          "r": 1.732797958416581,
+          "s": 0.8531678524172807,
+          "nu": 1.0743382393762158
+        },
+        "age": {
+          "m": 7.2773166623807715,
+          "r": 1.240004045662587,
+          "s": 0.03039195382313199,
+          "nu": 1.1542026525859868
+        },
+        "bmi": {
+          "m": 9.886328536822646,
+          "r": 1.3007199203560056,
+          "s": 0.8531678524172807,
+          "nu": 1.6128979635153649
+        },
+        "gender": {
+          "alpha": 1.0
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "column-statistical-types": {
+    "overall_res_visit_1": "nominal",
+    "ecog_visit_1": "nominal",
+    "psa_visit_1": "numerical",
+    "pk_visit_1": "numerical",
+    "age": "numerical",
+    "bmi": "numerical",
+    "gender": "nominal"
+  },
+  "categories": {
+    "overall_res_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "overall_res_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_3": [
+      "0.0",
+      "1.0"
+    ],
+    "gender": [
+      "0.0",
+      "1.0"
+    ]
+  },
+  "models": [
+    {
+      "column-partition": [
+        [
+          "age",
+          "bmi",
+          "gender"
+        ],
+        [
+          "psa_visit_1",
+          "ecog_visit_1",
+          "pk_visit_1",
+          "overall_res_visit_1"
+        ]
+      ],
+      "cluster-crp-hyperparameters": [
+        0.35957017329888774,
+        0.8663989792082905
+      ],
+      "clusters": [
+        [
+          [
+            0,
+            1,
+            2,
+            3,
+            7,
+            10,
+            11
+          ],
+          [
+            4,
+            5,
+            6,
+            8,
+            9,
+            12
+          ]
+        ],
+        [
+          [
+            5,
+            7,
+            8
+          ],
+          [
+            1,
+            4,
+            6,
+            10,
+            11
+          ],
+          [
+            0,
+            2,
+            3,
+            9,
+            12
+          ]
+        ]
+      ],
+      "column-hypers": {
+        "overall_res_visit_1": {
+          "alpha": 1.0
+        },
+        "ecog_visit_1": {
+          "alpha": 1.0
+        },
+        "psa_visit_1": {
+          "m": 7.168739076445558,
+          "r": 0.6660918816182642,
+          "s": 0.013738237958832639,
+          "nu": 1.240004045662587
+        },
+        "pk_visit_1": {
+          "m": 6.5129306701285925,
+          "r": 0.5,
+          "s": 0.016102620275609394,
+          "nu": 1.2699991982341425
+        },
+        "age": {
+          "m": 7.966971834794565,
+          "r": 1.8176431200757233,
+          "s": 0.011721022975334809,
+          "nu": 1.126942411232332
+        },
+        "bmi": {
+          "m": 5.40356991613299,
+          "r": 1.3007199203560056,
+          "s": 0.025929437974046683,
+          "nu": 1.2107173259617308
+        },
+        "gender": {
+          "alpha": 1.0
+        }
+      }
+    }
+  ]
+}

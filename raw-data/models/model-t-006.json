@@ -1,0 +1,140 @@
+{
+  "column-statistical-types": {
+    "overall_res_visit_1": "nominal",
+    "ecog_visit_1": "nominal",
+    "psa_visit_1": "numerical",
+    "pk_visit_1": "numerical",
+    "age": "numerical",
+    "bmi": "numerical",
+    "gender": "nominal"
+  },
+  "categories": {
+    "overall_res_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_1": [
+      "0.0",
+      "1.0"
+    ],
+    "overall_res_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_2": [
+      "0.0",
+      "1.0"
+    ],
+    "ecog_visit_3": [
+      "0.0",
+      "1.0"
+    ],
+    "gender": [
+      "0.0",
+      "1.0"
+    ]
+  },
+  "models": [
+    {
+      "column-partition": [
+        [
+          "ecog_visit_1",
+          "psa_visit_1",
+          "bmi"
+        ],
+        [
+          "age",
+          "pk_visit_1"
+        ],
+        [
+          "gender",
+          "overall_res_visit_1"
+        ]
+      ],
+      "cluster-crp-hyperparameters": [
+        3.0000000000000004,
+        2.2538848224646633,
+        0.44789228054605323
+      ],
+      "clusters": [
+        [
+          [
+            4
+          ],
+          [
+            0
+          ],
+          [
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            5
+          ]
+        ],
+        [
+          [
+            4,
+            5
+          ],
+          [
+            0,
+            2,
+            3
+          ],
+          [
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        ]
+      ],
+      "column-hypers": {
+        "overall_res_visit_1": {
+          "alpha": 1.0
+        },
+        "ecog_visit_1": {
+          "alpha": 1.0
+        },
+        "psa_visit_1": {
+          "m": 7.168739076445558,
+          "r": 1.6519132559793048,
+          "s": 0.018873918221350976,
+          "nu": 1.8176431200757233
+        },
+        "pk_visit_1": {
+          "m": 6.5129306701285925,
+          "r": 1.182122307190268,
+          "s": 0.17433288221999876,
+          "nu": 1.5748041437985785
+        },
+        "age": {
+          "m": 5.725592524449738,
+          "r": 0.5,
+          "s": 0.6210169418915613,
+          "nu": 1.6128979635153649
+        },
+        "bmi": {
+          "m": 5.40356991613299,
+          "r": 1.906642661893268,
+          "s": 0.17433288221999876,
+          "nu": 1.8616111078399704
+        },
+        "gender": {
+          "alpha": 1.0
+        }
+      }
+    }
+  ]
+}
