@@ -34,7 +34,7 @@
 ;; For example model-10 will have 11 rows from the dataset incorporated when rows-offset is 1.
 ;; And model-11 will have 12 rows incorporated...etc.
 ;; Normally this should just be set to 0. But my models were a little offset in that way.
-(def rows-offset 1)
+(def rows-offset 0)
 
 ;---------------------------
 
