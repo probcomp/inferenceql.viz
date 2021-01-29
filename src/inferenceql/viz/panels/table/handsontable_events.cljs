@@ -93,13 +93,13 @@
         ;; from the map representing the row.
         empty-cell? #(or (nil? %) (= "" %))]
 
-    (reduce (fn [acc [row-id row]]
-              (let [clean-row (medley/remove-vals empty-cell? row)]
-                (if (seq clean-row)
-                  (assoc acc row-id clean-row)
-                  acc)))
-            {}
-            merged-rows)))
+    (reduce-kv (fn [acc row-id row]
+                 (let [clean-row (medley/remove-vals empty-cell? row)]
+                   (if (seq clean-row)
+                     (assoc acc row-id clean-row)
+                     acc)))
+               {}
+               merged-rows)))
 
 (rf/reg-event-fx
   :hot/before-change
