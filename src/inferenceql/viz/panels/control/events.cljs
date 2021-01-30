@@ -77,7 +77,7 @@
 
 (defn query-string-with-changes
   [query-string changes]
-  "")
+  (str changes))
 
 (rf/reg-event-db
   :control/update-query-string

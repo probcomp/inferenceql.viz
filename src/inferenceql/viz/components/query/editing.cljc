@@ -129,14 +129,19 @@
       (format "WITH %s:\n%s" map-exprs-str qs-indented)
       qs)))
 
+(defn long-str [& strings] (clojure.string/join "\n" strings))
 
 (def prob-of-query
-  "SELECT (PROBABILITY OF height
-           GIVEN age, gender
-           UNDER model),
-          height,
-          age,
-          gender")
+  (long-str
+    "SELECT (PROBABILITY OF height"
+    "        GIVEN age, gender"
+    "        UNDER model),"
+    "       (PROBABILITY OF age"
+    "        UNDER model),"
+    "       height,"
+    "       age,"
+    "       gender"
+    "FROM data;"))
 
 (print (add-label-update "SELECT * FROM data;" updates))
 (print (add-label-update prob-of-query updates))
@@ -149,15 +154,47 @@
                           (map (fn [[k v]] (format "%s=%s" k v)))
                           (str/join ", "))
 
-        incorporate-str (format "INCORPORATE COLUMN (%s) INTO model", bindings-str)]
-    (query/parse incorporate-str :start :incorporate-expr)))
+        incorporate-str (format "(INCORPORATE COLUMN (%s) INTO model)", bindings-str)]
+    (query/parse incorporate-str :start :model-expr)))
+
+
+
+;; Hmm this might be right.
+
+(defn skip [loc]
+  (println "here")
+  (when loc
+    (if (z/right loc)
+      (z/right loc)
+      (recur (-> loc z/up)))))
 
 (defn add-label-incorporate [qs updates]
   (let [new-model-node (incorporate-node updates)
         query-tree (query/parse qs)]
-    ;; new to navigate to model pos.
-    query-tree))
-
+    (-> (zipper query-tree)
+        (seek-tag :model-expr)
+        (z/replace new-model-node)
+        ;; NOTE: not sure how to navigate to the node after this to
+        ;; begin searching for :model-expr again.
+        ;; maybe this will help?
+        ;; http://www.exampler.com/blog/2010/09/01/editing-trees-in-clojure-with-clojurezip/
+        #_(z/root)
+        #_(query/unparse))))
 
 (add-label-incorporate "SELECT * FROM data;" updates)
-(add-label-incorporate prob-of-query updates)
+(print (add-label-incorporate prob-of-query updates))
+
+(def node (add-label-incorporate prob-of-query updates))
+
+(z/node node)
+(z/right node)
+
+(-> node
+    (skip)
+    (z/next)
+    (z/next)
+    (z/next)
+    (z/next)
+    (z/node))
+
+
