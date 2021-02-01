@@ -84,8 +84,7 @@
 
 ;-------------------------------------------------------
 
-
-(def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
+;;; UPDATE column.
 
 (defn coerce-bool [val]
   (case (str/lower-case val)
@@ -95,7 +94,7 @@
     "f" false
     nil))
 
-(defn add-label-update [qs updates]
+(defn add-update-labels-expr [qs updates]
   (let [label-updates (medley/map-vals #(coerce-bool (:label %)) updates)
 
         ;; Indent original query.
@@ -129,24 +128,11 @@
       (format "WITH %s:\n%s" map-exprs-str qs-indented)
       qs)))
 
-(defn long-str [& strings] (clojure.string/join "\n" strings))
+;-------------------------------------------------------
 
-(def prob-of-query
-  (long-str
-    "SELECT (PROBABILITY OF height"
-    "        GIVEN age, gender"
-    "        UNDER model1),"
-    "       (PROBABILITY OF age"
-    "        UNDER model2),"
-    "       height,"
-    "       age,"
-    "       gender"
-    "FROM data;"))
+;;; INCORPORATE column.
 
-(print (add-label-update "SELECT * FROM data;" updates))
-(print (add-label-update prob-of-query updates))
-
-(defn incorporate-node [updates]
+(defn incorp-node [updates model-name]
   (let [label-updates (medley/map-vals #(coerce-bool (:label %)) updates)
 
         bindings-str (->> (seq label-updates)
@@ -154,79 +140,57 @@
                           (map (fn [[k v]] (format "%s=%s" k v)))
                           (str/join ", "))
 
-        incorporate-str (format "(INCORPORATE COLUMN (%s) INTO model)", bindings-str)]
+        incorporate-str (format "(INCORPORATE COLUMN (%s) INTO %s)", bindings-str model-name)]
     (query/parse incorporate-str :start :model-expr)))
 
-
-(defn no-incorp-expr? [loc]
+(defn no-incorp-node? [loc]
   (nil? (seek-tag loc :incorporate-expr)))
 
-(defn add-new-model-node [node updates]
+(defn add-incorp-node [node updates]
   (let [loc (zipper node)
-        new-model-expr (incorporate-node updates)
-        base-model-expr (seek-tag loc :simple-symbol)]
-    ;; TODO grab model name
-    (-> base-model-expr
+        model-name-loc (seek-tag loc :simple-symbol)
+        model-name (-> model-name-loc z/node tree/only-child)
+        incorp-node (incorp-node updates model-name)]
+    (-> model-name-loc
         (z/up) ; [:name ...]
         (z/up) ; [:ref ...]
         (z/up) ; [:model-expr ...]
-        (z/replace new-model-expr)
+        (z/replace incorp-node)
         (z/root))))
 
-(defn add-label-incorporate [qs updates]
-  (let [query-tree (query/parse qs)]
-    (loop [qz (zipper query-tree)]
-      (if (z/end? qz)
-        (-> qz z/node query/unparse)
-        (let [qz-under (seek-tag qz :under-clause)]
-          (println "under: ")
-          (println (some-> qz-under z/node))
-          (if (and qz-under (no-incorp-expr? qz-under))
-            (recur (z/edit qz-under add-new-model-node updates))
-            (recur (z/next qz))))))))
+(defn add-incorp-labels-expr [query-string updates]
+  (loop [qz (-> query-string query/parse zipper)]
+    (if (z/end? qz)
+      (-> qz z/node query/unparse)
+      (let [qz-under (seek-tag qz :under-clause)]
+        (if (some-> qz-under no-incorp-node?)
+          (recur (z/edit qz-under add-incorp-node updates))
+          (recur (z/next qz)))))))
 
+;--------------------------------------------
 
+;;; Testing
 
-#_(add-label-incorporate "SELECT * FROM data;" updates)
-(add-label-incorporate prob-of-query updates)
+(def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
 
-#_(def node (add-label-incorporate prob-of-query updates))
+(defn long-str [& strings] (clojure.string/join "\n" strings))
 
-#_(z/node node)
-#_(z/right node)
+(def prob-of-query
+  (long-str
+   "SELECT (PROBABILITY OF height"
+   "        GIVEN age, gender"
+   "        UNDER model1),"
+   "       (PROBABILITY OF age"
+   "        UNDER model2),"
+   "       height,"
+   "       age,"
+   "       gender"
+   "FROM data;"))
 
-(-> prob-of-query
-    (query/parse)
-    (zipper)
-    (seek-tag :model-expr)
-    (z/replace "foo")
-    (skip)
-    (seek-tag :model-expr)
-    (z/replace "bar")
-    (z/root)
-    (query/unparse))
+(comment
+  (print (add-update-labels-expr "SELECT * FROM data;" updates))
+  (print (add-update-labels-expr prob-of-query updates))
 
-
-(-> prob-of-query
-    (query/parse))
-
-;------------------------------------------
-
-
-
-
-(def node (z/vector-zip [[1 2] [3 4]]))
-
-(-> node
-    (z/down)
-    (z/down)
-    (z/right)
-    (z/next)
-    (z/next)
-    (z/next)
-    (z/next)
-    (z/next)
-    (z/next)
-    (z/node))
-
+  (add-incorp-labels-expr "SELECT * FROM data;" updates)
+  (add-incorp-labels-expr prob-of-query updates))
 
