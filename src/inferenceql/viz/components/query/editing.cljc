@@ -135,9 +135,9 @@
   (long-str
     "SELECT (PROBABILITY OF height"
     "        GIVEN age, gender"
-    "        UNDER model),"
+    "        UNDER model1),"
     "       (PROBABILITY OF age"
-    "        UNDER model),"
+    "        UNDER model2),"
     "       height,"
     "       age,"
     "       gender"
@@ -157,35 +157,43 @@
         incorporate-str (format "(INCORPORATE COLUMN (%s) INTO model)", bindings-str)]
     (query/parse incorporate-str :start :model-expr)))
 
-;; Hmm this might be right.
 
-(defn skip [loc]
-  (when loc
-    (let [r (z/right loc)]
-      (if r r (recur (-> loc z/up))))))
+(defn no-incorp-expr? [loc]
+  (nil? (seek-tag loc :incorporate-expr)))
+
+(defn add-new-model-node [node updates]
+  (let [loc (zipper node)
+        new-model-expr (incorporate-node updates)
+        base-model-expr (seek-tag loc :simple-symbol)]
+    ;; TODO grab model name
+    (-> base-model-expr
+        (z/up) ; [:name ...]
+        (z/up) ; [:ref ...]
+        (z/up) ; [:model-expr ...]
+        (z/replace new-model-expr)
+        (z/root))))
 
 (defn add-label-incorporate [qs updates]
-  (let [new-model-node (incorporate-node updates)
-        query-tree (query/parse qs)]
-    (-> (zipper query-tree)
-        (seek-tag :model-expr)
-        (z/replace new-model-node)
-        ;; NOTE: not sure how to navigate to the node after this to
-        ;; begin searching for :model-expr again.
-        ;; maybe this will help?
-        ;; http://www.exampler.com/blog/2010/09/01/editing-trees-in-clojure-with-clojurezip/
-        (z/root)
-        #_(query/unparse))))
+  (let [query-tree (query/parse qs)]
+    (loop [qz (zipper query-tree)]
+      (if (z/end? qz)
+        (-> qz z/node query/unparse)
+        (let [qz-under (seek-tag qz :under-clause)]
+          (println "under: ")
+          (println (some-> qz-under z/node))
+          (if (and qz-under (no-incorp-expr? qz-under))
+            (recur (z/edit qz-under add-new-model-node updates))
+            (recur (z/next qz))))))))
 
 
 
-(add-label-incorporate "SELECT * FROM data;" updates)
+#_(add-label-incorporate "SELECT * FROM data;" updates)
 (add-label-incorporate prob-of-query updates)
 
-(def node (add-label-incorporate prob-of-query updates))
+#_(def node (add-label-incorporate prob-of-query updates))
 
-(z/node node)
-(z/right node)
+#_(z/node node)
+#_(z/right node)
 
 (-> prob-of-query
     (query/parse)
@@ -208,11 +216,17 @@
 
 
 (def node (z/vector-zip [[1 2] [3 4]]))
+
 (-> node
     (z/down)
     (z/down)
     (z/right)
-    (z/prev)
+    (z/next)
+    (z/next)
+    (z/next)
+    (z/next)
+    (z/next)
+    (z/next)
     (z/node))
 
 
