@@ -157,16 +157,12 @@
         incorporate-str (format "(INCORPORATE COLUMN (%s) INTO model)", bindings-str)]
     (query/parse incorporate-str :start :model-expr)))
 
-
-
 ;; Hmm this might be right.
 
 (defn skip [loc]
-  (println "here")
   (when loc
-    (if (z/right loc)
-      (z/right loc)
-      (recur (-> loc z/up)))))
+    (let [r (z/right loc)]
+      (if r r (recur (-> loc z/up))))))
 
 (defn add-label-incorporate [qs updates]
   (let [new-model-node (incorporate-node updates)
@@ -178,23 +174,45 @@
         ;; begin searching for :model-expr again.
         ;; maybe this will help?
         ;; http://www.exampler.com/blog/2010/09/01/editing-trees-in-clojure-with-clojurezip/
-        #_(z/root)
+        (z/root)
         #_(query/unparse))))
 
+
+
 (add-label-incorporate "SELECT * FROM data;" updates)
-(print (add-label-incorporate prob-of-query updates))
+(add-label-incorporate prob-of-query updates)
 
 (def node (add-label-incorporate prob-of-query updates))
 
 (z/node node)
 (z/right node)
 
-(-> node
+(-> prob-of-query
+    (query/parse)
+    (zipper)
+    (seek-tag :model-expr)
+    (z/replace "foo")
     (skip)
-    (z/next)
-    (z/next)
-    (z/next)
-    (z/next)
+    (seek-tag :model-expr)
+    (z/replace "bar")
+    (z/root)
+    (query/unparse))
+
+
+(-> prob-of-query
+    (query/parse))
+
+;------------------------------------------
+
+
+
+
+(def node (z/vector-zip [[1 2] [3 4]]))
+(-> node
+    (z/down)
+    (z/down)
+    (z/right)
+    (z/prev)
     (z/node))
 
 
