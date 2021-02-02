@@ -45,7 +45,7 @@
         models (rf/subscribe [:store/models])]
     [:div#toolbar
      [:div#search-section
-       [:textarea#search-input {:on-change #(rf/dispatch [:control/set-query-string (-> % .-target .-value)])
+       [:textarea#search-input {:on-change #(rf/dispatch-sync [:control/set-query-string (-> % .-target .-value)])
                                 ;; This submits the query when enter is pressed, but allows the user
                                 ;; to enter a linebreak in the textarea with shift-enter.
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (not (.-shiftKey e)))
