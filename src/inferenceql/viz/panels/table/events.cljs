@@ -23,7 +23,9 @@
         headers (->> headers
                      ;; :rowid should not be displayed in the table. Instead it extracted
                      ;; from the rows using the Handsontable rowHeaders function.
-                     (remove #{:rowid})
+
+                     ;; :label column is removed so we can display in at the start.
+                     (remove #{:rowid :label})
                      ;; The first column should always be the :label column, which will get hidden
                      ;; and shown by the :table/show-label-column event.
                      (into [:label]))

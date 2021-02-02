@@ -100,6 +100,7 @@
     :js/alert -- If the query ran locally and failed, an error message will be output."
   [{:keys [db]} [_ text datasets models]]
   (let [{:keys [query-server-url]} config/config
+        ;; TODO: also add the label column to the selection list.
         query (add-rowid (str/trim text))]
     (if query-server-url
       ;; Use the query server as a remote query execution engine.
@@ -185,7 +186,8 @@
   [db [_ query]]
   (-> db
       (assoc-in [:query-component :column-details] (util/column-details query))
-      (assoc-in [:query-component :virtual] (util/virtual-data? query))))
+      (assoc-in [:query-component :virtual] (util/virtual-data? query))
+      (assoc-in [:query-component :query-displayed] query)))
 (rf/reg-event-db :query/set-details
                  event-interceptors
                  set-details)

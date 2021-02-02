@@ -8,10 +8,12 @@
   ;; NOTE: We currently assume the dataset and model referenced
   ;; in the current query is always :data and :model, respectively.
   {:query-component {:dataset-name :data
-                     :model-name :model}})
+                     :model-name :model
+                     :query-to-edit "SELECT * FROM data;"}})
 
 (s/def ::query-component (s/keys :req-un [::dataset-name
-                                          ::model-name]
+                                          ::model-name
+                                          ::query-displayed]
                                  :opt-un [::virtual
                                           ::column-details]))
 
@@ -43,3 +45,11 @@
 
 (s/def ::column-details (s/coll-of ::column-detail))
 (s/def ::column-detail (s/multi-spec column-detail-type ::detail-type))
+
+;; Edits to the table in the UI use the WITH expression in this query.
+(s/def ::query-displayed string?)
+
+;;; Accessor functions for indexing into parts of the query-panel's db.
+
+(defn query-displayed [db]
+  (get-in db [:query-panel :query-displayed]))

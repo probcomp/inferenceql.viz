@@ -5,7 +5,8 @@
             [inferenceql.query.parse-tree :as tree]
             [clojure.zip :as z]
             [clojure.string :as str]
-            [medley.core :as medley]))
+            [medley.core :as medley]
+            #?(:cljs [goog.string :refer [format]])))
 
 (defn make-node
   "Updates the children in an existing node."
@@ -94,7 +95,7 @@
     "f" false
     nil))
 
-(defn add-update-labels-expr [qs updates]
+(defn add-update-labels-expr-help [qs updates]
   (let [label-updates (medley/map-vals #(coerce-bool (:label %)) updates)
 
         ;; Indent original query.
@@ -115,10 +116,10 @@
                              (str/join " OR "))
 
         map-exprs ["(ALTER data ADD label) AS data"
-                   (when pos-cond-string
-                     (format "     (UPDATE data SET label=true WHERE %s)" pos-cond-string))
-                   (when neg-cond-string
-                     (format "     (UPDATE data SET label=false WHERE %s)" neg-cond-string))]
+                   (when-not (str/blank? pos-cond-string)
+                     (format "     (UPDATE data SET label=true WHERE %s) AS data" pos-cond-string))
+                   (when-not (str/blank? neg-cond-string)
+                     (format "     (UPDATE data SET label=false WHERE %s) AS data" neg-cond-string))]
 
         map-exprs-str (->> map-exprs
                            (remove nil?)
@@ -127,6 +128,18 @@
     (if (or (seq pos-cond-string) (seq neg-cond-string))
       (format "WITH %s:\n%s" map-exprs-str qs-indented)
       qs)))
+
+;---------------------------
+
+(defn add-update-labels-expr [qs prev-qs updates]
+  (let [qz (-> qs query/parse zipper)
+        qz-with (seek-tag qz :with-expr)]
+    (if qz-with
+      "WITH \n qs"
+      (add-update-labels-expr-help qs updates))))
+
+
+
 
 ;-------------------------------------------------------
 
@@ -172,6 +185,7 @@
 ;;; Testing
 
 (def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
+(def updates {3 {:label "True"}, 6 {:label "True"}})
 
 (defn long-str [& strings] (clojure.string/join "\n" strings))
 

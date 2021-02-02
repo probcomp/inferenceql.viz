@@ -11,7 +11,7 @@
   [tree]
   (when-not (insta/failure? tree)
     (as-> tree $
-      (tree/get-node-in $ [:select-clause :select-list])
+      (tree/get-node-in $ [:select-expr :select-clause :select-list])
       (tree/child-nodes $))))
 
 (defn- column-selection-rename

@@ -116,7 +116,9 @@
                           {}
                           changes)
           merged-updates (merge-row-updates (get-in db [:table-panel :changes :existing])
-                                            updates)]
+                                            updates)
+
+          displayed-query ()]
       ;; Stage the changes in the db. The Handsontable itself already has the updates.
       {:db (assoc-in db [:table-panel :changes :existing] merged-updates)
        :fx [[:dispatch [:control/update-query-string merged-updates]]]})))
