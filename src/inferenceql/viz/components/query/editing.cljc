@@ -100,7 +100,7 @@
 
         ;; Indent original query.
         qs-indented (->> (str/split-lines qs)
-                         (map #(str "  " %))
+                         #_(map #(str "  " %))
                          (str/join "\n"))
 
         pos-rowids (-> (medley/filter-vals true? label-updates)
@@ -131,15 +131,75 @@
 
 ;---------------------------
 
-(defn add-update-labels-expr [qs prev-qs updates]
+(defn with-sub-query-node [qs]
   (let [qz (-> qs query/parse zipper)
         qz-with (seek-tag qz :with-expr)]
     (if qz-with
-      "WITH \n qs"
-      (add-update-labels-expr-help qs updates))))
+      (-> (z/node qz-with)
+          (tree/get-node-in [:with-sub-expr :query-expr]))
+      (z/node qz))))
 
+(defn has-label-alter? [node]
+  (let [entry-exprs (->> (tree/get-node node :with-map-expr)
+                         (tree/child-nodes))
+        match (for [e entry-exprs]
+                (let [val-expr (tree/get-node e :with-map-value-expr)
+                      alter-expr (some-> (zipper val-expr)
+                                         (seek-tag :alter-expr)
+                                         (z/node))
+                      table-name (some-> alter-expr
+                                         (tree/get-node-in [:table-expr :ref])
+                                         (query/unparse))
+                      column-name (some-> alter-expr
+                                          (tree/get-node-in [:column-expr])
+                                          (query/unparse))
 
+                      binding-name (-> (tree/get-node e :name)
+                                       (query/unparse))]
+                  (and (= table-name "data")
+                       (= column-name "label")
+                       (= binding-name "data"))))]
+    ;; Any of the entry-exprs match.
+    (or match)))
 
+(defn add-label-alter [node]
+  (let [map-entry-expr (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr)
+        entry-exprs (->> (tree/get-node node :with-map-expr)
+                         (tree/child-nodes))]
+    (doall (map println entry-exprs)))
+  node)
+
+(defn add-label-update-pos [node updates]
+  node)
+
+(defn add-label-update-neg [node updates]
+  node)
+
+(defn add-updates-to-with [node updates]
+  (-> node
+      (add-label-alter)
+      (add-label-update-pos updates)
+      (add-label-update-neg updates)))
+
+(defn add-update-labels-expr [new-qs prev-qs updates]
+  (let [new-sub-query-node (with-sub-query-node new-qs)
+        qz (-> prev-qs query/parse zipper)
+        qz-with (seek-tag qz :with-expr)]
+    (if qz-with
+      (-> (z/edit qz-with add-updates-to-with updates)
+          (seek-tag :query-expr)
+          (z/replace new-sub-query-node)
+          (z/root)
+          (query/unparse))
+      (add-update-labels-expr-help new-qs updates))))
+
+(def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
+
+(add-update-labels-expr "SELECT age, gender FROM data;"
+                        "WITH (ALTER data ADD label) AS data,
+                              (UPDATE data SET label=false WHERE rowid=1 OR rowid=2 OR rowid=3) AS data:
+                         SELECT * FROM data;"
+                        updates)
 
 ;-------------------------------------------------------
 
@@ -202,9 +262,13 @@
    "FROM data;"))
 
 (comment
-  (print (add-update-labels-expr "SELECT * FROM data;" updates))
-  (print (add-update-labels-expr prob-of-query updates))
+  (print (add-update-labels-expr-help "SELECT * FROM data;" updates))
+  (print (add-update-labels-expr-help prob-of-query updates))
 
   (add-incorp-labels-expr "SELECT * FROM data;" updates)
   (add-incorp-labels-expr prob-of-query updates))
 
+
+
+
+(print (add-update-labels-expr-help prob-of-query updates))
