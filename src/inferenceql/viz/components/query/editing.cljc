@@ -8,6 +8,8 @@
             [medley.core :as medley]
             #?(:cljs [goog.string :refer [format]])))
 
+(defn long-str [& strings] (clojure.string/join "\n" strings))
+
 (defn make-node
   "Updates the children in an existing node."
   [node children]
@@ -139,37 +141,56 @@
           (tree/get-node-in [:with-sub-expr :query-expr]))
       (z/node qz))))
 
-(defn has-label-alter? [node]
-  (let [entry-exprs (->> (tree/get-node node :with-map-expr)
-                         (tree/child-nodes))
-        match (for [e entry-exprs]
-                (let [val-expr (tree/get-node e :with-map-value-expr)
-                      alter-expr (some-> (zipper val-expr)
-                                         (seek-tag :alter-expr)
-                                         (z/node))
-                      table-name (some-> alter-expr
-                                         (tree/get-node-in [:table-expr :ref])
-                                         (query/unparse))
-                      column-name (some-> alter-expr
-                                          (tree/get-node-in [:column-expr])
-                                          (query/unparse))
+(defn is-label-alter? [node]
+  (let [val-expr (tree/get-node node :with-map-value-expr)
+        alter-expr (some-> (zipper val-expr)
+                           (seek-tag :alter-expr)
+                           (z/node))
+        table-name (some-> alter-expr
+                           (tree/get-node-in [:table-expr :ref])
+                           (query/unparse))
+        column-name (some-> alter-expr
+                            (tree/get-node-in [:column-expr])
+                            (query/unparse))
 
-                      binding-name (-> (tree/get-node e :name)
-                                       (query/unparse))]
-                  (and (= table-name "data")
-                       (= column-name "label")
-                       (= binding-name "data"))))]
-    ;; Any of the entry-exprs match.
-    (or match)))
+        binding-name (-> (tree/get-node node :name)
+                         (query/unparse))]
+    (and (= table-name "data")
+         (= column-name "label")
+         (= binding-name "data"))))
 
 (defn add-label-alter [node]
   (let [map-entry-expr (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr)
-        entry-exprs (->> (tree/get-node node :with-map-expr)
-                         (tree/child-nodes))]
-    (doall (map println entry-exprs)))
-  node)
+        whitespace (query/parse "\n     " :start :ws)
+        entry-exprs (as-> node $
+                          (tree/get-node $ :with-map-expr)
+                          (tree/child-nodes $)
+                          (remove is-label-alter? $)
+                          (concat $ [map-entry-expr])
+                          ;; Is there a better way?
+                          (interleave $ (repeat ",") (repeat whitespace))
+                          (drop-last 2 $))]
+    (-> (zipper node)
+        (seek-tag :with-map-expr)
+        (z/replace (tree/node :with-map-expr entry-exprs))
+        (z/root))))
 
 (defn add-label-update-pos [node updates]
+  ;; TODO edit this to work correctly.
+  (let [map-entry-expr (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr)
+        whitespace (query/parse "\n     " :start :ws)
+        entry-exprs (as-> node $
+                          (tree/get-node $ :with-map-expr)
+                          (tree/child-nodes $)
+                          (remove is-label-alter? $)
+                          (concat $ [map-entry-expr])
+                          ;; Is there a better way?
+                          (interleave $ (repeat ",") (repeat whitespace))
+                          (drop-last 2 $))]
+    (-> (zipper node)
+        (seek-tag :with-map-expr)
+        (z/replace (tree/node :with-map-expr entry-exprs))
+        (z/root)))
   node)
 
 (defn add-label-update-neg [node updates]
@@ -195,11 +216,14 @@
 
 (def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
 
-(add-update-labels-expr "SELECT age, gender FROM data;"
-                        "WITH (ALTER data ADD label) AS data,
-                              (UPDATE data SET label=false WHERE rowid=1 OR rowid=2 OR rowid=3) AS data:
-                         SELECT * FROM data;"
-                        updates)
+(def test-new-qs "SELECT age, gender FROM data;")
+(def test-prev-qs
+  (long-str
+    "WITH (ALTER data ADD label) AS data,"
+    "     (UPDATE data SET label=false WHERE rowid=1 OR rowid=2 OR rowid=3) AS data:"
+    "SELECT * FROM data;"))
+
+(add-update-labels-expr test-new-qs test-prev-qs updates)
 
 ;-------------------------------------------------------
 
@@ -247,7 +271,6 @@
 (def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
 (def updates {3 {:label "True"}, 6 {:label "True"}})
 
-(defn long-str [& strings] (clojure.string/join "\n" strings))
 
 (def prob-of-query
   (long-str
