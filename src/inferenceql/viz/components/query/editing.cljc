@@ -196,7 +196,7 @@
                     nil))]
     (reducer node)))
 
-(defn update-pos-node? [node]
+(defn update-node-map [node]
   (let [val-expr (tree/get-node node :with-map-value-expr)
         update-expr (some-> (zipper val-expr)
                             (seek-tag :update-expr)
@@ -205,27 +205,30 @@
                            (tree/get-node-in [:table-expr :ref])
                            (query/unparse))
 
-        set-maps (some-> update-expr
-                         (tree/get-node-in [:set-clause :map-expr])
-                         (tree/child-nodes))
-
         eval #(query/eval % {})
-        set (some-> set-maps first eval)
+        set-map-exprs (some-> update-expr
+                              (tree/get-node-in [:set-clause :map-expr])
+                              (tree/child-nodes))
+        set-map (apply merge (map eval set-map-exprs))
 
         where-pairs  (some-> update-expr
                              (tree/get-node-in [:where-clause :or-condition])
                              (reduce-or-node))
         binding-name (-> (tree/get-node node :name)
-                         (query/unparse))]
-    (and (= table-name "data")
-         (= (count set-maps) 1)
-         (= set {:label true})
-         (every? #(and (= "rowid" (first %)) (integer? (second %)))
-                 where-pairs)
-         (= binding-name "data"))))
+                         (query/unparse))
 
-(defn get-updates [node]
-  {})
+        is-label-update (and (= table-name "data")
+                             (every? #(and (= "rowid" (first %)) (integer? (second %)))
+                                     where-pairs)
+                             (= binding-name "data"))]
+    {:table-name table-name
+     :set-map set-map
+     :where-pairs where-pairs
+     :binding-name binding-name
+     :is-label-pos-update (and is-label-update
+                               (= set-map {:label true}))
+     :is-label-neg-update (and is-label-update
+                               (= set-map {:label false}))}))
 
 (defn update-pos-node [updates]
   (let [rowids (-> (medley/filter-vals true? updates)
@@ -241,13 +244,19 @@
         entry-exprs (as-> node $
                           (tree/get-node $ :with-map-expr)
                           (tree/child-nodes $))
-        updates-pos (filter update-pos-node? entry-exprs)
 
-        existing-updates (apply merge (map get-updates updates-pos))
+        updates-pos-ids (->> entry-exprs
+                             (map update-node-map)
+                             (filter :is-label-pos-update)
+                             (map :where-pairs)
+                             (apply concat)
+                             (map second))
+
+        existing-updates (zipmap updates-pos-ids (repeat true))
         new-update-expr (update-pos-node (merge existing-updates updates))
 
         entry-exprs (as-> entry-exprs $
-                          (remove update-pos-node? $)
+                          (remove (comp :is-label-pos-update update-node-map) $)
                           (concat $ [new-update-expr])
                           ;; Is there a better way?
                           (interleave $ (repeat ",") (repeat whitespace))
@@ -285,7 +294,7 @@
 (def test-prev-qs
   (long-str
     "WITH (ALTER data ADD label) AS data,"
-    "     (UPDATE data SET label=false WHERE rowid=1 OR rowid=2 OR rowid=3) AS data:"
+    "     (UPDATE data SET label=true WHERE rowid=1 OR rowid=2 OR rowid=3) AS data:"
     "SELECT * FROM data;"))
 
 (add-update-labels-expr test-new-qs test-prev-qs updates)
