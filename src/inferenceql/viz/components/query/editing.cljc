@@ -175,32 +175,97 @@
         (z/replace (tree/node :with-map-expr entry-exprs))
         (z/root))))
 
+(defn reduce-or-node [node]
+  (let [reducer (fn reducer [node]
+                  (case (tree/tag node)
+                    :or-condition (let [child-nodes (tree/child-nodes node)]
+                                    (case (count child-nodes)
+                                      1 (reducer (tree/only-child node))
+                                      2 (let [where-pairs (map reducer child-nodes)]
+                                          (if (every? some? where-pairs)
+                                            (apply concat where-pairs)
+                                            nil))))
+                    :condition (reducer (tree/only-child node))
+                    :equality-condition (let [selection (some-> node
+                                                                (tree/get-node :selection)
+                                                                (query/eval {}))
+                                              value (some-> node
+                                                            (tree/get-node :value)
+                                                            (query/eval {}))]
+                                          [[selection value]])
+                    nil))]
+    (reducer node)))
+
+(defn update-pos-node? [node]
+  (let [val-expr (tree/get-node node :with-map-value-expr)
+        update-expr (some-> (zipper val-expr)
+                            (seek-tag :update-expr)
+                            (z/node))
+        table-name (some-> update-expr
+                           (tree/get-node-in [:table-expr :ref])
+                           (query/unparse))
+
+        set-maps (some-> update-expr
+                         (tree/get-node-in [:set-clause :map-expr])
+                         (tree/child-nodes))
+
+        eval #(query/eval % {})
+        set (some-> set-maps first eval)
+
+        where-pairs  (some-> update-expr
+                             (tree/get-node-in [:where-clause :or-condition])
+                             (reduce-or-node))
+        binding-name (-> (tree/get-node node :name)
+                         (query/unparse))]
+    (and (= table-name "data")
+         (= (count set-maps) 1)
+         (= set {:label true})
+         (every? #(and (= "rowid" (first %)) (integer? (second %)))
+                 where-pairs)
+         (= binding-name "data"))))
+
+(defn get-updates [node]
+  {})
+
+(defn update-pos-node [updates]
+  (let [rowids (-> (medley/filter-vals true? updates)
+                   (keys))
+        cond-str (->> rowids
+                      (map #(format "rowid=%d" %))
+                      (str/join " OR "))
+        qs (format "(UPDATE data SET label=true WHERE %s) AS data" cond-str)]
+    (query/parse qs :start :with-map-entry-expr)))
+
 (defn add-label-update-pos [node updates]
-  ;; TODO edit this to work correctly.
-  (let [map-entry-expr (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr)
-        whitespace (query/parse "\n     " :start :ws)
+  (let [whitespace (query/parse "\n     " :start :ws)
         entry-exprs (as-> node $
                           (tree/get-node $ :with-map-expr)
-                          (tree/child-nodes $)
-                          (remove is-label-alter? $)
-                          (concat $ [map-entry-expr])
+                          (tree/child-nodes $))
+        updates-pos (filter update-pos-node? entry-exprs)
+
+        existing-updates (apply merge (map get-updates updates-pos))
+        new-update-expr (update-pos-node (merge existing-updates updates))
+
+        entry-exprs (as-> entry-exprs $
+                          (remove update-pos-node? $)
+                          (concat $ [new-update-expr])
                           ;; Is there a better way?
                           (interleave $ (repeat ",") (repeat whitespace))
                           (drop-last 2 $))]
     (-> (zipper node)
         (seek-tag :with-map-expr)
         (z/replace (tree/node :with-map-expr entry-exprs))
-        (z/root)))
-  node)
+        (z/root))))
 
 (defn add-label-update-neg [node updates]
   node)
 
 (defn add-updates-to-with [node updates]
-  (-> node
-      (add-label-alter)
-      (add-label-update-pos updates)
-      (add-label-update-neg updates)))
+  (let [updates (medley/map-vals #(coerce-bool (:label %)) updates)]
+    (-> node
+        (add-label-alter)
+        (add-label-update-pos updates)
+        (add-label-update-neg updates))))
 
 (defn add-update-labels-expr [new-qs prev-qs updates]
   (let [new-sub-query-node (with-sub-query-node new-qs)
@@ -289,9 +354,9 @@
   (print (add-update-labels-expr-help prob-of-query updates))
 
   (add-incorp-labels-expr "SELECT * FROM data;" updates)
-  (add-incorp-labels-expr prob-of-query updates))
+  (add-incorp-labels-expr prob-of-query updates)
 
 
 
 
-(print (add-update-labels-expr-help prob-of-query updates))
+  (print (add-update-labels-expr-help prob-of-query updates)))
