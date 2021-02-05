@@ -4,7 +4,7 @@
             [inferenceql.query :as query]
             [inferenceql.query.parse-tree :as tree]
             [inferenceql.viz.components.query.util :as util]
-            [inferenceql.viz.components.query.editing :refer [add-rowid]]
+            [inferenceql.viz.components.query.editing :refer [add-rowid-and-label]]
             [inferenceql.viz.config :as config]
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
@@ -100,9 +100,7 @@
     :js/alert -- If the query ran locally and failed, an error message will be output."
   [{:keys [db]} [_ text datasets models]]
   (let [{:keys [query-server-url]} config/config
-        ;; TODO: also add the label column to the selection list.
-        query (add-rowid (str/trim text))]
-    (.log js/console :query query)
+        query (add-rowid-and-label (str/trim text))]
     (if query-server-url
       ;; Use the query server as a remote query execution engine.
       {:http-xhrio {:method          :post

@@ -46,7 +46,7 @@
     :else
     (recur (z/next loc) tag)))
 
-(defn- add-rowid-helper
+(defn- add-rowid-and-label-helper
   "Performs the heavy lifting for `add-row-id`.
 
   Args:
@@ -54,23 +54,26 @@
   Returns:
     A query string."
   [query]
-  #?(:cljs (.log js/console :here2))
-  (let [add-rowid (fn [zip]
-                    ;; Takes zip, a zipper that points to a :select-list node.
-                    #?(:cljs (.log js/console :zip (z/node zip)))
-                    (let [select-list-str (-> zip
-                                              (z/node)
-                                              (query/unparse))
-                          select-list-node (query/parse (str "rowid, " select-list-str) :start :select-list)]
-                      (z/replace zip select-list-node)))]
+  (let [rowid-selection-node (query/parse "rowid" :start :selection)
+        label-col-selection-node (query/parse "label" :start :selection)
+
+        add-rowid (fn [select-list-node]
+                    (let [selections (into [rowid-selection-node
+                                            label-col-selection-node]
+                                           (tree/child-nodes select-list-node))
+                          selections (as-> selections $
+                                           (interleave $ (repeat ",") (repeat (query/parse " " :start :ws)))
+                                           (drop-last 2 $))]
+
+                      (tree/node :select-list selections)))]
     (-> (query/parse query)
         (zipper)
         (seek-tag :select-list)
-        (add-rowid)
+        (z/edit add-rowid)
         (z/root)
         (query/unparse))))
 
-(defn add-rowid
+(defn add-rowid-and-label
   "Adds rowid to the start of the select-list in a `query` string.
   If the query can not be parsed, the original query will be returned.
   If rowid is already present in the select-list, this is a no-op.
@@ -80,13 +83,10 @@
   Returns:
     A query string."
   [query]
-  #?(:cljs (.log js/console :here))
   (let [node-or-failure (query/parse query)]
     (if (insta/failure? node-or-failure)
       query
-      (if (seek-tag (zipper node-or-failure) :rowid-selection)
-        query
-        (add-rowid-helper query)))))
+      (add-rowid-and-label-helper query))))
 
 ;-------------------------------------------------------
 
@@ -328,6 +328,8 @@
    "       age,"
    "       gender"
    "FROM data;"))
+
+(query/parse prob-of-query)
 
 
 ;;(add-incorp-labels-expr "SELECT * FROM data;" updates)
