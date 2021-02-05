@@ -8,14 +8,15 @@
   ;; NOTE: We currently assume the dataset and model referenced
   ;; in the current query is always :data and :model, respectively.
   {:query-component {:dataset-name :data
-                     :model-name :model
-                     :query-to-edit "SELECT * FROM data;"}})
+                     :model-name :model}})
+
 
 (s/def ::query-component (s/keys :req-un [::dataset-name
-                                          ::model-name
-                                          ::query-displayed]
+                                          ::model-name]
+
                                  :opt-un [::virtual
-                                          ::column-details]))
+                                          ::column-details
+                                          ::query-displayed]))
 
 ;; The dataset referenced in the last query executed.
 (s/def ::dataset-name keyword?)

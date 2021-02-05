@@ -102,6 +102,7 @@
   (let [{:keys [query-server-url]} config/config
         ;; TODO: also add the label column to the selection list.
         query (add-rowid (str/trim text))]
+    (.log js/console :query query)
     (if query-server-url
       ;; Use the query server as a remote query execution engine.
       {:http-xhrio {:method          :post
