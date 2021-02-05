@@ -1,1 +1,6 @@
-{:gender :categorical, :age :gaussian, :height :gaussian},
+{:gender :categorical,
+ :age :categorical,
+ :bmi :gaussian,
+ :smoker :categorical,
+ :health_status :categorical,
+ :exercise :categorical}
