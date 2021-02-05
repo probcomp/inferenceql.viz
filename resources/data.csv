@@ -1,51 +1,1987 @@
-age,height,gender
-48.2486907273,161.116010103,female
-43.7764871727,160.437072575,female
-43.9436564955,161.277734626,female
-42.8540627557,159.994006571,female
-46.7308152586,160.041904389,female
-40.3969226062,176.11423493,female
-48.4896235284,161.182731906,female
-43.4775861982,175.859100061,male
-45.6380781921,160.698862897,female
-44.501259249,162.241961964,female
-47.9242158741,162.047048051,female
-40.879718581,176.335593366,female
-44.355165592,175.542992721,male
-44.2318912907,161.566345679,female
-47.2675388847,176.501147262,male
-42.8002174654,161.279842086,female
-44.6551435849,176.607926727,male
-43.2442831642,161.29744958,female
-45.0844274934,160.484219487,female
-46.1656304274,161.635241531,female
-42.7987616456,160.069998734,female
-47.2894474197,176.234649276,male
-46.8031814412,176.205171928,male
-46.0049886778,161.615077471,female
-46.8017118985,176.874230163,male
-43.6325442817,162.14301677,female
-44.754219549,160.540693981,female
-43.1284611315,160.666507786,female
-44.4642238407,175.422354478,male
-46.0607109335,162.694225862,female
-43.6166784965,157.966698176,female
-44.2064929463,161.178512969,male
-43.6256545998,175.880762866,female
-43.309588717,162.79837682,female
-43.6575077383,176.372440833,male
-44.9746708022,175.969771315,male
-42.7653793027,161.065395285,female
-45.4688313956,176.126253979,male
-48.3196043542,175.860262911,male
-46.4840883212,175.798213655,male
-44.6163288953,176.195407259,female
-43.2247420718,176.350467568,male
-43.5056834125,175.916442307,male
-48.3849092021,175.698240824,male
-45.1016155096,161.345142103,female
-43.7260087069,176.354056466,male
-45.3818309693,175.441401466,male
-49.200510273,176.452651755,male
-45.240317905,176.064014828,male
-46.2344062194,176.120068128,male
+age,gender,bmi,health_status,smoker,exercise
+50-59,Male,23.0,Average,never,1.0
+60-69,Female,27.0,Average,never,1.0
+21-29,Female,19.0,Well above average,never,1.0
+50-59,Female,22.0,Well above average,never,1.0
+50-59,Male,27.0,Average,never,1.0
+21-29,Male,22.0,Average,never,1.0
+60-69,Female,34.0,Above average,never,1.0
+30-39,Male,21.0,Well above average,never,1.0
+60-69,Male,32.0,Above average,never,1.0
+50-59,Male,33.0,Above average,never,1.0
+60-69,Male,35.0,Below average,never,1.0
+50-59,Male,28.0,Average,former,0.0
+60-69,Female,32.0,Above average,never,1.0
+60-69,Female,30.0,Well above average,never,1.0
+50-59,Female,23.0,Below average,never,1.0
+60-69,Female,24.0,Above average,former,1.0
+40-49,Female,18.0,Well above average,former,0.0
+50-59,Female,37.0,Average,never,1.0
+70-79,Male,26.0,Above average,never,1.0
+60-69,Female,22.0,Average,former,0.0
+40-49,Male,26.0,Well above average,former,1.0
+40-49,Female,20.0,Well above average,never,1.0
+70-79,Female,23.0,Above average,former,0.0
+50-59,Male,31.0,Average,never,1.0
+18-20,Male,23.0,Above average,former,1.0
+40-49,Male,22.0,Above average,never,1.0
+70-79,Female,46.0,Average,former,0.0
+30-39,Female,23.0,Average,never,0.0
+30-39,Male,36.0,Average,never,0.0
+30-39,Male,32.0,Above average,never,0.0
+21-29,Male,18.0,Above average,never,1.0
+40-49,Male,22.0,Well above average,never,1.0
+30-39,Male,27.0,Above average,never,1.0
+50-59,Female,28.0,Below average,never,0.0
+50-59,Female,35.0,Below average,never,0.0
+40-49,Female,25.0,Above average,former,1.0
+50-59,Female,31.0,Above average,never,1.0
+30-39,Male,22.0,Well above average,never,1.0
+30-39,Male,31.0,Average,never,1.0
+60-69,Male,29.0,Above average,never,0.0
+40-49,Male,35.0,Below average,never,0.0
+21-29,Female,27.0,Average,never,0.0
+60-69,Male,24.0,Above average,never,1.0
+70-79,Male,31.0,Above average,former,1.0
+21-29,Male,21.0,Above average,never,1.0
+50-59,Female,24.0,Above average,never,1.0
+60-69,Female,34.0,Above average,never,1.0
+60-69,Female,23.0,Above average,never,1.0
+21-29,Male,24.0,Above average,never,1.0
+40-49,Male,34.0,Average,never,0.0
+50-59,Female,34.0,Average,never,1.0
+21-29,Male,24.0,Above average,never,1.0
+70-79,Female,27.0,Above average,never,0.0
+70-79,Female,23.0,Well below average,never,1.0
+21-29,Female,21.0,Above average,never,1.0
+30-39,Female,28.0,Above average,never,1.0
+70-79,Male,24.0,Above average,never,1.0
+21-29,Male,22.0,Average,ecig,1.0
+21-29,Male,21.0,Average,never,1.0
+60-69,Female,24.0,Above average,never,1.0
+60-69,Female,23.0,Well above average,never,1.0
+60-69,Female,24.0,Above average,former,1.0
+30-39,Female,26.0,Above average,never,1.0
+50-59,Female,42.0,Average,never,0.0
+40-49,Female,25.0,Average,never,1.0
+80-older,Male,23.0,Well above average,never,1.0
+21-29,Female,28.0,Above average,never,1.0
+40-49,Female,38.0,Above average,never,1.0
+21-29,Female,18.0,Above average,never,1.0
+30-39,Female,27.0,Above average,never,0.0
+60-69,Female,33.0,Below average,never,0.0
+40-49,Male,25.0,Above average,never,1.0
+40-49,Male,25.0,Above average,former,1.0
+30-39,Female,22.0,Above average,never,1.0
+40-49,Female,25.0,Average,former,1.0
+21-29,Female,27.0,Average,never,0.0
+60-69,Male,41.0,Below average,never,0.0
+30-39,Male,25.0,Above average,former,1.0
+50-59,Female,19.0,Well above average,never,1.0
+50-59,Female,26.0,Average,never,1.0
+40-49,Female,19.0,Well above average,never,1.0
+50-59,Female,22.0,Above average,never,1.0
+40-49,Male,26.0,Above average,former,1.0
+21-29,Male,28.0,Above average,never,1.0
+21-29,Female,16.0,Average,never,0.0
+40-49,Male,27.0,Well above average,former,1.0
+40-49,Male,35.0,Average,former,0.0
+50-59,Male,27.0,Well below average,never,0.0
+40-49,Male,29.0,Above average,never,1.0
+60-69,Female,21.0,Well above average,former,1.0
+50-59,Female,27.0,Above average,never,1.0
+50-59,Female,21.0,Well above average,former,1.0
+21-29,Female,22.0,Above average,never,1.0
+60-69,Female,22.0,Above average,never,1.0
+21-29,Female,23.0,Average,never,1.0
+21-29,Female,26.0,Average,former,1.0
+21-29,Female,34.0,Average,never,1.0
+21-29,Female,23.0,Above average,never,1.0
+40-49,Female,26.0,Average,ecig,0.0
+70-79,Male,28.0,Above average,never,1.0
+40-49,Female,20.0,Above average,never,1.0
+21-29,Female,25.0,Above average,former,0.0
+30-39,Female,29.0,Above average,never,1.0
+30-39,Female,22.0,Above average,never,0.0
+70-79,Female,35.0,Average,never,1.0
+60-69,Female,27.0,Average,never,1.0
+30-39,Female,31.0,Average,never,0.0
+70-79,Male,23.0,Above average,former,1.0
+40-49,Male,24.0,Well above average,never,1.0
+40-49,Male,27.0,Average,never,1.0
+30-39,Female,27.0,Above average,former,1.0
+30-39,Female,20.0,Average,never,0.0
+40-49,Male,30.0,Above average,former,1.0
+40-49,Male,24.0,Above average,never,0.0
+60-69,Female,29.0,Above average,never,0.0
+40-49,Male,29.0,Above average,former,1.0
+70-79,Female,25.0,Average,former,1.0
+30-39,Female,24.0,Above average,never,1.0
+30-39,Female,27.0,Well above average,never,1.0
+30-39,Female,33.0,Average,never,1.0
+21-29,Male,24.0,Well above average,never,1.0
+50-59,Female,21.0,Below average,never,0.0
+50-59,Female,27.0,Average,never,1.0
+21-29,Female,28.0,Well above average,never,1.0
+30-39,Female,22.0,Above average,former,1.0
+30-39,Female,27.0,Well above average,never,1.0
+40-49,Female,28.0,Average,never,0.0
+50-59,Male,29.0,Above average,never,1.0
+40-49,Female,28.0,Above average,former,1.0
+40-49,Male,22.0,Above average,never,1.0
+21-29,Female,20.0,Above average,never,1.0
+50-59,Female,21.0,Above average,never,1.0
+40-49,Female,19.0,Above average,never,0.0
+50-59,Female,24.0,Average,never,0.0
+40-49,Female,23.0,Above average,never,0.0
+21-29,Male,21.0,Above average,never,1.0
+40-49,Male,22.0,Average,never,0.0
+30-39,Male,27.0,Above average,never,1.0
+30-39,Female,21.0,Well above average,never,1.0
+21-29,Male,22.0,Above average,never,1.0
+40-49,Female,32.0,Above average,never,1.0
+40-49,Male,27.0,Average,never,0.0
+40-49,Female,23.0,Above average,never,1.0
+50-59,Female,24.0,Well above average,former,1.0
+40-49,Male,23.0,Average,never,0.0
+50-59,Male,20.0,Average,never,1.0
+60-69,Male,36.0,Below average,former,1.0
+40-49,Male,24.0,Average,never,1.0
+40-49,Female,27.0,Well above average,never,1.0
+21-29,Female,19.0,Above average,never,0.0
+40-49,Male,27.0,Average,never,0.0
+60-69,Female,26.0,Above average,never,1.0
+21-29,Male,26.0,Average,former,1.0
+60-69,Female,33.0,Above average,never,1.0
+30-39,Female,20.0,Above average,never,1.0
+30-39,Female,19.0,Well above average,never,1.0
+21-29,Female,24.0,Above average,never,1.0
+30-39,Male,23.0,Well above average,never,1.0
+60-69,Male,34.0,Below average,never,1.0
+30-39,Female,22.0,Above average,never,1.0
+40-49,Male,29.0,Below average,former,0.0
+60-69,Male,29.0,Average,former,1.0
+50-59,Male,28.0,Average,never,0.0
+21-29,Female,23.0,Above average,never,0.0
+40-49,Female,24.0,Average,never,1.0
+70-79,Male,27.0,Above average,never,1.0
+40-49,Female,28.0,Above average,never,1.0
+60-69,Male,26.0,Above average,never,1.0
+30-39,Male,23.0,Above average,never,1.0
+60-69,Male,31.0,Above average,never,1.0
+40-49,Male,29.0,Above average,never,1.0
+30-39,Female,18.0,Above average,never,1.0
+60-69,Female,19.0,Well above average,never,1.0
+21-29,Male,20.0,Average,never,0.0
+50-59,Male,24.0,Well above average,never,1.0
+21-29,Male,24.0,Above average,former,1.0
+50-59,Male,27.0,Average,never,1.0
+40-49,Male,23.0,Above average,never,1.0
+50-59,Male,24.0,Above average,never,1.0
+30-39,Female,20.0,Average,never,0.0
+60-69,Female,21.0,Well above average,never,1.0
+50-59,Female,26.0,Average,never,0.0
+70-79,Female,25.0,Above average,never,1.0
+21-29,Male,20.0,Average,never,0.0
+60-69,Female,27.0,Average,never,1.0
+30-39,Male,29.0,Above average,never,1.0
+21-29,Male,27.0,Average,never,0.0
+50-59,Female,26.0,Average,never,1.0
+50-59,Male,31.0,Average,ecig,1.0
+50-59,Female,25.0,Average,never,1.0
+50-59,Male,27.0,Average,never,0.0
+30-39,Male,46.0,Average,current,1.0
+40-49,Female,19.0,Above average,never,1.0
+50-59,Male,41.0,Average,never,1.0
+70-79,Male,44.0,Above average,never,1.0
+50-59,Female,19.0,Above average,never,0.0
+60-69,Male,23.0,Average,never,0.0
+50-59,Male,28.0,Average,never,1.0
+60-69,Female,18.0,Well above average,never,1.0
+50-59,Male,30.0,Well above average,never,1.0
+30-39,Female,22.0,Above average,former,1.0
+60-69,Male,23.0,Well above average,never,1.0
+70-79,Male,32.0,Above average,former,1.0
+40-49,Female,26.0,Average,never,1.0
+21-29,Female,17.0,Average,never,1.0
+21-29,Male,20.0,Average,never,1.0
+60-69,Male,25.0,Above average,former,1.0
+40-49,Female,25.0,Average,never,0.0
+30-39,Male,20.0,Average,former,0.0
+50-59,Male,27.0,Well above average,never,1.0
+40-49,Male,19.0,Above average,never,0.0
+18-20,Female,19.0,Average,never,0.0
+30-39,Female,24.0,Above average,never,1.0
+40-49,Male,25.0,Above average,former,1.0
+21-29,Female,25.0,Well above average,former,1.0
+30-39,Female,31.0,Above average,current,1.0
+50-59,Female,27.0,Above average,never,1.0
+21-29,Female,19.0,Average,former,0.0
+50-59,Male,25.0,Above average,never,1.0
+30-39,Male,29.0,Average,never,1.0
+30-39,Female,22.0,Above average,never,1.0
+50-59,Male,27.0,Average,never,1.0
+70-79,Male,31.0,Average,former,1.0
+30-39,Female,19.0,Average,current,0.0
+70-79,Female,32.0,Above average,never,1.0
+60-69,Male,25.0,Well above average,never,1.0
+50-59,Male,23.0,Well above average,never,1.0
+30-39,Female,24.0,Well above average,never,1.0
+50-59,Male,15.0,Above average,never,1.0
+50-59,Male,38.0,Average,former,1.0
+70-79,Male,23.0,Well above average,former,1.0
+50-59,Male,24.0,Above average,never,1.0
+40-49,Female,30.0,Above average,never,1.0
+70-79,Male,27.0,Above average,former,1.0
+60-69,Male,21.0,Well above average,never,1.0
+30-39,Female,22.0,Average,never,1.0
+50-59,Female,27.0,Average,never,0.0
+50-59,Male,33.0,Average,former,1.0
+40-49,Male,27.0,Above average,never,1.0
+30-39,Male,23.0,Above average,never,1.0
+40-49,Male,25.0,Above average,never,1.0
+40-49,Female,22.0,Average,never,1.0
+70-79,Male,22.0,Well above average,never,1.0
+40-49,Female,23.0,Above average,never,1.0
+70-79,Male,24.0,Above average,never,1.0
+40-49,Male,24.0,Above average,former,1.0
+70-79,Male,22.0,Above average,never,1.0
+40-49,Male,27.0,Above average,never,1.0
+60-69,Male,27.0,Above average,never,1.0
+30-39,Male,37.0,Below average,never,1.0
+40-49,Female,35.0,Average,never,0.0
+50-59,Female,24.0,Well above average,former,1.0
+30-39,Female,21.0,Above average,never,0.0
+40-49,Female,27.0,Average,never,0.0
+50-59,Male,30.0,Above average,never,0.0
+50-59,Male,25.0,Above average,never,1.0
+50-59,Male,25.0,Above average,never,1.0
+50-59,Female,27.0,Average,former,1.0
+70-79,Female,24.0,Well above average,former,1.0
+70-79,Male,28.0,Well above average,never,1.0
+70-79,Male,29.0,Below average,never,0.0
+40-49,Male,27.0,Above average,never,1.0
+21-29,Male,26.0,Above average,never,0.0
+70-79,Male,21.0,Above average,never,1.0
+50-59,Female,22.0,Above average,never,1.0
+70-79,Female,22.0,Well above average,former,1.0
+60-69,Male,27.0,Average,never,0.0
+80-older,Female,40.0,Above average,former,0.0
+60-69,Male,31.0,Above average,never,1.0
+30-39,Female,20.0,Well above average,never,1.0
+50-59,Female,25.0,Above average,former,1.0
+70-79,Male,21.0,Below average,never,1.0
+30-39,Female,23.0,Above average,never,1.0
+80-older,Male,27.0,Below average,never,0.0
+50-59,Female,28.0,Average,never,0.0
+40-49,Female,31.0,Well above average,never,0.0
+50-59,Male,26.0,Well above average,never,1.0
+40-49,Female,24.0,Above average,never,1.0
+70-79,Female,38.0,Average,never,0.0
+50-59,Female,30.0,Above average,never,1.0
+40-49,Female,33.0,Average,never,1.0
+40-49,Female,26.0,Average,current,1.0
+60-69,Female,27.0,Above average,never,0.0
+70-79,Male,22.0,Above average,never,1.0
+50-59,Female,27.0,Average,never,1.0
+50-59,Female,32.0,Well above average,never,0.0
+21-29,Female,22.0,Average,never,1.0
+40-49,Female,41.0,Below average,never,0.0
+50-59,Female,25.0,Above average,never,0.0
+60-69,Female,21.0,Above average,never,0.0
+60-69,Female,22.0,Above average,never,1.0
+40-49,Female,31.0,Above average,never,1.0
+40-49,Male,27.0,Above average,never,1.0
+50-59,Female,20.0,Above average,never,1.0
+50-59,Female,38.0,Average,former,1.0
+60-69,Female,20.0,Average,never,0.0
+50-59,Female,27.0,Above average,former,0.0
+60-69,Male,26.0,Well above average,never,0.0
+30-39,Female,22.0,Average,never,1.0
+30-39,Female,18.0,Average,never,0.0
+40-49,Female,20.0,Below average,never,0.0
+50-59,Female,46.0,Below average,never,0.0
+30-39,Male,24.0,Above average,never,0.0
+60-69,Female,21.0,Well above average,never,1.0
+50-59,Female,38.0,Below average,never,1.0
+21-29,Male,21.0,Well above average,never,1.0
+70-79,Male,27.0,Well above average,never,1.0
+30-39,Female,17.0,Well above average,never,1.0
+30-39,Female,25.0,Above average,never,1.0
+30-39,Male,25.0,Average,ecig,0.0
+30-39,Female,28.0,Average,former,1.0
+40-49,Male,32.0,Average,never,0.0
+21-29,Female,29.0,Above average,never,1.0
+21-29,Female,25.0,Above average,former,1.0
+50-59,Female,21.0,Well above average,never,1.0
+30-39,Female,27.0,Average,former,0.0
+30-39,Female,25.0,Above average,never,0.0
+50-59,Male,24.0,Well above average,never,1.0
+50-59,Female,21.0,Well above average,never,1.0
+50-59,Female,20.0,Well above average,never,1.0
+50-59,Female,24.0,Well below average,never,1.0
+60-69,Female,27.0,Well below average,former,0.0
+40-49,Female,27.0,Average,never,1.0
+60-69,Male,23.0,Average,former,1.0
+40-49,Male,24.0,Above average,never,0.0
+50-59,Female,27.0,Well above average,never,0.0
+21-29,Female,21.0,Above average,never,0.0
+50-59,Female,23.0,Above average,never,1.0
+30-39,Female,32.0,Above average,never,1.0
+21-29,Other,26.0,Below average,never,1.0
+40-49,Female,24.0,Average,never,0.0
+40-49,Male,23.0,Well above average,never,1.0
+40-49,Male,27.0,Above average,never,1.0
+40-49,Male,23.0,Average,former,0.0
+40-49,Female,25.0,Above average,never,1.0
+30-39,Male,24.0,Above average,never,1.0
+60-69,Male,26.0,Well above average,never,1.0
+50-59,Male,25.0,Above average,never,1.0
+70-79,Male,22.0,Above average,never,1.0
+60-69,Male,28.0,Above average,never,1.0
+40-49,Male,26.0,Above average,former,0.0
+30-39,Female,29.0,Above average,former,0.0
+60-69,Female,32.0,Above average,former,0.0
+60-69,Female,21.0,Well above average,never,1.0
+70-79,Female,24.0,Well above average,never,1.0
+30-39,Female,19.0,Above average,never,1.0
+30-39,Female,29.0,Above average,never,0.0
+30-39,Female,27.0,Average,never,1.0
+30-39,Male,33.0,Well above average,never,1.0
+40-49,Female,26.0,Well above average,never,1.0
+50-59,Male,32.0,Average,former,0.0
+40-49,Female,38.0,Below average,former,0.0
+60-69,Female,23.0,Above average,never,0.0
+40-49,Female,19.0,Above average,never,1.0
+40-49,Female,29.0,Well above average,never,1.0
+40-49,Female,37.0,Average,never,0.0
+50-59,Female,28.0,Above average,former,1.0
+18-20,Female,21.0,Well above average,never,1.0
+40-49,Female,28.0,Above average,never,1.0
+50-59,Female,29.0,Average,never,0.0
+50-59,Female,32.0,Average,never,1.0
+50-59,Male,22.0,Above average,never,1.0
+30-39,Female,23.0,Above average,never,1.0
+40-49,Male,29.0,Average,former,0.0
+21-29,Female,24.0,Average,never,1.0
+21-29,Female,20.0,Above average,never,1.0
+50-59,Female,35.0,Below average,former,0.0
+50-59,Male,25.0,Well above average,never,1.0
+60-69,Female,24.0,Above average,former,1.0
+50-59,Female,32.0,Above average,never,0.0
+21-29,Female,27.0,Average,never,1.0
+50-59,Female,23.0,Above average,never,0.0
+21-29,Female,39.0,Average,former,0.0
+21-29,Female,40.0,Above average,former,1.0
+50-59,Male,37.0,Average,never,0.0
+40-49,Female,21.0,Well above average,never,1.0
+40-49,Female,25.0,Well above average,never,1.0
+30-39,Female,25.0,Above average,former,0.0
+21-29,Female,23.0,Above average,never,0.0
+70-79,Female,27.0,Well above average,never,1.0
+60-69,Male,28.0,Average,never,1.0
+60-69,Female,32.0,Above average,former,0.0
+40-49,Female,33.0,Below average,never,0.0
+60-69,Male,26.0,Above average,never,1.0
+50-59,Male,32.0,Above average,never,0.0
+50-59,Male,27.0,Above average,never,1.0
+30-39,Female,31.0,Average,current,0.0
+50-59,Male,38.0,Average,never,0.0
+60-69,Female,26.0,Average,never,1.0
+50-59,Female,29.0,Average,never,0.0
+30-39,Female,22.0,Well above average,never,1.0
+30-39,Female,23.0,Average,former,1.0
+21-29,Female,20.0,Above average,never,1.0
+70-79,Male,25.0,Average,former,1.0
+30-39,Male,25.0,Above average,never,1.0
+40-49,Female,28.0,Well above average,current,0.0
+50-59,Male,31.0,Above average,former,1.0
+70-79,Female,29.0,Above average,former,1.0
+21-29,Male,20.0,Above average,never,0.0
+30-39,Male,33.0,Above average,never,1.0
+30-39,Female,23.0,Well above average,never,0.0
+40-49,Male,25.0,Average,never,1.0
+50-59,Male,23.0,Above average,never,1.0
+50-59,Female,21.0,Average,never,1.0
+50-59,Male,33.0,Above average,never,0.0
+30-39,Female,24.0,Well above average,never,1.0
+50-59,Female,38.0,Average,former,0.0
+30-39,Female,22.0,Average,never,0.0
+30-39,Female,32.0,Average,current,0.0
+50-59,Female,26.0,Average,former,0.0
+40-49,Male,36.0,Average,never,0.0
+30-39,Female,33.0,Above average,current,0.0
+30-39,Female,24.0,Average,current,0.0
+60-69,Female,34.0,Average,never,1.0
+30-39,Male,38.0,Average,never,0.0
+50-59,Female,51.0,Below average,never,0.0
+21-29,Male,29.0,Above average,current,0.0
+30-39,Female,27.0,Below average,current,0.0
+40-49,Male,19.0,Above average,current,1.0
+40-49,Female,22.0,Well above average,never,1.0
+30-39,Female,22.0,Above average,never,1.0
+70-79,Male,28.0,Above average,never,1.0
+60-69,Female,27.0,Average,former,0.0
+30-39,Female,34.0,Above average,former,0.0
+60-69,Female,33.0,Average,never,1.0
+50-59,Male,27.0,Above average,current,0.0
+50-59,Female,20.0,Above average,never,1.0
+50-59,Female,31.0,Above average,never,0.0
+50-59,Male,19.0,Average,never,1.0
+40-49,Female,19.0,Above average,current,1.0
+30-39,Female,28.0,Average,never,0.0
+40-49,Female,21.0,Above average,current,1.0
+50-59,Male,27.0,Well above average,current,0.0
+50-59,Female,23.0,Well above average,former,1.0
+40-49,Female,28.0,Below average,current,0.0
+30-39,Female,21.0,Above average,current,1.0
+50-59,Female,21.0,Well above average,never,1.0
+30-39,Male,22.0,Above average,current,0.0
+40-49,Female,21.0,Above average,former,1.0
+21-29,Female,15.0,Well above average,never,1.0
+40-49,Male,32.0,Average,former,1.0
+30-39,Male,29.0,Well above average,never,1.0
+21-29,Male,27.0,Above average,never,1.0
+30-39,Male,32.0,Above average,never,1.0
+40-49,Female,23.0,Average,never,1.0
+40-49,Male,31.0,Above average,never,1.0
+40-49,Male,40.0,Average,ecig,1.0
+40-49,Male,41.0,Average,ecig,1.0
+70-79,Female,32.0,Below average,never,0.0
+21-29,Male,18.0,Above average,never,0.0
+21-29,Female,20.0,Well above average,never,0.0
+50-59,Male,34.0,Below average,current,0.0
+50-59,Female,15.0,Average,never,0.0
+40-49,Male,32.0,Above average,current,1.0
+21-29,Female,27.0,Above average,ecig,1.0
+50-59,Female,21.0,Average,never,1.0
+21-29,Male,24.0,Above average,ecig,0.0
+50-59,Female,30.0,Average,former,0.0
+30-39,Male,30.0,Below average,never,1.0
+40-49,Female,25.0,Above average,former,1.0
+60-69,Male,26.0,Above average,never,1.0
+40-49,Female,23.0,Well above average,never,1.0
+60-69,Male,32.0,Average,former,0.0
+21-29,Male,43.0,Average,never,0.0
+40-49,Male,22.0,Well above average,never,1.0
+40-49,Female,27.0,Above average,never,1.0
+60-69,Male,27.0,Above average,never,0.0
+40-49,Male,24.0,Above average,never,1.0
+21-29,Female,27.0,Average,never,0.0
+30-39,Male,25.0,Well above average,former,1.0
+21-29,Male,22.0,Average,never,0.0
+21-29,Female,22.0,Above average,never,1.0
+21-29,Male,27.0,Above average,never,1.0
+40-49,Male,35.0,Above average,former,0.0
+70-79,Female,21.0,Well above average,never,1.0
+21-29,Female,23.0,Average,current,0.0
+21-29,Male,28.0,Average,never,1.0
+50-59,Male,28.0,Above average,former,1.0
+40-49,Female,25.0,Above average,former,1.0
+30-39,Female,22.0,Above average,never,1.0
+21-29,Female,22.0,Above average,never,1.0
+50-59,Female,19.0,Average,current,1.0
+40-49,Female,22.0,Above average,never,1.0
+50-59,Female,26.0,Average,never,1.0
+50-59,Female,31.0,Below average,never,0.0
+70-79,Female,17.0,Average,former,1.0
+50-59,Female,19.0,Above average,never,1.0
+21-29,Male,18.0,Above average,never,1.0
+21-29,Female,21.0,Above average,never,0.0
+70-79,Male,26.0,Above average,never,1.0
+40-49,Female,29.0,Below average,never,1.0
+21-29,Male,21.0,Well above average,never,1.0
+18-20,Male,24.0,Well above average,never,1.0
+70-79,Female,29.0,Above average,former,1.0
+40-49,Male,28.0,Above average,never,1.0
+70-79,Male,25.0,Below average,never,1.0
+21-29,Female,22.0,Above average,never,1.0
+40-49,Male,24.0,Average,never,0.0
+70-79,Male,24.0,Well above average,never,1.0
+30-39,Female,50.0,Average,never,0.0
+40-49,Male,27.0,Above average,never,1.0
+30-39,Female,66.0,Below average,current,0.0
+50-59,Female,32.0,Average,never,1.0
+60-69,Female,26.0,Above average,never,0.0
+60-69,Female,21.0,Average,former,0.0
+40-49,Female,19.0,Above average,never,1.0
+50-59,Female,20.0,Average,current,1.0
+70-79,Female,25.0,Above average,never,1.0
+70-79,Female,31.0,Below average,former,1.0
+40-49,Female,64.0,Below average,never,0.0
+40-49,Male,31.0,Average,never,1.0
+21-29,Female,33.0,Average,never,1.0
+60-69,Female,27.0,Well above average,never,1.0
+30-39,Female,21.0,Well above average,former,1.0
+80-older,Female,25.0,Above average,former,1.0
+40-49,Female,30.0,Above average,never,1.0
+80-older,Male,26.0,Average,former,0.0
+40-49,Female,23.0,Above average,never,1.0
+70-79,Female,24.0,Above average,former,1.0
+50-59,Female,39.0,Average,never,1.0
+60-69,Female,27.0,Above average,former,1.0
+50-59,Female,18.0,Above average,never,0.0
+40-49,Female,18.0,Well above average,never,1.0
+60-69,Female,23.0,Well above average,never,1.0
+70-79,Female,21.0,Above average,never,1.0
+21-29,Female,29.0,Average,never,1.0
+40-49,Female,24.0,Above average,never,1.0
+30-39,Female,22.0,Above average,never,1.0
+60-69,Male,24.0,Average,former,1.0
+50-59,Male,25.0,Average,never,1.0
+50-59,Female,25.0,Average,never,1.0
+30-39,Male,21.0,Above average,never,0.0
+21-29,Female,21.0,Above average,never,1.0
+30-39,Male,28.0,Average,former,0.0
+60-69,Male,25.0,Well above average,never,1.0
+60-69,Male,24.0,Well above average,never,1.0
+60-69,Female,29.0,Above average,never,1.0
+70-79,Male,28.0,Well above average,never,1.0
+40-49,Female,26.0,Above average,never,1.0
+70-79,Male,24.0,Well above average,former,1.0
+30-39,Male,26.0,Above average,former,0.0
+40-49,Female,20.0,Above average,former,0.0
+40-49,Female,22.0,Well above average,never,1.0
+70-79,Female,23.0,Above average,never,1.0
+21-29,Female,20.0,Above average,former,1.0
+70-79,Female,24.0,Above average,never,1.0
+50-59,Male,23.0,Well above average,never,1.0
+21-29,Male,30.0,Above average,former,1.0
+70-79,Female,26.0,Above average,never,1.0
+30-39,Male,24.0,Above average,current,1.0
+60-69,Male,20.0,Above average,never,1.0
+50-59,Male,27.0,Above average,never,1.0
+70-79,Female,25.0,Above average,former,0.0
+50-59,Female,20.0,Well above average,former,1.0
+21-29,Female,37.0,Well below average,current,0.0
+21-29,Female,21.0,Average,current,0.0
+70-79,Female,32.0,Average,never,1.0
+21-29,Female,22.0,Well above average,former,1.0
+21-29,Male,28.0,Above average,never,1.0
+60-69,Female,18.0,Well above average,never,1.0
+50-59,Female,19.0,Above average,never,1.0
+30-39,Female,28.0,Average,never,1.0
+50-59,Female,23.0,Well above average,former,1.0
+30-39,Female,26.0,Above average,former,1.0
+60-69,Female,27.0,Well above average,never,1.0
+60-69,Male,29.0,Average,never,1.0
+30-39,Female,21.0,Average,current,0.0
+60-69,Female,30.0,Below average,current,1.0
+80-older,Female,10.0,Well above average,former,1.0
+30-39,Male,26.0,Well above average,ecig,1.0
+80-older,Female,27.0,Above average,never,1.0
+80-older,Male,24.0,Average,never,1.0
+21-29,Female,24.0,Average,never,0.0
+50-59,Female,32.0,Average,never,0.0
+50-59,Female,17.0,Average,never,1.0
+40-49,Female,30.0,Average,never,0.0
+50-59,Male,24.0,Above average,former,1.0
+50-59,Female,29.0,Average,ecig,1.0
+60-69,Female,40.0,Average,former,0.0
+21-29,Female,20.0,Average,former,1.0
+60-69,Female,25.0,Below average,current,0.0
+40-49,Female,34.0,Average,never,0.0
+40-49,Female,24.0,Above average,never,1.0
+50-59,Female,21.0,Above average,never,1.0
+70-79,Female,34.0,Above average,former,1.0
+40-49,Female,29.0,Below average,never,1.0
+40-49,Female,18.0,Average,current,1.0
+70-79,Male,26.0,Average,former,0.0
+18-20,Female,19.0,Average,current,1.0
+21-29,Male,27.0,Well above average,never,1.0
+40-49,Female,22.0,Well above average,never,1.0
+50-59,Male,28.0,Average,former,1.0
+50-59,Female,22.0,Above average,never,1.0
+60-69,Female,21.0,Well above average,former,1.0
+30-39,Female,25.0,Above average,never,1.0
+50-59,Male,30.0,Below average,never,1.0
+30-39,Female,33.0,Above average,never,1.0
+30-39,Female,30.0,Average,former,1.0
+60-69,Male,26.0,Above average,never,1.0
+50-59,Male,28.0,Above average,former,1.0
+70-79,Female,19.0,Well above average,never,1.0
+30-39,Female,22.0,Above average,never,1.0
+50-59,Female,22.0,Above average,former,0.0
+60-69,Male,37.0,Below average,never,1.0
+21-29,Female,24.0,Above average,ecig,0.0
+60-69,Female,18.0,Above average,former,1.0
+21-29,Female,33.0,Average,former,1.0
+50-59,Female,25.0,Above average,former,1.0
+50-59,Male,25.0,Above average,never,1.0
+30-39,Male,24.0,Above average,never,0.0
+60-69,Male,32.0,Below average,never,1.0
+40-49,Male,22.0,Well above average,never,1.0
+30-39,Female,27.0,Average,former,0.0
+50-59,Female,20.0,Above average,never,1.0
+40-49,Male,27.0,Above average,never,1.0
+60-69,Male,26.0,Above average,never,0.0
+21-29,Female,53.0,Average,never,0.0
+30-39,Female,20.0,Above average,ecig,1.0
+40-49,Female,37.0,Below average,never,0.0
+30-39,Female,36.0,Average,current,0.0
+60-69,Male,30.0,Average,never,0.0
+21-29,Female,19.0,Above average,never,1.0
+30-39,Female,20.0,Above average,former,0.0
+50-59,Male,33.0,Average,former,1.0
+30-39,Male,20.0,Above average,never,1.0
+60-69,Male,21.0,Above average,never,1.0
+50-59,Male,32.0,Average,former,0.0
+60-69,Female,26.0,Well above average,former,0.0
+60-69,Female,21.0,Well above average,never,1.0
+40-49,Female,22.0,Above average,never,1.0
+70-79,Female,22.0,Above average,never,1.0
+60-69,Female,30.0,Below average,never,0.0
+50-59,Male,24.0,Average,current,1.0
+50-59,Female,25.0,Well above average,never,1.0
+50-59,Male,24.0,Above average,never,1.0
+30-39,Female,33.0,Average,current,0.0
+60-69,Male,26.0,Below average,former,0.0
+30-39,Male,24.0,Well above average,never,0.0
+50-59,Male,33.0,Average,never,0.0
+30-39,Female,22.0,Well above average,never,1.0
+60-69,Female,27.0,Average,current,1.0
+70-79,Female,21.0,Above average,former,1.0
+40-49,Female,19.0,Well above average,former,1.0
+70-79,Female,21.0,Above average,former,1.0
+60-69,Male,27.0,Well above average,former,1.0
+60-69,Female,27.0,Above average,never,1.0
+70-79,Male,28.0,Above average,never,0.0
+50-59,Male,26.0,Average,never,1.0
+50-59,Male,37.0,Below average,former,1.0
+60-69,Male,28.0,Above average,never,1.0
+60-69,Male,27.0,Average,never,1.0
+40-49,Male,35.0,Average,never,0.0
+70-79,Female,24.0,Well above average,former,1.0
+40-49,Female,19.0,Above average,never,1.0
+60-69,Female,35.0,Average,never,1.0
+40-49,Male,22.0,Well above average,never,1.0
+40-49,Female,23.0,Average,never,0.0
+70-79,Female,22.0,Well above average,never,1.0
+50-59,Male,27.0,Well above average,never,1.0
+60-69,Female,27.0,Above average,never,1.0
+50-59,Female,24.0,Well above average,never,1.0
+50-59,Female,23.0,Above average,never,1.0
+40-49,Female,19.0,Above average,current,0.0
+70-79,Male,27.0,Well above average,former,1.0
+30-39,Male,22.0,Above average,never,1.0
+40-49,Male,27.0,Below average,never,1.0
+70-79,Male,23.0,Above average,never,1.0
+50-59,Female,23.0,Above average,former,1.0
+60-69,Female,20.0,Average,never,1.0
+21-29,Female,26.0,Average,never,1.0
+40-49,Male,22.0,Above average,former,1.0
+60-69,Male,24.0,Above average,never,1.0
+40-49,Female,23.0,Below average,ecig,0.0
+21-29,Male,31.0,Average,never,0.0
+60-69,Female,19.0,Above average,former,1.0
+50-59,Male,26.0,Above average,former,1.0
+50-59,Male,29.0,Above average,never,1.0
+21-29,Female,22.0,Above average,never,1.0
+50-59,Male,29.0,Above average,never,1.0
+30-39,Female,27.0,Above average,never,1.0
+50-59,Male,24.0,Above average,former,1.0
+80-older,Male,24.0,Well above average,former,1.0
+40-49,Female,26.0,Average,never,1.0
+30-39,Male,25.0,Average,never,0.0
+60-69,Female,20.0,Above average,never,1.0
+50-59,Female,23.0,Above average,never,1.0
+70-79,Male,24.0,Average,former,1.0
+50-59,Male,25.0,Above average,never,0.0
+30-39,Male,25.0,Above average,never,1.0
+18-20,Male,22.0,Above average,ecig,1.0
+50-59,Male,25.0,Above average,never,1.0
+40-49,Female,28.0,Average,former,0.0
+60-69,Female,27.0,Average,ecig,1.0
+40-49,Female,24.0,Above average,never,1.0
+40-49,Female,35.0,Above average,former,1.0
+40-49,Female,22.0,Above average,never,0.0
+50-59,Male,25.0,Above average,never,1.0
+30-39,Female,44.0,Below average,current,0.0
+60-69,Other,19.0,Average,former,1.0
+40-49,Female,31.0,Below average,never,0.0
+40-49,Female,30.0,Below average,former,0.0
+60-69,Female,28.0,Above average,never,1.0
+70-79,Female,19.0,Below average,former,1.0
+50-59,Male,36.0,Average,never,0.0
+50-59,Male,25.0,Above average,never,1.0
+50-59,Female,47.0,Average,never,0.0
+18-20,Female,43.0,Below average,ecig,0.0
+21-29,Female,30.0,Above average,never,0.0
+50-59,Female,27.0,Above average,never,1.0
+50-59,Male,28.0,Well above average,current,1.0
+50-59,Female,33.0,Above average,never,0.0
+21-29,Female,22.0,Well above average,never,1.0
+21-29,Female,22.0,Average,former,0.0
+60-69,Female,20.0,Well above average,former,1.0
+30-39,Female,27.0,Above average,former,1.0
+30-39,Female,30.0,Above average,never,1.0
+50-59,Female,20.0,Above average,never,1.0
+40-49,Male,27.0,Average,never,0.0
+50-59,Female,22.0,Above average,current,1.0
+60-69,Female,26.0,Above average,never,1.0
+50-59,Female,61.0,Below average,never,0.0
+60-69,Female,22.0,Well above average,never,1.0
+30-39,Male,31.0,Average,never,1.0
+50-59,Male,32.0,Average,never,1.0
+40-49,Female,21.0,Above average,current,1.0
+30-39,Male,26.0,Above average,current,1.0
+18-20,Female,51.0,Average,never,0.0
+30-39,Female,14.0,Above average,ecig,1.0
+40-49,Female,25.0,Average,current,1.0
+21-29,Other,19.0,Above average,never,1.0
+50-59,Male,25.0,Well above average,never,1.0
+40-49,Female,21.0,Above average,current,1.0
+60-69,Female,35.0,Above average,current,1.0
+60-69,Male,27.0,Above average,never,1.0
+21-29,Female,24.0,Average,former,1.0
+50-59,Male,30.0,Above average,never,1.0
+50-59,Female,17.0,Above average,never,1.0
+60-69,Female,22.0,Well above average,never,1.0
+60-69,Male,22.0,Above average,never,1.0
+30-39,Male,32.0,Average,never,1.0
+40-49,Female,27.0,Above average,ecig,0.0
+30-39,Female,28.0,Above average,never,0.0
+50-59,Female,27.0,Average,former,1.0
+30-39,Female,23.0,Above average,never,1.0
+70-79,Male,25.0,Well above average,never,1.0
+21-29,Female,22.0,Above average,never,0.0
+60-69,Male,25.0,Average,current,0.0
+60-69,Male,20.0,Average,never,1.0
+30-39,Female,26.0,Average,never,0.0
+30-39,Female,42.0,Average,former,1.0
+30-39,Female,20.0,Well above average,never,1.0
+50-59,Female,19.0,Above average,former,1.0
+40-49,Female,25.0,Well above average,former,1.0
+30-39,Female,27.0,Average,never,1.0
+30-39,Female,29.0,Average,never,0.0
+40-49,Male,25.0,Well above average,never,1.0
+50-59,Male,26.0,Above average,former,1.0
+50-59,Female,33.0,Well above average,never,1.0
+50-59,Female,30.0,Average,never,1.0
+40-49,Female,25.0,Above average,never,1.0
+40-49,Female,34.0,Average,former,1.0
+60-69,Male,24.0,Average,former,0.0
+60-69,Male,27.0,Average,former,1.0
+40-49,Female,24.0,Above average,former,1.0
+30-39,Female,24.0,Average,current,0.0
+21-29,Female,23.0,Average,never,1.0
+60-69,Female,40.0,Average,ecig,0.0
+30-39,Female,26.0,Above average,never,0.0
+60-69,Male,26.0,Well above average,former,1.0
+30-39,Female,23.0,Above average,never,1.0
+40-49,Female,24.0,Above average,never,1.0
+60-69,Female,38.0,Average,never,1.0
+60-69,Female,39.0,Average,never,1.0
+60-69,Female,27.0,Average,never,0.0
+50-59,Male,26.0,Well above average,never,1.0
+30-39,Male,24.0,Above average,former,1.0
+50-59,Female,28.0,Average,current,0.0
+30-39,Female,34.0,Average,former,0.0
+30-39,Female,43.0,Average,former,1.0
+50-59,Female,33.0,Average,current,1.0
+40-49,Male,29.0,Below average,current,0.0
+40-49,Female,28.0,Average,never,1.0
+60-69,Male,26.0,Above average,current,1.0
+40-49,Female,23.0,Above average,former,1.0
+70-79,Female,27.0,Above average,former,0.0
+40-49,Female,23.0,Below average,ecig,1.0
+70-79,Male,24.0,Above average,former,1.0
+60-69,Female,22.0,Average,never,0.0
+40-49,Male,33.0,Average,former,1.0
+30-39,Female,22.0,Average,former,0.0
+40-49,Female,27.0,Average,current,1.0
+60-69,Female,27.0,Above average,never,1.0
+50-59,Female,25.0,Average,current,0.0
+40-49,Male,25.0,Average,never,1.0
+30-39,Female,21.0,Average,current,0.0
+70-79,Male,32.0,Above average,former,1.0
+60-69,Female,37.0,Average,former,1.0
+70-79,Male,27.0,Above average,never,0.0
+30-39,Female,21.0,Above average,never,0.0
+50-59,Male,25.0,Below average,never,0.0
+50-59,Female,23.0,Average,never,1.0
+50-59,Female,22.0,Average,never,1.0
+30-39,Male,24.0,Well above average,never,1.0
+21-29,Male,33.0,Above average,ecig,0.0
+40-49,Female,38.0,Average,ecig,1.0
+60-69,Male,25.0,Well above average,never,1.0
+40-49,Female,33.0,Above average,current,0.0
+60-69,Female,27.0,Average,never,0.0
+60-69,Female,24.0,Well above average,never,1.0
+70-79,Female,24.0,Above average,never,0.0
+70-79,Female,22.0,Above average,former,1.0
+30-39,Female,31.0,Average,current,0.0
+60-69,Female,21.0,Well above average,never,1.0
+40-49,Male,29.0,Above average,never,0.0
+30-39,Female,23.0,Average,never,0.0
+60-69,Male,34.0,Average,current,0.0
+60-69,Male,29.0,Average,former,1.0
+21-29,Female,25.0,Above average,never,1.0
+30-39,Male,28.0,Average,current,1.0
+21-29,Female,29.0,Average,never,1.0
+70-79,Female,29.0,Above average,former,1.0
+40-49,Male,38.0,Well above average,never,0.0
+40-49,Female,26.0,Above average,current,1.0
+50-59,Male,27.0,Average,never,1.0
+40-49,Male,37.0,Above average,former,0.0
+60-69,Male,23.0,Average,current,0.0
+70-79,Male,22.0,Above average,former,1.0
+30-39,Female,23.0,Above average,never,0.0
+30-39,Male,36.0,Average,former,0.0
+70-79,Female,29.0,Above average,never,0.0
+21-29,Female,17.0,Below average,never,0.0
+18-20,Female,20.0,Above average,never,0.0
+40-49,Female,22.0,Below average,never,0.0
+50-59,Female,26.0,Average,never,0.0
+60-69,Female,36.0,Above average,never,0.0
+70-79,Female,28.0,Above average,never,1.0
+30-39,Male,24.0,Average,never,0.0
+40-49,Female,21.0,Average,never,1.0
+40-49,Female,34.0,Average,never,1.0
+40-49,Female,44.0,Average,never,0.0
+30-39,Male,16.0,Well above average,never,1.0
+30-39,Female,19.0,Well above average,never,1.0
+30-39,Female,38.0,Below average,former,0.0
+40-49,Female,47.0,Average,current,0.0
+50-59,Female,39.0,Average,current,0.0
+21-29,Male,32.0,Below average,never,0.0
+50-59,Male,32.0,Above average,never,1.0
+21-29,Female,25.0,Below average,never,0.0
+50-59,Female,29.0,Average,current,0.0
+30-39,Male,33.0,Average,former,1.0
+60-69,Female,27.0,Above average,former,0.0
+50-59,Female,32.0,Average,never,0.0
+30-39,Female,21.0,Average,never,0.0
+40-49,Female,40.0,Average,never,0.0
+30-39,Female,38.0,Average,current,0.0
+50-59,Female,24.0,Average,never,1.0
+30-39,Female,33.0,Below average,never,0.0
+40-49,Female,28.0,Average,never,0.0
+50-59,Female,30.0,Above average,former,0.0
+60-69,Female,25.0,Above average,former,1.0
+30-39,Female,34.0,Average,never,0.0
+60-69,Female,34.0,Above average,never,1.0
+21-29,Female,35.0,Below average,current,0.0
+50-59,Male,26.0,Below average,current,0.0
+30-39,Female,24.0,Above average,never,1.0
+50-59,Female,26.0,Well below average,current,0.0
+40-49,Male,30.0,Average,former,0.0
+50-59,Female,27.0,Average,never,1.0
+50-59,Male,29.0,Average,never,0.0
+80-older,Male,26.0,Above average,former,1.0
+40-49,Male,31.0,Average,never,0.0
+50-59,Male,28.0,Average,never,0.0
+60-69,Male,29.0,Average,never,0.0
+18-20,Female,23.0,Above average,never,0.0
+40-49,Female,35.0,Below average,current,1.0
+50-59,Male,25.0,Above average,never,0.0
+21-29,Female,31.0,Average,current,1.0
+30-39,Male,37.0,Above average,former,1.0
+30-39,Female,23.0,Well above average,current,0.0
+40-49,Female,35.0,Above average,never,1.0
+40-49,Female,26.0,Average,current,1.0
+70-79,Female,27.0,Above average,former,1.0
+30-39,Female,49.0,Below average,never,0.0
+21-29,Male,23.0,Above average,former,1.0
+60-69,Male,28.0,Above average,never,0.0
+30-39,Male,22.0,Above average,never,1.0
+40-49,Female,22.0,Average,never,1.0
+30-39,Female,26.0,Average,never,0.0
+50-59,Female,27.0,Average,current,0.0
+50-59,Female,34.0,Above average,ecig,1.0
+40-49,Male,29.0,Well above average,never,1.0
+40-49,Male,27.0,Above average,never,0.0
+50-59,Female,31.0,Average,never,1.0
+40-49,Female,28.0,Average,former,0.0
+30-39,Female,40.0,Average,current,0.0
+60-69,Female,33.0,Above average,former,1.0
+50-59,Female,25.0,Well above average,former,1.0
+40-49,Female,30.0,Well above average,never,1.0
+60-69,Female,21.0,Average,former,1.0
+30-39,Female,24.0,Average,never,1.0
+40-49,Female,24.0,Average,current,0.0
+40-49,Female,30.0,Above average,never,0.0
+40-49,Male,33.0,Average,never,0.0
+30-39,Female,19.0,Above average,never,1.0
+50-59,Female,24.0,Above average,current,1.0
+60-69,Female,18.0,Average,current,0.0
+70-79,Female,19.0,Above average,former,1.0
+40-49,Male,25.0,Well above average,former,1.0
+50-59,Female,42.0,Average,never,1.0
+50-59,Male,27.0,Above average,former,1.0
+40-49,Female,30.0,Average,never,0.0
+40-49,Male,23.0,Above average,never,1.0
+60-69,Female,29.0,Average,never,0.0
+30-39,Female,23.0,Above average,never,1.0
+70-79,Other,26.0,Above average,former,0.0
+30-39,Female,38.0,Below average,never,0.0
+60-69,Female,21.0,Above average,never,1.0
+40-49,Female,23.0,Above average,never,1.0
+60-69,Female,29.0,Above average,former,1.0
+80-older,Male,25.0,Above average,never,0.0
+70-79,Male,25.0,Average,never,1.0
+40-49,Female,22.0,Average,never,0.0
+40-49,Female,20.0,Below average,never,1.0
+30-39,Female,28.0,Average,former,1.0
+70-79,Male,32.0,Above average,never,1.0
+50-59,Female,30.0,Above average,never,1.0
+50-59,Male,25.0,Above average,current,1.0
+60-69,Female,29.0,Above average,former,1.0
+30-39,Female,24.0,Above average,former,0.0
+30-39,Male,25.0,Well above average,current,0.0
+70-79,Male,36.0,Average,former,0.0
+40-49,Male,29.0,Average,former,1.0
+50-59,Male,39.0,Above average,never,0.0
+18-20,Male,24.0,Above average,ecig,1.0
+40-49,Female,34.0,Above average,former,1.0
+21-29,Male,29.0,Average,never,0.0
+21-29,Male,26.0,Average,current,1.0
+50-59,Female,24.0,Above average,never,1.0
+40-49,Male,37.0,Well above average,never,1.0
+60-69,Female,23.0,Above average,never,0.0
+30-39,Female,24.0,Average,ecig,1.0
+21-29,Female,24.0,Average,never,1.0
+30-39,Male,30.0,Average,former,0.0
+40-49,Male,34.0,Above average,former,1.0
+30-39,Male,27.0,Well above average,never,1.0
+21-29,Female,23.0,Average,current,1.0
+21-29,Female,21.0,Above average,ecig,1.0
+21-29,Other,23.0,Below average,never,1.0
+50-59,Male,23.0,Average,current,0.0
+50-59,Male,26.0,Above average,current,1.0
+50-59,Female,32.0,Below average,never,0.0
+40-49,Male,23.0,Well above average,never,1.0
+40-49,Female,21.0,Average,never,1.0
+30-39,Female,53.0,Above average,current,0.0
+50-59,Female,26.0,Above average,former,0.0
+40-49,Male,25.0,Above average,never,1.0
+40-49,Male,32.0,Average,never,1.0
+40-49,Female,23.0,Average,current,0.0
+30-39,Female,22.0,Average,former,0.0
+30-39,Male,22.0,Above average,current,1.0
+40-49,Female,35.0,Below average,never,0.0
+50-59,Female,43.0,Below average,never,0.0
+40-49,Male,39.0,Below average,never,1.0
+70-79,Male,27.0,Above average,former,1.0
+70-79,Female,21.0,Above average,never,1.0
+60-69,Male,24.0,Above average,never,1.0
+30-39,Female,29.0,Average,current,1.0
+40-49,Female,24.0,Average,current,0.0
+30-39,Male,28.0,Above average,never,1.0
+30-39,Female,21.0,Above average,never,1.0
+50-59,Female,23.0,Well above average,never,0.0
+40-49,Female,23.0,Average,former,1.0
+30-39,Male,31.0,Average,ecig,0.0
+30-39,Female,31.0,Average,never,1.0
+40-49,Male,44.0,Average,former,0.0
+30-39,Female,32.0,Above average,never,1.0
+21-29,Female,21.0,Average,former,1.0
+40-49,Female,23.0,Average,former,1.0
+60-69,Female,27.0,Above average,former,0.0
+21-29,Female,22.0,Above average,former,1.0
+70-79,Female,23.0,Below average,former,0.0
+60-69,Female,23.0,Well above average,never,1.0
+40-49,Male,22.0,Well above average,former,1.0
+60-69,Female,36.0,Below average,ecig,0.0
+40-49,Female,23.0,Above average,never,0.0
+60-69,Male,38.0,Average,former,0.0
+30-39,Female,24.0,Above average,never,1.0
+40-49,Female,25.0,Average,former,1.0
+60-69,Female,23.0,Above average,never,1.0
+30-39,Female,20.0,Average,current,0.0
+30-39,Female,22.0,Well above average,never,0.0
+40-49,Male,23.0,Above average,never,0.0
+50-59,Female,19.0,Above average,never,1.0
+30-39,Female,48.0,Average,never,0.0
+40-49,Male,27.0,Average,current,1.0
+30-39,Female,26.0,Above average,former,1.0
+21-29,Female,43.0,Below average,never,0.0
+40-49,Female,25.0,Above average,never,1.0
+40-49,Female,22.0,Average,never,1.0
+30-39,Female,25.0,Well above average,never,1.0
+30-39,Male,25.0,Above average,never,0.0
+50-59,Female,32.0,Average,former,1.0
+21-29,Female,19.0,Well above average,never,1.0
+40-49,Female,26.0,Average,former,1.0
+30-39,Male,22.0,Above average,never,0.0
+30-39,Female,52.0,Average,current,0.0
+50-59,Male,30.0,Average,never,0.0
+40-49,Female,24.0,Above average,never,1.0
+30-39,Female,22.0,Above average,never,0.0
+21-29,Female,27.0,Average,current,1.0
+40-49,Female,34.0,Above average,never,1.0
+40-49,Female,31.0,Above average,never,1.0
+50-59,Male,22.0,Above average,never,1.0
+40-49,Female,35.0,Average,never,0.0
+40-49,Female,26.0,Above average,never,1.0
+30-39,Female,25.0,Well above average,former,1.0
+30-39,Female,29.0,Above average,never,1.0
+21-29,Female,20.0,Above average,never,0.0
+70-79,Male,21.0,Average,former,1.0
+30-39,Male,25.0,Well above average,never,1.0
+40-49,Female,24.0,Average,former,1.0
+60-69,Female,28.0,Above average,never,1.0
+21-29,Male,38.0,Average,never,0.0
+60-69,Female,27.0,Well above average,former,1.0
+50-59,Male,22.0,Average,never,0.0
+30-39,Male,22.0,Above average,current,1.0
+40-49,Male,30.0,Above average,former,1.0
+30-39,Female,26.0,Above average,never,1.0
+30-39,Female,22.0,Above average,never,1.0
+40-49,Female,26.0,Above average,never,1.0
+21-29,Female,34.0,Average,current,0.0
+50-59,Male,23.0,Above average,never,1.0
+40-49,Female,19.0,Well above average,former,1.0
+40-49,Female,29.0,Above average,never,1.0
+60-69,Female,20.0,Above average,former,1.0
+70-79,Female,27.0,Above average,former,1.0
+60-69,Male,32.0,Above average,never,1.0
+50-59,Male,32.0,Above average,never,1.0
+60-69,Female,27.0,Average,former,0.0
+60-69,Female,25.0,Average,former,1.0
+60-69,Female,29.0,Above average,former,1.0
+21-29,Female,31.0,Average,current,0.0
+70-79,Male,30.0,Well above average,never,1.0
+70-79,Female,26.0,Above average,never,1.0
+70-79,Female,24.0,Above average,never,1.0
+30-39,Female,22.0,Average,ecig,0.0
+70-79,Female,36.0,Above average,never,0.0
+50-59,Male,23.0,Below average,current,0.0
+50-59,Male,29.0,Below average,former,0.0
+30-39,Female,30.0,Average,ecig,1.0
+70-79,Female,33.0,Above average,former,1.0
+30-39,Female,34.0,Below average,never,1.0
+21-29,Female,37.0,Average,never,1.0
+40-49,Female,22.0,Well above average,former,1.0
+40-49,Female,35.0,Average,never,0.0
+21-29,Male,19.0,Average,never,1.0
+30-39,Female,38.0,Below average,current,0.0
+40-49,Female,25.0,Well above average,current,1.0
+18-20,Female,35.0,Below average,never,1.0
+60-69,Female,22.0,Above average,never,1.0
+21-29,Female,21.0,Well above average,never,1.0
+50-59,Male,20.0,Below average,current,1.0
+60-69,Female,25.0,Above average,never,0.0
+60-69,Female,30.0,Average,former,0.0
+60-69,Male,26.0,Average,never,1.0
+50-59,Male,31.0,Average,ecig,1.0
+30-39,Female,33.0,Average,current,1.0
+50-59,Female,27.0,Average,never,1.0
+60-69,Female,24.0,Above average,never,1.0
+50-59,Female,48.0,Below average,former,0.0
+50-59,Female,38.0,Above average,current,1.0
+40-49,Female,36.0,Average,never,1.0
+40-49,Male,21.0,Average,former,0.0
+60-69,Female,24.0,Average,current,1.0
+50-59,Female,20.0,Average,ecig,1.0
+30-39,Female,37.0,Average,former,1.0
+70-79,Female,22.0,Above average,former,1.0
+50-59,Male,23.0,Average,former,1.0
+40-49,Female,29.0,Average,never,0.0
+60-69,Female,30.0,Below average,former,0.0
+80-older,Female,27.0,Well above average,never,1.0
+60-69,Female,34.0,Below average,never,1.0
+40-49,Female,42.0,Below average,current,0.0
+70-79,Female,23.0,Well above average,former,1.0
+60-69,Female,32.0,Average,former,1.0
+30-39,Male,22.0,Above average,never,1.0
+70-79,Female,22.0,Average,former,0.0
+40-49,Female,46.0,Below average,current,0.0
+40-49,Female,34.0,Above average,never,1.0
+30-39,Female,27.0,Average,current,0.0
+30-39,Male,29.0,Below average,former,0.0
+30-39,Female,29.0,Average,never,1.0
+50-59,Male,29.0,Above average,former,1.0
+30-39,Female,27.0,Above average,former,1.0
+50-59,Female,25.0,Well above average,never,1.0
+60-69,Female,24.0,Average,never,1.0
+30-39,Female,27.0,Average,current,0.0
+30-39,Female,23.0,Average,former,0.0
+50-59,Male,32.0,Average,former,1.0
+50-59,Male,26.0,Above average,never,1.0
+50-59,Female,19.0,Above average,never,1.0
+50-59,Female,25.0,Above average,never,0.0
+50-59,Female,25.0,Above average,never,1.0
+40-49,Male,34.0,Average,never,0.0
+50-59,Female,26.0,Average,never,1.0
+60-69,Female,20.0,Well below average,current,0.0
+30-39,Female,36.0,Average,ecig,0.0
+21-29,Female,27.0,Average,former,1.0
+50-59,Male,30.0,Average,never,1.0
+60-69,Male,30.0,Well above average,never,0.0
+60-69,Female,22.0,Average,never,1.0
+60-69,Female,42.0,Below average,former,0.0
+30-39,Female,25.0,Average,former,1.0
+60-69,Female,33.0,Above average,former,1.0
+50-59,Female,30.0,Average,former,1.0
+21-29,Female,20.0,Below average,current,0.0
+50-59,Male,24.0,Well above average,former,1.0
+60-69,Male,26.0,Above average,never,1.0
+21-29,Male,27.0,Average,never,0.0
+40-49,Male,33.0,Above average,ecig,0.0
+60-69,Female,33.0,Below average,never,0.0
+21-29,Female,24.0,Above average,never,0.0
+50-59,Female,29.0,Below average,never,0.0
+21-29,Female,27.0,Average,former,0.0
+70-79,Female,22.0,Well above average,never,1.0
+60-69,Female,18.0,Average,never,1.0
+40-49,Male,27.0,Above average,never,0.0
+30-39,Male,19.0,Below average,ecig,0.0
+60-69,Female,43.0,Below average,never,1.0
+40-49,Male,28.0,Well above average,never,1.0
+30-39,Female,23.0,Average,former,1.0
+30-39,Female,33.0,Above average,former,1.0
+30-39,Female,23.0,Above average,current,1.0
+50-59,Female,21.0,Above average,former,1.0
+40-49,Male,22.0,Below average,current,0.0
+21-29,Female,34.0,Average,never,0.0
+60-69,Female,32.0,Below average,ecig,1.0
+21-29,Female,20.0,Above average,never,1.0
+21-29,Female,23.0,Average,current,0.0
+50-59,Female,33.0,Well above average,never,1.0
+40-49,Female,27.0,Above average,never,1.0
+70-79,Female,31.0,Above average,former,1.0
+30-39,Female,20.0,Average,current,0.0
+30-39,Male,36.0,Above average,former,1.0
+50-59,Female,21.0,Average,former,1.0
+40-49,Female,32.0,Average,never,0.0
+50-59,Male,26.0,Above average,former,1.0
+50-59,Female,28.0,Above average,former,1.0
+50-59,Female,32.0,Average,ecig,1.0
+60-69,Male,26.0,Above average,former,1.0
+50-59,Female,24.0,Below average,current,0.0
+60-69,Female,23.0,Above average,never,0.0
+21-29,Male,23.0,Well above average,never,1.0
+50-59,Male,20.0,Above average,former,1.0
+50-59,Male,27.0,Average,ecig,0.0
+30-39,Female,20.0,Above average,former,1.0
+50-59,Female,27.0,Average,former,1.0
+60-69,Female,21.0,Well above average,never,1.0
+40-49,Female,32.0,Average,ecig,0.0
+50-59,Female,25.0,Average,current,0.0
+60-69,Female,24.0,Below average,never,0.0
+40-49,Female,26.0,Average,former,0.0
+40-49,Female,20.0,Above average,former,1.0
+50-59,Male,22.0,Above average,never,1.0
+50-59,Female,22.0,Well above average,former,1.0
+21-29,Female,20.0,Average,current,0.0
+60-69,Male,41.0,Below average,never,0.0
+30-39,Male,50.0,Below average,ecig,0.0
+50-59,Female,19.0,Above average,never,1.0
+60-69,Female,23.0,Average,current,1.0
+50-59,Female,24.0,Well above average,former,1.0
+60-69,Female,24.0,Above average,never,1.0
+30-39,Male,44.0,Below average,never,1.0
+40-49,Female,49.0,Above average,current,0.0
+40-49,Male,23.0,Above average,never,1.0
+40-49,Male,21.0,Above average,never,1.0
+40-49,Female,25.0,Above average,never,1.0
+50-59,Female,21.0,Above average,former,1.0
+30-39,Female,26.0,Average,never,1.0
+40-49,Male,25.0,Above average,never,1.0
+40-49,Female,27.0,Above average,never,0.0
+18-20,Male,23.0,Well above average,former,1.0
+40-49,Female,31.0,Above average,current,0.0
+30-39,Female,21.0,Above average,former,0.0
+40-49,Female,23.0,Average,never,1.0
+50-59,Male,25.0,Above average,former,1.0
+40-49,Female,23.0,Above average,never,1.0
+70-79,Female,23.0,Well above average,never,1.0
+60-69,Male,34.0,Above average,former,1.0
+40-49,Female,22.0,Average,current,0.0
+60-69,Female,23.0,Above average,never,1.0
+60-69,Male,25.0,Well above average,never,1.0
+60-69,Male,20.0,Average,never,1.0
+60-69,Female,33.0,Average,current,1.0
+30-39,Female,19.0,Below average,never,1.0
+50-59,Female,23.0,Above average,current,1.0
+40-49,Male,27.0,Well above average,former,0.0
+60-69,Female,25.0,Average,never,0.0
+50-59,Female,20.0,Below average,current,1.0
+60-69,Female,30.0,Average,current,0.0
+50-59,Female,27.0,Average,never,1.0
+70-79,Female,27.0,Above average,never,1.0
+70-79,Female,20.0,Below average,never,1.0
+50-59,Female,38.0,Average,never,0.0
+70-79,Female,24.0,Well above average,former,1.0
+50-59,Female,56.0,Average,former,0.0
+30-39,Female,37.0,Average,never,0.0
+60-69,Male,31.0,Above average,never,1.0
+40-49,Female,28.0,Above average,never,1.0
+50-59,Female,21.0,Above average,never,1.0
+30-39,Female,45.0,Average,current,0.0
+21-29,Male,24.0,Above average,never,1.0
+50-59,Female,24.0,Below average,former,1.0
+30-39,Male,25.0,Above average,never,1.0
+40-49,Male,24.0,Above average,never,0.0
+30-39,Female,19.0,Well below average,never,0.0
+50-59,Female,35.0,Average,former,0.0
+70-79,Female,22.0,Above average,former,1.0
+70-79,Male,33.0,Well above average,never,1.0
+50-59,Female,21.0,Above average,never,1.0
+70-79,Female,21.0,Above average,former,1.0
+50-59,Female,30.0,Average,never,1.0
+21-29,Male,30.0,Above average,never,0.0
+60-69,Female,27.0,Average,never,1.0
+50-59,Male,34.0,Above average,never,1.0
+70-79,Male,26.0,Above average,former,1.0
+60-69,Male,29.0,Above average,never,1.0
+21-29,Female,34.0,Average,former,0.0
+50-59,Female,32.0,Average,never,1.0
+50-59,Male,25.0,Well above average,never,1.0
+80-older,Female,25.0,Average,never,1.0
+60-69,Male,23.0,Above average,never,1.0
+50-59,Female,42.0,Above average,never,0.0
+50-59,Male,23.0,Well above average,never,1.0
+70-79,Female,20.0,Above average,never,1.0
+60-69,Female,28.0,Average,never,1.0
+70-79,Female,24.0,Above average,never,1.0
+60-69,Female,19.0,Well above average,never,1.0
+40-49,Male,33.0,Average,current,1.0
+21-29,Female,23.0,Well above average,never,1.0
+40-49,Female,23.0,Above average,never,1.0
+21-29,Male,23.0,Well above average,never,1.0
+40-49,Female,27.0,Above average,never,1.0
+60-69,Female,34.0,Below average,never,0.0
+40-49,Female,20.0,Above average,never,1.0
+40-49,Male,23.0,Well above average,never,1.0
+30-39,Female,30.0,Well above average,never,1.0
+50-59,Female,34.0,Average,never,1.0
+50-59,Female,22.0,Above average,never,1.0
+30-39,Female,26.0,Well above average,never,0.0
+30-39,Male,26.0,Well above average,never,1.0
+50-59,Female,25.0,Above average,never,1.0
+60-69,Female,24.0,Above average,never,1.0
+40-49,Female,29.0,Below average,former,0.0
+30-39,Female,42.0,Average,current,0.0
+50-59,Female,22.0,Above average,never,1.0
+21-29,Male,24.0,Well above average,never,1.0
+50-59,Female,24.0,Above average,former,1.0
+40-49,Male,33.0,Well below average,current,0.0
+40-49,Female,32.0,Average,never,0.0
+40-49,Male,30.0,Well above average,former,1.0
+70-79,Female,30.0,Above average,never,1.0
+60-69,Female,29.0,Above average,never,1.0
+50-59,Female,24.0,Below average,former,1.0
+40-49,Female,44.0,Below average,current,0.0
+40-49,Male,30.0,Average,never,1.0
+70-79,Male,21.0,Above average,never,1.0
+21-29,Female,23.0,Average,never,1.0
+40-49,Female,31.0,Below average,current,0.0
+40-49,Male,28.0,Average,former,1.0
+30-39,Female,25.0,Average,former,1.0
+50-59,Male,26.0,Average,current,1.0
+60-69,Male,30.0,Above average,never,1.0
+30-39,Male,25.0,Average,ecig,0.0
+60-69,Male,30.0,Well above average,never,0.0
+21-29,Female,22.0,Above average,never,1.0
+60-69,Female,23.0,Well above average,never,1.0
+40-49,Female,25.0,Average,current,1.0
+60-69,Female,24.0,Average,never,0.0
+40-49,Female,37.0,Average,former,0.0
+50-59,Female,21.0,Above average,former,0.0
+60-69,Male,27.0,Above average,former,1.0
+21-29,Female,21.0,Average,never,1.0
+40-49,Male,30.0,Average,never,0.0
+30-39,Male,33.0,Average,never,0.0
+40-49,Female,28.0,Average,current,0.0
+60-69,Female,25.0,Above average,never,1.0
+40-49,Female,26.0,Well above average,current,1.0
+60-69,Male,21.0,Well above average,never,1.0
+60-69,Female,21.0,Well below average,never,1.0
+50-59,Female,31.0,Below average,never,0.0
+30-39,Female,23.0,Above average,ecig,0.0
+40-49,Female,20.0,Average,current,1.0
+30-39,Female,27.0,Above average,never,0.0
+60-69,Female,27.0,Well above average,never,1.0
+60-69,Male,29.0,Average,never,1.0
+60-69,Female,31.0,Average,ecig,0.0
+50-59,Male,27.0,Average,never,1.0
+30-39,Female,27.0,Above average,never,1.0
+50-59,Female,28.0,Well below average,ecig,0.0
+21-29,Female,21.0,Average,never,1.0
+50-59,Female,53.0,Below average,never,0.0
+40-49,Female,32.0,Below average,former,0.0
+60-69,Female,24.0,Above average,never,0.0
+60-69,Male,17.0,Above average,never,1.0
+60-69,Female,20.0,Average,former,0.0
+30-39,Male,23.0,Above average,never,1.0
+60-69,Male,29.0,Above average,never,1.0
+21-29,Male,23.0,Above average,never,1.0
+50-59,Male,22.0,Well above average,former,1.0
+50-59,Female,23.0,Above average,never,0.0
+18-20,Female,25.0,Above average,never,0.0
+21-29,Female,20.0,Well above average,ecig,0.0
+70-79,Female,20.0,Well above average,former,1.0
+60-69,Male,23.0,Above average,former,1.0
+40-49,Female,27.0,Average,never,1.0
+70-79,Female,27.0,Above average,never,1.0
+60-69,Female,47.0,Below average,never,0.0
+40-49,Female,33.0,Average,never,1.0
+50-59,Female,25.0,Average,former,1.0
+70-79,Male,25.0,Well above average,former,1.0
+30-39,Female,30.0,Average,never,0.0
+50-59,Female,27.0,Average,former,1.0
+40-49,Male,27.0,Below average,never,0.0
+50-59,Female,36.0,Above average,never,1.0
+70-79,Male,33.0,Well above average,former,1.0
+40-49,Female,33.0,Average,current,1.0
+50-59,Female,29.0,Below average,never,0.0
+50-59,Female,28.0,Average,former,1.0
+60-69,Female,3.0,Average,never,1.0
+60-69,Female,27.0,Above average,never,0.0
+60-69,Male,29.0,Below average,former,0.0
+40-49,Female,23.0,Above average,never,1.0
+50-59,Female,22.0,Well above average,never,1.0
+70-79,Male,34.0,Above average,former,1.0
+21-29,Female,19.0,Average,never,1.0
+50-59,Male,70.0,Well above average,ecig,1.0
+70-79,Female,30.0,Above average,former,0.0
+40-49,Female,34.0,Above average,never,1.0
+70-79,Female,44.0,Above average,never,1.0
+40-49,Female,34.0,Average,never,0.0
+30-39,Female,17.0,Below average,former,0.0
+50-59,Male,21.0,Above average,never,1.0
+30-39,Female,26.0,Average,current,1.0
+50-59,Male,29.0,Above average,former,0.0
+40-49,Female,20.0,Above average,never,1.0
+30-39,Female,34.0,Average,current,0.0
+50-59,Female,21.0,Above average,never,1.0
+30-39,Female,37.0,Average,never,0.0
+50-59,Female,26.0,Average,current,1.0
+21-29,Female,19.0,Average,never,0.0
+40-49,Female,31.0,Average,former,0.0
+40-49,Other,29.0,Average,never,1.0
+40-49,Female,31.0,Average,never,1.0
+50-59,Female,20.0,Below average,never,1.0
+60-69,Male,26.0,Above average,never,0.0
+21-29,Female,26.0,Average,never,1.0
+50-59,Female,25.0,Above average,former,1.0
+30-39,Female,22.0,Above average,never,1.0
+40-49,Female,27.0,Well above average,never,1.0
+50-59,Male,34.0,Well above average,never,1.0
+30-39,Female,23.0,Average,current,1.0
+60-69,Male,24.0,Below average,former,1.0
+50-59,Female,19.0,Well below average,never,1.0
+50-59,Male,31.0,Average,never,1.0
+50-59,Female,21.0,Well above average,former,1.0
+50-59,Female,27.0,Above average,never,1.0
+21-29,Female,21.0,Above average,never,1.0
+40-49,Male,26.0,Above average,current,0.0
+30-39,Female,42.0,Below average,former,0.0
+30-39,Female,22.0,Average,ecig,1.0
+70-79,Male,28.0,Above average,former,1.0
+40-49,Female,26.0,Average,never,0.0
+21-29,Other,32.0,Average,never,1.0
+40-49,Female,28.0,Average,current,0.0
+21-29,Female,27.0,Well above average,never,0.0
+50-59,Female,21.0,Average,never,1.0
+60-69,Male,38.0,Well above average,former,1.0
+40-49,Male,44.0,Average,former,0.0
+21-29,Female,26.0,Average,current,1.0
+60-69,Female,43.0,Average,never,0.0
+30-39,Male,21.0,Above average,current,1.0
+40-49,Female,21.0,Above average,former,1.0
+50-59,Female,23.0,Above average,never,0.0
+70-79,Female,23.0,Well above average,former,1.0
+18-20,Female,2.0,Well above average,never,1.0
+30-39,Male,26.0,Above average,former,0.0
+18-20,Male,22.0,Above average,never,1.0
+50-59,Female,47.0,Below average,former,0.0
+50-59,Female,25.0,Average,ecig,1.0
+30-39,Male,28.0,Average,former,0.0
+30-39,Female,29.0,Average,never,1.0
+50-59,Male,24.0,Well above average,ecig,1.0
+40-49,Female,34.0,Below average,never,0.0
+70-79,Female,10.0,Well above average,former,1.0
+40-49,Female,30.0,Below average,former,0.0
+70-79,Male,34.0,Average,never,1.0
+60-69,Male,27.0,Well above average,never,0.0
+30-39,Female,24.0,Average,never,0.0
+40-49,Male,29.0,Above average,former,0.0
+21-29,Female,27.0,Average,never,1.0
+60-69,Female,36.0,Average,never,0.0
+70-79,Female,31.0,Above average,never,1.0
+40-49,Female,30.0,Average,never,0.0
+30-39,Female,26.0,Below average,never,0.0
+60-69,Female,33.0,Above average,never,1.0
+30-39,Female,20.0,Average,current,1.0
+50-59,Female,25.0,Well above average,never,0.0
+40-49,Female,23.0,Above average,never,1.0
+40-49,Male,35.0,Above average,former,1.0
+60-69,Female,35.0,Average,never,1.0
+70-79,Male,27.0,Above average,former,0.0
+30-39,Female,21.0,Below average,current,1.0
+60-69,Female,39.0,Well above average,never,0.0
+30-39,Female,26.0,Average,never,0.0
+50-59,Male,28.0,Above average,never,0.0
+70-79,Female,21.0,Above average,never,1.0
+30-39,Female,46.0,Average,former,1.0
+30-39,Female,29.0,Average,never,1.0
+30-39,Female,32.0,Average,current,1.0
+30-39,Female,25.0,Above average,former,1.0
+60-69,Female,21.0,Below average,current,1.0
+50-59,Female,40.0,Average,former,0.0
+40-49,Female,21.0,Average,current,0.0
+50-59,Female,22.0,Above average,former,1.0
+30-39,Female,21.0,Average,current,0.0
+60-69,Female,20.0,Well below average,ecig,1.0
+50-59,Female,27.0,Average,never,1.0
+30-39,Female,25.0,Average,current,1.0
+60-69,Female,21.0,Average,former,1.0
+50-59,Male,31.0,Below average,former,0.0
+40-49,Male,22.0,Above average,former,0.0
+70-79,Male,27.0,Average,never,0.0
+50-59,Female,40.0,Average,former,0.0
+21-29,Female,30.0,Average,current,0.0
+60-69,Male,28.0,Average,never,0.0
+40-49,Female,20.0,Above average,former,1.0
+60-69,Female,18.0,Well above average,never,1.0
+40-49,Female,32.0,Average,never,0.0
+40-49,Male,25.0,Average,current,1.0
+50-59,Female,37.0,Below average,never,0.0
+50-59,Female,23.0,Well above average,never,1.0
+50-59,Male,26.0,Above average,never,1.0
+50-59,Male,28.0,Above average,current,1.0
+40-49,Male,24.0,Well above average,never,1.0
+60-69,Female,34.0,Above average,never,1.0
+40-49,Male,29.0,Average,current,1.0
+40-49,Female,29.0,Above average,former,1.0
+40-49,Female,29.0,Above average,current,1.0
+60-69,Male,25.0,Average,never,0.0
+70-79,Female,21.0,Average,current,0.0
+40-49,Female,29.0,Average,never,1.0
+40-49,Female,38.0,Average,former,1.0
+50-59,Female,40.0,Well above average,former,0.0
+50-59,Female,25.0,Average,former,0.0
+60-69,Female,32.0,Average,never,1.0
+50-59,Female,43.0,Below average,former,0.0
+21-29,Female,22.0,Average,former,1.0
+70-79,Female,26.0,Above average,never,1.0
+30-39,Female,40.0,Average,current,0.0
+50-59,Female,22.0,Well above average,never,1.0
+30-39,Female,24.0,Below average,ecig,0.0
+40-49,Female,27.0,Average,former,1.0
+21-29,Female,23.0,Well above average,never,0.0
+40-49,Female,25.0,Above average,never,1.0
+60-69,Female,29.0,Average,never,1.0
+60-69,Female,22.0,Average,never,1.0
+30-39,Male,20.0,Well above average,former,1.0
+40-49,Female,27.0,Above average,former,1.0
+40-49,Female,37.0,Average,former,0.0
+40-49,Female,35.0,Below average,ecig,0.0
+60-69,Female,25.0,Above average,never,1.0
+70-79,Male,32.0,Average,former,1.0
+50-59,Female,30.0,Above average,never,0.0
+60-69,Male,33.0,Below average,former,0.0
+30-39,Female,23.0,Above average,never,1.0
+30-39,Female,21.0,Above average,never,1.0
+70-79,Female,27.0,Average,former,1.0
+50-59,Female,22.0,Above average,former,1.0
+50-59,Female,27.0,Average,never,1.0
+70-79,Female,25.0,Above average,never,1.0
+30-39,Female,20.0,Below average,former,1.0
+21-29,Male,24.0,Average,current,0.0
+50-59,Male,38.0,Average,never,0.0
+50-59,Male,32.0,Average,never,1.0
+80-older,Female,22.0,Well above average,never,1.0
+30-39,Female,29.0,Average,current,0.0
+60-69,Female,17.0,Average,current,1.0
+60-69,Female,21.0,Below average,former,1.0
+50-59,Female,26.0,Above average,never,1.0
+50-59,Female,33.0,Average,former,0.0
+50-59,Female,31.0,Average,never,1.0
+21-29,Female,30.0,Below average,current,0.0
+60-69,Male,30.0,Above average,former,0.0
+50-59,Female,27.0,Average,current,1.0
+70-79,Female,28.0,Average,never,1.0
+50-59,Female,35.0,Average,never,0.0
+50-59,Female,40.0,Average,former,0.0
+50-59,Female,33.0,Average,former,1.0
+30-39,Female,23.0,Average,current,1.0
+60-69,Female,37.0,Below average,ecig,0.0
+50-59,Female,27.0,Average,current,1.0
+60-69,Female,19.0,Above average,never,1.0
+50-59,Female,34.0,Above average,never,0.0
+60-69,Female,39.0,Well above average,never,0.0
+50-59,Female,24.0,Average,current,0.0
+50-59,Female,32.0,Above average,ecig,0.0
+60-69,Female,26.0,Below average,never,0.0
+50-59,Female,26.0,Average,never,1.0
+40-49,Female,22.0,Average,former,0.0
+40-49,Male,20.0,Average,never,0.0
+21-29,Male,28.0,Well above average,current,1.0
+40-49,Female,22.0,Average,current,0.0
+50-59,Female,21.0,Above average,never,0.0
+40-49,Female,21.0,Well above average,never,1.0
+70-79,Female,24.0,Well above average,former,1.0
+50-59,Male,26.0,Well above average,never,1.0
+50-59,Female,32.0,Average,never,0.0
+30-39,Female,27.0,Below average,never,1.0
+70-79,Female,27.0,Average,never,1.0
+21-29,Female,24.0,Above average,former,1.0
+40-49,Female,27.0,Average,never,0.0
+30-39,Female,30.0,Below average,never,0.0
+60-69,Male,27.0,Above average,never,0.0
+40-49,Female,37.0,Average,never,0.0
+40-49,Male,22.0,Average,current,1.0
+40-49,Female,24.0,Well above average,never,1.0
+70-79,Female,23.0,Well above average,never,1.0
+50-59,Female,27.0,Average,current,0.0
+60-69,Male,30.0,Average,former,1.0
+70-79,Male,27.0,Above average,never,1.0
+40-49,Female,33.0,Average,never,1.0
+60-69,Female,31.0,Above average,current,0.0
+60-69,Female,43.0,Average,never,0.0
+60-69,Female,24.0,Above average,never,0.0
+60-69,Male,44.0,Average,current,0.0
+40-49,Male,25.0,Well below average,former,0.0
+50-59,Female,25.0,Above average,former,1.0
+30-39,Female,27.0,Above average,never,1.0
+30-39,Male,56.0,Average,former,0.0
+40-49,Male,26.0,Average,former,0.0
+60-69,Female,43.0,Average,never,0.0
+40-49,Female,21.0,Below average,never,0.0
+50-59,Female,37.0,Average,former,1.0
+21-29,Male,21.0,Above average,never,1.0
+40-49,Male,27.0,Average,never,0.0
+60-69,Female,18.0,Above average,never,0.0
+30-39,Female,24.0,Above average,current,0.0
+50-59,Male,34.0,Above average,former,1.0
+30-39,Female,22.0,Above average,current,0.0
+70-79,Male,29.0,Above average,never,1.0
+40-49,Female,35.0,Average,never,0.0
+60-69,Female,20.0,Above average,current,0.0
+50-59,Female,34.0,Below average,never,0.0
+40-49,Female,29.0,Average,current,1.0
+50-59,Male,22.0,Below average,current,0.0
+30-39,Male,21.0,Above average,never,1.0
+21-29,Male,21.0,Average,current,1.0
+50-59,Female,20.0,Above average,current,1.0
+70-79,Female,24.0,Above average,never,1.0
+18-20,Male,22.0,Well above average,never,1.0
+21-29,Female,26.0,Above average,never,1.0
+18-20,Male,22.0,Average,former,1.0
+60-69,Female,24.0,Above average,never,1.0
+60-69,Female,30.0,Above average,never,1.0
+50-59,Male,23.0,Well above average,never,1.0
+70-79,Female,32.0,Above average,former,1.0
+50-59,Female,21.0,Above average,current,1.0
+30-39,Female,28.0,Average,never,0.0
+70-79,Male,30.0,Average,former,0.0
+21-29,Female,34.0,Above average,never,0.0
+40-49,Male,30.0,Below average,former,1.0
+40-49,Female,21.0,Average,current,0.0
+50-59,Female,31.0,Average,never,0.0
+21-29,Female,25.0,Average,former,0.0
+40-49,Male,31.0,Above average,never,1.0
+60-69,Female,34.0,Average,never,1.0
+50-59,Female,30.0,Average,current,0.0
+50-59,Female,29.0,Above average,never,0.0
+40-49,Female,29.0,Average,never,0.0
+50-59,Male,29.0,Above average,never,1.0
+50-59,Female,33.0,Average,former,0.0
+60-69,Male,30.0,Average,never,1.0
+60-69,Female,47.0,Below average,never,0.0
+60-69,Female,20.0,Below average,former,0.0
+70-79,Male,24.0,Well above average,former,1.0
+70-79,Female,25.0,Above average,never,1.0
+50-59,Female,20.0,Average,never,1.0
+50-59,Female,29.0,Average,never,0.0
+50-59,Female,29.0,Average,former,0.0
+30-39,Female,27.0,Well above average,current,1.0
+50-59,Female,23.0,Average,current,1.0
+70-79,Female,32.0,Average,never,1.0
+70-79,Female,32.0,Average,never,1.0
+30-39,Female,22.0,Above average,current,1.0
+60-69,Male,24.0,Well above average,never,1.0
+30-39,Female,22.0,Above average,never,1.0
+30-39,Female,33.0,Well below average,ecig,0.0
+50-59,Female,26.0,Average,current,1.0
+50-59,Female,29.0,Well above average,former,1.0
+50-59,Female,20.0,Well above average,never,1.0
+80-older,Female,32.0,Above average,former,1.0
+50-59,Female,39.0,Average,current,0.0
+40-49,Female,35.0,Below average,never,0.0
+60-69,Female,33.0,Average,never,1.0
+40-49,Male,24.0,Above average,former,1.0
+50-59,Female,20.0,Well above average,never,1.0
+50-59,Female,27.0,Above average,never,1.0
+50-59,Female,42.0,Below average,never,1.0
+60-69,Male,25.0,Average,former,0.0
+50-59,Female,23.0,Well below average,former,0.0
+60-69,Female,50.0,Average,never,0.0
+70-79,Female,22.0,Well above average,never,1.0
+60-69,Male,23.0,Average,former,1.0
+50-59,Female,26.0,Below average,current,1.0
+70-79,Female,39.0,Average,never,0.0
+50-59,Male,27.0,Average,never,1.0
+70-79,Male,27.0,Above average,never,1.0
+50-59,Female,23.0,Above average,never,1.0
+50-59,Female,23.0,Above average,never,1.0
+40-49,Female,32.0,Average,ecig,1.0
+50-59,Female,26.0,Average,current,0.0
+21-29,Male,23.0,Average,former,1.0
+21-29,Female,53.0,Average,never,0.0
+30-39,Male,24.0,Well above average,former,1.0
+60-69,Female,26.0,Average,never,0.0
+70-79,Female,36.0,Well above average,former,0.0
+70-79,Female,38.0,Below average,never,0.0
+50-59,Female,25.0,Average,current,1.0
+30-39,Female,23.0,Above average,never,0.0
+60-69,Female,32.0,Well above average,never,1.0
+40-49,Female,32.0,Average,former,0.0
+40-49,Female,22.0,Above average,never,0.0
+60-69,Male,28.0,Above average,former,1.0
+30-39,Male,24.0,Above average,never,0.0
+60-69,Female,26.0,Average,former,0.0
+30-39,Male,26.0,Average,former,0.0
+21-29,Male,23.0,Well above average,ecig,1.0
+60-69,Male,26.0,Average,never,1.0
+60-69,Female,33.0,Well above average,ecig,0.0
+50-59,Female,23.0,Well above average,never,1.0
+60-69,Female,29.0,Below average,former,1.0
+40-49,Female,36.0,Average,never,0.0
+60-69,Female,29.0,Below average,former,1.0
+30-39,Female,34.0,Below average,never,0.0
+60-69,Male,31.0,Average,current,1.0
+60-69,Female,38.0,Average,never,0.0
+60-69,Female,25.0,Above average,former,1.0
+30-39,Female,20.0,Well above average,never,1.0
+50-59,Female,30.0,Average,current,1.0
+40-49,Male,27.0,Average,former,0.0
+60-69,Male,30.0,Average,former,1.0
+50-59,Female,23.0,Below average,current,1.0
+60-69,Female,27.0,Above average,never,0.0
+50-59,Female,27.0,Average,former,1.0
+40-49,Male,25.0,Above average,current,1.0
+30-39,Female,26.0,Above average,former,1.0
+50-59,Male,22.0,Well above average,never,1.0
+40-49,Female,20.0,Above average,never,1.0
+50-59,Male,21.0,Above average,former,1.0
+60-69,Female,45.0,Average,never,0.0
+30-39,Female,56.0,Average,current,0.0
+60-69,Female,26.0,Well above average,former,1.0
+50-59,Female,35.0,Average,never,1.0
+50-59,Female,28.0,Average,former,1.0
+40-49,Female,30.0,Average,never,0.0
+50-59,Male,25.0,Average,never,0.0
+50-59,Female,36.0,Above average,never,0.0
+21-29,Female,19.0,Below average,never,0.0
+60-69,Female,17.0,Above average,former,1.0
+70-79,Female,29.0,Above average,never,1.0
+60-69,Female,36.0,Above average,former,1.0
+30-39,Female,36.0,Average,never,0.0
+21-29,Female,21.0,Average,never,1.0
+70-79,Male,30.0,Above average,never,1.0
+40-49,Female,38.0,Above average,never,0.0
+50-59,Female,20.0,Above average,never,1.0
+70-79,Female,27.0,Above average,former,0.0
+40-49,Female,26.0,Average,never,1.0
+30-39,Female,21.0,Average,current,1.0
+50-59,Male,28.0,Average,current,0.0
+30-39,Female,31.0,Average,never,1.0
+40-49,Male,30.0,Average,current,1.0
+70-79,Female,35.0,Below average,never,0.0
+30-39,Female,26.0,Average,current,0.0
+40-49,Female,22.0,Above average,former,1.0
+60-69,Female,27.0,Above average,former,1.0
+40-49,Female,35.0,Above average,ecig,1.0
+60-69,Female,33.0,Average,former,0.0
+40-49,Female,19.0,Average,current,0.0
+40-49,Female,38.0,Average,former,1.0
+50-59,Female,20.0,Above average,never,1.0
+70-79,Female,36.0,Average,never,0.0
+50-59,Male,26.0,Above average,current,1.0
+40-49,Female,45.0,Below average,never,1.0
+50-59,Male,26.0,Above average,never,1.0
+50-59,Female,25.0,Above average,never,0.0
+50-59,Female,29.0,Average,former,1.0
+50-59,Female,26.0,Average,current,1.0
+30-39,Female,31.0,Above average,never,1.0
+40-49,Female,25.0,Above average,current,0.0
+60-69,Female,19.0,Above average,never,1.0
+50-59,Female,35.0,Average,never,0.0
+60-69,Female,23.0,Average,never,1.0
+30-39,Female,23.0,Average,never,1.0
+21-29,Female,29.0,Above average,never,1.0
+50-59,Female,30.0,Below average,current,0.0
+40-49,Female,20.0,Well above average,never,0.0
+60-69,Male,32.0,Average,current,1.0
+60-69,Male,26.0,Well above average,current,1.0
+30-39,Female,25.0,Above average,never,1.0
+50-59,Female,38.0,Average,former,0.0
+40-49,Male,23.0,Above average,never,1.0
+50-59,Female,32.0,Average,never,0.0
+40-49,Female,37.0,Average,former,0.0
+50-59,Female,32.0,Below average,former,1.0
+40-49,Female,29.0,Above average,never,1.0
+60-69,Female,32.0,Average,current,1.0
+30-39,Female,32.0,Average,current,0.0
+40-49,Male,23.0,Below average,never,0.0
+50-59,Female,22.0,Well above average,former,1.0
+30-39,Male,26.0,Average,current,1.0
+60-69,Female,25.0,Below average,never,0.0
+50-59,Female,22.0,Above average,never,1.0
+30-39,Female,19.0,Above average,never,1.0
+50-59,Female,24.0,Above average,former,1.0
+50-59,Female,21.0,Well below average,former,1.0
+40-49,Male,29.0,Average,current,1.0
+40-49,Female,34.0,Average,current,1.0
+50-59,Male,22.0,Below average,former,0.0
+40-49,Male,31.0,Average,never,0.0
+40-49,Female,24.0,Average,never,1.0
+30-39,Female,26.0,Above average,never,1.0
+50-59,Female,40.0,Average,current,0.0
+70-79,Female,26.0,Above average,never,0.0
+40-49,Female,38.0,Above average,never,0.0
+60-69,Female,32.0,Average,former,1.0
+30-39,Female,22.0,Above average,never,1.0
+60-69,Female,38.0,Average,never,0.0
+40-49,Female,25.0,Above average,never,1.0
+60-69,Female,23.0,Well below average,never,1.0
+40-49,Female,35.0,Above average,former,0.0
+40-49,Female,25.0,Average,former,0.0
+40-49,Female,38.0,Below average,current,0.0
+60-69,Female,26.0,Well above average,former,1.0
+30-39,Female,29.0,Average,former,0.0
+21-29,Female,28.0,Below average,never,1.0
+50-59,Male,33.0,Average,never,0.0
+60-69,Male,29.0,Above average,never,1.0
+80-older,Female,23.0,Above average,former,0.0
+50-59,Female,20.0,Average,never,1.0
+50-59,Female,35.0,Average,never,1.0
+40-49,Female,21.0,Well above average,former,1.0
+70-79,Male,36.0,Below average,never,1.0
+40-49,Male,25.0,Well above average,never,1.0
+60-69,Male,24.0,Well above average,never,1.0
+60-69,Female,26.0,Below average,never,0.0
+30-39,Female,39.0,Average,never,0.0
+30-39,Female,33.0,Above average,current,0.0
+60-69,Female,22.0,Well above average,never,1.0
+30-39,Male,30.0,Average,never,1.0
+80-older,Female,26.0,Above average,former,1.0
+40-49,Female,19.0,Below average,current,1.0
+70-79,Female,19.0,Above average,current,0.0
+40-49,Female,24.0,Above average,former,0.0
+70-79,Female,31.0,Below average,former,1.0
+40-49,Female,24.0,Average,current,0.0
+50-59,Female,34.0,Average,never,1.0
+60-69,Male,35.0,Above average,never,0.0
+30-39,Female,32.0,Above average,never,0.0
+30-39,Female,42.0,Above average,former,0.0
+50-59,Female,23.0,Above average,never,1.0
+60-69,Female,29.0,Below average,former,0.0
+30-39,Female,24.0,Average,current,0.0
+60-69,Female,28.0,Above average,current,0.0
+60-69,Female,23.0,Below average,current,1.0
+60-69,Male,30.0,Well below average,current,0.0
+50-59,Female,29.0,Above average,former,1.0
+60-69,Male,25.0,Above average,current,0.0
+50-59,Female,40.0,Well above average,never,1.0
+40-49,Female,28.0,Above average,ecig,0.0
+50-59,Female,32.0,Above average,never,0.0
+50-59,Female,38.0,Below average,ecig,0.0
+60-69,Female,26.0,Average,ecig,0.0
+70-79,Female,27.0,Average,current,0.0
+50-59,Female,24.0,Above average,never,1.0
+70-79,Female,38.0,Well above average,never,0.0
+21-29,Female,25.0,Below average,never,1.0
+70-79,Female,22.0,Well above average,never,1.0
+50-59,Female,25.0,Average,never,1.0
+30-39,Female,41.0,Average,never,0.0
+60-69,Female,22.0,Above average,former,1.0
+60-69,Female,27.0,Well below average,ecig,0.0
+40-49,Female,27.0,Below average,never,1.0
+21-29,Female,20.0,Average,never,1.0
+30-39,Male,29.0,Above average,never,1.0
+60-69,Female,34.0,Above average,former,1.0
+30-39,Male,24.0,Average,former,0.0
+30-39,Female,35.0,Average,never,0.0
+50-59,Female,22.0,Well above average,never,1.0
+60-69,Female,41.0,Average,current,0.0
+60-69,Male,44.0,Average,current,0.0
+80-older,Female,21.0,Average,never,0.0
+40-49,Female,40.0,Average,never,0.0
+60-69,Female,32.0,Average,never,1.0
+70-79,Female,34.0,Average,never,0.0
+30-39,Female,29.0,Average,never,1.0
+50-59,Female,23.0,Well below average,current,0.0
+70-79,Female,28.0,Average,never,0.0
+70-79,Female,33.0,Well above average,never,1.0
+70-79,Male,23.0,Below average,never,0.0
+40-49,Female,23.0,Well above average,never,1.0
+50-59,Female,22.0,Average,current,0.0
+70-79,Female,24.0,Above average,never,0.0
+60-69,Female,30.0,Average,never,0.0
+60-69,Male,34.0,Above average,former,0.0
+50-59,Female,50.0,Below average,current,0.0
+60-69,Male,40.0,Below average,former,0.0
+60-69,Female,27.0,Above average,never,0.0
+80-older,Female,27.0,Average,former,0.0
+50-59,Male,32.0,Average,former,0.0
+50-59,Male,30.0,Above average,ecig,0.0
+50-59,Female,29.0,Average,never,0.0
+60-69,Female,26.0,Average,never,0.0
+40-49,Male,33.0,Above average,never,1.0
+30-39,Female,21.0,Above average,never,1.0
+70-79,Female,25.0,Above average,never,1.0
+40-49,Female,50.0,Below average,former,0.0
+60-69,Female,26.0,Average,never,0.0
+70-79,Male,33.0,Below average,never,0.0
+70-79,Female,39.0,Average,former,1.0
+60-69,Female,24.0,Average,former,0.0
+60-69,Female,33.0,Above average,never,1.0
+60-69,Female,31.0,Well below average,former,1.0
+60-69,Female,34.0,Below average,current,0.0
+50-59,Female,27.0,Average,current,1.0
+60-69,Female,34.0,Average,former,0.0
+70-79,Female,30.0,Average,former,0.0
+60-69,Male,15.0,Well below average,former,0.0
+60-69,Male,31.0,Below average,former,1.0
+60-69,Female,21.0,Above average,former,1.0
+60-69,Female,27.0,Average,current,0.0
+60-69,Female,22.0,Above average,ecig,1.0
+60-69,Female,38.0,Below average,former,1.0
+60-69,Male,24.0,Average,current,0.0
+60-69,Female,29.0,Well below average,current,1.0
+40-49,Female,36.0,Average,current,1.0
+60-69,Male,25.0,Average,never,1.0
+60-69,Female,33.0,Below average,former,0.0
+60-69,Male,29.0,Above average,former,0.0
+60-69,Female,31.0,Below average,former,0.0
+50-59,Female,27.0,Below average,current,1.0
+60-69,Female,30.0,Average,current,0.0
+60-69,Male,34.0,Average,current,1.0
+60-69,Female,23.0,Below average,former,0.0
+60-69,Female,31.0,Above average,former,0.0
+60-69,Male,21.0,Well above average,never,0.0
+40-49,Female,34.0,Below average,never,0.0
+60-69,Female,22.0,Above average,never,0.0
+50-59,Female,30.0,Average,current,0.0
+60-69,Female,31.0,Average,former,0.0
+80-older,Male,27.0,Above average,former,0.0
+50-59,Female,31.0,Well above average,never,0.0
+40-49,Male,27.0,Average,current,0.0
+50-59,Female,22.0,Average,never,1.0
+30-39,Female,29.0,Average,current,0.0
+60-69,Female,28.0,Well below average,never,1.0
+60-69,Female,31.0,Average,never,0.0
+40-49,Female,33.0,Average,ecig,0.0
+70-79,Female,27.0,Average,never,0.0
+50-59,Female,36.0,Average,never,0.0
+50-59,Male,25.0,Well above average,former,1.0
+60-69,Female,26.0,Below average,ecig,1.0
+60-69,Female,24.0,Above average,never,1.0
+40-49,Female,27.0,Above average,former,0.0
+40-49,Male,36.0,Average,never,0.0
+60-69,Female,22.0,Average,current,1.0
+60-69,Female,23.0,Well above average,ecig,1.0
+40-49,Male,28.0,Average,never,1.0
+80-older,Male,20.0,Above average,never,1.0
+60-69,Female,37.0,Average,former,1.0
+50-59,Female,27.0,Above average,never,1.0
+50-59,Male,20.0,Average,current,0.0
+60-69,Male,32.0,Average,former,1.0
+60-69,Female,40.0,Below average,never,0.0
+30-39,Female,29.0,Well above average,never,1.0
+60-69,Female,29.0,Above average,never,1.0
+50-59,Female,31.0,Average,former,1.0
+60-69,Male,31.0,Average,never,1.0
+30-39,Male,41.0,Average,never,0.0
+40-49,Female,53.0,Well below average,former,0.0
+40-49,Female,24.0,Below average,never,0.0
+50-59,Female,31.0,Well below average,former,0.0
+50-59,Male,23.0,Above average,never,1.0
+40-49,Female,28.0,Above average,never,1.0
+60-69,Female,25.0,Average,never,0.0
+60-69,Female,28.0,Above average,never,1.0
+40-49,Female,37.0,Well below average,never,0.0
+60-69,Female,29.0,Below average,current,1.0
+30-39,Female,26.0,Below average,current,1.0
+40-49,Female,19.0,Well above average,former,1.0
+50-59,Female,39.0,Below average,never,0.0
+40-49,Female,23.0,Below average,current,0.0
+30-39,Female,31.0,Average,former,1.0
+60-69,Female,31.0,Average,never,0.0
+40-49,Female,18.0,Above average,former,0.0
+50-59,Female,27.0,Above average,former,0.0
+40-49,Female,21.0,Below average,current,0.0
+50-59,Female,27.0,Average,former,0.0
+30-39,Male,24.0,Well above average,never,1.0
+30-39,Male,24.0,Well above average,never,0.0
+30-39,Male,34.0,Below average,former,0.0
+60-69,Female,26.0,Above average,former,1.0
+50-59,Female,27.0,Above average,never,0.0
+60-69,Female,29.0,Average,former,0.0
+60-69,Female,29.0,Below average,never,0.0
+60-69,Female,40.0,Below average,never,0.0
+30-39,Female,23.0,Average,current,1.0
+30-39,Female,33.0,Above average,current,1.0
+60-69,Female,22.0,Average,current,0.0
+60-69,Female,28.0,Above average,former,0.0
+50-59,Female,26.0,Average,current,0.0
+30-39,Male,25.0,Average,former,1.0
+60-69,Female,22.0,Above average,never,1.0
+50-59,Female,30.0,Below average,never,1.0
+40-49,Female,35.0,Average,never,1.0
+50-59,Female,29.0,Below average,former,1.0
+30-39,Female,44.0,Average,current,0.0
+30-39,Female,31.0,Below average,never,0.0
+50-59,Female,34.0,Below average,former,0.0
+60-69,Female,20.0,Average,never,1.0
+50-59,Other,36.0,Below average,never,0.0
+50-59,Female,26.0,Well above average,former,1.0
+40-49,Female,38.0,Above average,never,0.0
+60-69,Female,49.0,Below average,former,0.0
+60-69,Female,23.0,Well above average,never,0.0
+50-59,Female,28.0,Average,never,0.0
+40-49,Female,21.0,Average,never,1.0
+50-59,Female,35.0,Average,former,1.0
+30-39,Female,28.0,Below average,former,0.0
+30-39,Female,22.0,Average,current,1.0
+30-39,Female,43.0,Above average,former,0.0
+70-79,Female,25.0,Average,current,0.0
+50-59,Female,45.0,Average,former,1.0
+40-49,Female,27.0,Average,former,0.0
+60-69,Female,45.0,Above average,never,1.0
+50-59,Female,53.0,Below average,never,0.0
+40-49,Female,26.0,Above average,never,1.0
+40-49,Male,29.0,Above average,never,1.0
+60-69,Female,42.0,Above average,former,0.0
+40-49,Female,46.0,Below average,never,0.0
+50-59,Female,24.0,Well above average,never,0.0
+40-49,Female,18.0,Above average,current,1.0
+50-59,Female,27.0,Average,current,0.0
+30-39,Female,32.0,Average,never,0.0
+50-59,Female,26.0,Average,never,1.0
+40-49,Female,27.0,Average,current,0.0
+50-59,Female,36.0,Average,never,0.0
+30-39,Female,27.0,Average,current,0.0
+30-39,Female,39.0,Below average,never,1.0
+30-39,Female,27.0,Above average,former,1.0
+30-39,Male,27.0,Below average,current,0.0
+50-59,Female,33.0,Average,current,0.0
+60-69,Female,31.0,Well above average,former,1.0
+30-39,Male,21.0,Average,current,1.0
+70-79,Male,26.0,Above average,former,1.0
+40-49,Female,22.0,Above average,never,0.0
+40-49,Female,32.0,Average,current,0.0
+40-49,Female,34.0,Above average,never,1.0
+40-49,Female,38.0,Average,current,0.0
+50-59,Female,25.0,Average,never,0.0
+70-79,Female,21.0,Above average,current,0.0
+70-79,Male,23.0,Above average,former,1.0
+50-59,Female,25.0,Below average,current,1.0
+40-49,Female,27.0,Above average,never,1.0
+80-older,Male,24.0,Above average,never,1.0
+50-59,Other,21.0,Average,current,1.0
+60-69,Female,35.0,Average,never,0.0
+30-39,Female,49.0,Above average,current,1.0
+40-49,Female,30.0,Below average,current,0.0
+30-39,Male,28.0,Above average,former,1.0
+50-59,Female,32.0,Below average,never,1.0
+80-older,Male,30.0,Average,former,0.0
+60-69,Female,35.0,Below average,current,1.0
+60-69,Male,26.0,Above average,former,1.0
+80-older,Female,21.0,Above average,former,1.0
