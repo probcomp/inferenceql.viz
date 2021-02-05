@@ -21,14 +21,13 @@
         rows-by-id (medley/index-by :rowid rows)
 
         headers (->> headers
+                     ;; headers should always look like [:rowid :label ...] because :rowid and
+                     ;; :label are automatically added to the user's query by iql.viz.
+
                      ;; :rowid should not be displayed in the table. Instead it extracted
                      ;; from the rows using the Handsontable rowHeaders function.
-
-                     ;; :label column is removed so we can display in at the start.
-                     (remove #{:rowid :label})
-                     ;; The first column should always be the :label column, which will get hidden
-                     ;; and shown by the :table/show-label-column event.
-                     (into [:label]))
+                     (drop 1)
+                     (vec))
 
         new-db (-> db
                    (assoc-in [:table-panel :physical-data :row-order] row-order)
