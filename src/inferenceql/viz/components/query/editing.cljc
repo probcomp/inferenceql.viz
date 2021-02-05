@@ -312,10 +312,10 @@
 ;;; Testing
 
 (def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
-(def updates {3 {:label "True"}, 6 {:label "True"}})
-(def updates {7 {:label "False"}, 10 {:label "False"}})
-(def updates {})
-(def updates nil)
+#_(def updates {3 {:label "True"}, 6 {:label "True"}})
+#_(def updates {7 {:label "False"}, 10 {:label "False"}})
+#_(def updates {})
+#_(def updates nil)
 
 (def prob-of-query
   (long-str
