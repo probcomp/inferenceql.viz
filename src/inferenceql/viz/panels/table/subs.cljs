@@ -7,7 +7,10 @@
             [inferenceql.viz.panels.table.handsontable :as hot]
             [inferenceql.viz.panels.table.selections :as selections]
             [inferenceql.viz.panels.table.db :as db]
-            [inferenceql.viz.panels.override.views :as modal]))
+            [inferenceql.viz.panels.override.views :as modal]
+            [inferenceql.viz.util :refer [coerce-bool]]
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]))
+
 
 ;;; Subs related selection layer color.
 
@@ -106,7 +109,27 @@
                        {:data attr})]
     (map settings-map headers)))
 
-;;; Subs related to visual state of the table
+;;; Subs related to changes in the table data via the UI.
+
+(rf/reg-sub :table/changes-existing
+            (fn [db _]
+              (get-in db [:table-panel :changes :existing])))
+
+(rf/reg-sub :table/rows-by-id-with-changes
+            :<- [:table/physical-rows-by-id]
+            :<- [:table/changes-existing]
+            (fn [[rows-by-id changes]]
+              (merge-row-updates rows-by-id changes)))
+
+(rf/reg-sub :table/label-values
+            :<- [:table/rows-by-id-with-changes]
+            (fn [rows-by-id]
+              (->> rows-by-id
+                   (medley/map-vals :label)
+                   (medley/filter-vals some?)
+                   (medley/map-vals coerce-bool))))
+
+;;; Subs related to visual state of the table.
 
 (rf/reg-sub :table/visual-state
             (fn [db _]
@@ -124,7 +147,7 @@
 
 (rf/reg-sub :table/visual-rows
             :<- [:table/visual-row-order]
-            :<- [:table/physical-rows-by-id]
+            :<- [:table/rows-by-id-with-changes]
             (fn [[row-order rows-by-id]]
               (mapv rows-by-id row-order)))
 
@@ -134,12 +157,6 @@
             (fn [[rows pts-store-filter]]
               (when pts-store-filter
                 (map pts-store-filter rows))))
-
-;;; Subs related to changes in the table data.
-
-(rf/reg-sub :table/changes-existing
-            (fn [db _]
-              (get-in db [:table-panel :changes :existing])))
 
 ;;; Subs related showing/hiding certain columns or table controls.
 
@@ -233,41 +250,28 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/physical-headers])})
- (fn [{:keys [col-overrides col-names]}]
-   (let [set-function-fn (fn [key selection click-event]
-                           (this-as hot
-                             (let [last-col-num (.. (first selection) -start -col)
-                                   last-col-num-phys (.toPhysicalColumn hot last-col-num)
-                                   col-name (nth col-names last-col-num-phys)
-                                   fn-text (get col-overrides col-name)
-
-                                   modal-child [modal/js-function-entry-modal col-name fn-text]]
-                               (rf/dispatch [:override/set-modal {:child modal-child}]))))
-
-         clear-function-fn (fn [key selection click-event]
-                             (this-as hot
-                               (let [last-col-num (.. (first selection) -start -col)
-                                     last-col-num-phys (.toPhysicalColumn hot last-col-num)
-                                     col-name (nth col-names last-col-num-phys)]
-                                 (rf/dispatch [:override/clear-column-function col-name]))))
-
+    :col-names (rf/subscribe [:table/physical-headers])
+    :label-values (rf/subscribe [:table/label-values])})
+ (fn [{:keys [_col-overrides _col-names label-values]}]
+   (let [incorp-label-col (fn [_key _selection _click-event]
+                            (rf/dispatch [:control/incorp-label-values label-values]))
          disable-fn (fn []
                      (this-as hot
                        (let [last-selected (.getSelectedRangeLast hot)
                              from-col (.. last-selected -from -col)
                              to-col (.. last-selected -to -col)
-                             from-row (.. last-selected -from -row)]
+                             from-row (.. last-selected -from -row)
 
+                             prop-name (keyword (.colToProp hot to-col))]
                          ;; Disable the menu when either more than one column is selected
                          ;; or when the selection does not start from a cell in the header row.
-                         (or (not= from-col to-col) (not= from-row 0)))))]
-     {:items {"set_function" {:disabled disable-fn
-                              :name "Set js function"
-                              :callback set-function-fn}
-              "clear_function" {:disabled disable-fn
-                                :name "Clear js function"
-                                :callback clear-function-fn}}})))
+                         ;; or when the selection is not in the label column.
+                         (or (not= from-col to-col)
+                             (not= from-row -1)
+                             (not= prop-name :label)))))]
+     {:items {"incorp_label_col" {:disabled disable-fn
+                                  :name "INCORPORATE values into model"
+                                  :callback incorp-label-col}}})))
 
 (rf/reg-sub
  :table/cells-style-fn

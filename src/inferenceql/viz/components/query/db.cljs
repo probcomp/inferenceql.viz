@@ -53,4 +53,4 @@
 ;;; Accessor functions for indexing into parts of the query-panel's db.
 
 (defn query-displayed [db]
-  (get-in db [:query-panel :query-displayed]))
+  (get-in db [:query-component :query-displayed]))

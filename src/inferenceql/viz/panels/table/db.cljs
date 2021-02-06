@@ -1,5 +1,8 @@
 (ns inferenceql.viz.panels.table.db
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [medley.core :as medley]
+            [inferenceql.viz.util :refer [coerce-bool]]
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]))
 
 (def default-db
   {:table-panel {:selection-layer-coords {}
@@ -65,4 +68,15 @@
 (defn visual-row-order
   [db]
   (get-in db [:table-panel :visual-state :row-order]))
+
+(defn label-values
+  [db]
+  (let [;; Rows by id with changes merged in.
+        rows-by-id (merge-row-updates (get-in db [:table-panel :physical-data :rows-by-id])
+                                      (get-in db [:table-panel :changes :existing]))]
+    ;; filter
+    (->> rows-by-id
+         (medley/map-vals :label)
+         (medley/filter-vals some?)
+         (medley/map-vals coerce-bool))))
 

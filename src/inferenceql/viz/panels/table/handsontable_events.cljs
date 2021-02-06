@@ -5,7 +5,8 @@
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [medley.core :as medley]))
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
+            [inferenceql.viz.components.query.db :refer [query-displayed]]))
 
 (rf/reg-event-db
  :hot/after-selection-end
@@ -79,28 +80,6 @@
   (let [valid-change-sources #{"edit" "CopyPaste.paste" "Autofill.fill"}]
     (some? (valid-change-sources source))))
 
-(defn merge-row-updates
-  "Merges `updates` into `rows`.
-  Both `updates` and `rows` are a maps where keys are row-ids and vals are rows
-  (or row updates) in the case of `updates`."
-  [rows updates]
-  (let [merge-op (fnil (partial merge-with merge) {} {})
-        merged-rows (merge-op rows updates)
-
-        ;; Updates will sometimes have nil or "" as the new value for a particular attribute
-        ;; in a row. This means the user has entered "" in the cell or has deleted the cell's value.
-        ;; For these cases we want to remove these values and their corresponding keys
-        ;; from the map representing the row.
-        empty-cell? #(or (nil? %) (= "" %))]
-
-    (reduce-kv (fn [acc row-id row]
-                 (let [clean-row (medley/remove-vals empty-cell? row)]
-                   (if (seq clean-row)
-                     (assoc acc row-id clean-row)
-                     acc)))
-               {}
-               merged-rows)))
-
 (rf/reg-event-fx
   :hot/before-change
   event-interceptors
@@ -115,10 +94,7 @@
                               (assoc-in acc [row-id col] new-val)))
                           {}
                           changes)
-          merged-updates (merge-row-updates (get-in db [:table-panel :changes :existing])
-                                            updates)
-
-          displayed-query ()]
+          new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)]
       ;; Stage the changes in the db. The Handsontable itself already has the updates.
-      {:db (assoc-in db [:table-panel :changes :existing] merged-updates)
-       :fx [[:dispatch [:control/update-query-string merged-updates]]]})))
+      {:db new-db
+       :fx [[:dispatch [:control/update-query-string (query-displayed new-db) (table-db/label-values new-db)]]]})))

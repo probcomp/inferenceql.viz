@@ -3,6 +3,7 @@
   (:require [instaparse.core :as insta]
             [inferenceql.query :as query]
             [inferenceql.query.parse-tree :as tree]
+            [inferenceql.viz.util :refer [coerce-bool]]
             [clojure.zip :as z]
             [clojure.string :as str]
             [medley.core :as medley]
@@ -96,14 +97,6 @@
 (def whitespace (query/parse "\n     " :start :ws))
 
 (def label-alter-node (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr))
-
-(defn coerce-bool [val]
-  (case (str/lower-case val)
-    "true" true
-    "t" true
-    "false" false
-    "f" false
-    nil))
 
 (defn with-sub-query-node [qs]
   (let [qz (-> qs query/parse zipper)
@@ -213,13 +206,18 @@
                           (tree/get-node $ :with-map-expr)
                           (tree/child-nodes $))
 
-        existing-updates (->> entry-exprs
-                           (keep update-node-map)
-                           (apply merge))
-        all-updates (merge existing-updates updates)
+        ;; Not using the values already in the WITH.
+        #_existing-updates #_(->> entry-exprs
+                               (keep update-node-map)
+                               (apply merge))
+        ;;all-updates (merge existing-updates updates)
+        all-updates updates
 
         pos-update-node (update-label-node all-updates true)
         neg-update-node (update-label-node all-updates false)
+
+        _ (do #?(:cljs (.log js/console :pos pos-update-node)))
+        _ (do #?(:cljs (.log js/console :neg neg-update-node)))
 
         entry-exprs (remove update-node-map entry-exprs)
         entry-exprs (cond-> entry-exprs
@@ -241,6 +239,9 @@
 (defn new-with [sub-query-node updates]
   (let [pos-update-node (update-label-node updates true)
         neg-update-node (update-label-node updates false)
+        _ (do #?(:cljs (.log js/console :u updates)))
+        _ (do #?(:cljs (.log js/console :a pos-update-node)))
+        _ (do #?(:cljs (.log js/console :b neg-update-node)))
         entry-exprs (cond-> [label-alter-node]
                       pos-update-node (concat [pos-update-node])
                       neg-update-node (concat [neg-update-node]))
@@ -252,17 +253,20 @@
 
 (defn add-update-labels-expr [new-qs prev-qs updates]
   (if (seq updates)
-    (let [updates (medley/map-vals #(coerce-bool (:label %)) updates)
-          sub-query-node (with-sub-query-node new-qs)
+    (let [sub-query-node (with-sub-query-node new-qs)
           qz (some-> prev-qs query/parse zipper)
           qz-with (some-> qz (seek-tag :with-expr))]
       (if qz-with
-        (-> (z/edit qz-with add-updates-to-with updates)
-            (seek-tag :query-expr)
-            (z/replace sub-query-node)
-            (z/root)
-            (query/unparse))
-        (new-with sub-query-node updates)))
+        (do
+          (do #?(:cljs (.log js/console :here---------------)))
+          (-> (z/edit qz-with add-updates-to-with updates)
+              (seek-tag :query-expr)
+              (z/replace sub-query-node)
+              (z/root)
+              (query/unparse)))
+        (do
+          (do #?(:cljs (.log js/console :here2---------------)))
+          (new-with sub-query-node updates))))
     new-qs))
 
 

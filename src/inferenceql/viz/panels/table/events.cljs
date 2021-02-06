@@ -34,7 +34,10 @@
                    (assoc-in [:table-panel :physical-data :rows-by-id] rows-by-id)
                    (assoc-in [:table-panel :physical-data :headers] headers)
                    ;; Clear all selections in all selection layers.
-                   (assoc-in [:table-panel :selection-layer-coords] {}))]
+                   (assoc-in [:table-panel :selection-layer-coords] {})
+                   ;; Clear changes.
+                   (update-in [:table-panel] dissoc :changes))]
+
     {:db new-db
      ;; Clear previous selections made in vega-lite plots.
      :dispatch [:viz/clear-pts-store]}))
@@ -48,7 +51,7 @@
  event-interceptors
  (fn [{:keys [db]} [_]]
    (let [new-db (-> db
-                    (update-in [:table-panel] dissoc :physical-data :visual-state)
+                    (update-in [:table-panel] dissoc :physical-data :visual-state :changes)
                     (assoc-in [:table-panel :selection-layer-coords] {}))]
      {:db new-db
       :dispatch [:viz/clear-pts-store]})))

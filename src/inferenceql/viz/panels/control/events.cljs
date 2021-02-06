@@ -3,8 +3,7 @@
             [inferenceql.viz.panels.control.db :as db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.components.highlight.db :as highlight-db]
-            [inferenceql.viz.components.query.editing :refer [add-update-labels-expr add-incorp-labels-expr]]
-            [inferenceql.viz.components.query.db :refer [query-displayed]]))
+            [inferenceql.viz.components.query.editing :refer [add-update-labels-expr add-incorp-labels-expr]]))
 
 (defn query-for-conf-options [type threshold]
   (case type
@@ -80,5 +79,11 @@
 (rf/reg-event-db
   :control/update-query-string
   event-interceptors
-  (fn [db [_ changes-existing]]
-    (update-in db [:control-panel :query-string] add-update-labels-expr (query-displayed db) changes-existing)))
+  (fn [db [_ query-displayed label-values]]
+    (update-in db [:control-panel :query-string] add-update-labels-expr query-displayed label-values)))
+
+(rf/reg-event-db
+  :control/incorp-label-values
+  event-interceptors
+  (fn [db [_ label-values]]
+    (update-in db [:control-panel :query-string] add-incorp-labels-expr label-values)))
