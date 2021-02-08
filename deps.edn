@@ -18,10 +18,9 @@
         cljs-ajax/cljs-ajax {:mvn/version "0.8.1"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         cljsjs/highlight {:mvn/version "9.12.0-2"}
-        probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "26062216a52c549cf800d016a24ddeea1d1deb3c"}
+        probcomp/inferenceql.inference {:local/root "../inferenceql.inference/"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
-                                    :sha "34efe84636cc99455201ea1985cd359a595ac968"}
+                                    :sha "3cef811a3f6e4500514e8aa8cb5362dc0e757384"}
         probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
                                             :sha "506e847f55b0379b3888e0f2b2d3fa0e52f2166e"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"

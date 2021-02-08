@@ -6,7 +6,8 @@
             [inferenceql.auto-modeling.bayesdb-import :as bdb.import]
             [inferenceql.viz.config :as config]
             [inferenceql.viz.csv :as csv-utils]
-            [inferenceql.inference.gpm :as gpm]))
+            [inferenceql.inference.gpm :as gpm]
+            [medley.core :as medley]))
 
 ;;; Compiled-in elements to store
 
@@ -20,6 +21,28 @@
 ;; NOTE: Currently, we just take the first model in the bayes-db-export as our model.
 (def compiled-in-model (first (bdb.import/xcat-gpms (get config/config :bayes-db-export)
                                                     compiled-in-dataset)))
+
+(keys compiled-in-model)
+
+(:latents compiled-in-model)
+
+(:bmi (:columns (val (first (:views compiled-in-model)))))
+
+(def bmi-col (:bmi (:columns (val (first (:views compiled-in-model))))))
+(def bmi-cats (:categories bmi-col))
+
+(def vals (doall (medley/map-vals #(gpm/logpdf % {:bmi 20} {}) bmi-cats)))
+
+
+#?(:cljs (.log js/console :bmi-cats bmi-cats))
+#?(:clj (println :bmi-cats))
+#?(:clj (clojure.pprint/pprint bmi-cats))
+
+#?(:cljs (.log js/console :vals vals))
+#?(:clj (println :vals))
+#?(:clj (clojure.pprint/pprint vals))
+
+
 
 ;;; Setting up store component db
 
@@ -89,7 +112,7 @@
                                    ::projection-type]))
 
 ;; This is the actual geodata which is stored as a JS object.
-(s/def ::data object?)
+(s/def ::data some?)
 (s/def ::filetype #{:topojson :geojson})
 ;; This is the key for the collection of objects in the topojson to use for
 ;; matching with rows. This is only present for :topojson files.
