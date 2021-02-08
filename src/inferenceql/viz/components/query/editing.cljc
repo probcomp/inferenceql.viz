@@ -252,6 +252,7 @@
     (str "WITH " (query/unparse with-map-expr) ":\n" (query/unparse sub-query-node))))
 
 (defn add-update-labels-expr [new-qs prev-qs updates]
+  ;; TODO: handle the case where there are no updates. We sometimes need to remove the with.
   (if (seq updates)
     (let [sub-query-node (with-sub-query-node new-qs)
           qz (some-> prev-qs query/parse zipper)

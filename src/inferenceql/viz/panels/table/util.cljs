@@ -1,6 +1,9 @@
 (ns inferenceql.viz.panels.table.util
   (:require [medley.core :as medley]))
 
+
+;; TODO do not remove nils when merging updates with update
+
 (defn merge-row-updates
   "Merges `updates` into `rows`.
   Both `updates` and `rows` are a maps where keys are row-ids and vals are rows
@@ -15,11 +18,16 @@
         ;; from the map representing the row.
         empty-cell? #(or (nil? %) (= "" %))]
 
-    (reduce-kv (fn [acc row-id row]
-                 (let [clean-row (medley/remove-vals empty-cell? row)]
-                   (if (seq clean-row)
-                     (assoc acc row-id clean-row)
-                     acc)))
-               {}
-               merged-rows)))
+
+    ;; May need this when we are adding new rows.
+    ;; For now we just return the merge.
+    #_(reduce-kv (fn [acc row-id row]
+                   (let [clean-row (medley/remove-vals empty-cell? row)]
+                     (if (seq clean-row)
+                       (assoc acc row-id clean-row)
+                       acc)))
+                 {}
+                 merged-rows)
+
+    merged-rows))
 
