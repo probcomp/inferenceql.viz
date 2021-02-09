@@ -100,4 +100,7 @@
                          "+20+20")]
     (println "Resizing jpegs.")
     (sh "mogrify" "-gravity" "NorthWest" "-extent" max-size "-background" "white"
-        "-border" "20x20" "-bordercolor" "white" "-colorspace" "RGB" file-name-wildcard)))
+        "-border" "20x20" "-bordercolor" "white" "-colorspace" "RGB" file-name-wildcard))
+  ;; Deals with program hanging due to futures.
+  ;; https://clojuredocs.org/clojure.java.shell/sh
+  (System/exit 0))
