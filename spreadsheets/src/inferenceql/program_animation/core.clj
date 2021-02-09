@@ -19,14 +19,16 @@
             [clojure.pprint :refer [pprint]]))
 
 ;; Starting number in model filenames.
+;; XXX: need to uncomment this to read out below paramters from file.
 ;(def meta-csv (csv/read-csv (slurp "raw-data/meta-data.csv")))
 ;(def low-index  (int (first (second meta-csv))))
 ;(def high-index (int (second (second meta-csv))))
+
 ;; One above the final number in model filnames.
 ;; Starting number in model filenames.
 (def low-index 1)
 ;; One above the final number in model filnames.
-(def high-index 15)
+(def high-index 80)
 
 ;; How many rows from the dataset to incorporate into each model based on the model number.
 ;; (Difference between the number of rows to incorporate and the model number)
@@ -62,17 +64,6 @@
                        (let [num-rows (+ i rows-offset)]
                          (take num-rows all-rows))))
 
-(println "")
-(println "")
-(println "")
-(println "rows-for-models")
-(println rows-for-models)
-(println "first bayesdb-dumps")
-(println (first bayesdb-dumps))
-(println "")
-(println "")
-(println "")
-
 (def programs (for [[bdb-dump rows] (map vector bayesdb-dumps rows-for-models)]
                 (->> (bayesdb-import/xcat-gpms bdb-dump rows)
                      (first)
@@ -97,12 +88,12 @@
   (doseq [[i p] (map vector (range low-index high-index) programs)]
     (println (str "Writing model: " i))
     (let [svg-file (str "images-svg/model-" i ".svg")
-          jpg-file (str "images-jpeg/model-" i ".jpg")]
+          jpg-file (format "images-jpeg/t-%03d.jpg" i)]
       (spit svg-file (clygments/highlight p :js :svg {:style "xcode"}))
       (sh "svgexport" svg-file jpg-file "pad" "2x" "100%")))
 
   ;; Resize all images to the max width and height between all of them.
-  (let [file-name-wildcard "images-jpeg/model-*.jpg"
+  (let [file-name-wildcard "images-jpeg/t-*.jpg"
         file-sizes (:out (sh "identify" "-format" "%w %h\n" file-name-wildcard))
         max-size (:out (sh "awk" "($1>w){w=$1} ($2>h){h=$2} END{print w\"x\"h}" :in file-sizes))
         size-string (str (str/trim-newline max-size)
