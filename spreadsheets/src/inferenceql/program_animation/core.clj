@@ -50,7 +50,14 @@
         iql-types (map iql-type (vals bdb-types))]
     (zipmap columns iql-types)))
 
-(def schema (get-schema (first bayesdb-dumps)))
+(defn only-same-val
+  "Used as merge function to safely combine schemas from multiple models."
+  [a b]
+  (if (= a b)
+    a
+    (throw (ex-info "Models have conflicting schema information." {}))))
+
+(def schema (apply merge-with only-same-val (map get-schema bayesdb-dumps)))
 (def all-rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
 
 (def rows-for-models (for [i (range low-index high-index)]
