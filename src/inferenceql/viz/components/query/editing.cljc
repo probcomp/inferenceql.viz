@@ -231,44 +231,74 @@
         (z/replace (tree/node :with-map-expr entry-exprs))
         (z/root))))
 
-(defn add-updates-to-with [node updates]
-  (-> node
-      (add-label-alter)
-      (add-label-update updates)))
 
-(defn new-with [sub-query-node updates]
-  (let [pos-update-node (update-label-node updates true)
-        neg-update-node (update-label-node updates false)
-        _ (do #?(:cljs (.log js/console :u updates)))
-        _ (do #?(:cljs (.log js/console :a pos-update-node)))
-        _ (do #?(:cljs (.log js/console :b neg-update-node)))
-        entry-exprs (cond-> [label-alter-node]
-                      pos-update-node (concat [pos-update-node])
-                      neg-update-node (concat [neg-update-node]))
-        entry-exprs (as-> entry-exprs $
-                          (interleave $ (repeat ",") (repeat whitespace))
-                          (drop-last 2 $))
-        with-map-expr (tree/node :with-map-expr entry-exprs)]
-    (str "WITH " (query/unparse with-map-expr) ":\n" (query/unparse sub-query-node))))
+(defn edit-with-map-expr [node f]
+  (let [entry-exprs (-> node
+                        (tree/get-node :with-map-expr)
+                        (tree/child-nodes)
+                        (f))]
+    (-> (zipper node)
+        (seek-tag :with-map-expr)
+        (z/replace (tree/node :with-map-expr entry-exprs))
+        (z/root))))
 
-(defn add-update-labels-expr [new-qs prev-qs updates]
-  ;; TODO: handle the case where there are no updates. We sometimes need to remove the with.
+(defn add-new-with [sub-query-node updates]
   (if (seq updates)
-    (let [sub-query-node (with-sub-query-node new-qs)
-          qz (some-> prev-qs query/parse zipper)
-          qz-with (some-> qz (seek-tag :with-expr))]
-      (if qz-with
-        (do
-          (do #?(:cljs (.log js/console :here---------------)))
-          (-> (z/edit qz-with add-updates-to-with updates)
-              (seek-tag :query-expr)
-              (z/replace sub-query-node)
-              (z/root)
-              (query/unparse)))
-        (do
-          (do #?(:cljs (.log js/console :here2---------------)))
-          (new-with sub-query-node updates))))
-    new-qs))
+    (let [pos-update-node (update-label-node updates true)
+          neg-update-node (update-label-node updates false)
+          _ (do #?(:cljs (.log js/console :u updates)))
+          _ (do #?(:cljs (.log js/console :a pos-update-node)))
+          _ (do #?(:cljs (.log js/console :b neg-update-node)))
+          entry-exprs (cond-> [label-alter-node]
+                        pos-update-node (concat [pos-update-node])
+                        neg-update-node (concat [neg-update-node]))
+          entry-exprs (as-> entry-exprs $
+                            (interleave $ (repeat ",") (repeat whitespace))
+                            (drop-last 2 $))
+          with-map-expr (tree/node :with-map-expr entry-exprs)]
+      (str "WITH " (query/unparse with-map-expr) ":\n" (query/unparse sub-query-node)))
+    (query/unparse sub-query-node)))
+
+(defn handle [qz-with sub-query-node updates]
+  (if qz-with
+    (let [with-node (z/node qz-with)
+          new-with-node (cond-> with-node
+                          :always (remove-label-alter)
+                          :always (remove-label-update)
+                          (seq updates) (add-label-alter)
+                          (seq updates) (add-label-update updates))
+
+          has-map-entries (-> new-with-node
+                              (tree/get-node :with-map-expr)
+                              (tree/child-nodes)
+                              (seq))
+
+          return-node (if has-map-entries
+                        (-> qz-with
+                            (z/replace new-with-node)
+                            (seek-tag :query-expr)
+                            (z/replace sub-query-node)
+                            (z/root))
+                        sub-query-node)]
+      (query/unparse return-node))
+    (add-new-with sub-query-node updates)))
+
+(defn add-update-labels-expr [cur-qs prev-qs updates]
+  (if-not (insta/failure? (query/parse cur-qs))
+    ;; Edit the query.
+    (let [prev-qz (some-> prev-qs query/parse zipper)
+          prev-qz-with (some-> prev-qz (seek-tag :with-expr))
+          cur-qz (some-> cur-qs query/parse zipper)
+          cur-qz-with (some-> cur-qz (seek-tag :with-expr))
+          sub-query-node (with-sub-query-node cur-qs)]
+      (if prev-qz-with
+        ;; Use the previous WITH clause.
+        (handle prev-qz-with sub-query-node updates)
+        ;; Use the current WITH clause.
+        (handle cur-qz-with sub-query-node updates)))
+
+    ;; Just return the current un-edited query if it can't be parsed.
+    cur-qs))
 
 
 ;-------------------------------------------------------
@@ -348,5 +378,6 @@
    "     (UPDATE data SET label=true WHERE rowid=1 OR rowid=2 OR rowid=3) AS data:"
    "SELECT * FROM data;"))
 
+(query/parse test-prev-qs)
 
 ;;(add-update-labels-expr test-new-qs nil updates)
