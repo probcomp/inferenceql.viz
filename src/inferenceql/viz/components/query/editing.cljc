@@ -91,12 +91,7 @@
 
 ;-------------------------------------------------------
 
-;;; ALTER column.
-;;; UPDATE column.
-
 (def whitespace (query/parse "\n     " :start :ws))
-
-(def label-alter-node (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr))
 
 (defn with-sub-query-node [qs]
   (let [qz (-> qs query/parse zipper)
@@ -105,6 +100,10 @@
       (-> (z/node qz-with)
           (tree/get-node-in [:with-sub-expr :query-expr]))
       (z/node qz))))
+
+;------------------------------------------------------
+
+(def label-alter-node (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr))
 
 (defn is-label-alter? [node]
   (let [val-expr (tree/get-node node :with-map-value-expr)
@@ -124,20 +123,13 @@
          (= column-name "label")
          (= binding-name "data"))))
 
-(defn add-label-alter [node]
-  (let [whitespace (query/parse "\n     " :start :ws)
-        entry-exprs (as-> node $
-                          (tree/get-node $ :with-map-expr)
-                          (tree/child-nodes $)
-                          (remove is-label-alter? $)
-                          (concat $ [label-alter-node])
-                          ;; Is there a better way?
-                          (interleave $ (repeat ",") (repeat whitespace))
-                          (drop-last 2 $))]
-    (-> (zipper node)
-        (seek-tag :with-map-expr)
-        (z/replace (tree/node :with-map-expr entry-exprs))
-        (z/root))))
+(defn remove-label-alter [entry-exprs]
+  (remove is-label-alter? entry-exprs))
+
+(defn add-label-alter [entry-exprs]
+  (concat entry-exprs [label-alter-node]))
+
+;------------------------------------------------------
 
 (defn reduce-or-node [node]
   (let [reducer (fn reducer [node]
@@ -191,7 +183,7 @@
       (zipmap (map second where-pairs)
               (repeat (:label set-map))))))
 
-(defn update-label-node [updates label-val]
+(defn make-update-label-node [updates label-val]
   (let [rowids (-> (medley/filter-vals {label-val true} updates)
                    (keys))]
     (when (seq rowids)
@@ -201,28 +193,28 @@
             qs (format "(UPDATE data SET label=%s WHERE %s) AS data" label-val cond-str)]
         (query/parse qs :start :with-map-entry-expr)))))
 
-(defn add-label-update [node updates]
-  (let [entry-exprs (as-> node $
-                          (tree/get-node $ :with-map-expr)
-                          (tree/child-nodes $))
+(defn remove-label-update [entry-exprs]
+  (remove update-node-map entry-exprs))
 
-        ;; Not using the values already in the WITH.
-        #_existing-updates #_(->> entry-exprs
-                               (keep update-node-map)
-                               (apply merge))
-        ;;all-updates (merge existing-updates updates)
-        all-updates updates
-
-        pos-update-node (update-label-node all-updates true)
-        neg-update-node (update-label-node all-updates false)
-
+(defn add-label-update [entry-exprs updates]
+  (let [pos-update-node (make-update-label-node updates true)
+        neg-update-node (make-update-label-node updates false)
         _ (do #?(:cljs (.log js/console :pos pos-update-node)))
-        _ (do #?(:cljs (.log js/console :neg neg-update-node)))
+        _ (do #?(:cljs (.log js/console :neg neg-update-node)))]
+    (cond-> entry-exprs
+            pos-update-node (concat [pos-update-node])
+            neg-update-node (concat [neg-update-node]))))
 
-        entry-exprs (remove update-node-map entry-exprs)
-        entry-exprs (cond-> entry-exprs
-                            pos-update-node (concat [pos-update-node])
-                            neg-update-node (concat [neg-update-node]))
+;------------------------------------------------------
+
+(defn edit-map-exprs [node f & args]
+  (let [f-ready #(apply f (concat [%] args))
+        entry-exprs (-> node
+                        (tree/get-node :with-map-expr)
+                        (tree/child-nodes)
+                        (f-ready))
+
+        ;; Add commas and whitespace
         entry-exprs (as-> entry-exprs $
                           (interleave $ (repeat ",") (repeat whitespace))
                           (drop-last 2 $))]
@@ -231,21 +223,10 @@
         (z/replace (tree/node :with-map-expr entry-exprs))
         (z/root))))
 
-
-(defn edit-with-map-expr [node f]
-  (let [entry-exprs (-> node
-                        (tree/get-node :with-map-expr)
-                        (tree/child-nodes)
-                        (f))]
-    (-> (zipper node)
-        (seek-tag :with-map-expr)
-        (z/replace (tree/node :with-map-expr entry-exprs))
-        (z/root))))
-
 (defn add-new-with [sub-query-node updates]
   (if (seq updates)
-    (let [pos-update-node (update-label-node updates true)
-          neg-update-node (update-label-node updates false)
+    (let [pos-update-node (make-update-label-node updates true)
+          neg-update-node (make-update-label-node updates false)
           _ (do #?(:cljs (.log js/console :u updates)))
           _ (do #?(:cljs (.log js/console :a pos-update-node)))
           _ (do #?(:cljs (.log js/console :b neg-update-node)))
@@ -263,10 +244,10 @@
   (if qz-with
     (let [with-node (z/node qz-with)
           new-with-node (cond-> with-node
-                          :always (remove-label-alter)
-                          :always (remove-label-update)
-                          (seq updates) (add-label-alter)
-                          (seq updates) (add-label-update updates))
+                          :always (edit-map-exprs remove-label-alter)
+                          :always (edit-map-exprs remove-label-update)
+                          (seq updates) (edit-map-exprs add-label-alter)
+                          (seq updates) (edit-map-exprs add-label-update updates))
 
           has-map-entries (-> new-with-node
                               (tree/get-node :with-map-expr)
@@ -300,20 +281,16 @@
     ;; Just return the current un-edited query if it can't be parsed.
     cur-qs))
 
-
 ;-------------------------------------------------------
 
 ;;; INCORPORATE column.
 
 (defn incorp-node [updates model-name]
-  (let [label-updates (medley/map-vals #(coerce-bool (:label %)) updates)
-
-        bindings-str (->> (seq label-updates)
+  (let [bindings-str (->> (seq updates)
                           (sort-by first)
                           (map (fn [[k v]] (format "%s=%s" k v)))
                           (str/join ", "))
-
-        incorporate-str (format "(INCORPORATE COLUMN (%s) INTO %s)", bindings-str model-name)]
+        incorporate-str (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str model-name)]
     (query/parse incorporate-str :start :model-expr)))
 
 (defn no-incorp-node? [loc]
@@ -332,23 +309,26 @@
         (z/root))))
 
 (defn add-incorp-labels-expr [query-string updates]
+  #?(:cljs (.log js/console :query-string query-string))
+  #?(:cljs (.log js/console :updates updates))
   (if (seq updates)
     (loop [qz (-> query-string query/parse zipper)]
       (if (z/end? qz)
         (-> qz z/node query/unparse)
         (let [qz-under (seek-tag qz :under-clause)]
-          (if (some-> qz-under no-incorp-node?)
-            (recur (z/edit qz-under add-incorp-node updates))
-            (recur (z/next qz))))))
+          ;; Edit the node then recur.
+          (recur (z/next (z/edit qz-under add-incorp-node updates)))
+          ;; Just recur.
+          (recur (z/next qz)))))
     query-string))
 
 ;--------------------------------------------
 
 ;;; Testing
 
-(def updates {3 {:label "True"}, 6 {:label "True"}, 7 {:label "False"}, 10 {:label "False"}})
-#_(def updates {3 {:label "True"}, 6 {:label "True"}})
-#_(def updates {7 {:label "False"}, 10 {:label "False"}})
+#_(def updates {3 true 6 true 7 false 10 false})
+(def updates {3 true 6 true})
+#_(def updates {7 false 10 false})
 #_(def updates {})
 #_(def updates nil)
 
@@ -364,11 +344,30 @@
    "       gender"
    "FROM data;"))
 
-(query/parse prob-of-query)
+(def prob-of-query-2
+  (long-str
+    "WITH (ALTER data ADD label) AS data,"
+    "     (UPDATE data SET label=true WHERE rowid=4 OR rowid=10) AS data:"
+    "SELECT (PROBABILITY OF label=true"
+    "         GIVEN gender, height"
+    "         UNDER model),"
+    "       age, gender, height"
+    "FROM data"))
 
+(def prob-of-query-3
+  (long-str
+    "WITH (ALTER data ADD label) AS data,"
+    "       (UPDATE data SET label=true WHERE rowid=4 OR rowid=10) AS data:"
+    "  SELECT (PROBABILITY OF label=true"
+    "           GIVEN gender, height"
+    "           UNDER (INCORPORATE COLUMN (7=false, 10=false) AS label INTO model)),"
+    "         age, gender, height"
+    "  FROM data"))
 
 ;;(add-incorp-labels-expr "SELECT * FROM data;" updates)
-;;(add-incorp-labels-expr prob-of-query updates)
+(print (add-incorp-labels-expr prob-of-query-3 updates))
+
+(query/parse prob-of-query-3)
 
 
 (def test-new-qs "SELECT age, gender FROM data;")
@@ -378,6 +377,4 @@
    "     (UPDATE data SET label=true WHERE rowid=1 OR rowid=2 OR rowid=3) AS data:"
    "SELECT * FROM data;"))
 
-(query/parse test-prev-qs)
-
-;;(add-update-labels-expr test-new-qs nil updates)
+;;(add-update-labels-expr test-new-qs test-prev-qs updates)
