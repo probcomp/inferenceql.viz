@@ -75,9 +75,9 @@
 
 (defn valid-source?
   [source]
-  ;; Changes should only be the result of user edits, copy paste, or drag and autofill.
-  ;; This should be enforced by Hansontable settings.
-  (let [valid-change-sources #{"edit" "CopyPaste.paste" "Autofill.fill"}]
+  ;; Changes should only be the result of user edits, copy paste, drag and autofill,
+  ;; and undo. This should be enforced by Hansontable settings.
+  (let [valid-change-sources #{"edit" "CopyPaste.paste" "Autofill.fill" "UndoRedo.undo"}]
     (some? (valid-change-sources source))))
 
 (rf/reg-event-fx
