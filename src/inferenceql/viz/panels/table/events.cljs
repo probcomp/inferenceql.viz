@@ -21,12 +21,15 @@
         rows-by-id (medley/index-by :rowid rows)
 
         headers (->> headers
-                     ;; headers should always look like [:rowid :label ...] because :rowid and
-                     ;; :label are automatically added to the user's query by iql.viz.
+                     ;; headers should always look like [:rowid :editable :label ...] because
+                     ;; :rowid, :editable, and :label are automatically added to the
+                     ;; user's query by iql.viz.
 
                      ;; :rowid should not be displayed in the table. Instead it extracted
                      ;; from the rows using the Handsontable rowHeaders function.
-                     (drop 1)
+                     ;; :editable should also not be displayed.
+
+                     (drop 2) ; drop :rowid and :editable
                      (vec))
 
         new-db (-> db

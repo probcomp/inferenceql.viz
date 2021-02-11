@@ -20,10 +20,12 @@
     A query string."
   [query]
   (let [rowid-selection-node (query/parse "rowid" :start :selection)
+        editable-col-selection-node (query/parse "editable" :start :selection)
         label-col-selection-node (query/parse "label" :start :selection)
 
         add-rowid (fn [select-list-node]
                     (let [selections (into [rowid-selection-node
+                                            editable-col-selection-node
                                             label-col-selection-node]
                                            (tree/child-nodes select-list-node))
                           selections (as-> selections $
