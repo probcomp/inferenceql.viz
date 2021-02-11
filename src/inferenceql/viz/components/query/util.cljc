@@ -52,6 +52,7 @@
   [tree]
   (when-not (insta/failure? tree)
     (as-> tree $
+      ;; TODO: fix getting teh select-list
       (tree/get-node-in $ [:select-expr :select-clause :select-list])
       (tree/child-nodes $))))
 
@@ -81,6 +82,7 @@
         selection-type (tree/tag selection-block)]
     (when selection-type
       (case selection-type
+        ;; TODO: what happens when select list has * (star)
         :selection (column-details-for-selection selection-block)
         :rowid-selection nil ; We don't care about the rowid column.
         :column-selection (column-selection-rename selection-block)
@@ -97,11 +99,14 @@
 
 ;;; Functions related to (virtual-data?)
 
+;; TODO: fix checking for virtual data
+
 (defn- virtual-data-table-expr?
   "Returns whether this `table-expr` portion of the parse tree generates virtual data."
   [table-expr]
   (let [table-expr-contents (first (tree/child-nodes table-expr))
         table-expr-type (tree/tag table-expr-contents)]
+    ;; TODO: use (some? (seek-tag % :generated-table-expr))
     (case table-expr-type
       :table-expr (virtual-data-table-expr? table-expr-contents)
       :generated-table-expr true
@@ -113,4 +118,5 @@
   (let [node-or-failure (query/parse query)]
     (when-not (insta/failure? node-or-failure)
       (let [table-expr (tree/get-node-in node-or-failure [:from-clause :table-expr])]
+        ;; TODO: use some->
         (virtual-data-table-expr? table-expr)))))
