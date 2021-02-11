@@ -9,10 +9,6 @@
 
 (defn- sort-state-applicable
   "Determines whether `sort-config` can be applied to the columns.
-
-  This simply checks column numbers referenced `sort-config` are applicable to the number for
-  `columns` present.
-
   Args:
     columns: A vector of column names.
     sort-config: (js-object) A sort config returned by Handsontable.
@@ -41,13 +37,13 @@
 
     (when table-changed
       ;; Maintain the same sort order as before the update.
-      ;; If colHeaders hasn't changed, we can apply the previous sort state.
-      ;; Or if the sort-state is applicable to the current columns, we can as well.
+      ;; If colHeaders hasn't change we can apply the sort state. Or if the sort-state is
+      ;; applicable to the current columns.
       (when (or (nil? (:colHeaders new-settings))
                 (sort-state-applicable (:colHeaders new-settings) sort-config))
         (.sort sorting-plugin sort-config))
 
-      ;; Reapply selections present before the update.
+      ;; If we cleared selections because of the table-changed, reapply selections
       (when-let [coords (clj->js current-selection)]
         (.selectCells hot-instance coords false)))))
 
@@ -87,8 +83,8 @@
          (let [[_ _old-attributes old-props] old-argv
                [_ _new-attributes new-props] (reagent/argv this)
 
-               old-settings (:settings old-props)
-               new-settings (:settings new-props)
+               {old-settings :settings} old-props
+               {new-settings :settings} new-props
                changed-settings (filter-kv (fn [setting-key new-val]
                                              (not= (get old-settings setting-key) new-val))
                                            new-settings)]

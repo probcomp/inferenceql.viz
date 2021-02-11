@@ -7,7 +7,10 @@
             [inferenceql.viz.panels.table.handsontable :as hot]
             [inferenceql.viz.panels.table.selections :as selections]
             [inferenceql.viz.panels.table.db :as db]
-            [inferenceql.viz.panels.override.views :as modal]))
+            [inferenceql.viz.panels.override.views :as modal]
+            [inferenceql.viz.util :refer [coerce-bool]]
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]))
+
 
 ;;; Subs related selection layer color.
 
@@ -60,14 +63,30 @@
 
 ;;; Subs related to populating tables with data.
 
-(rf/reg-sub :table/table-headers
+(rf/reg-sub :table/physical-data
             (fn [db _]
-              (db/table-headers db)))
+              (get-in db [:table-panel :physical-data])))
 
-(defn table-rows
-  [db _]
-  (db/table-rows db))
-(rf/reg-sub :table/table-rows table-rows)
+(rf/reg-sub :table/physical-headers
+            :<- [:table/physical-data]
+            (fn [physical-data]
+              (get physical-data :headers)))
+
+(rf/reg-sub :table/physical-row-order
+            :<- [:table/physical-data]
+            (fn [physical-data]
+              (get physical-data :row-order)))
+
+(rf/reg-sub :table/physical-rows-by-id
+            :<- [:table/physical-data]
+            (fn [physical-data]
+              (get physical-data :rows-by-id)))
+
+(rf/reg-sub :table/physical-rows
+            :<- [:table/physical-row-order]
+            :<- [:table/physical-rows-by-id]
+            (fn [[row-order rows-by-id]]
+              (mapv rows-by-id row-order)))
 
 (defn- display-headers
   "Returns an sequence of strings for column name headers to display.
@@ -90,18 +109,50 @@
                        {:data attr})]
     (map settings-map headers)))
 
-;;; Subs related to visual state of the table
+;;; Subs related to changes in the table data via the UI.
+
+(rf/reg-sub :table/changes-existing
+            (fn [db _]
+              (get-in db [:table-panel :changes :existing])))
+
+(rf/reg-sub :table/rows-by-id-with-changes
+            :<- [:table/physical-rows-by-id]
+            :<- [:table/changes-existing]
+            (fn [[rows-by-id changes]]
+              (merge-row-updates rows-by-id changes)))
+
+(rf/reg-sub :table/label-values
+            :<- [:table/rows-by-id-with-changes]
+            (fn [rows-by-id]
+              (->> rows-by-id
+                   (medley/map-vals :label)
+                   (medley/filter-vals some?)
+                   (medley/map-vals coerce-bool))))
+
+;;; Subs related to visual state of the table.
+
+(rf/reg-sub :table/visual-state
+            (fn [db _]
+              (get-in db [:table-panel :visual-state])))
 
 (rf/reg-sub :table/visual-headers
-            (fn [db _]
-              (get-in db [:table-panel :visual-headers])))
+            :<- [:table/visual-state]
+            (fn [visual-state]
+              (get visual-state :headers)))
+
+(rf/reg-sub :table/visual-row-order
+            :<- [:table/visual-state]
+            (fn [visual-state]
+              (get visual-state :row-order)))
 
 (rf/reg-sub :table/visual-rows
-            (fn [db _]
-              (get-in db [:table-panel :visual-rows])))
+            :<- [:table/visual-row-order]
+            :<- [:table/rows-by-id-with-changes]
+            (fn [[row-order rows-by-id]]
+              (mapv rows-by-id row-order)))
 
 (rf/reg-sub :table/selected-row-flags
-            :<- [:table/table-rows]
+            :<- [:table/physical-rows]
             :<- [:viz/pts-store-filter]
             (fn [[rows pts-store-filter]]
               (when pts-store-filter
@@ -111,6 +162,7 @@
 
 (defn show-table-controls
   "Returns a value for the css visibility property.
+
   To be used as re-frame subscription."
   [rows]
   (if (seq rows)
@@ -118,7 +170,7 @@
     "hidden"))
 
 (rf/reg-sub :table/show-table-controls
-            :<- [:table/table-rows]
+            :<- [:table/physical-rows]
             show-table-controls)
 
 (rf/reg-sub :table/show-label-column
@@ -127,7 +179,7 @@
 
 (defn hidden-columns
   "Returns a value for the Handsontable hiddenColumns setting.
-  Hides the first column when `show-label-column` is false.
+  Hides the first column when `label-column-show` is false.
   To be used as a re-frame subscriptions."
   [show-label-column]
   (if show-label-column
@@ -151,28 +203,43 @@
 
           class-names [(when selected "selected-row")
                        (when label-column-cell "label-cell")]
-          class-names-string (str/join ", " (remove nil? class-names))]
+          class-names-string (str/join ", " (remove nil? class-names))
+          ;; Make the :label column editable
+          editable label-column-cell]
       #js {:className class-names-string
-           ;; Make cells in the :label column editable
-           :readOnly (not label-column-cell)})))
+           :readOnly (not editable)})))
 
 (rf/reg-sub :table/cells
             :<- [:table/selected-row-flags]
             cells)
 
+(defn row-headers
+  "Returns a function to be used as the rowHeaders option in Handsontable.
+  To be used as a re-frame subscription."
+  [hot]
+  (fn [row-physical-index]
+    (let [v-row (.toVisualRow hot row-physical-index)]
+      (.getDataAtRowProp hot v-row (name :rowid)))))
+
+(rf/reg-sub :table/row-headers
+            :<- [:table/hot-instance]
+            row-headers)
+
 (defn ^:sub real-hot-props
-  [[headers rows context-menu cells hidden-columns selection-coords-active]]
+  [[table-headers row-headers rows context-menu cells hidden-columns selection-coords-active]]
   (-> hot/real-hot-settings
       (assoc-in [:settings :data] rows)
-      (assoc-in [:settings :colHeaders] (display-headers headers))
-      (assoc-in [:settings :columns] (column-settings headers))
+      (assoc-in [:settings :colHeaders] (display-headers table-headers))
+      (assoc-in [:settings :columns] (column-settings table-headers))
+      (assoc-in [:settings :rowHeaders] row-headers)
       (assoc-in [:settings :cells] cells)
       (assoc-in [:settings :contextMenu] context-menu)
       (assoc-in [:settings :hiddenColumns] hidden-columns)
       (assoc-in [:selections-coords] selection-coords-active)))
 (rf/reg-sub :table/real-hot-props
-            :<- [:table/table-headers]
-            :<- [:table/table-rows]
+            :<- [:table/physical-headers]
+            :<- [:table/row-headers]
+            :<- [:table/physical-rows]
             :<- [:table/context-menu]
             :<- [:table/cells]
             :<- [:table/hidden-columns]
@@ -183,41 +250,28 @@
  :table/context-menu
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
-    :col-names (rf/subscribe [:table/table-headers])})
- (fn [{:keys [col-overrides col-names]}]
-   (let [set-function-fn (fn [key selection click-event]
-                           (this-as hot
-                             (let [last-col-num (.. (first selection) -start -col)
-                                   last-col-num-phys (.toPhysicalColumn hot last-col-num)
-                                   col-name (nth col-names last-col-num-phys)
-                                   fn-text (get col-overrides col-name)
-
-                                   modal-child [modal/js-function-entry-modal col-name fn-text]]
-                               (rf/dispatch [:override/set-modal {:child modal-child}]))))
-
-         clear-function-fn (fn [key selection click-event]
-                             (this-as hot
-                               (let [last-col-num (.. (first selection) -start -col)
-                                     last-col-num-phys (.toPhysicalColumn hot last-col-num)
-                                     col-name (nth col-names last-col-num-phys)]
-                                 (rf/dispatch [:override/clear-column-function col-name]))))
-
+    :col-names (rf/subscribe [:table/physical-headers])
+    :label-values (rf/subscribe [:table/label-values])})
+ (fn [{:keys [_col-overrides _col-names label-values]}]
+   (let [incorp-label-col (fn [_key _selection _click-event]
+                            (rf/dispatch [:control/incorp-label-values label-values]))
          disable-fn (fn []
                      (this-as hot
                        (let [last-selected (.getSelectedRangeLast hot)
                              from-col (.. last-selected -from -col)
                              to-col (.. last-selected -to -col)
-                             from-row (.. last-selected -from -row)]
+                             from-row (.. last-selected -from -row)
 
+                             prop-name (keyword (.colToProp hot to-col))]
                          ;; Disable the menu when either more than one column is selected
                          ;; or when the selection does not start from a cell in the header row.
-                         (or (not= from-col to-col) (not= from-row 0)))))]
-     {:items {"set_function" {:disabled disable-fn
-                              :name "Set js function"
-                              :callback set-function-fn}
-              "clear_function" {:disabled disable-fn
-                                :name "Clear js function"
-                                :callback clear-function-fn}}})))
+                         ;; or when the selection is not in the label column.
+                         (or (not= from-col to-col)
+                             (not= from-row -1)
+                             (not= prop-name :label)))))]
+     {:items {"incorp_label_col" {:disabled disable-fn
+                                  :name "INCORPORATE values into model"
+                                  :callback incorp-label-col}}})))
 
 (rf/reg-sub
  :table/cells-style-fn
@@ -235,7 +289,7 @@
     :missing-cells-flagged (rf/subscribe [:highlight/missing-cells-flagged])
     :conf-thresh (rf/subscribe [:control/confidence-threshold])
     :conf-mode (rf/subscribe [:control/reagent-form [:confidence-mode]])
-    :computed-headers (rf/subscribe [:table/table-headers])})
+    :computed-headers (rf/subscribe [:table/physical-headers])})
  ;; Returns a cell renderer function used by Handsontable.
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode

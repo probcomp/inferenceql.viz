@@ -57,6 +57,9 @@
             :<- [:store/models]
             model)
 
+;; TODO: fix this to use the schema subscription below.
+;; Also we need to send a mapping of column renames to the simulate function sub
+;; used in vega-lite specs.
 (defn ^:sub simulatable-cols
   "Returns a set of column names that are simulatable.
 

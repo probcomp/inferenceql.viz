@@ -2,9 +2,11 @@
   "Re-frame events that correspond to hooks in Handsontable."
   (:require [re-frame.core :as rf]
             [inferenceql.viz.panels.table.selections :as selections]
+            [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.panels.table.db :as table-db]))
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
+            [inferenceql.viz.components.query.db :refer [query-displayed]]))
 
 (rf/reg-event-db
  :hot/after-selection-end
@@ -12,7 +14,7 @@
  (fn [db [_ hot _id _row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-coords (selections/normalize (js->clj (.getSelected hot)))
          color (control-db/selection-color db)
-         num-rows (count (table-db/visual-rows db))]
+         num-rows (count (table-db/visual-row-order db))]
      (if (selections/valid-selection? selection-coords num-rows)
        (assoc-in db [:table-panel :selection-layer-coords color] selection-coords)
        (update-in db [:table-panel :selection-layer-coords] dissoc color)))))
@@ -35,21 +37,21 @@
   This all eventually gets passed onto the visualization code via subscriptions."
   [db hot]
   (let [headers (mapv keyword (js->clj (.getColHeader hot)))]
-    (assoc-in db [:table-panel :visual-headers] headers)))
+    (assoc-in db [:table-panel :visual-state :headers] headers)))
 
-(defn assoc-visual-row-data
-  "Associates the actual row data as displayed by `hot` into `db`.
-  The data changes when the user filters or sorts columns.
+(defn assoc-visual-row-order
+  "Associates the order of rows as displayed by `hot` into `db`.
+  This data changes when the user filters, re-orders columns, or sorts columns.
   We use this data to along with selection coordinates to produce the data subset selected.
   This all eventually gets passed onto the visualization code via subscriptions."
   [db hot]
-  (let [raw-rows (js->clj (.getData hot))
-        rows (for [r raw-rows]
-               (let [remove-nan (fn [cell] (when-not (js/Number.isNaN cell) cell))]
-                 (mapv remove-nan r)))
-        headers (mapv keyword (js->clj (.getColHeader hot)))
-        row-maps (mapv #(zipmap headers %) rows)]
-    (assoc-in db [:table-panel :visual-rows] row-maps)))
+  (let [num-rows-shown (.countRows hot)
+        ;; NOTE: Could I do this using the new row index mapper stuff?
+        visual-row-indices (range num-rows-shown)
+        physical-row-indices (map #(.toPhysicalRow hot %) visual-row-indices)
+        physical-row-order (table-db/physical-row-order db)
+        visual-row-order (mapv physical-row-order physical-row-indices)]
+    (assoc-in db [:table-panel :visual-state :row-order] visual-row-order)))
 
 (rf/reg-event-db
  :hot/after-column-move
@@ -62,11 +64,37 @@
  event-interceptors
  (fn [db [_ hot _id _current-sort-config _destination-sort-config]]
    (-> db
-       (assoc-visual-row-data hot)
-       (assoc-visual-headers hot))))
+       (assoc-visual-headers hot)
+       (assoc-visual-row-order hot))))
 
 (rf/reg-event-db
  :hot/after-filter
  event-interceptors
  (fn [db [_ hot _id _conditions-stack]]
-   (assoc-visual-row-data db hot)))
+   (assoc-visual-row-order db hot)))
+
+(defn valid-source?
+  [source]
+  ;; Changes should only be the result of user edits, copy paste, drag and autofill,
+  ;; and undo. This should be enforced by Hansontable settings.
+  (let [valid-change-sources #{"edit" "CopyPaste.paste" "Autofill.fill" "UndoRedo.undo"}]
+    (some? (valid-change-sources source))))
+
+(rf/reg-event-fx
+  :hot/before-change
+  event-interceptors
+  (fn [{:keys [db]} [_ hot id changes source]]
+    (assert (valid-source? source))
+    (let [updates (reduce (fn [acc change]
+                            (let [[row col _prev-val new-val] change
+                                  row-id (get (table-db/visual-row-order db) row)
+                                  col (keyword col)]
+                              ;; Changes should only occur in the label column.
+                              (assert (= col :label))
+                              (assoc-in acc [row-id col] new-val)))
+                          {}
+                          changes)
+          new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)]
+      ;; Stage the changes in the db. The Handsontable itself already has the updates.
+      {:db new-db
+       :fx [[:dispatch [:control/update-query-string (query-displayed new-db) (table-db/label-values new-db)]]]})))

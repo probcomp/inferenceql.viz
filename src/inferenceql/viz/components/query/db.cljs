@@ -10,10 +10,13 @@
   {:query-component {:dataset-name :data
                      :model-name :model}})
 
+
 (s/def ::query-component (s/keys :req-un [::dataset-name
                                           ::model-name]
+
                                  :opt-un [::virtual
-                                          ::column-details]))
+                                          ::column-details
+                                          ::query-displayed]))
 
 ;; The dataset referenced in the last query executed.
 (s/def ::dataset-name keyword?)
@@ -43,3 +46,11 @@
 
 (s/def ::column-details (s/coll-of ::column-detail))
 (s/def ::column-detail (s/multi-spec column-detail-type ::detail-type))
+
+;; Edits to the table in the UI use the WITH expression in this query.
+(s/def ::query-displayed string?)
+
+;;; Accessor functions for indexing into parts of the query-panel's db.
+
+(defn query-displayed [db]
+  (get-in db [:query-component :query-displayed]))
