@@ -51,10 +51,11 @@
   "Gets the selection-list portion of the parse `tree`."
   [tree]
   (when-not (insta/failure? tree)
-    (as-> tree $
-      ;; TODO: fix getting teh select-list
-      (tree/get-node-in $ [:select-expr :select-clause :select-list])
-      (tree/child-nodes $))))
+    (-> tree
+        (zipper)
+        (seek-tag :select-list)
+        (z/node)
+        (tree/child-nodes))))
 
 (defn- column-selection-rename
   "Returns a column-detail map for this type of selection node that renames a column."
@@ -82,7 +83,6 @@
         selection-type (tree/tag selection-block)]
     (when selection-type
       (case selection-type
-        ;; TODO: what happens when select list has * (star)
         :selection (column-details-for-selection selection-block)
         :rowid-selection nil ; We don't care about the rowid column.
         :column-selection (column-selection-rename selection-block)
