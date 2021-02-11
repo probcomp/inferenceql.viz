@@ -285,49 +285,49 @@
 
 ;;; INCORPORATE column.
 
-(defn incorp-node [updates model-name]
-  (let [bindings-str (->> (seq updates)
-                          (sort-by first)
-                          (map (fn [[k v]] (format "%s=%s" k v)))
-                          (str/join ", "))
-        incorporate-str (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str model-name)]
-    (query/parse incorporate-str :start :model-expr)))
-
-(defn no-incorp-node? [loc]
-  (nil? (seek-tag loc :incorporate-expr)))
+(defn maybe-incorp-node [updates model-name]
+  (let [model-string (if (seq updates)
+                       ;; Create an INCORPORATE statement.
+                       (let [bindings-str (->> (seq updates)
+                                               (sort-by first)
+                                               (map (fn [[k v]] (format "%s=%s" k v)))
+                                               (str/join ", "))]
+                         (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str model-name))
+                       ;; Just use the model name.
+                       model-name)]
+    (query/parse model-string :start :model-expr)))
 
 (defn add-incorp-node [node updates]
   (let [loc (zipper node)
-        model-name-loc (seek-tag loc :simple-symbol)
-        model-name (-> model-name-loc z/node tree/only-child)
-        incorp-node (incorp-node updates model-name)]
-    (-> model-name-loc
-        (z/up) ; [:name ...]
-        (z/up) ; [:ref ...]
-        (z/up) ; [:model-expr ...]
-        (z/replace incorp-node)
-        (z/root))))
+        incorp-loc (seek-tag loc :incorporate-expr)
+        model-name (if incorp-loc
+                       (-> incorp-loc
+                           (z/node)
+                           (tree/get-node-in [:incorporate-into-clause :model-expr :ref :name :simple-symbol])
+                           (tree/only-child))
+                       (-> (seek-tag loc :simple-symbol)
+                           (z/node)
+                           (tree/only-child)))
+        new-model-expr-node (maybe-incorp-node updates model-name)]
+    ;; NOTE: or I could edit the original node
+    [:under-clause "UNDER" [:ws " "] new-model-expr-node]))
 
 (defn add-incorp-labels-expr [query-string updates]
   #?(:cljs (.log js/console :query-string query-string))
   #?(:cljs (.log js/console :updates updates))
-  (if (seq updates)
-    (loop [qz (-> query-string query/parse zipper)]
-      (if (z/end? qz)
-        (-> qz z/node query/unparse)
-        (let [qz-under (seek-tag qz :under-clause)]
-          ;; Edit the node then recur.
-          (recur (z/next (z/edit qz-under add-incorp-node updates)))
-          ;; Just recur.
-          (recur (z/next qz)))))
-    query-string))
+  (loop [qz (-> query-string query/parse zipper)]
+    (if (z/end? qz)
+      (-> qz z/node query/unparse)
+      (if-let [qz-under (seek-tag qz :under-clause)]
+        (recur (z/next (z/edit qz-under add-incorp-node updates)))
+        (recur (z/next qz))))))
 
 ;--------------------------------------------
 
 ;;; Testing
 
-#_(def updates {3 true 6 true 7 false 10 false})
-(def updates {3 true 6 true})
+(def updates {3 true 6 true 7 false 10 false})
+#_(def updates {3 true 6 true})
 #_(def updates {7 false 10 false})
 #_(def updates {})
 #_(def updates nil)
@@ -365,10 +365,7 @@
     "  FROM data"))
 
 ;;(add-incorp-labels-expr "SELECT * FROM data;" updates)
-(print (add-incorp-labels-expr prob-of-query-3 updates))
-
-(query/parse prob-of-query-3)
-
+;;(add-incorp-labels-expr prob-of-query-3 updates)
 
 (def test-new-qs "SELECT age, gender FROM data;")
 (def test-prev-qs
