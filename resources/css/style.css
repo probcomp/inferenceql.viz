@@ -228,6 +228,7 @@ div {
 
 .handsontable tr td.label-cell {
   font-weight: 600;
+  font-style: normal;
 }
 
 .handsontable tr td.selected-row {

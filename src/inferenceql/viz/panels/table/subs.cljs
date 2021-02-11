@@ -209,16 +209,22 @@
   Provides special styling for rows selected through vega-lite visualizations."
   [selected-row-flags]
   (fn [row _col prop]
-    (let [selected (when row (nth selected-row-flags row))
-          label-column-cell (= prop (name :label))
+    (this-as obj
+      (let [hot (.-instance obj)
+            editable (true? (.getDataAtRowProp hot row (name :editable)))
+            selected (when row (nth selected-row-flags row))
+            label-column-cell (= prop (name :label))
 
-          class-names [(when selected "selected-row")
-                       (when label-column-cell "label-cell")]
-          class-names-string (str/join ", " (remove nil? class-names))
-          ;; Make the :label column editable
-          editable label-column-cell]
-      #js {:className class-names-string
-           :readOnly (not editable)})))
+            class-names [(when editable "editable-cell")
+                         (when selected "selected-row")
+                         (when label-column-cell "label-cell")]
+            class-names-string (str/join " " (remove nil? class-names))
+
+            ;; Make the :label column editable.
+            ;; Make editable row editable.
+            read-only (and (not label-column-cell) (not editable))]
+        #js {:className class-names-string
+             :readOnly read-only}))))
 
 (rf/reg-sub :table/cells
             :<- [:table/selected-row-flags]
