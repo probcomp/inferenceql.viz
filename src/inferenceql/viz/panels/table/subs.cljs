@@ -115,6 +115,11 @@
             (fn [db _]
               (get-in db [:table-panel :changes :existing])))
 
+(rf/reg-sub :table/new-row-order
+            (fn [db _]
+              (get-in db [:table-panel :changes :new-row-order])))
+
+;; TODO: this will have to be updated to include the new rows.
 (rf/reg-sub :table/rows-by-id-with-changes
             :<- [:table/physical-rows-by-id]
             :<- [:table/changes-existing]
@@ -128,6 +133,12 @@
                    (medley/map-vals :label)
                    (medley/filter-vals some?)
                    (medley/map-vals coerce-bool))))
+
+(rf/reg-sub :table/new-rowid
+            :<- [:table/physical-row-order]
+            :<- [:table/new-row-order]
+            (fn [[orig-rows new-rows]]
+              (inc (count (concat orig-rows new-rows)))))
 
 ;;; Subs related to visual state of the table.
 

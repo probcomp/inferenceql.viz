@@ -80,3 +80,8 @@
          (medley/filter-vals some?)
          (medley/map-vals coerce-bool))))
 
+(defn full-row-order
+  [db]
+  (let [original-rows (get-in db [:table-panel :physical-data :row-order])
+        new-rows (get-in db [:table-panel :changes :new-row-order])]
+    (vec (concat original-rows new-rows))))

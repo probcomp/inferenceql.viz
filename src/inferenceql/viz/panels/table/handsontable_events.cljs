@@ -49,7 +49,7 @@
         ;; NOTE: Could I do this using the new row index mapper stuff?
         visual-row-indices (range num-rows-shown)
         physical-row-indices (map #(.toPhysicalRow hot %) visual-row-indices)
-        physical-row-order (table-db/physical-row-order db)
+        physical-row-order (table-db/full-row-order db)
         visual-row-order (mapv physical-row-order physical-row-indices)]
     (assoc-in db [:table-panel :visual-state :row-order] visual-row-order)))
 

@@ -117,19 +117,20 @@
 (defn controls
   "Controls for a handsontable instance."
   [show-table-controls]
-  [:div#table-controls {:style {:visibility show-table-controls}}
-   [:button.table-button.pure-button
-    {:on-click (fn [e]
-                 (rf/dispatch [:table/toggle-label-column])
-                 (.blur (.-target e)))}
-    "labels"]
-   [:button.table-button.pure-button
-    {:on-click (fn [e]
-                 (rf/dispatch [:table/add-row])
-                 (.blur (.-target e)))}
-    "+row"]
-   [:button.table-button.pure-button
-    {:on-click (fn [e]
-                 (rf/dispatch [:table/delete-row])
-                 (.blur (.-target e)))}
-    "-row"]])
+  (let [new-rowid @(rf/subscribe [:table/new-rowid])]
+    [:div#table-controls {:style {:visibility show-table-controls}}
+     [:button.table-button.pure-button
+      {:on-click (fn [e]
+                   (rf/dispatch [:table/toggle-label-column])
+                   (.blur (.-target e)))}
+      "labels"]
+     [:button.table-button.pure-button
+      {:on-click (fn [e]
+                   (rf/dispatch [:table/add-row new-rowid])
+                   (.blur (.-target e)))}
+      "+row"]
+     [:button.table-button.pure-button
+      {:on-click (fn [e]
+                   (rf/dispatch [:table/delete-row])
+                   (.blur (.-target e)))}
+      "-row"]]))
