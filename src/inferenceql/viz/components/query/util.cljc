@@ -2,7 +2,48 @@
   "Utility functions for manipulating and extracting info from iql.query parse trees."
   (:require [instaparse.core :as insta]
             [inferenceql.query :as query]
-            [inferenceql.query.parse-tree :as tree]))
+            [inferenceql.query.parse-tree :as tree]
+            [clojure.zip :as z]))
+
+;;; Various utility functions related to queries.
+
+(defn long-str [& strings] (clojure.string/join "\n" strings))
+
+(defn make-node
+  "Updates the children in an existing node."
+  [node children]
+  (tree/node (tree/tag node) children))
+
+(defn children
+  "Gets the children of a node.
+  Unlike iql.query.parse-tree/children this does not remove whitespace."
+  [node]
+  (rest node))
+
+(defn zipper
+  "Given an iql.query parse tree, returns a zipper."
+  [node]
+  (z/zipper tree/branch? children make-node node))
+
+(defn seek-tag
+  "Navigates to the first location in a iql.query parse tree with `tag`.
+
+  Args:
+    loc: A zipper of an iql.query parse tree.
+    tag: A tag to search for.
+  Returns:
+    A zipper navigated to a node tagged with `tag`. If such a tagged node can not be found,
+      then returns nil."
+  [loc tag]
+  (cond
+    (z/end? loc)
+    nil
+
+    (and (z/branch? loc) (= tag (tree/tag (z/node loc))))
+    loc
+
+    :else
+    (recur (z/next loc) tag)))
 
 ;;; Functions related to (column-details)
 

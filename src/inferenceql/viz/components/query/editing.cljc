@@ -4,48 +4,12 @@
             [inferenceql.query :as query]
             [inferenceql.query.parse-tree :as tree]
             [inferenceql.viz.util :refer [coerce-bool]]
+            [inferenceql.viz.components.query.util :refer [long-str make-node children zipper
+                                                           seek-tag]]
             [clojure.zip :as z]
             [clojure.string :as str]
             [medley.core :as medley]
             #?(:cljs [goog.string :refer [format]])))
-
-(defn long-str [& strings] (clojure.string/join "\n" strings))
-
-(defn make-node
-  "Updates the children in an existing node."
-  [node children]
-  (tree/node (tree/tag node) children))
-
-(defn children
-  "Gets the children of a node.
-  Unlike iql.query.parse-tree/children this does not remove whitespace."
-  [node]
-  (rest node))
-
-(defn zipper
-  "Given an iql.query parse tree, returns a zipper."
-  [node]
-  (z/zipper tree/branch? children make-node node))
-
-(defn seek-tag
-  "Navigates to the first location in a iql.query parse tree with `tag`.
-
-  Args:
-    loc: A zipper of an iql.query parse tree.
-    tag: A tag to search for.
-  Returns:
-    A zipper navigated to a node tagged with `tag`. If such a tagged node can not be found,
-      then returns nil."
-  [loc tag]
-  (cond
-    (z/end? loc)
-    nil
-
-    (and (z/branch? loc) (= tag (tree/tag (z/node loc))))
-    loc
-
-    :else
-    (recur (z/next loc) tag)))
 
 (defn- add-rowid-and-label-helper
   "Performs the heavy lifting for `add-row-id`.
