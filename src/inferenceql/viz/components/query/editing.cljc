@@ -177,12 +177,8 @@
           (some?)))
 
 (defn make-new-row-node [row]
-  (let [row (dissoc row :rowid)
-        row (medley/remove-vals nil? row)
-        kv-strs (for [[k v] row]
-                  (let [k (name k)
-                        v (if (string? v) (format "\"%s\"" v) v)]
-                    (format "%s=%s" k v)))
+  (let [kv-strs (for [[k v] row]
+                  (format "%s=%s" k v))
         row-str (str/join ", " kv-strs)
         qs (format "(INSERT INTO data VALUES (%s)) AS data" row-str)]
     (query/parse qs :start :with-map-entry-expr)))
@@ -281,12 +277,7 @@
   (let [row-incorps  (if (seq editable-rows)
                        (loop [[r & rs] (reverse editable-rows) query model-name]
                          (if r
-                           (let [;; TODO: factor this row cleanup out.
-                                 r (->> r
-                                        (medley/remove-vals nil?)
-                                        (medley/map-keys name)
-                                        (medley/map-vals #(if (string? %) (format "\"%s\"" %) %)))
-                                 kv-strs (for [[k v] r]
+                           (let [kv-strs (for [[k v] r]
                                            (format "%s=%s" k v))
                                  row-str (str/join ", " kv-strs)
                                  new-query (format "(INCORPORATE ROW (%s) INTO %s)" row-str query)]
@@ -300,7 +291,7 @@
                                                 (sort-by first)
                                                 (map (fn [[k v]] (format "%s=%s" k v)))
                                                 (str/join ", "))]
-                          (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str model-name))
+                          (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str row-incorps))
 
                         row-incorps)]
     (query/parse column-incorp :start :model-expr)))

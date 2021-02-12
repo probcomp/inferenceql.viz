@@ -55,74 +55,80 @@
       {:display-name "handsontable-reagent"
 
        :component-did-mount
-       (fn [this]
-         (let [{:keys [settings hooks]} props
-               hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))]
+                     (fn [this]
+                       (let [{:keys [settings hooks]} props
+                             hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
-           ;; Add callbacks internal to hot object.
-           (doseq [key hooks]
-             (let [camel-key (csk/->camelCase (clj->js key))
-                   ;; Our hook functions call the associated re-frame event and then return true.  Some
-                   ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
-                   ;; false in order to cancel the event. It is likely that this behaviour exists in
-                   ;; other hooks as well it is just not documented. Returning nil or false from a
-                   ;; callback function can cause errors in handsontable plugins that also have
-                   ;; functions attached to that hook. Therefore, we are always returning true from hook
-                   ;; functions.
+                         ;; Add callbacks internal to hot object.
+                         (doseq [key hooks]
+                           (let [camel-key (csk/->camelCase (clj->js key))
+                                 ;; Our hook functions call the associated re-frame event and then return true.  Some
+                                 ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
+                                 ;; false in order to cancel the event. It is likely that this behaviour exists in
+                                 ;; other hooks as well it is just not documented. Returning nil or false from a
+                                 ;; callback function can cause errors in handsontable plugins that also have
+                                 ;; functions attached to that hook. Therefore, we are always returning true from hook
+                                 ;; functions.
 
-                   ;; TODO: add note about this.
-                   dispatch (if (= key :hot/before-change) rf/dispatch-sync rf/dispatch)
+                                 ;; TODO: add note about this.
+                                 dispatch (if (= key :hot/before-change) rf/dispatch-sync rf/dispatch)
 
-                   callback (fn [& args]
-                              (let [sub-bundle {:query/schema @(rf/subscribe [:query/schema])
-                                                :table/row-order-all @(rf/subscribe [:table/row-order-all])}]
-                                (dispatch (into [key hot sub-bundle] args)))
-                              true)]
-               (js/Handsontable.hooks.add camel-key callback hot)))
+                                 callback (fn [& args]
+                                            (let [sub-bundle {:query/schema-full   @(rf/subscribe [:query/schema-full])
+                                                              :table/row-order-all @(rf/subscribe [:table/row-order-all])
+                                                              :query/query-displayed @(rf/subscribe [:query/query-displayed])
+                                                              :query/schema @(rf/subscribe [:query/schema])
+                                                              :table/rows-by-id-with-changes @(rf/subscribe [:table/rows-by-id-with-changes])}]
+                                              (dispatch (into [key hot sub-bundle] args)))
+                                            true)]
+                             (js/Handsontable.hooks.add camel-key callback hot)))
 
-           ;; Save the hot object in the app db.
-           (rf/dispatch [:table/set-hot-instance hot])))
+                         ;; Save the hot object in the app db.
+                         (rf/dispatch [:table/set-hot-instance hot])))
 
        :component-did-update
-       (fn [this old-argv]
-         (let [[_ _old-attributes old-props] old-argv
-               [_ _new-attributes new-props] (reagent/argv this)
+                     (fn [this old-argv]
+                       (let [[_ _old-attributes old-props] old-argv
+                             [_ _new-attributes new-props] (reagent/argv this)
 
-               {old-settings :settings} old-props
-               {new-settings :settings} new-props
-               changed-settings (filter-kv (fn [setting-key new-val]
-                                             (not= (get old-settings setting-key) new-val))
-                                           new-settings)]
+                             {old-settings :settings} old-props
+                             {new-settings :settings} new-props
+                             changed-settings (filter-kv (fn [setting-key new-val]
+                                                           (not= (get old-settings setting-key) new-val))
+                                                         new-settings)]
 
-           ;; Update settings.
-           (when (seq changed-settings)
-             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))
+                         ;; Update settings.
+                         (when (seq changed-settings)
+                           (update-hot! @hot-instance changed-settings (:selections-coords new-props)))
 
-           ;; Update selections.
-           (let [current-selection (selections/normalize
-                                    (js->clj (.getSelected @hot-instance)))]
-             (when (and (not= (:selections-coords new-props) current-selection)
-                        (not= (:selections-coords new-props) (:selections-coords old-props)))
-               (if-let [coords (clj->js (:selections-coords new-props))]
-                 (.selectCells @hot-instance coords false)
-                 ;; When coords is nil it means nothing should be selected in the table.
-                 (.deselectCell @hot-instance))))))
+                         ;; Update selections.
+                         (let [current-selection (selections/normalize
+                                                  (js->clj (.getSelected @hot-instance)))]
+                           (when (and (not= (:selections-coords new-props) current-selection)
+                                      (not= (:selections-coords new-props) (:selections-coords old-props)))
+                             (if-let [coords (clj->js (:selections-coords new-props))]
+                               (.selectCells @hot-instance coords false)
+                               ;; When coords is nil it means nothing should be selected in the table.
+                               (.deselectCell @hot-instance))))))
 
        :component-will-unmount
-       (fn [this]
-         (when @hot-instance
-           (rf/dispatch [:table/unset-hot-instance])
-           (.destroy @hot-instance)))
+                     (fn [this]
+                       (when @hot-instance
+                         (rf/dispatch [:table/unset-hot-instance])
+                         (.destroy @hot-instance)))
 
        :reagent-render
-       (fn [attributes props]
-         [:div#table-container attributes
-          [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
+                     (fn [attributes props]
+                       [:div#table-container attributes
+                        [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
 
 (defn controls
   "Controls for a handsontable instance."
   [show-table-controls]
-  (let [new-rowid @(rf/subscribe [:table/new-rowid])]
+  (let [new-rowid @(rf/subscribe [:table/new-rowid])
+        query-displayed @(rf/subscribe [:query/query-displayed])
+        rows-by-id @(rf/subscribe [:table/rows-by-id-with-changes])
+        schema @(rf/subscribe [:query/schema])]
     [:div#table-controls {:style {:visibility show-table-controls}}
      [:button.table-button.pure-button
       {:on-click (fn [e]
@@ -131,7 +137,7 @@
       "labels"]
      [:button.table-button.pure-button
       {:on-click (fn [e]
-                   (rf/dispatch [:table/add-row new-rowid])
+                   (rf/dispatch [:table/add-row new-rowid query-displayed rows-by-id schema])
                    (.blur (.-target e)))}
       "+row"]
      [:button.table-button.pure-button

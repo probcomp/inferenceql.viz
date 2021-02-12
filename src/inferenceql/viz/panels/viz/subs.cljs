@@ -6,7 +6,7 @@
             [medley.core :as medley]))
 
 (rf/reg-sub :viz/vega-lite-spec
-            :<- [:query/schema]
+            :<- [:query/schema-full]
             :<- [:query/simulatable-cols]
             :<- [:query/geodata]
             :<- [:query/geo-id-col]

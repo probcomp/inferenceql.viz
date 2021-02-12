@@ -50,7 +50,3 @@
 ;; Edits to the table in the UI use the WITH expression in this query.
 (s/def ::query-displayed string?)
 
-;;; Accessor functions for indexing into parts of the query-panel's db.
-
-(defn query-displayed [db]
-  (get-in db [:query-component :query-displayed]))

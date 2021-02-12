@@ -3,6 +3,7 @@
   (:require [re-frame.core :as rf]
             [inferenceql.viz.panels.table.selections :as selections]
             [inferenceql.viz.panels.table.db :as table-db]
+            [inferenceql.viz.panels.table.subs :as table-subs]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
@@ -94,12 +95,13 @@
                             (let [[row col _prev-val new-val] change
                                   row-id (get (table-db/visual-row-order db) row)
                                   col (keyword col)
-                                  type (get-in sub-bundle [:query/schema col])]
+                                  type (get-in sub-bundle [:query/schema-full col])]
 
                               ;; Changes should only occur in the label column or in editable row.
                               ;; TODO: check this row is editable instead of true below.
                               (assert (or (= col :label) true))
 
+                              ;; TODO: only allow edits in modeled columns.
                               (if (= type :gaussian)
                                 ;; Try to cast.
                                 (let [new-val (edn/read-string new-val)]
@@ -118,11 +120,18 @@
                           {}
                           (map-indexed vector changes))
 
-          new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)]
+          new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)
+
+          changes (get-in new-db [:table-panel :changes :existing])
+          rows-by-id (merge-row-updates (:table/rows-by-id-with-changes sub-bundle) updates)
+          rows-all (mapv rows-by-id (:table/rows-all sub-bundle))
+
+          query (:query/query-displayed sub-bundle)
+          schema (:query/schema sub-bundle)]
 
       ;; Stage the changes in the db. The Handsontable itself already has the updates.
       {:db new-db
        :fx [[:dispatch [:control/update-query-string
-                        (query-displayed new-db)
-                        (table-db/label-values new-db)
-                        (table-db/editable-rows new-db)]]]})))
+                        query
+                        (table-subs/label-values rows-by-id)
+                        (table-subs/editable-rows [rows-all schema])]]]})))

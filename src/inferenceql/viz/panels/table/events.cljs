@@ -3,6 +3,8 @@
   (:refer-clojure :exclude [set])
   (:require [re-frame.core :as rf]
             [inferenceql.viz.panels.table.db :as db]
+            [inferenceql.viz.panels.table.subs :as table-subs]
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.components.query.db :refer [query-displayed]]
@@ -110,18 +112,26 @@
 (rf/reg-event-fx
  :table/add-row
  event-interceptors
- (fn [{:keys [db]} [_ new-rowid]]
+ (fn [{:keys [db]} [_ new-rowid query-displayed rows-by-id schema]]
    (let [new-row {:editable true
                   :rowid new-rowid}
          hot (get-in db [:table-panel :hot-instance])
+
          new-db (-> db
                     ;; Update changes with the new row.
                     (update-in [:table-panel :changes :existing] assoc new-rowid new-row)
-                    (update-in [:table-panel :changes :new-row-order] (fnil conj []) new-rowid))]
+                    (update-in [:table-panel :changes :new-row-order] (fnil conj []) new-rowid))
+
+         changes (get-in new-db [:table-panel :changes :existing])
+         row-order (get-in new-db [:table-panel :changes :new-row-order])
+
+         rows-by-id (merge-row-updates rows-by-id changes)
+         rows-all (mapv rows-by-id row-order)]
+
      {:db new-db
       :hot/add-row [hot new-row]
       :fx [[:dispatch [:control/update-query-string
-                        (query-displayed new-db)
-                        (db/label-values new-db)
-                        (db/editable-rows new-db)]]]})))
+                        query-displayed
+                        (table-subs/label-values rows-by-id)
+                        (table-subs/editable-rows [rows-all schema])]]]})))
 

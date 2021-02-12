@@ -9,7 +9,8 @@
             [inferenceql.viz.panels.table.db :as db]
             [inferenceql.viz.panels.override.views :as modal]
             [inferenceql.viz.util :refer [coerce-bool]]
-            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]))
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
+            [goog.string :refer [format]]))
 
 
 ;;; Subs related selection layer color.
@@ -125,14 +126,17 @@
             (fn [[rows-by-id changes]]
               (merge-row-updates rows-by-id changes)))
 
+(defn label-values
+  [rows-by-id]
+  (->> rows-by-id
+    (medley/remove-vals :editable)
+    (medley/map-vals :label)
+    (medley/filter-vals some?)
+    (medley/map-vals coerce-bool)))
+
 (rf/reg-sub :table/label-values
             :<- [:table/rows-by-id-with-changes]
-            (fn [rows-by-id]
-              (->> rows-by-id
-                   (medley/remove-vals :editable)
-                   (medley/map-vals :label)
-                   (medley/filter-vals some?)
-                   (medley/map-vals coerce-bool))))
+            label-values)
 
 (rf/reg-sub :table/row-order-all
             :<- [:table/physical-row-order]
@@ -151,10 +155,29 @@
             (fn [[row-order rows-by-id]]
               (mapv rows-by-id row-order)))
 
+(defn editable-rows
+  [[rows-all schema]]
+  (let [rows (filter :editable rows-all)
+        quote-strings #(if (string? %) (format "\"%s\"" %) %)
+        ;; Not keeping :rowid key.
+        keys-to-keep (conj (keys schema) :editable)]
+    (vec (for [r rows]
+           (as-> r $
+                 (select-keys $ keys-to-keep)
+                 (medley/remove-vals nil? $)
+                 (medley/map-keys name $)
+                 (medley/map-vals quote-strings $))))))
+
 (rf/reg-sub :table/editable-rows
             :<- [:table/rows-all]
-            (fn [rows-all]
-              (filter :editable rows-all)))
+            :<- [:query/schema]
+            editable-rows)
+
+(rf/reg-sub :table/editable-rows-for-incorp
+            :<- [:table/editable-rows]
+            (fn [editable-rows]
+              (vec (for [r editable-rows]
+                     (dissoc r :editable)))))
 
 ;;; Subs related to visual state of the table.
 
@@ -285,7 +308,7 @@
    {:col-overrides (rf/subscribe [:override/column-overrides])
     :col-names (rf/subscribe [:table/physical-headers])
     :label-values (rf/subscribe [:table/label-values])
-    :editable-rows (rf/subscribe [:table/editable-rows])})
+    :editable-rows (rf/subscribe [:table/editable-rows-for-incorp])})
  (fn [{:keys [_col-overrides _col-names label-values editable-rows]}]
    (let [incorp-label-col (fn [_key _selection _click-event]
                             (rf/dispatch [:control/incorp-label-values label-values editable-rows]))

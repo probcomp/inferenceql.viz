@@ -68,25 +68,3 @@
 (defn visual-row-order
   [db]
   (get-in db [:table-panel :visual-state :row-order]))
-
-(defn label-values
-  [db]
-  (let [;; Rows by id with changes merged in.
-        rows-by-id (merge-row-updates (get-in db [:table-panel :physical-data :rows-by-id])
-                                      (get-in db [:table-panel :changes :existing]))]
-    ;; filter
-    (->> rows-by-id
-         (medley/remove-vals :editable)
-         (medley/map-vals :label)
-         (medley/filter-vals some?)
-         (medley/map-vals coerce-bool))))
-
-(defn editable-rows
-  [db]
-  (let [rows-by-id (merge-row-updates (get-in db [:table-panel :physical-data :rows-by-id])
-                                      (get-in db [:table-panel :changes :existing]))
-        row-order-all (vec (concat
-                            (get-in db [:table-panel :physical-data :row-order])
-                            (get-in db [:table-panel :changes :new-row-order])))
-        rows-all (mapv rows-by-id row-order-all)]
-    (filter :editable rows-all)))
