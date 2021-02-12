@@ -80,6 +80,7 @@
   :control/update-query-string
   event-interceptors
   (fn [db [_ query-displayed label-values editable-rows]]
+    ;; TODO add an error when the query cant be edited using an fx.
     (update-in db [:control-panel :query-string] add-update-labels-expr query-displayed label-values editable-rows)))
 
 (rf/reg-event-db
