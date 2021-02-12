@@ -11,7 +11,7 @@
 (rf/reg-event-db
  :hot/after-selection-end
  event-interceptors
- (fn [db [_ hot _id _row-index _col _row2 _col2 _selection-layer-level]]
+ (fn [db [_ hot _sub-bundle _row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-coords (selections/normalize (js->clj (.getSelected hot)))
          color (control-db/selection-color db)
          num-rows (count (table-db/visual-row-order db))]
@@ -22,7 +22,7 @@
 (rf/reg-event-db
   :hot/after-on-cell-mouse-down
   event-interceptors
-  (fn [db [_ _hot _id mouse-event _coords _TD]]
+  (fn [db [_ _hot _sub-bundle mouse-event _coords _TD]]
     (let [alt-key-pressed (.-altKey mouse-event) ;; User held alt during last click.
           color (control-db/selection-color db)]
       (cond-> db
@@ -56,13 +56,13 @@
 (rf/reg-event-db
  :hot/after-column-move
  event-interceptors
- (fn [db [_ hot _id _moved-columns _final-index _drop-index _move-possible _order-changed]]
+ (fn [db [_ hot _sub-bundle _moved-columns _final-index _drop-index _move-possible _order-changed]]
    (assoc-visual-headers db hot)))
 
 (rf/reg-event-db
  :hot/after-column-sort
  event-interceptors
- (fn [db [_ hot _id _current-sort-config _destination-sort-config]]
+ (fn [db [_ hot _sub-bundle _current-sort-config _destination-sort-config]]
    (-> db
        (assoc-visual-headers hot)
        (assoc-visual-row-order hot))))
@@ -70,7 +70,7 @@
 (rf/reg-event-db
  :hot/after-filter
  event-interceptors
- (fn [db [_ hot _id _conditions-stack]]
+ (fn [db [_ hot _sub-bundle _conditions-stack]]
    (assoc-visual-row-order db hot)))
 
 (defn valid-source?
@@ -83,7 +83,7 @@
 (rf/reg-event-fx
   :hot/before-change
   event-interceptors
-  (fn [{:keys [db]} [_ hot id changes source]]
+  (fn [{:keys [db]} [_ hot sub-bundle changes source]]
     (assert (valid-source? source))
     (let [updates (reduce (fn [acc change]
                             (let [[row col _prev-val new-val] change

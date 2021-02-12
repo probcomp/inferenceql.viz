@@ -56,25 +56,25 @@
 
        :component-did-mount
        (fn [this]
-         (let [{:keys [settings name hooks]} props
-               hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))
-               unique-id (keyword name)]
+         (let [{:keys [settings hooks]} props
+               hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
-           ;; add callbacks internal to hot object
+           ;; Add callbacks internal to hot object.
            (doseq [key hooks]
-             (let [camel-key (csk/->camelCase (clj->js key))]
-               ;; Our hook functions call the associated re-frame event and then return true.  Some
-               ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
-               ;; false in order to cancel the event. It is likely that this behaviour exists in
-               ;; other hooks as well it is just not documented. Returning nil or false from a
-               ;; callback function can cause errors in handsontable plugins that also have
-               ;; functions attached to that hook. Therefore, we are always returning true from hook
-               ;; functions.
-               (js/Handsontable.hooks.add camel-key
-                                          (fn [& args]
-                                            (rf/dispatch (into [key hot unique-id] args))
-                                            true)
-                                          hot)))
+             (let [camel-key (csk/->camelCase (clj->js key))
+                   ;; Our hook functions call the associated re-frame event and then return true.  Some
+                   ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
+                   ;; false in order to cancel the event. It is likely that this behaviour exists in
+                   ;; other hooks as well it is just not documented. Returning nil or false from a
+                   ;; callback function can cause errors in handsontable plugins that also have
+                   ;; functions attached to that hook. Therefore, we are always returning true from hook
+                   ;; functions.
+                   callback (fn [& args]
+                              (let [sub-bundle {:query/schema @(rf/subscribe [:query/schema])}]
+                                (rf/dispatch (into [key hot sub-bundle] args)))
+                              true)]
+               (js/Handsontable.hooks.add camel-key callback hot)))
+
            ;; Save the hot object in the app db.
            (rf/dispatch [:table/set-hot-instance hot])))
 

@@ -80,6 +80,7 @@
          (medley/filter-vals some?)
          (medley/map-vals coerce-bool))))
 
+;; TODO Pass a subscription in the sub-bundle instead. And get rid of this function.
 (defn full-row-order
   [db]
   (let [original-rows (get-in db [:table-panel :physical-data :row-order])

@@ -35,5 +35,4 @@
                      :hot/before-change])
 
 (def real-hot-settings (-> default-hot-settings
-                           (assoc-in [:hooks] real-hot-hooks)
-                           (assoc-in [:name] "real-table")))
+                           (assoc-in [:hooks] real-hot-hooks)))
