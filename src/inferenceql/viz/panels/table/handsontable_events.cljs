@@ -6,7 +6,8 @@
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
-            [inferenceql.viz.components.query.db :refer [query-displayed]]))
+            [inferenceql.viz.components.query.db :refer [query-displayed]]
+            [goog.string :refer [format]]))
 
 (rf/reg-event-db
  :hot/after-selection-end
@@ -85,16 +86,27 @@
   event-interceptors
   (fn [{:keys [db]} [_ hot sub-bundle changes source]]
     (assert (valid-source? source))
-    (let [updates (reduce (fn [acc change]
+    (let [updates (reduce (fn [acc [c-idx change]]
                             (let [[row col _prev-val new-val] change
                                   row-id (get (table-db/visual-row-order db) row)
                                   col (keyword col)]
                               ;; Changes should only occur in the label column.
+                              ;; TODO: fix assert
                               (assert (= col :label))
+
+                              ;; TODO: Add if clause
+                              ;; Cancel changes
+                              #_(aset changes 0 nil)
+                              (.error js/console (format "Table entry for column %s cancelled. Value '%s' is not a number." col new-val))
+
                               (assoc-in acc [row-id col] new-val)))
                           {}
-                          changes)
+                          (map-indexed vector changes))
           new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)]
+
+      ;; TESTING, not sure why its not working.
+      (doseq [[i change] (map-indexed vector changes)]
+        (aset changes i nil))
       ;; Stage the changes in the db. The Handsontable itself already has the updates.
       {:db new-db
        :fx [[:dispatch [:control/update-query-string (query-displayed new-db) (table-db/label-values new-db)]]]})))
