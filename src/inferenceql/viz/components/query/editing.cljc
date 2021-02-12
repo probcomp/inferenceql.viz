@@ -178,8 +178,11 @@
 
 (defn make-new-row-node [row]
   (let [row (dissoc row :rowid)
+        row (medley/remove-vals nil? row)
         kv-strs (for [[k v] row]
-                  (format "%s=%s" (name k) v))
+                  (let [k (name k)
+                        v (if (string? v) (format "\"%s\"" v) v)]
+                    (format "%s=%s" k v)))
         row-str (str/join ", " kv-strs)
         qs (format "(INSERT INTO data VALUES (%s)) AS data" row-str)]
     (query/parse qs :start :with-map-entry-expr)))
@@ -188,7 +191,6 @@
   (remove new-row-node? entry-exprs))
 
 (defn add-new-rows [entry-exprs new-rows]
-  #?(:cljs (.log js/console :new-rows new-rows))
   (concat entry-exprs (map make-new-row-node new-rows)))
 
 ;------------------------------------------------------
@@ -209,17 +211,17 @@
         (z/replace (tree/node :with-map-expr entry-exprs))
         (z/root))))
 
-;; TODO make use of new-rows
 (defn add-new-with [sub-query-node updates new-rows]
-  (if (seq updates)
+  (if (or (seq updates) (seq new-rows))
     (let [pos-update-node (make-update-label-node updates true)
           neg-update-node (make-update-label-node updates false)
-          _ (do #?(:cljs (.log js/console :u updates)))
-          _ (do #?(:cljs (.log js/console :a pos-update-node)))
-          _ (do #?(:cljs (.log js/console :b neg-update-node)))
-          entry-exprs (cond-> [label-alter-node]
-                        pos-update-node (concat [pos-update-node])
-                        neg-update-node (concat [neg-update-node]))
+          new-row-nodes (map make-new-row-node new-rows)
+
+          entry-exprs (cond-> []
+                              (seq updates) (concat [label-alter-node])
+                              pos-update-node (concat [pos-update-node])
+                              neg-update-node (concat [neg-update-node])
+                              (seq new-row-nodes) (concat new-row-nodes))
           entry-exprs (as-> entry-exprs $
                             (interleave $ (repeat ",") (repeat whitespace))
                             (drop-last 2 $))
@@ -254,7 +256,6 @@
     (add-new-with sub-query-node updates new-rows)))
 
 (defn add-update-labels-expr [cur-qs prev-qs updates new-rows]
-  #?(:cljs (.log js/console :here------ new-rows))
   (if-not (insta/failure? (query/parse cur-qs))
     ;; Edit the query.
     (let [prev-qz (some-> prev-qs query/parse zipper)

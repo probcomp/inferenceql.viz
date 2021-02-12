@@ -5,6 +5,7 @@
             [inferenceql.viz.panels.table.db :as db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
+            [inferenceql.viz.components.query.db :refer [query-displayed]]
             [inferenceql.viz.util :as util]
             [medley.core :as medley]))
 
@@ -112,9 +113,15 @@
  (fn [{:keys [db]} [_ new-rowid]]
    (let [new-row {:editable true
                   :rowid new-rowid}
-         hot (get-in db [:table-panel :hot-instance])]
-     {:hot/add-row [hot new-row]
-      :db (-> db
-              ;; Update changes with the new row.
-              (update-in [:table-panel :changes :existing] assoc new-rowid new-row)
-              (update-in [:table-panel :changes :new-row-order] (fnil conj []) new-rowid))})))
+         hot (get-in db [:table-panel :hot-instance])
+         new-db (-> db
+                    ;; Update changes with the new row.
+                    (update-in [:table-panel :changes :existing] assoc new-rowid new-row)
+                    (update-in [:table-panel :changes :new-row-order] (fnil conj []) new-rowid))]
+     {:db new-db
+      :hot/add-row [hot new-row]
+      :fx [[:dispatch [:control/update-query-string
+                        (query-displayed new-db)
+                        (db/label-values new-db)
+                        (db/editable-rows new-db)]]]})))
+
