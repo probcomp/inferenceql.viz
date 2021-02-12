@@ -160,10 +160,11 @@
   (let [rows (filter :editable rows-all)
         quote-strings #(if (string? %) (format "\"%s\"" %) %)
         ;; Not keeping :rowid key.
-        keys-to-keep (conj (keys schema) :editable)]
+        keys-to-keep (conj (keys schema) :editable :label)]
     (vec (for [r rows]
            (as-> r $
                  (select-keys $ keys-to-keep)
+                 (medley/update-existing $ :label coerce-bool)
                  (medley/remove-vals nil? $)
                  (medley/map-keys name $)
                  (medley/map-vals quote-strings $))))))
@@ -176,8 +177,11 @@
 (rf/reg-sub :table/editable-rows-for-incorp
             :<- [:table/editable-rows]
             (fn [editable-rows]
-              (vec (for [r editable-rows]
-                     (dissoc r :editable)))))
+              (->> (for [r editable-rows]
+                      (dissoc r "editable"))
+                   ;; Remove empty rows;
+                   (filter seq)
+                   (vec))))
 
 ;;; Subs related to visual state of the table.
 

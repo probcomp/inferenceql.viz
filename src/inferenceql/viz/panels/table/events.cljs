@@ -7,7 +7,6 @@
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.components.query.db :refer [query-displayed]]
             [inferenceql.viz.util :as util]
             [medley.core :as medley]))
 

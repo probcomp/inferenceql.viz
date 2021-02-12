@@ -7,7 +7,6 @@
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
-            [inferenceql.viz.components.query.db :refer [query-displayed]]
             [goog.string :refer [format]]
             [clojure.edn :as edn]))
 
@@ -122,9 +121,8 @@
 
           new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)
 
-          changes (get-in new-db [:table-panel :changes :existing])
           rows-by-id (merge-row-updates (:table/rows-by-id-with-changes sub-bundle) updates)
-          rows-all (mapv rows-by-id (:table/rows-all sub-bundle))
+          rows-all (mapv rows-by-id (:table/row-order-all sub-bundle))
 
           query (:query/query-displayed sub-bundle)
           schema (:query/schema sub-bundle)]
