@@ -69,7 +69,6 @@
   [db]
   (get-in db [:table-panel :visual-state :row-order]))
 
-;; TODO change this to only use row-ids that have editable != true.
 (defn label-values
   [db]
   (let [;; Rows by id with changes merged in.
@@ -77,6 +76,7 @@
                                       (get-in db [:table-panel :changes :existing]))]
     ;; filter
     (->> rows-by-id
+         (medley/remove-vals :editable)
          (medley/map-vals :label)
          (medley/filter-vals some?)
          (medley/map-vals coerce-bool))))

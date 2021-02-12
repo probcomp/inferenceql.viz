@@ -125,12 +125,11 @@
             (fn [[rows-by-id changes]]
               (merge-row-updates rows-by-id changes)))
 
-;; TODO only include rowids that are not in editable-rows
-;; TODO is this used anywhere else?
 (rf/reg-sub :table/label-values
             :<- [:table/rows-by-id-with-changes]
             (fn [rows-by-id]
               (->> rows-by-id
+                   (medley/remove-vals :editable)
                    (medley/map-vals :label)
                    (medley/filter-vals some?)
                    (medley/map-vals coerce-bool))))
