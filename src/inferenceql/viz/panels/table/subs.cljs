@@ -151,7 +151,6 @@
             (fn [[row-order rows-by-id]]
               (mapv rows-by-id row-order)))
 
-;; TODO Maybe delete this sub?
 (rf/reg-sub :table/editable-rows
             :<- [:table/rows-all]
             (fn [rows-all]
@@ -285,10 +284,11 @@
  (fn [_ _]
    {:col-overrides (rf/subscribe [:override/column-overrides])
     :col-names (rf/subscribe [:table/physical-headers])
-    :label-values (rf/subscribe [:table/label-values])})
- (fn [{:keys [_col-overrides _col-names label-values]}]
+    :label-values (rf/subscribe [:table/label-values])
+    :editable-rows (rf/subscribe [:table/editable-rows])})
+ (fn [{:keys [_col-overrides _col-names label-values editable-rows]}]
    (let [incorp-label-col (fn [_key _selection _click-event]
-                            (rf/dispatch [:control/incorp-label-values label-values]))
+                            (rf/dispatch [:control/incorp-label-values label-values editable-rows]))
          disable-fn (fn []
                      (this-as hot
                        (let [last-selected (.getSelectedRangeLast hot)
@@ -303,8 +303,8 @@
                          (or (not= from-col to-col)
                              (not= from-row -1)
                              (not= prop-name :label)))))]
-     {:items {"incorp_label_col" {:disabled disable-fn
-                                  :name "INCORPORATE values into model"
+     {:items {"incorp_label_col" {:disabled false
+                                  :name "INCORPORATE all new values into model"
                                   :callback incorp-label-col}}})))
 
 (rf/reg-sub

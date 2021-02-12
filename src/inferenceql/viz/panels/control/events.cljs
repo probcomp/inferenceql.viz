@@ -86,5 +86,5 @@
 (rf/reg-event-db
   :control/incorp-label-values
   event-interceptors
-  (fn [db [_ label-values]]
-    (update-in db [:control-panel :query-string] add-incorp-labels-expr label-values)))
+  (fn [db [_ label-values editable-rows]]
+    (update-in db [:control-panel :query-string] add-incorp-labels-expr label-values editable-rows)))

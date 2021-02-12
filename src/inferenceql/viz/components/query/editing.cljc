@@ -276,41 +276,60 @@
 
 ;;; INCORPORATE column.
 
-(defn maybe-incorp-node [updates model-name]
-  (let [model-string (if (seq updates)
-                       ;; Create an INCORPORATE statement.
-                       (let [bindings-str (->> (seq updates)
-                                               (sort-by first)
-                                               (map (fn [[k v]] (format "%s=%s" k v)))
-                                               (str/join ", "))]
-                         (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str model-name))
-                       ;; Just use the model name.
-                       model-name)]
-    (query/parse model-string :start :model-expr)))
+(defn maybe-incorp-node [updates editable-rows model-name]
+  #?(:cljs (.log js/console :model-name model-name))
+  (let [row-incorps  (if (seq editable-rows)
+                       (loop [[r & rs] (reverse editable-rows) query model-name]
+                         (if r
+                           (let [;; TODO: factor this row cleanup out.
+                                 r (->> r
+                                        (medley/remove-vals nil?)
+                                        (medley/map-keys name)
+                                        (medley/map-vals #(if (string? %) (format "\"%s\"" %) %)))
+                                 kv-strs (for [[k v] r]
+                                           (format "%s=%s" k v))
+                                 row-str (str/join ", " kv-strs)
+                                 new-query (format "(INCORPORATE ROW (%s) INTO %s)" row-str query)]
+                             (recur rs new-query))
+                           query))
+                       model-name)
 
-(defn add-incorp-node [node updates]
+        column-incorp (if (seq updates)
+                        ;; Create an INCORPORATE statement.
+                        (let [bindings-str (->> (seq updates)
+                                                (sort-by first)
+                                                (map (fn [[k v]] (format "%s=%s" k v)))
+                                                (str/join ", "))]
+                          (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str model-name))
+
+                        row-incorps)]
+    (query/parse column-incorp :start :model-expr)))
+
+(defn add-incorp-node [node updates editable-rows]
   (let [loc (zipper node)
         incorp-loc (seek-tag loc :incorporate-expr)
         model-name (if incorp-loc
                        (-> incorp-loc
+                           (seek-tag :ref)
                            (z/node)
-                           (tree/get-node-in [:incorporate-into-clause :model-expr :ref :name :simple-symbol])
+                           (tree/get-node-in [:name :simple-symbol])
                            (tree/only-child))
                        (-> (seek-tag loc :simple-symbol)
                            (z/node)
                            (tree/only-child)))
-        new-model-expr-node (maybe-incorp-node updates model-name)]
+        new-model-expr-node (maybe-incorp-node updates editable-rows model-name)]
     ;; NOTE: or I could edit the original node
     [:under-clause "UNDER" [:ws " "] new-model-expr-node]))
 
-(defn add-incorp-labels-expr [query-string updates]
+(defn add-incorp-labels-expr [query-string updates editable-rows]
   #?(:cljs (.log js/console :query-string query-string))
   #?(:cljs (.log js/console :updates updates))
+  #?(:cljs (.log js/console :editable-rows editable-rows))
   (loop [qz (-> query-string query/parse zipper)]
     (if (z/end? qz)
       (-> qz z/node query/unparse)
       (if-let [qz-under (seek-tag qz :under-clause)]
-        (recur (z/next (z/edit qz-under add-incorp-node updates)))
+        (recur (z/next (z/edit qz-under add-incorp-node updates editable-rows)))
         (recur (z/next qz))))))
 
 ;--------------------------------------------
@@ -362,8 +381,19 @@
     "     (INSERT INTO data VALUES (age=75, editable=true)) AS data:"
     "SELECT age, gender, height FROM data;"))
 
-(query/parse new-row-query)
 
+(def incorp-row-query
+  (long-str
+   "WITH (ALTER data ADD label) AS data,"
+   "       (UPDATE data SET label=true WHERE rowid=4 OR rowid=10) AS data:"
+   "  SELECT (PROBABILITY OF label=true"
+   "           GIVEN gender, height"
+   "           UNDER (INCORPORATE COLUMN (7=false, 10=false) AS label INTO"
+   "                  (INCORPORATE ROW (age=75, gender=\"Male\") INTO model))),"
+   "         age, gender, height"
+   "  FROM data"))
+
+(query/parse incorp-row-query)
 
 
 ;;(add-incorp-labels-expr "SELECT * FROM data;" updates)
