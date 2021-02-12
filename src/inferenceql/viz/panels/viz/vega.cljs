@@ -291,9 +291,11 @@
                        :zoom "wheel![!event.shiftKey]"
                        :empty "none"}}
      :encoding {:x {:field (first cols-to-draw)
-                    :type "quantitative"}
+                    :type "quantitative"
+                    :scale {:zero false}}
                 :y {:field (second cols-to-draw)
-                    :type "quantitative"}
+                    :type "quantitative"
+                    :scale {:zero false}}
                 :color {:condition {:selection "pts"
                                     :value selection-color}}}}))
 
