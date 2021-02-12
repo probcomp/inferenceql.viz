@@ -171,6 +171,26 @@
             pos-update-node (concat [pos-update-node])
             neg-update-node (concat [neg-update-node]))))
 
+(defn new-row-node? [node]
+  (some-> (zipper node)
+          (seek-tag :insert-into-clause)
+          (some?)))
+
+(defn make-new-row-node [row]
+  (let [row (dissoc row :rowid)
+        kv-strs (for [[k v] row]
+                  (format "%s=%s" (name k) v))
+        row-str (str/join ", " kv-strs)
+        qs (format "(INSERT INTO data VALUES (%s)) AS data" row-str)]
+    (query/parse qs :start :with-map-entry-expr)))
+
+(defn remove-new-rows [entry-exprs]
+  (remove new-row-node? entry-exprs))
+
+(defn add-new-rows [entry-exprs new-rows]
+  #?(:cljs (.log js/console :new-rows new-rows))
+  (concat entry-exprs (map make-new-row-node new-rows)))
+
 ;------------------------------------------------------
 
 (defn edit-map-exprs [node f & args]
@@ -189,7 +209,8 @@
         (z/replace (tree/node :with-map-expr entry-exprs))
         (z/root))))
 
-(defn add-new-with [sub-query-node updates]
+;; TODO make use of new-rows
+(defn add-new-with [sub-query-node updates new-rows]
   (if (seq updates)
     (let [pos-update-node (make-update-label-node updates true)
           neg-update-node (make-update-label-node updates false)
@@ -206,14 +227,16 @@
       (str "WITH " (query/unparse with-map-expr) ":\n" (query/unparse sub-query-node)))
     (query/unparse sub-query-node)))
 
-(defn handle [qz-with sub-query-node updates]
+(defn handle [qz-with sub-query-node updates new-rows]
   (if qz-with
     (let [with-node (z/node qz-with)
           new-with-node (cond-> with-node
                           :always (edit-map-exprs remove-label-alter)
                           :always (edit-map-exprs remove-label-update)
+                          :always (edit-map-exprs remove-new-rows)
                           (seq updates) (edit-map-exprs add-label-alter)
-                          (seq updates) (edit-map-exprs add-label-update updates))
+                          (seq updates) (edit-map-exprs add-label-update updates)
+                          (seq new-rows) (edit-map-exprs add-new-rows new-rows))
 
           has-map-entries (-> new-with-node
                               (tree/get-node :with-map-expr)
@@ -228,9 +251,10 @@
                             (z/root))
                         sub-query-node)]
       (query/unparse return-node))
-    (add-new-with sub-query-node updates)))
+    (add-new-with sub-query-node updates new-rows)))
 
-(defn add-update-labels-expr [cur-qs prev-qs updates]
+(defn add-update-labels-expr [cur-qs prev-qs updates new-rows]
+  #?(:cljs (.log js/console :here------ new-rows))
   (if-not (insta/failure? (query/parse cur-qs))
     ;; Edit the query.
     (let [prev-qz (some-> prev-qs query/parse zipper)
@@ -240,9 +264,9 @@
           sub-query-node (with-sub-query-node cur-qs)]
       (if prev-qz-with
         ;; Use the previous WITH clause.
-        (handle prev-qz-with sub-query-node updates)
+        (handle prev-qz-with sub-query-node updates new-rows)
         ;; Use the current WITH clause.
-        (handle cur-qz-with sub-query-node updates)))
+        (handle cur-qz-with sub-query-node updates new-rows)))
 
     ;; Just return the current un-edited query if it can't be parsed.
     cur-qs))
@@ -329,6 +353,17 @@
     "           UNDER (INCORPORATE COLUMN (7=false, 10=false) AS label INTO model)),"
     "         age, gender, height"
     "  FROM data"))
+
+(def new-row-query
+  (long-str
+    "WITH (ALTER data ADD label) AS data,"
+    "     (UPDATE data SET label=true WHERE rowid=4 OR rowid=8) AS data,"
+    "     (INSERT INTO data VALUES (age=75, editable=true)) AS data:"
+    "SELECT age, gender, height FROM data;"))
+
+(query/parse new-row-query)
+
+
 
 ;;(add-incorp-labels-expr "SELECT * FROM data;" updates)
 ;;(add-incorp-labels-expr prob-of-query-3 updates)

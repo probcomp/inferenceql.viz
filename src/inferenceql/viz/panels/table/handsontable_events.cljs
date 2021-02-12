@@ -122,4 +122,7 @@
 
       ;; Stage the changes in the db. The Handsontable itself already has the updates.
       {:db new-db
-       :fx [[:dispatch [:control/update-query-string (query-displayed new-db) (table-db/label-values new-db)]]]})))
+       :fx [[:dispatch [:control/update-query-string
+                        (query-displayed new-db)
+                        (table-db/label-values new-db)
+                        (table-db/editable-rows new-db)]]]})))

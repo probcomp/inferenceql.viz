@@ -125,6 +125,8 @@
             (fn [[rows-by-id changes]]
               (merge-row-updates rows-by-id changes)))
 
+;; TODO only include rowids that are not in editable-rows
+;; TODO is this used anywhere else?
 (rf/reg-sub :table/label-values
             :<- [:table/rows-by-id-with-changes]
             (fn [rows-by-id]
@@ -149,6 +151,12 @@
             :<- [:table/rows-by-id-with-changes]
             (fn [[row-order rows-by-id]]
               (mapv rows-by-id row-order)))
+
+;; TODO Maybe delete this sub?
+(rf/reg-sub :table/editable-rows
+            :<- [:table/rows-all]
+            (fn [rows-all]
+              (filter :editable rows-all)))
 
 ;;; Subs related to visual state of the table.
 

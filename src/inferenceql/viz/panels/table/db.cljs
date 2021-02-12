@@ -69,6 +69,7 @@
   [db]
   (get-in db [:table-panel :visual-state :row-order]))
 
+;; TODO change this to only use row-ids that have editable != true.
 (defn label-values
   [db]
   (let [;; Rows by id with changes merged in.
@@ -79,3 +80,13 @@
          (medley/map-vals :label)
          (medley/filter-vals some?)
          (medley/map-vals coerce-bool))))
+
+(defn editable-rows
+  [db]
+  (let [rows-by-id (merge-row-updates (get-in db [:table-panel :physical-data :rows-by-id])
+                                      (get-in db [:table-panel :changes :existing]))
+        row-order-all (vec (concat
+                            (get-in db [:table-panel :physical-data :row-order])
+                            (get-in db [:table-panel :changes :new-row-order])))
+        rows-all (mapv rows-by-id row-order-all)]
+    (filter :editable rows-all)))

@@ -75,7 +75,9 @@
 
                    callback (fn [& args]
                               (let [sub-bundle {:query/schema @(rf/subscribe [:query/schema])
-                                                :table/row-order-all @(rf/subscribe [:table/row-order-all])}]
+                                                :table/row-order-all @(rf/subscribe [:table/row-order-all])
+                                                ;; TODO: Get rid of this.
+                                                :table/editable-rows @(rf/subscribe [:table/editable-rows])}]
                                 (dispatch (into [key hot sub-bundle] args)))
                               true)]
                (js/Handsontable.hooks.add camel-key callback hot)))
