@@ -46,12 +46,11 @@
   This data changes when the user filters, re-orders columns, or sorts columns.
   We use this data to along with selection coordinates to produce the data subset selected.
   This all eventually gets passed onto the visualization code via subscriptions."
-  [db hot]
+  [db hot physical-row-order]
   (let [num-rows-shown (.countRows hot)
         ;; NOTE: Could I do this using the new row index mapper stuff?
         visual-row-indices (range num-rows-shown)
         physical-row-indices (map #(.toPhysicalRow hot %) visual-row-indices)
-        physical-row-order (table-db/full-row-order db)
         visual-row-order (mapv physical-row-order physical-row-indices)]
     (assoc-in db [:table-panel :visual-state :row-order] visual-row-order)))
 
@@ -61,19 +60,23 @@
  (fn [db [_ hot _sub-bundle _moved-columns _final-index _drop-index _move-possible _order-changed]]
    (assoc-visual-headers db hot)))
 
+;; NOTE: This is also being used to capture the visual row order whenever data is
+;; changed in the table or when new rows are added. This is because we always unsort the table
+;; first before change it. We may want to use a different Handsontable hook to fulfill this need
+;; in the future.
 (rf/reg-event-db
  :hot/after-column-sort
  event-interceptors
- (fn [db [_ hot _sub-bundle _current-sort-config _destination-sort-config]]
+ (fn [db [_ hot sub-bundle _current-sort-config _destination-sort-config]]
    (-> db
        (assoc-visual-headers hot)
-       (assoc-visual-row-order hot))))
+       (assoc-visual-row-order hot (:table/row-order-all sub-bundle)))))
 
 (rf/reg-event-db
  :hot/after-filter
  event-interceptors
- (fn [db [_ hot _sub-bundle _conditions-stack]]
-   (assoc-visual-row-order db hot)))
+ (fn [db [_ hot sub-bundle _conditions-stack]]
+   (assoc-visual-row-order db hot (:table/row-order-all sub-bundle))))
 
 (defn valid-source?
   [source]

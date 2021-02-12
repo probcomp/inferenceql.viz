@@ -74,7 +74,8 @@
                    dispatch (if (= key :hot/before-change) rf/dispatch-sync rf/dispatch)
 
                    callback (fn [& args]
-                              (let [sub-bundle {:query/schema @(rf/subscribe [:query/schema])}]
+                              (let [sub-bundle {:query/schema @(rf/subscribe [:query/schema])
+                                                :table/row-order-all @(rf/subscribe [:table/row-order-all])}]
                                 (dispatch (into [key hot sub-bundle] args)))
                               true)]
                (js/Handsontable.hooks.add camel-key callback hot)))

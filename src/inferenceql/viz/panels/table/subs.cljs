@@ -119,7 +119,6 @@
             (fn [db _]
               (get-in db [:table-panel :changes :new-row-order])))
 
-;; TODO: this will have to be updated to include the new rows.
 (rf/reg-sub :table/rows-by-id-with-changes
             :<- [:table/physical-rows-by-id]
             :<- [:table/changes-existing]
@@ -134,11 +133,22 @@
                    (medley/filter-vals some?)
                    (medley/map-vals coerce-bool))))
 
-(rf/reg-sub :table/new-rowid
+(rf/reg-sub :table/row-order-all
             :<- [:table/physical-row-order]
             :<- [:table/new-row-order]
             (fn [[orig-rows new-rows]]
-              (inc (count (concat orig-rows new-rows)))))
+              (vec (concat orig-rows new-rows))))
+
+(rf/reg-sub :table/new-rowid
+            :<- [:table/row-order-all]
+            (fn [row-order]
+              (inc (count row-order))))
+
+(rf/reg-sub :table/rows-all
+            :<- [:table/row-order-all]
+            :<- [:table/rows-by-id-with-changes]
+            (fn [[row-order rows-by-id]]
+              (mapv rows-by-id row-order)))
 
 ;;; Subs related to visual state of the table.
 
@@ -163,7 +173,7 @@
               (mapv rows-by-id row-order)))
 
 (rf/reg-sub :table/selected-row-flags
-            :<- [:table/physical-rows]
+            :<- [:table/rows-all]
             :<- [:viz/pts-store-filter]
             (fn [[rows pts-store-filter]]
               (when pts-store-filter
@@ -212,7 +222,7 @@
     (this-as obj
       (let [hot (.-instance obj)
             editable (true? (.getDataAtRowProp hot row (name :editable)))
-            selected (when row (nth selected-row-flags row))
+            selected (when row (nth selected-row-flags row false))
             label-column-cell (= prop (name :label))
 
             class-names [(when editable "editable-cell")
