@@ -7,7 +7,8 @@
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
             [inferenceql.viz.components.query.db :refer [query-displayed]]
-            [goog.string :refer [format]]))
+            [goog.string :refer [format]]
+            [clojure.edn :as edn]))
 
 (rf/reg-event-db
  :hot/after-selection-end
@@ -86,27 +87,36 @@
   event-interceptors
   (fn [{:keys [db]} [_ hot sub-bundle changes source]]
     (assert (valid-source? source))
-    (let [updates (reduce (fn [acc [c-idx change]]
+    (let [updates (reduce (fn [acc [i change]]
                             (let [[row col _prev-val new-val] change
                                   row-id (get (table-db/visual-row-order db) row)
-                                  col (keyword col)]
-                              ;; Changes should only occur in the label column.
-                              ;; TODO: fix assert
-                              (assert (= col :label))
+                                  col (keyword col)
+                                  type (get-in sub-bundle [:query/schema col])]
 
-                              ;; TODO: Add if clause
-                              ;; Cancel changes
-                              #_(aset changes 0 nil)
-                              (.error js/console (format "Table entry for column %s cancelled. Value '%s' is not a number." col new-val))
+                              ;; Changes should only occur in the label column or in editable row.
+                              ;; TODO: check this row is editable instead of true below.
+                              (assert (or (= col :label) true))
 
-                              (assoc-in acc [row-id col] new-val)))
+                              (if (= type :gaussian)
+                                ;; Try to cast.
+                                (let [new-val (edn/read-string new-val)]
+                                  (if (or (number? new-val) (nil? new-val))
+                                    ;; Include the change.
+                                    (assoc-in acc [row-id col] new-val)
+                                    (do
+                                      ;; Cancel this change.
+                                      (aset changes i nil)
+                                      (.error js/console (format "The value '%s' is not a number. New values for column '%s' must be a number." new-val col))
+                                      ;; Do not include the change.
+                                      acc)))
+
+                                ;; Not gaussian, just include the change.
+                                (assoc-in acc [row-id col] new-val))))
                           {}
                           (map-indexed vector changes))
+
           new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)]
 
-      ;; TESTING, not sure why its not working.
-      (doseq [[i change] (map-indexed vector changes)]
-        (aset changes i nil))
       ;; Stage the changes in the db. The Handsontable itself already has the updates.
       {:db new-db
        :fx [[:dispatch [:control/update-query-string (query-displayed new-db) (table-db/label-values new-db)]]]})))

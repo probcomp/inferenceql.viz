@@ -69,9 +69,13 @@
                    ;; callback function can cause errors in handsontable plugins that also have
                    ;; functions attached to that hook. Therefore, we are always returning true from hook
                    ;; functions.
+
+                   ;; TODO: add note about this.
+                   dispatch (if (= key :hot/before-change) rf/dispatch-sync rf/dispatch)
+
                    callback (fn [& args]
                               (let [sub-bundle {:query/schema @(rf/subscribe [:query/schema])}]
-                                (rf/dispatch (into [key hot sub-bundle] args)))
+                                (dispatch (into [key hot sub-bundle] args)))
                               true)]
                (js/Handsontable.hooks.add camel-key callback hot)))
 
