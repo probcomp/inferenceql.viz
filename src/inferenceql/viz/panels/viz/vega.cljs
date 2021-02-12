@@ -381,7 +381,9 @@
                        :empty "none"}}
      :encoding {:x {:field x-field
                     :type x-type
-                    :axis {:grid true :gridDash [2 2]}}
+                    :axis {:grid true :gridDash [2 2]}
+                    ;; Note: this assumes the x-axis is quantitative.
+                    :scale {:zero false}}
                 :y {:field y-field
                     :type y-type
                     :axis {:grid true :gridDash [2 2]}}
