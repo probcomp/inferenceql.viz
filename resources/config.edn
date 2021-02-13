@@ -1,4 +1,5 @@
 {:data #csv "data.csv"
  :schema  #edn "schema.edn"
  :bayes-db-export #export-json "data_models.json"
- :js-model-template #txt "templates/model.js.mustache"}
+ :js-model-template #txt "templates/model.js.mustache"
+ :enable-debug-interceptors true}

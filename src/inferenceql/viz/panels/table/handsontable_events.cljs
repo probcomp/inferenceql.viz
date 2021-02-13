@@ -2,17 +2,21 @@
   "Re-frame events that correspond to hooks in Handsontable."
   (:require [re-frame.core :as rf]
             [inferenceql.viz.panels.table.selections :as selections]
+            [inferenceql.viz.panels.table.db :as table-db]
+            [inferenceql.viz.panels.table.subs :as table-subs]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.panels.control.db :as control-db]
-            [inferenceql.viz.panels.table.db :as table-db]))
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
+            [goog.string :refer [format]]
+            [clojure.edn :as edn]))
 
 (rf/reg-event-db
  :hot/after-selection-end
  event-interceptors
- (fn [db [_ hot _id _row-index _col _row2 _col2 _selection-layer-level]]
+ (fn [db [_ hot _sub-bundle _row-index _col _row2 _col2 _selection-layer-level]]
    (let [selection-coords (selections/normalize (js->clj (.getSelected hot)))
          color (control-db/selection-color db)
-         num-rows (count (table-db/visual-rows db))]
+         num-rows (count (table-db/visual-row-order db))]
      (if (selections/valid-selection? selection-coords num-rows)
        (assoc-in db [:table-panel :selection-layer-coords color] selection-coords)
        (update-in db [:table-panel :selection-layer-coords] dissoc color)))))
@@ -20,7 +24,7 @@
 (rf/reg-event-db
   :hot/after-on-cell-mouse-down
   event-interceptors
-  (fn [db [_ _hot _id mouse-event _coords _TD]]
+  (fn [db [_ _hot _sub-bundle mouse-event _coords _TD]]
     (let [alt-key-pressed (.-altKey mouse-event) ;; User held alt during last click.
           color (control-db/selection-color db)]
       (cond-> db
@@ -35,38 +39,97 @@
   This all eventually gets passed onto the visualization code via subscriptions."
   [db hot]
   (let [headers (mapv keyword (js->clj (.getColHeader hot)))]
-    (assoc-in db [:table-panel :visual-headers] headers)))
+    (assoc-in db [:table-panel :visual-state :headers] headers)))
 
-(defn assoc-visual-row-data
-  "Associates the actual row data as displayed by `hot` into `db`.
-  The data changes when the user filters or sorts columns.
+(defn assoc-visual-row-order
+  "Associates the order of rows as displayed by `hot` into `db`.
+  This data changes when the user filters, re-orders columns, or sorts columns.
   We use this data to along with selection coordinates to produce the data subset selected.
   This all eventually gets passed onto the visualization code via subscriptions."
-  [db hot]
-  (let [raw-rows (js->clj (.getData hot))
-        rows (for [r raw-rows]
-               (let [remove-nan (fn [cell] (when-not (js/Number.isNaN cell) cell))]
-                 (mapv remove-nan r)))
-        headers (mapv keyword (js->clj (.getColHeader hot)))
-        row-maps (mapv #(zipmap headers %) rows)]
-    (assoc-in db [:table-panel :visual-rows] row-maps)))
+  [db hot physical-row-order]
+  (let [num-rows-shown (.countRows hot)
+        ;; NOTE: Could I do this using the new row index mapper stuff?
+        visual-row-indices (range num-rows-shown)
+        physical-row-indices (map #(.toPhysicalRow hot %) visual-row-indices)
+        visual-row-order (mapv physical-row-order physical-row-indices)]
+    (assoc-in db [:table-panel :visual-state :row-order] visual-row-order)))
 
 (rf/reg-event-db
  :hot/after-column-move
  event-interceptors
- (fn [db [_ hot _id _moved-columns _final-index _drop-index _move-possible _order-changed]]
+ (fn [db [_ hot _sub-bundle _moved-columns _final-index _drop-index _move-possible _order-changed]]
    (assoc-visual-headers db hot)))
 
+;; NOTE: This is also being used to capture the visual row order whenever data is
+;; changed in the table or when new rows are added. This is because we always unsort the table
+;; first before change it. We may want to use a different Handsontable hook to fulfill this need
+;; in the future.
 (rf/reg-event-db
  :hot/after-column-sort
  event-interceptors
- (fn [db [_ hot _id _current-sort-config _destination-sort-config]]
+ (fn [db [_ hot sub-bundle _current-sort-config _destination-sort-config]]
    (-> db
-       (assoc-visual-row-data hot)
-       (assoc-visual-headers hot))))
+       (assoc-visual-headers hot)
+       (assoc-visual-row-order hot (:table/row-order-all sub-bundle)))))
 
 (rf/reg-event-db
  :hot/after-filter
  event-interceptors
- (fn [db [_ hot _id _conditions-stack]]
-   (assoc-visual-row-data db hot)))
+ (fn [db [_ hot sub-bundle _conditions-stack]]
+   (assoc-visual-row-order db hot (:table/row-order-all sub-bundle))))
+
+(defn valid-source?
+  [source]
+  ;; Changes should only be the result of user edits, copy paste, drag and autofill,
+  ;; and undo. This should be enforced by Hansontable settings.
+  (let [valid-change-sources #{"edit" "CopyPaste.paste" "Autofill.fill" "UndoRedo.undo"}]
+    (some? (valid-change-sources source))))
+
+(rf/reg-event-fx
+  :hot/before-change
+  event-interceptors
+  (fn [{:keys [db]} [_ hot sub-bundle changes source]]
+    (assert (valid-source? source))
+    (let [updates (reduce (fn [acc [i change]]
+                            (let [[row col _prev-val new-val] change
+                                  row-id (get (table-db/visual-row-order db) row)
+                                  col (keyword col)
+                                  type (get-in sub-bundle [:query/schema-full col])]
+
+                              ;; Changes should only occur in the label column or in editable row.
+                              ;; TODO: check this row is editable instead of true below.
+                              (assert (or (= col :label) true))
+
+                              ;; TODO: only allow edits in modeled columns.
+                              (if (= type :gaussian)
+                                ;; Try to cast.
+                                (let [new-val (edn/read-string new-val)]
+                                  (if (or (number? new-val) (nil? new-val))
+                                    ;; Include the change.
+                                    (assoc-in acc [row-id col] new-val)
+                                    (do
+                                      ;; Cancel this change.
+                                      (aset changes i nil)
+                                      (.error js/console (format "The value '%s' is not a number. New values for column '%s' must be a number." new-val col))
+                                      ;; Do not include the change.
+                                      acc)))
+
+                                ;; Not gaussian, just include the change.
+                                (assoc-in acc [row-id col] new-val))))
+                          {}
+                          (map-indexed vector changes))
+
+          new-db (update-in db [:table-panel :changes :existing] merge-row-updates updates)
+
+          rows-by-id (merge-row-updates (:table/rows-by-id-with-changes sub-bundle) updates)
+          rows-all (mapv rows-by-id (:table/row-order-all sub-bundle))
+
+          query (:query/query-displayed sub-bundle)
+          schema (:query/schema sub-bundle)]
+
+      ;; Stage the changes in the db. The Handsontable itself already has the updates.
+      {:db new-db
+       :fx [[:dispatch [:control/update-query-string
+                        query
+                        (table-subs/label-values rows-by-id)
+                        (table-subs/editable-rows [rows-all schema])]]]})))

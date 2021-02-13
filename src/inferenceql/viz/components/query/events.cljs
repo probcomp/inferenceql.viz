@@ -4,9 +4,11 @@
             [inferenceql.query :as query]
             [inferenceql.query.parse-tree :as tree]
             [inferenceql.viz.components.query.util :as util]
+            [inferenceql.viz.components.query.editing :refer [add-rowid-and-label]]
             [inferenceql.viz.config :as config]
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
+            [inferenceql.viz.model :as model]
             [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]
             [day8.re-frame.http-fx]
@@ -98,7 +100,7 @@
     :js/alert -- If the query ran locally and failed, an error message will be output."
   [{:keys [db]} [_ text datasets models]]
   (let [{:keys [query-server-url]} config/config
-        query (str/trim text)]
+        query (add-rowid-and-label (str/trim text))]
     (if query-server-url
       ;; Use the query server as a remote query execution engine.
       {:http-xhrio {:method          :post
@@ -183,7 +185,8 @@
   [db [_ query]]
   (-> db
       (assoc-in [:query-component :column-details] (util/column-details query))
-      (assoc-in [:query-component :virtual] (util/virtual-data? query))))
+      (assoc-in [:query-component :virtual] (util/virtual-data? query))
+      (assoc-in [:query-component :query-displayed] query)))
 (rf/reg-event-db :query/set-details
                  event-interceptors
                  set-details)

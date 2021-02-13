@@ -2,6 +2,7 @@
   "Code related to generating vega-lite specs"
   (:require [clojure.walk :as walk]
             [clojure.string :as string]
+            [inferenceql.viz.model :as model]
             [inferenceql.viz.panels.table.handsontable :as hot]
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.config :as config]
@@ -54,10 +55,11 @@
        s))
 
 (defn probability-column? [col-name]
-  "Returns whether a `col-name` was the result of probability-of statement.
+  "Returns whether a `col-name` was the result of PROBABILITY OF statement
+  or PROBABILITY DENSITY OF statement and was not rebinded with an AS label.
   `col-name` is the name of the column."
   (when col-name
-    (some? (re-matches #"^prob[\w\-]*$" (name col-name)))))
+    (some? (re-matches #"^density[\d]*$" (name col-name)))))
 
 (defn vega-type-fn
   "Given a `schema`, returns a vega-type function.
@@ -289,9 +291,11 @@
                        :zoom "wheel![!event.shiftKey]"
                        :empty "none"}}
      :encoding {:x {:field (first cols-to-draw)
-                    :type "quantitative"}
+                    :type "quantitative"
+                    :scale {:zero false}}
                 :y {:field (second cols-to-draw)
-                    :type "quantitative"}
+                    :type "quantitative"
+                    :scale {:zero false}}
                 :color {:condition {:selection "pts"
                                     :value selection-color}}}}))
 
@@ -377,7 +381,9 @@
                        :empty "none"}}
      :encoding {:x {:field x-field
                     :type x-type
-                    :axis {:grid true :gridDash [2 2]}}
+                    :axis {:grid true :gridDash [2 2]}
+                    ;; Note: this assumes the x-axis is quantitative.
+                    :scale {:zero false}}
                 :y {:field y-field
                     :type y-type
                     :axis {:grid true :gridDash [2 2]}}

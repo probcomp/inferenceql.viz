@@ -22,6 +22,11 @@
  (fn [db _]
    (get-in db [:query-component :column-details])))
 
+(rf/reg-sub
+ :query/query-displayed
+ (fn [db _]
+   (get-in db [:query-component :query-displayed])))
+
 (defn ^:sub dataset
   "Returns the dataset referenced in the query text."
   [[dataset-name datasets]]
@@ -57,6 +62,18 @@
             :<- [:store/models]
             model)
 
+(defn ^:sub schema
+  "Returns the schema for the dataset referenced in the query text."
+  [dataset]
+  (:schema dataset))
+
+(rf/reg-sub :query/schema
+            :<- [:query/dataset]
+            schema)
+
+;; TODO: fix this to use the schema subscription below.
+;; Also we need to send a mapping of column renames to the simulate function sub
+;; used in vega-lite specs.
 (defn ^:sub simulatable-cols
   "Returns a set of column names that are simulatable.
 
@@ -98,17 +115,16 @@
             :<- [:query/column-details]
             new-columns-schema)
 
-(defn ^:sub schema
+(defn ^:sub schema-full
   "Returns a schema for the query whose results are currently displayed.
 
   This schema includes new columns that have been generated and columns that have been renamed.
   Returns: {:column-name-1 :gaussian, :column-name-2 :categorical, ...}"
-  [[dataset column-renames new-columns-schema]]
-  (let [schema (:schema dataset)
-        schema-with-renames (medley/map-keys #(get column-renames % %) schema)]
+  [[schema column-renames new-columns-schema]]
+  (let [schema-with-renames (medley/map-keys #(get column-renames % %) schema)]
     (merge new-columns-schema schema-with-renames)))
-(rf/reg-sub :query/schema
-            :<- [:query/dataset]
+(rf/reg-sub :query/schema-full
+            :<- [:query/schema]
             :<- [:query/column-renames]
             :<- [:query/new-columns-schema]
-            schema)
+            schema-full)

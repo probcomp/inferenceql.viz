@@ -2,7 +2,48 @@
   "Utility functions for manipulating and extracting info from iql.query parse trees."
   (:require [instaparse.core :as insta]
             [inferenceql.query :as query]
-            [inferenceql.query.parse-tree :as tree]))
+            [inferenceql.query.parse-tree :as tree]
+            [clojure.zip :as z]))
+
+;;; Various utility functions related to queries.
+
+(defn long-str [& strings] (clojure.string/join "\n" strings))
+
+(defn make-node
+  "Updates the children in an existing node."
+  [node children]
+  (tree/node (tree/tag node) children))
+
+(defn children
+  "Gets the children of a node.
+  Unlike iql.query.parse-tree/children this does not remove whitespace."
+  [node]
+  (rest node))
+
+(defn zipper
+  "Given an iql.query parse tree, returns a zipper."
+  [node]
+  (z/zipper tree/branch? children make-node node))
+
+(defn seek-tag
+  "Navigates to the first location in a iql.query parse tree with `tag`.
+
+  Args:
+    loc: A zipper of an iql.query parse tree.
+    tag: A tag to search for.
+  Returns:
+    A zipper navigated to a node tagged with `tag`. If such a tagged node can not be found,
+      then returns nil."
+  [loc tag]
+  (cond
+    (z/end? loc)
+    nil
+
+    (and (z/branch? loc) (= tag (tree/tag (z/node loc))))
+    loc
+
+    :else
+    (recur (z/next loc) tag)))
 
 ;;; Functions related to (column-details)
 
@@ -10,9 +51,11 @@
   "Gets the selection-list portion of the parse `tree`."
   [tree]
   (when-not (insta/failure? tree)
-    (as-> tree $
-      (tree/get-node-in $ [:select-clause :select-list])
-      (tree/child-nodes $))))
+    (-> tree
+        (zipper)
+        (seek-tag :select-list)
+        (z/node)
+        (tree/child-nodes))))
 
 (defn- column-selection-rename
   "Returns a column-detail map for this type of selection node that renames a column."
@@ -56,11 +99,14 @@
 
 ;;; Functions related to (virtual-data?)
 
+;; TODO: fix checking for virtual data
+
 (defn- virtual-data-table-expr?
   "Returns whether this `table-expr` portion of the parse tree generates virtual data."
   [table-expr]
   (let [table-expr-contents (first (tree/child-nodes table-expr))
         table-expr-type (tree/tag table-expr-contents)]
+    ;; TODO: use (some? (seek-tag % :generated-table-expr))
     (case table-expr-type
       :table-expr (virtual-data-table-expr? table-expr-contents)
       :generated-table-expr true
@@ -72,4 +118,5 @@
   (let [node-or-failure (query/parse query)]
     (when-not (insta/failure? node-or-failure)
       (let [table-expr (tree/get-node-in node-or-failure [:from-clause :table-expr])]
+        ;; TODO: use some->
         (virtual-data-table-expr? table-expr)))))
