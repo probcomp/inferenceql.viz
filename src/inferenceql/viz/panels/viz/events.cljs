@@ -33,4 +33,4 @@
   :viz/clear-pts-store
   event-interceptors
   (fn [db _]
-    (update-in db [:viz-panel] dissoc :pts-store)))
+    (update-in db [:viz-panel] dissoc :pts-store :pts-store-staged)))
