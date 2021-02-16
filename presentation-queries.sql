@@ -38,22 +38,18 @@ FROM (GENERATE age, bmi, gender, health_status, smoker
       UNDER model)
 LIMIT 100;
 
-----------------------------------hypotheical rows
+----------------------------------hypothetical rows -- looking at simulation plots
 
-WITH (ALTER data ADD label) AS data,
-     (UPDATE data SET label=true WHERE rowid=195 OR rowid=268) AS data:
-SELECT gender, age, bmi, smoker, health_status, exercise, 
-       (PROBABILITY OF label=true 
-        GIVEN gender, age, bmi, smoker, health_status, exercise
-        UNDER model
-        AS prob)
-FROM data;
+WITH (INSERT INTO data VALUES (editable=true, bmi=50, smoker="current")) AS data,
+     (INSERT INTO data VALUES (editable=true, bmi=20, smoker="never")) AS data:
+SELECT gender, age, bmi, smoker, health_status, exercise FROM data;
 
+----------------------------------hypothetical rows -- incorporating values
 
 WITH (INSERT INTO data VALUES (editable=true, bmi=70)) AS data,
      (INSERT INTO data VALUES (editable=true, bmi=80)) AS data:
 SELECT gender, age, bmi, smoker, health_status, exercise, 
-       (PROBABILITY OF bmi 
+       (PROBABILITY DENSITY OF bmi
         UNDER model
         AS prob)
 FROM data;
@@ -61,28 +57,27 @@ FROM data;
 WITH (INSERT INTO data VALUES (editable=true, bmi=70)) AS data,
      (INSERT INTO data VALUES (editable=true, bmi=80)) AS data:
 SELECT gender, age, bmi, smoker, health_status, exercise, 
-       (PROBABILITY OF bmi 
+       (PROBABILITY DENSITY OF bmi
         UNDER (INCORPORATE ROW (bmi=70) INTO (INCORPORATE ROW (bmi=80) INTO model))
         AS prob)
 FROM data;
 
-
-----------------------------------labeling
+-----------------------labeling queries
 
 WITH (ALTER data ADD label) AS data,
-     (UPDATE data SET label=true WHERE rowid=1337 OR rowid=1979) AS data:
+     (UPDATE data SET label=true WHERE rowid=721 OR rowid=1302 OR rowid=502 OR rowid=1947 OR rowid=510) AS data:
 SELECT gender, age, bmi, smoker, health_status, exercise,
-       (PROBABILITY OF label=true 
+       (PROBABILITY OF label=true
         GIVEN bmi, health_status
-        UNDER model
+        UNDER (INCORPORATE COLUMN (502=true, 510=true, 721=true, 1302=true, 1947=true) AS label INTO model)
         AS prob)
 FROM data;
 
 WITH (ALTER data ADD label) AS data,
-     (UPDATE data SET label=true WHERE rowid=1337 OR rowid=1979) AS data:
+     (UPDATE data SET label=true WHERE rowid=721 OR rowid=1302 OR rowid=502 OR rowid=1947 OR rowid=510) AS data:
 SELECT gender, age, bmi, smoker, health_status, exercise,
-       (PROBABILITY OF label=true 
-        GIVEN bmi, health_status
-        UNDER (INCORPORATE COLUMN (1337=true, 1979=true) AS label INTO model)
+       (PROBABILITY OF label=true
+        GIVEN bmi, health_status, gender, exercise
+        UNDER (INCORPORATE COLUMN (502=true, 510=true, 721=true, 1302=true, 1947=true) AS label INTO model)
         AS prob)
 FROM data;
