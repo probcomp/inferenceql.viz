@@ -252,21 +252,22 @@
     (add-new-with sub-query-node updates new-rows)))
 
 (defn add-update-labels-expr [cur-qs prev-qs updates new-rows]
-  (if-not (insta/failure? (query/parse cur-qs))
-    ;; Edit the query.
-    (let [prev-qz (some-> prev-qs query/parse zipper)
-          prev-qz-with (some-> prev-qz (seek-tag :with-expr))
-          cur-qz (some-> cur-qs query/parse zipper)
-          cur-qz-with (some-> cur-qz (seek-tag :with-expr))
-          sub-query-node (with-sub-query-node cur-qs)]
-      (if prev-qz-with
-        ;; Use the previous WITH clause.
-        (handle prev-qz-with sub-query-node updates new-rows)
-        ;; Use the current WITH clause.
-        (handle cur-qz-with sub-query-node updates new-rows)))
+  (let [cur-qs (str/trim cur-qs)]
+    (if-not (insta/failure? (query/parse cur-qs))
+      ;; Edit the query.
+      (let [prev-qz (some-> prev-qs query/parse zipper)
+            prev-qz-with (some-> prev-qz (seek-tag :with-expr))
+            cur-qz (some-> cur-qs query/parse zipper)
+            cur-qz-with (some-> cur-qz (seek-tag :with-expr))
+            sub-query-node (with-sub-query-node cur-qs)]
+        (if prev-qz-with
+          ;; Use the previous WITH clause.
+          (handle prev-qz-with sub-query-node updates new-rows)
+          ;; Use the current WITH clause.
+          (handle cur-qz-with sub-query-node updates new-rows)))
 
-    ;; Just return the current un-edited query if it can't be parsed.
-    cur-qs))
+      ;; Just return the current un-edited query if it can't be parsed.
+      cur-qs)))
 
 ;-------------------------------------------------------
 
