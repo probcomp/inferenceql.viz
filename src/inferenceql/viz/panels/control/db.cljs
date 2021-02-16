@@ -4,7 +4,7 @@
 (def default-db
   {:control-panel {:confidence-threshold 0.9
                    :reagent-forms {:confidence-mode :none}
-                   :query-string "SELECT age, gender, height FROM data;"
+                   :query-string "SELECT gender, age, bmi, smoker, health_status, exercise FROM data;"
                    :selection-color :blue}})
 
 
