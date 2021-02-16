@@ -81,3 +81,8 @@ SELECT gender, age, bmi, smoker, health_status, exercise,
         UNDER (INCORPORATE COLUMN (502=true, 510=true, 721=true, 1302=true, 1947=true) AS label INTO model)
         AS prob)
 FROM data;
+
+-----------------------testing broken queries
+
+WITH (INSERT INTO data VALUES (editable=true, bmi=70)) AS data:
+SELECT gender, age, bmi FROM data;
