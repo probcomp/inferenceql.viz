@@ -294,6 +294,7 @@
                           (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str row-incorps))
 
                         row-incorps)]
+    #?(:cljs (.log js/console :incorp-string column-incorp))
     (query/parse column-incorp :start :model-expr)))
 
 (defn add-incorp-node [node updates editable-rows]
