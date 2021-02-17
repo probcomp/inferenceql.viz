@@ -131,8 +131,8 @@
   (->> rows-by-id
     (medley/remove-vals :editable)
     (medley/map-vals :label)
-    (medley/filter-vals some?)
-    (medley/map-vals coerce-bool)))
+    (medley/map-vals coerce-bool)
+    (medley/filter-vals some?)))
 
 (rf/reg-sub :table/label-values
             :<- [:table/rows-by-id-with-changes]
@@ -166,6 +166,7 @@
                  (select-keys $ keys-to-keep)
                  (medley/update-existing $ :label coerce-bool)
                  (medley/remove-vals nil? $)
+                 (medley/remove-vals #(= "" %) $)
                  (medley/map-keys name $)
                  (medley/map-vals quote-strings $))))))
 
