@@ -210,7 +210,7 @@
             :<- [:viz/pts-store-filter]
             (fn [[rows pts-store-filter]]
               (when pts-store-filter
-                (map pts-store-filter rows))))
+                (mapv pts-store-filter rows))))
 
 ;;; Subs related showing/hiding certain columns or table controls.
 
