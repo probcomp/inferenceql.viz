@@ -274,7 +274,8 @@
 ;;; INCORPORATE column.
 
 (defn maybe-incorp-node [updates editable-rows model-name]
-  #?(:cljs (.log js/console :model-name model-name))
+  #?(:cljs (.log js/console "model-name: "))
+  #?(:cljs (.log js/console model-name))
   (let [row-incorps  (if (seq editable-rows)
                        (loop [[r & rs] (reverse editable-rows) query model-name]
                          (if r
@@ -295,7 +296,8 @@
                           (format "(INCORPORATE COLUMN (%s) AS label INTO %s)", bindings-str row-incorps))
 
                         row-incorps)]
-    #?(:cljs (.log js/console :incorp-string column-incorp))
+    #?(:cljs (.log js/console "incorp-string: "))
+    #?(:cljs (.log js/console column-incorp))
     (query/parse column-incorp :start :model-expr)))
 
 (defn add-incorp-node [node updates editable-rows]
