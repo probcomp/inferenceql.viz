@@ -267,7 +267,10 @@
           (handle cur-qz-with sub-query-node updates new-rows)))
 
       ;; Just return the current un-edited query if it can't be parsed.
-      cur-qs)))
+      (do
+        ;; TODO: move this.
+        #?(:cljs (.error js/console "Query string could not be parsed."))
+        cur-qs))))
 
 ;-------------------------------------------------------
 
@@ -317,15 +320,25 @@
     [:under-clause "UNDER" [:ws " "] new-model-expr-node]))
 
 (defn add-incorp-labels-expr [query-string updates editable-rows]
-  #?(:cljs (.log js/console :query-string query-string))
-  #?(:cljs (.log js/console :updates updates))
-  #?(:cljs (.log js/console :editable-rows editable-rows))
-  (loop [qz (-> query-string query/parse zipper)]
-    (if (z/end? qz)
-      (-> qz z/node query/unparse)
-      (if-let [qz-under (seek-tag qz :under-clause)]
-        (recur (z/next (z/edit qz-under add-incorp-node updates editable-rows)))
-        (recur (z/next qz))))))
+  (let [query-string (str/trim query-string)]
+    (if-not (insta/failure? (query/parse query-string))
+      ;; Edit the query.
+      (do
+        #?(:cljs (.log js/console :query-string query-string))
+        #?(:cljs (.log js/console :updates updates))
+        #?(:cljs (.log js/console :editable-rows editable-rows))
+        (loop [qz (-> query-string query/parse zipper)]
+          (if (z/end? qz)
+            (-> qz z/node query/unparse)
+            (if-let [qz-under (seek-tag qz :under-clause)]
+              (recur (z/next (z/edit qz-under add-incorp-node updates editable-rows)))
+              (recur (z/next qz))))))
+      ;; Just return the current un-edited query if it can't be parsed.
+      (do
+        ;; TODO: move this.
+        #?(:cljs (.error js/console "Query string could not be parsed."))
+        query-string))))
+
 
 ;--------------------------------------------
 
