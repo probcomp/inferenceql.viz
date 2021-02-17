@@ -111,7 +111,7 @@
 (rf/reg-event-fx
  :table/add-row
  event-interceptors
- (fn [{:keys [db]} [_ new-rowid query-displayed rows-by-id schema]]
+ (fn [{:keys [db]} [_ new-rowid query-displayed rows-by-id row-order schema]]
    (let [new-row {:editable true
                   :rowid new-rowid}
          hot (get-in db [:table-panel :hot-instance])
@@ -122,10 +122,12 @@
                     (update-in [:table-panel :changes :new-row-order] (fnil conj []) new-rowid))
 
          changes (get-in new-db [:table-panel :changes :existing])
-         row-order (get-in new-db [:table-panel :changes :new-row-order])
+         row-order-all (vec (concat row-order
+                                    (get-in new-db [:table-panel :changes :new-row-order])))
+
 
          rows-by-id (merge-row-updates rows-by-id changes)
-         rows-all (mapv rows-by-id row-order)]
+         rows-all (mapv rows-by-id row-order-all)]
 
      {:db new-db
       :hot/add-row [hot new-row]

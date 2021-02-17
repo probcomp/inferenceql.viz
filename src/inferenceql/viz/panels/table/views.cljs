@@ -128,6 +128,7 @@
   (let [new-rowid @(rf/subscribe [:table/new-rowid])
         query-displayed @(rf/subscribe [:query/query-displayed])
         rows-by-id @(rf/subscribe [:table/rows-by-id-with-changes])
+        row-order @(rf/subscribe [:table/physical-row-order])
         schema @(rf/subscribe [:query/schema])]
     [:div#table-controls {:style {:visibility show-table-controls}}
      [:button.table-button.pure-button
@@ -137,7 +138,7 @@
       "labels"]
      [:button.table-button.pure-button
       {:on-click (fn [e]
-                   (rf/dispatch [:table/add-row new-rowid query-displayed rows-by-id schema])
+                   (rf/dispatch [:table/add-row new-rowid query-displayed rows-by-id row-order schema])
                    (.blur (.-target e)))}
       "+row"]
      [:button.table-button.pure-button
