@@ -142,7 +142,8 @@
         bin-flag (should-bin? col-type)]
     {:data {:values selections}
      :layer [{:mark {:type "bar"
-                     :color default-table-color}
+                     :color default-table-color
+                     :tooltip {:content "data"}}
               :encoding {:x {:bin bin-flag
                              :field col
                              :type col-type}
