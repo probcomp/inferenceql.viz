@@ -1,4 +1,5 @@
 (ns inferenceql.viz.config
+  #?(:cljs (:require [inferenceql.inference.gpm]))
   #?(:cljs (:require-macros [inferenceql.viz.config-reader :as config-reader])
      :clj (:require [inferenceql.viz.config-reader :as config-reader])))
 

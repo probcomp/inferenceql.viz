@@ -1,4 +1,5 @@
 {:data #csv "data.csv"
  :schema  #edn "schema.edn"
  :bayes-db-export #export-json "data_models.json"
+ :xcat-model #xcat-model "xcat-model.edn"
  :js-model-template #txt "templates/model.js.mustache"}
