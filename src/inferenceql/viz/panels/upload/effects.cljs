@@ -23,8 +23,8 @@
                    nil)
         file-ext (when filename (last (str/split filename #"\.")))]
     (case file-ext
-      "edn" :multimix
       "json" :bayes-db-export
+      "edn" :xcat
        nil)))
 
 (defmulti put-read
