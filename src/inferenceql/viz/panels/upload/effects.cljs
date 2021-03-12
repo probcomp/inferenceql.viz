@@ -24,7 +24,7 @@
         file-ext (when filename (last (str/split filename #"\.")))]
     (case file-ext
       "json" :bayes-db-export
-      "edn" :xcat
+      "edn" :edn
        nil)))
 
 (defmulti put-read

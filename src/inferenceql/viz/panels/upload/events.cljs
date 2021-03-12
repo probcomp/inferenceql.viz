@@ -3,7 +3,6 @@
   (:require [clojure.edn :as edn]
             [re-frame.core :as rf]
             [goog.labs.format.csv :as csv]
-            [inferenceql.inference.gpm :as gpm]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.csv :as csv-utils]
             [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
@@ -133,8 +132,9 @@
                                   (bayesdb-import/xcat-gpms
                                    (js->clj (.parse js/JSON (:raw-data model-read)))
                                    dataset-rows)))
-                               :xcat
-                               (util/read-xcat-string (:raw-data model-read))))
+                               :edn
+                               (edn/read-string {:readers util/edn-readers}
+                                                (:raw-data model-read))))
                            model-reads)
 
           geodata-reads (->> reads

@@ -17,7 +17,7 @@
 
 (defmethod aero/reader 'edn
   [_ _ s]
-  (-> s (io/resource) (slurp) (edn/read-string)))
+  (->> s (io/resource) (slurp) (edn/read-string {:readers util/edn-readers})))
 
 (defmethod aero/reader 'json
   [_ _ s]
@@ -26,10 +26,6 @@
 (defmethod aero/reader 'export-json
   [_ _ s]
   (-> s (io/resource) (slurp) (json/read-str)))
-
-(defmethod aero/reader 'xcat-model
-  [_ _ s]
-  (->> s (io/resource) (slurp) (util/read-xcat-string)))
 
 (defmacro read
   "Loads the app config."
