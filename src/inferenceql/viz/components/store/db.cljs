@@ -16,8 +16,7 @@
                                   (get config/config :data)
                                   {:keywordize-cols true}))
 
-;; NOTE: Currently, we just take the first model in the bayes-db-export as our model.
-(def compiled-in-model (get config/config :xcat-model))
+(def compiled-in-model (get config/config :model))
 
 ;;; Setting up store component db
 

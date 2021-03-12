@@ -1,4 +1,4 @@
 {:data #csv "data.csv"
  :schema  #edn "schema.edn"
- :xcat-model #xcat-model "xcat-model.edn"
+ :model #xcat-model "xcat-model.edn"
  :js-model-template #txt "templates/model.js.mustache"}
