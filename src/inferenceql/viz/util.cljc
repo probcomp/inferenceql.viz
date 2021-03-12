@@ -1,6 +1,13 @@
 (ns inferenceql.viz.util
   (:require [medley.core :as medley]
-            [lambdaisland.uri :refer [query-map]]))
+            [lambdaisland.uri :refer [query-map]]
+            [clojure.edn :as edn]
+            [inferenceql.inference.gpm]
+            [inferenceql.inference.gpm.crosscat :as xcat]
+            [inferenceql.inference.gpm.view :as view]
+            [inferenceql.inference.gpm.column :as column]
+            [inferenceql.inference.gpm.primitive-gpms.categorical :as categorical]
+            [inferenceql.inference.gpm.primitive-gpms.gaussian :as gaussian]))
 
 (defn filter-nil-kvs [a-map]
   (into {} (remove (comp nil? val) a-map)))
@@ -24,3 +31,22 @@
   (let [app-url #?(:cljs (.-location js/window)
                    :clj nil)]
     (query-map app-url {:multikeys :never})))
+
+(defn read-xcat-string
+  "Returns an XCat record given an edn string export of an XCat record."
+  [edn-string]
+  (edn/read-string {:readers {'inferenceql.inference.gpm.primitive_gpms.gaussian.Gaussian
+                              gaussian/map->Gaussian
+
+                              'inferenceql.inference.gpm.column.Column
+                              column/map->Column
+
+                              'inferenceql.inference.gpm.view.View
+                              view/map->View
+
+                              'inferenceql.inference.gpm.primitive_gpms.categorical.Categorical
+                              categorical/map->Categorical
+
+                              'inferenceql.inference.gpm.crosscat.XCat
+                              xcat/map->XCat}}
+                   edn-string))
