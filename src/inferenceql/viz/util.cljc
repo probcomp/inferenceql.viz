@@ -1,6 +1,12 @@
 (ns inferenceql.viz.util
   (:require [medley.core :as medley]
-            [lambdaisland.uri :refer [query-map]]))
+            [lambdaisland.uri :refer [query-map]]
+            [inferenceql.inference.gpm]
+            [inferenceql.inference.gpm.crosscat :as xcat]
+            [inferenceql.inference.gpm.view :as view]
+            [inferenceql.inference.gpm.column :as column]
+            [inferenceql.inference.gpm.primitive-gpms.categorical :as categorical]
+            [inferenceql.inference.gpm.primitive-gpms.gaussian :as gaussian]))
 
 (defn filter-nil-kvs [a-map]
   (into {} (remove (comp nil? val) a-map)))
@@ -24,3 +30,21 @@
   (let [app-url #?(:cljs (.-location js/window)
                    :clj nil)]
     (query-map app-url {:multikeys :never})))
+
+(def edn-readers
+  "A map of tag symbols to data-reader functions for use with `clojure.edn/read`
+  and `clojure.edn/read-string`."
+  {'inferenceql.inference.gpm.primitive_gpms.gaussian.Gaussian
+   gaussian/map->Gaussian
+
+   'inferenceql.inference.gpm.column.Column
+   column/map->Column
+
+   'inferenceql.inference.gpm.view.View
+   view/map->View
+
+   'inferenceql.inference.gpm.primitive_gpms.categorical.Categorical
+   categorical/map->Categorical
+
+   'inferenceql.inference.gpm.crosscat.XCat
+   xcat/map->XCat})

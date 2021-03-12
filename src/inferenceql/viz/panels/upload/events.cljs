@@ -3,11 +3,11 @@
   (:require [clojure.edn :as edn]
             [re-frame.core :as rf]
             [goog.labs.format.csv :as csv]
-            [inferenceql.inference.gpm :as gpm]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.csv :as csv-utils]
             [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
-            [medley.core :refer [index-by map-vals find-first]]))
+            [medley.core :refer [index-by map-vals find-first]]
+            [inferenceql.viz.util :as util]))
 
 (defn ^:event-fx read-form
   "Starts the processing of a form for uploading a new dataset and model.
@@ -125,15 +125,16 @@
 
           models (map-vals (fn [model-read]
                              (case (:model-type model-read)
-                               :multimix
-                               (gpm/Multimixture (edn/read-string (:raw-data model-read)))
                                :bayes-db-export
                                (let [dataset-name (get model-read :dataset)
                                      dataset-rows (get-in datasets [dataset-name :rows])]
                                  (first ; Taking the first model.
                                   (bayesdb-import/xcat-gpms
                                    (js->clj (.parse js/JSON (:raw-data model-read)))
-                                   dataset-rows)))))
+                                   dataset-rows)))
+                               :edn
+                               (edn/read-string {:readers util/edn-readers}
+                                                (:raw-data model-read))))
                            model-reads)
 
           geodata-reads (->> reads
