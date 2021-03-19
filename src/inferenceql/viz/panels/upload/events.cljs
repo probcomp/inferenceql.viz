@@ -3,11 +3,11 @@
   (:require [clojure.edn :as edn]
             [re-frame.core :as rf]
             [goog.labs.format.csv :as csv]
+            [medley.core :refer [index-by map-vals find-first]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.csv :as csv-utils]
             [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
-            [medley.core :refer [index-by map-vals find-first]]
-            [inferenceql.viz.util :as util]))
+            [inferenceql.inference.gpm :as gpm]))
 
 (defn ^:event-fx read-form
   "Starts the processing of a form for uploading a new dataset and model.
@@ -133,7 +133,7 @@
                                    (js->clj (.parse js/JSON (:raw-data model-read)))
                                    dataset-rows)))
                                :edn
-                               (edn/read-string {:readers util/edn-readers}
+                               (edn/read-string {:readers gpm/readers}
                                                 (:raw-data model-read))))
                            model-reads)
 

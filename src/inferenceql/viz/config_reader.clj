@@ -5,7 +5,7 @@
             [clojure.edn :as edn]
             [clojure.java.io :as io]
             [aero.core :as aero]
-            [inferenceql.viz.util :as util]))
+            [inferenceql.inference.gpm :as gpm]))
 
 (defmethod aero/reader 'txt
   [_ _ s]
@@ -17,7 +17,7 @@
 
 (defmethod aero/reader 'edn
   [_ _ s]
-  (->> s (io/resource) (slurp) (edn/read-string {:readers util/edn-readers})))
+  (->> s (io/resource) (slurp) (edn/read-string {:readers gpm/readers})))
 
 (defmethod aero/reader 'json
   [_ _ s]
