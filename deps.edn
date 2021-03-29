@@ -21,7 +21,7 @@
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "9b906a91b47245c2d99c3450971cf4acd6b0c7c9"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
-                                    :sha "3cef811a3f6e4500514e8aa8cb5362dc0e757384"}
+                                    :sha "f4e0d8033130864db33671c634e42aa1f1f17d5c"}
         probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
                                             :sha "506e847f55b0379b3888e0f2b2d3fa0e52f2166e"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
