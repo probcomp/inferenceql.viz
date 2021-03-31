@@ -1,4 +1,4 @@
-{:preloads [devtools.preload]
+{;;:preloads [devtools.preload]
  :main "inferenceql.viz.core"
  :asset-path "out"
  :foreign-libs [{:file "node_modules/vega/build/vega.js"
@@ -15,4 +15,5 @@
                 {:file "node_modules/handsontable/dist/handsontable.full.js"
                  :file-min "node_modules/handsontable/dist/handsontable.min.js"
                  :provides ["yarn.handsontable"]}]
+ ;;:install-deps true
  :optimizations :none}
