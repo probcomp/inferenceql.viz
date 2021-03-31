@@ -32,7 +32,6 @@ jobs:
         with:
           path: ~/.gitlibs
           key: gitlibs-${{ hashFiles('deps.edn') }}
-
       - name: Prepare dependencies
         run: clojure -A:test -P
       - name: Run tests
