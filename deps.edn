@@ -17,7 +17,6 @@
 
         cljsjs/react {:mvn/version "16.13.0-0"}
         cljsjs/react-dom {:mvn/version "16.13.0-0"}
-        cljsjs/react-dom-server {:mvn/version "16.13.0-0"}
 
         reagent-forms/reagent-forms {:mvn/version "0.5.44"}
         day8.re-frame/http-fx {:mvn/version "v0.2.0"}

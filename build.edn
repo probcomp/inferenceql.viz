@@ -16,4 +16,4 @@
                  :file-min "node_modules/handsontable/dist/handsontable.min.js"
                  :provides ["yarn.handsontable"]}]
  ;;:install-deps true
- :optimizations :none}
+ :optimizations :whitespace}
