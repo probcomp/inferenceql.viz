@@ -130,11 +130,11 @@
                            (tree/get-node-in [:table-expr :ref])
                            (query/unparse))
 
-        eval #(query/eval % {})
+        evaluate #(query/eval % {})
         set-map-exprs (some-> update-expr
                               (tree/get-node-in [:set-clause :map-expr])
                               (tree/child-nodes))
-        set-map (apply merge (map eval set-map-exprs))
+        set-map (apply merge (map evaluate set-map-exprs))
 
         where-pairs  (some-> update-expr
                              (tree/get-node-in [:where-clause :or-condition])
