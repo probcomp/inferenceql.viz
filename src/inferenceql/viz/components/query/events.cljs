@@ -2,12 +2,11 @@
   (:require [clojure.string :as str]
             [re-frame.core :as rf]
             [inferenceql.query :as query]
-            [inferenceql.query.parse-tree :as tree]
+            [inferenceql.viz.components.store.db :as store-db]
             [inferenceql.viz.components.query.util :as util]
+            [inferenceql.viz.components.query.editing :refer [add-rowid-and-label]]
             [inferenceql.viz.config :as config]
-            [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]
             [day8.re-frame.http-fx]
             [ajax.core]
@@ -98,7 +97,7 @@
     :js/alert -- If the query ran locally and failed, an error message will be output."
   [{:keys [db]} [_ text datasets models]]
   (let [{:keys [query-server-url]} config/config
-        query (str/trim text)]
+        query (add-rowid-and-label (str/trim text))]
     (if query-server-url
       ;; Use the query server as a remote query execution engine.
       {:http-xhrio {:method          :post
@@ -133,7 +132,8 @@
   (let [{result-rows :result metadata :metadata} result
         {columns :iql/columns} metadata]
     {:fx [[:dispatch [:table/set result-rows columns]]
-          [:dispatch [:query/set-details query]]]}))
+          [:dispatch [:query/set-details query]]
+          [:dispatch [:viz/clear-pts-store]]]}))
 
 (rf/reg-event-fx :query/post-success event-interceptors post-success)
 
@@ -181,9 +181,32 @@
   Params:
     `query` (string) -- The query to extract details from."
   [db [_ query]]
-  (-> db
-      (assoc-in [:query-component :column-details] (util/column-details query))
-      (assoc-in [:query-component :virtual] (util/virtual-data? query))))
+  (let [datasets (store-db/datasets db)
+        dataset-name (get-in db [:query-component :dataset-name])
+        schema-base (get-in datasets [dataset-name :schema])
+
+        column-details (util/column-details query)
+        virtual (util/virtual-data? query)
+
+        column-renames (util/column-renames column-details)
+        schema-with-renames (medley/map-keys #(get column-renames % %) schema-base)
+        new-columns-schema (util/new-columns-schema column-details)
+        schema (merge new-columns-schema schema-with-renames)]
+    (-> db
+        (assoc-in [:query-component :query] query)
+        (assoc-in [:query-component :column-details] column-details)
+        (assoc-in [:query-component :virtual] virtual)
+        (assoc-in [:query-component :schema-base] schema-base)
+        (assoc-in [:query-component :schema] schema))))
+
 (rf/reg-event-db :query/set-details
                  event-interceptors
                  set-details)
+
+(defn clear-details
+  [db _]
+  (update db :query-component dissoc :query :column-details :virtual :schema :schema-base))
+
+(rf/reg-event-db :query/clear-details
+                 event-interceptors
+                 clear-details)

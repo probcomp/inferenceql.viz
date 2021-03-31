@@ -4,7 +4,6 @@
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]
-            [inferenceql.viz.panels.table.selections :as selections]
             [medley.core :refer [filter-kv]]))
 
 (defn- sort-state-applicable
@@ -60,25 +59,14 @@
 
        :component-did-mount
        (fn [this]
-         (let [{:keys [settings name hooks]} props
-               hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))
-               unique-id (keyword name)]
+         (let [{:keys [settings hooks]} props
+               hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
-           ;; add callbacks internal to hot object
-           (doseq [key hooks]
+           ;; Add callbacks internal to hot object.
+           (doseq [[key callback-gen] hooks]
              (let [camel-key (csk/->camelCase (clj->js key))]
-               ;; Our hook functions call the associated re-frame event and then return true.  Some
-               ;; reframe hooks such as :beforeCreateCol (not used) allow the hook function to return
-               ;; false in order to cancel the event. It is likely that this behaviour exists in
-               ;; other hooks as well it is just not documented. Returning nil or false from a
-               ;; callback function can cause errors in handsontable plugins that also have
-               ;; functions attached to that hook. Therefore, we are always returning true from hook
-               ;; functions.
-               (js/Handsontable.hooks.add camel-key
-                                          (fn [& args]
-                                            (rf/dispatch (into [key hot unique-id] args))
-                                            true)
-                                          hot)))
+               (js/Handsontable.hooks.add camel-key (callback-gen hot) hot)))
+
            ;; Save the hot object in the app db.
            (rf/dispatch [:table/set-hot-instance hot])))
 
@@ -95,17 +83,7 @@
 
            ;; Update settings.
            (when (seq changed-settings)
-             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))
-
-           ;; Update selections.
-           (let [current-selection (selections/normalize
-                                    (js->clj (.getSelected @hot-instance)))]
-             (when (and (not= (:selections-coords new-props) current-selection)
-                        (not= (:selections-coords new-props) (:selections-coords old-props)))
-               (if-let [coords (clj->js (:selections-coords new-props))]
-                 (.selectCells @hot-instance coords false)
-                 ;; When coords is nil it means nothing should be selected in the table.
-                 (.deselectCell @hot-instance))))))
+             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))))
 
        :component-will-unmount
        (fn [this]
@@ -135,5 +113,6 @@
    [:button.table-button.pure-button
     {:on-click (fn [e]
                  (rf/dispatch [:table/delete-row])
-                 (.blur (.-target e)))}
+                 (.blur (.-target e)))
+     :disabled true}
     "-row"]])
