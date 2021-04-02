@@ -3,6 +3,7 @@
   The store component is esentially a part of the app-db where datasets and
   models and geodata are stored."
   (:require [clojure.spec.alpha :as s]
+            [clojure.edn :as edn]
             [inferenceql.viz.config :as config]
             [inferenceql.viz.csv :as csv-utils]
             [inferenceql.inference.gpm :as gpm]))
@@ -16,7 +17,8 @@
                                   (get config/config :data)
                                   {:keywordize-cols true}))
 
-(def compiled-in-model (get config/config :model))
+(def compiled-in-model
+  (edn/read-string {:readers gpm/readers} (get config/config :model)))
 
 (.log js/console "model-----------")
 (.log js/console (str compiled-in-model))

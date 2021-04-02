@@ -23,17 +23,19 @@
 
 (defn return-nil [_] nil)
 
+(defn wrap-string [content] (str "aaaaaa" content "zzzzzz"))
+
 (def readers
-  {'inferenceql.inference.gpm.crosscat.XCat vector #_xcat/map->XCat
-   'inferenceql.inference.gpm.view.View vector #_view/map->View
-   'inferenceql.inference.gpm.column.Column return-nil #_column/map->Column
-   'inferenceql.inference.gpm.primitive_gpms.bernoulli.Bernoulli vector #_bernoulli/map->Bernoulli
-   'inferenceql.inference.gpm.primitive_gpms.categorical.Categorical vector  #_categorical/map->Categorical
-   'inferenceql.inference.gpm.primitive_gpms.gaussian.Gaussian vector #_gaussian/map->Gaussian})
+  {'inferenceql.inference.gpm.crosscat.XCat identity #_xcat/map->XCat
+   'inferenceql.inference.gpm.view.View identity #_view/map->View
+   'inferenceql.inference.gpm.column.Column edn/read-string #_column/map->Column
+   'inferenceql.inference.gpm.primitive_gpms.bernoulli.Bernoulli identity #_bernoulli/map->Bernoulli
+   'inferenceql.inference.gpm.primitive_gpms.categorical.Categorical identity  #_categorical/map->Categorical
+   'inferenceql.inference.gpm.primitive_gpms.gaussian.Gaussian identity #_gaussian/map->Gaussian})
 
 (defmethod aero/reader 'edn
   [_ _ s]
-  (->> s (io/resource) (slurp) (edn/read-string {:readers readers})))
+  (->> s (io/resource) (slurp) (edn/read-string {:readers gpm/readers})))
 
 (defmethod aero/reader 'json
   [_ _ s]
