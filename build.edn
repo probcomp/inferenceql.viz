@@ -1,7 +1,4 @@
-{:preloads [devtools.preload]
- :main "inferenceql.viz.core"
- :asset-path "out"
- :foreign-libs [{:file "node_modules/vega/build/vega.js"
+{:foreign-libs [{:file "node_modules/vega/build/vega.js"
                  :file-min "node_modules/vega/build/vega.min.js"
                  :provides ["yarn.vega"]}
                 {:file "node_modules/vega-lite/build/vega-lite.js"
@@ -13,6 +10,13 @@
                             "yarn.vega-lite"]
                  :provides ["yarn.vega-embed"]}
                 {:file "node_modules/handsontable/dist/handsontable.full.js"
-                 :file-min "node_modules/handsontable/dist/handsontable.min.js"
+                ;:file-min "node_modules/handsontable/dist/handsontable.min.js"
                  :provides ["yarn.handsontable"]}]
- :optimizations :none}
+ :externs ["externs/handsontable.ext.js"
+           "externs/vega.ext.js"
+           "externs/vega-embed.ext.js"
+           "externs/vega-lite.ext.js"]
+ :optimizations :advanced
+
+ :pseudo-names true
+ :pretty-print true}

@@ -44,8 +44,6 @@ main-ns      := inferenceql.viz.core
 
 cljs-main-opts := \
 		-co $(compile-opts) \
-		-d $(output-dir) \
-		-o $(output-to) \
 		-c $(main-ns)
 
 $(output-to): $(hot-css-resource)
