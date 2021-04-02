@@ -6,4 +6,4 @@
   #?(:cljs (:require-macros [inferenceql.viz.config-reader :as config-reader])
      :clj (:require [inferenceql.viz.config-reader :as config-reader])))
 
-(def config nil #_(config-reader/read))
+(def config (config-reader/read))
