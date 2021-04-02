@@ -21,13 +21,15 @@
   [_ _ s]
   (-> s (io/resource) (slurp) (csv/read-csv) (vec)))
 
+(defn return-nil [_] nil)
+
 (def readers
-  {'inferenceql.inference.gpm.crosscat.XCat xcat/map->XCat
-   'inferenceql.inference.gpm.view.View view/map->View
-   'inferenceql.inference.gpm.column.Column column/map->Column
-   'inferenceql.inference.gpm.primitive_gpms.bernoulli.Bernoulli bernoulli/map->Bernoulli
-   'inferenceql.inference.gpm.primitive_gpms.categorical.Categorical categorical/map->Categorical
-   'inferenceql.inference.gpm.primitive_gpms.gaussian.Gaussian #_vector gaussian/map->Gaussian})
+  {'inferenceql.inference.gpm.crosscat.XCat vector #_xcat/map->XCat
+   'inferenceql.inference.gpm.view.View vector #_view/map->View
+   'inferenceql.inference.gpm.column.Column return-nil #_column/map->Column
+   'inferenceql.inference.gpm.primitive_gpms.bernoulli.Bernoulli vector #_bernoulli/map->Bernoulli
+   'inferenceql.inference.gpm.primitive_gpms.categorical.Categorical vector  #_categorical/map->Categorical
+   'inferenceql.inference.gpm.primitive_gpms.gaussian.Gaussian vector #_gaussian/map->Gaussian})
 
 (defmethod aero/reader 'edn
   [_ _ s]

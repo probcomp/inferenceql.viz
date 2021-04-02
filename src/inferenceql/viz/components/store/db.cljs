@@ -18,6 +18,9 @@
 
 (def compiled-in-model (get config/config :model))
 
+(.log js/console "model-----------")
+(.log js/console (str compiled-in-model))
+
 ;;; Setting up store component db
 
 (def default-db-basic
