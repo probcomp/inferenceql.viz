@@ -821,3 +821,18 @@ var Handsontable = {
 
 Handsontable.Core.prototype.getPlugin = function() {};
 Handsontable.Core.plugins.ColumnSorting.prototype.getSortConfig = function() {};
+Handsontable.Core.plugins.ColumnSorting.prototype.sort = function() {};
+
+
+
+Handsontable.Core.prototype.deselectCell = function() {};
+Handsontable.Core.prototype.loadData = function() {};
+Handsontable.Core.prototype.updateSettings = function() {};
+Handsontable.Core.prototype.selectCells = function() {};
+Handsontable.Core.prototype.getSelected = function() {};
+Handsontable.Core.prototype.deselectCell = function() {};
+Handsontable.Core.prototype.destroy = function() {};
+Handsontable.Core.prototype.getColHeader = function() {};
+Handsontable.Core.prototype.getData = function() {};
+
+// js/Handsontable.hooks.add ?
