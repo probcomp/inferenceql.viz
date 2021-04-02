@@ -10,7 +10,7 @@
                             "yarn.vega-lite"]
                  :provides ["yarn.vega-embed"]}
                 {:file "node_modules/handsontable/dist/handsontable.full.js"
-                ;:file-min "node_modules/handsontable/dist/handsontable.min.js"
+                 :file-min "node_modules/handsontable/dist/handsontable.full.min.js"
                  :provides ["yarn.handsontable"]}]
  :externs ["externs/handsontable.ext.js"
            "externs/vega.ext.js"
