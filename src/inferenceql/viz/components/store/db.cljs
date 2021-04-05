@@ -20,9 +20,6 @@
 (def compiled-in-model
   (edn/read-string {:readers gpm/readers} (get config/config :model)))
 
-(.log js/console "model-----------")
-(.log js/console (str compiled-in-model))
-
 ;;; Setting up store component db
 
 (def default-db-basic
