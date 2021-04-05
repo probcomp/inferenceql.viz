@@ -1,18 +1,3 @@
-/*----------------------------------------------------------------------------------------
-  re-com.css
-
-  This file is required for styling the re-com UI library components.
-  To use the library, bootstrap.css is also required, which is best obtained from a CDN.
-  So, place the following lines in the <head> section of the html file:
-
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.css">
-    <link rel="stylesheet" href="resources/css/re-com.css">
-
-  The following is required for constraining an application to the
-  height of the browser window and setting some global defaults like font...
-----------------------------------------------------------------------------------------*/
-
-/* The following style addresses: http://stackoverflow.com/questions/28636832/firefox-overflow-y-not-working-with-nested-flexbox */
 * {
 	min-height:     0px;
    	min-width:      0px;
@@ -46,33 +31,6 @@ html, body {
 }
 
 
-/*----------------------------------------------------------------------------------------
-  The section immediately below is required for the drop-down components and comes from
-  the bootstrap-chosen library:
-
-    https://github.com/alxlit/bootstrap-chosen
-    License: MIT.
-
-  That library provides it's css as a .less file.
-  To compile the less file into the css below, use the following steps from
-  a command prompt (you'll need git and the lessc compiler (http://lesscss.org):
-
-	git clone https://github.com/alxlit/bootstrap-chosen
-
-	cd bootstrap-chosen
-
-	git clone --depth=1 https://github.com/twbs/bootstrap
-
-  Now edit bootstrap-chosen.less and add the following two lines before the first @import:
-    @import "bootstrap/less/variables.less";
-    @import "bootstrap/less/mixins.less";
-
-    lessc bootstrap-chosen.less > bootstrap-chosen.css
-
-  Finally, replace the section below with the contents of bootstrap-chosen.css.
-
-  START OF BOOTSTRAP-CHOSEN SECTION...
-----------------------------------------------------------------------------------------*/
 
 .chosen-select {
   width: 100%;
@@ -501,17 +459,6 @@ html, body {
   background-image: none;
 }
 
-/*----------------------------------------------------------------------------------------
- Stylesheet for re-com.date Date Picker variants inline-picker & dropdown-picker
- Day8 variation loosely based on:
- Copyright 2013 Dan Grossman ( http://www.dangrossman.info )
- Licensed under the Apache License v2.0
- http://www.apache.org/licenses/LICENSE-2.0
- Built for http://www.improvely.com
- http://eternicode.github.io/bootstrap-datepicker
-
-  START OF DATE PICKER SECTION...
-----------------------------------------------------------------------------------------*/
 
 .datepicker.single .calendar {
     float: none;
@@ -630,7 +577,6 @@ html, body {
     color: #fff;
 }
 
-/* Introduced by Day8 from http://eternicode.github.io/bootstrap-datepicker */
 .datepicker td.today, .datepicker td.today:hover {
     background-color: #ffcd70;
     border-color: #f59e00;
@@ -888,11 +834,6 @@ html, body {
     background-color: #eeeeee;
 }
 
-/*----------------------------------------------------------------------------------------
-  Custom scrollbars
-   - http://css-tricks.com/custom-scrollbars-in-webkit
-   - http://codemug.com/html/custom-scrollbars-using-css
-----------------------------------------------------------------------------------------*/
 
 ::-webkit-scrollbar {
   width: 10px;
@@ -1139,22 +1080,6 @@ code {
    color: lightgrey;
 }
 
-/*----------------------------------------------------------------------------------------
-  info-button
-
-  CSS styles below are taken from https://github.com/oakmac/cljs.info...
-
-    The MIT License (MIT)
-    Copyright (c) 2014 Chris Oakman and contributors
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
-    to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-    and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-    IN THE SOFTWARE.
-----------------------------------------------------------------------------------------*/
 
 .rc-info-button {
     padding-left:        3px;
