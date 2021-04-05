@@ -28,7 +28,6 @@
   [hot-instance new-settings current-selection]
   (let [;; Stores whether settings that determine the data displayed have changed.
         table-changed (some new-settings [:data :colHeaders])
-        _ (.log js/console :here!!! hot-instance)
         sorting-plugin (.getPlugin hot-instance "multiColumnSorting")
         sort-config (.getSortConfig sorting-plugin)]
 
@@ -62,7 +61,6 @@
        :component-did-mount
        (fn [this]
          (let [{:keys [settings name hooks]} props
-               _ (.log js/console "here" (:table-div @dom-nodes))
                hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))
                unique-id (keyword name)]
 
