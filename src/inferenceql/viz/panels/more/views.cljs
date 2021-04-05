@@ -21,7 +21,7 @@
     :on-click (fn [e]
                 (rf/dispatch [:more/toggle-show-menu])
                 (.blur (.-target e)))}
-   [:object.more-icon {:type "image/svg+xml" :data "resources/icons/more_vert-24px.svg"}
+   [:object.more-icon {:type "image/svg+xml" :data "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'%3E%3Cstyle type='text/css' %3E%3C!%5BCDATA%5B .more-icon-dots %7B fill: %23AAA; %7D %5D%5D%3E%3C/style%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath class='more-icon-dots' d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/%3E%3C/svg%3E"}
     "More icon"]])
 
 (defn menu-item
