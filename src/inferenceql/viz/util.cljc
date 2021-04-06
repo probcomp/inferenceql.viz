@@ -1,6 +1,7 @@
 (ns inferenceql.viz.util
   (:require [medley.core :as medley]
-            [lambdaisland.uri :refer [query-map]]))
+            [lambdaisland.uri :refer [query-map]]
+            [clojure.string :as str]))
 
 (defn filter-nil-kvs [a-map]
   (into {} (remove (comp nil? val) a-map)))
@@ -24,3 +25,11 @@
   (let [app-url #?(:cljs (.-location js/window)
                    :clj nil)]
     (query-map app-url {:multikeys :never})))
+
+(defn coerce-bool [val]
+  (case (str/lower-case (str val))
+    "true" true
+    "t" true
+    "false" false
+    "f" false
+    nil))

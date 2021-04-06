@@ -18,6 +18,7 @@
             [inferenceql.viz.panels.table.events]
             [inferenceql.viz.panels.table.subs]
             [inferenceql.viz.panels.table.handsontable-events]
+            [inferenceql.viz.panels.table.handsontable-effects]
             ;; More Panel
             [inferenceql.viz.panels.more.events]
             [inferenceql.viz.panels.more.subs]
@@ -65,4 +66,5 @@
   ;; not reset the state of the app.
   (rf/dispatch-sync [:initialize-db])
   (rf/dispatch-sync [:upload/read-query-string-params (query-string-params)])
+  (rf/dispatch-sync [:control/set-query-string-to-select-all])
   (render-app))

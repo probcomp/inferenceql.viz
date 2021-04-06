@@ -102,3 +102,9 @@
 ;; data. See here for more info:
 ;; https://vega.github.io/vega-lite/docs/projection.html#projection-types
 (s/def ::projection-type #{"albers" "albersUsa" "mercator" "identity"})
+
+;;; Accessor functions to portions of the table-panel db.
+
+(defn datasets
+  [db]
+  (get-in db [:store-component :datasets]))

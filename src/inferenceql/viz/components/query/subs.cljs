@@ -57,58 +57,31 @@
             :<- [:store/models]
             model)
 
+(defn ^:sub schema-base
+  "Returns the base schema for the dataset referenced in the query executed."
+  [db _]
+  (get-in db [:query-component :schema-base]))
+
+(rf/reg-sub :query/schema-base
+            schema-base)
+
 (defn ^:sub simulatable-cols
   "Returns a set of column names that are simulatable.
 
   These are columns that apppear in the dataset's schema and therefore they are
   assumed to be modeled."
-  [dataset]
-  (-> dataset
-      (:schema)
-      (keys)
-      (set)))
+  [schema]
+  (-> schema keys set))
 (rf/reg-sub :query/simulatable-cols
-            :<- [:query/dataset]
+            :<- [:query/schema-base]
             simulatable-cols)
-
-(defn ^:sub column-renames
-  "Returns a map of columns that have been renamed as a result of executing the last query.
-
-  Columns can be renames in queries using the AS keyword.
-  Returns: {:old-column-name :new-column-name, ...}"
-  [column-details]
-  (->> column-details
-       (filter #(= (:detail-type %) :rename))
-       (map (juxt :old-name :new-name))
-       (into {})))
-(rf/reg-sub :query/column-renames
-            :<- [:query/column-details]
-            column-renames)
-
-(defn ^:sub new-columns-schema
-  "Returns a schema for new columns that were created as a result of executing the last query.
-
-  Returns: {:new-column-name :gaussian, ...}"
-  [column-details]
-  (->> column-details
-       (filter #(= (:detail-type %) :new-column-schema))
-       (map (juxt :name :stat-type))
-       (into {})))
-(rf/reg-sub :query/new-columns-schema
-            :<- [:query/column-details]
-            new-columns-schema)
 
 (defn ^:sub schema
   "Returns a schema for the query whose results are currently displayed.
 
   This schema includes new columns that have been generated and columns that have been renamed.
   Returns: {:column-name-1 :gaussian, :column-name-2 :categorical, ...}"
-  [[dataset column-renames new-columns-schema]]
-  (let [schema (:schema dataset)
-        schema-with-renames (medley/map-keys #(get column-renames % %) schema)]
-    (merge new-columns-schema schema-with-renames)))
+  [db _]
+  (get-in db [:query-component :schema]))
 (rf/reg-sub :query/schema
-            :<- [:query/dataset]
-            :<- [:query/column-renames]
-            :<- [:query/new-columns-schema]
             schema)
