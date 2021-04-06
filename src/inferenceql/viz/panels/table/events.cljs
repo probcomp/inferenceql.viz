@@ -87,7 +87,11 @@
 
   Triggered when the user presses the +row button in the control panel UI."
   [{:keys [db]} [_]]
-  (let [new-rowid (inc (count (get-in db [:table-panel :row-ids])))
+  (let [row-ids (get-in db [:table-panel :row-ids])
+        new-rowid (inc (apply max row-ids))
+        ;; The next free row-id and next free row index are not the same.
+        new-row-index (count row-ids)
+
         new-row {:rowid new-rowid :editable true}
         new-db (-> db
                    (update-in [:table-panel :rows-by-id] assoc new-rowid new-row)
@@ -95,7 +99,7 @@
 
         hot (get-in db [:table-panel :hot-instance])]
     {:db new-db
-     :hot/add-row [hot new-row]
+     :hot/add-row [hot new-row new-row-index]
      :fx [[:dispatch [:control/add-edits-to-query]]]}))
 
 (rf/reg-event-fx :table/add-row

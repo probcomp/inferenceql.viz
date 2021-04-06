@@ -5,9 +5,8 @@
   "Adds a new row to the Handsontable instance `hot`.
   To be used as a re-frame fx.
   Adds the new row, and selects the first cell in that new row (excluding the label column)."
-  [[hot row]]
-  (let [row-index (dec (:rowid row))
-        values (for [[k v] row]
+  [[hot row row-index]]
+  (let [values (for [[k v] row]
                  [row-index k v])
         ;; Table coordinates of the first cell of the new row we are adding.
         new-selection [[row-index 1 row-index 1]]]
