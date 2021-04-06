@@ -88,6 +88,14 @@
                                        (physical-row-indices hot)])
                          true))
 
+                     :hot/after-remove-row
+                     (fn [hot]
+                       (fn [_index _amount _physical-rows source]
+                         (rf/dispatch [:hot/after-remove-row
+                                       source
+                                       (physical-row-indices hot)])
+                         true))
+
                      :hot/after-filter
                      (fn [hot]
                        (fn [_conditions-stack]

@@ -166,6 +166,25 @@
             :<- [:table/rows]
             show-table-controls)
 
+(defn deletable-row
+  "Returns whether the currently selected row can be deleted.
+  To be used as re-frame subscription."
+  [[rows-by-id visual-row-ids selection-coords]]
+  (let [[r1 _ r2 _] (first selection-coords)
+        row-id (get visual-row-ids r1)
+        editable-row (:editable (get rows-by-id row-id))]
+    ;; Row is only deletable when there is only one selection rectangle and
+    ;; it is set on a single row. The number of columns spanned does not matter.
+    (and (= 1 (count selection-coords))
+         (= r1 r2)
+         editable-row)))
+
+(rf/reg-sub :table/deletable-row
+            :<- [:table/rows-by-id]
+            :<- [:table/visual-row-ids]
+            :<- [:table/selection-coords-active]
+            deletable-row)
+
 (rf/reg-sub :table/show-label-column
             (fn [db _]
               (get-in db [:table-panel :show-label-column])))

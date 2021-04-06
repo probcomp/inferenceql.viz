@@ -3,6 +3,7 @@
   (:refer-clojure :exclude [set])
   (:require [re-frame.core :as rf]
             [medley.core :as medley]
+            [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
@@ -100,3 +101,31 @@
 (rf/reg-event-fx :table/add-row
                  event-interceptors
                  add-row)
+
+(defn delete-row
+  [{:keys [db]} [_]]
+  (let [color (control-db/selection-color db)
+        selection-coords (get-in db [:table-panel :selection-layer-coords color])
+        ;; Visual row index of the row to delete.
+        [r1 _ _ _] (first selection-coords)
+        row-id (get-in db [:table-panel :visual-state :row-ids r1])
+
+        remove-row-id (fn [row-ids]
+                        ;; Using .lastIndexOf to search for #{row-id} from the back of vector. This
+                        ;; will improve performance in most instances-when the table is not sorted.
+                        (let [idx (.lastIndexOf row-ids row-id)]
+                          (vec (concat (subvec row-ids 0 idx)
+                                       (subvec row-ids (inc idx))))))
+
+        new-db (-> db
+                   (update-in [:table-panel :rows-by-id] dissoc row-id)
+                   (update-in [:table-panel :row-ids] remove-row-id))
+
+        hot (get-in db [:table-panel :hot-instance])]
+    {:db new-db
+     :hot/delete-row [hot r1]
+     :fx [[:dispatch [:control/add-edits-to-query]]]}))
+
+(rf/reg-event-fx :table/delete-row
+                 event-interceptors
+                 delete-row)
