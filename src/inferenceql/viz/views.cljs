@@ -18,10 +18,10 @@
         highlight-class @(rf/subscribe [:table/highlight-class])
         modal-content @(rf/subscribe [:modal/content])
         show-table-controls @(rf/subscribe [:table/show-table-controls])
-        deletable-row @(rf/subscribe [:table/deletable-row])]
+        removable-row @(rf/subscribe [:table/removable-row])]
     [v-box
      :children [[control/panel]
-                [table/controls show-table-controls deletable-row]
+                [table/controls show-table-controls removable-row]
                 [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
                 [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
                 [modal/modal modal-content]]]))

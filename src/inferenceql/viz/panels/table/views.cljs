@@ -98,7 +98,7 @@
 
 (defn controls
   "Controls for a handsontable instance."
-  [show-table-controls deletable-row]
+  [show-table-controls removable-row]
   [:div#table-controls {:style {:visibility show-table-controls}}
    [:button.table-button.pure-button
     {:on-click (fn [e]
@@ -112,7 +112,7 @@
     "+row"]
    [:button.table-button.pure-button
     {:on-click (fn [e]
-                 (rf/dispatch [:table/delete-row])
+                 (rf/dispatch [:table/remove-row])
                  (.blur (.-target e)))
-     :disabled (not deletable-row)}
+     :disabled (not removable-row)}
     "-row"]])

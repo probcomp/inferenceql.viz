@@ -166,7 +166,7 @@
             :<- [:table/rows]
             show-table-controls)
 
-(defn deletable-row
+(defn removable-row
   "Returns whether the currently selected row can be deleted.
   To be used as re-frame subscription."
   [[rows-by-id visual-row-ids selection-coords]]
@@ -179,11 +179,11 @@
          (= r1 r2)
          editable-row)))
 
-(rf/reg-sub :table/deletable-row
+(rf/reg-sub :table/removable-row
             :<- [:table/rows-by-id]
             :<- [:table/visual-row-ids]
             :<- [:table/selection-coords-active]
-            deletable-row)
+            removable-row)
 
 (rf/reg-sub :table/show-label-column
             (fn [db _]

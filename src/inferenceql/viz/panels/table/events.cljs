@@ -102,7 +102,7 @@
                  event-interceptors
                  add-row)
 
-(defn delete-row
+(defn remove-row
   [{:keys [db]} [_]]
   (let [color (control-db/selection-color db)
         selection-coords (get-in db [:table-panel :selection-layer-coords color])
@@ -123,9 +123,9 @@
 
         hot (get-in db [:table-panel :hot-instance])]
     {:db new-db
-     :hot/delete-row [hot r1]
+     :hot/remove-row [hot r1]
      :fx [[:dispatch [:control/add-edits-to-query]]]}))
 
-(rf/reg-event-fx :table/delete-row
+(rf/reg-event-fx :table/remove-row
                  event-interceptors
-                 delete-row)
+                 remove-row)

@@ -26,13 +26,13 @@
 (rf/reg-fx :hot/add-row
            add-row)
 
-(defn delete-row
+(defn remove-row
   [[hot visual-row-idx]]
   ;; Remove the row.
-  (.alter hot "remove_row" visual-row-idx 1 "delete-row-fx"))
+  (.alter hot "remove_row" visual-row-idx 1 "remove-row-fx"))
 
-(rf/reg-fx :hot/delete-row
-           delete-row)
+(rf/reg-fx :hot/remove-row
+           remove-row)
 
 (defn select
   "Selects the cells specified by `selection` in the Handsontable instance `hot`.

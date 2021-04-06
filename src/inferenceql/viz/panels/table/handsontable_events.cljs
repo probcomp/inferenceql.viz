@@ -62,7 +62,7 @@
   :hot/after-remove-row
   event-interceptors
   (fn [db [_ source physical-row-indices]]
-    (assert (= source "delete-row-fx"))
+    (assert (= source "remove-row-fx"))
     (let [row-ids (get-in db [:table-panel :row-ids])]
       (assoc-in db [:table-panel :visual-state :row-ids] (mapv row-ids physical-row-indices)))))
 
