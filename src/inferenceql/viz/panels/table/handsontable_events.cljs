@@ -9,7 +9,8 @@
             [inferenceql.viz.components.query.db :as query-db]
             [inferenceql.viz.components.store.db :as store-db]
             [goog.string :refer [format]]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [clojure.string :as string]))
 
 (rf/reg-event-db
  :hot/after-selection-end
@@ -103,7 +104,7 @@
                             ;; Include the change.
                             (assoc-in acc [:updates row-id col] new-val)
                             (let [error (format
-                                         (str "The value '%s' is not a number. "
+                                         (str "Table-edit cancelled: The value '%s' is not a number. "
                                               "New values for column '%s' must be a number.")
                                          new-val (name col))]
                               ;; Do not include the change. Add the error.
@@ -114,13 +115,14 @@
                         (= type :categorical)
                         ;; Check if valid category-value
                         (let [categories (get categories col)]
-                          (if (contains? categories new-val)
+                          (if (or (contains? categories new-val) (string/blank? new-val))
                             ;; Include the change.
                             (assoc-in acc [:updates row-id col] new-val)
                             (let [error (format
-                                         (str "The value '%s' is not a valid category value "
-                                              "for the column '%s'. Valid categories are %s.")
-                                         new-val (name col) categories)]
+                                         (str "Table-edit cancelled: The value '%s' is not a valid "
+                                              "category value for the column '%s'. Valid categories "
+                                              "are %s.")
+                                         new-val (name col) (seq categories))]
                               ;; Do not include the change. Add the error.
                               (-> acc
                                   (update :errors conj error)
@@ -134,8 +136,8 @@
                         ;; Trying to edit a column that is either not in the original
                         ;; dateset's schema or the column has been renamed in the query.
                         (let [error (format
-                                     (str "Column '%s' is not part of the original dataset. "
-                                          "You can not edit its values.")
+                                     (str "Table-edit cancelled: Column '%s' is not part of the "
+                                          "original dataset. You can not edit its values.")
                                      (name col))]
                           (-> acc
                               (update :errors conj error)
@@ -154,9 +156,11 @@
           errors (cond-> errors
                    (seq errors)
                    (conj [:dispatch-later
-                          [{:ms 300 :dispatch [:alert (str "Your edits to the table could not be made. \n"
-                                                           "Check the browser console "
-                                                           "for more information.")]}]]))]
+                          [{:ms 100 :dispatch [:alert (str "Your edits were undone because they "
+                                                           "contained invalid values or they edited "
+                                                           "special columns. "
+                                                           "Check the browser console for more "
+                                                           "information.")]}]]))]
       ;; Cancel changes by mutating changes.
       (doseq [id change-ids-to-cancel]
         (aset changes id nil))
