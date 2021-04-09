@@ -84,7 +84,7 @@
                             [col-name (set (:metadata col))])
                           (into {}))
 
-          {:keys [updates errors cancelled-changes]}
+          {:keys [updates errors change-ids-to-cancel]}
           (reduce (fn [acc [i change]]
                     (let [[row col _prev-val new-val] change
                           row-id (get (table-db/visual-row-ids db) row)
@@ -109,7 +109,7 @@
                               ;; Do not include the change. Add the error.
                               (-> acc
                                   (update :errors conj error)
-                                  (update :cancelled-changes conj i)))))
+                                  (update :change-ids-to-cancel conj i)))))
 
                         (= type :categorical)
                         ;; Check if valid category-value
@@ -124,7 +124,7 @@
                               ;; Do not include the change. Add the error.
                               (-> acc
                                   (update :errors conj error)
-                                  (update :cancelled-changes conj i)))))
+                                  (update :change-ids-to-cancel conj i)))))
 
                         (= col :label)
                         ;; Just include the change.
@@ -139,9 +139,9 @@
                                      (name col))]
                           (-> acc
                               (update :errors conj error)
-                              (update :cancelled-changes conj i))))))
+                              (update :change-ids-to-cancel conj i))))))
 
-                  {:updates {} :errors [] :cancelled-changes []}
+                  {:updates {} :errors [] :change-ids-to-cancel []}
                   (map-indexed vector changes))
 
 
@@ -149,7 +149,8 @@
           ;; Re-frame :fx vectors for emmiting errors to browser console.
           errors (vec (for [error errors]
                         [:js/console-error error]))
-          ;; Display a js alert message later.
+          ;; If we have errors, display a js alert message slightly later,
+          ;; so we don't lock up Handsontable from undoing changes.
           errors (cond-> errors
                    (seq errors)
                    (conj [:dispatch-later
@@ -157,7 +158,7 @@
                                                            "Check the browser console "
                                                            "for more information.")]}]]))]
       ;; Cancel changes by mutating changes.
-      (doseq [id cancelled-changes]
+      (doseq [id change-ids-to-cancel]
         (aset changes id nil))
       ;; Add the changes to db. Handsontable itself already has the updates.
       {:db (update-in db [:table-panel :rows-by-id] merge-row-updates updates)
