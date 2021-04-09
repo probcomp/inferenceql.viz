@@ -156,11 +156,11 @@
           errors (cond-> errors
                    (seq errors)
                    (conj [:dispatch-later
-                          [{:ms 100 :dispatch [:alert (str "Your edits were undone because they "
-                                                           "contained invalid values or they edited "
-                                                           "special columns. "
-                                                           "Check the browser console for more "
-                                                           "information.")]}]]))]
+                          [{:ms 100 :dispatch [:app/alert (str "Your edits were undone because they "
+                                                               "contained invalid values or they edited "
+                                                               "special columns. "
+                                                               "Check the browser console for more "
+                                                               "information.")]}]]))]
       ;; Cancel changes by mutating changes.
       (doseq [id change-ids-to-cancel]
         (aset changes id nil))
