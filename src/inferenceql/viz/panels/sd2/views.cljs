@@ -1,6 +1,9 @@
 (ns inferenceql.viz.panels.sd2.views
   (:require [reagent.core :as r]
             [inferenceql.inference.gpm.view :as view]
+            [inferenceql.inference.gpm.column :as column]
+            [inferenceql.inference.gpm.primitive-gpms :as pgpms]
+            [clojure.pprint :refer [pprint]]
             [re-frame.core :as rf]
             [medley.core :as medley]
             [goog.string :refer [format]]
@@ -155,6 +158,22 @@
                          [gap :size "20px"]
                          [files-form]]]]))
 
+(defn xcat-category [view cat-name]
+  (let [params
+        (reduce-kv (fn [column-categories _ column]
+                     (let [;; If there is no category for a given column, this means
+                           ;; that there is no associated data with that column in the rows within
+                           ;; that category. Because the types are collapsed, we can generate
+                           ;; a new (empty) category for that column.
+                           col-cat (get-in column [:categories cat-name] (column/generate-category column))
+                           col-stattype (:stattype column)]
+                       (merge column-categories
+                              (pgpms/export-category col-stattype col-cat))))
+                   {}
+                   (:columns view))]
+    [:div
+     [:h3 cat-name]
+     [:pre (with-out-str (pprint params))]]))
 
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
@@ -167,7 +186,9 @@
       (for [[cat-name weight] weights]
         [:div.cat-group
           [:span.cat-name (str (name cat-name) ":")]
-          [:span.cat-weight (format "%.3f" weight)]])]))
+          [:span.cat-weight (format "%.3f" weight)]])
+      (for [[cat-name _] weights]
+        [xcat-category view cat-name])]))
 
 (defn view [model constraints]
   [:div
