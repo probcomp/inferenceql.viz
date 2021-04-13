@@ -4,7 +4,8 @@
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.viz.views :as viz]
             [inferenceql.viz.panels.table.views :as table]
-            [inferenceql.viz.panels.modal.views :as modal]))
+            [inferenceql.viz.panels.modal.views :as modal]
+            [inferenceql.viz.panels.sd2.views :as sd2]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
 
@@ -17,10 +18,7 @@
         virtual @(rf/subscribe [:query/virtual])
         highlight-class @(rf/subscribe [:table/highlight-class])
         modal-content @(rf/subscribe [:modal/content])
-        show-table-controls @(rf/subscribe [:table/show-table-controls])]
+        show-table-controls @(rf/subscribe [:table/show-table-controls])
+        models @(rf/subscribe [:store/models])]
     [v-box
-     :children [[control/panel]
-                [table/controls show-table-controls]
-                [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
-                [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
-                [modal/modal modal-content]]]))
+     :children [[sd2/view (:model models) {}]]]))

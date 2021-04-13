@@ -310,3 +310,21 @@ psuedo-class applied. */
   width: 100%;
   height: 400px;
 }
+
+/* -----------------------------------------------------*/
+
+.cat-group {
+  display: inline;
+  margin: 10px;
+}
+
+.cat-name {
+  background-color: lightgrey;
+  padding: 2px 5px;
+  margin: 0px;
+}
+
+.cat-weight {
+  padding: 2px;
+  margin: 2px;
+}
