@@ -314,17 +314,22 @@ psuedo-class applied. */
 /* -----------------------------------------------------*/
 
 .cat-group {
-  display: inline;
+  display: inline-block;
   margin: 10px;
+  border: 10px;
+  border-bottom-style: solid;
 }
 
 .cat-name {
+  display: inline-block;
   background-color: lightgrey;
   padding: 2px 5px;
   margin: 0px;
+  border-radius: 10px;
 }
 
 .cat-weight {
+  display: inline-block;
   padding: 2px;
-  margin: 2px;
+  margin: 0px;
 }

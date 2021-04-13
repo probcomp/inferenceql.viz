@@ -175,18 +175,35 @@
      [:h3 cat-name]
      [:pre (with-out-str (pprint params))]]))
 
+(defn scale [weights]
+  (let [weights (map second weights)
+        min-w (apply min weights)
+        max-w (apply max weights)
+
+        lin (.scale js/vega "linear")
+        ;; TODO: try with different color scale.
+        scheme (.scheme js/vega "blues")
+        scale-fn (doto (lin)
+                       (.domain [min-w max-w])
+                       (.range [0 1]))]
+    (fn [weight]
+      (scheme (scale-fn weight)))))
+
+
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
-        weights (->> (view/category-weights view {})
+        weights (->> (view/category-weights view constraints)
                      (medley/map-vals Math/exp)
-                     (sort-by first))]
-    [:div
+                     (sort-by first))
+        scale (scale weights)]
+    [:div {:style {:width "800px"}}
       [:h2 view-id]
       [:h4 (pr-str columns)]
-      (for [[cat-name weight] weights]
-        [:div.cat-group
-          [:span.cat-name (str (name cat-name) ":")]
-          [:span.cat-weight (format "%.3f" weight)]])
+      [:div.cats
+        (for [[cat-name weight] weights]
+          [:div.cat-group {:style {:border-color (scale weight)}}
+            [:div.cat-name (str (name cat-name) ":")]
+            [:div.cat-weight (format "%.3f" weight)]])]
       (for [[cat-name _] weights]
         [xcat-category view cat-name])]))
 
