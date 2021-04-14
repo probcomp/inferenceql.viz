@@ -212,8 +212,9 @@
           js-code]])})))
 
 
-(defn xcat-category [view cat-name]
-  (let [stat-types (medley/map-vals :stattype (:columns view))
+(defn xcat-category [view cat-name hidden]
+  (let [hidden (r/atom true)
+        stat-types (medley/map-vals :stattype (:columns view))
         params (reduce-kv
                 (fn [acc col-name col-gpm]
                   (let [;; If there is no category for a given column, this means
@@ -225,9 +226,26 @@
                     (merge acc exported-cat)))
                 {}
                 (:columns view))]
-    [:div
-     [:h3 cat-name]
-     [js-code-block (js-fn-text stat-types params)]]))
+    (fn []
+      (let [display (if @hidden "none" "block")
+            more-icon-path (if @hidden "resources/icons/expand_more_black_48dp.svg"
+                                       "resources/icons/expand_less_black_48dp.svg")]
+        [:div
+         [v-box
+          :gap "5px"
+          :children [[h-box
+                      :gap "5px"
+                      :children [[:button.toolbar-button.pure-button.more-button
+                                  {:class (when false "pure-button-active pure-button-hover")
+                                   :on-click (fn [e]
+                                               ;; set atom
+                                               (swap! hidden not)
+                                               (.blur (.-target e)))}
+                                  [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
+                                   "expand content"]]
+                                 [:h3 cat-name]]]
+                     [:div {:style {:display display}}
+                       [js-code-block (js-fn-text stat-types params)]]]]]))))
 
 (defn scale [weights]
   (let [weights (map second weights)
@@ -260,7 +278,7 @@
             [:div.cat-name (str (name cat-name) ":")]
             [:div.cat-weight (format "%.3f" weight)]])]
       (for [[cat-name _] weights]
-        [xcat-category view cat-name])]))
+        [xcat-category view cat-name true])]))
 
 (defn view [model constraints]
   [:div
