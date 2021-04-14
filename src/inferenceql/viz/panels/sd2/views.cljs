@@ -243,8 +243,12 @@
                                                (.blur (.-target e)))}
                                   [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
                                    "expand content"]]
-                                 [:h3 cat-name]]]
-                     [:div {:style {:display display}}
+                                 [:div {:style {:font-size "24px" :font-weight "500"
+                                                :line-height "1.1" :color "inherit"}}
+                                  cat-name]]]
+
+                     [:div {:style {:display display
+                                    :margin-left "40px"}}
                        [js-code-block (js-fn-text stat-types params)]]]]]))))
 
 (defn scale [weights]
