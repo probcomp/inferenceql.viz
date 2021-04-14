@@ -159,18 +159,18 @@
                          [files-form]]]]))
 
 (defn xcat-category [view cat-name]
-  (let [params
-        (reduce-kv (fn [column-categories _ column]
-                     (let [;; If there is no category for a given column, this means
-                           ;; that there is no associated data with that column in the rows within
-                           ;; that category. Because the types are collapsed, we can generate
-                           ;; a new (empty) category for that column.
-                           col-cat (get-in column [:categories cat-name] (column/generate-category column))
-                           col-stattype (:stattype column)]
-                       (merge column-categories
-                              (pgpms/export-category col-stattype col-cat))))
-                   {}
-                   (:columns view))]
+  (let [stat-types (medley/map-vals :stattype (:columns view))
+        params (reduce-kv
+                (fn [acc col-name col-gpm]
+                  (let [;; If there is no category for a given column, this means
+                        ;; that there is no associated data with that column in the rows within
+                        ;; that category. Because the types are collapsed, we can generate
+                        ;; a new (empty) category for that column.
+                        col-cat (get-in col-gpm [:categories cat-name] (column/generate-category col-gpm))
+                        exported-cat (pgpms/export-category (get stat-types col-name) col-cat)]
+                    (merge acc exported-cat)))
+                {}
+                (:columns view))]
     [:div
      [:h3 cat-name]
      [:pre (with-out-str (pprint params))]]))
