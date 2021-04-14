@@ -1,4 +1,5 @@
 {:data #csv "data.csv"
  :schema  #edn "schema.edn"
  :model #edn "xcat-model.edn"
- :js-model-template #txt "templates/model.js.mustache"}
+ :js-model-template #txt "templates/model.js.mustache"
+ :cluster-fn-template #txt "templates/cluster.js.mustache"}

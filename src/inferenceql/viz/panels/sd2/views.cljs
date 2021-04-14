@@ -9,7 +9,13 @@
             [goog.string :refer [format]]
             [re-com.core :refer [border title v-box p h-box line button gap input-text
                                  checkbox horizontal-bar-tabs horizontal-tabs
-                                 radio-button]]))
+                                 radio-button]]
+            [clojure.string :as string]
+            [goog.string :refer [format]]
+            [cljsjs.highlight]
+            [cljsjs.highlight.langs.javascript]
+            [cljstache.core :refer [render]]
+            [inferenceql.viz.config :refer [config]]))
 
 (defn file-info
   "Reagent component that displays basic information about a local file.
@@ -158,6 +164,54 @@
                          [gap :size "20px"]
                          [files-form]]]]))
 
+(defn cats-string [col-params]
+  (let [kv-strings (for [[cat-val cat-weight] col-params]
+                     (format "\"%s\": %.3f" cat-val cat-weight))]
+    (string/join ", " kv-strings)))
+
+(defn template-data [stat-types params]
+  (let [last-index (-> params count dec)
+        columns (reduce
+                 (fn [acc [index [col-name col-params]]]
+                   (conj acc (case (get stat-types col-name)
+                               :categorical
+                               {:col-name (name col-name) :categorical true
+                                :cats-string (cats-string col-params)
+                                :last (= index last-index)}
+                               :gaussian
+                               {:col-name (name col-name) :gaussian true
+                                :mu (format "%.3f" (:mu col-params))
+                                :sigma (format "%.3f" (:sigma col-params))
+                                :last (= index last-index)})))
+                 []
+                 (map-indexed vector params))]
+    {:columns columns}))
+
+(defn js-fn-text [stat-types params]
+  (let [template-data (template-data stat-types params)
+        rendered (render (:cluster-fn-template config) template-data)]
+    (->> rendered
+         (string/split-lines)
+         (remove string/blank?)
+         (string/join "\n"))))
+
+(defn js-code-block
+  [js-code]
+  (let [dom-nodes (r/atom {})]
+    (r/create-class
+     {:display-name "js-model-code"
+
+      :component-did-mount
+      (fn [this]
+        (.highlightBlock js/hljs (:program-display @dom-nodes)))
+
+      :reagent-render
+      (fn []
+        [:pre.program-display {:ref #(swap! dom-nodes assoc :program-display %)}
+         [:code {:class "js"}
+          js-code]])})))
+
+
 (defn xcat-category [view cat-name]
   (let [stat-types (medley/map-vals :stattype (:columns view))
         params (reduce-kv
@@ -173,7 +227,7 @@
                 (:columns view))]
     [:div
      [:h3 cat-name]
-     [:pre (with-out-str (pprint params))]]))
+     [js-code-block (js-fn-text stat-types params)]]))
 
 (defn scale [weights]
   (let [weights (map second weights)
@@ -192,13 +246,14 @@
 
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
+        columns (map name columns)
         weights (->> (view/category-weights view constraints)
                      (medley/map-vals Math/exp)
                      (sort-by first))
         scale (scale weights)]
-    [:div {:style {:width "800px"}}
+    [:div {:style {:width "750px"}}
       [:h2 view-id]
-      [:h4 (pr-str columns)]
+      [:h4 "columns: " (string/join ", " columns)]
       [:div.cats
         (for [[cat-name weight] weights]
           [:div.cat-group {:style {:border-color (scale weight)}}

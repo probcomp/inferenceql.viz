@@ -1,0 +1,12 @@
+function () {
+    return {
+        {{#columns}}
+        {{#gaussian}}
+        "{{col-name}}": sample_gaussian({ "mu": {{mu}}, "sigma": {{sigma}} }){{^last}},{{/last}}
+        {{/gaussian}}
+        {{#categorical}}
+        "{{col-name}}": sample_categorical({ {{{cats-string}}} }){{^last}},{{/last}}
+        {{/categorical}}
+        {{/columns}}
+    };
+}

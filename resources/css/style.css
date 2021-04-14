@@ -281,15 +281,13 @@ psuedo-class applied. */
 
 /* --------------- styling for js-model code view --------------- */
 
-#program-display {
-  height: 700px;
-  width: 940px;
+.program-display {
   padding: 5px;
   font-size: .875rem;
   background-color: #f8f8f8;
 }
 
-#program-display code {
+.program-display code {
   background-color: #f8f8f8;
   border: none;
   padding: 0px;
