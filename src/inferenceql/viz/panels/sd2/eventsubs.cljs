@@ -16,3 +16,14 @@
 (rf/reg-sub :sd2/cluster-open
             cluster-open)
 
+;; add event :sd2/highlight-cluster-weight
+;; add sub :sd2/cluster-weight-highlighted
+
+;; add event :sd2/set-cluster-output
+;; add sub :sd2/cluster-output
+
+;; add event :sd2/set-model-output
+;; add sub :sd2/model-ouput
+
+;; add event :sd2/reset
+;; clears all open displays and highlights
