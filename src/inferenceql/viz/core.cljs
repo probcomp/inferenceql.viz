@@ -33,6 +33,8 @@
             [inferenceql.viz.panels.upload.effects]
             ;; JSmodel Panel
             [inferenceql.viz.panels.jsmodel.subs]
+            ;; SD2 Panel
+            [inferenceql.viz.panels.sd2.eventsubs]
             ;; Query Component
             [inferenceql.viz.components.query.events]
             [inferenceql.viz.components.query.subs]
@@ -44,6 +46,7 @@
             [inferenceql.viz.components.store.subs]
             ;; Library functions for user-defined JS functions.
             [inferenceql.viz.user]))
+
 
 (enable-console-print!)
 (set! *warn-on-infer* true)

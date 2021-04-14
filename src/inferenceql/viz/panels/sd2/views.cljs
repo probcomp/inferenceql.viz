@@ -65,8 +65,8 @@
           js-code]])})))
 
 
-(defn xcat-category [view cat-name hidden]
-  (let [hidden (r/atom true)
+(defn xcat-category [view view-id cat-id]
+  (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
         stat-types (medley/map-vals :stattype (:columns view))
         params (reduce-kv
                 (fn [acc col-name col-gpm]
@@ -74,15 +74,16 @@
                         ;; that there is no associated data with that column in the rows within
                         ;; that category. Because the types are collapsed, we can generate
                         ;; a new (empty) category for that column.
-                        col-cat (get-in col-gpm [:categories cat-name] (column/generate-category col-gpm))
+                        col-cat (get-in col-gpm [:categories cat-id] (column/generate-category col-gpm))
                         exported-cat (pgpms/export-category (get stat-types col-name) col-cat)]
                     (merge acc exported-cat)))
                 {}
                 (:columns view))]
     (fn []
-      (let [display (if @hidden "none" "block")
-            more-icon-path (if @hidden "resources/icons/expand_more_black_48dp.svg"
-                                       "resources/icons/expand_less_black_48dp.svg")]
+      (let [display (if @open "block" "none")
+            more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
+                                     "resources/icons/expand_more_black_48dp.svg")]
+
         [:div
          [v-box
           :gap "5px"
@@ -91,14 +92,13 @@
                       :children [[:button.toolbar-button.pure-button.more-button
                                   {:class (when false "pure-button-active pure-button-hover")
                                    :on-click (fn [e]
-                                               ;; set atom
-                                               (swap! hidden not)
+                                               (rf/dispatch [:sd2/toggle-cluster view-id cat-id])
                                                (.blur (.-target e)))}
                                   [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
                                    "expand content"]]
                                  [:div {:style {:font-size "24px" :font-weight "500"
                                                 :line-height "1.1" :color "inherit"}}
-                                  cat-name]]]
+                                  cat-id]]]
 
                      [:div {:style {:display display
                                     :margin-left "40px"}}
@@ -130,12 +130,12 @@
       [:h2 view-id]
       [:h4 "columns: " (string/join ", " columns)]
       [:div.cats
-        (for [[cat-name weight] weights]
+        (for [[cat-id weight] weights]
           [:div.cat-group {:style {:border-color (scale weight)}}
-            [:div.cat-name (str (name cat-name) ":")]
+            [:div.cat-name (str (name cat-id) ":")]
             [:div.cat-weight (format "%.3f" weight)]])]
-      (for [[cat-name _] weights]
-        [xcat-category view cat-name true])]))
+      (for [[cat-id _] weights]
+        [xcat-category view view-id cat-id])]))
 
 (defn view [model constraints]
   [:div
