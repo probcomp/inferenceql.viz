@@ -62,6 +62,10 @@
   [db]
   (get-in db [:query-component :query]))
 
+(defn model-name
+  [db]
+  (get-in db [:query-component :model-name]))
+
 (defn schema-base
   [db]
   (get-in db [:query-component :schema-base]))

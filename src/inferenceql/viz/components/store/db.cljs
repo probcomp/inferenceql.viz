@@ -108,3 +108,7 @@
 (defn datasets
   [db]
   (get-in db [:store-component :datasets]))
+
+(defn models
+  [db]
+  (get-in db [:store-component :models]))
