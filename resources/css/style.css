@@ -318,6 +318,17 @@ psuedo-class applied. */
   border-bottom-style: solid;
 }
 
+.cat-group-container {
+  display: inline-block;
+}
+
+.cat-group-highlighted {
+  border: 6px;
+  border-color: crimson;
+  border-style: solid;
+  border-radius: 4px;
+}
+
 .cat-name {
   display: inline-block;
   background-color: lightgrey;

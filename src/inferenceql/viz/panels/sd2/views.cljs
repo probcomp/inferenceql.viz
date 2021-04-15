@@ -67,6 +67,7 @@
 
 (defn xcat-category [view view-id cat-id]
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
+        cluster-output (rf/subscribe [:sd2/cluster-output view-id cat-id])
         stat-types (medley/map-vals :stattype (:columns view))
         params (reduce-kv
                 (fn [acc col-name col-gpm]
@@ -100,9 +101,16 @@
                                                 :line-height "1.1" :color "inherit"}}
                                   cat-id]]]
 
+
                      [:div {:style {:display display
                                     :margin-left "40px"}}
-                       [js-code-block (js-fn-text stat-types params)]]]]]))))
+                      [js-code-block (js-fn-text stat-types params)]]
+                     (when @cluster-output
+                       [:div {:style {:display display
+                                      :margin-left "40px"}}
+                        [:pre.cat-group-highlighted @cluster-output]])]]]))))
+
+
 
 (defn scale [weights]
   (let [weights (map second weights)
@@ -118,6 +126,13 @@
     (fn [weight]
       (scheme (scale-fn weight)))))
 
+(defn cat-weight [view-id cat-id scale weight]
+  (let [highlighted (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
+    (fn []
+      [:div {:class ["cat-group-container" (when true "cat-group-highlighted")]}
+        [:div.cat-group {:style {:border-color (scale weight)}}
+         [:div.cat-name (str (name cat-id) ":")]
+         [:div.cat-weight (format "%.3f" weight)]]])))
 
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
@@ -131,14 +146,21 @@
       [:h4 "columns: " (string/join ", " columns)]
       [:div.cats
         (for [[cat-id weight] weights]
-          [:div.cat-group {:style {:border-color (scale weight)}}
-            [:div.cat-name (str (name cat-id) ":")]
-            [:div.cat-weight (format "%.3f" weight)]])]
+          [cat-weight view-id cat-id scale weight])]
       (for [[cat-id _] weights]
         [xcat-category view view-id cat-id])]))
+
+(defn model-output []
+  (let [output (rf/subscribe [:sd2/model-output])]
+    (fn []
+      (when @output
+        [:div
+         [:h1 "model output"]
+         [:pre.cat-group-highlighted @output]]))))
 
 (defn view [model constraints]
   [:div
     [:h1 "xcat-model"]
     (for [[view-id view] (:views model)]
-      [xcat-view view-id view constraints])])
+      [xcat-view view-id view constraints])
+    [model-output]])
