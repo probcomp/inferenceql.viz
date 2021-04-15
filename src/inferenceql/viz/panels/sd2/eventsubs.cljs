@@ -59,7 +59,7 @@
 
 (defn model-output
   [db [_]]
-  (get-in db [:sd2-panel :model-output] "{:foo 3 :bar 9}"))
+  (get-in db [:sd2-panel :model-output]))
 (rf/reg-sub :sd2/model-output
             model-output)
 

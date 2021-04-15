@@ -127,9 +127,9 @@
       (scheme (scale-fn weight)))))
 
 (defn cat-weight [view-id cat-id scale weight]
-  (let [highlighted (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
+  (let [hl (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
     (fn []
-      [:div {:class ["cat-group-container" (when true "cat-group-highlighted")]}
+      [:div {:class ["cat-group-container" (when @hl "cat-group-highlighted")]}
         [:div.cat-group {:style {:border-color (scale weight)}}
          [:div.cat-name (str (name cat-id) ":")]
          [:div.cat-weight (format "%.3f" weight)]]])))
@@ -160,7 +160,7 @@
 
 (defn view [model constraints]
   [:div
-    [:h1 "xcat-model"]
+    [:h1 "model"]
     (for [[view-id view] (:views model)]
       [xcat-view view-id view constraints])
     [model-output]])
