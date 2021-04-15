@@ -149,6 +149,9 @@
       ;; TODO: Check datasets, schemas, and geodata against spec before storing.
       {:fx [[:dispatch [:store/datasets datasets]]
             [:dispatch [:store/models models]]
+            [:js/console-warn "Successfully read the following datasets and models."]
+            [:js/console-warn (clj->js datasets)]
+            [:js/console-warn (clj->js models)]
             (when (seq geodata) [:dispatch [:store/geodata geodata]])]})
     (catch js/Error e
       {:fx [[:dispatch [:upload/read-failed (str "Error processing reads.\n" (.-stack e))]]]})))
