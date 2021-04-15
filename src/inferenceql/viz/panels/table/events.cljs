@@ -118,8 +118,8 @@
                         ;; Using .lastIndexOf to search for #{row-id} from the back of vector. This
                         ;; will improve performance in most instances-when the table is not sorted.
                         (let [idx (.lastIndexOf row-ids row-id)]
-                          (vec (concat (subvec row-ids 0 idx)
-                                       (subvec row-ids (inc idx))))))
+                          (into (subvec row-ids 0 idx)
+                                (subvec row-ids (inc idx)))))
 
         new-db (-> db
                    (update-in [:table-panel :rows-by-id] dissoc row-id)
