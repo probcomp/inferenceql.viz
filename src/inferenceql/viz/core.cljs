@@ -18,6 +18,7 @@
             [inferenceql.viz.panels.table.events]
             [inferenceql.viz.panels.table.subs]
             [inferenceql.viz.panels.table.handsontable-events]
+            [inferenceql.viz.panels.table.handsontable-effects]
             ;; More Panel
             [inferenceql.viz.panels.more.events]
             [inferenceql.viz.panels.more.subs]
@@ -63,12 +64,13 @@
   []
   ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
   ;; not reset the state of the app.
-  (rf/dispatch-sync [:initialize-db])
+  (rf/dispatch-sync [:app/initialize-db])
 
   (let [params (query-string-params)]
     (rf/dispatch-sync [:upload/read-query-string-params params])
     ;; Set the query string only when it is included in params.
-    (when (:query params)
-      (rf/dispatch-sync [:control/set-query-string (:query params)])))
+    (if (:query params)
+      (rf/dispatch-sync [:control/set-query-string (:query params)])
+      (rf/dispatch-sync [:control/set-query-string-to-select-all])))
 
   (render-app))
