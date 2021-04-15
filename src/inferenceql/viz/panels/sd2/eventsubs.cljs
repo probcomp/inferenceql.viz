@@ -12,6 +12,13 @@
                  event-interceptors
                  toggle-cluster)
 
+(defn set-cluster-open
+  [db [_ view-id cluster-id new-val]]
+  (assoc-in db [:sd2-panel :display view-id cluster-id] new-val))
+(rf/reg-event-db :sd2/set-cluster-open
+                 event-interceptors
+                 set-cluster-open)
+
 (defn cluster-open
   [db [_ view-id cluster-id]]
   (get-in db [:sd2-panel :display view-id cluster-id]))
@@ -65,3 +72,34 @@
 
 ;; add event :sd2/reset
 ;; clears all open displays and highlights
+
+(defn stage-animation
+  [db [_ events]]
+  (-> db
+      (assoc-in [:sd2-panel :animation :events] events)
+      (assoc-in [:sd2-panel :animation :running] false)))
+(rf/reg-event-db :sd2/stage-animation
+                 event-interceptors
+                 stage-animation)
+
+(defn start-animation
+  [{:keys [db]} [_]]
+  (when (seq (get-in db [:sd2-panel :animation :events]))
+    {:db (assoc-in db [:sd2-panel :animation :running] true)
+     :fx [[:dispatch [:sd2/continue-animation]]]}))
+(rf/reg-event-fx :sd2/start-animation
+                 event-interceptors
+                 start-animation)
+
+(defn continue-animation
+  [{:keys [db]} [_]]
+  (let [events (get-in db [:sd2-panel :animation :events])]
+    (if (seq events)
+      {:db (update-in db [:sd2-panel :animation :events] rest)
+       :fx [[:dispatch (first events)]
+            [:dispatch-later [{:ms 500 :dispatch [:sd2/continue-animation]}]]]}
+      {:db (assoc-in db [:sd2-panel :animation :running] false)})))
+(rf/reg-event-fx :sd2/continue-animation
+                 event-interceptors
+                 continue-animation)
+

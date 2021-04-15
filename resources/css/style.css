@@ -323,7 +323,7 @@ psuedo-class applied. */
 }
 
 .cat-group-highlighted {
-  border: 6px;
+  border: 2px;
   border-color: crimson;
   border-style: solid;
   border-radius: 4px;
