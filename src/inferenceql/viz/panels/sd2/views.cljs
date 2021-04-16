@@ -187,7 +187,7 @@
                          :gap "15px"
                          :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
                                     [:h4 {:style {:display "inline" :margin-top "9px" :margin-bottom "0px"}}
-                                     "(models: " (string/join ", " columns) ")"]]]
+                                     "(" (string/join ", " columns) ")"]]]
                         [:div {:style {:margin-left "20px"}}
                          [v-box :children [[gap :size "20px"]
                                            [cats view-id weights]
