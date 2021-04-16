@@ -157,14 +157,21 @@
                      (medley/map-vals Math/exp)
                      (sort-by first))
         scale (scale weights)]
-    [:div {:style {:width "750px"}}
-      [:h2 view-id]
-      [:h4 "columns: " (string/join ", " columns)]
-      [:div.cats
-        (for [[cat-id weight] weights]
-          [cat-weight view-id cat-id scale weight])]
-      (for [[cat-id _] weights]
-        [xcat-category view view-id cat-id])]))
+    [:div {:style {:width "750px" :margin-left "20px"}}
+      [h-box
+       :gap "25px"
+       :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
+                  [:h4 {:style {:display "inline" :margin-top "8px"}}
+                   "(models: " (string/join ", " columns) ")"]]]
+      [:div {:style {:margin-left "20px"}}
+       [:div.cats
+         [:h4 "sample a category"]
+         [:div {:style {:margin-left "-10px"}}
+           (for [[cat-id weight] weights]
+             [cat-weight view-id cat-id scale weight])]]
+       [:div {:style {:margin-left "-15px"}}
+         (for [[cat-id _] weights]
+           [xcat-category view view-id cat-id])]]]))
 
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
@@ -180,7 +187,7 @@
            [:pre.cat-group-highlighted @output]]))})))
 
 (defn view [model constraints]
-  [:div
+  [:div {:style {:margin-left "20px"}}
     [:h1 "model"]
     (for [[view-id view] (:views model)]
       [xcat-view view-id view constraints])
