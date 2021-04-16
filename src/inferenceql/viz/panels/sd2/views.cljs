@@ -142,23 +142,34 @@
 (defn cat-weight [view-id cat-id scale weight]
   (let [hl (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
     (r/create-class
-     {:component-did-update
-      scroll-into-view
-
-      :reagent-render
+     {:reagent-render
       (fn [view-id cat-id scale weight]
         [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]}
           [:div.cat-group {:style {:border-color (scale weight)}}
            [:div.cat-name (str (name cat-id) ":")]
            [:div.cat-weight (format "%.3f" weight)]]])})))
 
+(defn cats [view-id weights]
+  (let [balh nil ;; add subs to view cluster sampleing
+        scale (scale weights)]
+    (r/create-class
+     {:component-did-update
+      scroll-into-view
+
+      :reagent-render
+      (fn [view-id weights]
+        [:div.cats
+         [:h4 {:style {:margin "0px" :margin-bottom "5px"}} "sample a cluster to use"]
+         [:div {:style {:margin-left "-10px"}}
+          (for [[cat-id weight] weights]
+            [cat-weight view-id cat-id scale weight])]])})))
+
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
         columns (map name columns)
         weights (->> (view/category-weights view constraints)
                      (medley/map-vals Math/exp)
-                     (sort-by first))
-        scale (scale weights)]
+                     (sort-by first))]
     [:div {:style {:width "750px" :margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
@@ -167,11 +178,7 @@
                                      "(models: " (string/join ", " columns) ")"]]]
                         [:div {:style {:margin-left "20px"}}
                          [v-box :children [[gap :size "20px"]
-                                           [:div.cats
-                                             [:h4 {:style {:margin "0px" :margin-bottom "5px"}} "sample a cluster to use"]
-                                             [:div {:style {:margin-left "-10px"}}
-                                               (for [[cat-id weight] weights]
-                                                 [cat-weight view-id cat-id scale weight])]]
+                                           [cats view-id weights]
                                            [gap :size "20px"]
                                            [:div {:style {:margin-left "-15px"}}
                                              (for [[cat-id _] weights]
