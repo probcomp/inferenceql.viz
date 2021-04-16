@@ -120,8 +120,10 @@
                                                 :line-height "1.1" :color "inherit"}}
                                   cat-id]]]
                      [:div {:style {:display display :margin-left "40px"}}
-                      [js-code-block (js-fn-text stat-types params) display]
-                      [cluster-output view-id cat-id]]]]]))))
+                      [v-box :children [[gap :size "15px"]
+                                        [js-code-block (js-fn-text stat-types params) display]
+                                        [cluster-output view-id cat-id]
+                                        [gap :size "15px"]]]]]]]))))
 
 (defn scale [weights]
   (let [weights (map second weights)
@@ -158,20 +160,23 @@
                      (sort-by first))
         scale (scale weights)]
     [:div {:style {:width "750px" :margin-left "20px"}}
-      [h-box
-       :gap "25px"
-       :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
-                  [:h4 {:style {:display "inline" :margin-top "8px"}}
-                   "(models: " (string/join ", " columns) ")"]]]
-      [:div {:style {:margin-left "20px"}}
-       [:div.cats
-         [:h4 "sample a category"]
-         [:div {:style {:margin-left "-10px"}}
-           (for [[cat-id weight] weights]
-             [cat-weight view-id cat-id scale weight])]]
-       [:div {:style {:margin-left "-15px"}}
-         (for [[cat-id _] weights]
-           [xcat-category view view-id cat-id])]]]))
+      [v-box :children [[h-box
+                         :gap "15px"
+                         :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
+                                    [:h4 {:style {:display "inline" :margin-top "9px" :margin-bottom "0px"}}
+                                     "(models: " (string/join ", " columns) ")"]]]
+                        [:div {:style {:margin-left "20px"}}
+                         [v-box :children [[gap :size "20px"]
+                                           [:div.cats
+                                             [:h4 {:style {:margin "0px"}} "sample a category"]
+                                             [:div {:style {:margin-left "-10px"}}
+                                               (for [[cat-id weight] weights]
+                                                 [cat-weight view-id cat-id scale weight])]]
+                                           [gap :size "20px"]
+                                           [:div {:style {:margin-left "-15px"}}
+                                             (for [[cat-id _] weights]
+                                               [xcat-category view view-id cat-id])]
+                                           [gap :size "20px"]]]]]]]))
 
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
@@ -182,16 +187,16 @@
       :reagent-render
       (fn []
         (when @output
-          [:div
+          [:div {:style {:width "770px"}}
            [:h1 "model output"]
            [:pre.cat-group-highlighted @output]]))})))
 
 (defn view [model constraints]
   [:div {:style {:margin-left "20px"}}
-    [:h1 "model"]
-    (for [[view-id view] (:views model)]
-      [xcat-view view-id view constraints])
-    [model-output]])
+   [v-box :children [[:h1 "model"]
+                     (for [[view-id view] (:views model)]
+                       [xcat-view view-id view constraints])
+                     [model-output]]]])
 
 ;; TODO: remember to pass in all the component args into render function in
 ;; type 2 and 3 components.
