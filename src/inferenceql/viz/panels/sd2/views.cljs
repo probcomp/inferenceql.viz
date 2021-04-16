@@ -213,7 +213,10 @@
   [:div {:style {:margin-left "20px"}}
    [v-box :children [[:h1 "model"]
                      (for [[view-id view] (:views model)]
-                       [xcat-view view-id view constraints])
+                       [:<>
+                        [gap :size "30px"]
+                        [xcat-view view-id view constraints]])
+                     [gap :size "40px"]
                      [model-output]]]])
 
 ;; TODO: remember to pass in all the component args into render function in
