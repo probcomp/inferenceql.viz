@@ -14,5 +14,8 @@
                  :provides ["yarn.vega-embed"]}
                 {:file "node_modules/handsontable/dist/handsontable.full.js"
                  :file-min "node_modules/handsontable/dist/handsontable.min.js"
-                 :provides ["yarn.handsontable"]}]
+                 :provides ["yarn.handsontable"]}
+                {:file "node_modules/scroll-into-view-if-needed/umd/scroll-into-view-if-needed.js"
+                 :file-min "node_modules/scroll-into-view-if-needed/umd/scroll-into-view-if-needed.min.js"
+                 :provides ["yarn.scroll-into-view"]}]
  :optimizations :none}

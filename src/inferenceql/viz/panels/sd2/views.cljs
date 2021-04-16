@@ -1,5 +1,6 @@
 (ns inferenceql.viz.panels.sd2.views
   (:require [reagent.core :as r]
+            [reagent.dom :as rdom]
             [inferenceql.inference.gpm.view :as view]
             [inferenceql.inference.gpm.column :as column]
             [inferenceql.inference.gpm.primitive-gpms :as pgpms]
@@ -15,7 +16,14 @@
             [cljsjs.highlight]
             [cljsjs.highlight.langs.javascript]
             [cljstache.core :refer [render]]
-            [inferenceql.viz.config :refer [config]]))
+            [inferenceql.viz.config :refer [config]]
+            [yarn.scroll-into-view]))
+
+(defn scroll-into-view
+  [this _old-argv]
+  (.scrollIntoView js/window
+                   (rdom/dom-node this)
+                   (clj->js {:scrollMode "if-needed" :behavior "smooth" :block "center" :inline "start"})))
 
 (defn cats-string [col-params]
   (let [kv-strings (for [[cat-val cat-weight] col-params]
@@ -49,10 +57,13 @@
          (string/join "\n"))))
 
 (defn js-code-block
-  [js-code]
+  [js-code display]
   (let [dom-nodes (r/atom {})]
     (r/create-class
      {:display-name "js-model-code"
+
+      :component-did-update
+      scroll-into-view
 
       :component-did-mount
       (fn [this]
@@ -64,10 +75,19 @@
          [:code {:class "js"}
           js-code]])})))
 
+(defn cluster-output [view-id cat-id]
+  (let [output (rf/subscribe [:sd2/cluster-output view-id cat-id])]
+    (r/create-class
+     {:component-did-update
+      scroll-into-view
+
+      :reagent-render
+      (fn [view-id cat-id]
+        (when @output
+          [:pre.cat-group-highlighted @output]))})))
 
 (defn xcat-category [view view-id cat-id]
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
-        cluster-output (rf/subscribe [:sd2/cluster-output view-id cat-id])
         stat-types (medley/map-vals :stattype (:columns view))
         params (reduce-kv
                 (fn [acc col-name col-gpm]
@@ -84,7 +104,6 @@
       (let [display (if @open "block" "none")
             more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
                                      "resources/icons/expand_more_black_48dp.svg")]
-
         [:div
          [v-box
           :gap "5px"
@@ -100,17 +119,9 @@
                                  [:div {:style {:font-size "24px" :font-weight "500"
                                                 :line-height "1.1" :color "inherit"}}
                                   cat-id]]]
-
-
-                     [:div {:style {:display display
-                                    :margin-left "40px"}}
-                      [js-code-block (js-fn-text stat-types params)]]
-                     (when @cluster-output
-                       [:div {:style {:display display
-                                      :margin-left "40px"}}
-                        [:pre.cat-group-highlighted @cluster-output]])]]]))))
-
-
+                     [:div {:style {:display display :margin-left "40px"}}
+                      [js-code-block (js-fn-text stat-types params) display]
+                      [cluster-output view-id cat-id]]]]]))))
 
 (defn scale [weights]
   (let [weights (map second weights)
@@ -128,11 +139,16 @@
 
 (defn cat-weight [view-id cat-id scale weight]
   (let [hl (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
-    (fn []
-      [:div {:class ["cat-group-container" (when @hl "cat-group-highlighted")]}
-        [:div.cat-group {:style {:border-color (scale weight)}}
-         [:div.cat-name (str (name cat-id) ":")]
-         [:div.cat-weight (format "%.3f" weight)]]])))
+    (r/create-class
+     {:component-did-update
+      scroll-into-view
+
+      :reagent-render
+      (fn [view-id cat-id scale weight]
+        [:div {:class ["cat-group-container" (when @hl "cat-group-highlighted")]}
+          [:div.cat-group {:style {:border-color (scale weight)}}
+           [:div.cat-name (str (name cat-id) ":")]
+           [:div.cat-weight (format "%.3f" weight)]]])})))
 
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
@@ -152,11 +168,16 @@
 
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
-    (fn []
-      (when @output
-        [:div
-         [:h1 "model output"]
-         [:pre.cat-group-highlighted @output]]))))
+    (r/create-class
+     {:component-did-update
+      scroll-into-view
+
+      :reagent-render
+      (fn []
+        (when @output
+          [:div
+           [:h1 "model output"]
+           [:pre.cat-group-highlighted @output]]))})))
 
 (defn view [model constraints]
   [:div
@@ -164,3 +185,6 @@
     (for [[view-id view] (:views model)]
       [xcat-view view-id view constraints])
     [model-output]])
+
+;; TODO: remember to pass in all the component args into render function in
+;; type 2 and 3 components.

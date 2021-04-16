@@ -97,7 +97,7 @@
     (if (seq events)
       {:db (update-in db [:sd2-panel :animation :events] rest)
        :fx [[:dispatch (first events)]
-            [:dispatch-later [{:ms 500 :dispatch [:sd2/continue-animation]}]]]}
+            [:dispatch-later [{:ms 1000 :dispatch [:sd2/continue-animation]}]]]}
       {:db (assoc-in db [:sd2-panel :animation :running] false)})))
 (rf/reg-event-fx :sd2/continue-animation
                  event-interceptors
