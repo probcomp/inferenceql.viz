@@ -147,7 +147,7 @@
 
       :reagent-render
       (fn [view-id cat-id scale weight]
-        [:div {:class ["cat-group-container" (when @hl "cat-group-highlighted")]}
+        [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]}
           [:div.cat-group {:style {:border-color (scale weight)}}
            [:div.cat-name (str (name cat-id) ":")]
            [:div.cat-weight (format "%.3f" weight)]]])})))
@@ -168,7 +168,7 @@
                         [:div {:style {:margin-left "20px"}}
                          [v-box :children [[gap :size "20px"]
                                            [:div.cats
-                                             [:h4 {:style {:margin "0px"}} "sample a category"]
+                                             [:h4 {:style {:margin "0px" :margin-bottom "5px"}} "sample a cluster to use"]
                                              [:div {:style {:margin-left "-10px"}}
                                                (for [[cat-id weight] weights]
                                                  [cat-weight view-id cat-id scale weight])]]
