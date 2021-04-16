@@ -100,30 +100,32 @@
                     (merge acc exported-cat)))
                 {}
                 (:columns view))]
-    (fn []
-      (let [display (if @open "block" "none")
-            more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
-                                     "resources/icons/expand_more_black_48dp.svg")]
-        [:div
-         [v-box
-          :gap "5px"
-          :children [[h-box
-                      :gap "5px"
-                      :children [[:button.toolbar-button.pure-button.more-button
-                                  {:class (when false "pure-button-active pure-button-hover")
-                                   :on-click (fn [e]
-                                               (rf/dispatch [:sd2/toggle-cluster view-id cat-id])
-                                               (.blur (.-target e)))}
-                                  [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
-                                   "expand content"]]
-                                 [:div {:style {:font-size "24px" :font-weight "500"
-                                                :line-height "1.1" :color "inherit"}}
-                                  cat-id]]]
-                     [:div {:style {:display display :margin-left "40px"}}
-                      [v-box :children [[gap :size "15px"]
-                                        [js-code-block (js-fn-text stat-types params) display]
-                                        [cluster-output view-id cat-id]
-                                        [gap :size "15px"]]]]]]]))))
+    (r/create-class
+     {:reagent-render
+      (fn []
+        (let [display (if @open "block" "none")
+              more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
+                                       "resources/icons/expand_more_black_48dp.svg")]
+          [:div
+           [v-box
+            :gap "5px"
+            :children [[h-box
+                        :gap "5px"
+                        :children [[:button.toolbar-button.pure-button.more-button
+                                    {:class (when false "pure-button-active pure-button-hover")
+                                     :on-click (fn [e]
+                                                 (rf/dispatch [:sd2/toggle-cluster view-id cat-id])
+                                                 (.blur (.-target e)))}
+                                    [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
+                                     "expand content"]]
+                                   [:div {:style {:font-size "24px" :font-weight "500"
+                                                  :line-height "1.1" :color "inherit"}}
+                                    cat-id]]]
+                       [:div {:style {:display display :margin-left "40px"}}
+                        [v-box :children [[gap :size "15px"]
+                                          [js-code-block (js-fn-text stat-types params) display]
+                                          [cluster-output view-id cat-id]
+                                          [gap :size "15px"]]]]]]]))})))
 
 (defn scale [weights]
   (let [weights (map second weights)
@@ -149,20 +151,29 @@
            [:div.cat-name (str (name cat-id) ":")]
            [:div.cat-weight (format "%.3f" weight)]]])})))
 
-(defn cats [view-id weights]
-  (let [balh nil ;; add subs to view cluster sampleing
-        scale (scale weights)]
+(defn cat-output [view-id]
+  (let [output (rf/subscribe [:sd2/view-cat-selection view-id])]
     (r/create-class
      {:component-did-update
       scroll-into-view
 
       :reagent-render
+      (fn [view-id]
+        (when @output
+          [:pre.cat-group-highlighted @output]))})))
+
+(defn cats [view-id weights]
+  (let [ scale (scale weights)]
+    (r/create-class
+     {:reagent-render
       (fn [view-id weights]
-        [:div.cats
-         [:h4 {:style {:margin "0px" :margin-bottom "5px"}} "sample a cluster to use"]
-         [:div {:style {:margin-left "-10px"}}
-          (for [[cat-id weight] weights]
-            [cat-weight view-id cat-id scale weight])]])})))
+        [:div {:id (name view-id)}
+         [:div.cats
+          [:h4 {:style {:margin "0px" :margin-bottom "5px"}} "sample a cluster to use"]
+          [:div {:style {:margin-left "-10px"}}
+           (for [[cat-id weight] weights]
+             [cat-weight view-id cat-id scale weight])]]
+         [cat-output view-id]])})))
 
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)

@@ -40,6 +40,21 @@
 (rf/reg-sub :sd2/cluster-weight-highlighted
             cluster-weight-highlighted)
 
+;; View's category selection.
+
+(defn set-view-cat-selection
+  [db [_ view-id new-val]]
+  (assoc-in db [:sd2-panel :view-cat-selection view-id] new-val))
+(rf/reg-event-db :sd2/set-view-cat-selection
+                 event-interceptors
+                 set-view-cat-selection)
+
+(defn view-cat-selection
+  [db [_ view-id]]
+  (get-in db [:sd2-panel :view-cat-selection view-id]))
+(rf/reg-sub :sd2/view-cat-selection
+            view-cat-selection)
+
 ;; Output of a clusters.
 
 (defn set-cluster-output
@@ -103,3 +118,20 @@
                  event-interceptors
                  continue-animation)
 
+;; Scrolling
+
+(defn scroll
+  [{:keys [db]} [_ div-id options]]
+  {:fx [[:scroll [div-id options]]]})
+(rf/reg-event-fx :sd2/scroll
+                 event-interceptors
+                 scroll)
+
+(defn scroll-fx
+  [[div-id options]]
+  (let [dom-elem (.getElementById js/document div-id)]
+    (.scrollIntoView js/window dom-elem
+                     (clj->js {:scrollMode "if-needed" :behavior "smooth" :block "center" :inline "start"}))))
+
+(rf/reg-fx :scroll
+           scroll-fx)

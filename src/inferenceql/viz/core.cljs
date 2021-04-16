@@ -72,10 +72,12 @@
   (rf/dispatch-sync [:control/set-query-string-to-select-all])
 
 
-  (rf/dispatch-sync [:sd2/stage-animation [[:sd2/highlight-cluster-weight :view_0 :cluster_0]
+  (rf/dispatch-sync [:sd2/stage-animation [[:sd2/scroll "view_0" {:foo 3}]
+                                           [:sd2/set-view-cat-selection :view_0 "cluster_0"]
                                            [:sd2/set-cluster-open :view_0 :cluster_0 true]
                                            [:sd2/set-cluster-output :view_0 :cluster_0 "{:age 22}"]
-                                           [:sd2/highlight-cluster-weight :view_1 :cluster_0]
+                                           [:sd2/scroll "view_1" {}]
+                                           [:sd2/set-view-cat-selection :view_1 "cluster_0"]
                                            [:sd2/set-cluster-open :view_1 :cluster_0 true]
                                            [:sd2/set-cluster-output :view_1 :cluster_0 "{:gender \"female\" :height 99}"]
                                            [:sd2/set-model-output "{:age 22 .....}"]]])
