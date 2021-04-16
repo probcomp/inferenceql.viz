@@ -169,7 +169,8 @@
       (fn [view-id weights]
         [:div {:id (name view-id)}
          [:div.cats
-          [:h4 {:style {:margin "0px" :margin-bottom "5px"}} "sample a cluster to use"]
+          [:h4 {:style {:margin "0px" :margin-bottom "5px" :font-size "14px"}}
+           "sample a cluster to use"]
           [:div {:style {:margin-left "-10px"}}
            (for [[cat-id weight] weights]
              [cat-weight view-id cat-id scale weight])]]
