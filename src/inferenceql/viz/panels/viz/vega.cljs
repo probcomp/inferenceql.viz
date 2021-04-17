@@ -91,7 +91,7 @@
     false))
 
 (defn simulatable?
-  "Checks if `selections` and `selected-cols` are valid for simulation"
+  "Checks if `selections` and `selected-cols` are valid for sim"
   [selections selected-cols simulatable-cols]
   (and (= 1 (count selections)) ; Single row selected.
        (= 1 (count selected-cols)) ; Single column selected.
@@ -101,7 +101,7 @@
   "Generates a vega-lite spec for a histogram of simulated values for a cell.
   `col-name` is the column that the cell is in. And `row` is map of
   data representing the row our cell is in.
-  This spec itself does not perform the simulation. An other function must update
+  This spec itself does not perform the sim. An other function must update
   the `data` dataset via the vega-lite API."
   [col-name row dataset-name vega-type]
   (let [col-kw (keyword col-name)

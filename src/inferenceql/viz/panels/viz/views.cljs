@@ -61,7 +61,7 @@
                     (doto (js/vegaEmbed (:vega-node @dom-nodes)
                                         spec
                                         opt)
-                      ;; Start generators for inserting data in simulation plots.
+                      ;; Start generators for inserting data in sim plots.
                       (.then (fn [res]
                                (when generators
                                  (let [current-run (swap! run inc)]

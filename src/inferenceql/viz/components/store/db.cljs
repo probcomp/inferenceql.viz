@@ -61,7 +61,7 @@
 (s/def ::schema (s/map-of ::column-name ::stat-type))
 (s/def ::stat-type #{:gaussian :categorical})
 (s/def ::model-name keyword?)
-;; This is the model used to generate samples for simulation plots when a
+;; This is the model used to generate samples for sim plots when a
 ;; single cell is selected in the table.
 (s/def ::default-model ::model-name)
 ;; This is the name of the column in the dataset that is joined against entity

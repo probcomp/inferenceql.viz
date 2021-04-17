@@ -211,7 +211,7 @@
            [:pre.cat-group-highlighted @output]]))})))
 
 (defn view [model constraints]
-  [:div {:style {:margin-left "20px"}}
+  [:div
    [v-box :children [[:h1 "model"]
                      (for [[view-id view] (:views model)]
                        [:<>
