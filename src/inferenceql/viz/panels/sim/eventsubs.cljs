@@ -4,13 +4,24 @@
             [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]))
 
-(defn animation-steps [model row]
-  ;; todo using model create a map of view to columns
-  (let [view-names (-> model :views keys sort)
+(defn anim-steps-for-view [view-id cluster-id row]
+  ;; todo: make this take a keyword
+  [[:sd2/scroll (name view-id) {}]
+   [:sd2/set-view-cat-selection view-id (name cluster-id)]
+   [:sd2/set-cluster-open view-id cluster-id true]
+   [:sd2/set-cluster-output view-id cluster-id (str row)]])
+
+(defn animation-steps [model row cols]
+  (let [view-ids (-> model :views keys sort)
         view-cols (medley/map-vals (fn [view] (-> view :columns keys))
-                                   (:views model))]
-    [[:sd2/scroll (name (first view-names))]
-     [:sd2/scroll (name (second view-names))]]))
+                                   (:views model))
+        steps-per-view (for [view-id view-ids]
+                         (let [cluster-id (get row view-id)
+                               row (select-keys row (get view-cols view-id))]
+                           (anim-steps-for-view view-id cluster-id row)))
+        steps-per-view (conj (vec steps-per-view)
+                             [[:sd2/set-model-output (str (select-keys row cols))]])]
+    (apply concat steps-per-view)))
 
 
 
@@ -23,8 +34,7 @@
                                           [:sd2/set-view-cat-selection :view_1 "cluster_0"]
                                           [:sd2/set-cluster-open :view_1 :cluster_0 true]
                                           [:sd2/set-cluster-output :view_1 :cluster_0 "{:gender \"female\" :height 99}"]
-                                          [:sd2/set-model-output "{:age 22 .....}"]]])
- (rf/dispatch-sync [:sd2/start-animation]))
+                                          [:sd2/set-model-output "{:age 22 .....}"]]]))
 
 
 (defn one
@@ -34,9 +44,10 @@
         ;; todo: I should be able to do this if I update iql.inference.
         ;;cols (gpm/variables model)
         row (gpm/simulate model cols {})
-        steps (animation-steps model row)]
+        steps (animation-steps model row cols)]
     {:db (update-in db [:sim-panel :simulations] (fnil conj []) row)
-     :fx [[:dispatch [:sd2/stage-animation steps]]
+     :fx [[:dispatch [:sd2/clear-animation]]
+          [:dispatch [:sd2/stage-animation steps]]
           [:dispatch [:sd2/start-animation]]]}))
 (rf/reg-event-fx :sim/one
                  event-interceptors

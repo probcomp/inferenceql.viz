@@ -32,6 +32,6 @@
                                   (.blur (.-target e)))}
                "Simulate many"]
               [:button.toolbar-button.pure-button
-               {:on-click (fn [e] (rf/dispatch [:sim/clear])
+               {:on-click (fn [e] (rf/dispatch [:sd2/clear-animation])
                                   (.blur (.-target e)))}
                "Clear"]]])

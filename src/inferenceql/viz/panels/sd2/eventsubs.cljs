@@ -85,9 +85,6 @@
 (rf/reg-sub :sd2/model-output
             model-output)
 
-;; add event :sd2/reset
-;; clears all open displays and highlights
-
 (defn stage-animation
   [db [_ events]]
   (-> db
@@ -117,6 +114,20 @@
 (rf/reg-event-fx :sd2/continue-animation
                  event-interceptors
                  continue-animation)
+
+(defn clear-animation
+  [db [_]]
+  (-> db
+      (assoc-in [:sd2-panel :animation :running] false)
+      (assoc-in [:sd2-panel :animation :events] nil)
+      (update :sd2-panel dissoc
+              :display :weights-highlighted
+              :view-cat-selection :cluster-output
+              :model-output)))
+
+(rf/reg-event-db :sd2/clear-animation
+                 event-interceptors
+                 clear-animation)
 
 ;; Scrolling
 
