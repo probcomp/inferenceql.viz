@@ -34,19 +34,6 @@
     (apply concat steps-per-view)))
 
 
-
-(comment
- (rf/dispatch-sync [:sd2/stage-animation [[:sd2/scroll "view_0" {}]
-                                          [:sd2/set-view-cat-selection :view_0 "cluster_0"]
-                                          [:sd2/set-cluster-open :view_0 :cluster_0 true]
-                                          [:sd2/set-cluster-output :view_0 :cluster_0 "{:age 22}"]
-                                          [:sd2/scroll "view_1" {}]
-                                          [:sd2/set-view-cat-selection :view_1 "cluster_0"]
-                                          [:sd2/set-cluster-open :view_1 :cluster_0 true]
-                                          [:sd2/set-cluster-output :view_1 :cluster_0 "{:gender \"female\" :height 99}"]
-                                          [:sd2/set-model-output "{:age 22 .....}"]]]))
-
-
 (defn one
   [{:keys [db]} [_]]
   (let [model (get-in db [:store-component :models :model])
@@ -69,3 +56,19 @@
 (rf/reg-event-db :sim/clear
                  event-interceptors
                  clear)
+
+
+;; Expression level
+
+(defn expr-level
+  [db [_]]
+  (get-in db [:sim-panel :expr-level]))
+(rf/reg-sub :sim/expr-level
+            expr-level)
+
+(defn set-expr-level
+  [db [_ new-val]]
+  (assoc-in db [:sim-panel :expr-level] new-val))
+(rf/reg-event-db :sim/set-expr-level
+                 event-interceptors
+                 set-expr-level)

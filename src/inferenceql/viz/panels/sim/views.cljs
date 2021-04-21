@@ -19,19 +19,34 @@
             [inferenceql.viz.config :refer [config]]
             [yarn.scroll-into-view]))
 
+(defn expr-level-slider []
+  (let [level (rf/subscribe [:sim/expr-level])]
+    [h-box
+     :style {:width "400px"}
+     :children [[:span "Expression level: "]
+                [:input {:type :range :name :expr-level
+                         :min 0 :max 100 :step 1
+                                 :value @level
+                                 :on-change (fn [e]
+                                              ;; TODO find a way to debounce this callback -- still needed?
+                                              (rf/dispatch [:sim/set-expr-level
+                                                            (js/parseFloat (-> e .-target .-value))]))}]
+                [:label @level]]]))
 
 (defn view []
-  [h-box
-   :gap "10px"
-   :children [[:button.toolbar-button.pure-button
-               {:on-click (fn [e] (rf/dispatch [:sim/one])
-                            (.blur (.-target e)))}
-               "Simulate one"]
-              [:button.toolbar-button.pure-button
-               {:on-click (fn [e] (rf/dispatch [:sim/many])
-                                  (.blur (.-target e)))}
-               "Simulate many"]
-              [:button.toolbar-button.pure-button
-               {:on-click (fn [e] (rf/dispatch [:sd2/clear-animation])
-                                  (.blur (.-target e)))}
-               "Clear"]]])
+  [v-box
+   :children [[h-box
+               :gap "10px"
+               :children [[:button.toolbar-button.pure-button
+                           {:on-click (fn [e] (rf/dispatch [:sim/one])
+                                        (.blur (.-target e)))}
+                           "Simulate one"]
+                          [:button.toolbar-button.pure-button
+                           {:on-click (fn [e] (rf/dispatch [:sim/many])
+                                              (.blur (.-target e)))}
+                           "Simulate many"]
+                          [:button.toolbar-button.pure-button
+                           {:on-click (fn [e] (rf/dispatch [:sd2/clear-animation])
+                                              (.blur (.-target e)))}
+                           "Clear"]]]
+              [expr-level-slider]]])
