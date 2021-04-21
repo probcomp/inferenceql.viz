@@ -37,6 +37,12 @@
 
 ;;; Simulating points.
 
+(defn simulations
+  [db [_]]
+  (get-in db [:sim-panel :simulations]))
+(rf/reg-sub :sim/simulations
+            simulations)
+
 (defn simulate-one
   [{:keys [db]} [_]]
   (let [model (get-in db [:store-component :models :model])
@@ -73,12 +79,12 @@
                  event-interceptors
                  simulate-many)
 
-(defn clear
+(defn clear-simulations
   [db [_]]
   (assoc-in db [:sim-panel :simulations] nil))
-(rf/reg-event-db :sim/clear
+(rf/reg-event-db :sim/clear-simulations
                  event-interceptors
-                 clear)
+                 clear-simulations)
 
 ;;; Target gene expression level.
 
@@ -111,9 +117,15 @@
 ;; Points count.
 
 (defn points-count
-  [db [_]]
-  7)
+  [simulations [_ view-id cluster-id]]
+  (->> simulations
+       (map view-id)
+       (map #{cluster-id})
+       (filter some?)
+       (count)))
+
 (rf/reg-sub :sim/points-count
+            :<- [:sim/simulations]
             points-count)
 
 

@@ -72,6 +72,10 @@
       (when @output
         [:pre.cat-group-highlighted @output]))))
 
+(defn points-badge [points-count]
+  (when (> points-count 0)
+    [:div.points-badge points-count]))
+
 (defn xcat-category [view view-id cat-id]
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
         points-count (rf/subscribe [:sim/points-count view-id cat-id])
@@ -107,7 +111,7 @@
                                  [:div {:style {:font-size "24px" :font-weight "500"
                                                 :line-height "1.1" :color "inherit"}}
                                   cat-id]
-                                 [:div.points-badge @points-count]]]
+                                 [points-badge @points-count]]]
                      [:div {:style {:display display :margin-left "40px"}}
                       [v-box :children [[gap :size "15px"]
                                         [js-code-block (js-fn-text stat-types params) display]

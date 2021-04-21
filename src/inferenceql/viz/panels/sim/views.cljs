@@ -47,6 +47,7 @@
                            "Simulate many"]
                           [:button.toolbar-button.pure-button
                            {:on-click (fn [e] (rf/dispatch [:sd2/clear-animation])
+                                              (rf/dispatch [:sim/clear-simulations])
                                               (.blur (.-target e)))}
                            "Clear"]]]
               [expr-level-slider]]])

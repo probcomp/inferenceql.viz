@@ -356,3 +356,9 @@ psuedo-class applied. */
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+.points-badge {
+  background: lightgray;
+  padding: 4px 10px 4px 10px;
+  border-radius: 30px;
+}
