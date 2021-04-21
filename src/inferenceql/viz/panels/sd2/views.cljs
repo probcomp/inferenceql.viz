@@ -19,12 +19,6 @@
             [inferenceql.viz.config :refer [config]]
             [yarn.scroll-into-view]))
 
-(defn scroll-into-view
-  [this _old-argv]
-  (.scrollIntoView js/window
-                   (rdom/dom-node this)
-                   (clj->js {:scrollMode "if-needed" :behavior "smooth" :block "center" :inline "start"})))
-
 (defn cats-string [col-params]
   (let [kv-strings (for [[cat-val cat-weight] col-params]
                      (format "\"%s\": %.3f" cat-val cat-weight))]
@@ -62,9 +56,6 @@
     (r/create-class
      {:display-name "js-model-code"
 
-      :component-did-update
-      scroll-into-view
-
       :component-did-mount
       (fn [this]
         (.highlightBlock js/hljs (:program-display @dom-nodes)))
@@ -77,14 +68,9 @@
 
 (defn cluster-output [view-id cat-id]
   (let [output (rf/subscribe [:sd2/cluster-output view-id cat-id])]
-    (r/create-class
-     {:component-did-update
-      scroll-into-view
-
-      :reagent-render
-      (fn [view-id cat-id]
-        (when @output
-          [:pre.cat-group-highlighted @output]))})))
+    (fn [view-id cat-id]
+      (when @output
+        [:pre.cat-group-highlighted @output]))))
 
 (defn xcat-category [view view-id cat-id]
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
@@ -100,32 +86,30 @@
                     (merge acc exported-cat)))
                 {}
                 (:columns view))]
-    (r/create-class
-     {:reagent-render
-      (fn []
-        (let [display (if @open "block" "none")
-              more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
-                                       "resources/icons/expand_more_black_48dp.svg")]
-          [:div
-           [v-box
-            :gap "5px"
-            :children [[h-box
-                        :gap "5px"
-                        :children [[:button.toolbar-button.pure-button.more-button
-                                    {:class (when false "pure-button-active pure-button-hover")
-                                     :on-click (fn [e]
-                                                 (rf/dispatch [:sd2/toggle-cluster view-id cat-id])
-                                                 (.blur (.-target e)))}
-                                    [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
-                                     "expand content"]]
-                                   [:div {:style {:font-size "24px" :font-weight "500"
-                                                  :line-height "1.1" :color "inherit"}}
-                                    cat-id]]]
-                       [:div {:style {:display display :margin-left "40px"}}
-                        [v-box :children [[gap :size "15px"]
-                                          [js-code-block (js-fn-text stat-types params) display]
-                                          [cluster-output view-id cat-id]
-                                          [gap :size "15px"]]]]]]]))})))
+    (fn []
+      (let [display (if @open "block" "none")
+            more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
+                                     "resources/icons/expand_more_black_48dp.svg")]
+        [:div {:id (str (name view-id) "--" (name cat-id))}
+         [v-box
+          :gap "5px"
+          :children [[h-box
+                      :gap "5px"
+                      :children [[:button.toolbar-button.pure-button.more-button
+                                  {:class (when false "pure-button-active pure-button-hover")
+                                   :on-click (fn [e]
+                                               (rf/dispatch [:sd2/toggle-cluster view-id cat-id])
+                                               (.blur (.-target e)))}
+                                  [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
+                                   "expand content"]]
+                                 [:div {:style {:font-size "24px" :font-weight "500"
+                                                :line-height "1.1" :color "inherit"}}
+                                  cat-id]]]
+                     [:div {:style {:display display :margin-left "40px"}}
+                      [v-box :children [[gap :size "15px"]
+                                        [js-code-block (js-fn-text stat-types params) display]
+                                        [cluster-output view-id cat-id]
+                                        [gap :size "15px"]]]]]]]))))
 
 (defn scale [weights]
   (let [weights (map second weights)
@@ -143,38 +127,29 @@
 
 (defn cat-weight [view-id cat-id scale weight]
   (let [hl (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
-    (r/create-class
-     {:reagent-render
-      (fn [view-id cat-id scale weight]
-        [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]}
-          [:div.cat-group {:style {:border-color (scale weight)}}
-           [:div.cat-name (str (name cat-id) ":")]
-           [:div.cat-weight (format "%.3f" weight)]]])})))
+    (fn [view-id cat-id scale weight]
+      [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]}
+        [:div.cat-group {:style {:border-color (scale weight)}}
+         [:div.cat-name (str (name cat-id) ":")]
+         [:div.cat-weight (format "%.3f" weight)]]])))
 
 (defn cat-output [view-id]
   (let [output (rf/subscribe [:sd2/view-cat-selection view-id])]
-    (r/create-class
-     {:component-did-update
-      scroll-into-view
-
-      :reagent-render
-      (fn [view-id]
-        (when @output
-          [:pre.cat-group-highlighted @output]))})))
+    (fn [view-id]
+      (when @output
+        [:pre.cat-group-highlighted @output]))))
 
 (defn cats [view-id weights]
-  (let [ scale (scale weights)]
-    (r/create-class
-     {:reagent-render
-      (fn [view-id weights]
-        [:div {:id (name view-id)}
-         [:div.cats
-          [:h4 {:style {:margin "0px" :margin-bottom "5px" :font-size "14px"}}
-           "sample a cluster to use"]
-          [:div {:style {:margin-left "-10px"}}
-           (for [[cat-id weight] weights]
-             [cat-weight view-id cat-id scale weight])]]
-         [cat-output view-id]])})))
+  (let [scale (scale weights)]
+    (fn [view-id weights]
+      [:div
+       [:div.cats
+        [:h4 {:style {:margin "0px" :margin-bottom "5px" :font-size "14px"}}
+         "sample a cluster to use"]
+        [:div {:style {:margin-left "-10px"}}
+         (for [[cat-id weight] weights]
+           [cat-weight view-id cat-id scale weight])]]
+       [cat-output view-id]])))
 
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
@@ -182,7 +157,7 @@
         weights (->> (view/category-weights view constraints)
                      (medley/map-vals Math/exp)
                      (sort-by first))]
-    [:div {:style {:width "750px" :margin-left "20px"}}
+    [:div {:id (name view-id) :style {:width "750px" :margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
                          :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
@@ -199,16 +174,11 @@
 
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
-    (r/create-class
-     {:component-did-update
-      scroll-into-view
-
-      :reagent-render
-      (fn []
-        (when @output
-          [:div {:style {:width "770px"}}
-           [:h1 "model output"]
-           [:pre.cat-group-highlighted @output]]))})))
+    (fn []
+      (when @output
+        [:div#model-output {:style {:width "770px"}}
+         [:h1 "model output"]
+         [:pre.cat-group-highlighted @output]]))))
 
 (defn view [model constraints]
   [:div

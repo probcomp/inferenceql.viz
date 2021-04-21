@@ -5,11 +5,14 @@
             [medley.core :as medley]))
 
 (defn anim-steps-for-view [view-id cluster-id row]
-  ;; todo: make this take a keyword
-  [[:sd2/scroll (name view-id) {}]
-   [:sd2/set-view-cat-selection view-id (name cluster-id)]
-   [:sd2/set-cluster-open view-id cluster-id true]
-   [:sd2/set-cluster-output view-id cluster-id (str row)]])
+  (let [view-dom-id (name view-id)
+        cluster-dom-id (str (name view-id) "--" (name cluster-id))
+        row (medley/map-keys name row)]
+    [[:sd2/scroll view-dom-id {}]
+     [:sd2/set-view-cat-selection view-id (name cluster-id)]
+     [:sd2/set-cluster-open view-id cluster-id true]
+     [:sd2/set-cluster-output view-id cluster-id (str row)]
+     [:sd2/scroll cluster-dom-id]]))
 
 (defn animation-steps [model row cols]
   (let [view-ids (-> model :views keys sort)
@@ -19,8 +22,15 @@
                          (let [cluster-id (get row view-id)
                                row (select-keys row (get view-cols view-id))]
                            (anim-steps-for-view view-id cluster-id row)))
+
+        ;; Adding model output animation step.
+        model-output (as-> row $
+                           (select-keys $ cols)
+                           (medley/map-keys name $)
+                           (str $))
         steps-per-view (conj (vec steps-per-view)
-                             [[:sd2/set-model-output (str (select-keys row cols))]])]
+                             [[:sd2/set-model-output model-output]
+                              [:sd2/scroll "model-output"]])]
     (apply concat steps-per-view)))
 
 
