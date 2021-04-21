@@ -141,15 +141,14 @@
 
 (defn cats [view-id weights]
   (let [scale (scale weights)]
-    (fn [view-id weights]
-      [:div
-       [:div.cats
-        [:h4 {:style {:margin "0px" :margin-bottom "5px" :font-size "14px"}}
-         "sample a cluster to use"]
-        [:div {:style {:margin-left "-10px"}}
-         (for [[cat-id weight] weights]
-           [cat-weight view-id cat-id scale weight])]]
-       [cat-output view-id]])))
+    [:div
+     [:div.cats
+      [:h4 {:style {:margin "0px" :margin-bottom "5px" :font-size "14px"}}
+       "sample a cluster to use"]
+      [:div {:style {:margin-left "-10px"}}
+       (for [[cat-id weight] weights]
+         [cat-weight view-id cat-id scale weight])]]
+     [cat-output view-id]]))
 
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)

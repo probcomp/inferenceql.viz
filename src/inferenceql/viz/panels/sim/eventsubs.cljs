@@ -72,3 +72,12 @@
 (rf/reg-event-db :sim/set-expr-level
                  event-interceptors
                  set-expr-level)
+
+;; Constraints
+
+(defn constraints
+  [expr-level]
+  {:age expr-level})
+(rf/reg-sub :sim/constraints
+            :<- [:sim/expr-level]
+            constraints)

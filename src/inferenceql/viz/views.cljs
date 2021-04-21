@@ -20,9 +20,10 @@
         highlight-class @(rf/subscribe [:table/highlight-class])
         modal-content @(rf/subscribe [:modal/content])
         show-table-controls @(rf/subscribe [:table/show-table-controls])
-        models @(rf/subscribe [:store/models])]
+        models @(rf/subscribe [:store/models])
+        constraints @(rf/subscribe [:sim/constraints])]
     [v-box
      :style {:margin "20px"}
      :children [[sim/view]
                 [gap :size "30px"]
-                [sd2/view (:model models) {}]]]))
+                [sd2/view (:model models) constraints]]]))
