@@ -33,22 +33,45 @@
                               [:sd2/scroll "model-output"]])]
     (apply concat steps-per-view)))
 
+;--------------------------
 
-(defn one
+;;; Simulating points.
+
+(defn simulate-one
   [{:keys [db]} [_]]
   (let [model (get-in db [:store-component :models :model])
+        constraints (get-in db [:sim-panel :constraints])
         cols (keys (get-in db [:store-component :datasets :data :schema]))
+        cols (remove (set (keys constraints)) cols)
+
         ;; todo: I should be able to do this if I update iql.inference.
         ;;cols (gpm/variables model)
-        row (gpm/simulate model cols {})
+
+        row (gpm/simulate model cols constraints)
+        row (merge row constraints)
+
         steps (animation-steps model row cols)]
     {:db (update-in db [:sim-panel :simulations] (fnil conj []) row)
      :fx [[:dispatch [:sd2/clear-animation]]
           [:dispatch [:sd2/stage-animation steps]]
           [:dispatch [:sd2/start-animation]]]}))
-(rf/reg-event-fx :sim/one
+(rf/reg-event-fx :sim/simulate-one
                  event-interceptors
-                 one)
+                 simulate-one)
+
+(defn simulate-many
+  [db [_]]
+  (let [model (get-in db [:store-component :models :model])
+        constraints (get-in db [:sim-panel :constraints])
+        cols (keys (get-in db [:store-component :datasets :data :schema]))
+        cols (remove (set (keys constraints)) cols)
+
+        rows (repeatedly 10 #(-> (gpm/simulate model cols constraints)
+                                 (merge constraints)))]
+    (update-in db [:sim-panel :simulations] (fnil concat []) rows)))
+(rf/reg-event-db :sim/simulate-many
+                 event-interceptors
+                 simulate-many)
 
 (defn clear
   [db [_]]
@@ -57,8 +80,7 @@
                  event-interceptors
                  clear)
 
-
-;; Expression level
+;;; Target gene expression level.
 
 (defn expr-level
   [db [_]]
@@ -66,18 +88,34 @@
 (rf/reg-sub :sim/expr-level
             expr-level)
 
+(defn constraints
+  [db [_]]
+  (get-in db [:sim-panel :constraints]))
+(rf/reg-sub :sim/constraints
+            constraints)
+
+(defn make-constraints [new-val]
+  (if new-val
+    {:age new-val}
+    {}))
+
 (defn set-expr-level
   [db [_ new-val]]
-  (assoc-in db [:sim-panel :expr-level] new-val))
+  (-> db
+      (assoc-in [:sim-panel :expr-level] new-val)
+      (assoc-in [:sim-panel :constraints] (make-constraints new-val))))
 (rf/reg-event-db :sim/set-expr-level
                  event-interceptors
                  set-expr-level)
 
-;; Constraints
+;; Points count.
 
-(defn constraints
-  [expr-level]
-  {:age expr-level})
-(rf/reg-sub :sim/constraints
-            :<- [:sim/expr-level]
-            constraints)
+(defn points-count
+  [db [_]]
+  7)
+(rf/reg-sub :sim/points-count
+            points-count)
+
+
+
+

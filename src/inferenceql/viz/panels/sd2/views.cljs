@@ -74,6 +74,8 @@
 
 (defn xcat-category [view view-id cat-id]
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
+        points-count (rf/subscribe [:sim/points-count view-id cat-id])
+
         stat-types (medley/map-vals :stattype (:columns view))
         params (reduce-kv
                 (fn [acc col-name col-gpm]
@@ -104,7 +106,8 @@
                                    "expand content"]]
                                  [:div {:style {:font-size "24px" :font-weight "500"
                                                 :line-height "1.1" :color "inherit"}}
-                                  cat-id]]]
+                                  cat-id]
+                                 [:div.points-badge @points-count]]]
                      [:div {:style {:display display :margin-left "40px"}}
                       [v-box :children [[gap :size "15px"]
                                         [js-code-block (js-fn-text stat-types params) display]
@@ -128,7 +131,8 @@
 (defn cat-weight [view-id cat-id scale weight]
   (let [hl (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
     (fn [view-id cat-id scale weight]
-      [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]}
+      [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]
+             :on-click #(rf/dispatch [:sd2/toggle-cluster view-id cat-id])}
         [:div.cat-group {:style {:border-color (scale weight)}}
          [:div.cat-name (str (name cat-id) ":")]
          [:div.cat-weight (format "%.3f" weight)]]])))

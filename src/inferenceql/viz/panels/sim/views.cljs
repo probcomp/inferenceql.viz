@@ -38,11 +38,11 @@
    :children [[h-box
                :gap "10px"
                :children [[:button.toolbar-button.pure-button
-                           {:on-click (fn [e] (rf/dispatch [:sim/one])
+                           {:on-click (fn [e] (rf/dispatch [:sim/simulate-one])
                                         (.blur (.-target e)))}
                            "Simulate one"]
                           [:button.toolbar-button.pure-button
-                           {:on-click (fn [e] (rf/dispatch [:sim/many])
+                           {:on-click (fn [e] (rf/dispatch [:sim/simulate-many])
                                               (.blur (.-target e)))}
                            "Simulate many"]
                           [:button.toolbar-button.pure-button
