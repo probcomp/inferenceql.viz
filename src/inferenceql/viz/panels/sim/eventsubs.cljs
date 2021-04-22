@@ -167,3 +167,21 @@
 (rf/reg-event-db :sim/set-conditioned
                  event-interceptors
                  set-conditioned)
+
+;; Expr-level slider settings.
+
+(defn expr-level-slider-settings
+  [[datasets target-gene]]
+  (let [rows (get-in datasets [:data :rows])
+        vals (map target-gene rows)
+        min-val (apply min vals)
+        max-val (apply max vals)
+        step (/ (- max-val min-val)
+                100)]
+    {:min min-val :max max-val :step step
+     :initial (+ min-val (* 50 step))}))
+
+(rf/reg-sub :sim/expr-level-slider-settings
+            :<- [:store/datasets]
+            :<- [:sim/target-gene]
+            expr-level-slider-settings)

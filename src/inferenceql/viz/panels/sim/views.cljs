@@ -22,7 +22,8 @@
 
 (defn expr-level-slider []
   (let [level (rf/subscribe [:sim/expr-level])
-        conditioned (rf/subscribe [:sim/conditioned])]
+        conditioned (rf/subscribe [:sim/conditioned])
+        settings (rf/subscribe [:sim/expr-level-slider-settings])]
     [v-box
      :margin "5px 20px"
      :children [[box :child [:span "Expression level (target gene): "]]
@@ -36,15 +37,15 @@
                             [box
                              :child [:input {:type :range :name :expr-level
                                              :disabled (not @conditioned)
-                                             :min 0 :max 100 :step 1
-                                                     :value @level
-                                                     :on-change (fn [e]
-                                                                  ;; TODO find a way to debounce this callback -- still needed?
-                                                                  (rf/dispatch [:sim/set-expr-level
-                                                                                (js/parseFloat (-> e .-target .-value))]))}]]
+                                             :min (:min @settings) :max (:max @settings) :step (:step @settings)
+                                             :value (or @level (:initial @settings))
+                                             :on-change (fn [e]
+                                                          ;; TODO find a way to debounce this callback -- still needed?
+                                                          (rf/dispatch [:sim/set-expr-level
+                                                                        (js/parseFloat (-> e .-target .-value))]))}]]
                             [gap :size "10px"]
                             [box :child [:label (if @conditioned
-                                                  (str "constrained at " @level)
+                                                  (str "constrained at " (format "%.2f" (or @level (:initial @settings))))
                                                   "(unconstrained)")]]]]]]))
 
 (defn view [target-gene essential-genes]

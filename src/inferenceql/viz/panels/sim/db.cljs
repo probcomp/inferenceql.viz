@@ -7,7 +7,7 @@
                :essential-genes [:recR :mdxG]
                :conditioned false
 
-               :expr-level 50
+               :expr-level nil
                :constraints {}}})
 
 
