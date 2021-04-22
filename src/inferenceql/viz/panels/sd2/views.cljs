@@ -17,7 +17,8 @@
             [cljsjs.highlight.langs.javascript]
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
-            [yarn.scroll-into-view]))
+            [yarn.scroll-into-view]
+            [clojure.edn :as edn]))
 
 (defn cats-string [col-params]
   (let [kv-strings (for [[cat-val cat-weight] col-params]
@@ -164,9 +165,15 @@
 (defn xcat-view [view-id view constraints]
   (let [columns (-> view :columns keys)
         columns (map name columns)
+        sort-fn (fn [cat-1 cat-2]
+                  (let [cat-1-num (some-> cat-1 name (string/split #"_" 2) second edn/read-string)
+                        cat-2-num (some-> cat-2 name (string/split #"_" 2) second edn/read-string)]
+                    (if (and (number? cat-1-num) (number? cat-2-num))
+                      (< cat-1-num cat-2-num)
+                      (> cat-1 cat-2))))
         weights (->> (view/category-weights view constraints)
                      (medley/map-vals Math/exp)
-                     (sort-by first))]
+                     (sort-by first sort-fn))]
     [:div {:id (name view-id) :style {:margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
