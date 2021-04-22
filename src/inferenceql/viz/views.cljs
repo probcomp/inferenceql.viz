@@ -32,6 +32,6 @@
                        :size "1px"
                        :color "whitesmoke"]
                       [box
-                       :size "1"
+                       :size "2"
                        :child [viz/vega-lite vega-lite-spec {} nil nil]]]]))
 

@@ -6,6 +6,7 @@
             [inferenceql.viz.panels.viz.db :as viz-panel]
             [inferenceql.viz.panels.more.db :as more-panel]
             [inferenceql.viz.panels.modal.db :as modal-panel]
+            [inferenceql.viz.panels.sim.db :as sim-panel]
             [inferenceql.viz.components.highlight.db :as highlight-component]
             [inferenceql.viz.components.query.db :as query-component]
             [inferenceql.viz.components.store.db :as store-component]))
@@ -39,6 +40,7 @@
              viz-panel/default-db
              more-panel/default-db
              modal-panel/default-db
+             sim-panel/default-db
              highlight-component/default-db
              query-component/default-db
              store-component/default-db]]

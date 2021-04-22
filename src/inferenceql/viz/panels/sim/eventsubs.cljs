@@ -128,6 +128,16 @@
             :<- [:sim/simulations]
             points-count)
 
+;; Target gene and essential genes.
 
+(defn target-gene
+  [db [_]]
+  (get-in db [:sim-panel :target-gene]))
+(rf/reg-sub :sim/target-gene
+            target-gene)
 
-
+(defn essential-genes
+  [db [_]]
+  (get-in db [:sim-panel :essential-genes]))
+(rf/reg-sub :sim/essential-genes
+            essential-genes)

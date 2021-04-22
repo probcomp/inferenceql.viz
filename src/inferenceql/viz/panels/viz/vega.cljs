@@ -422,30 +422,30 @@
 
 (defn- spec-for-selection-layer [schema selection-layer]
   (let [vega-type (vega-type-fn schema)
-        {layer-name :id
-         selections :selections
-         cols :selected-columns
-         row :row-at-selection-start} selection-layer]
+        {:keys [cols selections]} selection-layer]
     ;; Only produce a spec when we can find a vega-type for all selected columns
     ;; except the geo-id-col which we handle specially.
     (when (every? some? (map vega-type cols))
-      (let [spec (cond (= 1 (count cols)) ; One column selected.
-                       (gen-histogram (first cols) selections vega-type)
+      (cond (= 1 (count cols)) ; One column selected.
+            (gen-histogram (first cols) selections vega-type)
 
-                       :else ; Two or more columns selected.
-                       (gen-comparison-plot (take 2 cols) selections vega-type))
-             title {:title {:text (str (name layer-name) " " "selection")
-                            :color (title-color layer-name)
-                            :fontWeight 500}}]
-        (merge spec title)))))
+            :else ; Two or more columns selected.
+            (gen-comparison-plot (take 2 cols) selections vega-type)))))
 
-(vega/generate-spec simulations target-gene essential-genes datasets)
+(defn generate-spec [simulations target-gene essential-genes datasets]
+  (let [schema (get-in datasets [:data :schema])
+        observed-data (->> (get-in datasets [:data :rows])
+                           (map #(assoc % :dataset "observed")))
+        simulations (map #(assoc % :dataset "virtual") simulations)
+        all-data (concat observed-data simulations)
 
-(defn generate-spec [schema selection-layers]
-  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema %) selection-layers))]
-    {:$schema default-vega-lite-schema
-     :concat spec-layers
-     :columns 2
-     :resolve {:legend {:size "independent"
-                        :color "independent"}
-               :scale {:color "independent"}}}))
+        selection-layers (for [gene essential-genes]
+                           {:cols [target-gene gene]
+                            :selections all-data})]
+    (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema %) selection-layers))]
+      {:$schema default-vega-lite-schema
+       :concat spec-layers
+       :columns 2
+       :resolve {:legend {:size "independent"
+                          :color "independent"}
+                 :scale {:color "independent"}}})))
