@@ -200,9 +200,9 @@
 (defn view [model constraints]
   [:div
    [v-box :children [[:h1 "model"]
+                     [gap :size "5px"]
                      (for [[view-id view] (:views model)]
                        [:<>
-                        [gap :size "30px"]
                         [xcat-view view-id view constraints]])
                      [gap :size "40px"]
                      [model-output]]]])
