@@ -4,7 +4,12 @@
 (def default-db
   {:sim-panel {:display {}
                :target-gene :age
-               :essential-genes [:age :height]}})
+               :essential-genes [:height]
+               :conditioned false
+
+               :expr-level 50
+               :constraints {}}})
+
 
 (s/def ::sim-panel (s/keys :req-un []))
 

@@ -28,7 +28,7 @@
                        :size "6"
                        :style {:margin "20px"}
                        :children [[sim/view target-gene essential-genes]
-                                  [gap :size "30px"]
+                                  [gap :size "10px"]
                                   [sd2/view (:model models) constraints]]]
                       [line
                        :size "1px"

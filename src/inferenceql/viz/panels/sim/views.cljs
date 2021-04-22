@@ -20,32 +20,42 @@
             [yarn.scroll-into-view]))
 
 (defn expr-level-slider []
-  (let [level (rf/subscribe [:sim/expr-level])]
-    [h-box
-     ;;:style {:width "400px"}
+  (let [level (rf/subscribe [:sim/expr-level])
+        conditioned (rf/subscribe [:sim/conditioned])]
+    [v-box
      :margin "5px 20px"
-     :children [[box
-                 :size "200px"
-                 :child [:span "Expression level (target gene): "]]
-                [box
-                 :child [:input {:type :range :name :expr-level
-                                 :min 0 :max 100 :step 1
-                                         :value @level
-                                         :on-change (fn [e]
-                                                      ;; TODO find a way to debounce this callback -- still needed?
-                                                      (rf/dispatch [:sim/set-expr-level
-                                                                    (js/parseFloat (-> e .-target .-value))]))}]]
-                [gap :size "10px"]
-                [box :child [:label @level]]]]))
+     :children [[box :child [:span "Expression level (target gene): "]]
+                [h-box
+                 :style {:margin-left "20px"
+                         :margin-top "5px"}
+                 :children [[checkbox
+                             :model @conditioned
+                             :on-change #(rf/dispatch [:sim/set-conditioned %])]
+                            [gap :size "10px"]
+                            [box
+                             :child [:input {:type :range :name :expr-level
+                                             :disabled (not @conditioned)
+                                             :min 0 :max 100 :step 1
+                                                     :value @level
+                                                     :on-change (fn [e]
+                                                                  ;; TODO find a way to debounce this callback -- still needed?
+                                                                  (rf/dispatch [:sim/set-expr-level
+                                                                                (js/parseFloat (-> e .-target .-value))]))}]]
+                            [gap :size "10px"]
+                            [box :child [:label (if @conditioned
+                                                  (str "constrained at " @level)
+                                                  "(unconstrained)")]]]]]]))
 
 (defn view [target-gene essential-genes]
   [v-box
-   :children [[:h1 (str "Target gene: " (name target-gene))]
-              [:h1 (str "Essential genes: " (string/join ", " (map name essential-genes)))]
+   :children [[:h4 (str "Target gene: " (name target-gene))]
+              [:h4 (str "Essential genes: " (string/join ", " (map name essential-genes)))]
               [:h2 "simulation controls: "]
+              [gap :size "5px"]
               [expr-level-slider]
+              [gap :size "20px"]
               [h-box
-               :margin "5px 15px"
+               :style {:margin "5px 15px 0px 15px"}
                :gap "10px"
                :children [[:button.toolbar-button.pure-button
                            {:on-click (fn [e] (rf/dispatch [:sim/simulate-one])

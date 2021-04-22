@@ -141,3 +141,23 @@
   (get-in db [:sim-panel :essential-genes]))
 (rf/reg-sub :sim/essential-genes
             essential-genes)
+
+;; Conditioned.
+
+(defn conditioned
+  [db [_]]
+  (get-in db [:sim-panel :conditioned]))
+(rf/reg-sub :sim/conditioned
+            conditioned)
+
+(defn set-conditioned
+  [db [_ new-val]]
+  (let [expr-level (get-in db [:sim-panel :expr-level])
+        constraints (if new-val (make-constraints expr-level) {})]
+    (-> db
+        (assoc-in [:sim-panel :conditioned] new-val)
+        (assoc-in [:sim-panel :constraints] constraints))))
+
+(rf/reg-event-db :sim/set-conditioned
+                 event-interceptors
+                 set-conditioned)
