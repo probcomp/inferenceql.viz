@@ -25,10 +25,10 @@
 
 (def vega-plot-width
   "A general width setting vega-lite plots"
-  400)
+  300)
 (def vega-plot-height
   "A general height setting vega-lite plots"
-  400)
+  300)
 
 (def default-table-color "SteelBlue")
 
@@ -295,8 +295,10 @@
                 :y {:field (second cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
-                :color {:condition {:selection "pts"
-                                    :value selection-color}}}}))
+                :color {:field "dataset"
+                        :legend nil
+                        #_:condition #_{:selection "pts"
+                                        :value selection-color}}}}))
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.

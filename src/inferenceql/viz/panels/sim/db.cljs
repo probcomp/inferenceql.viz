@@ -4,7 +4,7 @@
 (def default-db
   {:sim-panel {:display {}
                :target-gene :age
-               :essential-genes [:age :gender :height]}})
+               :essential-genes [:age :height]}})
 
 (s/def ::sim-panel (s/keys :req-un []))
 

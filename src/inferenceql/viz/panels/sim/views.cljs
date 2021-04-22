@@ -33,22 +33,25 @@
                                                             (js/parseFloat (-> e .-target .-value))]))}]
                 [:label @level]]]))
 
-(defn view []
+(defn view [target-gene essential-genes]
   [v-box
-   :children [[h-box
+   :children [[:h1 (str "Target gene: " (name target-gene))]
+              [:h1 (str "Essential genes: " (string/join ", " (map name essential-genes)))]
+              [:h2 "simulation controls: "]
+              [h-box
                :gap "10px"
                :children [[:button.toolbar-button.pure-button
                            {:on-click (fn [e] (rf/dispatch [:sim/simulate-one])
                                         (.blur (.-target e)))}
-                           "Simulate one"]
+                           "Simulate 1 point"]
                           [:button.toolbar-button.pure-button
                            {:on-click (fn [e] (rf/dispatch [:sd2/clear-animation])
                                               (rf/dispatch [:sim/simulate-many])
                                               (.blur (.-target e)))}
-                           "Simulate many"]
+                           "Simulate 10 points"]
                           [:button.toolbar-button.pure-button
                            {:on-click (fn [e] (rf/dispatch [:sd2/clear-animation])
                                               (rf/dispatch [:sim/clear-simulations])
                                               (.blur (.-target e)))}
-                           "Clear"]]]
+                           "Clear simulations"]]]
               [expr-level-slider]]])
