@@ -108,8 +108,11 @@
                                                (.blur (.-target e)))}
                                   [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
                                    "expand content"]]
-                                 [:div {:style {:font-size "24px" :font-weight "500"
-                                                :line-height "1.1" :color "inherit"}}
+                                 [:div
+                                  {:style {:font-size "24px" :font-weight "500"
+                                           :line-height "1.1" :color "inherit"}
+                                   :on-click (fn [e]
+                                               (rf/dispatch [:sd2/toggle-cluster view-id cat-id]))}
                                   cat-id]
                                  [points-badge @points-count]]]
                      [:div {:style {:display display :margin-left "40px"}}
@@ -164,7 +167,7 @@
         weights (->> (view/category-weights view constraints)
                      (medley/map-vals Math/exp)
                      (sort-by first))]
-    [:div {:id (name view-id) :style {:width "750px" :margin-left "20px"}}
+    [:div {:id (name view-id) :style {:margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
                          :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
@@ -183,7 +186,7 @@
   (let [output (rf/subscribe [:sd2/model-output])]
     (fn []
       (when @output
-        [:div#model-output {:style {:width "770px"}}
+        [:div#model-output
          [:h1 "model output"]
          [:pre.cat-group-highlighted @output]]))))
 

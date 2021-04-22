@@ -6,14 +6,13 @@
             [medley.core :as medley]))
 
 (rf/reg-sub :viz/vega-lite-spec
-            :<- [:query/schema]
-            :<- [:query/simulatable-cols]
-            :<- [:query/geodata]
-            :<- [:query/geo-id-col]
-            :<- [:table/selection-layers-list]
-            (fn [[schema simulatable-cols geodata geo-id-col selection-layers]]
+            :<- [:sim/simulations]
+            :<- [:sim/target-gene]
+            :<- [:sim/essential-genes]
+            :<- [:store/datasets]
+            (fn [[simulations target-gene essential-genes datasets]]
               (clj->js
-                (vega/generate-spec schema simulatable-cols geodata geo-id-col selection-layers))))
+                (vega/generate-spec simulations target-gene essential-genes datasets))))
 
 (defn ^:sub make-simulate-fn
   [col-to-sim row override-fns simulatable-cols model]

@@ -420,7 +420,7 @@
            #{"nominal"} (table-bubble-plot selections cols)
            #{"quantitative" "nominal"} (strip-plot selections cols vega-type))))
 
-(defn- spec-for-selection-layer [schema simulatable-cols geodata geo-id-col selection-layer]
+(defn- spec-for-selection-layer [schema selection-layer]
   (let [vega-type (vega-type-fn schema)
         {layer-name :id
          selections :selections
@@ -428,14 +428,8 @@
          row :row-at-selection-start} selection-layer]
     ;; Only produce a spec when we can find a vega-type for all selected columns
     ;; except the geo-id-col which we handle specially.
-    (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
-      (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
-                       (gen-choropleth geodata geo-id-col selections cols vega-type)
-
-                       (simulatable? selections cols simulatable-cols)
-                       (gen-simulate-plot (first cols) row (name layer-name) vega-type)
-
-                       (= 1 (count cols)) ; One column selected.
+    (when (every? some? (map vega-type cols))
+      (let [spec (cond (= 1 (count cols)) ; One column selected.
                        (gen-histogram (first cols) selections vega-type)
 
                        :else ; Two or more columns selected.
@@ -445,11 +439,13 @@
                             :fontWeight 500}}]
         (merge spec title)))))
 
-(defn generate-spec [schema simulatable-cols geodata geo-id-col selection-layers]
-  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema simulatable-cols geodata geo-id-col %)
-                                    selection-layers))]
+(vega/generate-spec simulations target-gene essential-genes datasets)
+
+(defn generate-spec [schema selection-layers]
+  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema %) selection-layers))]
     {:$schema default-vega-lite-schema
-     :hconcat spec-layers
+     :concat spec-layers
+     :columns 2
      :resolve {:legend {:size "independent"
                         :color "independent"}
                :scale {:color "independent"}}}))
