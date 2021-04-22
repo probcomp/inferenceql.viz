@@ -100,16 +100,12 @@
 (rf/reg-sub :sim/constraints
             constraints)
 
-(defn make-constraints [new-val]
-  (if new-val
-    {:age new-val}
-    {}))
-
 (defn set-expr-level
   [db [_ new-val]]
-  (-> db
-      (assoc-in [:sim-panel :expr-level] new-val)
-      (assoc-in [:sim-panel :constraints] (make-constraints new-val))))
+  (let [target-gene (get-in db [:sim-panel :target-gene])]
+    (-> db
+        (assoc-in [:sim-panel :expr-level] new-val)
+        (assoc-in [:sim-panel :constraints] {target-gene new-val}))))
 (rf/reg-event-db :sim/set-expr-level
                  event-interceptors
                  set-expr-level)
@@ -142,6 +138,14 @@
 (rf/reg-sub :sim/essential-genes
             essential-genes)
 
+(defn columns-used
+  [[target-gene essential-genes]]
+  (set (conj essential-genes target-gene)))
+(rf/reg-sub :sim/columns-used
+            :<- [:sim/target-gene]
+            :<- [:sim/essential-genes]
+            columns-used)
+
 ;; Conditioned.
 
 (defn conditioned
@@ -152,8 +156,10 @@
 
 (defn set-conditioned
   [db [_ new-val]]
-  (let [expr-level (get-in db [:sim-panel :expr-level])
-        constraints (if new-val (make-constraints expr-level) {})]
+  (let [target-gene (get-in db [:sim-panel :target-gene])
+        expr-level (get-in db [:sim-panel :expr-level])
+
+        constraints (if new-val {target-gene expr-level} {})]
     (-> db
         (assoc-in [:sim-panel :conditioned] new-val)
         (assoc-in [:sim-panel :constraints] constraints))))

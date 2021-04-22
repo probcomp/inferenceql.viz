@@ -21,6 +21,7 @@
         show-table-controls @(rf/subscribe [:table/show-table-controls])
         vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         models @(rf/subscribe [:store/models])
+        columns-used @(rf/subscribe [:sim/columns-used])
         constraints @(rf/subscribe [:sim/constraints])
         target-gene @(rf/subscribe [:sim/target-gene])
         essential-genes @(rf/subscribe [:sim/essential-genes])]
@@ -29,7 +30,7 @@
                        :style {:margin "20px"}
                        :children [[sim/view target-gene essential-genes]
                                   [gap :size "10px"]
-                                  [sd2/view (:model models) constraints]]]
+                                  [sd2/view (:model models) columns-used constraints]]]
                       [line
                        :size "1px"
                        :color "whitesmoke"]

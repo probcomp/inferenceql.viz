@@ -77,11 +77,11 @@
   (when (> points-count 0)
     [:div.points-badge points-count]))
 
-(defn xcat-category [view view-id cat-id]
+(defn xcat-category [column-gpms view-id cat-id]
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
         points-count (rf/subscribe [:sim/points-count view-id cat-id])
 
-        stat-types (medley/map-vals :stattype (:columns view))
+        stat-types (medley/map-vals :stattype column-gpms)
         params (reduce-kv
                 (fn [acc col-name col-gpm]
                   (let [;; If there is no category for a given column, this means
@@ -92,7 +92,7 @@
                         exported-cat (pgpms/export-category (get stat-types col-name) col-cat)]
                     (merge acc exported-cat)))
                 {}
-                (:columns view))]
+                column-gpms)]
     (fn []
       (let [display (if @open "block" "none")
             more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
@@ -137,13 +137,11 @@
       (scheme (scale-fn weight)))))
 
 (defn cat-weight [view-id cat-id scale weight]
-  (let [hl (rf/subscribe [:sd2/cluster-weight-highlighted view-id cat-id])]
-    (fn [view-id cat-id scale weight]
-      [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]
-             :on-click #(rf/dispatch [:sd2/toggle-cluster view-id cat-id])}
-        [:div.cat-group {:style {:border-color (scale weight)}}
-         [:div.cat-name (str (name cat-id) ":")]
-         [:div.cat-weight (format "%.3f" weight)]]])))
+  [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]
+         :on-click #(rf/dispatch [:sd2/toggle-cluster view-id cat-id])}
+    [:div.cat-group {:style {:border-color (scale weight)}}
+     [:div.cat-name (str (name cat-id) ":")]
+     [:div.cat-weight (format "%.3f" weight)]]])
 
 (defn cat-output [view-id]
   (let [output (rf/subscribe [:sd2/view-cat-selection view-id])]
@@ -159,11 +157,12 @@
        "sample a cluster to use"]
       [:div {:style {:margin-left "-10px"}}
        (for [[cat-id weight] weights]
-         [cat-weight view-id cat-id scale weight])]]
+         ^{:key [view-id cat-id]} [cat-weight view-id cat-id scale weight])]]
      [cat-output view-id]]))
 
-(defn xcat-view [view-id view constraints]
+(defn xcat-view [view-id view columns-used constraints]
   (let [columns (-> view :columns keys)
+        columns (filter columns-used columns)
         columns (map name columns)
         sort-fn (fn [cat-1 cat-2]
                   (let [cat-1-num (some-> cat-1 name (string/split #"_" 2) second edn/read-string)
@@ -173,21 +172,25 @@
                       (> cat-1 cat-2))))
         weights (->> (view/category-weights view constraints)
                      (medley/map-vals Math/exp)
-                     (sort-by first sort-fn))]
+                     (sort-by first sort-fn))
+        column-gpms (medley/filter-keys columns-used (:columns view))]
     [:div {:id (name view-id) :style {:margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
                          :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
                                     [:h4 {:style {:display "inline" :margin-top "9px" :margin-bottom "0px"}}
-                                     "(" (string/join ", " columns) ")"]]]
-                        [:div {:style {:margin-left "20px"}}
-                         [v-box :children [[gap :size "20px"]
-                                           [cats view-id weights]
-                                           [gap :size "20px"]
-                                           [:div {:style {:margin-left "-15px"}}
-                                             (for [[cat-id _] weights]
-                                               [xcat-category view view-id cat-id])]
-                                           [gap :size "20px"]]]]]]]))
+                                     (if (seq columns)
+                                       (str "(" (string/join ", " columns) ")")
+                                       "[not used]")]]]
+                        (if (seq columns)
+                          [:div {:style {:margin-left "20px"}}
+                           [v-box :children [[gap :size "20px"]
+                                             [cats view-id weights]
+                                             [gap :size "20px"]
+                                             [:div {:style {:margin-left "-15px"}}
+                                               (for [[cat-id _] weights]
+                                                 ^{:key [view-id cat-id]} [xcat-category column-gpms view-id cat-id])]
+                                             [gap :size "20px"]]]])]]]))
 
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
@@ -197,13 +200,12 @@
          [:h1 "model output"]
          [:pre.cat-group-highlighted @output]]))))
 
-(defn view [model constraints]
+(defn view [model columns-used constraints]
   [:div
    [v-box :children [[:h1 "model"]
                      [gap :size "5px"]
                      (for [[view-id view] (:views model)]
-                       [:<>
-                        [xcat-view view-id view constraints]])
+                       ^{:key view-id} [xcat-view view-id view columns-used constraints])
                      [gap :size "40px"]
                      [model-output]]]])
 

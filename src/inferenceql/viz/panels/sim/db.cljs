@@ -3,8 +3,8 @@
 
 (def default-db
   {:sim-panel {:display {}
-               :target-gene :age
-               :essential-genes [:height]
+               :target-gene :stoA
+               :essential-genes [:recR :mdxG]
                :conditioned false
 
                :expr-level 50
