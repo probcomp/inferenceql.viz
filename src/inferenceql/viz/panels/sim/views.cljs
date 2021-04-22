@@ -17,7 +17,8 @@
             [cljsjs.highlight.langs.javascript]
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
-            [yarn.scroll-into-view]))
+            [yarn.scroll-into-view]
+            [yarn.react-chips]))
 
 (defn expr-level-slider []
   (let [level (rf/subscribe [:sim/expr-level])
@@ -47,9 +48,16 @@
                                                   "(unconstrained)")]]]]]]))
 
 (defn view [target-gene essential-genes]
+  ;(.log js/console :---------test1 js/Chips)
+  ;(.log js/console :---------test1 js/Chip)
   [v-box
    :children [[:h4 (str "Target gene: " (name target-gene))]
               [:h4 (str "Essential genes: " (string/join ", " (map name essential-genes)))]
+              #_[:> (r/adapt-react-class js/Chips)
+                 {:value ["foo"]
+                  :suggestions ["bar" "biz" "baz"]
+                  :onChange #(.log js/console :-------output %)}]
+
               [:h2 "simulation controls: "]
               [gap :size "5px"]
               [expr-level-slider]
