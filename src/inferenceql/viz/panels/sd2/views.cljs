@@ -24,7 +24,7 @@
   "utility fn"
   [cat-id]
   (let [cat-num (some->> (name cat-id)
-                         (re-matches #"cluster_(.)+")
+                         (re-matches #"cluster_(.+)")
                          (second))]
     (if cat-num
       (str "regime_" cat-num)
@@ -34,7 +34,7 @@
   "utility fn"
   [view-id]
   (let [view-num (some->> (name view-id)
-                          (re-matches #"view_(.)+")
+                          (re-matches #"view_(.+)")
                           (second))]
     (if view-num
       (str "regulon_" view-num)
