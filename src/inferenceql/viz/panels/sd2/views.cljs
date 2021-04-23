@@ -20,7 +20,7 @@
             [yarn.scroll-into-view]
             [clojure.edn :as edn]))
 
-(defn regime-name
+(defn sd2-cat-rename
   "utility fn"
   [cat-id]
   (let [cat-num (some->> (name cat-id)
@@ -30,7 +30,7 @@
       (str "regime_" cat-num)
       (name cat-id))))
 
-(defn regulon-name
+(defn sd2-view-rename
   "utility fn"
   [view-id]
   (let [view-num (some->> (name view-id)
@@ -134,7 +134,7 @@
                                            :line-height "1.1" :color "inherit"}
                                    :on-click (fn [e]
                                                (rf/dispatch [:sd2/toggle-cluster view-id cat-id]))}
-                                  (regime-name cat-id)]
+                                  (sd2-cat-rename cat-id)]
                                  [points-badge @points-count]]]
                      [:div {:style {:display display :margin-left "40px"}}
                       [v-box :children [[gap :size "15px"]
@@ -160,14 +160,14 @@
   [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]
          :on-click #(rf/dispatch [:sd2/toggle-cluster view-id cat-id])}
     [:div.cat-group {:style {:border-color (scale weight)}}
-     [:div.cat-name (str (regime-name cat-id) ":")]
+     [:div.cat-name (str (sd2-cat-rename cat-id) ":")]
      [:div.cat-weight (format "%.3f" weight)]]])
 
 (defn cat-output [view-id]
   (let [output (rf/subscribe [:sd2/view-cat-selection view-id])]
     (fn [view-id]
       (when @output
-        [:pre.cat-group-highlighted @output]))))
+        [:pre.cat-group-highlighted (sd2-cat-rename @output)]))))
 
 (defn cats [view-id weights]
   (let [scale (scale weights)]
@@ -197,7 +197,7 @@
     [:div {:id (name view-id) :style {:margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
-                         :children [[:h2 {:style {:display "inline" :margin "0px"}} (regulon-name view-id)]
+                         :children [[:h2 {:style {:display "inline" :margin "0px"}} (sd2-view-rename view-id)]
                                     [:h4 {:style {:display "inline" :margin-top "9px" :margin-bottom "0px"}}
                                      (if (seq columns)
                                        (str "(" (string/join ", " columns) ")")
