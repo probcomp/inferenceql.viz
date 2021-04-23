@@ -112,35 +112,34 @@
                         exported-cat (pgpms/export-category (get stat-types col-name) col-cat)]
                     (merge acc exported-cat)))
                 {}
-                column-gpms)]
-    (fn []
-      (let [display (if @open "block" "none")
-            more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
-                                     "resources/icons/expand_more_black_48dp.svg")]
-        [:div {:id (str (name view-id) "--" (name cat-id))}
-         [v-box
-          :gap "5px"
-          :children [[h-box
-                      :gap "5px"
-                      :children [[:button.toolbar-button.pure-button.more-button
-                                  {:class (when false "pure-button-active pure-button-hover")
-                                   :on-click (fn [e]
-                                               (rf/dispatch [:sd2/toggle-cluster view-id cat-id])
-                                               (.blur (.-target e)))}
-                                  [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
-                                   "expand content"]]
-                                 [:div
-                                  {:style {:font-size "24px" :font-weight "500"
-                                           :line-height "1.1" :color "inherit"}
-                                   :on-click (fn [e]
-                                               (rf/dispatch [:sd2/toggle-cluster view-id cat-id]))}
-                                  (sd2-cat-rename cat-id)]
-                                 [points-badge @points-count]]]
-                     [:div {:style {:display display :margin-left "40px"}}
-                      [v-box :children [[gap :size "15px"]
-                                        [js-code-block (js-fn-text stat-types params) display]
-                                        [cluster-output view-id cat-id]
-                                        [gap :size "15px"]]]]]]]))))
+                column-gpms)
+        display (if @open "block" "none")
+        more-icon-path (if @open "resources/icons/expand_less_black_48dp.svg"
+                                 "resources/icons/expand_more_black_48dp.svg")]
+    [:div {:id (str (name view-id) "--" (name cat-id))}
+     [v-box
+      :gap "5px"
+      :children [[h-box
+                  :gap "5px"
+                  :children [[:button.toolbar-button.pure-button.more-button
+                              {:class (when false "pure-button-active pure-button-hover")
+                               :on-click (fn [e]
+                                           (rf/dispatch [:sd2/toggle-cluster view-id cat-id])
+                                           (.blur (.-target e)))}
+                              [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
+                               "expand content"]]
+                             [:div
+                              {:style {:font-size "24px" :font-weight "500"
+                                       :line-height "1.1" :color "inherit"}
+                               :on-click (fn [e]
+                                           (rf/dispatch [:sd2/toggle-cluster view-id cat-id]))}
+                              (sd2-cat-rename cat-id)]
+                             [points-badge @points-count]]]
+                 [:div {:style {:display display :margin-left "40px"}}
+                  [v-box :children [[gap :size "15px"]
+                                    [js-code-block (js-fn-text stat-types params) display]
+                                    [cluster-output view-id cat-id]
+                                    [gap :size "15px"]]]]]]]))
 
 (defn scale [weights]
   (let [weights (map second weights)
