@@ -26,7 +26,7 @@
         settings (rf/subscribe [:sim/expr-level-slider-settings])]
     [v-box
      :margin "5px 20px"
-     :children [[box :child [:span "Expression level (target gene): "]]
+     :children [[box :child [:span "Expression level (gene knockout): "]]
                 [h-box
                  :style {:margin-left "20px"
                          :margin-top "5px"}
@@ -52,7 +52,7 @@
   ;(.log js/console :---------test1 js/Chips)
   ;(.log js/console :---------test1 js/Chip)
   [v-box
-   :children [[:h4 (str "Target gene: " (name target-gene))]
+   :children [[:h4 (str "Gene knockout: " (name target-gene))]
               [:h4 (str "Essential genes: " (string/join ", " (map name essential-genes)))]
               #_[:> (r/adapt-react-class js/Chips)
                  {:value ["foo"]

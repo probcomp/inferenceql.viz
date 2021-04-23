@@ -20,6 +20,26 @@
             [yarn.scroll-into-view]
             [clojure.edn :as edn]))
 
+(defn regime-name
+  "utility fn"
+  [cat-id]
+  (let [cat-num (some->> (name cat-id)
+                         (re-matches #"cluster_(.)+")
+                         (second))]
+    (if cat-num
+      (str "regime_" cat-num)
+      (name cat-id))))
+
+(defn regulon-name
+  "utility fn"
+  [view-id]
+  (let [view-num (some->> (name view-id)
+                          (re-matches #"view_(.)+")
+                          (second))]
+    (if view-num
+      (str "regulon_" view-num)
+      (name view-id))))
+
 (defn cats-string [col-params]
   (let [kv-strings (for [[cat-val cat-weight] col-params]
                      (format "\"%s\": %.3f" cat-val cat-weight))]
@@ -114,7 +134,7 @@
                                            :line-height "1.1" :color "inherit"}
                                    :on-click (fn [e]
                                                (rf/dispatch [:sd2/toggle-cluster view-id cat-id]))}
-                                  cat-id]
+                                  (regime-name cat-id)]
                                  [points-badge @points-count]]]
                      [:div {:style {:display display :margin-left "40px"}}
                       [v-box :children [[gap :size "15px"]
@@ -140,7 +160,7 @@
   [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]
          :on-click #(rf/dispatch [:sd2/toggle-cluster view-id cat-id])}
     [:div.cat-group {:style {:border-color (scale weight)}}
-     [:div.cat-name (str (name cat-id) ":")]
+     [:div.cat-name (str (regime-name cat-id) ":")]
      [:div.cat-weight (format "%.3f" weight)]]])
 
 (defn cat-output [view-id]
@@ -154,7 +174,7 @@
     [:div
      [:div.cats
       [:h4 {:style {:margin "0px" :margin-bottom "5px" :font-size "14px"}}
-       "sample a cluster to use"]
+       "sample a regime to use"]
       [:div {:style {:margin-left "-10px"}}
        (for [[cat-id weight] weights]
          ^{:key [view-id cat-id]} [cat-weight view-id cat-id scale weight])]]
@@ -177,7 +197,7 @@
     [:div {:id (name view-id) :style {:margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
-                         :children [[:h2 {:style {:display "inline" :margin "0px"}} view-id]
+                         :children [[:h2 {:style {:display "inline" :margin "0px"}} (regulon-name view-id)]
                                     [:h4 {:style {:display "inline" :margin-top "9px" :margin-bottom "0px"}}
                                      (if (seq columns)
                                        (str "(" (string/join ", " columns) ")")
