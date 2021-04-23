@@ -5,14 +5,17 @@
             [medley.core :as medley]))
 
 (defn anim-steps-for-view [view-id cluster-id row]
-  (let [view-dom-id (name view-id)
-        cluster-dom-id (str (name view-id) "--" (name cluster-id))
-        row (medley/map-keys name row)]
-    [[:sd2/scroll view-dom-id {}]
-     [:sd2/set-view-cat-selection view-id (name cluster-id)]
-     [:sd2/set-cluster-open view-id cluster-id true]
-     [:sd2/set-cluster-output view-id cluster-id (str row)]
-     [:sd2/scroll cluster-dom-id]]))
+  (if (seq row)
+    (let [view-dom-id (name view-id)
+          cluster-dom-id (str (name view-id) "--" (name cluster-id))
+          row (medley/map-keys name row)]
+      [[:sd2/scroll view-dom-id {}]
+       [:sd2/set-view-cat-selection view-id (name cluster-id)]
+       [:sd2/set-cluster-open view-id cluster-id true]
+       [:sd2/set-cluster-output view-id cluster-id (str row)]
+       [:sd2/scroll cluster-dom-id]])
+    ;; Return no steps.
+    []))
 
 (defn animation-steps [model row cols]
   (let [view-ids (-> model :views keys sort)
