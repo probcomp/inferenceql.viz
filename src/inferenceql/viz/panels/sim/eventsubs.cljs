@@ -47,11 +47,9 @@
   [{:keys [db]} [_]]
   (let [model (get-in db [:store-component :models :model])
         constraints (get-in db [:sim-panel :constraints])
-        cols (keys (get-in db [:store-component :datasets :data :schema]))
-        cols (remove (set (keys constraints)) cols)
 
-        ;; todo: I should be able to do this if I update iql.inference.
-        ;;cols (gpm/variables model)
+        cols (get-in db [:sim-panel :columns-used])
+        cols (remove (set (keys constraints)) cols)
 
         row (gpm/simulate model cols constraints)
         row (merge row constraints)
@@ -139,11 +137,9 @@
             essential-genes)
 
 (defn columns-used
-  [[target-gene essential-genes]]
-  (set (conj essential-genes target-gene)))
+  [db [_]]
+  (get-in db [:sim-panel :columns-used]))
 (rf/reg-sub :sim/columns-used
-            :<- [:sim/target-gene]
-            :<- [:sim/essential-genes]
             columns-used)
 
 ;; Conditioned.
