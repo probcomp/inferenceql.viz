@@ -145,6 +145,33 @@
 (rf/reg-sub :sim/columns-used
             columns-used)
 
+(defn all-essential-genes
+  [[target-gene datasets]]
+  (let [all-genes (keys (get-in datasets [:data :schema]))]
+    (remove #{target-gene} all-genes)))
+(rf/reg-sub :sim/all-essential-genes
+            :<- [:sim/target-gene]
+            :<- [:store/datasets]
+            all-essential-genes)
+
+(defn add-essential-gene
+  [db [_ new-gene]]
+  (-> db
+      (update-in [:sim-panel :essential-genes] conj new-gene)
+      (update-in [:sim-panel :columns-used] conj new-gene)))
+(rf/reg-event-db :sim/add-essential-gene
+                 event-interceptors
+                 add-essential-gene)
+
+(defn remove-essential-gene
+  [db [_ gene-to-remove]]
+  (-> db
+      (update-in [:sim-panel :essential-genes] #(remove (set [gene-to-remove]) %))
+      (update-in [:sim-panel :columns-used] disj gene-to-remove)))
+(rf/reg-event-db :sim/remove-essential-gene
+                 event-interceptors
+                 remove-essential-gene)
+
 ;; Conditioned.
 
 (defn conditioned

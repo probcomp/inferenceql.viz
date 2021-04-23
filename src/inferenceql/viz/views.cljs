@@ -24,12 +24,13 @@
         columns-used @(rf/subscribe [:sim/columns-used])
         constraints @(rf/subscribe [:sim/constraints])
         target-gene @(rf/subscribe [:sim/target-gene])
-        essential-genes @(rf/subscribe [:sim/essential-genes])]
+        essential-genes @(rf/subscribe [:sim/essential-genes])
+        all-essential-genes @(rf/subscribe [:sim/all-essential-genes])]
     [h-box :children [[v-box
                        :size "6"
                        :style {:margin "20px"}
-                       :children [[sim/view target-gene essential-genes]
-                                  [gap :size "10px"]
+                       :children [[sim/view target-gene essential-genes all-essential-genes]
+                                  [gap :size "30px"]
                                   [sd2/view (:model models) columns-used constraints]]]
                       [line
                        :size "1px"

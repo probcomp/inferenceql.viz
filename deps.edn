@@ -18,6 +18,7 @@
         cljs-ajax/cljs-ajax {:mvn/version "0.8.1"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         cljsjs/highlight {:mvn/version "9.12.0-2"}
+        metosin/komponentit {:mvn/version "0.3.10"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "d4d1354dd872bc77d11f3a4fc51ffd948d365562"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"

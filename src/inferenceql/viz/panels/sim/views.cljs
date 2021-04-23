@@ -18,7 +18,9 @@
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
             [yarn.scroll-into-view]
-            [yarn.react-chips]))
+            [yarn.react-chips]
+            [komponentit.autocomplete :as autocomplete]
+            [komponentit.mixins :as mixins]))
 
 (defn expr-level-slider []
   (let [level (rf/subscribe [:sim/expr-level])
@@ -48,18 +50,38 @@
                                                   (str "constrained at " (format "%.2f" (or @level (:initial @settings))))
                                                   "(unconstrained)")]]]]]]))
 
-(defn view [target-gene essential-genes]
-  ;(.log js/console :---------test1 js/Chips)
-  ;(.log js/console :---------test1 js/Chip)
+
+(defn view [target-gene essential-genes all-essential-genes]
   [v-box
-   :children [[:h4 (str "Gene knockout: " (name target-gene))]
-              [:h4 (str "Essential genes: " (string/join ", " (map name essential-genes)))]
+   :children [[:h1 (str "Gene knockout: " (name target-gene))]
+
+              [:h3 "Essential genes:"]
+
+              [box
+               :style {:margin-left "20px"}
+               :child [autocomplete/multiple-autocomplete
+                       {:value essential-genes
+
+                        :on-change
+                        #_(fn [item] (swap! value conj (:key item)))
+                        #(rf/dispatch [:sim/add-essential-gene (:key %)])
+
+                        :on-remove
+                        #_(fn [v] (swap! value disj v))
+                        #(rf/dispatch [:sim/remove-essential-gene %])
+
+                        :search-fields [:value]
+                        :items (zipmap all-essential-genes (map name all-essential-genes))
+                        :max-results 20}]]
+              [gap :size "10px"]
+
               #_[:> (r/adapt-react-class js/Chips)
                  {:value ["foo"]
                   :suggestions ["bar" "biz" "baz"]
                   :onChange #(.log js/console :-------output %)}]
 
-              [:h2 "simulation controls: "]
+              [:h3 "simulation controls: "]
+
               [gap :size "5px"]
               [expr-level-slider]
               [gap :size "20px"]
