@@ -55,8 +55,10 @@
   [v-box
    :children [[:h1 (str "Gene knockout: " (name target-gene))]
 
-              [:h3 "Essential genes:"]
+              [:h3 "Essential genes"]
 
+              ;; TODO: remove ability to add already included gene.
+              ;; TODO: remove drop down when new gene is deleted
               [box
                :style {:margin-left "20px"}
                :child [autocomplete/multiple-autocomplete
@@ -68,7 +70,11 @@
 
                         :on-remove
                         #_(fn [v] (swap! value disj v))
-                        #(rf/dispatch [:sim/remove-essential-gene %])
+                        #(do
+                           #_(this-as this
+                               (.log js/console :--------- this)
+                               (.blur this))
+                           (rf/dispatch [:sim/remove-essential-gene %]))
 
                         :search-fields [:value]
                         :items (zipmap all-essential-genes (map name all-essential-genes))
@@ -80,9 +86,7 @@
                   :suggestions ["bar" "biz" "baz"]
                   :onChange #(.log js/console :-------output %)}]
 
-              [:h3 "simulation controls: "]
-
-              [gap :size "5px"]
+              [:h3 "Simulation controls"]
               [expr-level-slider]
               [gap :size "20px"]
               [h-box

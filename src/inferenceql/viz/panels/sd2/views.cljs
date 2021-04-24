@@ -77,13 +77,20 @@
     (r/create-class
      {:display-name "js-model-code"
 
-      :component-did-mount
+      #_:component-did-mount
+      #_(fn [this]
+          (.highlightBlock js/hljs (rdom/dom-node this) #_(:program-display @dom-nodes)))
+
+      :component-did-update
       (fn [this]
-        (.highlightBlock js/hljs (:program-display @dom-nodes)))
+        ;;(.log js/console :running-component-did-update--------- this (:program-display @dom-nodes))
+        (.highlightBlock js/hljs (rdom/dom-node this) #_(:program-display @dom-nodes)))
 
       :reagent-render
-      (fn []
-        [:pre.program-display {:ref #(swap! dom-nodes assoc :program-display %)}
+      (fn [js-code display]
+        (.log js/console :update---------2----- js-code)
+        ^{:key js-code}
+        [:pre.program-display #_{:ref #(swap! dom-nodes assoc :program-display %)}
          [:code {:class "js"}
           js-code]])})))
 
@@ -98,6 +105,7 @@
     [:div.points-badge points-count]))
 
 (defn xcat-category [column-gpms view-id cat-id]
+  (.log js/console :update--------- view-id cat-id (keys column-gpms))
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
         points-count (rf/subscribe [:sim/points-count view-id cat-id])
 
