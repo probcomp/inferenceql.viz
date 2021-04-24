@@ -72,27 +72,19 @@
          (string/join "\n"))))
 
 (defn js-code-block
-  [js-code display]
-  (let [dom-nodes (r/atom {})]
-    (r/create-class
-     {:display-name "js-model-code"
+  [js-code]
+  (r/create-class
+   {:display-name "js-model-code"
 
-      #_:component-did-mount
-      #_(fn [this]
-          (.highlightBlock js/hljs (rdom/dom-node this) #_(:program-display @dom-nodes)))
+    :component-did-update
+    (fn [this]
+      (.highlightBlock js/hljs (rdom/dom-node this)))
 
-      :component-did-update
-      (fn [this]
-        ;;(.log js/console :running-component-did-update--------- this (:program-display @dom-nodes))
-        (.highlightBlock js/hljs (rdom/dom-node this) #_(:program-display @dom-nodes)))
-
-      :reagent-render
-      (fn [js-code display]
-        (.log js/console :update---------2----- js-code)
-        ^{:key js-code}
-        [:pre.program-display #_{:ref #(swap! dom-nodes assoc :program-display %)}
-         [:code {:class "js"}
-          js-code]])})))
+    :reagent-render
+    (fn [js-code]
+      ^{:key js-code} [:pre.program-display
+                       [:code {:class "js"}
+                        js-code]])}))
 
 (defn cluster-output [view-id cat-id]
   (let [output (rf/subscribe [:sd2/cluster-output view-id cat-id])]
@@ -105,7 +97,6 @@
     [:div.points-badge points-count]))
 
 (defn xcat-category [column-gpms view-id cat-id]
-  (.log js/console :update--------- view-id cat-id (keys column-gpms))
   (let [open (rf/subscribe [:sd2/cluster-open view-id cat-id])
         points-count (rf/subscribe [:sim/points-count view-id cat-id])
 
@@ -145,7 +136,7 @@
                              [points-badge @points-count]]]
                  [:div {:style {:display display :margin-left "40px"}}
                   [v-box :children [[gap :size "15px"]
-                                    [js-code-block (js-fn-text stat-types params) display]
+                                    [js-code-block (js-fn-text stat-types params)]
                                     [cluster-output view-id cat-id]
                                     [gap :size "15px"]]]]]]]))
 
