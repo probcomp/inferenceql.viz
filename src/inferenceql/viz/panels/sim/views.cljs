@@ -53,9 +53,16 @@
 
 (defn view [target-gene essential-genes all-essential-genes]
   [v-box
-   :children [[:h1 (str "Gene knockout: " (name target-gene))]
+   :children [[h-box
+               :style {:margin-bottom "30px"}
+               :gap "25px"
+               :children [[:h3 {:style {:display "inline" :margin-top "23px"
+                                        :margin-bottom "0px"}} "GENE KNOCKOUT"]
+                          [:h1 {:style {:display "inline" :margin-top "0px"
+                                        :margin-bottom "0px" :font-size "56px"}} (name target-gene)]]]
 
-              [:h3 "Essential genes"]
+              [:h4 "ESSENTIAL GENES"]
+              [gap :size "5px"]
 
               ;; TODO: remove ability to add already included gene.
               ;; TODO: remove drop down when new gene is deleted
@@ -86,7 +93,7 @@
                   :suggestions ["bar" "biz" "baz"]
                   :onChange #(.log js/console :-------output %)}]
 
-              [:h3 "Simulation controls"]
+              [:h4 "SIMULATION CONTROLS"]
               [expr-level-slider]
               [gap :size "20px"]
               [h-box
