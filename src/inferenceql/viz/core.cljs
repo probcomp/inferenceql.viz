@@ -65,6 +65,14 @@
   ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
   ;; not reset the state of the app.
   (rf/dispatch-sync [:app/initialize-db])
-  (rf/dispatch-sync [:upload/read-query-string-params (query-string-params)])
-  (rf/dispatch-sync [:control/set-query-string-to-select-all])
+
+  (let [params (query-string-params)]
+    (rf/dispatch-sync [:upload/read-query-string-params params])
+
+    (if (:query params)
+      ;; Use the query string passed in params.
+      (rf/dispatch-sync [:control/set-query-string (:query params)])
+      ;; Set the query string to select all columns.
+      (rf/dispatch-sync [:control/set-query-string-to-select-all])))
+
   (render-app))
