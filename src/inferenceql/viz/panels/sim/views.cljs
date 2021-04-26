@@ -57,7 +57,7 @@
                :style {:margin-bottom "30px"}
                :gap "25px"
                :children [[:h3 {:style {:display "inline" :margin-top "25px"
-                                        :margin-bottom "0px"}} "GENE KNOCKOUT"]
+                                        :margin-bottom "0px"}} "GENE KNOCKOUT➔"]
                           [:h1 {:style {:display "inline" :margin-top "0px"
                                         :margin-bottom "0px" :font-size "56px"}} (name target-gene)]]]
 
