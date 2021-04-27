@@ -4,7 +4,7 @@
   models and geodata are stored."
   (:require [clojure.spec.alpha :as s]
             [inferenceql.viz.config :as config]
-            [inferenceql.viz.csv :as csv-utils]
+            [inferenceql.viz.csv :refer [clean-csv-maps]]
             [inferenceql.inference.gpm :as gpm]))
 
 ;;; Compiled-in elements to store
@@ -12,9 +12,9 @@
 (def compiled-in-schema (get config/config :schema))
 
 (def compiled-in-dataset
-  (csv-utils/csv-data->clean-maps (get config/config :schema)
-                                  (get config/config :data)
-                                  {:keywordize-cols true}))
+  (clean-csv-maps (get config/config :schema)
+                  (get config/config :data)))
+
 
 (def compiled-in-model (get config/config :model))
 
