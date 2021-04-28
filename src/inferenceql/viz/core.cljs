@@ -48,7 +48,8 @@
             [inferenceql.query.js]
             ;; Misc requires for observable.
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
-            [inferenceql.viz.panels.table.views :refer [handsontable]]))
+            [inferenceql.viz.panels.table.views :refer [handsontable]]
+            [inferenceql.viz.panels.table.subs :refer [column-settings]]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
@@ -81,12 +82,13 @@
 
 (defn ^:export table
   ""
-  [data columns]
+  []
   (let [node (dom/createElement "div")
-        node (dom/$ "app")
+        ;;node (dom/$ "app")
         settings (-> default-hot-settings
                      (assoc-in [:settings :data] data)
-                     (assoc-in [:settings :colHeaders] columns))]
+                     (assoc-in [:settings :colHeaders] columns)
+                     (assoc-in [:settings :columns] (clj->js (column-settings columns))))]
     (rdom/render [handsontable {} settings] node)
     node))
 

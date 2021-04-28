@@ -99,7 +99,7 @@
                              header)] ;; no-op stub for now.
       (map make-presentable headers))))
 
-(defn- column-settings [headers]
+(defn column-settings [headers]
   "Returns an array of objects that define settings for each column
   in the table including which attribute from the underlying map for the row
   is presented."
