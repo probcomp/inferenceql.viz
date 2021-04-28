@@ -45,7 +45,10 @@
             ;; Library functions for user-defined JS functions.
             [inferenceql.viz.user]
             ;; Functions for running iql queries from JS.
-            [inferenceql.query.js]))
+            [inferenceql.query.js]
+            ;; Misc requires for observable.
+            [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
+            [inferenceql.viz.panels.table.views :refer [handsontable]]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
@@ -66,13 +69,28 @@
   []
   ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
   ;; not reset the state of the app.
-  (rf/dispatch-sync [:app/initialize-db])
+  (rf/dispatch-sync [:app/initialize-db]))
 
-  (let [params (query-string-params)]
-    (rf/dispatch-sync [:upload/read-query-string-params params])
-    ;; Set the query string only when it is included in params.
-    (if (:query params)
-      (rf/dispatch-sync [:control/set-query-string (:query params)])
-      (rf/dispatch-sync [:control/set-query-string-to-select-all])))
+;--------------------------------------------------------------------------------
 
-  (render-app))
+(def ^:export data (clj->js [{:age 33 :height 50 :gender "male"}
+                             {:age 55 :height 150 :gender "male"}
+                             {:age 88 :height 200 :gender "female"}]))
+
+(def ^:export columns (clj->js [:age :height :gender]))
+
+(defn ^:export table
+  ""
+  [data columns]
+  (let [node (dom/createElement "div")
+        node (dom/$ "app")
+        settings (-> default-hot-settings
+                     (assoc-in [:settings :data] data)
+                     (assoc-in [:settings :colHeaders] columns))]
+    (rdom/render [handsontable {} settings] node)
+    node))
+
+(defn ^:export viz
+  ""
+  [data selections schema]
+  nil)
