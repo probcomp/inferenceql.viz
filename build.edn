@@ -16,7 +16,7 @@
            "externs/vega.ext.js"
            "externs/vega-embed.ext.js"
            "externs/vega-lite.ext.js"]
- :optimizations :advanced
+ :optimizations :advanced}
 
- :pseudo-names true
- :pretty-print true}
+ ;:pseudo-names true
+ ;:pretty-print true}
