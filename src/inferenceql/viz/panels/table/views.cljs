@@ -67,8 +67,7 @@
                (js/Handsontable.hooks.add camel-key (callback-gen hot) hot)))
 
            ;; Save the hot object in the app db.
-           (rf/dispatch [:table/set-hot-instance hot])
-           (set! js/table hot)))
+           (rf/dispatch [:table/set-hot-instance hot])))
 
        :component-did-update
        (fn [this old-argv]

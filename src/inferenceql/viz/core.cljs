@@ -48,7 +48,10 @@
             [inferenceql.query.js]
             ;; Misc requires for observable.
             [inferenceql.viz.config :as config]
-            [inferenceql.viz.csv :refer [csv-data->clean-maps]]
+            [inferenceql.viz.csv :refer [csv-data->clean-maps
+                                         cast-items-in-row]]
+
+            [clojure.edn :as edn]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
             [inferenceql.viz.panels.table.views :refer [handsontable]]
             [inferenceql.viz.panels.table.subs :refer [column-settings]]
@@ -85,10 +88,11 @@
 (def ^:export columns (clj->js [:age :height :gender]))
 
 (defn ^:export table
-  ""
-  []
-  (let [node (dom/createElement "div")
-        ;;node (dom/$ "app")
+  [data columns]
+  (let [columns (map keyword (js->clj columns))
+        data (js->clj data {:keywordize-keys true})
+
+        node (dom/createElement "div")
         settings (-> default-hot-settings
                      (assoc-in [:settings :data] data)
                      (assoc-in [:settings :colHeaders] columns)
@@ -96,7 +100,32 @@
     (rdom/render [handsontable {} settings] node)
     node))
 
-(defn ^:export viz
+(defn ^:export read_schema
+  [schema-string]
+  (clj->js (edn/read-string schema-string)))
+
+(defn ^:export plot
+  ""
+  [data schema selections]
+  (let [selections (for [cols selections]
+                     (for [col cols]
+                       (keyword col)))
+        schema (js->clj schema {:keywordize-keys true})
+
+        data (js->clj data {:keywordize-keys true})
+        data (mapv #(cast-items-in-row schema %) data)
+
+        spec (vega/generate-spec schema data selections)
+        _ (.log js/console "data" (clj->js data))
+        _ (.log js/console "schema" (clj->js schema))
+        _ (.log js/console "spec" (clj->js spec))
+        comp [viz-views/vega-lite spec {:actions false} nil nil]
+
+        n (dom/createElement "div")]
+    (rdom/render comp n)
+    n))
+
+(defn ^:export old-viz-test
   ""
   []
   (let [data (csv-data->clean-maps (get config/config :schema)
@@ -115,7 +144,7 @@
     (rdom/render comp n)
     n))
 
-(defn ^:export viz2
+(defn ^:export old-viz2
   ""
   []
   (let [

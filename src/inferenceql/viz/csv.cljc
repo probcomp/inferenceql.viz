@@ -20,7 +20,7 @@
              (when-not (js/Number.isNaN n)
                n))))
 
-(defn- cast-items-in-row [column-types row]
+(defn cast-items-in-row [column-types row]
   "Casts vals in a map `row` based on their type as defined by `column-types`."
   (medley/map-kv (fn [k v]
                    (let [type (get column-types k)]
