@@ -1,22 +1,5 @@
-{:foreign-libs [{:file "node_modules/vega/build/vega.js"
-                 :file-min "node_modules/vega/build/vega.min.js"
-                 :provides ["yarn.vega"]}
-                {:file "node_modules/vega-lite/build/vega-lite.js"
-                 :file-min "node_modules/vega-lite/build/vega-lite.min.js"
-                 :provides ["yarn.vega-lite"]}
-                {:file "node_modules/vega-embed/build/vega-embed.js"
-                 :file-min "node_modules/vega-embed/build/vega-embed.min.js"
-                 :requires ["yarn.vega"
-                            "yarn.vega-lite"]
-                 :provides ["yarn.vega-embed"]}
-                {:file "node_modules/handsontable/dist/handsontable.full.js"
-                 :file-min "node_modules/handsontable/dist/handsontable.full.min.js"
-                 :provides ["yarn.handsontable"]}]
- :externs ["externs/handsontable.ext.js"
+{:externs ["externs/handsontable.ext.js"
            "externs/vega.ext.js"
            "externs/vega-embed.ext.js"
            "externs/vega-lite.ext.js"]
  :optimizations :advanced}
-
- ;:pseudo-names true
- ;:pretty-print true}

@@ -1,6 +1,5 @@
 (ns inferenceql.viz.vega
-  "Code for initializing vega"
-  (:require [yarn.vega-embed]))
+  "Code for initializing vega")
 
 (def nyt-color-scheme
   "This is a name for the NYTimes color scheme.

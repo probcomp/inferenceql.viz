@@ -1,6 +1,5 @@
 (ns inferenceql.viz.panels.table.views
-  (:require [yarn.handsontable]
-            [camel-snake-kebab.core :as csk]
+  (:require [camel-snake-kebab.core :as csk]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]

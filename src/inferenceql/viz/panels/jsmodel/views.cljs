@@ -1,9 +1,7 @@
 (ns inferenceql.viz.panels.jsmodel.views
   (:require [re-com.core :refer [border v-box title button gap]]
             [reagent.core :as r]
-            [re-frame.core :as rf]
-            [cljsjs.highlight]
-            [cljsjs.highlight.langs.javascript]))
+            [re-frame.core :as rf]))
 
 (defn js-code-block
   "Display of Javascript code with syntax highlighting.
