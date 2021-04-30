@@ -1,5 +1,9 @@
 {:externs ["externs/handsontable.ext.js"
            "externs/vega.ext.js"
            "externs/vega-embed.ext.js"
-           "externs/vega-lite.ext.js"]
- :optimizations :advanced}
+           "externs/vega-lite.ext.js"
+           "externs/react.ext.js"
+           "externs/react-dom.ext.js"]
+ :optimizations :advanced
+ :pretty-print true
+ :pseudo-names true}

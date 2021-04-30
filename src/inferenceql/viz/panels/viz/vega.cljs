@@ -420,34 +420,20 @@
            #{"nominal"} (table-bubble-plot selections cols)
            #{"quantitative" "nominal"} (strip-plot selections cols vega-type))))
 
-(defn- spec-for-selection-layer [schema simulatable-cols geodata geo-id-col selection-layer]
-  (let [vega-type (vega-type-fn schema)
-        {layer-name :id
-         selections :selections
-         cols :selected-columns
-         row :row-at-selection-start} selection-layer]
+(defn- spec-for-selection-layer [schema data cols]
+  (let [vega-type (vega-type-fn schema)]
     ;; Only produce a spec when we can find a vega-type for all selected columns
     ;; except the geo-id-col which we handle specially.
-    (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
-      (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
-                       (gen-choropleth geodata geo-id-col selections cols vega-type)
+    (when (every? some? (map vega-type cols))
+      (cond (= 1 (count cols)) ; One column selected.
+            (gen-histogram (first cols) data vega-type)
 
-                       (simulatable? selections cols simulatable-cols)
-                       (gen-simulate-plot (first cols) row (name layer-name) vega-type)
+            :else ; Two or more columns selected.
+            (gen-comparison-plot (take 2 cols) data vega-type)))))
 
-                       (= 1 (count cols)) ; One column selected.
-                       (gen-histogram (first cols) selections vega-type)
-
-                       :else ; Two or more columns selected.
-                       (gen-comparison-plot (take 2 cols) selections vega-type))
-             title {:title {:text (str (name layer-name) " " "selection")
-                            :color (title-color layer-name)
-                            :fontWeight 500}}]
-        (merge spec title)))))
-
-(defn generate-spec [schema simulatable-cols geodata geo-id-col selection-layers]
-  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema simulatable-cols geodata geo-id-col %)
-                                    selection-layers))]
+(defn generate-spec [schema data selections]
+  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema data %)
+                                    selections))]
     {:$schema default-vega-lite-schema
      :hconcat spec-layers
      :resolve {:legend {:size "independent"

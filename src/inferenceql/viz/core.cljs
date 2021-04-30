@@ -47,9 +47,13 @@
             ;; Functions for running iql queries from JS.
             [inferenceql.query.js]
             ;; Misc requires for observable.
+            [inferenceql.viz.config :as config]
+            [inferenceql.viz.csv :refer [csv-data->clean-maps]]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
             [inferenceql.viz.panels.table.views :refer [handsontable]]
-            [inferenceql.viz.panels.table.subs :refer [column-settings]]))
+            [inferenceql.viz.panels.table.subs :refer [column-settings]]
+            [inferenceql.viz.panels.viz.views :as viz-views]
+            [inferenceql.viz.panels.viz.vega :as vega]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
@@ -94,5 +98,30 @@
 
 (defn ^:export viz
   ""
-  [data selections schema]
-  nil)
+  []
+  (let [data (csv-data->clean-maps (get config/config :schema)
+                                   (get config/config :data)
+                                   {:keywordize-cols true})
+        selections [[:age :height] [:gender :height]]
+        schema (:schema config/config)
+
+        spec (vega/generate-spec schema data selections)
+        _ (.log js/console "data" (clj->js data))
+        _ (.log js/console "schema" (clj->js schema))
+        _ (.log js/console "spec" (clj->js spec))
+        comp [viz-views/vega-lite spec {:actions false} nil nil]
+
+        n (dom/createElement "div")]
+    (rdom/render comp n)
+    n))
+
+(defn ^:export viz2
+  ""
+  []
+  (let [
+        comp [:div
+              [:h1 "haoeuae"]]
+
+        n (dom/createElement "div")]
+    (rdom/render comp n)
+    n))
