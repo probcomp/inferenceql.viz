@@ -90,7 +90,8 @@
 (defn ^:export table
   [data columns]
   (let [columns (map keyword (js->clj columns))
-        data (js->clj data {:keywordize-keys true})
+        ;; should be keywordized?
+        data (js->clj data)
 
         node (dom/createElement "div")
         settings (-> default-hot-settings
@@ -105,51 +106,21 @@
   (clj->js (edn/read-string schema-string)))
 
 (defn ^:export plot
-  ""
   [data schema selections]
   (let [selections (for [cols selections]
                      (for [col cols]
                        (keyword col)))
-        schema (js->clj schema {:keywordize-keys true})
 
-        data (js->clj data {:keywordize-keys true})
+        schema (js->clj schema :keywordize-keys true)
+        data (js->clj data :keywordize-keys true)
         data (mapv #(cast-items-in-row schema %) data)
 
         spec (vega/generate-spec schema data selections)
-        _ (.log js/console "data" (clj->js data))
-        _ (.log js/console "schema" (clj->js schema))
-        _ (.log js/console "spec" (clj->js spec))
+        _ (.log js/console "selections" (str selections))
+        _ (.log js/console "data" (str data))
+        _ (.log js/console "schema" (str schema))
+        _ (.log js/console "spec" (str spec))
         comp [viz-views/vega-lite spec {:actions false} nil nil]
-
-        n (dom/createElement "div")]
-    (rdom/render comp n)
-    n))
-
-(defn ^:export old-viz-test
-  ""
-  []
-  (let [data (csv-data->clean-maps (get config/config :schema)
-                                   (get config/config :data)
-                                   {:keywordize-cols true})
-        selections [[:age :height] [:gender :height]]
-        schema (:schema config/config)
-
-        spec (vega/generate-spec schema data selections)
-        _ (.log js/console "data" (clj->js data))
-        _ (.log js/console "schema" (clj->js schema))
-        _ (.log js/console "spec" (clj->js spec))
-        comp [viz-views/vega-lite spec {:actions false} nil nil]
-
-        n (dom/createElement "div")]
-    (rdom/render comp n)
-    n))
-
-(defn ^:export old-viz2
-  ""
-  []
-  (let [
-        comp [:div
-              [:h1 "haoeuae"]]
 
         n (dom/createElement "div")]
     (rdom/render comp n)
