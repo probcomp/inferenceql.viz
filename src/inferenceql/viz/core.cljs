@@ -81,23 +81,34 @@
 
 ;--------------------------------------------------------------------------------
 
-(def ^:export data (clj->js [{:age 33 :height 50 :gender "male"}
-                             {:age 55 :height 150 :gender "male"}
-                             {:age 88 :height 200 :gender "female"}]))
-
-(def ^:export columns (clj->js [:age :height :gender]))
-
 (defn ^:export table
   ([data]
-   ;; Grabbing the columns from the keys in the first row of data.
-   (table data (->> data first js-keys)))
-  ([data columns]
-   (let [node (dom/createElement "div")
+   (table data {}))
+  ([data options]
+   (let [options (js->clj options)
+         {:strs [cols height v-scroll]} options
+
+         ;; Potentially grabbing the columns from the keys in the first row of data.
+         cols (or cols (->> data first js-keys))
+
+         height (cond
+                  (false? v-scroll) "auto"
+                  (some? height) height
+                  :else
+                  ;; TODO: may need to adjust these sizes.
+                  (let [data-height (+ (* (count data) 22) 38)]
+                    (min data-height 500)))
+
+         node (dom/createElement "div")
          settings (-> default-hot-settings
                       (assoc-in [:settings :data] data)
-                      (assoc-in [:settings :colHeaders] columns)
-                      (assoc-in [:settings :columns] (clj->js (column-settings columns))))]
-     (rdom/render [handsontable {:style {:padding-bottom "10px"}} settings]
+                      (assoc-in [:settings :colHeaders] cols)
+                      (assoc-in [:settings :columns] (column-settings cols))
+                      (assoc-in [:settings :height] height)
+                      (assoc-in [:settings :width] "100%"))]
+     (rdom/render [handsontable
+                   {:style {:padding-bottom "10px"}}
+                   settings]
                   node)
      node)))
 

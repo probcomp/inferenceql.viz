@@ -51,8 +51,9 @@
 
 (defn handsontable
   ([attributes props]
-   (let [hot-instance (rf/subscribe [:table/hot-instance])
+   (let [hot-instance (reagent/atom nil)
          dom-nodes (reagent/atom {})]
+
      (reagent/create-class
       {:display-name "handsontable-reagent"
 
@@ -61,13 +62,17 @@
          (let [{:keys [settings hooks]} props
                hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
-           ;; Add callbacks internal to hot object.
-           (doseq [[key callback-gen] hooks]
-             (let [camel-key (csk/->camelCase (clj->js key))]
-               (js/Handsontable.hooks.add camel-key (callback-gen hot) hot)))
+           ;; Fix scrolling for HOT in Observable.
+           (js/Handsontable.hooks.add "afterRender"
+                                      (fn []
+                                        (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
+                                      hot)
 
-           ;; Save the hot object in the app db.
-           (rf/dispatch [:table/set-hot-instance hot])))
+           ;; Make new HOT instances appear immediately in Observable.
+           (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30)
+
+           ;; Save HOT instance.
+           (reset! hot-instance hot)))
 
        :component-did-update
        (fn [this old-argv]
@@ -87,7 +92,6 @@
        :component-will-unmount
        (fn [this]
          (when @hot-instance
-           (rf/dispatch [:table/unset-hot-instance])
            (.destroy @hot-instance)))
 
        :reagent-render

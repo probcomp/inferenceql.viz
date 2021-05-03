@@ -824,8 +824,6 @@ Handsontable.Core.plugins.ColumnSorting.prototype.getSortConfig = function() {};
 Handsontable.Core.plugins.ColumnSorting.prototype.sort = function() {};
 Handsontable.Core.plugins.ColumnSorting.prototype.clearSort = function() {};
 
-
-
 Handsontable.Core.prototype.deselectCell = function() {};
 Handsontable.Core.prototype.loadData = function() {};
 Handsontable.Core.prototype.updateSettings = function() {};
@@ -840,10 +838,10 @@ Handsontable.Core.prototype.toVisualRow = function() {};
 Handsontable.Core.prototype.toPhysicalRow = function() {};
 Handsontable.Core.prototype.countRows = function() {};
 
-
 Handsontable.Core.prototype.alter = function() {};
 Handsontable.Core.prototype.setSourceDataAtCell = function() {};
+Handsontable.Core.prototype.refreshDimensions = function() {};
 
-
+Handsontable.Core.view.wt.wtOverlays.prototype.updateMainScrollableElements = function() {};
 
 // js/Handsontable.hooks.add ?

@@ -7,12 +7,12 @@
 /* --------------- styling for handsontables --------------- */
 
 .ht_master tr td {
-  font-family: arial;
+  font-family: roboto;
   font-size: 14px;
 }
 
 .handsontable th {
-  font-family: arial;
+  font-family: roboto;
   font-size: 14px;
 }
 
