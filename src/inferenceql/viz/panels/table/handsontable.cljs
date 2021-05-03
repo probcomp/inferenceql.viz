@@ -3,8 +3,8 @@
 
 (def default-hot-settings
   {:settings {:data                []
-              :colHeaders          []
-              :columns             []
+              ;; :colHeaders optional.
+              ;; :columns optional.
               :rowHeaders          true
               :multiColumnSorting  true
               :manualColumnMove    true

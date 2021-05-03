@@ -88,18 +88,18 @@
 (def ^:export columns (clj->js [:age :height :gender]))
 
 (defn ^:export table
-  [data columns]
-  (let [columns (map keyword (js->clj columns))
-        ;; should be keywordized?
-        data (js->clj data)
-
-        node (dom/createElement "div")
-        settings (-> default-hot-settings
-                     (assoc-in [:settings :data] data)
-                     (assoc-in [:settings :colHeaders] columns)
-                     (assoc-in [:settings :columns] (clj->js (column-settings columns))))]
-    (rdom/render [handsontable {:style {:padding-bottom "10px"}} settings] node)
-    node))
+  ([data]
+   ;; Grabbing the columns from the keys in the first row of data.
+   (table data (->> data first js-keys)))
+  ([data columns]
+   (let [node (dom/createElement "div")
+         settings (-> default-hot-settings
+                      (assoc-in [:settings :data] data)
+                      (assoc-in [:settings :colHeaders] columns)
+                      (assoc-in [:settings :columns] (clj->js (column-settings columns))))]
+     (rdom/render [handsontable {:style {:padding-bottom "10px"}} settings]
+                  node)
+     node)))
 
 (defn ^:export read_schema
   [schema-string]
