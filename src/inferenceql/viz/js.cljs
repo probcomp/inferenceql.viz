@@ -1,16 +1,26 @@
 (ns inferenceql.viz.js
   (:require [clojure.edn :as edn]
+            [goog.labs.format.csv :as goog.csv]
+            [goog.dom :as dom]
+            [reagent.dom :as rdom]
             [inferenceql.query.data :refer [row-coercer]]
             [inferenceql.viz.csv]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
             [inferenceql.viz.panels.table.views :refer [handsontable]]
             [inferenceql.viz.panels.table.subs :refer [column-settings]]
             [inferenceql.viz.panels.viz.views :as viz-views]
-            [inferenceql.viz.panels.viz.vega :as vega]))
+            [inferenceql.viz.panels.viz.vega :as vega]
+            ;; Functions for running iql queries from JS.
+            [inferenceql.query.js]))
 
 (defn ^:export read_schema
   [schema-string]
   (clj->js (edn/read-string schema-string)))
+
+#_(defn ^:export read_and_coerce_csv
+    [csv-text schema]
+    (let [csv-vecs (-> csv-text goog.csv/parse js->clj)]
+      (csv-data->clean-maps schema csv-vecs {:keywordize-cols true})))
 
 (defn ^:export table
   ([data]
@@ -37,8 +47,9 @@
                       (assoc-in [:settings :columns] (column-settings cols))
                       (assoc-in [:settings :height] height)
                       (assoc-in [:settings :width] "100%"))]
+     ;; todo: move component up
      (rdom/render [handsontable
-                   {:style {:padding-bottom "10px"}}
+                   {:style {:padding-bottom "5px"}}
                    settings]
                   node)
      node)))
