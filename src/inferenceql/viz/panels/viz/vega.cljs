@@ -68,16 +68,29 @@
 
   Returns: (a function) Which returns a vega-lite type given `col-name`, a column name
     from the data table. Returns nil if vega-lite type can't be deterimend."
-  [schema]
+  [schema data]
   (fn [col-name]
     (cond (probability-column? col-name)
           "quantitative"
 
           :else
-          ;; Mapping from multi-mix stat-types to vega-lite data-types.
-          (let [mapping {:gaussian "quantitative"
-                         :categorical "nominal"}]
-            (get mapping (get schema col-name))))))
+          (let [ ;; Mapping from multi-mix stat-types to vega-lite data-types.
+                mapping {:gaussian "quantitative"
+                         :categorical "nominal"}
+
+                infer-type (fn [col-name]
+                             (let [numbers (->> data
+                                                (take 10)
+                                                (map #(get % col-name))
+                                                (map number?)
+                                                (every? true?))]
+                               (if numbers :gaussian :categorical)))
+
+                iql-type (or (->> col-name
+                                  (get schema)
+                                  (keyword))
+                             (infer-type col-name))]
+            (get mapping iql-type)))))
 
 (defn should-bin?
   "Returns whether data for a certain column should be binned in a vega-lite spec.
@@ -423,9 +436,10 @@
 (defn- spec-for-selection-layer [schema data cols]
   (.log js/console "spec-for-layer: " (str cols))
   (.log js/console "schema: " (str schema))
-  (let [vega-type (vega-type-fn schema)]
+  (let [vega-type (vega-type-fn schema data)]
     ;; Only produce a spec when we can find a vega-type for all selected columns
     ;; except the geo-id-col which we handle specially.
+    (.log js/console "vega-types: " (str (map vega-type cols)))
     (when (every? some? (map vega-type cols))
       (.log js/console "here-------------")
       (cond (= 1 (count cols)) ; One column selected.
