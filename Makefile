@@ -40,7 +40,7 @@ clean:
 ### Compilation
 
 compile-opts := $(current-dir)/build.edn
-main-ns      := inferenceql.viz.core
+main-ns      := inferenceql.viz.js
 
 cljs-main-opts := \
 		-co $(compile-opts) \

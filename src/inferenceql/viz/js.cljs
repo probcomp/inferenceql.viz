@@ -1,6 +1,7 @@
 (ns inferenceql.viz.js
   (:require [clojure.edn :as edn]
-            [inferenceql.viz.csv :refer [csv-data->clean-maps cast-items-in-row]]
+            [inferenceql.query.data :refer [row-coercer]]
+            [inferenceql.viz.csv]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
             [inferenceql.viz.panels.table.views :refer [handsontable]]
             [inferenceql.viz.panels.table.subs :refer [column-settings]]
@@ -50,7 +51,9 @@
 
         schema (js->clj schema :keywordize-keys true)
         data (js->clj data :keywordize-keys true)
-        data (mapv #(cast-items-in-row schema %) data)
+
+        coercer (row-coercer schema)
+        data (mapv coercer data)
 
         spec (vega/generate-spec schema data selections)
         comp [viz-views/vega-lite spec {:actions false} nil nil]
