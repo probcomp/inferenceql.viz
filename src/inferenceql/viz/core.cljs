@@ -43,9 +43,7 @@
             [inferenceql.viz.components.store.events]
             [inferenceql.viz.components.store.subs]
             ;; Library functions for user-defined JS functions.
-            [inferenceql.viz.user]
-            ;; Functions for running iql queries from JS.
-            [inferenceql.query.js]))
+            [inferenceql.viz.user]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
@@ -66,4 +64,15 @@
   []
   ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
   ;; not reset the state of the app.
-  (rf/dispatch-sync [:app/initialize-db]))
+  (rf/dispatch-sync [:app/initialize-db])
+
+  (let [params (query-string-params)]
+    (rf/dispatch-sync [:upload/read-query-string-params params])
+
+    (if (:query params)
+      ;; Use the query string passed in params.
+      (rf/dispatch-sync [:control/set-query-string (:query params)])
+      ;; Set the query string to select all columns.
+      (rf/dispatch-sync [:control/set-query-string-to-select-all])))
+
+  (render-app))

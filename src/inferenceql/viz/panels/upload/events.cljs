@@ -5,7 +5,7 @@
             [goog.labs.format.csv :as csv]
             [medley.core :refer [index-by map-vals find-first]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.viz.csv :as csv-utils]
+            [inferenceql.viz.csv :refer [clean-csv-maps]]
             [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
             [inferenceql.inference.gpm :as gpm]))
 
@@ -112,8 +112,7 @@
 
                                      schema (edn/read-string (:raw-data schema-read))
                                      csv-data (csv/parse (:raw-data dataset-read))
-                                     rows (csv-utils/csv-data->clean-maps
-                                           schema csv-data {:keywordize-cols true})]
+                                     rows (clean-csv-maps schema csv-data)]
 
                                  (merge (:details dataset-read)
                                         {:schema schema :rows rows})))
