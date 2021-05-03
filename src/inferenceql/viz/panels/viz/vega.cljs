@@ -434,14 +434,10 @@
            #{"quantitative" "nominal"} (strip-plot selections cols vega-type))))
 
 (defn- spec-for-selection-layer [schema data cols]
-  (.log js/console "spec-for-layer: " (str cols))
-  (.log js/console "schema: " (str schema))
   (let [vega-type (vega-type-fn schema data)]
     ;; Only produce a spec when we can find a vega-type for all selected columns
     ;; except the geo-id-col which we handle specially.
-    (.log js/console "vega-types: " (str (map vega-type cols)))
     (when (every? some? (map vega-type cols))
-      (.log js/console "here-------------")
       (cond (= 1 (count cols)) ; One column selected.
             (gen-histogram (first cols) data vega-type)
 

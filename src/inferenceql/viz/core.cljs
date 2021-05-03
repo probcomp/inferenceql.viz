@@ -98,7 +98,7 @@
                      (assoc-in [:settings :data] data)
                      (assoc-in [:settings :colHeaders] columns)
                      (assoc-in [:settings :columns] (clj->js (column-settings columns))))]
-    (rdom/render [handsontable {} settings] node)
+    (rdom/render [handsontable {:style {:padding-bottom "10px"}} settings] node)
     node))
 
 (defn ^:export read_schema
@@ -116,10 +116,6 @@
         data (mapv #(cast-items-in-row schema %) data)
 
         spec (vega/generate-spec schema data selections)
-        _ (.log js/console "selections" (str selections))
-        _ (.log js/console "data" (str data))
-        _ (.log js/console "schema" (str schema))
-        _ (.log js/console "spec" (str spec))
         comp [viz-views/vega-lite spec {:actions false} nil nil]
 
         n (dom/createElement "div")]

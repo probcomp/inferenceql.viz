@@ -130,7 +130,5 @@
       :reagent-render
       (fn [spec opt generators pts-store]
         (when spec
-          [:div#viz-container
-           [:div.flex-box-space-filler-20]
-           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
-           [:div.flex-box-space-filler-20]]))})))
+          [:div#viz-container {:style {:overflow-x "auto"}}
+           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
