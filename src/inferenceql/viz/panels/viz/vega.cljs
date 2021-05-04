@@ -448,7 +448,8 @@
   (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema data %)
                                     selections))]
     {:$schema default-vega-lite-schema
-     :hconcat spec-layers
+     :concat spec-layers
+     :columns 2
      :resolve {:legend {:size "independent"
                         :color "independent"}
                :scale {:color "independent"}}}))
