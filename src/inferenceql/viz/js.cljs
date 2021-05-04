@@ -22,6 +22,13 @@
     (let [csv-vecs (-> csv-text goog.csv/parse js->clj)]
       (csv-data->clean-maps schema csv-vecs {:keywordize-cols true})))
 
+
+(defn ^:export simple
+  []
+  (let [node (dom/createElement "div")]
+    (rdom/render [:h1 "Hello"] node)
+    node))
+
 (defn ^:export table
   ([data]
    (table data {}))
