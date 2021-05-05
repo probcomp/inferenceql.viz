@@ -2,18 +2,18 @@
 
 {{#views}}
 function view_{{num}}() {
-  var cluster_id = sample_categorical({ {{cluster-probs}} });
+  var cluster_id = sample_categorical({{{cluster-probs}}});
 
 {{#clusters}}
-{{#first}}  if (cluster_id == {{num}}) {
+{{#first}}  if (cluster_id == "{{num}}") {
     return {
 {{#parameters}}
       "{{name}}": {{#gaussian}}sample_gaussian({"mu": {{mu}}, "sigma": {{{sigma}}}}){{/gaussian}}{{#categorical}}sample_categorical({ {{weights}} }){{/categorical}}{{^last}},{{/last}}
 {{/parameters}}
     };
 {{/first}}
-{{^first}}  } else if (cluster_id == {{num}}) {
-    return { /* a virtual row... */ };
+{{^first}}  } else if (cluster_id == "{{num}}") {
+    return { /* a virtual row */ };
 {{/first}}
 {{/clusters}}  }
 }
