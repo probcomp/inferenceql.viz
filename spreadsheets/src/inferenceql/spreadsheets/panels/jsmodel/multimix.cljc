@@ -121,9 +121,9 @@
                                     {:first (= cluster-num 1)
                                      :last (= cluster-num (count view))
                                      :num cluster-num
-                                     #_:param-summ #_(if (> (count params) 4)
-                                                       "/* Some columns ommited. */"
-                                                       nil)
+                                     :param-summ (if (> (count params) 4)
+                                                   "      /* Some columns ommited. */\n"
+                                                   nil)
                                      :parameters (take 4 params)}))]
                    (case (count clusters)
                      1 [(first clusters)]
