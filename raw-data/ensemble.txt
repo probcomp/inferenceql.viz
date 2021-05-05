@@ -1,0 +1,5 @@
+function ensemble() {
+  var model = sample_categorical({model_1: 0.20, model_2: 0.20, model_3: 0.20, model_4: 0.20, model_5: 0.20});
+
+  return model();
+}
