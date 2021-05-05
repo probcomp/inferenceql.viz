@@ -2,13 +2,13 @@
 
 {{#views}}
 function view_{{num}}() {
-  var cluster_id = categorical([{{cluster-probs}}]) + 1;
+  var cluster_id = sample_categorical({ {{cluster-probs}} });
 
 {{#clusters}}
 {{#first}}  if (cluster_id == {{num}}) {
     return {
 {{#parameters}}
-      "{{name}}": {{#gaussian}}gaussian({{mu}}, {{sigma}}){{/gaussian}}{{#categorical}}categorical([{{weights}}]){{/categorical}}{{^last}},{{/last}}
+      "{{name}}": {{#gaussian}}sample_gaussian({"mu": {{mu}}, "sigma": {{{sigma}}}}){{/gaussian}}{{#categorical}}sample_categorical({ {{weights}} }){{/categorical}}{{^last}},{{/last}}
 {{/parameters}}
     };
 {{/first}}

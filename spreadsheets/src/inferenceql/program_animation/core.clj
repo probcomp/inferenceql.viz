@@ -18,28 +18,8 @@
             [me.raynes.fs :as fs]
             [clojure.pprint :refer [pprint]]))
 
-;; Starting number in model filenames.
-(def low-index 10)
-;; One above the final number in model filnames.
-(def high-index 100)
-
-;; How many rows from the dataset to incorporate into each model based on the model number.
-;; (Difference between the number of rows to incorporate and the model number)
-;;
-;; For example model-10 will have 11 rows from the dataset incorporated when rows-offset is 1.
-;; And model-11 will have 12 rows incorporated...etc.
-;; Normally this should just be set to 0. But my models were a little offset in that way.
-(def rows-offset 1)
-
-;---------------------------
-
 (def csv (csv/read-csv (slurp "raw-data/data.csv")))
-(def model-dir "raw-data/models/")
-
-(def model-filenames (for [i (range low-index high-index)]
-                       (let [pad-i (format "%04d" i)]
-                         (str model-dir "model-t-" pad-i  ".json"))))
-(def bayesdb-dumps (map #(json/read-str (slurp %)) model-filenames))
+(def bayesdb-dump (json/read-str (slurp "raw-data/data_models.json")))
 
 (defn get-schema [bdb-dump]
   (let [bdb-types (get bdb-dump "column-statistical-types")
@@ -50,26 +30,15 @@
         iql-types (map iql-type (vals bdb-types))]
     (zipmap columns iql-types)))
 
-(defn only-same-val
-  "Used as merge function to safely combine schemas from multiple models."
-  [a b]
-  (if (= a b)
-    a
-    (throw (ex-info "Models have conflicting schema information." {}))))
+(def schema (get-schema bayesdb-dump))
+;; TODO: schema will not have all columns here. Use schema from file?
+(def rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
 
-(def schema (apply merge-with only-same-val (map get-schema bayesdb-dumps)))
-(def all-rows (csv-utils/csv-data->clean-maps schema csv {:keywordize-cols true}))
-
-(def rows-for-models (for [i (range low-index high-index)]
-                       (let [num-rows (+ i rows-offset)]
-                         (take num-rows all-rows))))
-
-(def programs (for [[bdb-dump rows] (map vector bayesdb-dumps rows-for-models)]
-                (->> (bayesdb-import/xcat-gpms bdb-dump rows)
-                     (first)
-                     (crosscat/xcat->mmix)
-                     (multimix/template-data)
-                     (render (:js-model-template config)))))
+(def program (->> (bayesdb-import/xcat-gpms bayesdb-dump rows)
+                  (first) ;; Only one model here.
+                  (crosscat/xcat->mmix)
+                  (multimix/template-data)
+                  (render (:js-model-template config))))
 
 (defn clean-output-dirs
   "Make clean output directories."
@@ -85,22 +54,27 @@
 
 (defn -main []
   (clean-output-dirs)
-  (doseq [[i p] (map vector (range low-index high-index) programs)]
-    (println (str "Writing model: " i))
-    (let [svg-file (str "images-svg/model-" i ".svg")
-          jpg-file (str "images-jpeg/model-" i ".jpg")]
-      (spit svg-file (clygments/highlight p :js :svg {:style "xcode"}))
-      (sh "svgexport" svg-file jpg-file "pad" "2x" "100%")))
+
+  (println "Writing model")
+  (let [i 0
+        svg-file (str "images-svg/model-" i ".svg")
+        jpg-file (str "images-jpeg/model-" i ".jpg")]
+    (spit svg-file (clygments/highlight program :js :svg {:style "xcode"}))
+    (sh "svgexport" svg-file jpg-file "pad" "2x" "100%"))
 
   ;; Resize all images to the max width and height between all of them.
-  (let [file-name-wildcard "images-jpeg/model-*.jpg"
-        file-sizes (:out (sh "identify" "-format" "%w %h\n" file-name-wildcard))
-        max-size (:out (sh "awk" "($1>w){w=$1} ($2>h){h=$2} END{print w\"x\"h}" :in file-sizes))
-        size-string (str (str/trim-newline max-size)
-                         "+20+20")]
-    (println "Resizing jpegs.")
-    (sh "mogrify" "-gravity" "NorthWest" "-extent" max-size "-background" "white"
-        "-border" "20x20" "-bordercolor" "white" "-colorspace" "RGB" file-name-wildcard))
+  #_(let [file-name-wildcard "images-jpeg/model-*.jpg"
+          file-sizes (:out (sh "identify" "-format" "%w %h\n" file-name-wildcard))
+          max-size (:out (sh "awk" "($1>w){w=$1} ($2>h){h=$2} END{print w\"x\"h}" :in file-sizes))
+          size-string (str (str/trim-newline max-size)
+                           "+20+20")]
+      (println "Resizing jpegs.")
+      (sh "mogrify" "-gravity" "NorthWest" "-extent" max-size "-background" "white"
+          "-border" "20x20" "-bordercolor" "white" "-colorspace" "RGB" file-name-wildcard))
+
   ;; Deals with program hanging due to futures.
   ;; https://clojuredocs.org/clojure.java.shell/sh
   (System/exit 0))
+
+
+(-main)
