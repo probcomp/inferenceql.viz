@@ -8,7 +8,7 @@ function view_{{num}}() {
 {{#first}}  if (cluster_id == "{{num}}") {
     return {
 {{#parameters}}
-      "{{name}}": {{#gaussian}}sample_gaussian({"mu": {{mu}}, "sigma": {{{sigma}}}}){{/gaussian}}{{#categorical}}sample_categorical({ {{weights}} }){{/categorical}}{{^last}},{{/last}}
+      "{{name}}": {{#gaussian}}sample_gaussian({"mu": {{mu}}, "sigma": {{{sigma}}}}){{/gaussian}}{{#categorical}}sample_categorical({{{weights}}}){{/categorical}}{{^last}},{{/last}}
 {{/parameters}}
     };
 {{/first}}

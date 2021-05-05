@@ -63,12 +63,15 @@
     (for [[index [param-key param-vals]] (map vector range-1 parameters)]
       (case (some? (get categorical-col-vals param-key))
         true ;; Categorical variable.
-        (let [weights (map param-vals (get categorical-col-vals param-key))
-              weight-strings (map #(format "%.2f" %) weights)
+        (let [cat-vals (get categorical-col-vals param-key)
+              cat-weights (map param-vals cat-vals)
+              weight-strings (map (fn [v w] (format "\"%s\": %.2f" v w))
+                                  cat-vals cat-weights)
+
 
               num-not-included (- (count weight-strings) 3)
               rem-string (when (pos? num-not-included)
-                           (format "/* and %s other categories */ " num-not-included))
+                           (format "/* and %s others */ " num-not-included))
 
               weight-strings (cond-> (take 3 weight-strings)
                                rem-string (concat [rem-string]))]
@@ -77,7 +80,7 @@
            :last (= index num-params)
            :categorical true
            ;; We need to produce a string of the category weights in a consistent order.
-           :weights (str/join ", " weight-strings)})
+           :weights (str "{" (str/join ", " weight-strings) "}")})
 
         false ;; Guassian variable.
         {:name (name param-key)
@@ -101,7 +104,7 @@
 
                             num-not-included (- (count weight-strings) 3)
                             rem-string (when (pos? num-not-included)
-                                         (format "/* and %s other categories */ " num-not-included))
+                                         (format "/* and %s others */ " num-not-included))
 
                             weight-strings (cond-> (take 3 weight-strings)
                                              rem-string (concat [rem-string]))]
