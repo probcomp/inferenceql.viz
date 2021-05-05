@@ -75,7 +75,7 @@
 
               num-not-included (- (count weight-strings) 3)
               rem-string (when (pos? num-not-included)
-                           (format "/* And %s others */ " num-not-included))
+                           (format "/* And %s others */" num-not-included))
 
               weight-strings (cond-> (take 3 weight-strings)
                                rem-string (concat [rem-string]))]
@@ -108,7 +108,7 @@
 
                             num-not-included (- (count weight-strings) 3)
                             rem-string (when (pos? num-not-included)
-                                         (format "/* And %s others */ " num-not-included))
+                                         (format "/* And %s others */" num-not-included))
 
                             weight-strings (cond-> (take 3 weight-strings)
                                              rem-string (concat [rem-string]))]
