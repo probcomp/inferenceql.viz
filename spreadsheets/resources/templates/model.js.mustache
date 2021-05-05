@@ -12,7 +12,8 @@ function view_{{num}}() {
 {{/parameters}}
     };
 {{/first}}
-{{^first}}  /* middle clusters not displayed */
+{{^first}}
+  /* Middle clusters ommited. Showing last cluster. */
   } else if (cluster_id == "{{num}}") {
     return { /* samples */ };
 {{/first}}
