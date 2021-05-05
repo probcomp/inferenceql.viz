@@ -1,4 +1,3 @@
-/* Views */
 
 {{#views}}
 function view_{{num}}() {
@@ -10,21 +9,19 @@ function view_{{num}}() {
 {{#parameters}}
       "{{name}}": {{#gaussian}}sample_gaussian({"mu": {{mu}}, "sigma": {{{sigma}}}}){{/gaussian}}{{#categorical}}sample_categorical({{{weights}}}){{/categorical}}{{^last}},{{/last}}
 {{/parameters}}
+      {{param-summ}}
     };
 {{/first}}
 {{^first}}
-  /* Middle clusters ommited. Showing last cluster. */
+  /* Showing last cluster. Others omitted. */
   } else if (cluster_id == "{{num}}") {
-    return { /* samples */ };
+    return { /* Samples */ };
 {{/first}}
 {{/clusters}}  }
 }
 
 {{/views}}
-/* Model */
-
-{{#model}}
-function model() {
+{{#model}}function model() {
   {{#view-fn-nums}}
   var view_{{.}} = view_{{.}}();
   {{/view-fn-nums}}

@@ -75,7 +75,7 @@
 
               num-not-included (- (count weight-strings) 3)
               rem-string (when (pos? num-not-included)
-                           (format "/* and %s others */ " num-not-included))
+                           (format "/* And %s others */ " num-not-included))
 
               weight-strings (cond-> (take 3 weight-strings)
                                rem-string (concat [rem-string]))]
@@ -108,23 +108,27 @@
 
                             num-not-included (- (count weight-strings) 3)
                             rem-string (when (pos? num-not-included)
-                                         (format "/* and %s others */ " num-not-included))
+                                         (format "/* And %s others */ " num-not-included))
 
                             weight-strings (cond-> (take 3 weight-strings)
                                              rem-string (concat [rem-string]))]
                         (str "{" (str/join ", " weight-strings) "}"))
        :clusters (let [clusters (for [[cluster-num cluster] (map vector range-1 view)]
-                                  {:first (= cluster-num 1)
-                                   :last (= cluster-num (count view))
-                                   :num cluster-num
-                                   :parameters
-                                   (remove (comp sensitive-column? :name)
-                                           (parameters-section (get cluster :parameters)
-                                                               categorical-col-vals))})]
+                                  (let [params (remove
+                                                (comp sensitive-column? :name)
+                                                (parameters-section (get cluster :parameters)
+                                                                    categorical-col-vals))]
+                                    {:first (= cluster-num 1)
+                                     :last (= cluster-num (count view))
+                                     :num cluster-num
+                                     #_:param-summ #_(if (> (count params) 4)
+                                                       "/* Some columns ommited. */"
+                                                       nil)
+                                     :parameters (take 4 params)}))]
                    (case (count clusters)
                      1 [(first clusters)]
                      2 [(first clusters) (last clusters)]
-                     [(first clusters) #_{:summary true :msg "\\* and 4 other clusters. *\\"} (last clusters)]))})))
+                     [(first clusters) (last clusters)]))})))
 
 (defn template-data
   "Produces template data to be passed to our js-model mustache template.
