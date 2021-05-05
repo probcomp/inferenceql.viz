@@ -122,7 +122,7 @@
                                      :last (= cluster-num (count view))
                                      :num cluster-num
                                      :param-summ (if (> (count params) 4)
-                                                   "      /* Some columns ommited. */\n"
+                                                   "      /* Some columns omitted. */\n"
                                                    nil)
                                      :parameters (take 4 params)}))]
                    (case (count clusters)
