@@ -5,6 +5,10 @@
             [medley.core :as medley]
             [clojure.pprint :refer [pprint]]))
 
+(defn sensitive-column?
+  [col-name]
+  (some? (#{"spreadtoissuercurve_diff"} col-name)))
+
 (def range-1
   "Infinite list of natural numbers."
   (map inc (range)))
@@ -109,11 +113,18 @@
                             weight-strings (cond-> (take 3 weight-strings)
                                              rem-string (concat [rem-string]))]
                         (str "{" (str/join ", " weight-strings) "}"))
-       :clusters (for [[cluster-num cluster] (map vector range-1 view)]
-                   {:first (= cluster-num 1)
-                    :num cluster-num
-                    :parameters (parameters-section (get cluster :parameters)
-                                                    categorical-col-vals)})})))
+       :clusters (let [clusters (for [[cluster-num cluster] (map vector range-1 view)]
+                                  {:first (= cluster-num 1)
+                                   :last (= cluster-num (count view))
+                                   :num cluster-num
+                                   :parameters
+                                   (remove (comp sensitive-column? :name)
+                                           (parameters-section (get cluster :parameters)
+                                                               categorical-col-vals))})]
+                   (case (count clusters)
+                     1 [(first clusters)]
+                     2 [(first clusters) (last clusters)]
+                     [(first clusters) #_{:summary true :msg "\\* and 4 other clusters. *\\"} (last clusters)]))})))
 
 (defn template-data
   "Produces template data to be passed to our js-model mustache template.

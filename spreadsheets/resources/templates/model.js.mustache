@@ -12,8 +12,9 @@ function view_{{num}}() {
 {{/parameters}}
     };
 {{/first}}
-{{^first}}  } else if (cluster_id == "{{num}}") {
-    return { /* a virtual row */ };
+{{^first}}  /* middle clusters not displayed */
+  } else if (cluster_id == "{{num}}") {
+    return { /* samples */ };
 {{/first}}
 {{/clusters}}  }
 }
