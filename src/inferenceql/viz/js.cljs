@@ -11,13 +11,31 @@
             [inferenceql.viz.panels.viz.views :as viz-views]
             [inferenceql.viz.panels.viz.vega :as vega]
             [inferenceql.query.js] ; Used to run queries from JS. Not used directly.
-            [medley.core :as medley]))
+            [medley.core :as medley]
+            [ajax.core]
+            [ajax.edn]))
 
 (defn clj-schema
   [js-schema]
   (medley/map-kv (fn [k v]
                    [(keyword k) (keyword v)])
                  (js->clj js-schema)))
+
+(defn ^:export run-remote_query
+  [query query-server-url]
+  (js/Promise. (fn [resolve reject]
+                 (ajax.core/ajax-request
+                  {:method :post
+                   :uri query-server-url
+                   :params query
+                   :timeout 5000
+                   :format (ajax.core/text-request-format)
+                   :response-format (ajax.edn/edn-response-format)
+                   :handler (fn [[ok result]]
+                              (let [result (clj->js result)]
+                                (if ok
+                                  (resolve result)
+                                  (reject result))))}))))
 
 (defn ^:export read_schema
   [schema-string]
