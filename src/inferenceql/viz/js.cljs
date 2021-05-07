@@ -22,7 +22,7 @@
                    [(keyword k) (keyword v)])
                  (js->clj js-schema)))
 
-(defn ^:export run-remote_query
+(defn ^:export run-remote-query
   [query query-server-url]
   (js/Promise. (fn [resolve reject]
                  (ajax.core/ajax-request
@@ -45,11 +45,11 @@
                                                   (str "\n" (with-out-str (pprint result))))]
                                   (reject (js/Error. error-msg)))))}))))
 
-(defn ^:export read_schema
+(defn ^:export read-schema
   [schema-string]
   (clj->js (edn/read-string schema-string)))
 
-(defn ^:export read_and_coerce_csv
+(defn ^:export read-and-coerce-csv
   [csv-text schema]
   (let [csv-vecs (-> csv-text goog.csv/parse js->clj)
         schema (clj-schema schema)]
