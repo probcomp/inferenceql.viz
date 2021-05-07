@@ -1,5 +1,6 @@
 (ns inferenceql.viz.js
   (:require [clojure.edn :as edn]
+            [clojure.pprint :refer [pprint]]
             [goog.labs.format.csv :as goog.csv]
             [goog.dom :as dom]
             [reagent.dom :as rdom]
@@ -10,7 +11,7 @@
             [inferenceql.viz.panels.table.subs :refer [column-settings]]
             [inferenceql.viz.panels.viz.views :as viz-views]
             [inferenceql.viz.panels.viz.vega :as vega]
-            [inferenceql.query.js] ; Used to run queries from JS. Not used directly.
+            [inferenceql.query.js] ; For the Observable user to run queries. Not used directly.
             [medley.core :as medley]
             [ajax.core]
             [ajax.edn]))
@@ -32,10 +33,17 @@
                    :format (ajax.core/text-request-format)
                    :response-format (ajax.edn/edn-response-format)
                    :handler (fn [[ok result]]
-                              (let [result (clj->js result)]
-                                (if ok
-                                  (resolve result)
-                                  (reject result))))}))))
+                              (if ok
+                                ;; Success case.
+                                (resolve (clj->js result))
+                                ;; Failure case.
+                                (let [parse-error (get-in result [:response :instaparse/failure])
+                                      error-msg (if (some? parse-error)
+                                                  ;; Return just the parse error.
+                                                  (with-out-str (print parse-error))
+                                                  ;; Return the entire error-result as a string.
+                                                  (str "\n" (with-out-str (pprint result))))]
+                                  (reject (js/Error. error-msg)))))}))))
 
 (defn ^:export read_schema
   [schema-string]
