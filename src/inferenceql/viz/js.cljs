@@ -97,3 +97,9 @@
         node (dom/createElement "div")]
     (rdom/render comp node)
     node))
+
+(defn ^:export this-function-fails
+  []
+  (let [inner-fn (fn [] (throw
+                         (js/Error. "This is an intentional failure.")))]
+    (inner-fn)))
