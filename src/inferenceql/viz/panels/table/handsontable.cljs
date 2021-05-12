@@ -5,6 +5,7 @@
   {:settings {:data                []
               ;; :colHeaders optional.
               ;; :columns optional.
+              ;; :colWidths optional.
               :rowHeaders          true
               :multiColumnSorting  true
               :manualColumnMove    true
