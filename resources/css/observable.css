@@ -11,9 +11,9 @@
   font-size: 14px;
 }
 
+/* All headers */
 .handsontable th {
-  font-family: roboto;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .handsontable .htDimmed {
