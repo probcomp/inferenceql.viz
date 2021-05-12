@@ -60,7 +60,7 @@
    (table data {}))
   ([data options]
    (let [options (js->clj options)
-         {:strs [cols height v-scroll]} options
+         {:strs [cols height v-scroll cells]} options
 
          ;; Potentially grabbing the columns from the keys in the first row of data.
          cols (or cols (->> data first js-keys))
@@ -78,6 +78,9 @@
                       (assoc-in [:settings :columns] (column-settings cols))
                       (assoc-in [:settings :height] height)
                       (assoc-in [:settings :width] "100%"))
+         settings (cond-> settings
+                    cells (assoc-in [:settings :cells] cells))
+
          node (dom/createElement "div")
          hot-component [handsontable {:style {:padding-bottom "5px"}} settings]]
      (rdom/render hot-component node)
