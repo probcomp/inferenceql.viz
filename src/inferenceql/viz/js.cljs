@@ -60,10 +60,13 @@
    (table data {}))
   ([data options]
    (let [options (js->clj options)
-         {:strs [cols height v-scroll cells]} options
+         {:strs [cols height v-scroll cells col-widths]} options
 
          ;; Potentially grabbing the columns from the keys in the first row of data.
          cols (or cols (->> data first js-keys))
+
+         col-headers (for [col cols]
+                       (clojure.string/replace col #"_" "_<wbr>"))
          height (cond
                   (false? v-scroll) "auto"
                   (some? height) height
@@ -74,12 +77,13 @@
 
          settings (-> default-hot-settings
                       (assoc-in [:settings :data] data)
-                      (assoc-in [:settings :colHeaders] cols)
+                      (assoc-in [:settings :colHeaders] col-headers)
                       (assoc-in [:settings :columns] (column-settings cols))
                       (assoc-in [:settings :height] height)
                       (assoc-in [:settings :width] "100%"))
          settings (cond-> settings
-                    cells (assoc-in [:settings :cells] cells))
+                    cells (assoc-in [:settings :cells] cells)
+                    col-widths (assoc-in [:settings :colWidths] col-widths))
 
          node (dom/createElement "div")
          hot-component [handsontable {:style {:padding-bottom "5px"}} settings]]
