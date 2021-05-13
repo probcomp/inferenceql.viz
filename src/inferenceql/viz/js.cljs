@@ -29,7 +29,7 @@
                   {:method :post
                    :uri query-server-url
                    :params query
-                   :timeout 5000
+                   :timeout 0
                    :format (ajax.core/text-request-format)
                    :response-format (ajax.edn/edn-response-format)
                    :handler (fn [[ok result]]
