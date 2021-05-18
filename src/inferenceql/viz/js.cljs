@@ -11,6 +11,7 @@
             [inferenceql.viz.panels.table.subs :refer [column-settings]]
             [inferenceql.viz.panels.viz.views :as viz-views]
             [inferenceql.viz.panels.viz.vega :as vega]
+            [inferenceql.viz.panels.control.views :as control]
             [inferenceql.query.js] ; For the Observable user to run queries. Not used directly.
             [medley.core :as medley]
             [ajax.core]
@@ -102,6 +103,12 @@
 
         comp [viz-views/vega-lite spec {:actions false} nil nil]
         node (dom/createElement "div")]
+    (rdom/render comp node)
+    node))
+
+(defn ^:export app []
+  (let [node (dom/createElement "div")
+        comp [control/panel]]
     (rdom/render comp node)
     node))
 

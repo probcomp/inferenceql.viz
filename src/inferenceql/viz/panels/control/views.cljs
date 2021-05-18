@@ -78,5 +78,4 @@
                                   (.blur (.-target e)))}
                     "Clear results"]
                    [more/menu show-menu]]]]
-     [:div.flex-box-space-filler-60]
-     [selection-color-selector]]))
+     [:div.flex-box-space-filler-60]]))
