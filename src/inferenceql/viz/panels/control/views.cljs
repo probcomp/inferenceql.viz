@@ -50,8 +50,10 @@
                                 ;; to enter a linebreak in the textarea with shift-enter.
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (.-shiftKey e))
                                                         (do
-                                                          (.preventDefault e)
-                                                          (reset! results (query-fn @input-text)))))
+                                                          (go
+                                                           (let [r (<p! (query-fn @input-text))]
+                                                             (reset! results r)))
+                                                          (.preventDefault e))))
                                 :placeholder (str "Write a query here.\n"
                                                   "[enter] - inserts a newline\n"
                                                   "[shift-enter] - executes query")
@@ -71,7 +73,6 @@
                     {:on-click (fn [e]
                                  (go
                                    (let [r (<p! (query-fn @input-text))]
-                                     (.log js/console "here------" r)
                                      (reset! results r)))
                                  (.blur (.-target e)))}
                     "Run query"]

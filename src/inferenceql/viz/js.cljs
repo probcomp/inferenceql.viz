@@ -141,16 +141,25 @@
        [handsontable {:style {:padding-bottom "5px"}} settings]))))
 
 
-(defn ^:export mini-app [query-fn]
+(defn ^:export mini-app [query-fn options]
   (let [node (dom/createElement "div")
 
-        input-text (r/atom "SELECT * FROM data;")
+        options (js->clj options)
+        query (get options "query" "SELECT * FROM data;")
+
+        input-text (r/atom query)
         results (r/atom nil)
+
+        ;; TODO find a good way to remove this trackers
+        ;; when component is unmounted. Otherwise, we have a
+        ;; memory leak.
+        _ (r/track! #(set! (.-query node) @input-text))
+        _ (r/track! #(set! (.-data node) @results))
 
         comp (fn []
                [:div
                 [control/panel input-text results query-fn]
-                (make-table-comp @results)])]
+                (make-table-comp @results options)])]
 
     (rdom/render [comp] node)
     node))
