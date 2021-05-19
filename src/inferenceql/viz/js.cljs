@@ -12,10 +12,11 @@
             [inferenceql.viz.panels.viz.views :as viz-views]
             [inferenceql.viz.panels.viz.vega :as vega]
             [inferenceql.viz.panels.control.views :as control]
-            [inferenceql.query.js] ; For the Observable user to run queries. Not used directly.
+            [inferenceql.query.js]                          ; For the Observable user to run queries. Not used directly.
             [medley.core :as medley]
             [ajax.core]
-            [ajax.edn]))
+            [ajax.edn]
+            [reagent.core :as r]))
 
 (defn clj-schema
   [js-schema]
@@ -106,10 +107,52 @@
     (rdom/render comp node)
     node))
 
-(defn ^:export app []
+
+(defn make-table-comp
+  ([data]
+   (make-table-comp data {}))
+  ([data options]
+   (when data
+     (let [options (js->clj options)
+           {:strs [cols height v-scroll cells col-widths]} options
+
+           ;; Potentially grabbing the columns from the keys in the first row of data.
+           cols (or cols (->> data first js-keys))
+
+           col-headers (for [col cols]
+                         (clojure.string/replace col #"_" "_<wbr>"))
+           height (cond
+                    (false? v-scroll) "auto"
+                    (some? height) height
+                    :else
+                    ;; TODO: may need to adjust these sizes.
+                    (let [data-height (+ (* (count data) 22) 38)]
+                      (min data-height 500)))
+
+           settings (-> default-hot-settings
+                        (assoc-in [:settings :data] data)
+                        (assoc-in [:settings :colHeaders] col-headers)
+                        (assoc-in [:settings :columns] (column-settings cols))
+                        (assoc-in [:settings :height] height)
+                        (assoc-in [:settings :width] "100%"))
+           settings (cond-> settings
+                      cells (assoc-in [:settings :cells] cells)
+                      col-widths (assoc-in [:settings :colWidths] col-widths))]
+       [handsontable {:style {:padding-bottom "5px"}} settings]))))
+
+
+(defn ^:export mini-app [query-fn]
   (let [node (dom/createElement "div")
-        comp [control/panel]]
-    (rdom/render comp node)
+
+        input-text (r/atom "SELECT * FROM data;")
+        results (r/atom nil)
+
+        comp (fn []
+               [:div
+                [control/panel input-text results query-fn]
+                (make-table-comp @results)])]
+
+    (rdom/render [comp] node)
     node))
 
 (defn ^:export this-function-fails

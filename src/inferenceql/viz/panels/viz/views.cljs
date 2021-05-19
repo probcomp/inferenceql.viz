@@ -107,9 +107,9 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt generators pts-store)
+        (embed this spec opt generators pts-store))
         ;; Add global listener for mouseup.
-        (.addEventListener js/window "mouseup" mouseup-handler))
+        ;;(.addEventListener js/window "mouseup" mouseup-handler))
 
       :component-did-update
       (fn [this old-argv]
@@ -123,9 +123,9 @@
 
       :component-will-unmount
       (fn [this]
-        (free-resources)
+        (free-resources))
         ;; Remove global listener for mouseup.
-        (.removeEventListener js/window "mouseup" mouseup-handler))
+        ;;(.removeEventListener js/window "mouseup" mouseup-handler))
 
       :reagent-render
       (fn [spec opt generators pts-store]

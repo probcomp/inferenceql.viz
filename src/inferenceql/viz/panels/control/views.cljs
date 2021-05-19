@@ -2,7 +2,10 @@
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]
             [re-com.core :refer [h-box]]
-            [inferenceql.viz.panels.more.views :as more]))
+            [inferenceql.viz.panels.more.views :as more]
+            [reagent.core :as r]
+            [cljs.core.async :refer [go]]
+            [cljs.core.async.interop :refer-macros [<p!]]))
 
 (def reagent-forms-function-map
   "Function map that allows a reagent-forms template
@@ -38,20 +41,17 @@
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
-  []
-  (let [input-text (rf/subscribe [:control/query-string])
-        show-menu (rf/subscribe [:more/show-menu])
-        datasets (rf/subscribe [:store/datasets])
-        models (rf/subscribe [:store/models])]
+  [input-text results query-fn]
+  (let []
     [:div#toolbar
      [:div#search-section
-       [:textarea#search-input {:on-change #(rf/dispatch-sync [:control/set-query-string (-> % .-target .-value)])
+       [:textarea#search-input {:on-change #(reset! input-text (-> % .-target .-value))
                                 ;; This submits the query when enter is pressed, but allows the user
                                 ;; to enter a linebreak in the textarea with shift-enter.
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (.-shiftKey e))
                                                         (do
                                                           (.preventDefault e)
-                                                          (rf/dispatch [:query/parse-query @input-text @datasets @models]))))
+                                                          (reset! results (query-fn @input-text)))))
                                 :placeholder (str "Write a query here.\n"
                                                   "[enter] - inserts a newline\n"
                                                   "[shift-enter] - executes query")
@@ -69,13 +69,14 @@
         :justify :end
         :children [[:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                 (rf/dispatch [:query/parse-query @input-text @datasets @models])
+                                 (go
+                                   (let [r (<p! (query-fn @input-text))]
+                                     (.log js/console "here------" r)
+                                     (reset! results r)))
                                  (.blur (.-target e)))}
-                    "Run InferenceQL"]
+                    "Run query"]
                    [:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                  (rf/dispatch [:table/clear])
+                                  (reset! results nil)
                                   (.blur (.-target e)))}
-                    "Clear results"]
-                   [more/menu show-menu]]]]
-     [:div.flex-box-space-filler-60]]))
+                    "Clear results"]]]]]))
