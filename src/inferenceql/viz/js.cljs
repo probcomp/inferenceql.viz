@@ -150,15 +150,21 @@
         input-text (r/atom query)
         results (r/atom nil)
 
+        update-results #(do
+                          (reset! results %)
+                          (if (nil? %)
+                            (js-delete node "value")
+                            (set! (.-value node) %))
+                          (.dispatchEvent node (js/CustomEvent. "input")))
+
         ;; TODO find a good way to remove this trackers
         ;; when component is unmounted. Otherwise, we have a
         ;; memory leak.
         _ (r/track! #(set! (.-query node) @input-text))
-        _ (r/track! #(set! (.-data node) @results))
 
         comp (fn []
                [:div
-                [control/panel input-text results query-fn]
+                [control/panel input-text results query-fn update-results]
                 (make-table-comp @results options)])]
 
     (rdom/render [comp] node)

@@ -41,18 +41,19 @@
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
-  [input-text results query-fn]
+  [input-text results query-fn update-results]
   (let []
     [:div#toolbar
      [:div#search-section
-       [:textarea#search-input {:on-change #(reset! input-text (-> % .-target .-value))
+       [:textarea#search-input {:on-change #((do
+                                               (reset! input-text (-> % .-target .-value))))
                                 ;; This submits the query when enter is pressed, but allows the user
                                 ;; to enter a linebreak in the textarea with shift-enter.
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (.-shiftKey e))
                                                         (do
                                                           (go
                                                            (let [r (<p! (query-fn @input-text))]
-                                                             (reset! results r)))
+                                                             (update-results r)))
                                                           (.preventDefault e))))
                                 :placeholder (str "Write a query here.\n"
                                                   "[enter] - inserts a newline\n"
@@ -73,11 +74,11 @@
                     {:on-click (fn [e]
                                  (go
                                    (let [r (<p! (query-fn @input-text))]
-                                     (reset! results r)))
+                                     (update-results r)))
                                  (.blur (.-target e)))}
                     "Run query"]
                    [:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                  (reset! results nil)
+                                  (update-results nil)
                                   (.blur (.-target e)))}
                     "Clear results"]]]]]))
