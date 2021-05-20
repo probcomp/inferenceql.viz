@@ -13,6 +13,7 @@
             [inferenceql.viz.panels.viz.vega :as vega]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.query.js]                          ; For the Observable user to run queries. Not used directly.
+            [inferenceql.inference.js]
             [medley.core :as medley]
             [ajax.core]
             [ajax.edn]
