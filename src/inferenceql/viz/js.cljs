@@ -94,19 +94,18 @@
 
 (defn ^:export plot
   [data schema selections]
-  (let [selections (for [cols selections]
-                     (for [col cols]
-                       (keyword col)))
-
-        schema (clj-schema schema)
-        data (js->clj data :keywordize-keys true)
-        spec (vega/generate-spec schema data selections)
-
-        comp [viz-views/vega-lite spec {:actions false} nil nil]
+  (let [comp (if data
+               (let [selections (for [cols selections]
+                                  (for [col cols]
+                                    (keyword col)))
+                     schema (clj-schema schema)
+                     data (js->clj data :keywordize-keys true)
+                     spec (vega/generate-spec schema data selections)]
+                   [viz-views/vega-lite spec {:actions false} nil nil])
+               [:span {:class "observablehq--inspect"} "Waiting for results from prior query."])
         node (dom/createElement "div")]
-    (rdom/render comp node)
-    node))
-
+   (rdom/render comp node)
+   node))
 
 (defn make-table-comp
   ([data]
@@ -152,9 +151,7 @@
 
         update-results #(do
                           (reset! results %)
-                          (if (nil? %)
-                            (js-delete node "value")
-                            (set! (.-value node) %))
+                          (set! (.-value node) %)
                           (.dispatchEvent node (js/CustomEvent. "input")))
 
         ;; TODO find a good way to remove this trackers
@@ -168,6 +165,7 @@
                 (make-table-comp @results options)])]
 
     (rdom/render [comp] node)
+    (set! (.-value node) nil)
     node))
 
 (defn ^:export this-function-fails
