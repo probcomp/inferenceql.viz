@@ -92,20 +92,28 @@
      (rdom/render hot-component node)
      node)))
 
+(defn ^:export waiting-msg []
+  (let [node (dom/createElement "div")
+        comp [:span {:class "observablehq--inspect"} "Waiting for query results."]]
+        ;;text (.createTextNode js/document "This is new.")]
+    ;;(.appendChild node text)
+    (rdom/render comp node)
+    node))
+
 (defn ^:export plot
   [data schema selections]
-  (let [comp (if data
-               (let [selections (for [cols selections]
-                                  (for [col cols]
-                                    (keyword col)))
-                     schema (clj-schema schema)
-                     data (js->clj data :keywordize-keys true)
-                     spec (vega/generate-spec schema data selections)]
-                   [viz-views/vega-lite spec {:actions false} nil nil])
-               [:span {:class "observablehq--inspect"} "Waiting for results from prior query."])
-        node (dom/createElement "div")]
-   (rdom/render comp node)
-   node))
+  (if (some? data)
+    (let [selections (for [cols selections]
+                       (for [col cols]
+                         (keyword col)))
+          schema (clj-schema schema)
+          data (js->clj data :keywordize-keys true)
+          spec (vega/generate-spec schema data selections)
+          comp [viz-views/vega-lite spec {:actions false} nil nil]
+          node (dom/createElement "div")]
+     (rdom/render comp node)
+     node)
+    (waiting-msg)))
 
 (defn make-table-comp
   ([data]
