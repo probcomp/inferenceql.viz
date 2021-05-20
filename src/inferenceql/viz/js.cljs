@@ -95,8 +95,6 @@
 (defn ^:export waiting-msg []
   (let [node (dom/createElement "div")
         comp [:span {:class "observablehq--inspect"} "Waiting for query results."]]
-        ;;text (.createTextNode js/document "This is new.")]
-    ;;(.appendChild node text)
     (rdom/render comp node)
     node))
 
