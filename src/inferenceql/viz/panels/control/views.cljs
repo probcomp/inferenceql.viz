@@ -1,7 +1,7 @@
 (ns inferenceql.viz.panels.control.views
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]
-            [re-com.core :refer [h-box]]
+            [re-com.core :refer [h-box throbber]]
             [inferenceql.viz.panels.more.views :as more]
             [reagent.core :as r]
             [cljs.core.async :refer [go]]
@@ -74,7 +74,7 @@
                                 :value @input-text}]
        [h-box
         :attr {:id "search-buttons"}
-        :justify :end
+        :justify :start
         :children [[:button.toolbar-button.pure-button
                     {:on-click (fn [e]
                                  (run-query)
@@ -84,4 +84,8 @@
                     {:on-click (fn [e]
                                   (update-results nil)
                                   (.blur (.-target e)))}
-                    "Clear results"]]]]]))
+                    "Clear results"]
+                   (when @running
+                     [:div {:style {:padding-top "4px" :padding-left "10px" :height "22px"}}
+                       [:img {:src "https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif"
+                              :height "22px"}]])]]]]))

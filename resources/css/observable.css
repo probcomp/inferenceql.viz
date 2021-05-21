@@ -113,4 +113,41 @@ Still working on this.
   font-size: .75rem;
 }
 
+/* re-com */
+
+
+
+/*----------------------------------------------------------------------------------------
+  Flexbox "display" styles
+  Requires 2 display values which we can't represent in a Clojure map
+----------------------------------------------------------------------------------------*/
+
+.display-flex {
+    display: -webkit-flex;
+    display: flex;
+}
+.display-inline-flex {
+    display: -webkit-inline-flex;
+    display: inline-flex;
+}
+
+.zmdi-hc-fw-rc {
+  width: 1em;
+  text-align: center;
+}
+
+.rc-typeahead-suggestions-container {
+    position: absolute;
+    width: 100%;
+    background-color: #eee;
+}
+
+.rc-typeahead-suggestion {
+    background-color: #eee;
+    padding: 0.4em;
+}
+
+.rc-typeahead-suggestion.active {
+    background-color: #ddd;
+}
 
