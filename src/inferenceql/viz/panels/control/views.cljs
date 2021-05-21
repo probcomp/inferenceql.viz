@@ -41,8 +41,15 @@
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
-  [input-text results query-fn update-results]
-  (let []
+  [input-text running query-fn update-results update-failure]
+  (let [run-query #(go
+                    (reset! running true)
+                    (try
+                      (let [r (<p! (query-fn @input-text))]
+                        (update-results r))
+                      (catch js/Error err
+                        (update-failure (with-out-str (print (.-message (ex-cause err))))))
+                      (finally (reset! running false))))]
     [:div#toolbar
      [:div#search-section
        [:textarea#search-input {:on-change #((do
@@ -51,9 +58,7 @@
                                 ;; to enter a linebreak in the textarea with shift-enter.
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (.-shiftKey e))
                                                         (do
-                                                          (go
-                                                           (let [r (<p! (query-fn @input-text))]
-                                                             (update-results r)))
+                                                          (run-query)
                                                           (.preventDefault e))))
                                 :placeholder (str "Write a query here.\n"
                                                   "[enter] - inserts a newline\n"
@@ -72,9 +77,7 @@
         :justify :end
         :children [[:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                 (go
-                                   (let [r (<p! (query-fn @input-text))]
-                                     (update-results r)))
+                                 (run-query)
                                  (.blur (.-target e)))}
                     "Run query"]
                    [:button.toolbar-button.pure-button

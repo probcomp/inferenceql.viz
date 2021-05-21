@@ -45,7 +45,7 @@
                                                   ;; Return just the parse error.
                                                   (with-out-str (print parse-error))
                                                   ;; Return the entire error-result as a string.
-                                                  (str "\n" (with-out-str (pprint result))))]
+                                                  (with-out-str (pprint result)))]
                                   (reject (js/Error. error-msg)))))}))))
 
 (defn ^:export read-schema
@@ -155,21 +155,37 @@
 
         input-text (r/atom query)
         results (r/atom nil)
+        failure (r/atom nil)
+        running (r/atom false)
 
         update-results #(do
+                          (reset! failure nil)
                           (reset! results %)
                           (set! (.-value node) %)
+                          (.dispatchEvent node (js/CustomEvent. "input")))
+
+        update-failure #(do
+                          (reset! failure %)
+                          (reset! results nil)
+                          (set! (.-value node) nil)
                           (.dispatchEvent node (js/CustomEvent. "input")))
 
         ;; TODO find a good way to remove this trackers
         ;; when component is unmounted. Otherwise, we have a
         ;; memory leak.
-        _ (r/track! #(set! (.-query node) @input-text))
+        ;;_ (r/track! #(set! (.-query node) @input-text))
 
         comp (fn []
                [:div
-                [control/panel input-text results query-fn update-results]
-                (make-table-comp @results options)])]
+                [control/panel input-text running query-fn update-results update-failure]
+                (if (some? @failure)
+                  [:div {:class "observablehq--inspect"
+                         :style {:whitespace "pre"
+                                 :color "red"}}
+                   @failure]
+
+                  (make-table-comp @results options))])]
+
 
     (rdom/render [comp] node)
     (set! (.-value node) nil)
