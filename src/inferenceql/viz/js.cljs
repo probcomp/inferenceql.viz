@@ -17,7 +17,8 @@
             [medley.core :as medley]
             [ajax.core]
             [ajax.edn]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [cljs-bean.core :refer [->clj]]))
 
 (defn clj-schema
   [js-schema]
@@ -119,8 +120,7 @@
    (make-table-comp data {}))
   ([data options]
    (when data
-     (let [options (js->clj options)
-           {:strs [cols height v-scroll cells col-widths]} options
+     (let [{:keys [cols height v-scroll cells col-widths]} options
 
            ;; Potentially grabbing the columns from the keys in the first row of data.
            cols (or cols (->> data first js-keys))
@@ -150,8 +150,8 @@
 (defn ^:export mini-app [query-fn options]
   (let [node (dom/createElement "div")
 
-        options (js->clj options)
-        query (get options "query" "SELECT * FROM data;")
+        options (->clj options)
+        query (get options :query "SELECT * FROM data;")
 
         input-text (r/atom query)
         results (r/atom nil)
@@ -190,6 +190,41 @@
     (rdom/render [comp] node)
     (set! (.-value node) nil)
     node))
+
+(defn ^:export cell-by-cell-app [query-fn table-data options]
+  (let [node (dom/createElement "div")
+
+        options (js->clj options :keywordize-keys true)
+
+        cols (get options :cols)
+        query "SELECT * FROM data;"
+
+        cells-fn (fn [row col prop] #js {})
+        options (r/atom (assoc-in options [:settings :cells] cells-fn))
+
+
+        comp (fn [options]
+               [:div
+                (make-table-comp table-data @options)
+                [:div {:class "observablehq--inspect"
+                       :style {:whitespace "pre"}}
+                 query]])]
+
+    (js/setTimeout (fn []
+                     (let [new-cells (fn [row col prop]
+                                       #js {"className" "gold-highlight"}
+                                       #_(let [cell-props #js {}]
+                                           (when (= row 1)
+                                             (set! (.-className cell-props) "gold-highlight"))
+                                           cell-props))]
+                       (swap! options assoc-in [:settings :cells] new-cells)
+                       (.log js/console "here-------")))
+                   2000)
+
+    (rdom/render [comp options] node)
+    (set! (.-value node) nil)
+    node))
+
 
 (defn ^:export this-function-fails
   []
