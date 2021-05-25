@@ -20,7 +20,7 @@
         cljs-bean/cljs-bean {:mvn/version "1.7.0"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "d81f39d734ccb08aad20aff3624a03ae93f06e1f"}
+                                        :sha "080aa7e4f6a26c5143bd1096fc8b1e5a90d50616"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "6b6ffd597f1c75a631f39176d241b3b2486deb7c"}
         probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
