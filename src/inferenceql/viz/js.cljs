@@ -194,33 +194,50 @@
 (defn ^:export cell-by-cell-app [query-fn table-data options]
   (let [node (dom/createElement "div")
 
-        options (js->clj options :keywordize-keys true)
+        table-data (vec (take 10 (->clj table-data)))
 
-        cols (get options :cols)
-        query "SELECT * FROM data;"
+        options (js->clj options :keywordize-keys true)
+        cols (map keyword (get options :cols))
+        query (r/atom "SELECT * FROM data;")
 
         cells-fn (fn [row col prop] #js {})
-        options (r/atom (assoc-in options [:settings :cells] cells-fn))
-
+        options (r/atom (assoc options :cells cells-fn))
 
         comp (fn [options]
                [:div
-                (make-table-comp table-data @options)
+                [make-table-comp table-data @options]
                 [:div {:class "observablehq--inspect"
                        :style {:whitespace "pre"}}
-                 query]])]
+                 @query]])
 
-    (js/setTimeout (fn []
-                     (let [new-cells (fn [row col prop]
-                                       #js {"className" "gold-highlight"}
-                                       #_(let [cell-props #js {}]
-                                           (when (= row 1)
-                                             (set! (.-className cell-props) "gold-highlight"))
-                                           cell-props))]
-                       (swap! options assoc-in [:settings :cells] new-cells)
-                       (.log js/console "here-------")))
-                   2000)
+        checks (for [c cols i (range (count table-data))]
+                 {:column c :row i})
+        checks (filter #(some? (get-in table-data [(:row %) (:column %)]))
+                       checks)
+        checks (r/atom checks)
 
+        step-time 500
+        anim-step (fn anim-step []
+                    (let [c (first @checks)]
+                      (when c
+
+                        ;; Construct 2 queries
+                        ;; Run query
+                        ;; Highlight cell accordingly
+
+                        (reset! query (str c))
+                        (swap! checks rest)
+
+                        (let [new-cells (fn [row col prop]
+                                          (let [cell-props #js {}]
+                                            (when (and (= row (:row c))
+                                                       (= prop (name (:column c))))
+                                              (set! (.-className cell-props) "gold-highlight"))
+                                            cell-props))]
+                          (swap! options assoc :cells new-cells))
+                        (js/setTimeout anim-step step-time))))]
+
+    (js/setTimeout anim-step step-time)
     (rdom/render [comp options] node)
     (set! (.-value node) nil)
     node))
