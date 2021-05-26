@@ -117,6 +117,17 @@
      node)
     (waiting-msg)))
 
+(defn make-plot-comp
+  [data schema selections]
+  (if (some? data)
+    (let [selections (for [cols selections]
+                       (for [col cols]
+                         (keyword col)))
+          schema (clj-schema schema)
+          data (js->clj data :keywordize-keys true)
+          spec (vega/generate-spec schema data selections)]
+      [viz-views/vega-lite spec {:actions false} nil nil])))
+
 (defn make-table-comp
   ([data]
    (make-table-comp data {}))
@@ -202,6 +213,7 @@
         cols (map keyword (get options :cols))
         query (r/atom "SELECT * FROM data;")
 
+        plot-data (r/atom nil)
         schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
                               (->clj schema))
 
@@ -213,7 +225,8 @@
                 [make-table-comp table-data @options]
                 [:div {:class "observablehq--inspect"
                        :style {:white-space "pre-wrap"}}
-                 @query]])
+                 @query]
+                [make-plot-comp (:rows @plot-data) schema [(:col-names @plot-data)]]])
 
         checks (for [c cols i (range (count table-data))]
                  {:column c :row i})
@@ -221,66 +234,80 @@
                        checks)
         checks (r/atom checks)
 
+        last-col (r/atom nil)
+
         anim-step (fn anim-step []
                     (let [c (first @checks)]
                       (when c
+                        (let [col-order (remove #{(:column c)} cols)]
+                          (if (not= @last-col (:column c))
+                            (let [all-bindings (string/join " AND " (map name col-order))
+                                  q2-all (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data;"
+                                                 (name (:column c))
+                                                 (name (:column c))
+                                                 all-bindings)
+                                  new-plot-data {:col-names [(name (:column c)) "p"]
+                                                 :rows (query-fn q2-all)}]
+                              (reset! plot-data new-plot-data)
+                              (reset! last-col (:column c))))
 
-                        (let [col-order (remove #{(:column c)} cols)
-                              row (nth table-data (:row c))
+                          (let [row (nth table-data (:row c))
 
-                              col-type (get schema (:column c))
-                              val (get row (:column c))
-                              val (if (= col-type :gaussian)
-                                    (str val)
-                                    (str "\"" val "\""))
+                                col-type (get schema (:column c))
+                                val (get row (:column c))
+                                val (if (= col-type :gaussian)
+                                      (str val)
+                                      (str "\"" val "\""))
 
 
-                              q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name (:column c)) val)
-                              row-rest (-> row
-                                           (dissoc (:column c)))
-                              cells (for [c col-order]
-                                      [c (get row-rest c)])
-                              cells (filter #(some? (second %)) cells)
+                                q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name (:column c)) val)
+                                row-rest (-> row
+                                             (dissoc (:column c)))
+                                cells (for [c col-order]
+                                        [c (get row-rest c)])
+                                cells (filter #(some? (second %)) cells)
 
-                              binding-strs (for [c cells]
-                                             (let [format-string
-                                                   (case (get schema (first c))
-                                                     :categorical
-                                                     "%s=\"%s\""
-                                                     :gaussian
-                                                     "%s=%s"
-                                                     ;; else case, same as :categorical.
-                                                     "%s=\"%s\"")]
-                                               (format format-string (name (first c)) (second c))))
-                              bind-str (string/join " AND " binding-strs)
+                                binding-strs (for [c cells]
+                                               (let [format-string
+                                                     (case (get schema (first c))
+                                                       :categorical
+                                                       "%s=\"%s\""
+                                                       :gaussian
+                                                       "%s=%s"
+                                                       ;; else case, same as :categorical.
+                                                       "%s=\"%s\"")]
+                                                 (format format-string (name (first c)) (second c))))
+                                bind-str (string/join " AND " binding-strs)
 
-                              q2 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
-                                         (name (:column c))
-                                         val
-                                         bind-str)
+                                q2 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
+                                           (name (:column c))
+                                           val
+                                           bind-str)
 
-                              q1-val (-> (query-fn q1)
-                                         first
-                                         (.-p))
-                              q2-val (-> (query-fn q2)
-                                         first
-                                         (.-p))
-                              abs-diff (Math/abs (- q1-val q2-val))]
-                          (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val) "abs-diff" abs-diff]))
+                                q1-val (-> (query-fn q1)
+                                           first
+                                           (.-p))
+                                q2-val (-> (query-fn q2)
+                                           first
+                                           (.-p))
 
-                          (swap! checks rest)
+                                abs-diff (Math/abs (- q1-val q2-val))]
 
-                          (let [new-cells (fn [row col prop]
-                                            (let [cell-props #js {}]
-                                              (when (and (= row (:row c))
-                                                         (= prop (name (:column c))))
-                                                (let [color (if (>= abs-diff thresh)
-                                                              "red-highlight"
-                                                              "blue-highlight")]
-                                                  (set! (.-className cell-props) color)))
-                                              cell-props))]
-                            (swap! options assoc :cells new-cells))
-                          (js/setTimeout anim-step step-time)))))]
+                            (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val) "abs-diff" abs-diff]))
+
+                            (swap! checks rest)
+
+                            (let [new-cells (fn [row col prop]
+                                              (let [cell-props #js {}]
+                                                (when (and (= row (:row c))
+                                                           (= prop (name (:column c))))
+                                                  (let [color (if (>= abs-diff thresh)
+                                                                "red-highlight"
+                                                                "blue-highlight")]
+                                                    (set! (.-className cell-props) color)))
+                                                cell-props))]
+                              (swap! options assoc :cells new-cells))
+                            (js/setTimeout anim-step step-time))))))]
 
     (js/setTimeout anim-step step-time)
     (rdom/render [comp options] node)
