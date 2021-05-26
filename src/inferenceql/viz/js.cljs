@@ -118,7 +118,7 @@
     (waiting-msg)))
 
 (defn make-plot-comp
-  [data schema selections]
+  [data schema selections pts-store]
   (if (some? data)
     (let [selections (for [cols selections]
                        (for [col cols]
@@ -126,7 +126,7 @@
           schema (clj-schema schema)
           data (js->clj data :keywordize-keys true)
           spec (vega/generate-spec schema data selections)]
-      [viz-views/vega-lite spec {:actions false} nil nil])))
+      [viz-views/vega-lite spec {:actions false} nil pts-store])))
 
 (defn make-table-comp
   ([data]
@@ -220,13 +220,15 @@
         cells-fn (fn [row col prop] #js {})
         options (r/atom (assoc options :cells cells-fn))
 
+        pts-store (r/atom nil)
+
         comp (fn [options]
                [:div
                 [make-table-comp table-data @options]
+                [make-plot-comp (take 10 (js->clj (:rows @plot-data) :keywordize-keys true)) schema [(:col-names @plot-data)] @pts-store]
                 [:div {:class "observablehq--inspect"
                        :style {:white-space "pre-wrap"}}
-                 @query]
-                [make-plot-comp (:rows @plot-data) schema [(:col-names @plot-data)]]])
+                 @query]])
 
         checks (for [c cols i (range (count table-data))]
                  {:column c :row i})
@@ -294,6 +296,7 @@
                                 abs-diff (Math/abs (- q1-val q2-val))]
 
                             (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val) "abs-diff" abs-diff]))
+                            (reset! pts-store [{:fields [{:field "rowid" :type "E"}] :values [(:row c)]}])
 
                             (swap! checks rest)
 

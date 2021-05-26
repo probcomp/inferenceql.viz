@@ -35,6 +35,7 @@
 ;; Represents which vega-lite encoding channel this field's selection corresponds to.
 (s/def ::channel #{"x" "y"})
 
+
 ;;; ::values related specs.
 
 (s/def ::values (s/or :single-collection ::value-seq  ;; This form is returned by selections in choropleths.

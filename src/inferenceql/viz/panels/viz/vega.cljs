@@ -308,6 +308,13 @@
                 :y {:field (second cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
+                :order {:condition {:selection "pts"
+                                    :value 1}
+                        :value 0}
+
+                :size {:condition {:selection "pts"
+                                   :value 100}
+                       :value 20}
                 :color {:condition {:selection "pts"
                                     :value selection-color}}}}))
 
@@ -399,8 +406,12 @@
                 :y {:field y-field
                     :type y-type
                     :axis {:grid true :gridDash [2 2]}}
+                :order {:condition {:selection "pts"
+                                    :value 1}
+                        :value 0}
                 :color {:condition {:selection "pts"
                                     :value selection-color}}}}))
+
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.
@@ -450,6 +461,9 @@
     {:$schema default-vega-lite-schema
      :concat spec-layers
      :columns 2
+     :config {:tick
+              {:thickness 2}}
+               ;;:bandSize 10}}
      :resolve {:legend {:size "independent"
                         :color "independent"}
                :scale {:color "independent"}}}))
