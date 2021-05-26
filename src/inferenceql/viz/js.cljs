@@ -1,6 +1,7 @@
 (ns inferenceql.viz.js
   (:require [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]
+            [clojure.string :as string]
             [goog.labs.format.csv :as goog.csv]
             [goog.dom :as dom]
             [reagent.dom :as rdom]
@@ -18,7 +19,8 @@
             [ajax.core]
             [ajax.edn]
             [reagent.core :as r]
-            [cljs-bean.core :refer [->clj]]))
+            [cljs-bean.core :refer [->clj]]
+            [goog.string :refer [format]]))
 
 (defn clj-schema
   [js-schema]
@@ -191,7 +193,7 @@
     (set! (.-value node) nil)
     node))
 
-(defn ^:export cell-by-cell-app [query-fn table-data options]
+(defn ^:export cell-by-cell-app [query-fn table-data schema thresh step-time options]
   (let [node (dom/createElement "div")
 
         table-data (vec (take 10 (->clj table-data)))
@@ -200,6 +202,9 @@
         cols (map keyword (get options :cols))
         query (r/atom "SELECT * FROM data;")
 
+        schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
+                              (->clj schema))
+
         cells-fn (fn [row col prop] #js {})
         options (r/atom (assoc options :cells cells-fn))
 
@@ -207,7 +212,7 @@
                [:div
                 [make-table-comp table-data @options]
                 [:div {:class "observablehq--inspect"
-                       :style {:whitespace "pre"}}
+                       :style {:white-space "pre-wrap"}}
                  @query]])
 
         checks (for [c cols i (range (count table-data))]
@@ -216,26 +221,66 @@
                        checks)
         checks (r/atom checks)
 
-        step-time 500
         anim-step (fn anim-step []
                     (let [c (first @checks)]
                       (when c
 
-                        ;; Construct 2 queries
-                        ;; Run query
-                        ;; Highlight cell accordingly
+                        (let [col-order (remove #{(:column c)} cols)
+                              row (nth table-data (:row c))
 
-                        (reset! query (str c))
-                        (swap! checks rest)
+                              col-type (get schema (:column c))
+                              val (get row (:column c))
+                              val (if (= col-type :gaussian)
+                                    (str val)
+                                    (str "\"" val "\""))
 
-                        (let [new-cells (fn [row col prop]
-                                          (let [cell-props #js {}]
-                                            (when (and (= row (:row c))
-                                                       (= prop (name (:column c))))
-                                              (set! (.-className cell-props) "gold-highlight"))
-                                            cell-props))]
-                          (swap! options assoc :cells new-cells))
-                        (js/setTimeout anim-step step-time))))]
+
+                              q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name (:column c)) val)
+                              row-rest (-> row
+                                           (dissoc (:column c)))
+                              cells (for [c col-order]
+                                      [c (get row-rest c)])
+                              cells (filter #(some? (second %)) cells)
+
+                              binding-strs (for [c cells]
+                                             (let [format-string
+                                                   (case (get schema (first c))
+                                                     :categorical
+                                                     "%s=\"%s\""
+                                                     :gaussian
+                                                     "%s=%s"
+                                                     ;; else case, same as :categorical.
+                                                     "%s=\"%s\"")]
+                                               (format format-string (name (first c)) (second c))))
+                              bind-str (string/join " AND " binding-strs)
+
+                              q2 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
+                                         (name (:column c))
+                                         val
+                                         bind-str)
+
+                              q1-val (-> (query-fn q1)
+                                         first
+                                         (.-p))
+                              q2-val (-> (query-fn q2)
+                                         first
+                                         (.-p))
+                              abs-diff (Math/abs (- q1-val q2-val))]
+                          (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val) "abs-diff" abs-diff]))
+
+                          (swap! checks rest)
+
+                          (let [new-cells (fn [row col prop]
+                                            (let [cell-props #js {}]
+                                              (when (and (= row (:row c))
+                                                         (= prop (name (:column c))))
+                                                (let [color (if (>= abs-diff thresh)
+                                                              "red-highlight"
+                                                              "blue-highlight")]
+                                                  (set! (.-className cell-props) color)))
+                                              cell-props))]
+                            (swap! options assoc :cells new-cells))
+                          (js/setTimeout anim-step step-time)))))]
 
     (js/setTimeout anim-step step-time)
     (rdom/render [comp options] node)
