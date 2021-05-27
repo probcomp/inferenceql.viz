@@ -205,25 +205,26 @@
     node))
 
 (defn ^:export cell-by-cell-app [query-fn table-data schema thresh step-time options]
-  (let [node (dom/createElement "div")
-
-        num-rows 15
+  (let [num-rows 15
 
         table-data (vec (take num-rows (->clj table-data)))
-
-        options (js->clj options :keywordize-keys true)
-        cols (map keyword (get options :cols))
-        query (r/atom "SELECT * FROM data;")
-
-        plot-data (r/atom nil)
         schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
                               (->clj schema))
 
-        cells-fn (fn [row col prop] #js {})
-        options (r/atom (assoc options :cells cells-fn))
+        options (js->clj options :keywordize-keys true)
+        cols (map keyword (get options :cols))
 
+        query (r/atom "SELECT * FROM data;")
+        plot-data (r/atom nil)
+        options (r/atom (assoc options :cells (fn [row col prop] #js {})))
         pts-store (r/atom nil)
 
+        checks (for [c cols i (range (count table-data))] {:column c :row i})
+        checks (filter #(some? (get-in table-data [(:row %) (:column %)])) checks)
+        checks (r/atom checks)
+        last-col (r/atom nil)
+
+        node (dom/createElement "div")
         comp (fn [options]
                [:div
                 [make-table-comp table-data @options]
@@ -232,14 +233,6 @@
                 [:div {:class "observablehq--inspect"
                        :style {:white-space "pre-wrap"}}
                  @query]])
-
-        checks (for [c cols i (range (count table-data))]
-                 {:column c :row i})
-        checks (filter #(some? (get-in table-data [(:row %) (:column %)]))
-                       checks)
-        checks (r/atom checks)
-
-        last-col (r/atom nil)
 
         anim-step (fn anim-step []
                     (let [c (first @checks)]
@@ -315,9 +308,9 @@
                               (swap! options assoc :cells new-cells))
                             (js/setTimeout anim-step step-time))))))]
 
+    ;; Start animation.
     (js/setTimeout anim-step step-time)
     (rdom/render [comp options] node)
-    (set! (.-value node) nil)
     node))
 
 
