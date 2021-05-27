@@ -204,10 +204,8 @@
     (set! (.-value node) nil)
     node))
 
-(defn ^:export cell-by-cell-app [query-fn table-data schema thresh step-time options]
-  (let [num-rows 15
-
-        table-data (vec (take num-rows (->clj table-data)))
+(defn ^:export cell-by-cell-app [query-fn table-data schema num-rows thresh step-time options]
+  (let [table-data (vec (take num-rows (->clj table-data)))
         schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
                               (->clj schema))
 
