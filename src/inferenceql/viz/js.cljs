@@ -117,7 +117,7 @@
      node)
     (waiting-msg)))
 
-(defn make-plot-comp
+(defn plot-help
   [data schema selections pts-store]
   (if (some? data)
     (let [selections (for [cols selections]
@@ -229,7 +229,7 @@
                [:div
                 [make-table-comp table-data @options]
                 (let [plot-rows (some->> (:rows @plot-data) ->clj (take num-rows))]
-                  [make-plot-comp plot-rows schema [(:col-names @plot-data)] @pts-store])
+                  [plot-help plot-rows schema [(:col-names @plot-data)] @pts-store])
                 [:div {:class "observablehq--inspect"
                        :style {:white-space "pre-wrap"}}
                  @query]])
