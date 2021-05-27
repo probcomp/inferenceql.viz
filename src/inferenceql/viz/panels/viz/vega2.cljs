@@ -1,4 +1,4 @@
-(ns inferenceql.viz.panels.viz.vega
+(ns inferenceql.viz.panels.viz.vega2
   "Code related to generating vega-lite specs"
   (:require [clojure.walk :as walk]
             [clojure.string :as string]
@@ -25,10 +25,10 @@
 
 (def vega-plot-width
   "A general width setting vega-lite plots"
-  400)
+  250)
 (def vega-plot-height
   "A general height setting vega-lite plots"
-  400)
+  250)
 
 (def default-table-color "SteelBlue")
 
@@ -308,6 +308,13 @@
                 :y {:field (second cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
+                :order {:condition {:selection "pts"
+                                    :value 1}
+                        :value 0}
+
+                :size {:condition {:selection "pts"
+                                   :value 100}
+                       :value 50}
                 :color {:condition {:selection "pts"
                                     :value selection-color}}}}))
 
@@ -399,8 +406,12 @@
                 :y {:field y-field
                     :type y-type
                     :axis {:grid true :gridDash [2 2]}}
+                :order {:condition {:selection "pts"
+                                    :value 1}
+                        :value 0}
                 :color {:condition {:selection "pts"
                                     :value selection-color}}}}))
+
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.
@@ -450,6 +461,8 @@
     {:$schema default-vega-lite-schema
      :concat spec-layers
      :columns 2
+     :config {:tick
+              {:thickness 3}}
      :resolve {:legend {:size "independent"
                         :color "independent"}
                :scale {:color "independent"}}}))

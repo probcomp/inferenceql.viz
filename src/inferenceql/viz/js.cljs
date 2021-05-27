@@ -12,6 +12,7 @@
             [inferenceql.viz.panels.table.subs :refer [column-settings]]
             [inferenceql.viz.panels.viz.views :as viz-views]
             [inferenceql.viz.panels.viz.vega :as vega]
+            [inferenceql.viz.panels.viz.vega2 :as vega2]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.query.js]                          ; For the Observable user to run queries. Not used directly.
             [inferenceql.inference.js]
@@ -125,7 +126,7 @@
                          (keyword col)))
           schema (clj-schema schema)
           data (js->clj data :keywordize-keys true)
-          spec (vega/generate-spec schema data selections)]
+          spec (vega2/generate-spec schema data selections)]
       [viz-views/vega-lite spec {:actions false} nil pts-store])))
 
 (defn make-table-comp
