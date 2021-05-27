@@ -124,7 +124,7 @@
                        (for [col cols]
                          (keyword col)))
           schema (clj-schema schema)
-          data (js->clj data :keywordize-keys true)
+          data (take 10 (js->clj data :keywordize-keys true))
           spec (vega/generate-spec schema data selections)]
       [viz-views/vega-lite spec {:actions false} nil pts-store])))
 
@@ -225,7 +225,7 @@
         comp (fn [options]
                [:div
                 [make-table-comp table-data @options]
-                [make-plot-comp (take 10 (js->clj (:rows @plot-data) :keywordize-keys true)) schema [(:col-names @plot-data)] @pts-store]
+                [make-plot-comp (:rows @plot-data) schema [(:col-names @plot-data)] @pts-store]
                 [:div {:class "observablehq--inspect"
                        :style {:white-space "pre-wrap"}}
                  @query]])

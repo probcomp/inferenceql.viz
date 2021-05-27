@@ -25,10 +25,10 @@
 
 (def vega-plot-width
   "A general width setting vega-lite plots"
-  400)
+  250)
 (def vega-plot-height
   "A general height setting vega-lite plots"
-  400)
+  250)
 
 (def default-table-color "SteelBlue")
 
@@ -314,7 +314,7 @@
 
                 :size {:condition {:selection "pts"
                                    :value 100}
-                       :value 20}
+                       :value 50}
                 :color {:condition {:selection "pts"
                                     :value selection-color}}}}))
 
@@ -462,8 +462,7 @@
      :concat spec-layers
      :columns 2
      :config {:tick
-              {:thickness 2}}
-               ;;:bandSize 10}}
+              {:thickness 3}}
      :resolve {:legend {:size "independent"
                         :color "independent"}
                :scale {:color "independent"}}}))
