@@ -124,7 +124,7 @@
                        (for [col cols]
                          (keyword col)))
           schema (clj-schema schema)
-          data (take 10 (js->clj data :keywordize-keys true))
+          data (js->clj data :keywordize-keys true)
           spec (vega/generate-spec schema data selections)]
       [viz-views/vega-lite spec {:actions false} nil pts-store])))
 
@@ -207,7 +207,9 @@
 (defn ^:export cell-by-cell-app [query-fn table-data schema thresh step-time options]
   (let [node (dom/createElement "div")
 
-        table-data (vec (take 10 (->clj table-data)))
+        num-rows 15
+
+        table-data (vec (take num-rows (->clj table-data)))
 
         options (js->clj options :keywordize-keys true)
         cols (map keyword (get options :cols))
@@ -225,7 +227,8 @@
         comp (fn [options]
                [:div
                 [make-table-comp table-data @options]
-                [make-plot-comp (:rows @plot-data) schema [(:col-names @plot-data)] @pts-store]
+                (let [plot-rows (some->> (:rows @plot-data) ->clj (take 10))]
+                  [make-plot-comp plot-rows schema [(:col-names @plot-data)] @pts-store])
                 [:div {:class "observablehq--inspect"
                        :style {:white-space "pre-wrap"}}
                  @query]])
