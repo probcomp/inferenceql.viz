@@ -228,19 +228,20 @@
         comp (fn [options]
                [:div
                 [make-table-comp table-data @options]
-                (let [plot-rows (some->> (:rows @plot-data) ->clj (take 10))]
+                (let [plot-rows (some->> (:rows @plot-data) ->clj (take num-rows))]
                   [make-plot-comp plot-rows schema [(:col-names @plot-data)] @pts-store])
                 [:div {:class "observablehq--inspect"
                        :style {:white-space "pre-wrap"}}
                  @query]])
 
         anim-step (fn anim-step []
+                    ;; When there are checks left to be made.
                     (when-let [chk (first @checks)]
-                      (let [other-cols (remove #{(:column chk)} cols)]
+                      (let [other-cols (remove #{(:column chk)} cols)
+                            col-name (name (:column chk))]
                         ;; Update the plot.
                         (if (not= @cur-col (:column chk))
-                          (let [col-name (name (:column chk))
-                                all-bindings (string/join " AND " (map name other-cols))
+                          (let [all-bindings (string/join " AND " (map name other-cols))
                                 all-columns (string/join ", " (map name cols))
                                 q-conditional-all (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data;"
                                                           all-columns col-name all-bindings)]
@@ -251,46 +252,38 @@
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
 
+                              quote-val (fn [val] (format "\"%s\"" val))
+
                               col-type (get schema (:column chk))
-                              val (get row (:column chk))
-                              val (if (= col-type :gaussian)
-                                    (str val)
-                                    (str "\"" val "\""))
+                              val (str (get row (:column chk)))
+                              val (if (= col-type :gaussian) val (quote-val val))
 
+                              q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" col-name val)
 
-                              q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name (:column chk)) val)
-                              row-rest (-> row
-                                           (dissoc (:column chk)))
+                              row-rest (dissoc row (:column chk))
                               cells (for [c other-cols]
-                                      [c (get row-rest c)])
-                              cells (filter #(some? (second %)) cells)
-
-                              binding-strs (for [c cells]
-                                             (let [format-string
-                                                   (case (get schema (first c))
-                                                     :categorical
-                                                     "%s=\"%s\""
-                                                     :gaussian
-                                                     "%s=%s"
-                                                     ;; else case, same as :categorical.
-                                                     "%s=\"%s\"")]
-                                               (format format-string (name (first c)) (second c))))
-                              bind-str (string/join " AND " binding-strs)
-
+                                      {:col c :val (get row-rest c)})
+                              cells (filter #(some? (:val %)) cells)
+                              cells (map (fn [{:keys [col val]}]
+                                           (if (= (get schema col) :gaussian)
+                                             (format "%s=%s" (name col) val)
+                                             (format "%s=\"%s\"" (name col) val)))
+                                         cells)
+                              bind-str (string/join " AND " cells)
                               q2 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
-                                         (name (:column chk))
-                                         val
-                                         bind-str)
+                                         col-name val bind-str)
 
                               q1-val (-> (query-fn q1) first (.-p))
                               q2-val (-> (query-fn q2) first (.-p))
                               abs-diff (Math/abs (- q1-val q2-val))]
-
+                          ;; Update query.
                           (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val) "abs-diff" abs-diff]))
+                          ;; Update highlighted point in plot.
                           (reset! pts-store [{:fields [{:field "rowid" :type "E"}] :values [(:row chk)]}])
-
+                          ;; Switch to next check.
                           (swap! checks rest)
 
+                          ;; Update table highlighting.
                           (let [new-cells (fn [row col prop]
                                             (let [cell-props #js {}]
                                               (when (and (= row (:row chk))
@@ -301,6 +294,7 @@
                                                   (set! (.-className cell-props) color)))
                                               cell-props))]
                             (swap! options assoc :cells new-cells))
+                          ;; Setup next iteration.
                           (js/setTimeout anim-step step-time)))))]
 
     ;; Start animation.
