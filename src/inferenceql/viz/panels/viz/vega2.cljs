@@ -44,7 +44,7 @@
         :red "red"
         "black"))
 
-(def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
+(def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v5.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
 
 (defn- left-pad
@@ -308,10 +308,11 @@
                 :y {:field (second cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
-                :order {:condition {:selection "pts"
-                                    :value 1}
-                        :value 0}
-
+                #_:order #_{:field "anomaly"
+                            :type "nominal"
+                            :scale {:domain ["true", "false", "undefined"]
+                                    :range [1 1 0]}
+                            :legend nil}
                 :size {:condition {:selection "pts"
                                    :value 100}
                        :value 50}
@@ -409,9 +410,11 @@
                 :y {:field y-field
                     :type y-type
                     :axis {:grid true :gridDash [2 2]}}
-                :order {:condition {:selection "pts"
-                                    :value 1}
-                        :value 0}
+                #_:order #_{:field "anomaly"
+                            :type "nominal"
+                            :scale {:domain ["true", "false", "undefined"]
+                                    :range [1 1 0]}
+                            :legend nil}
                 :color {:field "anomaly"
                         :type "nominal"
                         :scale {:domain ["true", "false", "undefined"]
