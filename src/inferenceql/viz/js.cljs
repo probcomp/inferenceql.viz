@@ -20,6 +20,7 @@
             [ajax.core]
             [ajax.edn]
             [reagent.core :as r]
+            [re-com.core :refer [v-box h-box gap]]
             [cljs-bean.core :refer [->clj]]
             [goog.string :refer [format]]))
 
@@ -225,19 +226,24 @@
 
         node (dom/createElement "div")
         comp (fn [options]
-               [:div.cell-by-cell-app
-                {:style {:border-width "3px"
-                         :border-style "solid"
-                         :padding "20px 20px 20px 20px"
-                         :margin "25px 0px 25px 0px"
-                         :border-radius "7px"
-                         :border-color "grey"}}
-                [make-table-comp table-data @options]
-                (let [plot-rows (some->> (:rows @plot-data) ->clj (take num-rows))]
-                  [plot-help plot-rows schema [(:col-names @plot-data)] @pts-store])
-                [:div {:class "observablehq--inspect"
-                       :style {:white-space "pre-wrap"}}
-                 @query]])
+               [v-box
+                :class "cell-by-cell-app"
+                :style {:border-width "3px"
+                        :border-style "solid"
+                        :padding "20px 20px 20px 20px"
+                        :margin "25px 0px 25px 0px"
+                        :border-radius "7px"
+                        :border-color "grey"}
+                :children [[make-table-comp table-data @options]
+                           [gap :size "10px"]
+                           [h-box
+                            :children [[gap :size "20px"]
+                                       (let [plot-rows (some->> (:rows @plot-data) ->clj (take num-rows))]
+                                         [plot-help plot-rows schema [(:col-names @plot-data)] @pts-store])]]
+                           [gap :size "10px"]
+                           [:div {:class "observablehq--inspect"
+                                  :style {:white-space "pre-wrap"}}
+                            @query]]])
 
         anim-step (fn anim-step []
                     ;; When there are checks left to be made.
