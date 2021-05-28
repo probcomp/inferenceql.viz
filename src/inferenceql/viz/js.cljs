@@ -225,7 +225,13 @@
 
         node (dom/createElement "div")
         comp (fn [options]
-               [:div
+               [:div.cell-by-cell-app
+                {:style {:border-width "3px"
+                         :border-style "solid"
+                         :padding "20px 20px 20px 20px"
+                         :margin "25px 0px 25px 0px"
+                         :border-radius "7px"
+                         :border-color "grey"}}
                 [make-table-comp table-data @options]
                 (let [plot-rows (some->> (:rows @plot-data) ->clj (take num-rows))]
                   [plot-help plot-rows schema [(:col-names @plot-data)] @pts-store])
