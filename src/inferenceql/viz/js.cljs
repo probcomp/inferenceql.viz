@@ -220,7 +220,7 @@
         pts-store (r/atom nil)
 
         checks (for [c cols i (range (count table-data))] {:column c :row i})
-        checks (filter #(some? (get-in table-data [(:row %) (:column %)])) checks)
+        checks (cycle (filter #(some? (get-in table-data [(:row %) (:column %)])) checks))
         checks (r/atom checks)
         cur-col (r/atom nil)
         cur-row (r/atom nil)
