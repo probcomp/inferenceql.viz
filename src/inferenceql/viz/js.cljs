@@ -228,29 +228,29 @@
 
         node (dom/createElement "div")
         comp (fn [options]
-               [box
-                :min-height "1000px"
-                :child [v-box
-                        :class "cell-by-cell-app"
-                        :style {:border-width "3px"
-                                :border-style "solid"
-                                :padding "20px 20px 20px 20px"
-                                :margin "25px 0px 25px 0px"
-                                :border-radius "7px"
-                                :border-color "grey"}
-                        :children [[make-table-comp table-data @options]
-                                   [gap :size "20px"]
-                                   [h-box
-                                    :children [[gap :size "25px"]
-                                               (when (and (some? @plot-data) (some? @cur-row) (some? @cur-cell-status))
-                                                 (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
-                                                       plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
-                                                       plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
-                                                   [plot-help plot-rows schema [(:col-names @plot-data)] nil]))]]
-                                   [gap :size "20px"]
-                                   [:div {:class "observablehq--inspect"
-                                          :style {:white-space "pre-wrap"}}
-                                    @query]]]])
+               [v-box
+                :min-height "1100px"
+                :children [[v-box
+                            :class "cell-by-cell-app"
+                            :style {:border-width "3px"
+                                    :border-style "solid"
+                                    :padding "20px 20px 20px 20px"
+                                    :margin "25px 0px 25px 0px"
+                                    :border-radius "7px"
+                                    :border-color "grey"}
+                            :children [[make-table-comp table-data @options]
+                                       [gap :size "20px"]
+                                       [h-box
+                                        :children [[gap :size "25px"]
+                                                   (when (and (some? @plot-data) (some? @cur-row) (some? @cur-cell-status))
+                                                     (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
+                                                           plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
+                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
+                                                       [plot-help plot-rows schema [(:col-names @plot-data)] nil]))]]
+                                       [gap :size "20px"]
+                                       [:div {:class "observablehq--inspect"
+                                              :style {:white-space "pre-wrap"}}
+                                        @query]]]]])
 
         anim-step (fn anim-step []
                     ;; When there are checks left to be made.
