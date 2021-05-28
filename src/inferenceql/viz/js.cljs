@@ -280,9 +280,10 @@
 
                               q1-val (-> (query-fn q1) first (.-p))
                               q2-val (-> (query-fn q2) first (.-p))
-                              abs-diff (Math/abs (- q1-val q2-val))]
+                              anomaly (and (< q2-val q1-val)
+                                           (< q2-val thresh))]
                           ;; Update query.
-                          (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val) "abs-diff" abs-diff]))
+                          (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val)]))
                           ;; Update highlighted point in plot.
                           (reset! pts-store [{:fields [{:field "rowid" :type "E"}] :values [(:row chk)]}])
                           ;; Switch to next check.
@@ -293,7 +294,7 @@
                                             (let [cell-props #js {}]
                                               (when (and (= row (:row chk))
                                                          (= prop (name (:column chk))))
-                                                (let [color (if (>= abs-diff thresh)
+                                                (let [color (if anomaly
                                                               "red-highlight"
                                                               "blue-highlight")]
                                                   (set! (.-className cell-props) color)))
