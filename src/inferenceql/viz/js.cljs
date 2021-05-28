@@ -259,8 +259,8 @@
                         (if (not= @cur-col (:column chk))
                           (let [all-bindings (string/join " AND " (map name other-cols))
                                 all-columns (string/join ", " (map name cols))
-                                q-conditional-all (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data;"
-                                                          all-columns col-name all-bindings)]
+                                q-conditional-all (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
+                                                          all-columns col-name all-bindings num-rows)]
                             (reset! plot-data {:col-names [col-name "p"]
                                                :rows (query-fn q-conditional-all)})
                             (reset! cur-col (:column chk))))
