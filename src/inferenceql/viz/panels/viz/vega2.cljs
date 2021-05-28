@@ -315,8 +315,11 @@
                 :size {:condition {:selection "pts"
                                    :value 100}
                        :value 50}
-                :color {:condition {:selection "pts"
-                                    :value selection-color}}}}))
+                :color {:field "anomaly"
+                        :type "nominal"
+                        :scale {:domain ["true", "false", "undefined"]
+                                :range ["Crimson" "steelblue" "lightgrey"]}
+                        :legend nil}}}))
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -409,8 +412,11 @@
                 :order {:condition {:selection "pts"
                                     :value 1}
                         :value 0}
-                :color {:condition {:selection "pts"
-                                    :value selection-color}}}}))
+                :color {:field "anomaly"
+                        :type "nominal"
+                        :scale {:domain ["true", "false", "undefined"]
+                                :range ["Crimson" "steelblue" "lightgrey"]}
+                        :legend nil}}}))
 
 
 (defn- table-bubble-plot

@@ -223,6 +223,8 @@
         checks (filter #(some? (get-in table-data [(:row %) (:column %)])) checks)
         checks (r/atom checks)
         cur-col (r/atom nil)
+        cur-row (r/atom nil)
+        cur-cell-status (r/atom false)
 
         node (dom/createElement "div")
         comp (fn [options]
@@ -235,12 +237,15 @@
                         :border-radius "7px"
                         :border-color "grey"}
                 :children [[make-table-comp table-data @options]
-                           [gap :size "10px"]
+                           [gap :size "20px"]
                            [h-box
-                            :children [[gap :size "20px"]
-                                       (let [plot-rows (some->> (:rows @plot-data) ->clj (take num-rows))]
-                                         [plot-help plot-rows schema [(:col-names @plot-data)] @pts-store])]]
-                           [gap :size "10px"]
+                            :children [[gap :size "25px"]
+                                       (when (and (some? @plot-data) (some? @cur-row) (some? @cur-cell-status))
+                                         (let [plot-rows (some->> (:rows @plot-data) ->clj (take num-rows) vec)
+                                               plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
+                                               plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
+                                           [plot-help plot-rows schema [(:col-names @plot-data)] nil]))]]
+                           [gap :size "20px"]
                            [:div {:class "observablehq--inspect"
                                   :style {:white-space "pre-wrap"}}
                             @query]]])
@@ -290,8 +295,12 @@
                                            (< q2-val thresh))]
                           ;; Update query.
                           (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val)]))
+
                           ;; Update highlighted point in plot.
-                          (reset! pts-store [{:fields [{:field "rowid" :type "E"}] :values [(:row chk)]}])
+                          ;;(reset! pts-store [{:fields [{:field "rowid" :type "E"}] :values [(:row chk)]}])
+                          (reset! cur-row (:row chk))
+                          (reset! cur-cell-status anomaly)
+
                           ;; Switch to next check.
                           (swap! checks rest)
 
