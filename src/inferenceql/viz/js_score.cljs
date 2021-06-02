@@ -1,18 +1,15 @@
-(ns inferenceql.viz.js_score
+(ns inferenceql.viz.js-score
   (:require [inferenceql.viz.util :as util]
             [inferenceql.inference.gpm.multimixture.search :as search]
             [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
             [metaprob.prelude :as mp]
             [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]
+            [cljs-bean.core :refer [->clj]]
             [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
-            [cljs-bean.core :refer [->clj]]))
-
-(def ^:private imputation-sample-size
-  "The number of imputed values used to determine the value a missing cell."
-  10)
+            [goog.string :refer [format]]))
 
 (defn- min-max-normalizer-fn [nums]
   "Returns a function that rescales a number from `nums` to the range [0,1]."
@@ -22,29 +19,32 @@
     #(/ (- % min-n)
         scale-factor)))
 
-
 ;;; These functions are for imputing data in empty cells and
 ;;; also returning a score for the imputed values.
 
 (defn impute-and-score-cell
   "Returns an imputed value of `key-to-impute` along with its score"
-  [query-fn schema row key-to-impute]
+  [query-fn schema row key-to-impute num-samples]
   (let [cond-string (->> row
-                         (map (fn [[k v]] (case (get schema k)
-                                            :gaussian [(name k) (str v)]
-                                            :categorical [(name k) (str "\"" v "\"")])))
-                         (map (fn [[k v]] (format "%s=%s" k v)))
-                         (string/join " AND "))
+                         (map (fn [[k v]]
+                                (case (get schema k)
+                                  :gaussian [(name k) (str v)]
+                                  :categorical [(name k) (str "\"" v "\"")])))
+                         (map (fn [[k v]] (format "%s=%s" k v))))
+        cond-string (string/join " AND " cond-string)
 
         query-str (format
                    "SELECT %s FROM (GENERATE %s UNDER model CONDITIONED BY %s) LIMIT %s"
                    (name key-to-impute)
                    (name key-to-impute)
                    cond-string
-                   imputation-sample-size)
+                   num-samples)
 
-        samples (map #(get % key-to-impute) (query-fn query-str))
+        results (->clj (query-fn query-str))
+        samples (map key-to-impute results)
         freq-list (sort-by val > (frequencies samples))
+        _ (.log js/console (str key-to-impute " " freq-list))
+
         [top-sample top-sample-count] (first freq-list)
 
         total-sample-count (count samples)
@@ -53,10 +53,11 @@
 
 (defn impute-missing-cells-in-row
   "Returns a map of imputed values and scores for all missing values in `row`"
-  [query-fn schema row]
+  [query-fn schema row num-samples]
   (let [available-keys (keys row)
         missing-keys (set/difference (set (keys schema)) (set available-keys))
-        values-scores (map #(impute-and-score-cell query-fn schema row %) missing-keys)]
+        missing-keys (filter #(= (get schema %) :categorical) missing-keys)
+        values-scores (map #(impute-and-score-cell query-fn schema row % num-samples) missing-keys)]
     (zipmap missing-keys values-scores)))
 
 (defn normalize-missing-cells-scores
@@ -70,21 +71,16 @@
 
 (defn impute-missing-cells
   "Returns imputed values and normalized scores for all missing values in `rows`"
-  [query-fn schema rows]
-  (let [rows (vec (->clj rows))
-        schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
-                              (->clj schema))
-
-        values-and-scores-by-row (map #(impute-missing-cells-in-row query-fn schema %) rows)
+  [query-fn schema rows num-samples]
+  (let [values-and-scores-by-row (map #(impute-missing-cells-in-row query-fn schema % num-samples) rows)
 
         all-scores (->> values-and-scores-by-row
                         (map vals) ;; Produces sequence of {:score _ :value _ } maps for each row.
                         (apply concat)  ;; Flattened sequence of {:score _ :value _ } maps.
-                        (map :score)) ;; Sequence of score values.
+                        (map :score))] ;; Sequence of score values.
 
-        ;; Only normalize if distinct scores present.
-        ret-map (if (> (count (distinct all-scores)) 1)
-                  (normalize-missing-cells-scores values-and-scores-by-row all-scores)
-                  ;; Just return the raw likelihoods otherwise.
-                  values-and-scores-by-row)]
-    (clj->js ret-map)))
+    ;; Only normalize if distinct scores present.
+    (if (> (count (distinct all-scores)) 1)
+      (normalize-missing-cells-scores values-and-scores-by-row all-scores)
+      ;; Just return the raw likelihoods otherwise.
+      values-and-scores-by-row)))

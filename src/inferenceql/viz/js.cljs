@@ -16,7 +16,7 @@
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.query.js]  ; For the Observable user to run queries. Not used directly.
             [inferenceql.inference.js]
-            [inferenceql.viz.js_score]
+            [inferenceql.viz.js-score :as score]
             [medley.core :as medley]
             [ajax.core]
             [ajax.edn]
@@ -338,6 +338,13 @@
     (rdom/render [comp options] node)
     node))
 
+(defn ^:export impute-missing-cells
+  "Returns imputed values and normalized scores for all missing values in `rows`"
+  [query-fn schema rows num-samples]
+  (let [rows (vec (->clj rows))
+        schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
+                              (->clj schema))]
+    (clj->js (score/impute-missing-cells query-fn schema rows num-samples))))
 
 (defn ^:export this-function-fails
   []
