@@ -343,7 +343,8 @@
   [query-fn schema rows num-samples]
   (let [rows (vec (->clj rows))
         schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
-                              (->clj schema))]
+                              (->clj schema))
+        query-fn #(->clj (query-fn %))]
     (clj->js (score/impute-missing-cells query-fn schema rows num-samples))))
 
 (defn ^:export this-function-fails

@@ -1,13 +1,8 @@
 (ns inferenceql.viz.js-score
   (:require [inferenceql.viz.util :as util]
-            [inferenceql.inference.gpm.multimixture.search :as search]
-            [inferenceql.inference.gpm.multimixture.utils :as mm.utils]
-            [metaprob.prelude :as mp]
-            [inferenceql.inference.gpm :as gpm]
             [medley.core :as medley]
             [cljs-bean.core :refer [->clj]]
             [clojure.set :as set]
-            [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [goog.string :refer [format]]))
 
@@ -40,8 +35,7 @@
                    cond-string
                    num-samples)
 
-        results (->clj (query-fn query-str))
-        samples (map key-to-impute results)
+        samples (map key-to-impute (query-fn query-str))
         freq-list (sort-by val > (frequencies samples))
         _ (.log js/console (str key-to-impute " " freq-list))
 
