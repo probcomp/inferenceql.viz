@@ -47,10 +47,9 @@
 
 (defn impute-missing-cells-in-row
   "Returns a map of imputed values and scores for all missing values in `row`"
-  [query-fn schema row num-samples]
+  [query-fn schema row num-samples impute-cols]
   (let [available-keys (keys row)
-        missing-keys (set/difference (set (keys schema)) (set available-keys))
-        missing-keys (filter #(= (get schema %) :categorical) missing-keys)
+        missing-keys (set/difference (set impute-cols) (set available-keys))
         values-scores (map #(impute-and-score-cell query-fn schema row % num-samples) missing-keys)]
     (zipmap missing-keys values-scores)))
 
@@ -65,16 +64,18 @@
 
 (defn impute-missing-cells
   "Returns imputed values and normalized scores for all missing values in `rows`"
-  [query-fn schema rows num-samples]
-  (let [values-and-scores-by-row (map #(impute-missing-cells-in-row query-fn schema % num-samples) rows)
+  [query-fn schema rows num-samples impute-cols]
+  (let [values-and-scores-by-row (map #(impute-missing-cells-in-row query-fn schema % num-samples impute-cols) rows)
 
         all-scores (->> values-and-scores-by-row
                         (map vals) ;; Produces sequence of {:score _ :value _ } maps for each row.
                         (apply concat)  ;; Flattened sequence of {:score _ :value _ } maps.
                         (map :score))] ;; Sequence of score values.
 
+
     ;; Only normalize if distinct scores present.
-    (if (> (count (distinct all-scores)) 1)
-      (normalize-missing-cells-scores values-and-scores-by-row all-scores)
-      ;; Just return the raw likelihoods otherwise.
-      values-and-scores-by-row)))
+    values-and-scores-by-row
+    #_(if (> (count (distinct all-scores)) 1)
+        (normalize-missing-cells-scores values-and-scores-by-row all-scores)
+        ;; Just return the raw likelihoods otherwise.
+        values-and-scores-by-row)))

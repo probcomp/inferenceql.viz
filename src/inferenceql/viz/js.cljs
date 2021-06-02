@@ -340,12 +340,13 @@
 
 (defn ^:export impute-missing-cells
   "Returns imputed values and normalized scores for all missing values in `rows`"
-  [query-fn schema rows num-samples]
+  [query-fn schema rows num-samples impute-cols]
   (let [rows (vec (->clj rows))
         schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
                               (->clj schema))
-        query-fn #(->clj (query-fn %))]
-    (clj->js (score/impute-missing-cells query-fn schema rows num-samples))))
+        query-fn #(->clj (query-fn %))
+        impute-cols (map keyword (->clj impute-cols))]
+    (clj->js (score/impute-missing-cells query-fn schema rows num-samples impute-cols))))
 
 (defn ^:export this-function-fails
   []
