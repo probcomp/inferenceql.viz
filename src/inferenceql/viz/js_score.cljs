@@ -23,8 +23,8 @@
   (let [cond-string (->> row
                          (map (fn [[k v]]
                                 (case (get schema k)
-                                  :gaussian [(name k) (str v)]
-                                  :categorical [(name k) (str "\"" v "\"")])))
+                                  :numerical [(name k) (str v)]
+                                  :nominal [(name k) (str "\"" v "\"")])))
                          (map (fn [[k v]] (format "%s=%s" k v))))
         cond-string (string/join " AND " cond-string)
 
@@ -88,8 +88,8 @@
       (let [cond-string (->> row
                           (map (fn [[k v]]
                                  (case (get schema k)
-                                   :gaussian [(name k) (str v)]
-                                   :categorical [(name k) (str "\"" v "\"")])))
+                                   :numerical [(name k) (str v)]
+                                   :nominal [(name k) (str "\"" v "\"")])))
                           (map (fn [[k v]] (format "%s=%s" k v))))
             cond-string (string/join " AND " cond-string)
 
