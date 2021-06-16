@@ -336,6 +336,15 @@
         impute-cols (map keyword (->clj impute-cols))]
     (clj->js (score/impute-missing-cells query-fn schema rows num-samples impute-cols))))
 
+
+(defn ^:export impute-missing-cells-queries
+  [rows schema impute-cols num-samples]
+  (let [rows (vec (->clj rows))
+        schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
+                              (->clj schema))
+        impute-cols (map keyword (->clj impute-cols))]
+    (clj->js (take 3 (score/impute-missing-cells-queries rows schema impute-cols num-samples)))))
+
 (defn ^:export this-function-fails
   []
   (let [inner-fn (fn [] (throw

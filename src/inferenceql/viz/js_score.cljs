@@ -37,8 +37,6 @@
 
         samples (map key-to-impute (query-fn query-str))
         freq-list (sort-by val > (frequencies samples))
-        _ (.log js/console (str key-to-impute " " freq-list))
-
         [top-sample top-sample-count] (first freq-list)
 
         total-sample-count (count samples)
@@ -79,3 +77,33 @@
         (normalize-missing-cells-scores values-and-scores-by-row all-scores)
         ;; Just return the raw likelihoods otherwise.
         values-and-scores-by-row)))
+
+;------------------
+
+(defn fake-query
+  [row schema impute-cols num-samples]
+  (let [available-keys (keys row)
+        missing-keys (set/difference (set impute-cols) (set available-keys))]
+    (when (seq missing-keys)
+      (let [cond-string (->> row
+                          (map (fn [[k v]]
+                                 (case (get schema k)
+                                   :gaussian [(name k) (str v)]
+                                   :categorical [(name k) (str "\"" v "\"")])))
+                          (map (fn [[k v]] (format "%s=%s" k v))))
+            cond-string (string/join " AND " cond-string)
+
+            impute-cols-str (string/join ", " (map name impute-cols))]
+
+        (format
+         "SELECT %s FROM \n(GENERATE %s \nUNDER model \nCONDITIONED BY %s) \nLIMIT %s"
+         impute-cols-str
+         impute-cols-str
+         cond-string
+         num-samples)))))
+
+(defn impute-missing-cells-queries
+  [rows schema impute-cols num-samples]
+  (let [queries (for [[idx r] (map-indexed vector rows)]
+                  [idx (fake-query r schema impute-cols num-samples)])]
+    (filter (comp some? second) queries)))
