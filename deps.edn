@@ -35,7 +35,7 @@
                                lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}
                                com.lambdaisland/kaocha-cljs {:mvn/version "1.0.93"}}}
            :figwheel {:extra-paths ["figwheel-target"]
-                      :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.11"}
+                      :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.13"}
                                    com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}}
                       :main-opts ["-m" "figwheel.main"
                                   "-co" "build.edn:figwheel/figwheel_build_support.edn"

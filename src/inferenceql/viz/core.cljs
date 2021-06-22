@@ -76,6 +76,3 @@
       (rf/dispatch-sync [:control/set-query-string-to-select-all])))
 
   (render-app))
-
-;; Start the app during the loading of this namespace.
-(-main)
