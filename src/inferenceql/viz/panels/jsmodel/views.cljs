@@ -28,7 +28,7 @@
       :reagent-render
       (fn []
         [:pre#program-display {:ref #(swap! dom-nodes assoc :program-display %)}
-         [:code {:class "javascript"}
+         [:code {:class "js"}
           js-code]])})))
 
 (defn display
