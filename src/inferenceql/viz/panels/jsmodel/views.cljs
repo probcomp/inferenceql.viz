@@ -2,8 +2,12 @@
   (:require [re-com.core :refer [border v-box title button gap]]
             [reagent.core :as r]
             [re-frame.core :as rf]
-            [cljsjs.highlight]
-            [cljsjs.highlight.langs.javascript]))
+            ["highlight.js/lib/core" :as yarn-hljs]
+            ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]))
+
+;; We are using the minimal version of highlight.js where
+;; every language used has to be registered individually.
+(.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
 (defn js-code-block
   "Display of Javascript code with syntax highlighting.
@@ -19,12 +23,12 @@
 
       :component-did-mount
       (fn [this]
-        (.highlightBlock js/hljs (:program-display @dom-nodes)))
+        (.highlightElement yarn-hljs (:program-display @dom-nodes)))
 
       :reagent-render
       (fn []
         [:pre#program-display {:ref #(swap! dom-nodes assoc :program-display %)}
-         [:code {:class "js"}
+         [:code {:class "javascript"}
           js-code]])})))
 
 (defn display

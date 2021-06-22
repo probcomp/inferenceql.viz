@@ -1,0 +1,13 @@
+{:output-to "out/index.js"
+ :output-dir "out"
+ :externs ["externs/handsontable.ext.js"
+           "externs/vega.ext.js"
+           "externs/vega-embed.ext.js"
+           "externs/vega-lite.ext.js"
+           "externs/highlight.ext.js"]
+ :browser-repl false
+ :target :bundle
+ ;; Webpack will minify code.
+ :bundle-cmd {:default ["yarn" "run" "webpack" "--config-name" "minified"]}
+ :closure-defines {cljs.core/*global* "window"}
+ :optimizations :advanced}

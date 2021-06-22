@@ -1,15 +1,16 @@
 (ns inferenceql.viz.panels.viz.views
   "Views for displaying vega-lite specs"
-  (:require [yarn.vega-embed]
+  (:require [vega :as yarn-vega]
+            [vega-embed$default :as yarn-vega-embed]
             [reagent.core :as r]
             [re-frame.core :as rf]
             [goog.functions :as gfn]))
 
 (def ^:private log-level-default
-  (.-Error js/vega))
+  (.-Error yarn-vega))
 
 (def ^:private log-level-debug
-  (.-Warn js/vega))
+  (.-Warn yarn-vega))
 
 (def ^:private default-vega-embed-options
   {:renderer "svg"
@@ -44,7 +45,7 @@
         gen-and-insert (fn [generators vega-instance]
                          (doall (for [[dataset-name gen-fn] (seq generators)]
                                   (let [datum (gen-fn)
-                                        changeset (.. js/vega
+                                        changeset (.. yarn-vega
                                                       (changeset)
                                                       (insert (clj->js datum)))]
                                     (.. vega-instance
@@ -58,9 +59,9 @@
                   (let [spec (clj->js spec)
                         opt (clj->js (merge default-vega-embed-options
                                             opt))]
-                    (doto (js/vegaEmbed (:vega-node @dom-nodes)
-                                        spec
-                                        opt)
+                    (doto (yarn-vega-embed (:vega-node @dom-nodes)
+                                           spec
+                                           opt)
                       ;; Start generators for inserting data in simulation plots.
                       (.then (fn [res]
                                (when generators
