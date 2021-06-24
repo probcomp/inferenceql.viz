@@ -30,4 +30,5 @@
 (defmacro read
   "Loads the app config."
   []
-  (aero.core/read-config (io/resource "config.edn")))
+  `(quote ~(aero.core/read-config (io/resource "config.edn"))))
+

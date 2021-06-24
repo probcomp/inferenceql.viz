@@ -17,8 +17,7 @@
                   (get config/config :data)))
 
 
-(def compiled-in-model
-  (edn/read-string {:readers gpm/readers} (get config/config :model)))
+(def compiled-in-model (get config/config :model))
 
 ;;; Setting up store component db
 
