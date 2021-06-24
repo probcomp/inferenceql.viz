@@ -25,11 +25,17 @@ figwheel-index-file := $(figwheel-public-dir)/index.html
 
 all: js
 
-js: $(output-to)
-
 .PHONY: watch
 watch: $(hot-css-resource)
 	clojure -M -m cljs.main -w $(src-dir) $(cljs-main-opts)
+
+.PHONY: watch-advanced
+watch-advanced: $(hot-css-resource)
+	clojure -M -m cljs.main -w $(src-dir) $(cljs-main-opts-advn)
+
+.PHONY: watch-advanced-min
+watch-advanced-min: $(hot-css-resource)
+	clojure -M -m cljs.main -w $(src-dir) $(cljs-main-opts-advn-min)
 
 clean:
 	rm -Rf $(output-dir)
@@ -39,17 +45,34 @@ clean:
 
 ### Compilation
 
-compile-opts := $(current-dir)/build.edn
+compile-opts := $(current-dir)/compiler_options/app/build.edn
+compile-opts-advn := $(current-dir)/compiler_options/app/build-advanced.edn
+compile-opts-advn-min := $(current-dir)/compiler_options/app/build-advanced-min.edn
 main-ns      := inferenceql.viz.core
 
 cljs-main-opts := \
 		-co $(compile-opts) \
-		-d $(output-dir) \
-		-o $(output-to) \
 		-c $(main-ns)
 
-$(output-to): $(hot-css-resource)
+cljs-main-opts-advn := \
+		-co $(compile-opts-advn) \
+		-c $(main-ns)
+
+cljs-main-opts-advn-min := \
+		-co $(compile-opts-advn-min) \
+		-c $(main-ns)
+
+.PHONY: js
+js: $(hot-css-resource)
 	clojure -M -m cljs.main $(cljs-main-opts)
+
+.PHONY: js-advanced
+js-advanced: $(hot-css-resource)
+	clojure -M -m cljs.main $(cljs-main-opts-advn)
+
+.PHONY: js-advanced-min
+js-advanced-min: $(hot-css-resource)
+	clojure -M -m cljs.main $(cljs-main-opts-advn-min)
 
 yarn-install-opts = --no-progress --frozen-lockfile
 

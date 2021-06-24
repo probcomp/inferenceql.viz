@@ -1,5 +1,5 @@
 (ns inferenceql.viz.panels.table.views
-  (:require [yarn.handsontable]
+  (:require [handsontable$default :as yarn-handsontable]
             [camel-snake-kebab.core :as csk]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
@@ -60,12 +60,15 @@
        :component-did-mount
        (fn [this]
          (let [{:keys [settings hooks]} props
-               hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))]
+               hot (yarn-handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
            ;; Add callbacks internal to hot object.
            (doseq [[key callback-gen] hooks]
              (let [camel-key (csk/->camelCase (clj->js key))]
-               (js/Handsontable.hooks.add camel-key (callback-gen hot) hot)))
+               (.add (.-hooks yarn-handsontable)
+                     camel-key
+                     (callback-gen hot)
+                     hot)))
 
            ;; Save the hot object in the app db.
            (rf/dispatch [:table/set-hot-instance hot])))

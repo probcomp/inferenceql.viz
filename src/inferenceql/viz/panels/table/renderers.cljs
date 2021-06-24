@@ -1,5 +1,6 @@
 (ns inferenceql.viz.panels.table.renderers
-  "A cell renderer functions for use in handsontable properties")
+  "A cell renderer functions for use in handsontable properties"
+  (:require [handsontable$default :as yarn-handsontable]))
 
 (defn row-wise-likelihood-threshold-renderer
   "Colors rows that have likelihood greater than or equal to `conf-thresh`"
@@ -11,11 +12,12 @@
         row (.toPhysicalRow hot row)
 
         td-style (.-style td)
-        text-render-fn js/Handsontable.renderers.TextRenderer]
+        text-render-fn (.. yarn-handsontable -renderers -TextRenderer)]
 
     ;; Performs standard rendering of text in cell
-    (this-as this
-      (.apply text-render-fn this renderer-args-js))
+    ;; FIXME: This particular use of this has issues with advanced compilation.
+    #_(this-as this
+        (.apply text-render-fn this renderer-args-js))
 
     ;; Colors rows when we have likelihoods loaded
     (when (seq row-likelihoods)
@@ -37,15 +39,16 @@
         col (.toPhysicalColumn hot col)
 
         td-style (.-style td)
-        text-render-fn js/Handsontable.renderers.TextRenderer
+        text-render-fn (.. yarn-handsontable -renderers -TextRenderer)
 
         prop-name-of-cell (nth computed-headers col)
 
         color-above-thresh "#CEC"
         color-below-thresh "#DDD"]
     ;; Performs standard rendering of text in cell
-    (this-as this
-      (.apply text-render-fn this renderer-args-js))
+    ;; FIXME: This particular use of this has issues with advanced compilation.
+    #_(this-as this
+        (.apply text-render-fn this renderer-args-js))
 
     ;; Perform coloring when we have missing-cells information loaded.
     (when-let [mvs (not-empty missing-vals-and-scores)]
