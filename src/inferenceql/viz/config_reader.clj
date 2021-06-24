@@ -31,4 +31,3 @@
   "Loads the app config."
   []
   `(quote ~(aero.core/read-config (io/resource "config.edn"))))
-
