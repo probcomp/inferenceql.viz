@@ -1,3 +1,0 @@
-{:foo (1 2 3 4)}
-;; Reading this as edn in the config does not work.
-;; Proves the error has to do with the :hypergrid in the column gpm.
