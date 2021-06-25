@@ -9,7 +9,7 @@
 (def more-icon-inlined
   "This is an inlined version of the icon located at resources/icons/more_vert-24px.svg
   Inlining the icon allows for more easily inlined the entire iql.viz app into a single html file."
-
+  
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   height='24' viewBox='0 0 24 24' width='24'%3E%3Cstyle type='text/css'
   %3E%3C!%5BCDATA%5B .more-icon-dots %7B fill: %23AAA; %7D

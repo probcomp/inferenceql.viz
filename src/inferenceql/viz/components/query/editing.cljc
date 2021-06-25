@@ -136,9 +136,9 @@
                               (tree/child-nodes))
         set-map (apply merge (map q-eval set-map-exprs))
 
-        where-pairs (some-> update-expr
-                            (tree/get-node-in [:where-clause :or-condition])
-                            (reduce-or-node))
+        where-pairs  (some-> update-expr
+                             (tree/get-node-in [:where-clause :or-condition])
+                             (reduce-or-node))
         binding-name (-> (tree/get-node node :name)
                          (query/unparse))
 
