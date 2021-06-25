@@ -1,14 +1,16 @@
 (ns inferenceql.viz.panels.viz.views
   "Views for displaying vega-lite specs"
-  (:require [reagent.core :as r]
+  (:require [vega :as yarn-vega]
+            [vega-embed$default :as yarn-vega-embed]
+            [reagent.core :as r]
             [re-frame.core :as rf]
             [goog.functions :as gfn]))
 
 (def ^:private log-level-default
-  (.-Error js/vega))
+  (.-Error yarn-vega))
 
 (def ^:private log-level-debug
-  (.-Warn js/vega))
+  (.-Warn yarn-vega))
 
 (def ^:private default-vega-embed-options
   {:renderer "svg"
@@ -43,7 +45,7 @@
         gen-and-insert (fn [generators vega-instance]
                          (doall (for [[dataset-name gen-fn] (seq generators)]
                                   (let [datum (gen-fn)
-                                        changeset (.. js/vega
+                                        changeset (.. yarn-vega
                                                       (changeset)
                                                       (insert (clj->js datum)))]
                                     (.. vega-instance
@@ -57,9 +59,9 @@
                   (let [spec (clj->js spec)
                         opt (clj->js (merge default-vega-embed-options
                                             opt))]
-                    (doto (js/vegaEmbed (:vega-node @dom-nodes)
-                                        spec
-                                        opt)
+                    (doto (yarn-vega-embed (:vega-node @dom-nodes)
+                                           spec
+                                           opt)
                       ;; Start generators for inserting data in simulation plots.
                       (.then (fn [res]
                                (when generators
@@ -107,9 +109,9 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt generators pts-store))
+        (embed this spec opt generators pts-store)
         ;; Add global listener for mouseup.
-        ;;(.addEventListener js/window "mouseup" mouseup-handler))
+        (.addEventListener js/window "mouseup" mouseup-handler))
 
       :component-did-update
       (fn [this old-argv]
@@ -123,12 +125,14 @@
 
       :component-will-unmount
       (fn [this]
-        (free-resources))
+        (free-resources)
         ;; Remove global listener for mouseup.
-        ;;(.removeEventListener js/window "mouseup" mouseup-handler))
+        (.removeEventListener js/window "mouseup" mouseup-handler))
 
       :reagent-render
       (fn [spec opt generators pts-store]
         (when spec
-          [:div#viz-container {:style {:overflow-x "auto"}}
-           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
+          [:div#viz-container
+           [:div.flex-box-space-filler-20]
+           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
+           [:div.flex-box-space-filler-20]]))})))

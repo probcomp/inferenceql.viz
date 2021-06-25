@@ -8,7 +8,8 @@
             [inferenceql.viz.panels.table.selections :as selections]
             [inferenceql.viz.util :refer [coerce-bool]]
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
-            [goog.string :refer [format]]))
+            [goog.string :refer [format]]
+            [handsontable$default :as yarn-handsontable]))
 
 ;;; Subs related selection layer color.
 
@@ -271,7 +272,7 @@
  (fn [{:keys [row-likelihoods missing-cells-flagged conf-thresh conf-mode computed-headers]}]
    (case conf-mode
      :none
-     js/Handsontable.renderers.TextRenderer
+     (.. yarn-handsontable -renderers -TextRenderer)
 
      :row
      (fn [& args]
@@ -282,7 +283,7 @@
        (rends/row-wise-likelihood-threshold-renderer args row-likelihoods conf-thresh))
 
      :cells-existing
-     js/Handsontable.renderers.TextRenderer
+     (.. yarn-handsontable -renderers -TextRenderer)
 
      :cells-missing
      (fn [& args]

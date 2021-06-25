@@ -1,5 +1,6 @@
 (ns inferenceql.viz.panels.table.views
-  (:require [camel-snake-kebab.core :as csk]
+  (:require [handsontable$default :as yarn-handsontable]
+            [camel-snake-kebab.core :as csk]
             [re-frame.core :as rf]
             [reagent.core :as reagent]
             [reagent.dom :as dom]
@@ -51,28 +52,26 @@
 
 (defn handsontable
   ([attributes props]
-   (let [hot-instance (reagent/atom nil)
+   (let [hot-instance (rf/subscribe [:table/hot-instance])
          dom-nodes (reagent/atom {})]
-
      (reagent/create-class
       {:display-name "handsontable-reagent"
 
        :component-did-mount
        (fn [this]
          (let [{:keys [settings hooks]} props
-               hot (js/Handsontable. (:table-div @dom-nodes) (clj->js settings))]
+               hot (yarn-handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
-           ;; Fix scrolling for HOT in Observable.
-           (js/Handsontable.hooks.add "afterRender"
-                                      (fn []
-                                        (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
-                                      hot)
+           ;; Add callbacks internal to hot object.
+           (doseq [[key callback-gen] hooks]
+             (let [camel-key (csk/->camelCase (clj->js key))]
+               (.add (.-hooks yarn-handsontable)
+                     camel-key
+                     (callback-gen hot)
+                     hot)))
 
-           ;; Make new HOT instances appear immediately in Observable.
-           (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30)
-
-           ;; Save HOT instance.
-           (reset! hot-instance hot)))
+           ;; Save the hot object in the app db.
+           (rf/dispatch [:table/set-hot-instance hot])))
 
        :component-did-update
        (fn [this old-argv]
@@ -92,6 +91,7 @@
        :component-will-unmount
        (fn [this]
          (when @hot-instance
+           (rf/dispatch [:table/unset-hot-instance])
            (.destroy @hot-instance)))
 
        :reagent-render
