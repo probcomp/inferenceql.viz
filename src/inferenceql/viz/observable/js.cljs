@@ -1,4 +1,4 @@
-(ns inferenceql.viz.js
+(ns inferenceql.viz.observable.js
   (:require [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as string]
