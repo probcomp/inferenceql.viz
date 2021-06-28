@@ -38,7 +38,7 @@
                       :extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.13"}
                                    com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}}
                       :main-opts ["-m" "figwheel.main"
-                                  "-co" "build.edn:figwheel/figwheel_build_support.edn"
+                                  "-co" "compiler_options/app/build.edn:figwheel/figwheel_build_support.edn"
                                   "-d" "figwheel-target/public/out"
                                   "-o" "figwheel-target/public/out/main.js"
                                   "-c" "inferenceql.viz.core"
@@ -48,7 +48,7 @@
                              ;; This is the only line that differs from :figwheel :main-opts.
                              ;; There is the addition of an extra .edn file for build options related
                              ;; to reframe-10x.
-                             "-co" "build.edn:figwheel/figwheel_build_support.edn:figwheel/reframe_10x_support.edn"
+                             "-co" "compiler_options/app/build.edn:figwheel/figwheel_build_support.edn:figwheel/reframe_10x_support.edn"
                              "-d" "figwheel-target/public/out"
                              "-o" "figwheel-target/public/out/main.js"
                              "-c" "inferenceql.viz.core"
