@@ -39,27 +39,27 @@ compile-opts-advn-min := $(current-dir)/compiler_options/app/build-advanced-min.
 
 .PHONY: watch
 watch: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts)
+	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts) -c inferenceql.viz.core
 
 .PHONY: watch-advanced
 watch-advanced: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn)
+	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn) -c inferenceql.viz.core
 
 .PHONY: watch-advanced-min
 watch-advanced-min: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn-min)
+	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 .PHONY: js
 js: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(compile-opts)
+	clojure -M -m cljs.main -co $(compile-opts) -c inferenceql.viz.core
 
 .PHONY: js-advanced
 js-advanced: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(compile-opts-advn)
+	clojure -M -m cljs.main -co $(compile-opts-advn) -c inferenceql.viz.core
 
 .PHONY: js-advanced-min
 js-advanced-min: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(compile-opts-advn-min)
+	clojure -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 ### Observable components compilation.
 
@@ -67,11 +67,11 @@ observable-compile-opts := $(current-dir)/compiler_options/observable/build-adva
 
 .PHONY: watch-observable
 watch-observable: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts)
+	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts) -c inferenceql.viz.observable.js
 
 .PHONY: observable
 observable: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(observable-compile-opts)
+	clojure -M -m cljs.main -co $(observable-compile-opts) -c inferenceql.viz.observable.js
 
 ### Supporting defs for compilation.
 
