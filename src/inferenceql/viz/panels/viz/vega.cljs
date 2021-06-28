@@ -25,10 +25,10 @@
 
 (def vega-plot-width
   "A general width setting vega-lite plots"
-  250)
+  400)
 (def vega-plot-height
   "A general height setting vega-lite plots"
-  250)
+  400)
 
 (def default-table-color "SteelBlue")
 
@@ -44,7 +44,7 @@
         :red "red"
         "black"))
 
-(def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v5.json")
+(def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
 (def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
 
 (defn- left-pad
@@ -308,19 +308,8 @@
                 :y {:field (second cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
-                #_:order #_{:field "anomaly"
-                            :type "nominal"
-                            :scale {:domain ["true", "false", "undefined"]
-                                    :range [1 1 0]}
-                            :legend nil}
-                :size {:condition {:selection "pts"
-                                   :value 100}
-                       :value 50}
-                :color {:field "anomaly"
-                        :type "nominal"
-                        :scale {:domain ["true", "false", "undefined"]
-                                :range ["Crimson" "steelblue" "lightgrey"]}
-                        :legend nil}}}))
+                :color {:condition {:selection "pts"
+                                    :value selection-color}}}}))
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
@@ -410,17 +399,8 @@
                 :y {:field y-field
                     :type y-type
                     :axis {:grid true :gridDash [2 2]}}
-                #_:order #_{:field "anomaly"
-                            :type "nominal"
-                            :scale {:domain ["true", "false", "undefined"]
-                                    :range [1 1 0]}
-                            :legend nil}
-                :color {:field "anomaly"
-                        :type "nominal"
-                        :scale {:domain ["true", "false", "undefined"]
-                                :range ["Crimson" "steelblue" "lightgrey"]}
-                        :legend nil}}}))
-
+                :color {:condition {:selection "pts"
+                                    :value selection-color}}}}))
 
 (defn- table-bubble-plot
   "Generates vega-lite spec for a table-bubble plot.
@@ -470,8 +450,6 @@
     {:$schema default-vega-lite-schema
      :concat spec-layers
      :columns 2
-     :config {:tick
-              {:thickness 3}}
      :resolve {:legend {:size "independent"
                         :color "independent"}
                :scale {:color "independent"}}}))

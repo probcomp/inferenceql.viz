@@ -113,7 +113,7 @@
                          (keyword col)))
           schema (clj-schema schema)
           data (js->clj data :keywordize-keys true)
-          spec (vega2/generate-spec schema data selections)
+          spec (vega/generate-spec schema data selections)
           comp [viz-views/vega-lite spec {:actions false} nil nil]
           node (dom/createElement "div")]
      (rdom/render comp node)
@@ -128,7 +128,7 @@
                          (keyword col)))
           schema (clj-schema schema)
           data (js->clj data :keywordize-keys true)
-          spec (vega/generate-spec schema data selections)]
+          spec (vega2/generate-spec schema data selections)]
       [viz-views/vega-lite spec {:actions false} nil pts-store])))
 
 (defn make-table-comp
