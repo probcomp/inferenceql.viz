@@ -44,8 +44,8 @@
         :red "red"
         "black"))
 
-(def ^:private default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
-(def ^:private v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
+(def default-vega-lite-schema "https://vega.github.io/schema/vega-lite/v4.json")
+(def v3-vega-lite-schema "https://vega.github.io/schema/vega-lite/v3.json")
 
 (defn- left-pad
   [s n c]
