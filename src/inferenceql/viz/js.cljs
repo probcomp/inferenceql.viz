@@ -16,7 +16,7 @@
             [inferenceql.viz.observable.control :as control]
             [inferenceql.query.js]  ; For the Observable user to run queries. Not used directly.
             [inferenceql.inference.js]
-            [inferenceql.viz.js-score :as score]
+            [inferenceql.viz.observable.js-score :as score]
             [medley.core :as medley]
             [ajax.core]
             [ajax.edn]
