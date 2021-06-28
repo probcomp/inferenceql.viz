@@ -1,4 +1,4 @@
-{:main "inferenceql.viz.core"
+{:main "inferenceql.viz.observable.js"
  :output-to "out/index.js"
  :output-dir "out"
  :externs ["externs/handsontable.ext.js"
