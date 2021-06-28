@@ -1,11 +1,8 @@
 (ns inferenceql.viz.panels.control.views
   (:require [re-frame.core :as rf]
             [reagent-forms.core :as forms]
-            [re-com.core :refer [h-box throbber]]
-            [inferenceql.viz.panels.more.views :as more]
-            [reagent.core :as r]
-            [cljs.core.async :refer [go]]
-            [cljs.core.async.interop :refer-macros [<p!]]))
+            [re-com.core :refer [h-box]]
+            [inferenceql.viz.panels.more.views :as more]))
 
 (def reagent-forms-function-map
   "Function map that allows a reagent-forms template
@@ -41,25 +38,20 @@
 
 (defn panel
   "A reagant component. Acts as control and input panel for the app."
-  [input-text running query-fn update-results update-failure]
-  (let [run-query #(go
-                    (reset! running true)
-                    (try
-                      (let [r (<p! (query-fn @input-text))]
-                        (update-results r))
-                      (catch js/Error err
-                        (update-failure (with-out-str (print (.-message (ex-cause err))))))
-                      (finally (reset! running false))))]
+  []
+  (let [input-text (rf/subscribe [:control/query-string])
+        show-menu (rf/subscribe [:more/show-menu])
+        datasets (rf/subscribe [:store/datasets])
+        models (rf/subscribe [:store/models])]
     [:div#toolbar
      [:div#search-section
-       [:textarea#search-input {:on-change #((do
-                                               (reset! input-text (-> % .-target .-value))))
+       [:textarea#search-input {:on-change #(rf/dispatch-sync [:control/set-query-string (-> % .-target .-value)])
                                 ;; This submits the query when enter is pressed, but allows the user
                                 ;; to enter a linebreak in the textarea with shift-enter.
                                 :on-key-press (fn [e] (if (and (= (.-key e) "Enter") (.-shiftKey e))
                                                         (do
-                                                          (run-query)
-                                                          (.preventDefault e))))
+                                                          (.preventDefault e)
+                                                          (rf/dispatch [:query/parse-query @input-text @datasets @models]))))
                                 :placeholder (str "Write a query here.\n"
                                                   "[enter] - inserts a newline\n"
                                                   "[shift-enter] - executes query")
@@ -74,18 +66,17 @@
                                 :value @input-text}]
        [h-box
         :attr {:id "search-buttons"}
-        :justify :start
+        :justify :end
         :children [[:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                 (run-query)
+                                 (rf/dispatch [:query/parse-query @input-text @datasets @models])
                                  (.blur (.-target e)))}
-                    "Run query"]
+                    "Run InferenceQL"]
                    [:button.toolbar-button.pure-button
                     {:on-click (fn [e]
-                                  (update-results nil)
+                                  (rf/dispatch [:table/clear])
                                   (.blur (.-target e)))}
                     "Clear results"]
-                   (when @running
-                     [:div {:style {:padding-top "4px" :padding-left "10px" :height "22px"}}
-                       [:img {:src "https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif"
-                              :height "22px"}]])]]]]))
+                   [more/menu show-menu]]]]
+     [:div.flex-box-space-filler-60]
+     [selection-color-selector]]))

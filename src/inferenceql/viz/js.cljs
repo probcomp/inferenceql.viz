@@ -13,7 +13,7 @@
             [inferenceql.viz.panels.viz.views :as viz-views]
             [inferenceql.viz.observable.vega :as vega]
             [inferenceql.viz.observable.vega-cell-by-cell :as vega-cell-by-cell]
-            [inferenceql.viz.panels.control.views :as control]
+            [inferenceql.viz.observable.control :as control]
             [inferenceql.query.js]  ; For the Observable user to run queries. Not used directly.
             [inferenceql.inference.js]
             [inferenceql.viz.js-score :as score]
