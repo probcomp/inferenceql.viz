@@ -3,9 +3,8 @@
 
 (def default-hot-settings
   {:settings {:data                []
-              ;; :colHeaders optional.
-              ;; :columns optional.
-              ;; :colWidths optional.
+              :colHeaders          []
+              :columns             []
               :rowHeaders          true
               :multiColumnSorting  true
               :manualColumnMove    true
@@ -16,12 +15,17 @@
               ;; TODO: investigate more closely what each of
               ;; these options adds. And if they can be put
               ;; in the context-menu instead.
+              :dropdownMenu        ["filter_by_condition"
+                                    "filter_operators"
+                                    "filter_by_condition2"
+                                    "filter_by_value"
+                                    "filter_action_bar"]
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :outsideClickDeselects false
               :readOnly            true
-              :height              "auto"
-              :width               "auto"
+              :height              "50vh"
+              :width               "100vw"
               :stretchH            "none"
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
