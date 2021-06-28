@@ -68,29 +68,16 @@
 
   Returns: (a function) Which returns a vega-lite type given `col-name`, a column name
     from the data table. Returns nil if vega-lite type can't be deterimend."
-  [schema data]
+  [schema]
   (fn [col-name]
     (cond (probability-column? col-name)
           "quantitative"
 
           :else
-          (let [ ;; Mapping from multi-mix stat-types to vega-lite data-types.
-                mapping {:gaussian "quantitative"
-                         :categorical "nominal"}
-
-                infer-type (fn [col-name]
-                             (let [numbers (->> data
-                                                (take 10)
-                                                (map #(get % col-name))
-                                                (map number?)
-                                                (every? true?))]
-                               (if numbers :gaussian :categorical)))
-
-                iql-type (or (->> col-name
-                                  (get schema)
-                                  (keyword))
-                             (infer-type col-name))]
-            (get mapping iql-type)))))
+          ;; Mapping from multi-mix stat-types to vega-lite data-types.
+          (let [mapping {:gaussian "quantitative"
+                         :categorical "nominal"}]
+            (get mapping (get schema col-name))))))
 
 (defn should-bin?
   "Returns whether data for a certain column should be binned in a vega-lite spec.
@@ -433,23 +420,36 @@
            #{"nominal"} (table-bubble-plot selections cols)
            #{"quantitative" "nominal"} (strip-plot selections cols vega-type))))
 
-(defn- spec-for-selection-layer [schema data cols]
-  (let [vega-type (vega-type-fn schema data)]
+(defn- spec-for-selection-layer [schema simulatable-cols geodata geo-id-col selection-layer]
+  (let [vega-type (vega-type-fn schema)
+        {layer-name :id
+         selections :selections
+         cols :selected-columns
+         row :row-at-selection-start} selection-layer]
     ;; Only produce a spec when we can find a vega-type for all selected columns
     ;; except the geo-id-col which we handle specially.
-    (when (every? some? (map vega-type cols))
-      (cond (= 1 (count cols)) ; One column selected.
-            (gen-histogram (first cols) data vega-type)
+    (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
+      (let [spec (cond (some #{geo-id-col} cols) ; geo-id-col selected.
+                       (gen-choropleth geodata geo-id-col selections cols vega-type)
 
-            :else ; Two or more columns selected.
-            (gen-comparison-plot (take 2 cols) data vega-type)))))
+                       (simulatable? selections cols simulatable-cols)
+                       (gen-simulate-plot (first cols) row (name layer-name) vega-type)
 
-(defn generate-spec [schema data selections]
-  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema data %)
-                                    selections))]
+                       (= 1 (count cols)) ; One column selected.
+                       (gen-histogram (first cols) selections vega-type)
+
+                       :else ; Two or more columns selected.
+                       (gen-comparison-plot (take 2 cols) selections vega-type))
+             title {:title {:text (str (name layer-name) " " "selection")
+                            :color (title-color layer-name)
+                            :fontWeight 500}}]
+        (merge spec title)))))
+
+(defn generate-spec [schema simulatable-cols geodata geo-id-col selection-layers]
+  (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema simulatable-cols geodata geo-id-col %)
+                                    selection-layers))]
     {:$schema default-vega-lite-schema
-     :concat spec-layers
-     :columns 2
+     :hconcat spec-layers
      :resolve {:legend {:size "independent"
                         :color "independent"}
                :scale {:color "independent"}}}))
