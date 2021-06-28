@@ -5,25 +5,25 @@
             [goog.labs.format.csv :as goog.csv]
             [goog.dom :as dom]
             [reagent.dom :as rdom]
-            [inferenceql.query.data :refer [row-coercer]]
-            [inferenceql.viz.csv :as csv]
-            [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
-            [inferenceql.viz.panels.table.views :refer [handsontable]]
-            [inferenceql.viz.panels.table.subs :refer [column-settings]]
-            [inferenceql.viz.panels.viz.views :as viz-views]
-            [inferenceql.viz.observable.vega :as vega]
-            [inferenceql.viz.observable.vega-cell-by-cell :as vega-cell-by-cell]
-            [inferenceql.viz.observable.control :as control]
-            [inferenceql.query.js]  ; For the Observable user to run queries. Not used directly.
-            [inferenceql.inference.js]
-            [inferenceql.viz.observable.js-score :as score]
             [medley.core :as medley]
             [ajax.core]
             [ajax.edn]
             [reagent.core :as r]
             [re-com.core :refer [v-box h-box box gap]]
             [cljs-bean.core :refer [->clj]]
-            [goog.string :refer [format]]))
+            [goog.string :refer [format]]
+            [inferenceql.query.data :refer [row-coercer]]
+            [inferenceql.query.js] ; For consumption from Observable. Not used directly.
+            [inferenceql.inference.js] ; For consumption from Observable. Not used directly.
+            [inferenceql.viz.csv :as csv]
+            [inferenceql.viz.observable.handsontable :refer [default-hot-settings]]
+            [inferenceql.viz.observable.table :refer [handsontable]]
+            [inferenceql.viz.observable.viz :refer [vega-lite]]
+            [inferenceql.viz.observable.vega :as vega]
+            [inferenceql.viz.observable.vega-cell-by-cell :as vega-cell-by-cell]
+            [inferenceql.viz.observable.control :as control]
+            [inferenceql.viz.observable.js-score :as score]
+            [inferenceql.viz.panels.table.subs :refer [column-settings]]))
 
 (defn clj-schema
   [js-schema]
@@ -114,7 +114,7 @@
           schema (clj-schema schema)
           data (js->clj data :keywordize-keys true)
           spec (vega/generate-spec schema data selections)
-          comp [viz-views/vega-lite spec {:actions false} nil nil]
+          comp [vega-lite spec {:actions false} nil nil]
           node (dom/createElement "div")]
      (rdom/render comp node)
      node)
@@ -129,7 +129,7 @@
           schema (clj-schema schema)
           data (js->clj data :keywordize-keys true)
           spec (vega-cell-by-cell/generate-spec schema data selections)]
-      [viz-views/vega-lite spec {:actions false} nil pts-store])))
+      [vega-lite spec {:actions false} nil pts-store])))
 
 (defn make-table-comp
   ([data]
