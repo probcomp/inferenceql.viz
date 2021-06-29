@@ -61,7 +61,7 @@
                hot (yarn-handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
            ;; Fix scrolling for HOT in Observable.
-           (.add (.-hook yarn-handsontable)
+           (.add (.-hooks yarn-handsontable)
                  "afterRender"
                  (fn []
                    (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
