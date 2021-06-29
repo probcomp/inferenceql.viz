@@ -97,7 +97,7 @@
                       (assert (or (= col :label) editable))
 
                       (cond
-                        (= type :gaussian)
+                        (= type :numerical)
                         ;; Try to cast.
                         (let [new-val (edn/read-string new-val)]
                           (if (or (number? new-val) (nil? new-val))
@@ -112,7 +112,7 @@
                                   (update :errors conj error)
                                   (update :change-ids-to-cancel conj i)))))
 
-                        (= type :categorical)
+                        (= type :nominal)
                         ;; Check if valid category-value
                         (let [categories (get categories col)]
                           (if (or (contains? categories new-val) (string/blank? new-val))
