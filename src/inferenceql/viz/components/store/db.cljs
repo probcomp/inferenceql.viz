@@ -60,7 +60,7 @@
 (s/def ::rows (s/coll-of ::row))
 (s/def ::row (s/map-of ::column-name any?))
 (s/def ::schema (s/map-of ::column-name ::stat-type))
-(s/def ::stat-type #{:gaussian :categorical})
+(s/def ::stat-type #{:numerical :nominal})
 (s/def ::model-name keyword?)
 ;; This is the model used to generate samples for simulation plots when a
 ;; single cell is selected in the table.
