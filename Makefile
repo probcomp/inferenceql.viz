@@ -25,54 +25,43 @@ figwheel-index-file := $(figwheel-public-dir)/index.html
 
 all: js
 
-.PHONY: watch
-watch: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) $(cljs-main-opts)
-
-.PHONY: watch-advanced
-watch-advanced: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) $(cljs-main-opts-advn)
-
-.PHONY: watch-advanced-min
-watch-advanced-min: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) $(cljs-main-opts-advn-min)
-
 clean:
 	rm -Rf $(output-dir)
 	rm -Rf $(figwheel-build-dir)
 	rm -Rf $(publish-dir)
 	rm -Rf $(node-modules-dir)
 
-### Compilation
+### Spreadsheets app compilation.
 
 compile-opts := $(current-dir)/compiler_options/app/build.edn
 compile-opts-advn := $(current-dir)/compiler_options/app/build-advanced.edn
 compile-opts-advn-min := $(current-dir)/compiler_options/app/build-advanced-min.edn
-main-ns      := inferenceql.viz.core
 
-cljs-main-opts := \
-		-co $(compile-opts) \
-		-c $(main-ns)
+.PHONY: watch
+watch: $(hot-css-resource)
+	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts) -c inferenceql.viz.core
 
-cljs-main-opts-advn := \
-		-co $(compile-opts-advn) \
-		-c $(main-ns)
+.PHONY: watch-advanced
+watch-advanced: $(hot-css-resource)
+	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn) -c inferenceql.viz.core
 
-cljs-main-opts-advn-min := \
-		-co $(compile-opts-advn-min) \
-		-c $(main-ns)
+.PHONY: watch-advanced-min
+watch-advanced-min: $(hot-css-resource)
+	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 .PHONY: js
 js: $(hot-css-resource)
-	clojure -M -m cljs.main $(cljs-main-opts)
+	clojure -M -m cljs.main -co $(compile-opts) -c inferenceql.viz.core
 
 .PHONY: js-advanced
 js-advanced: $(hot-css-resource)
-	clojure -M -m cljs.main $(cljs-main-opts-advn)
+	clojure -M -m cljs.main -co $(compile-opts-advn) -c inferenceql.viz.core
 
 .PHONY: js-advanced-min
 js-advanced-min: $(hot-css-resource)
-	clojure -M -m cljs.main $(cljs-main-opts-advn-min)
+	clojure -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
+
+### Supporting defs for compilation.
 
 yarn-install-opts = --no-progress --frozen-lockfile
 
