@@ -75,8 +75,8 @@
 
           :else
           ;; Mapping from multi-mix stat-types to vega-lite data-types.
-          (let [mapping {:gaussian "quantitative"
-                         :categorical "nominal"}]
+          (let [mapping {:numerical "quantitative"
+                         :nominal "nominal"}]
             (get mapping (get schema col-name))))))
 
 (defn should-bin?

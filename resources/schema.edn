@@ -1,1 +1,1 @@
-{:gender :categorical, :age :gaussian, :height :gaussian},
+{:gender :nominal, :age :numerical, :height :numerical},
