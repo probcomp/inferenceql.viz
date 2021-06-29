@@ -1,5 +1,6 @@
 current-dir      := $(shell pwd)
 output-dir       := $(current-dir)/out
+output-dir-worker:= $(current-dir)/out-worker
 src-dir          := $(current-dir)/src
 resource-dir     := $(current-dir)/resources
 cache-dir        := $(current-dir)/src/inferenceql/spreadsheets
@@ -27,6 +28,7 @@ all: js
 
 clean:
 	rm -Rf $(output-dir)
+	rm -Rf $(output-dir-worker)
 	rm -Rf $(figwheel-build-dir)
 	rm -Rf $(publish-dir)
 	rm -Rf $(node-modules-dir)
@@ -64,6 +66,7 @@ js-advanced-min: $(hot-css-resource)
 ### Observable components compilation.
 
 observable-compile-opts := $(current-dir)/compiler_options/observable/build-advanced.edn
+observable-worker-compile-opts := $(current-dir)/compiler_options/observable/build-advanced-worker.edn
 
 .PHONY: watch-observable
 watch-observable: $(hot-css-resource)
@@ -72,6 +75,10 @@ watch-observable: $(hot-css-resource)
 .PHONY: observable
 observable: $(hot-css-resource)
 	clojure -M -m cljs.main -co $(observable-compile-opts) -c inferenceql.viz.observable.js
+
+.PHONY: observable
+observable-worker:
+	clojure -M -m cljs.main -co $(observable-worker-compile-opts) -c inferenceql.viz.observable.worker
 
 ### Supporting defs for compilation.
 
