@@ -1,7 +1,6 @@
 (ns inferenceql.viz.observable.score
   (:require [inferenceql.viz.util :as util]
             [medley.core :as medley]
-            [cljs-bean.core :refer [->clj]]
             [clojure.set :as set]
             [clojure.string :as string]
             [goog.string :refer [format]]))

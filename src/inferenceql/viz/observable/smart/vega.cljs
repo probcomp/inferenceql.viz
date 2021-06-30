@@ -1,4 +1,4 @@
-(ns inferenceql.viz.observable.vega-cell-by-cell
+(ns inferenceql.viz.observable.smart.vega
   (:require [inferenceql.viz.panels.viz.vega :as app-vega]))
 
 (defn vega-type-fn
