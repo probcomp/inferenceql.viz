@@ -7,10 +7,10 @@
             [re-com.core :refer [v-box h-box box gap]]
             [cljs-bean.core :refer [->clj]]
             [goog.string :refer [format]]
-            [inferenceql.viz.observable.viz :refer [vega-lite]]
+            [inferenceql.viz.observable.components :refer [make-table-comp]]
+            [inferenceql.viz.observable.components.viz :refer [vega-lite]]
             [inferenceql.viz.observable.smart.vega :as vega]
-            [inferenceql.viz.observable.util :refer [clj-schema]]
-            [inferenceql.viz.observable.components :refer [make-table-comp]]))
+            [inferenceql.viz.observable.util :refer [clj-schema]]))
 
 (defn plot-help
   [data schema selections pts-store]
