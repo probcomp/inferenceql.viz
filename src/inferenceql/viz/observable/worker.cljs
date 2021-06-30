@@ -11,7 +11,7 @@
             [inferenceql.query.js] ; For consumption from Observable. Not used directly.
             [inferenceql.inference.js] ; For consumption from Observable. Not used directly.
             [inferenceql.viz.csv :as csv]
-            [inferenceql.viz.observable.js-score :as score]))
+            [inferenceql.viz.observable.score :as score]))
 
 (defn clj-schema
   [js-schema]

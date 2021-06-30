@@ -21,7 +21,7 @@
             [inferenceql.viz.observable.vega :as vega]
             [inferenceql.viz.observable.vega-cell-by-cell :as vega-cell-by-cell]
             [inferenceql.viz.observable.control :as control]
-            [inferenceql.viz.observable.js-score :as score]
+            [inferenceql.viz.observable.score :as score]
             [inferenceql.viz.panels.table.subs :refer [column-settings]]))
 
 (defn clj-schema

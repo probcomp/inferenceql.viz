@@ -1,4 +1,4 @@
-(ns inferenceql.viz.observable.js-score
+(ns inferenceql.viz.observable.score
   (:require [inferenceql.viz.util :as util]
             [medley.core :as medley]
             [cljs-bean.core :refer [->clj]]
