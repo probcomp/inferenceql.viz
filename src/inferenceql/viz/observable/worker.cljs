@@ -1,4 +1,5 @@
 (ns inferenceql.viz.observable.worker
-  (:require [inferenceql.query.js] ; For consumption from Observable. Not used directly.
-            [inferenceql.inference.js] ; For consumption from Observable. Not used directly.
-            [inferenceql.viz.observable.util])) ; For consumption from Observable. Not used directly.
+  "Main namespace for compiling a js-bundle for use from a web worker in an Observable notebook."
+  (:require [inferenceql.query.js]
+            [inferenceql.inference.js]
+            [inferenceql.viz.observable.util]))

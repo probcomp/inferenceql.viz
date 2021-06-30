@@ -70,11 +70,11 @@ observable-worker-compile-opts := $(current-dir)/compiler_options/observable/bui
 
 .PHONY: watch-observable
 watch-observable: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts) -c inferenceql.viz.observable.js
+	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts) -c inferenceql.viz.observable.core
 
 .PHONY: observable
 observable: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(observable-compile-opts) -c inferenceql.viz.observable.js
+	clojure -M -m cljs.main -co $(observable-compile-opts) -c inferenceql.viz.observable.core
 
 .PHONY: observable
 observable-worker:
