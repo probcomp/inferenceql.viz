@@ -5,7 +5,7 @@
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.panels.table.subs :refer [column-settings]]
             [inferenceql.viz.observable.components.viz :refer [vega-lite]]
-            [inferenceql.viz.observable.components.table :refer [handsontable default-hot-settings]]
+            [inferenceql.viz.observable.components.hot :refer [handsontable default-hot-settings]]
             [inferenceql.viz.observable.components.vega :as vega]
             [inferenceql.viz.observable.components.control :as control]
             [inferenceql.viz.observable.util :refer [clj-schema]]))
