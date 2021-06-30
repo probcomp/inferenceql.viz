@@ -16,8 +16,7 @@
             [inferenceql.query.js] ; For consumption from Observable. Not used directly.
             [inferenceql.inference.js] ; For consumption from Observable. Not used directly.
             [inferenceql.viz.csv :as csv]
-            [inferenceql.viz.observable.handsontable :refer [default-hot-settings]]
-            [inferenceql.viz.observable.table :refer [handsontable]]
+            [inferenceql.viz.observable.table :refer [handsontable default-hot-settings]]
             [inferenceql.viz.observable.viz :refer [vega-lite]]
             [inferenceql.viz.observable.vega :as vega]
             [inferenceql.viz.observable.vega-cell-by-cell :as vega-cell-by-cell]
