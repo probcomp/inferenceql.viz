@@ -1,4 +1,4 @@
-(ns inferenceql.viz.observable.viz
+(ns inferenceql.viz.observable.components.viz
   "Views for displaying vega-lite specs"
   (:require [vega :as yarn-vega]
             [vega-embed$default :as yarn-vega-embed]

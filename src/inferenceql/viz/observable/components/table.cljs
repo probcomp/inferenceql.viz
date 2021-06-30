@@ -1,4 +1,4 @@
-(ns inferenceql.viz.observable.table
+(ns inferenceql.viz.observable.components.table
   (:require [handsontable$default :as yarn-handsontable]
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]))

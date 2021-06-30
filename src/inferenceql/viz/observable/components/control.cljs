@@ -1,4 +1,4 @@
-(ns inferenceql.viz.observable.control
+(ns inferenceql.viz.observable.components.control
   (:require [re-com.core :refer [h-box throbber]]
             [cljs.core.async :refer [go]]
             [cljs.core.async.interop :refer-macros [<p!]]))

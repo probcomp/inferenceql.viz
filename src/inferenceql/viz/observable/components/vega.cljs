@@ -1,4 +1,4 @@
-(ns inferenceql.viz.observable.vega
+(ns inferenceql.viz.observable.components.vega
   (:require [inferenceql.viz.panels.viz.vega :as app-vega]))
 
 (defn vega-type-fn

@@ -1,27 +1,14 @@
 (ns inferenceql.viz.observable.components
-  (:require [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]]
-            [goog.labs.format.csv :as goog.csv]
-            [goog.dom :as dom]
+  (:require [goog.dom :as dom]
             [reagent.dom :as rdom]
-            [medley.core :as medley]
-            [ajax.core]
-            [ajax.edn]
             [reagent.core :as r]
-            [re-com.core :refer [v-box h-box box gap]]
             [cljs-bean.core :refer [->clj]]
-            [goog.string :refer [format]]
-            [inferenceql.query.data :refer [row-coercer]]
-            [inferenceql.query.js] ; For consumption from Observable. Not used directly.
-            [inferenceql.inference.js] ; For consumption from Observable. Not used directly.
-            [inferenceql.viz.csv :as csv]
+            [inferenceql.viz.panels.table.subs :refer [column-settings]]
             [inferenceql.viz.observable.table :refer [handsontable default-hot-settings]]
             [inferenceql.viz.observable.viz :refer [vega-lite]]
             [inferenceql.viz.observable.vega :as vega]
             [inferenceql.viz.observable.control :as control]
-            [inferenceql.viz.observable.score :as score]
-            [inferenceql.viz.observable.util :refer []]
-            [inferenceql.viz.panels.table.subs :refer [column-settings]]))
+            [inferenceql.viz.observable.util :refer [clj-schema]]))
 
 (defn ^:export table
   ([data]
