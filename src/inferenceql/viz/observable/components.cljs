@@ -29,12 +29,12 @@
     (let [selections (postwalk #(if (string? %) (keyword  %) %)
                                selections)
           schema (clj-schema schema)
-          data (js->clj data :keywordize-keys true)
+          data (->clj data)
           spec (vega/generate-spec schema data selections)
           comp [vega-lite spec {:actions false} nil nil]
           node (dom/createElement "div")]
-     (rdom/render comp node)
-     node)))
+      (rdom/render comp node)
+      node)))
 
 (defn ^:export mini-app [query-fn options]
   (let [node (dom/createElement "div")

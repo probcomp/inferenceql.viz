@@ -13,15 +13,16 @@
             [inferenceql.viz.observable.smart.vega :as vega]
             [inferenceql.viz.observable.util :refer [clj-schema]]))
 
-(defn plot-help
-  [data schema selections pts-store]
+(defn anomaly-plot
+  [data schema selections]
   (if (some? data)
     (let [selections (postwalk #(if (string? %) (keyword  %) %)
                                selections)
           schema (clj-schema schema)
           data (->clj data)
+          ;; Custom spec generating function for SMART app.
           spec (vega/generate-spec schema data selections)]
-      [vega-lite spec {:actions false} nil pts-store])))
+      [vega-lite spec {:actions false} nil nil])))
 
 (defn ^:export app [query-fn table-data schema num-rows thresh step-time options]
   (let [table-data (vec (take num-rows (->clj table-data)))
@@ -34,7 +35,6 @@
         query (r/atom "SELECT * FROM data;")
         plot-data (r/atom nil)
         options (r/atom (assoc options :cells (fn [row col prop] #js {})))
-        pts-store (r/atom nil)
 
         checks (for [c cols i (range (count table-data))] {:column c :row i})
         checks (cycle (filter #(some? (get-in table-data [(:row %) (:column %)])) checks))
@@ -63,7 +63,7 @@
                                                      (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
                                                            plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
-                                                       [plot-help plot-rows schema [(:col-names @plot-data)] nil]))]]
+                                                       [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))]]
                                        [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
