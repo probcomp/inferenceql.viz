@@ -26,14 +26,12 @@
 
 (defn ^:export app [query-fn table-data schema num-rows thresh step-time options]
   (let [table-data (vec (take num-rows (->clj table-data)))
-        schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
-                              (->clj schema))
+        schema (clj-schema schema)
 
-        options (js->clj options :keywordize-keys true)
-        cols (map keyword (get options :cols))
+        options (->clj options)
+        cols (map keyword (:cols options))
 
         query (r/atom "SELECT * FROM data;")
-        plot-data (r/atom nil)
         options (r/atom (assoc options :cells (fn [row col prop] #js {})))
 
         checks (for [c cols i (range (count table-data))] {:column c :row i})
@@ -42,6 +40,7 @@
         cur-col (r/atom nil)
         cur-row (r/atom nil)
         cur-cell-status (r/atom false)
+        plot-data (r/atom nil)
 
         node (dom/createElement "div")
         comp (fn [options]
@@ -59,6 +58,7 @@
                                        [gap :size "20px"]
                                        [h-box
                                         :children [[gap :size "25px"]
+                                                   ;; TODO: Move this into the anomaly-plot component.
                                                    (when (and (some? @plot-data) (some? @cur-row) (some? @cur-cell-status))
                                                      (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
                                                            plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
@@ -116,7 +116,6 @@
                           (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val)]))
 
                           ;; Update highlighted point in plot.
-                          ;;(reset! pts-store [{:fields [{:field "rowid" :type "E"}] :values [(:row chk)]}])
                           (reset! cur-row (:row chk))
                           (reset! cur-cell-status anomaly)
 
