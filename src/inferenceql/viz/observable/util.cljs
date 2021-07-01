@@ -7,8 +7,8 @@
             [ajax.edn]
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.csv :as csv]
-            [inferenceql.viz.observable.imputation :refer [impute-missing-cells
-                                                           imputation-queries]]))
+            [inferenceql.viz.observable.imputation :as imputation]))
+
 
 (defn clj-schema
   [js-schema]
@@ -56,11 +56,11 @@
         schema (clj-schema schema)
         query-fn #(->clj (query-fn %))
         impute-cols (map keyword (->clj impute-cols))]
-    (clj->js (impute-missing-cells query-fn rows schema impute-cols num-samples))))
+    (clj->js (imputation/impute-missing-cells query-fn rows schema impute-cols num-samples))))
 
 (defn ^:export imputation-queries
   [rows schema impute-cols num-samples]
   (let [rows (vec (->clj rows))
         schema (clj-schema schema)
         impute-cols (map keyword (->clj impute-cols))]
-    (clj->js (imputation-queries rows schema impute-cols num-samples))))
+    (clj->js (imputation/imputation-queries rows schema impute-cols num-samples))))
