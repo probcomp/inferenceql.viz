@@ -13,6 +13,15 @@
     #(/ (- % min-n)
         scale-factor)))
 
+(defn normalize-missing-cells-scores
+  "Normalizes scores within each map in `values-and-scores-by-row`"
+  [values-and-scores-by-row all-scores]
+  (let [normalizer (min-max-normalizer-fn all-scores)
+        norm-scores (fn [row-vals-scores]
+                      (medley/map-vals (fn [val-score-map] (update val-score-map :score normalizer))
+                                       row-vals-scores))]
+    (map norm-scores values-and-scores-by-row)))
+
 ;;; These functions are for imputing data in empty cells and
 ;;; also returning a score for the imputed values.
 
@@ -50,15 +59,6 @@
         values-scores (map #(impute-and-score-cell query-fn row schema % num-samples) missing-keys)]
     (zipmap missing-keys values-scores)))
 
-(defn normalize-missing-cells-scores
-  "Normalizes scores within each map in `values-and-scores-by-row`"
-  [values-and-scores-by-row all-scores]
-  (let [normalizer (min-max-normalizer-fn all-scores)
-        norm-scores (fn [row-vals-scores]
-                      (medley/map-vals (fn [val-score-map] (update val-score-map :score normalizer))
-                                       row-vals-scores))]
-    (map norm-scores values-and-scores-by-row)))
-
 (defn impute-missing-cells
   "Returns imputed values and normalized scores for all missing values in `rows`"
   [query-fn rows schema impute-cols num-samples]
@@ -68,32 +68,27 @@
                         (map vals) ;; Produces sequence of {:score _ :value _ } maps for each row.
                         (apply concat)  ;; Flattened sequence of {:score _ :value _ } maps.
                         (map :score))] ;; Sequence of score values.
-
-
     ;; Only normalize if distinct scores present.
-    values-and-scores-by-row
-    #_(if (> (count (distinct all-scores)) 1)
-        (normalize-missing-cells-scores values-and-scores-by-row all-scores)
-        ;; Just return the raw likelihoods otherwise.
-        values-and-scores-by-row)))
+    (if (> (count (distinct all-scores)) 1)
+      (normalize-missing-cells-scores values-and-scores-by-row all-scores)
+      ;; Just return the raw likelihoods otherwise.
+      values-and-scores-by-row)))
 
-;------------------
+;;; Mock query functions.
 
-(defn imputation-query
+(defn- imputation-query
   [row schema impute-cols num-samples]
-  (let [available-keys (keys row)
-        missing-keys (set/difference (set impute-cols) (set available-keys))]
+  (let [missing-keys (set/difference (set impute-cols) (set (keys row)))]
     (when (seq missing-keys)
       (let [cond-string (->> row
-                          (map (fn [[k v]]
-                                 (case (get schema k)
-                                   :numerical [(name k) (str v)]
-                                   :nominal [(name k) (str "\"" v "\"")])))
-                          (map (fn [[k v]] (format "%s=%s" k v))))
+                             ;; TODO: Sort conditions in a consistent order.
+                             (map (fn [[k v]]
+                                    (case (get schema k)
+                                      :numerical [(name k) (str v)]
+                                      :nominal [(name k) (str "\"" v "\"")])))
+                             (map (fn [[k v]] (format "%s=%s" k v))))
             cond-string (string/join " AND " cond-string)
-
             impute-cols-str (string/join ", " (map name impute-cols))]
-
         (format
          "SELECT %s FROM \n(GENERATE %s \nUNDER model \nCONDITIONED BY %s) \nLIMIT %s"
          impute-cols-str
