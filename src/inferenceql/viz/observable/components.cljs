@@ -42,35 +42,24 @@
         options (->clj options)
         query (get options :query "SELECT * FROM data;")
 
-        input-text (r/atom query)
         results (r/atom nil)
         failure (r/atom nil)
-        running (r/atom false)
-
         update-results #(do
                           (reset! failure nil)
                           (reset! results %)
                           (set! (.-value node) %)
                           (.dispatchEvent node (js/CustomEvent. "input")))
-
         update-failure #(do
                           (reset! failure %)
                           (reset! results nil)
                           (set! (.-value node) nil)
                           (.dispatchEvent node (js/CustomEvent. "input")))
-
-        ;; TODO find a good way to remove this trackers
-        ;; when component is unmounted. Otherwise, we have a
-        ;; memory leak.
-        ;;_ (r/track! #(set! (.-query node) @input-text))
-
-        comp (fn []
-               [:div
-                [control/panel input-text running query-fn update-results update-failure]
+        hiccup [:div
+                [control/panel query query-fn update-results update-failure]
                 (if (some? @failure)
                   [failure-msg @failure]
-                  [handsontable-wrapper @results options])])]
+                  [handsontable-wrapper @results options])]]
 
-    (rdom/render [comp] node)
+    (rdom/render hiccup node)
     (set! (.-value node) nil)
     node))
