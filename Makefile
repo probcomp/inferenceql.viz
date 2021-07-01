@@ -68,17 +68,26 @@ js-advanced-min: $(hot-css-resource)
 observable-compile-opts := $(current-dir)/compiler_options/observable/build-advanced.edn
 observable-worker-compile-opts := $(current-dir)/compiler_options/observable/build-advanced-worker.edn
 
-.PHONY: watch-observable
-watch-observable: $(hot-css-resource)
+.PHONY: watch-observable-core
+watch-observable-core: $(hot-css-resource)
 	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts) -c inferenceql.viz.observable.core
 
-.PHONY: observable
-observable: $(hot-css-resource)
+.PHONY: watch-observable-worker
+watch-observable-worker: $(hot-css-resource)
+	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts) -c inferenceql.viz.observable.worker
+
+.PHONY: observable-core
+observable-core: $(hot-css-resource)
+	## Compile js-bundle for notebooks.
 	clojure -M -m cljs.main -co $(observable-compile-opts) -c inferenceql.viz.observable.core
 
-.PHONY: observable
+.PHONY: observable-worker
 observable-worker:
+	## Compile js-bundle for web-workers.
 	clojure -M -m cljs.main -co $(observable-worker-compile-opts) -c inferenceql.viz.observable.worker
+
+.PHONY: observable
+observable: observable-core observable-worker
 
 ### Supporting defs for compilation.
 
