@@ -13,7 +13,7 @@
   [js-schema]
   (medley/map-kv (fn [k v]
                    [(keyword k) (keyword v)])
-                 (js->clj js-schema)))
+                 (->clj js-schema)))
 
 (defn ^:export read-schema
   [schema-string]
@@ -52,8 +52,7 @@
   "Returns imputed values and normalized scores for all missing values in `rows`"
   [query-fn schema rows num-samples impute-cols]
   (let [rows (vec (->clj rows))
-        schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
-                              (->clj schema))
+        schema (clj-schema schema)
         query-fn #(->clj (query-fn %))
         impute-cols (map keyword (->clj impute-cols))]
     (clj->js (score/impute-missing-cells query-fn schema rows num-samples impute-cols))))
@@ -61,7 +60,6 @@
 (defn ^:export impute-missing-cells-queries
   [rows schema impute-cols num-samples]
   (let [rows (vec (->clj rows))
-        schema (medley/map-kv (fn [k v] [(keyword k) (keyword v)])
-                              (->clj schema))
+        schema (clj-schema schema)
         impute-cols (map keyword (->clj impute-cols))]
     (clj->js (take 3 (score/impute-missing-cells-queries rows schema impute-cols num-samples)))))
