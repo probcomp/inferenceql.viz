@@ -5,6 +5,7 @@
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.observable.components.viz :refer [vega-lite]]
             [inferenceql.viz.observable.components.hot :refer [handsontable-wrapper]]
+            [inferenceql.viz.observable.components.message :refer [failure-msg]]
             [inferenceql.viz.observable.components.vega :as vega]
             [inferenceql.viz.observable.components.control :as control]
             [inferenceql.viz.observable.util :refer [clj-schema]]))
@@ -67,9 +68,7 @@
                [:div
                 [control/panel input-text running query-fn update-results update-failure]
                 (if (some? @failure)
-                  [:div {:class "observablehq--inspect"
-                         :style {:whitespace "pre" :color "red"}}
-                   @failure]
+                  [failure-msg @failure]
                   [handsontable-wrapper @results options])])]
 
     (rdom/render [comp] node)
