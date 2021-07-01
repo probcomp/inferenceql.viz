@@ -57,9 +57,9 @@
         impute-cols (map keyword (->clj impute-cols))]
     (clj->js (score/impute-missing-cells query-fn rows schema impute-cols num-samples))))
 
-(defn ^:export impute-missing-cells-queries
+(defn ^:export imputation-queries
   [rows schema impute-cols num-samples]
   (let [rows (vec (->clj rows))
         schema (clj-schema schema)
         impute-cols (map keyword (->clj impute-cols))]
-    (clj->js (take 3 (score/impute-missing-cells-queries rows schema impute-cols num-samples)))))
+    (clj->js (take 3 (score/imputation-queries rows schema impute-cols num-samples)))))

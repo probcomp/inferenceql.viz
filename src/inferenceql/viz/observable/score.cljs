@@ -79,7 +79,7 @@
 
 ;------------------
 
-(defn fake-query
+(defn imputation-query
   [row schema impute-cols num-samples]
   (let [available-keys (keys row)
         missing-keys (set/difference (set impute-cols) (set available-keys))]
@@ -101,8 +101,8 @@
          cond-string
          num-samples)))))
 
-(defn impute-missing-cells-queries
+(defn imputation-queries
   [rows schema impute-cols num-samples]
   (let [queries (for [[idx r] (map-indexed vector rows)]
-                  [idx (fake-query r schema impute-cols num-samples)])]
+                  [idx (imputation-query r schema impute-cols num-samples)])]
     (filter (comp some? second) queries)))
