@@ -1,7 +1,8 @@
 (ns inferenceql.viz.observable.components.hot
   (:require [handsontable$default :as yarn-handsontable]
             [reagent.core :as reagent]
-            [medley.core :refer [filter-kv]]))
+            [medley.core :refer [filter-kv]]
+            [inferenceql.viz.panels.table.subs :refer [column-settings]]))
 
 (def default-hot-settings
   {:settings {:data                []
@@ -122,3 +123,30 @@
        (fn [attributes props]
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
+
+(defn handsontable-wrapper
+  [data options]
+  (when data
+    (let [{:keys [cols height v-scroll cells col-widths]} options
+
+          ;; If no "cols" setting, use the keys in the first row as "cols".
+          cols (or cols (->> data first keys))
+          col-headers (for [col cols]
+                        (clojure.string/replace col #"_" "_<wbr>"))
+          height (cond
+                   (false? v-scroll) "auto"
+                   (some? height) height
+                   :else
+                   ;; TODO: may need to adjust these sizes.
+                   (let [data-height (+ (* (count data) 22) 38)]
+                     (min data-height 500)))
+          settings (-> default-hot-settings
+                       (assoc-in [:settings :data] data)
+                       (assoc-in [:settings :colHeaders] col-headers)
+                       (assoc-in [:settings :columns] (column-settings cols))
+                       (assoc-in [:settings :height] height)
+                       (assoc-in [:settings :width] "100%"))
+          settings (cond-> settings
+                           cells (assoc-in [:settings :cells] cells)
+                           col-widths (assoc-in [:settings :colWidths] col-widths))]
+      [handsontable {:style {:padding-bottom "5px"}} settings])))

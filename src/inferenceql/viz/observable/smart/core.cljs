@@ -7,7 +7,7 @@
             [re-com.core :refer [v-box h-box box gap]]
             [cljs-bean.core :refer [->clj]]
             [goog.string :refer [format]]
-            [inferenceql.viz.observable.components :refer [make-table-comp]]
+            [inferenceql.viz.observable.components.hot :refer [handsontable-wrapper]]
             [inferenceql.viz.observable.components.viz :refer [vega-lite]]
             [inferenceql.viz.observable.smart.vega :as vega]
             [inferenceql.viz.observable.util :refer [clj-schema]]))
@@ -55,7 +55,7 @@
                                     :margin "25px 0px 25px 0px"
                                     :border-radius "7px"
                                     :border-color "grey"}
-                            :children [[make-table-comp table-data @options]
+                            :children [[handsontable-wrapper table-data @options]
                                        [gap :size "20px"]
                                        [h-box
                                         :children [[gap :size "25px"]
