@@ -1,4 +1,4 @@
-(ns inferenceql.viz.observable.score
+(ns inferenceql.viz.observable.imputation
   (:require [inferenceql.viz.util :as util]
             [medley.core :as medley]
             [clojure.set :as set]
