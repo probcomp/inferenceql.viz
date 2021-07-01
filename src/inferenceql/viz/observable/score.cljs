@@ -18,7 +18,7 @@
 
 (defn impute-and-score-cell
   "Returns an imputed value of `key-to-impute` along with its score"
-  [query-fn schema row key-to-impute num-samples]
+  [query-fn row schema key-to-impute num-samples]
   (let [cond-string (->> row
                          (map (fn [[k v]]
                                 (case (get schema k)
@@ -44,10 +44,10 @@
 
 (defn impute-missing-cells-in-row
   "Returns a map of imputed values and scores for all missing values in `row`"
-  [query-fn schema row num-samples impute-cols]
+  [query-fn row schema impute-cols num-samples]
   (let [available-keys (keys row)
         missing-keys (set/difference (set impute-cols) (set available-keys))
-        values-scores (map #(impute-and-score-cell query-fn schema row % num-samples) missing-keys)]
+        values-scores (map #(impute-and-score-cell query-fn row schema % num-samples) missing-keys)]
     (zipmap missing-keys values-scores)))
 
 (defn normalize-missing-cells-scores
@@ -61,8 +61,8 @@
 
 (defn impute-missing-cells
   "Returns imputed values and normalized scores for all missing values in `rows`"
-  [query-fn schema rows num-samples impute-cols]
-  (let [values-and-scores-by-row (map #(impute-missing-cells-in-row query-fn schema % num-samples impute-cols) rows)
+  [query-fn rows schema impute-cols num-samples]
+  (let [values-and-scores-by-row (map #(impute-missing-cells-in-row query-fn % schema impute-cols num-samples) rows)
 
         all-scores (->> values-and-scores-by-row
                         (map vals) ;; Produces sequence of {:score _ :value _ } maps for each row.

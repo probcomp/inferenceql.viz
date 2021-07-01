@@ -50,12 +50,12 @@
 
 (defn ^:export impute-missing-cells
   "Returns imputed values and normalized scores for all missing values in `rows`"
-  [query-fn schema rows num-samples impute-cols]
+  [query-fn rows schema impute-cols num-samples]
   (let [rows (vec (->clj rows))
         schema (clj-schema schema)
         query-fn #(->clj (query-fn %))
         impute-cols (map keyword (->clj impute-cols))]
-    (clj->js (score/impute-missing-cells query-fn schema rows num-samples impute-cols))))
+    (clj->js (score/impute-missing-cells query-fn rows schema impute-cols num-samples))))
 
 (defn ^:export impute-missing-cells-queries
   [rows schema impute-cols num-samples]
