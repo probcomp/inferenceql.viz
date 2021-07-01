@@ -16,9 +16,6 @@
               :autoWrapCol         false
               :autoWrapRow         false
               :filters             true
-              ;; TODO: investigate more closely what each of
-              ;; these options adds. And if they can be put
-              ;; in the context-menu instead.
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :outsideClickDeselects false
