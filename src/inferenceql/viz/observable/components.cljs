@@ -3,6 +3,7 @@
             [reagent.dom :as rdom]
             [reagent.core :as r]
             [cljs-bean.core :refer [->clj]]
+            [clojure.walk :refer [postwalk]]
             [inferenceql.viz.observable.components.viz :refer [vega-lite]]
             [inferenceql.viz.observable.components.hot :refer [handsontable-wrapper]]
             [inferenceql.viz.observable.components.message :refer [failure-msg]]
@@ -25,9 +26,8 @@
 (defn ^:export plot
   [data schema selections]
   (if (some? data)
-    (let [selections (for [cols selections]
-                       (for [col cols]
-                         (keyword col)))
+    (let [selections (postwalk #(if (string? %) (keyword  %) %)
+                               selections)
           schema (clj-schema schema)
           data (js->clj data :keywordize-keys true)
           spec (vega/generate-spec schema data selections)

@@ -1,5 +1,6 @@
 (ns inferenceql.viz.observable.smart.core
   (:require [clojure.string :as string]
+            [clojure.walk :refer [postwalk]]
             [goog.dom :as dom]
             [reagent.dom :as rdom]
             [medley.core :as medley]
@@ -15,11 +16,10 @@
 (defn plot-help
   [data schema selections pts-store]
   (if (some? data)
-    (let [selections (for [cols selections]
-                       (for [col cols]
-                         (keyword col)))
+    (let [selections (postwalk #(if (string? %) (keyword  %) %)
+                               selections)
           schema (clj-schema schema)
-          data (js->clj data :keywordize-keys true)
+          data (->clj data)
           spec (vega/generate-spec schema data selections)]
       [vega-lite spec {:actions false} nil pts-store])))
 
