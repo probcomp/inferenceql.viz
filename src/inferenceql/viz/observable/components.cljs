@@ -45,12 +45,6 @@
      (rdom/render hot-component node)
      node)))
 
-(defn ^:export waiting-msg []
-  (let [node (dom/createElement "div")
-        comp [:span {:class "observablehq--inspect"} "Waiting for query results."]]
-    (rdom/render comp node)
-    node))
-
 (defn ^:export plot
   [data schema selections]
   (if (some? data)
@@ -63,8 +57,7 @@
           comp [vega-lite spec {:actions false} nil nil]
           node (dom/createElement "div")]
      (rdom/render comp node)
-     node)
-    (waiting-msg)))
+     node)))
 
 (defn make-table-comp
   ([data]
