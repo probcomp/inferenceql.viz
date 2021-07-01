@@ -46,7 +46,7 @@
         failure (r/atom nil)
         update-results #(do
                           (reset! failure nil)
-                          (reset! results %)
+                          (reset! results (->clj %))
                           (set! (.-value node) %)
                           (.dispatchEvent node (js/CustomEvent. "input")))
         update-failure #(do
@@ -54,12 +54,12 @@
                           (reset! results nil)
                           (set! (.-value node) nil)
                           (.dispatchEvent node (js/CustomEvent. "input")))
-        hiccup [:div
+        comp (fn []
+               [:div
                 [control/panel query query-fn update-results update-failure]
                 (if (some? @failure)
                   [failure-msg @failure]
-                  [handsontable-wrapper @results options])]]
-
-    (rdom/render hiccup node)
+                  [handsontable-wrapper @results options])])]
+    (rdom/render [comp] node)
     (set! (.-value node) nil)
     node))

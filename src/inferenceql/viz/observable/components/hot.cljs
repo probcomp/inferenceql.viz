@@ -125,9 +125,8 @@
   [data options]
   (when data
     (let [{:keys [cols height v-scroll cells col-widths]} options
-
           ;; If no "cols" setting, use the keys in the first row as "cols".
-          cols (or cols (->> data first keys))
+          cols (or cols (->> data first keys (map name)))
           col-headers (for [col cols]
                         (clojure.string/replace col #"_" "_<wbr>"))
           height (cond
