@@ -44,14 +44,12 @@
 
         ret (concat (map #(conj % :rec) rec-flattened)
                     (map #(conj % :not-rec) not-rec-flattened))]
-    ret))
-
+    (map (fn [[gene time expr-level status]]
+           {:gene gene :time time :expr-level expr-level :status status})
+         ret)))
 
 (def default-db
   {:sd2-start-panel {:gene-recs (:gene-recs config/config)
                      :gene-growth-curves (:gene-growth-curves config/config)}})
 
 (s/def ::sd2-start-panel (s/keys :req-un []))
-
-
-(.log js/console :plot-data plot-data)
