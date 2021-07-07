@@ -2,7 +2,7 @@
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db
-  {:sd2-panel {:display {}}})
+  {:sd2-model-panel {:display {}}})
 
-(s/def ::sd2-panel (s/keys :req-un []))
+(s/def ::sd2-model-panel (s/keys :req-un []))
 
