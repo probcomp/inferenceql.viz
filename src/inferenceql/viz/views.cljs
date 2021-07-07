@@ -28,7 +28,8 @@
         all-essential-genes @(rf/subscribe [:sim/all-essential-genes])]
     [h-box :children [[v-box
                        :size "6"
-                       :style {:margin "20px"}
+                       :style {:padding "20px"
+                               :background "#fafafa"}
                        :children [[sim/view target-gene essential-genes all-essential-genes]
                                   [gap :size "30px"]
                                   [sd2/view (:model models) columns-used constraints]]]
