@@ -5,7 +5,7 @@
             [inferenceql.viz.panels.viz.views :as viz]
             [inferenceql.viz.panels.table.views :as table]
             [inferenceql.viz.panels.modal.views :as modal]
-            [inferenceql.viz.panels.sd2.views :as sd2]
+            [inferenceql.viz.panels.sd2.model.views :as sd2-model]
             [inferenceql.viz.panels.sim.views :as sim]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
@@ -32,7 +32,7 @@
                                :background "#fafafa"}
                        :children [[sim/view target-gene essential-genes all-essential-genes]
                                   [gap :size "30px"]
-                                  [sd2/view (:model models) columns-used constraints]]]
+                                  [sd2-model/view (:model models) columns-used constraints]]]
                       [line
                        :size "1px"
                        :color "whitesmoke"]

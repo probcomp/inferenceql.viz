@@ -34,7 +34,7 @@
             ;; JSmodel Panel
             [inferenceql.viz.panels.jsmodel.subs]
             ;; SD2 Related Stuff
-            [inferenceql.viz.panels.sd2.eventsubs]
+            [inferenceql.viz.panels.sd2.model.eventsubs]
             [inferenceql.viz.panels.sim.eventsubs]
             ;; Query Component
             [inferenceql.viz.components.query.events]
