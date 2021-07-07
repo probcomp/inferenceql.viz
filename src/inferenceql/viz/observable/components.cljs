@@ -11,6 +11,15 @@
             [inferenceql.viz.observable.components.control :as control]
             [inferenceql.viz.observable.util :refer [clj-schema]]))
 
+(defn ^:export js-handsontable-wrapper
+  [props]
+  (let [{:keys [data options]} (->clj props)]
+    (let [data (->clj data)
+          options (->clj options)]
+      [handsontable-wrapper data options])))
+
+(def ^:export react-js-handsontable-wrapper (r/reactify-component js-handsontable-wrapper))
+
 (defn ^:export table
   ([data]
    (table data {}))
