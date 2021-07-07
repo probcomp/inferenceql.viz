@@ -42,8 +42,8 @@
         rec-flattened (flatten-time-series rec-gene-time-series)
         not-rec-flattened (flatten-time-series not-rec-gene-time-series)
 
-        ret (concat (map #(conj % :rec) rec-flattened)
-                    (map #(conj % :not-rec) not-rec-flattened))]
+        ret (concat (map #(conj % :not-rec) not-rec-flattened)
+                    (map #(conj % :rec) rec-flattened))]
     (map (fn [[gene time expr-level status]]
            {:gene gene :time time :expr-level expr-level :status status})
          ret)))
