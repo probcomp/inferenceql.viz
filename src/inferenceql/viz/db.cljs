@@ -15,7 +15,7 @@
 (def default-general-db
   "This db map is meant to contain keys and values not specific to
   any application panel."
-  {})
+  {:page :start})
 
 (defn default-db
   "When the application starts, this will be the value put in `app-db`.

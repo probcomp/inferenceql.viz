@@ -16,20 +16,25 @@
         constraints @(rf/subscribe [:sim/constraints])
         target-gene @(rf/subscribe [:sim/target-gene])
         essential-genes @(rf/subscribe [:sim/essential-genes])
-        all-essential-genes @(rf/subscribe [:sim/all-essential-genes])]
-    #_[sd2-start/view]
-    [h-box :children [[v-box
-                       :size "6"
-                       :style {:padding "20px"
-                               :background "#fafafa"}
-                       :children [[sd2-sim/view target-gene essential-genes all-essential-genes]
-                                  [gap :size "30px"]
-                                  [sd2-model/view (:model models) columns-used constraints]]]
-                      [line
-                       :size "1px"
-                       :color "whitesmoke"]
-                      [box
-                       :size "8"
-                       :margin "40px 0px"
-                       :child [viz/vega-lite vega-lite-spec {} nil nil]]]]))
+        all-essential-genes @(rf/subscribe [:sim/all-essential-genes])
+        page @(rf/subscribe [:page])]
+    (case page
+      :start
+      [sd2-start/view]
+
+      :knockout-sim
+      [h-box :children [[v-box
+                         :size "6"
+                         :style {:padding "20px"
+                                 :background "#fafafa"}
+                         :children [[sd2-sim/view target-gene essential-genes all-essential-genes]
+                                    [gap :size "30px"]
+                                    [sd2-model/view (:model models) columns-used constraints]]]
+                        [line
+                         :size "1px"
+                         :color "whitesmoke"]
+                        [box
+                         :size "8"
+                         :margin "40px 0px"
+                         :child [viz/vega-lite vega-lite-spec {} nil nil]]]])))
 

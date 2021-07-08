@@ -49,8 +49,6 @@
          ret)))
 
 (def default-db
-  {}
-  #_{:sd2-start-panel {:gene-recs (:gene-recs config/config)
-                       :gene-growth-curves (:gene-growth-curves config/config)}})
+  {:sd2-start-panel {}})
 
 (s/def ::sd2-start-panel (s/keys :req-un []))

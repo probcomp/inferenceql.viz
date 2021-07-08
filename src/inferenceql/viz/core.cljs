@@ -4,7 +4,7 @@
             [reagent.dom :as rdom]
             ;; Core
             [inferenceql.viz.util :refer [query-string-params]]
-            [inferenceql.viz.events]
+            [inferenceql.viz.eventsubs]
             [inferenceql.viz.effects]
             [inferenceql.viz.views :as views]
             [inferenceql.viz.vega :as vega.init]
@@ -70,7 +70,4 @@
   ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
   ;; not reset the state of the app.
   (rf/dispatch-sync [:initialize-db])
-  (rf/dispatch-sync [:upload/read-query-string-params (query-string-params)])
-  (rf/dispatch-sync [:control/set-query-string-to-select-all])
-
   (render-app))
