@@ -8,24 +8,25 @@
 
 (defn time-series [data]
   {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
-   :width 1000
    :config {:view {:stroke nil}}
-   :height 1000
    :data {:values data}
    ;;:transform [{:calculate "datum.status == 'rec' ? 1 : 0" :as "zorder"}]
+   :resolve {:axis {:x "independent" :y "independent"}}
+   :width 1000
+   :height 1000
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}}
-   :resolve {:axis {:x "independent" :y "independent"}}
-   :layer [{:mark {:type "line" #_:tooltip #_{:content "data"}}
-            :params [{:name "brush",
-                      :select {:type "interval" :encodings ["x", "y"]}}]
+   :layer [{:mark {:type "line" #_:tooltip #_{:content "data"}
+                   :strokeWidth 1}
             :encoding {:x {:field "time", :type "quantitative"
                            :axis {:grid true
                                   :values (range 0 60 2)}}
                        :y {:field "expr-level", :type "quantitative"
                            :axis {:grid true}}
                                   ;:values (range 0 1.70 0.4)}}
-                       :strokeDash {:field "gene" :type "nominal" :legend nil}}}
+                       :strokeDash {:field "gene" :type "nominal" :legend nil}
+                       :label {:field "gene" :type "nominal"}}}
+
            {:encoding {:x {:aggregate "max"
                            :field "time"
                            :type "quantitative"
@@ -38,6 +39,7 @@
                      :encoding {:detail {:field "gene" :type "nominal"}}}
                     {:mark {:type "text" :align "left" :dx 4}
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
+
 
 (defn time-series-2 [data]
   {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
