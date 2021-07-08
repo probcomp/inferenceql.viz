@@ -16,27 +16,43 @@
    :height 1000
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}
-              :order {:condition {:param "hover"
+              :order {:condition {:param "click"
                                   :value 1}
                       :value 0}
-              :opacity {:condition {:param "hover",
+              :opacity {:condition {:param "click",
                                     :value 1}
                         :value 0.1}}
 
-   :layer [{:mark {:type "line" #_:tooltip #_{:content "data"}
-                   :strokeWidth 2}
+   :layer [
+
+
+           {:mark {:type "point"}
             :params [{:name "hover"
+                      #_:select #_{:type "point",
+                                   :fields ["gene"],
+                                   :on "mouseover"}}
+                     {:name "click"
                       :select {:type "point",
                                :fields ["gene"],
-                               :on "mouseover"}}]
+                               :on "mousedown"
+                               :nearest true}}]
+            :encoding {:x {:field "time", :type "quantitative"
+                           :axis nil}
+                       :y {:field "expr-level", :type "quantitative"
+                           :axis nil}
+                       :opacity {:value 0}}}
+
+           {:mark {:type "line" #_:tooltip #_{:content "data"}
+                   :strokeWidth 2}
             :encoding {:x {:field "time", :type "quantitative"
                            :axis {:grid true
                                   :values (range 0 60 2)}}
                        :y {:field "expr-level", :type "quantitative"
                            :axis {:grid true}}
-                                  ;:values (range 0 1.70 0.4)}}
-                       :strokeDash {:field "gene" :type "nominal" :legend nil}
-                       :label {:field "gene" :type "nominal"}}}
+                       ;:values (range 0 1.70 0.4)}}
+                       ;; TODO: make stroke solid on selection.
+                       :strokeDash {:field "gene" :type "nominal" :legend nil}}}
+
 
            {:encoding {:x {:aggregate "max"
                            :field "time"
