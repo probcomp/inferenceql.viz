@@ -4,8 +4,6 @@
             [inferenceql.viz.panels.sd2.start.db :refer [plot-data]]
             [inferenceql.viz.panels.viz.views :as viz]))
 
-;;(.log js/console :aoeu plot-data)
-
 (defn time-series [data]
   {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
    :config {:view {:stroke nil}}
@@ -69,21 +67,6 @@
                      ;; TODO: make text bold on selection.
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
 
-
-(defn time-series-2 [data]
-  {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
-   :width 1000
-   :config {:view {:stroke nil}}
-   :height 1000
-   :data {:values data}
-   :encoding {:color {:field "status", :type "nominal"
-                      :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}}
-   :layer [{:mark {:type "line" :clip true :tooltip {:content "data"}}
-            :encoding {:x {:field "time", :type "quantitative"}
-                           ;;:scale {:domain [40, 59]}}
-                       :y {:field "expr-level", :type "quantitative"}
-                           ;:scale {:domain [0.9, 1.4]}}
-                       :strokeDash {:field "gene" :type "nominal" :legend nil}}}]})
 
 (defn view []
   [viz/vega-lite (time-series plot-data) {} nil nil])
