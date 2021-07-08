@@ -8,7 +8,7 @@
             [inferenceql.viz.panels.modal.db :as modal-panel]
             [inferenceql.viz.panels.sd2.model.db :as sd2-model-panel]
             [inferenceql.viz.panels.sd2.start.db :as sd2-start-panel]
-            [inferenceql.viz.panels.sim.db :as sim-panel]
+            [inferenceql.viz.panels.sd2.sim.db :as sd2-sim-panel]
             [inferenceql.viz.components.highlight.db :as highlight-component]
             [inferenceql.viz.components.query.db :as query-component]
             [inferenceql.viz.components.store.db :as store-component]))
@@ -23,7 +23,7 @@
                              ::modal-panel/modal-panel
                              ::sd2-model-panel/sd2-model-panel
                              ::sd2-start-panel/sd2-start-panel
-                             ::sim-panel/sd2-sim-panel
+                             ::sd2-sim-panel/sd2-sim-panel
                              ::highlight-component/highlight-component
                              ::query-component/query-component
                              ::store-component/store-component]))
@@ -47,7 +47,7 @@
              modal-panel/default-db
              sd2-model-panel/default-db
              sd2-start-panel/default-db
-             sim-panel/default-db
+             sd2-sim-panel/default-db
              highlight-component/default-db
              query-component/default-db
              store-component/default-db]]

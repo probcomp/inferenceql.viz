@@ -1,4 +1,4 @@
-(ns inferenceql.viz.panels.sim.views
+(ns inferenceql.viz.panels.sd2.sim.views
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
             [inferenceql.inference.gpm.view :as view]

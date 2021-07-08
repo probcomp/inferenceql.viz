@@ -1,4 +1,4 @@
-(ns inferenceql.viz.panels.sim.eventsubs
+(ns inferenceql.viz.panels.sd2.sim.eventsubs
   (:require [re-frame.core :as rf]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.inference.gpm :as gpm]

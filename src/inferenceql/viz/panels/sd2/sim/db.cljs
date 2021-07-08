@@ -1,4 +1,4 @@
-(ns inferenceql.viz.panels.sim.db
+(ns inferenceql.viz.panels.sd2.sim.db
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db

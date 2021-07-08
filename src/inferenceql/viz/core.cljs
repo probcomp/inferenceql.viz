@@ -36,7 +36,7 @@
             ;; SD2 Related Stuff
             [inferenceql.viz.panels.sd2.model.eventsubs]
             [inferenceql.viz.panels.sd2.start.eventsubs]
-            [inferenceql.viz.panels.sim.eventsubs]
+            [inferenceql.viz.panels.sd2.sim.eventsubs]
             ;; Query Component
             [inferenceql.viz.components.query.events]
             [inferenceql.viz.components.query.subs]

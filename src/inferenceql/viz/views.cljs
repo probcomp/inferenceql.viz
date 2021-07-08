@@ -7,7 +7,7 @@
             [inferenceql.viz.panels.modal.views :as modal]
             [inferenceql.viz.panels.sd2.model.views :as sd2-model]
             [inferenceql.viz.panels.sd2.start.views :as sd2-start]
-            [inferenceql.viz.panels.sim.views :as sim]))
+            [inferenceql.viz.panels.sd2.sim.views :as sd2-sim]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
 
@@ -27,19 +27,19 @@
         target-gene @(rf/subscribe [:sim/target-gene])
         essential-genes @(rf/subscribe [:sim/essential-genes])
         all-essential-genes @(rf/subscribe [:sim/all-essential-genes])]
-    [sd2-start/view]
-    #_[h-box :children [[v-box
-                         :size "6"
-                         :style {:padding "20px"
-                                 :background "#fafafa"}
-                         :children [[sim/view target-gene essential-genes all-essential-genes]
-                                    [gap :size "30px"]
-                                    [sd2-model/view (:model models) columns-used constraints]]]
-                        [line
-                         :size "1px"
-                         :color "whitesmoke"]
-                        [box
-                         :size "8"
-                         :margin "40px 0px"
-                         :child [viz/vega-lite vega-lite-spec {} nil nil]]]]))
+    #_[sd2-start/view]
+    [h-box :children [[v-box
+                       :size "6"
+                       :style {:padding "20px"
+                               :background "#fafafa"}
+                       :children [[sd2-sim/view target-gene essential-genes all-essential-genes]
+                                  [gap :size "30px"]
+                                  [sd2-model/view (:model models) columns-used constraints]]]
+                      [line
+                       :size "1px"
+                       :color "whitesmoke"]
+                      [box
+                       :size "8"
+                       :margin "40px 0px"
+                       :child [viz/vega-lite vega-lite-spec {} nil nil]]]]))
 
