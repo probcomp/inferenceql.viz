@@ -2,7 +2,8 @@
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
             [inferenceql.viz.panels.sd2.start.db :refer [plot-data]]
-            [inferenceql.viz.panels.viz.views :as viz]))
+            [inferenceql.viz.panels.viz.views :as viz]
+            [re-frame.core :as rf]))
 
 (defn time-series [data]
   {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
@@ -14,10 +15,10 @@
    :height 1000
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}
-              :order {:condition {:param "click"
+              :order {:condition {:param "pts"
                                   :value 1}
                       :value 0}
-              :opacity {:condition {:param "click",
+              :opacity {:condition {:param "pts",
                                     :value 1}
                         :value 0.1}}
    :layer [{:mark {:type "point" :tooltip {:content "data"}}
@@ -30,7 +31,7 @@
                                :fields ["time", "expr-level"]
                                :on "mousedown"
                                :nearest true}}
-                     {:name "click"
+                     {:name "pts"
                       :select {:type "point",
                                :fields ["gene"],
                                :on "mousedown"
@@ -69,4 +70,8 @@
 
 
 (defn view []
-  [viz/vega-lite (time-series plot-data) {} nil nil])
+  (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
+    [:div
+     [:span gene-clicked]
+     [viz/vega-lite (time-series plot-data) {} nil nil]]))
+

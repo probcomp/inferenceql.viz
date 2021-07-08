@@ -36,9 +36,6 @@
                                 ;; See https://github.com/vega/vega-embed#api-reference
                                 (.finalize @vega-embed-result)))
 
-        ;; Used to set the pts-store whenever the mouse click is lifted.
-        mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
-
         ;; Uses generator functions in map `generators` to generate new rows and
         ;; insert them into `vega-instance`.
         gen-and-insert (fn [generators vega-instance]
@@ -75,7 +72,9 @@
                                (let [view-obj (.-view res)
                                      spec-has-pts-store (try (some? (.data view-obj "pts_store"))
                                                              (catch :default e false))]
+                                 (.log js/console "outside")
                                  (when spec-has-pts-store
+                                   (.log js/console "here")
                                    ;; Update value of pts_store in view object to the last value
                                    ;; we had saved.
                                    (when pts-store
@@ -86,18 +85,7 @@
                                    ;; in the visualization itself. Stage changes.
                                    (.addDataListener view-obj "pts_store"
                                                      (fn [_ds-name data]
-                                                       (rf/dispatch [:viz/stage-pts-store data])))
-
-                                   ;; Used to set the pts-store shortly after the mouse wheel is
-                                   ;; done scrolling on a selection rectangle (pts_brush) within
-                                   ;; a vega-lite visualization.
-                                   (.addEventListener view-obj "wheel"
-                                                      (gfn/debounce
-                                                       (fn [_event item]
-                                                         (when (= "pts_brush" (.. item -mark -name))
-                                                           (rf/dispatch [:viz/set-pts-store])))
-                                                       500))))))
-
+                                                       (rf/dispatch [:viz/set-pts-store data])))))))
                       ;; Store the result of vega-embed.
                       (.then (fn [res]
                                (reset! vega-embed-result res)))
@@ -108,9 +96,7 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt generators pts-store)
-        ;; Add global listener for mouseup.
-        (.addEventListener js/window "mouseup" mouseup-handler))
+        (embed this spec opt generators pts-store))
 
       :component-did-update
       (fn [this old-argv]
@@ -124,9 +110,7 @@
 
       :component-will-unmount
       (fn [this]
-        (free-resources)
-        ;; Remove global listener for mouseup.
-        (.removeEventListener js/window "mouseup" mouseup-handler))
+        (free-resources))
 
       :reagent-render
       (fn [spec opt generators pts-store]
