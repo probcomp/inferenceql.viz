@@ -15,9 +15,20 @@
    :width 1000
    :height 1000
    :encoding {:color {:field "status", :type "nominal"
-                      :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}}
+                      :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}
+              :order {:condition {:param "hover"
+                                  :value 1}
+                      :value 0}
+              :opacity {:condition {:param "hover",
+                                    :value 1}
+                        :value 0.1}}
+
    :layer [{:mark {:type "line" #_:tooltip #_{:content "data"}
-                   :strokeWidth 1}
+                   :strokeWidth 2}
+            :params [{:name "hover"
+                      :select {:type "point",
+                               :fields ["gene"],
+                               :on "mouseover"}}]
             :encoding {:x {:field "time", :type "quantitative"
                            :axis {:grid true
                                   :values (range 0 60 2)}}
