@@ -72,9 +72,7 @@
                                (let [view-obj (.-view res)
                                      spec-has-pts-store (try (some? (.data view-obj "pts_store"))
                                                              (catch :default e false))]
-                                 (.log js/console "outside")
                                  (when spec-has-pts-store
-                                   (.log js/console "here")
                                    ;; Update value of pts_store in view object to the last value
                                    ;; we had saved.
                                    (when pts-store

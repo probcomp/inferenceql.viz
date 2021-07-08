@@ -13,7 +13,7 @@
   :set-page
   event-interceptors
   (fn [db [_ new-val]]
-    (update-in db [:page] new-val)))
+    (assoc-in db [:page] new-val)))
 
 (rf/reg-sub
   :page

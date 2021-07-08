@@ -1,6 +1,7 @@
 (ns inferenceql.viz.panels.sd2.start.views
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
+            [re-com.core :refer [v-box h-box box gap line]]
             [inferenceql.viz.panels.sd2.start.db :refer [plot-data]]
             [inferenceql.viz.panels.viz.views :as viz]
             [re-frame.core :as rf]))
@@ -71,7 +72,17 @@
 
 (defn view []
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
-    [:div
-     [:span gene-clicked]
-     [viz/vega-lite (time-series plot-data) {} nil nil]]))
+    [v-box :children [
+                      [:div {:style {:margin "20px 0px 0px 80px"}}
+                        (if gene-clicked
+                          [h-box :children [[:h4 (str gene-clicked " selected")]
+                                            [gap :size "10px"]
+                                            [:button.toolbar-button.pure-button
+                                             {:on-click (fn [e]
+                                                          (rf/dispatch [:set-page :knockout-sim])
+                                                          (.blur (.-target e)))}
+                                             "continue"]]]
+
+                          [:h4  "Select a target gene"])]
+                      [h-box :children [[viz/vega-lite (time-series plot-data) {} nil nil]]]]]))
 
