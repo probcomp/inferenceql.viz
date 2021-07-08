@@ -13,17 +13,18 @@
    :height 1000
    :data {:values data}
    ;;:transform [{:calculate "datum.status == 'rec' ? 1 : 0" :as "zorder"}]
-   :mark {:type "line" :tooltip {:content "data"}}
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}}
    :resolve {:axis {:x "independent" :y "independent"}}
-   :layer [{:mark "line"
+   :layer [{:mark {:type "line" #_:tooltip #_{:content "data"}}
+            :params [{:name "brush",
+                      :select {:type "interval" :encodings ["x", "y"]}}]
             :encoding {:x {:field "time", :type "quantitative"
                            :axis {:grid true
-                                  :values (range 0 50 16)}}
+                                  :values (range 0 60 2)}}
                        :y {:field "expr-level", :type "quantitative"
-                           :axis {:grid true
-                                  :values (range 0 1.70 0.4)}}
+                           :axis {:grid true}}
+                                  ;:values (range 0 1.70 0.4)}}
                        :strokeDash {:field "gene" :type "nominal" :legend nil}}}
            {:encoding {:x {:aggregate "max"
                            :field "time"
@@ -37,7 +38,6 @@
                      :encoding {:detail {:field "gene" :type "nominal"}}}
                     {:mark {:type "text" :align "left" :dx 4}
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
-
 
 (defn time-series-2 [data]
   {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
@@ -45,35 +45,14 @@
    :config {:view {:stroke nil}}
    :height 1000
    :data {:values data}
-   ;;:transform [{:calculate "datum.status == 'rec' ? 1 : 0" :as "zorder"}]
-   :mark {:type "line" :tooltip {:content "data"}}
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}}
-   :resolve {:axis {:x "independent" :y "independent"}}
-   :layer [{:mark "line"
-            :encoding {:x {:field "time", :type "quantitative"
-                           :axis {:grid true
-                                  :values (range 0 50 16)}}
-                       :y {:field "expr-level", :type "quantitative"
-                           :axis {:grid true
-                                  :values (range 0 1.70 0.4)}}
-                       ;;:scale {:domain [0.90, 1.4]}}
-                       :strokeDash {:field "gene" :type "nominal" :legend nil}}}
-           {:encoding {:x {:aggregate "max"
-                           :field "time"
-                           :type "quantitative"
-                           :axis nil}
-                       :y {:aggregate {:argmax "time"}
-                           :field "expr-level"
-                           :type "quantitative"
-                           :axis nil}}
-            :layer [{:mark {:type "circle"}
-                     :encoding {:detail {:field "gene" :type "nominal"}}}
-                    {:mark {:type "text" :align "left" :dx 4}
-                     :encoding {:text {:field "gene" :type "nominal"}}}]}]})
-
-
-
+   :layer [{:mark {:type "line" :clip true :tooltip {:content "data"}}
+            :encoding {:x {:field "time", :type "quantitative"}
+                           ;;:scale {:domain [40, 59]}}
+                       :y {:field "expr-level", :type "quantitative"}
+                           ;:scale {:domain [0.9, 1.4]}}
+                       :strokeDash {:field "gene" :type "nominal" :legend nil}}}]})
 
 (defn view []
   [viz/vega-lite (time-series plot-data) {} nil nil])
