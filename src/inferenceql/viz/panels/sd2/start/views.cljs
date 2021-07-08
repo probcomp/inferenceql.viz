@@ -79,10 +79,10 @@
                                             [gap :size "10px"]
                                             [:button.toolbar-button.pure-button
                                              {:on-click (fn [e]
+                                                          (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
                                                           (rf/dispatch [:set-page :knockout-sim])
                                                           (.blur (.-target e)))}
                                              "continue"]]]
-
                           [:h4  "Select a target gene"])]
                       [h-box :children [[viz/vega-lite (time-series plot-data) {} nil nil]]]]]))
 

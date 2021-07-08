@@ -127,6 +127,13 @@
 
 ;; Target gene and essential genes.
 
+(defn set-target-gene
+  [db [_ new-target]]
+  (assoc-in db [:sd2-sim-panel :target-gene] new-target))
+(rf/reg-event-db :sim/set-target-gene
+                 event-interceptors
+                 set-target-gene)
+
 (defn target-gene
   [db [_]]
   (get-in db [:sd2-sim-panel :target-gene]))
