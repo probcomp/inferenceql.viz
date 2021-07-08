@@ -23,7 +23,7 @@
                              ::modal-panel/modal-panel
                              ::sd2-model-panel/sd2-model-panel
                              ::sd2-start-panel/sd2-start-panel
-                             ::sim-panel/sim-panel
+                             ::sim-panel/sd2-sim-panel
                              ::highlight-component/highlight-component
                              ::query-component/query-component
                              ::store-component/store-component]))

@@ -2,16 +2,16 @@
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db
-  {:sim-panel {:display {}
-               :target-gene :stoA
-               :essential-genes [:recR :mdxG]
-               :columns-used #{:stoA :recR :mdxG}
+  {:sd2-sim-panel {:display {}
+                   :target-gene :stoA
+                   :essential-genes [:recR :mdxG]
+                   :columns-used #{:stoA :recR :mdxG}
 
-               :conditioned false
+                   :conditioned false
 
-               :expr-level nil
-               :constraints {}}})
+                   :expr-level nil
+                   :constraints {}}})
 
 
-(s/def ::sim-panel (s/keys :req-un []))
+(s/def ::sd2-sim-panel (s/keys :req-un []))
 

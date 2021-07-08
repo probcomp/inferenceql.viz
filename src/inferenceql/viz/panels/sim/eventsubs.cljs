@@ -42,23 +42,23 @@
 
 (defn simulations
   [db [_]]
-  (get-in db [:sim-panel :simulations]))
+  (get-in db [:sd2-sim-panel :simulations]))
 (rf/reg-sub :sim/simulations
             simulations)
 
 (defn simulate-one
   [{:keys [db]} [_]]
   (let [model (get-in db [:store-component :models :model])
-        constraints (get-in db [:sim-panel :constraints])
+        constraints (get-in db [:sd2-sim-panel :constraints])
 
-        cols (get-in db [:sim-panel :columns-used])
+        cols (get-in db [:sd2-sim-panel :columns-used])
         cols (remove (set (keys constraints)) cols)
 
         row (gpm/simulate model cols constraints)
         row (merge row constraints)
 
         steps (animation-steps model row cols)]
-    {:db (update-in db [:sim-panel :simulations] (fnil conj []) row)
+    {:db (update-in db [:sd2-sim-panel :simulations] (fnil conj []) row)
      :fx [[:dispatch [:sd2/clear-animation]]
           [:dispatch [:sd2/stage-animation steps]]
           [:dispatch [:sd2/start-animation]]]}))
@@ -69,20 +69,20 @@
 (defn simulate-many
   [db [_]]
   (let [model (get-in db [:store-component :models :model])
-        constraints (get-in db [:sim-panel :constraints])
+        constraints (get-in db [:sd2-sim-panel :constraints])
         cols (keys (get-in db [:store-component :datasets :data :schema]))
         cols (remove (set (keys constraints)) cols)
 
         rows (repeatedly 10 #(-> (gpm/simulate model cols constraints)
                                  (merge constraints)))]
-    (update-in db [:sim-panel :simulations] (fnil concat []) rows)))
+    (update-in db [:sd2-sim-panel :simulations] (fnil concat []) rows)))
 (rf/reg-event-db :sim/simulate-many
                  event-interceptors
                  simulate-many)
 
 (defn clear-simulations
   [db [_]]
-  (assoc-in db [:sim-panel :simulations] nil))
+  (assoc-in db [:sd2-sim-panel :simulations] nil))
 (rf/reg-event-db :sim/clear-simulations
                  event-interceptors
                  clear-simulations)
@@ -91,22 +91,22 @@
 
 (defn expr-level
   [db [_]]
-  (get-in db [:sim-panel :expr-level]))
+  (get-in db [:sd2-sim-panel :expr-level]))
 (rf/reg-sub :sim/expr-level
             expr-level)
 
 (defn constraints
   [db [_]]
-  (get-in db [:sim-panel :constraints]))
+  (get-in db [:sd2-sim-panel :constraints]))
 (rf/reg-sub :sim/constraints
             constraints)
 
 (defn set-expr-level
   [db [_ new-val]]
-  (let [target-gene (get-in db [:sim-panel :target-gene])]
+  (let [target-gene (get-in db [:sd2-sim-panel :target-gene])]
     (-> db
-        (assoc-in [:sim-panel :expr-level] new-val)
-        (assoc-in [:sim-panel :constraints] {target-gene new-val}))))
+        (assoc-in [:sd2-sim-panel :expr-level] new-val)
+        (assoc-in [:sd2-sim-panel :constraints] {target-gene new-val}))))
 (rf/reg-event-db :sim/set-expr-level
                  event-interceptors
                  set-expr-level)
@@ -129,19 +129,19 @@
 
 (defn target-gene
   [db [_]]
-  (get-in db [:sim-panel :target-gene]))
+  (get-in db [:sd2-sim-panel :target-gene]))
 (rf/reg-sub :sim/target-gene
             target-gene)
 
 (defn essential-genes
   [db [_]]
-  (get-in db [:sim-panel :essential-genes]))
+  (get-in db [:sd2-sim-panel :essential-genes]))
 (rf/reg-sub :sim/essential-genes
             essential-genes)
 
 (defn columns-used
   [db [_]]
-  (get-in db [:sim-panel :columns-used]))
+  (get-in db [:sd2-sim-panel :columns-used]))
 (rf/reg-sub :sim/columns-used
             columns-used)
 
@@ -157,8 +157,8 @@
 (defn add-essential-gene
   [db [_ new-gene]]
   (-> db
-      (update-in [:sim-panel :essential-genes] conj new-gene)
-      (update-in [:sim-panel :columns-used] conj new-gene)))
+      (update-in [:sd2-sim-panel :essential-genes] conj new-gene)
+      (update-in [:sd2-sim-panel :columns-used] conj new-gene)))
 (rf/reg-event-db :sim/add-essential-gene
                  event-interceptors
                  add-essential-gene)
@@ -166,8 +166,8 @@
 (defn remove-essential-gene
   [db [_ gene-to-remove]]
   (-> db
-      (update-in [:sim-panel :essential-genes] #(remove (set [gene-to-remove]) %))
-      (update-in [:sim-panel :columns-used] disj gene-to-remove)))
+      (update-in [:sd2-sim-panel :essential-genes] #(remove (set [gene-to-remove]) %))
+      (update-in [:sd2-sim-panel :columns-used] disj gene-to-remove)))
 (rf/reg-event-db :sim/remove-essential-gene
                  event-interceptors
                  remove-essential-gene)
@@ -176,19 +176,19 @@
 
 (defn conditioned
   [db [_]]
-  (get-in db [:sim-panel :conditioned]))
+  (get-in db [:sd2-sim-panel :conditioned]))
 (rf/reg-sub :sim/conditioned
             conditioned)
 
 (defn set-conditioned
   [db [_ new-val]]
-  (let [target-gene (get-in db [:sim-panel :target-gene])
-        expr-level (get-in db [:sim-panel :expr-level])
+  (let [target-gene (get-in db [:sd2-sim-panel :target-gene])
+        expr-level (get-in db [:sd2-sim-panel :expr-level])
 
         constraints (if new-val {target-gene expr-level} {})]
     (-> db
-        (assoc-in [:sim-panel :conditioned] new-val)
-        (assoc-in [:sim-panel :constraints] constraints))))
+        (assoc-in [:sd2-sim-panel :conditioned] new-val)
+        (assoc-in [:sd2-sim-panel :constraints] constraints))))
 
 (rf/reg-event-db :sim/set-conditioned
                  event-interceptors
