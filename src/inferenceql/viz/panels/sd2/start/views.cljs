@@ -22,15 +22,16 @@
               :opacity {:condition {:param "click",
                                     :value 1}
                         :value 0.1}}
-
-   :layer [
-
-
-           {:mark {:type "point"}
-            :params [{:name "hover"
-                      #_:select #_{:type "point",
-                                   :fields ["gene"],
-                                   :on "mouseover"}}
+   :layer [{:mark {:type "point" :tooltip {:content "data"}}
+            :params [#_{:name "hover"
+                        :select {:type "point",
+                                 :fields ["gene"],
+                                 :on "mouseover"}}
+                     {:name "xypoint"
+                      :select {:type "point",
+                               :fields ["time", "expr-level"]
+                               :on "mousedown"
+                               :nearest true}}
                      {:name "click"
                       :select {:type "point",
                                :fields ["gene"],
@@ -42,7 +43,7 @@
                            :axis nil}
                        :opacity {:value 0}}}
 
-           {:mark {:type "line" #_:tooltip #_{:content "data"}
+           {:mark {:type "line"
                    :strokeWidth 2}
             :encoding {:x {:field "time", :type "quantitative"
                            :axis {:grid true
@@ -65,6 +66,7 @@
             :layer [{:mark {:type "circle"}
                      :encoding {:detail {:field "gene" :type "nominal"}}}
                     {:mark {:type "text" :align "left" :dx 4}
+                     ;; TODO: make text bold on selection.
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
 
 
