@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
             [re-com.core :refer [v-box h-box box gap line]]
-            [inferenceql.viz.panels.sd2.start.db :refer [plot-data]]
+            [inferenceql.viz.panels.sd2.start.db :refer [plot-data gene-selection-list]]
             [inferenceql.viz.panels.viz.views :as viz]
             [re-frame.core :as rf]))
 
@@ -69,10 +69,16 @@
                      ;; TODO: make text bold on selection.
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
 
+(defn gene-selector [gene-clicked]
+  [:div
+   (for [row gene-selection-list]
+     (let [[value gene-name rec] row]
+       ^{:key gene-name} [:div (name gene-name)]))])
 
 (defn view []
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])
         pts-store @(rf/subscribe [:viz/pts-store])]
+
     [v-box :children [
                       [:div {:style {:margin "20px 0px 0px 80px"}}
                         (if gene-clicked
@@ -85,5 +91,8 @@
                                                           (.blur (.-target e)))}
                                              "continue"]]]
                           [:h4  "Select a target gene"])]
-                      [h-box :children [[viz/vega-lite (time-series plot-data) {:actions false} nil pts-store]]]]]))
+                      [h-box
+                       :children
+                       [[viz/vega-lite (time-series plot-data) {:actions false} nil pts-store]
+                        [gene-selector gene-clicked]]]]]))
 

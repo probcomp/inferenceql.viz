@@ -22,7 +22,7 @@
         not-rec (set (map (comp keyword second) rows))]
     {:rec rec :not-rec not-rec}))
 
-(def plot-data
+(def all-gene-time-series
   (let [header (map keyword (first (:gene-growth-curves config/config)))
         rows (rest (:gene-growth-curves config/config))
         timepoints (->> rows
@@ -33,10 +33,25 @@
                      (postwalk (fn [thing]
                                  (if (string? thing)
                                    (edn/read-string thing)
-                                   thing))))
-        all-gene-time-series (zipmap header timepoints)
+                                   thing))))]
+    (zipmap header timepoints)))
 
-        rec-gene-time-series (medley/filter-keys (:rec gene-filter) all-gene-time-series)
+(def gene-selection-list
+  (let [final-levels (medley/map-vals last all-gene-time-series)
+        ret (for [[gene-name value] final-levels]
+              (cond
+                ((:rec gene-filter) gene-name)
+                [value gene-name true]
+
+                ((:not-rec gene-filter) gene-name)
+                [value gene-name false]
+
+                :else nil))
+        ret (filter some? ret)]
+    (sort-by first ret)))
+
+(def plot-data
+  (let [rec-gene-time-series (medley/filter-keys (:rec gene-filter) all-gene-time-series)
         not-rec-gene-time-series (medley/filter-keys (:not-rec gene-filter) all-gene-time-series)
 
         rec-flattened (flatten-time-series rec-gene-time-series)
