@@ -70,17 +70,27 @@
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
 
 (defn gene-selector [gene-clicked]
-  [:div
+  [:div {:style {:display "flex"
+                 :align-items "stretch"
+                 :max-height "800px"
+                 :flex-flow "column wrap"
+                 :flex "0 0 auto"
+                 :justify-content "flex-start"}}
    (for [row gene-selection-list]
-     (let [[value gene-name rec] row]
-       ^{:key gene-name} [:div (name gene-name)]))])
+     (let [[value gene-key rec] row
+           gene-name (name gene-key)]
+       ^{:key gene-name} [h-box
+                          :style {:margin-left "60px"}
+                          :children [(if (= gene-name gene-clicked)
+                                       [:div "➡️"])
+                                     [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")}}
+                                      gene-name]]]))])
 
 (defn view []
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])
         pts-store @(rf/subscribe [:viz/pts-store])]
 
-    [v-box :children [
-                      [:div {:style {:margin "20px 0px 0px 80px"}}
+    [v-box :children [[:div {:style {:margin "20px 0px 0px 80px"}}
                         (if gene-clicked
                           [h-box :children [[:h4 (str gene-clicked " selected")]
                                             [gap :size "10px"]
