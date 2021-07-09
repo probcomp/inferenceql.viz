@@ -27,7 +27,13 @@
                          :size "6"
                          :style {:padding "20px"
                                  :background "#fafafa"}
-                         :children [[sd2-sim/view target-gene essential-genes all-essential-genes]
+                         :children [[:button.toolbar-button.pure-button
+                                     {:on-click (fn [e]
+                                                  (rf/dispatch [:set-page :start])
+                                                  (.blur (.-target e)))
+                                      :style {:align-self "start" :margin-left "0px"}}
+                                     "back"]
+                                    [sd2-sim/view target-gene essential-genes all-essential-genes]
                                     [gap :size "30px"]
                                     [sd2-model/view (:model models) columns-used constraints]]]
                         [line
