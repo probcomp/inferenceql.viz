@@ -48,7 +48,7 @@
 
                 :else nil))
         ret (filter some? ret)]
-    (sort-by first ret)))
+    (sort-by first > ret)))
 
 (def plot-data
   (let [rec-gene-time-series (medley/filter-keys (:rec gene-filter) all-gene-time-series)
