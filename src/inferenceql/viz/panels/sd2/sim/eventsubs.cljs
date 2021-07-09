@@ -51,7 +51,8 @@
   (let [model (get-in db [:store-component :models :model])
         constraints (get-in db [:sd2-sim-panel :constraints])
 
-        cols (get-in db [:sd2-sim-panel :columns-used])
+        cols (conj (get-in db [:sd2-sim-panel :essential-genes])
+                   (get-in db [:sd2-sim-panel :target-gene]))
         cols (remove (set (keys constraints)) cols)
 
         row (gpm/simulate model cols constraints)
@@ -70,7 +71,9 @@
   [db [_]]
   (let [model (get-in db [:store-component :models :model])
         constraints (get-in db [:sd2-sim-panel :constraints])
-        cols (keys (get-in db [:store-component :datasets :data :schema]))
+
+        cols (conj (get-in db [:sd2-sim-panel :essential-genes])
+                   (get-in db [:sd2-sim-panel :target-gene]))
         cols (remove (set (keys constraints)) cols)
 
         rows (repeatedly 10 #(-> (gpm/simulate model cols constraints)
@@ -148,7 +151,8 @@
 
 (defn columns-used
   [db [_]]
-  (get-in db [:sd2-sim-panel :columns-used]))
+  (set (conj (get-in db [:sd2-sim-panel :essential-genes])
+             (get-in db [:sd2-sim-panel :target-gene]))))
 (rf/reg-sub :sim/columns-used
             columns-used)
 
@@ -164,8 +168,7 @@
 (defn add-essential-gene
   [db [_ new-gene]]
   (-> db
-      (update-in [:sd2-sim-panel :essential-genes] conj new-gene)
-      (update-in [:sd2-sim-panel :columns-used] conj new-gene)))
+      (update-in [:sd2-sim-panel :essential-genes] conj new-gene)))
 (rf/reg-event-db :sim/add-essential-gene
                  event-interceptors
                  add-essential-gene)
@@ -173,8 +176,7 @@
 (defn remove-essential-gene
   [db [_ gene-to-remove]]
   (-> db
-      (update-in [:sd2-sim-panel :essential-genes] #(remove (set [gene-to-remove]) %))
-      (update-in [:sd2-sim-panel :columns-used] disj gene-to-remove)))
+      (update-in [:sd2-sim-panel :essential-genes] #(remove (set [gene-to-remove]) %))))
 (rf/reg-event-db :sim/remove-essential-gene
                  event-interceptors
                  remove-essential-gene)

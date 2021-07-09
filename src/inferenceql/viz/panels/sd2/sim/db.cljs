@@ -5,7 +5,6 @@
   {:sd2-sim-panel {:display {}
                    :target-gene :stoA
                    :essential-genes [:recR :mdxG]
-                   :columns-used #{:stoA :recR :mdxG}
 
                    :conditioned false
 
