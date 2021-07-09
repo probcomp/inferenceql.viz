@@ -12,8 +12,8 @@
    :data {:values data}
    ;;:transform [{:calculate "datum.status == 'rec' ? 1 : 0" :as "zorder"}]
    :resolve {:axis {:x "independent" :y "independent"}}
-   :width 600
-   :height 600
+   :width 800
+   :height 800
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}
               :order {:condition {:param "pts"
