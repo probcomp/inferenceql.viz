@@ -12,8 +12,8 @@
    :data {:values data}
    ;;:transform [{:calculate "datum.status == 'rec' ? 1 : 0" :as "zorder"}]
    :resolve {:axis {:x "independent" :y "independent"}}
-   :width 1000
-   :height 1000
+   :width 600
+   :height 600
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}
               :order {:condition {:param "pts"
@@ -84,5 +84,5 @@
                                                           (.blur (.-target e)))}
                                              "continue"]]]
                           [:h4  "Select a target gene"])]
-                      [h-box :children [[viz/vega-lite (time-series plot-data) {} nil nil]]]]]))
+                      [h-box :children [[viz/vega-lite (time-series plot-data) {:actions false} nil nil]]]]]))
 
