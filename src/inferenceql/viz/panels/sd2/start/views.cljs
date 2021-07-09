@@ -71,25 +71,50 @@
 
 
 (defn gene-selector [gene-clicked]
-  [:div {:style {:display "flex"
-                 :align-items "stretch"
-                 :max-height "800px"
-                 :flex-flow "column wrap"
-                 :flex "0 0 auto"
-                 :justify-content "flex-start"}}
-   (for [row gene-selection-list]
-     (let [[value gene-key rec] row
-           gene-name (name gene-key)]
-       ^{:key gene-name}
-       [h-box
-        :style {:margin-left "60px"}
-        :children [(if (= gene-name gene-clicked)
-                     [:div "➡️"])
-                   [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
-                                  :cursor "pointer"}
-                          :on-click (fn [e]
-                                      (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
-                    gene-name]]]))])
+  (let [current-gene-index (when gene-clicked
+                             ;;TODO: find index of gene clicked
+                             nil)
+        keydown-handler (fn [e]
+                          (let [msg (case (.-code e)
+                                      ;; TODO selecet next gene
+                                      "ArrowDown" "down"
+                                      ;; TODO selecet previous gene
+                                      "ArrowUp" "up"
+                                      nil)]
+                            (when msg (.log js/console :msg msg))))]
+    (r/create-class
+      {:display-name "gene-selector"
+
+       :component-did-mount
+       (fn [this]
+         (.addEventListener js/window "keydown" keydown-handler))
+
+       :component-will-unmount
+       (fn [this]
+         (.removeEventListener js/window "keydown" keydown-handler))
+
+       :reagent-render
+       (fn [gene-clicked]
+         [:div {:style {:display "flex"
+                        :align-items "stretch"
+                        :max-height "800px"
+                        :flex-flow "column wrap"
+                        :flex "0 0 auto"
+                        :justify-content "flex-start"}}
+          (for [row gene-selection-list]
+            (let [[value gene-key rec] row
+                  gene-name (name gene-key)]
+              ^{:key gene-name}
+              [h-box
+               :style {:margin-left "60px"}
+               :children [(if (= gene-name gene-clicked)
+                            [:div "➡️"])
+                          [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
+                                         :cursor "pointer"}
+                                 :on-click (fn [e]
+                                             (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
+                           gene-name]]]))])})))
+
 
 (defn view []
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
