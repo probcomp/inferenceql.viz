@@ -26,3 +26,15 @@
   event-interceptors
   (fn [db _]
     (update-in db [:viz-panel] dissoc :pts-store :pts-store-staged)))
+
+(rf/reg-event-db
+  :viz/set-instance
+  event-interceptors
+  (fn [db [_ new-val]]
+    (assoc-in db [:viz-panel :instance] new-val)))
+
+(rf/reg-event-db
+  :viz/clear-instance
+  event-interceptors
+  (fn [db _]
+    (update-in db [:viz-panel] dissoc :instance)))

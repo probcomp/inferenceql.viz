@@ -90,3 +90,7 @@
                                                      (<= low row-val high))
                                                "E" (contains? (set vals) row-val))))]
                       (every? true? (map passes-filter? filter-maps))))))))
+
+(rf/reg-sub :viz/instance
+            (fn [db _]
+              (get-in db [:viz-panel :instance])))

@@ -23,12 +23,25 @@
             :headerFacet {:title nil}
             :concat {:spacing 50}}})
 
+(defn set-pts-store
+  [[embed-obj new-val]]
+  (let [view-obj (.-view embed-obj)
+        spec-has-pts-store (try (some? (.data view-obj "pts_store"))
+                                (catch :default e false))]
+    (when spec-has-pts-store
+      ;; Update value of pts_store in view object to the last value
+      ;; we had saved.
+      (when new-val
+        (.data view-obj "pts_store" (clj->js new-val))
+        (.run view-obj)))))
+(rf/reg-fx :viz/set-pts-store set-pts-store)
+
 (defn vega-lite
   "vega-lite reagent component"
   [spec opt generators pts-store]
   (let [run (atom 0)
         dom-nodes (r/atom {})
-        vega-embed-result (r/atom nil)
+        vega-embed-result (rf/subscribe [:viz/instance])
 
         free-resources (fn [] (swap! run inc) ; Turn off any running generators.
                               (when @vega-embed-result
@@ -86,7 +99,7 @@
                                                        (rf/dispatch [:viz/set-pts-store data])))))))
                       ;; Store the result of vega-embed.
                       (.then (fn [res]
-                               (reset! vega-embed-result res)))
+                               (rf/dispatch [:viz/set-instance res])))
                       (.catch (fn [err]
                                 (js/console.error err)))))))]
     (r/create-class

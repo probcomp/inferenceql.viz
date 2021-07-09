@@ -69,6 +69,7 @@
                      ;; TODO: make text bold on selection.
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
 
+
 (defn gene-selector [gene-clicked]
   [:div {:style {:display "flex"
                  :align-items "stretch"
@@ -79,17 +80,19 @@
    (for [row gene-selection-list]
      (let [[value gene-key rec] row
            gene-name (name gene-key)]
-       ^{:key gene-name} [h-box
-                          :style {:margin-left "60px"}
-                          :children [(if (= gene-name gene-clicked)
-                                       [:div "➡️"])
-                                     [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")}}
-                                      gene-name]]]))])
+       ^{:key gene-name}
+       [h-box
+        :style {:margin-left "60px"}
+        :children [(if (= gene-name gene-clicked)
+                     [:div "➡️"])
+                   [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
+                                  :cursor "pointer"}
+                          :on-click (fn [e]
+                                      (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
+                    gene-name]]]))])
 
 (defn view []
-  (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])
-        pts-store @(rf/subscribe [:viz/pts-store])]
-
+  (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
     [v-box :children [[:div {:style {:margin "20px 0px 0px 80px"}}
                         (if gene-clicked
                           [h-box :children [[:h4 (str gene-clicked " selected")]
@@ -103,6 +106,6 @@
                           [:h4  "Select a target gene"])]
                       [h-box
                        :children
-                       [[viz/vega-lite (time-series plot-data) {:actions false} nil pts-store]
+                       [[viz/vega-lite (time-series plot-data) {:actions false} nil nil]
                         [gene-selector gene-clicked]]]]]))
 
