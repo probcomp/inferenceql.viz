@@ -71,17 +71,17 @@
 
 
 (defn gene-selector [gene-clicked]
-  (let [current-gene-index (when gene-clicked
-                             ;;TODO: find index of gene clicked
-                             nil)
+  (let [next-gene (r/atom nil)
+        prev-gene (r/atom nil)
         keydown-handler (fn [e]
-                          (let [msg (case (.-code e)
-                                      ;; TODO selecet next gene
-                                      "ArrowDown" "down"
-                                      ;; TODO selecet previous gene
-                                      "ArrowUp" "up"
-                                      nil)]
-                            (when msg (.log js/console :msg msg))))]
+                          (case (.-code e)
+                            "ArrowDown"
+                            (rf/dispatch [:sd2-start/set-gene-clicked @next-gene])
+
+                            "ArrowUp"
+                            (rf/dispatch [:sd2-start/set-gene-clicked @prev-gene])
+
+                            nil))]
     (r/create-class
       {:display-name "gene-selector"
 
@@ -95,25 +95,46 @@
 
        :reagent-render
        (fn [gene-clicked]
-         [:div {:style {:display "flex"
-                        :align-items "stretch"
-                        :max-height "800px"
-                        :flex-flow "column wrap"
-                        :flex "0 0 auto"
-                        :justify-content "flex-start"}}
-          (for [row gene-selection-list]
-            (let [[value gene-key rec] row
-                  gene-name (name gene-key)]
-              ^{:key gene-name}
-              [h-box
-               :style {:margin-left "60px"}
-               :children [(if (= gene-name gene-clicked)
-                            [:div "➡️"])
-                          [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
-                                         :cursor "pointer"}
-                                 :on-click (fn [e]
-                                             (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
-                           gene-name]]]))])})))
+         (let [gene-order (map vector
+                               (range)
+                               (map (comp name second) gene-selection-list))
+
+               cur-gene-index (when gene-clicked
+                                (some (fn [[idx gene]]
+                                        (when (= gene gene-clicked)
+                                          idx))
+                                      gene-order))
+
+               ;; TODO deal with end cases of gene indices of 0 and last.
+               ng (some->> cur-gene-index
+                           inc
+                           (nth gene-order)
+                           second)
+               pg (some->> cur-gene-index
+                           dec
+                           (nth gene-order)
+                           second)]
+           (reset! next-gene ng)
+           (reset! prev-gene pg)
+           [:div {:style {:display "flex"
+                          :align-items "stretch"
+                          :max-height "800px"
+                          :flex-flow "column wrap"
+                          :flex "0 0 auto"
+                          :justify-content "flex-start"}}
+            (for [row gene-selection-list]
+              (let [[value gene-key rec] row
+                    gene-name (name gene-key)]
+                ^{:key gene-name}
+                [h-box
+                 :style {:margin-left "60px"}
+                 :children [(if (= gene-name gene-clicked)
+                              [:div "➡️"])
+                            [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
+                                           :cursor "pointer"}
+                                   :on-click (fn [e]
+                                               (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
+                             gene-name]]]))]))})))
 
 
 (defn view []
