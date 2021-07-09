@@ -10,9 +10,10 @@
                 (first (:values (first pts-store))))))
 
 (defn pts-store-format [gene-name]
-  [{:unit "layer_0"
-    :fields [{:type "E" :field "gene"}]
-    :values [gene-name]}])
+  (when gene-name
+    [{:unit "layer_0"
+      :fields [{:type "E" :field "gene"}]
+      :values [gene-name]}]))
 
 (defn set-gene-clicked
   [{:keys [db]} [_ gene-name]]

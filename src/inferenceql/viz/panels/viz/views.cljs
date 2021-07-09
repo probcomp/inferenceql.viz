@@ -31,9 +31,8 @@
     (when spec-has-pts-store
       ;; Update value of pts_store in view object to the last value
       ;; we had saved.
-      (when new-val
-        (.data view-obj "pts_store" (clj->js new-val))
-        (.run view-obj)))))
+      (.data view-obj "pts_store" (clj->js new-val))
+      (.run view-obj))))
 (rf/reg-fx :viz/set-pts-store set-pts-store)
 
 (defn vega-lite

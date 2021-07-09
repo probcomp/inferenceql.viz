@@ -81,17 +81,20 @@
                             "ArrowUp"
                             (rf/dispatch [:sd2-start/set-gene-clicked @prev-gene])
 
-                            nil))]
+                            nil))
+        dbl-click-handler (fn [e] (rf/dispatch [:sd2-start/set-gene-clicked nil]))]
     (r/create-class
       {:display-name "gene-selector"
 
        :component-did-mount
        (fn [this]
-         (.addEventListener js/window "keydown" keydown-handler))
+         (.addEventListener js/window "keydown" keydown-handler)
+         (.addEventListener js/window "dblclick" dbl-click-handler))
 
        :component-will-unmount
        (fn [this]
-         (.removeEventListener js/window "keydown" keydown-handler))
+         (.removeEventListener js/window "keydown" keydown-handler)
+         (.addEventListener js/window "dblclick" dbl-click-handler))
 
        :reagent-render
        (fn [gene-clicked]
