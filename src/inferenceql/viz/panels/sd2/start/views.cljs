@@ -71,7 +71,8 @@
 
 
 (defn view []
-  (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
+  (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])
+        pts-store @(rf/subscribe [:viz/pts-store])]
     [v-box :children [
                       [:div {:style {:margin "20px 0px 0px 80px"}}
                         (if gene-clicked
@@ -84,5 +85,5 @@
                                                           (.blur (.-target e)))}
                                              "continue"]]]
                           [:h4  "Select a target gene"])]
-                      [h-box :children [[viz/vega-lite (time-series plot-data) {:actions false} nil nil]]]]]))
+                      [h-box :children [[viz/vega-lite (time-series plot-data) {:actions false} nil pts-store]]]]]))
 
