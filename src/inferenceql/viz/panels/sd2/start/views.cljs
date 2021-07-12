@@ -119,6 +119,8 @@
            [:div {:style {:display "flex"
                           :align-items "stretch"
                           :max-height "800px"
+                          :min-width "650px"
+                          :margin "20px"
                           :flex-flow "column wrap"
                           :flex "0 0 auto"
                           :justify-content "flex-start"}}
@@ -152,6 +154,7 @@
                           [:h4  "Select a target gene"])]
                       [h-box
                        :children
-                       [[viz/vega-lite (time-series plot-data) {:actions false} :start-page]
-                        [gene-selector gene-clicked]]]]]))
+                       [[gene-selector gene-clicked]
+                        [viz/vega-lite (time-series plot-data) {:actions false} :start-page]]]]]))
+
 
