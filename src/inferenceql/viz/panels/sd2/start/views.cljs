@@ -119,7 +119,6 @@
            [:div {:style {:display "flex"
                           :align-items "stretch"
                           :max-height "800px"
-                          :min-width "650px"
                           :margin "20px"
                           :flex-flow "column wrap"
                           :flex "0 0 auto"
@@ -141,20 +140,27 @@
 
 (defn view []
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
-    [v-box :children [[:div {:style {:margin "20px 0px 0px 80px"}}
-                        (if gene-clicked
-                          [h-box :children [[:h4 (str gene-clicked " selected")]
-                                            [gap :size "10px"]
-                                            [:button.toolbar-button.pure-button
-                                             {:on-click (fn [e]
-                                                          (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
-                                                          (rf/dispatch [:set-page :knockout-sim])
-                                                          (.blur (.-target e)))}
-                                             "continue"]]]
-                          [:h4  "Select a target gene"])]
-                      [h-box
-                       :children
-                       [[gene-selector gene-clicked]
-                        [viz/vega-lite (time-series plot-data) {:actions false} :start-page]]]]]))
+    [h-box
+     :children
+     [[v-box
+       :size "5"
+       :style {:padding "20px"
+               :background "#f0f0f0"}
+       :children [[:div {:style {:margin "20px 0px 0px 80px"}}
+                   (if gene-clicked
+                     [h-box :children [[:h4 (str gene-clicked " selected")]
+                                       [gap :size "10px"]
+                                       [:button.toolbar-button.pure-button
+                                        {:on-click (fn [e]
+                                                     (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
+                                                     (rf/dispatch [:set-page :knockout-sim])
+                                                     (.blur (.-target e)))}
+                                        "continue"]]]
+                     [:h4 "Select a target gene"])]
+                  [gene-selector gene-clicked]]]
+      [line :size "1px" :color "whitesmoke"]
+      [box :size "8" :margin "40px 0px"
+       :child [viz/vega-lite (time-series plot-data) {:actions false} :start-page]]]]))
+
 
 

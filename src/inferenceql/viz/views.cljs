@@ -26,7 +26,7 @@
       [h-box :children [[v-box
                          :size "6"
                          :style {:padding "20px"
-                                 :background "#fafafa"}
+                                 :background "#f0f0f0"}
                          :children [[:button.toolbar-button.pure-button
                                      {:on-click (fn [e]
                                                   (rf/dispatch [:set-page :start])
