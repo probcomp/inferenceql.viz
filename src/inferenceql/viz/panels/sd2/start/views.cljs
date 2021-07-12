@@ -119,7 +119,6 @@
            [:div {:style {:display "flex"
                           :align-items "stretch"
                           :max-height "800px"
-                          :margin "20px"
                           :flex-flow "column wrap"
                           :flex "0 0 auto"
                           :justify-content "flex-start"}}
@@ -128,7 +127,7 @@
                     gene-name (name gene-key)]
                 ^{:key gene-name}
                 [h-box
-                 :style {:margin-left "60px"}
+                 :style {:margin-right "60px"}
                  :children [(if (= gene-name gene-clicked)
                               [:div "➡️"])
                             [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
@@ -144,9 +143,9 @@
      :children
      [[v-box
        :size "5"
-       :style {:padding "20px"
+       :style {:padding "20px 60px"
                :background "#f0f0f0"}
-       :children [[:div {:style {:margin "20px 0px 0px 80px"}}
+       :children [[:div
                    (if gene-clicked
                      [h-box :children [[:h4 (str gene-clicked " selected")]
                                        [gap :size "10px"]
@@ -157,9 +156,10 @@
                                                      (.blur (.-target e)))}
                                         "continue"]]]
                      [:h4 "Select a target gene"])]
+                  [gap :size "20px"]
                   [gene-selector gene-clicked]]]
       [line :size "1px" :color "whitesmoke"]
-      [box :size "8" :margin "40px 0px"
+      [box :size "8" :margin "60px 0px"
        :child [viz/vega-lite (time-series plot-data) {:actions false} :start-page]]]]))
 
 
