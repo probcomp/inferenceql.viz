@@ -101,24 +101,18 @@
          (let [gene-order (map vector
                                (range)
                                (map (comp name second) gene-selection-list))
-
                cur-gene-index (when gene-clicked
                                 (some (fn [[idx gene]]
                                         (when (= gene gene-clicked)
                                           idx))
                                       gene-order))
+               prev-gene-index (when (and (some? cur-gene-index) (not= cur-gene-index 0))
+                                 (dec cur-gene-index))
+               next-gene-index (when (and (some? cur-gene-index) (not= cur-gene-index (dec (count gene-order))))
+                                 (inc cur-gene-index))]
 
-               ;; TODO deal with end cases of gene indices of 0 and last.
-               ng (some->> cur-gene-index
-                           inc
-                           (nth gene-order)
-                           second)
-               pg (some->> cur-gene-index
-                           dec
-                           (nth gene-order)
-                           second)]
-           (reset! next-gene ng)
-           (reset! prev-gene pg)
+           (reset! next-gene (some->> next-gene-index (nth gene-order) second))
+           (reset! prev-gene (some->> prev-gene-index (nth gene-order) second))
            [:div {:style {:display "flex"
                           :align-items "stretch"
                           :max-height "800px"
