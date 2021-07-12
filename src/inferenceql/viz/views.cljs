@@ -30,7 +30,7 @@
                          :children [[:button.toolbar-button.pure-button
                                      {:on-click (fn [e]
                                                   (rf/dispatch [:set-page :start])
-                                                  (rf/dispatch [:sd2-start/set-gene-clicked (name target-gene)])
+                                                  ;;(rf/dispatch [:sd2-start/set-gene-clicked (name target-gene)])
                                                   (.blur (.-target e)))
                                       :style {:align-self "start" :margin-left "0px"}}
                                      "back"]
@@ -43,5 +43,5 @@
                         [box
                          :size "8"
                          :margin "40px 0px"
-                         :child [viz/vega-lite vega-lite-spec {} nil nil]]]])))
+                         :child [viz/vega-lite vega-lite-spec {} nil nil :knockout-sim-page]]]])))
 

@@ -30,11 +30,11 @@
 (rf/reg-event-db
   :viz/set-instance
   event-interceptors
-  (fn [db [_ new-val]]
-    (assoc-in db [:viz-panel :instance] new-val)))
+  (fn [db [_ id new-val]]
+    (assoc-in db [:viz-panel :instance id] new-val)))
 
 (rf/reg-event-db
   :viz/clear-instance
   event-interceptors
-  (fn [db _]
+  (fn [db _ id]
     (update-in db [:viz-panel] dissoc :instance)))

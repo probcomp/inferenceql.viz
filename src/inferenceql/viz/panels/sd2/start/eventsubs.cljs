@@ -17,7 +17,7 @@
 
 (defn set-gene-clicked
   [{:keys [db]} [_ gene-name]]
-  (let [embed-obj (get-in db [:viz-panel :instance])]
+  (let [embed-obj (get-in db [:viz-panel :instance :start-page])]
     {:fx [[:viz/set-pts-store [embed-obj (pts-store-format gene-name)]]]}))
 (rf/reg-event-fx :sd2-start/set-gene-clicked
                  event-interceptors

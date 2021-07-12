@@ -37,10 +37,10 @@
 
 (defn vega-lite
   "vega-lite reagent component"
-  [spec opt generators pts-store]
+  [spec opt generators pts-store id]
   (let [run (atom 0)
         dom-nodes (r/atom {})
-        vega-embed-result (rf/subscribe [:viz/instance])
+        vega-embed-result (r/atom nil)
 
         free-resources (fn [] (swap! run inc) ; Turn off any running generators.
                               (when @vega-embed-result
@@ -98,7 +98,8 @@
                                                        (rf/dispatch [:viz/set-pts-store data])))))))
                       ;; Store the result of vega-embed.
                       (.then (fn [res]
-                               (rf/dispatch [:viz/set-instance res])))
+                               (reset! vega-embed-result res)
+                               (rf/dispatch [:viz/set-instance id res])))
                       (.catch (fn [err]
                                 (js/console.error err)))))))]
     (r/create-class
