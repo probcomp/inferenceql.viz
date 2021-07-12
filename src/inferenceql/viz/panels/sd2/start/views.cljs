@@ -81,6 +81,9 @@
                             "ArrowUp"
                             (rf/dispatch [:sd2-start/set-gene-clicked @prev-gene])
 
+                            "Escape"
+                            (rf/dispatch [:sd2-start/set-gene-clicked nil])
+
                             nil))
         dbl-click-handler (fn [e] (rf/dispatch [:sd2-start/set-gene-clicked nil]))]
     (r/create-class
