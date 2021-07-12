@@ -30,7 +30,6 @@
                          :children [[:button.toolbar-button.pure-button
                                      {:on-click (fn [e]
                                                   (rf/dispatch [:set-page :start])
-                                                  ;;(rf/dispatch [:sd2-start/set-gene-clicked (name target-gene)])
                                                   (.blur (.-target e)))
                                       :style {:align-self "start" :margin-left "0px"}}
                                      "back"]

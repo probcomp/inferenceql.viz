@@ -36,5 +36,5 @@
 (rf/reg-event-db
   :viz/clear-instance
   event-interceptors
-  (fn [db _ id]
+  (fn [db [_ id]]
     (update-in db [:viz-panel :instance] dissoc id)))
