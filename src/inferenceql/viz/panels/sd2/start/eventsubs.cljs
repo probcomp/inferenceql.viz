@@ -4,7 +4,7 @@
             [medley.core :as medley]))
 
 (rf/reg-sub :sd2-start/gene-clicked
-            :<- [:viz/pts-store]
+            :<- [:viz/pts-store :start-page]
             (fn [pts-store]
               (when (seq pts-store)
                 (first (:values (first pts-store))))))

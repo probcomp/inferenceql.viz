@@ -149,6 +149,6 @@
                           [:h4  "Select a target gene"])]
                       [h-box
                        :children
-                       [[viz/vega-lite (time-series plot-data) {:actions false} nil nil :start-page]
+                       [[viz/vega-lite (time-series plot-data) {:actions false} :start-page]
                         [gene-selector gene-clicked]]]]]))
 

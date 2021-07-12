@@ -6,7 +6,7 @@
 (rf/reg-event-db
   :viz/set-pts-store
   event-interceptors
-  (fn [db [_ new-val]]
+  (fn [db [_ id new-val]]
       (let [new-pts-store (js->clj new-val :keywordize-keys true)
             cleaned-pts-store (when (seq new-pts-store)
                                 (for [store-elem new-pts-store]
@@ -18,8 +18,8 @@
                                   (let [clean-fields (fn [fields] (mapv #(dissoc % :getter) fields))]
                                     (update store-elem :fields clean-fields))))]
         (if cleaned-pts-store
-          (assoc-in db [:viz-panel :pts-store] cleaned-pts-store)
-          (update-in db [:viz-panel] dissoc :pts-store)))))
+          (assoc-in db [:viz-panel :pts-store id] cleaned-pts-store)
+          (update-in db [:viz-panel :pts-store] dissoc id)))))
 
 (rf/reg-event-db
   :viz/clear-pts-store
@@ -37,4 +37,4 @@
   :viz/clear-instance
   event-interceptors
   (fn [db _ id]
-    (update-in db [:viz-panel] dissoc :instance)))
+    (update-in db [:viz-panel :instance] dissoc id)))

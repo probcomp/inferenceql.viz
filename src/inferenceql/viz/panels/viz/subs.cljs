@@ -46,8 +46,8 @@
                    (medley/remove-vals nil?))))
 
 (rf/reg-sub :viz/pts-store
-  (fn [db _]
-    (get-in db [:viz-panel :pts-store])))
+  (fn [db [_ id]]
+    (get-in db [:viz-panel :pts-store id])))
 
 ;; Returns a function that checks whether a data row matches the filtering criteria in `:viz/pts-store`
 (rf/reg-sub :viz/pts-store-filter

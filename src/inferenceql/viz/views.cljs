@@ -43,5 +43,5 @@
                         [box
                          :size "8"
                          :margin "40px 0px"
-                         :child [viz/vega-lite vega-lite-spec {} nil nil :knockout-sim-page]]]])))
+                         :child [viz/vega-lite vega-lite-spec {} :knockout-sim-page]]]])))
 
