@@ -285,13 +285,14 @@ psuedo-class applied. */
 /* --------------- styling for js-model code view --------------- */
 
 .program-display {
-  padding: 5px;
-  font-size: .875rem;
-  background-color: #f8f8f8;
+  padding: 6px;
+  background-color: #f0f0f0;
+  border-left: 3px solid #ccc;
+  border-width: 0px 0px 0px 3px;
+  border-radius: 0px;
 }
 
 .program-display code {
-  background-color: #f8f8f8;
   border: none;
   padding: 0px;
   font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
