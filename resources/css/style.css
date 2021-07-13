@@ -285,7 +285,7 @@ psuedo-class applied. */
 /* --------------- styling for js-model code view --------------- */
 
 .program-display {
-  padding: 6px;
+  padding: 8px;
   background-color: #f0f0f0;
   border-left: 3px solid #ccc;
   border-width: 0px 0px 0px 3px;

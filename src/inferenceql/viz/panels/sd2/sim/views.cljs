@@ -140,9 +140,9 @@
      :children [[v-box
                  :size "6"
                  :style {:padding "20px"
-                         :background "#f0f0f0"}
-                 :children [
-                            [simulator-controls target-gene essential-genes all-essential-genes]
+                         :background "#f0f0f0"
+                         :min-width "740px"}
+                 :children [[simulator-controls target-gene essential-genes all-essential-genes]
                             [gap :size "30px"]
                             [sd2-model/view (:model models) columns-used constraints]]]
                 [line
