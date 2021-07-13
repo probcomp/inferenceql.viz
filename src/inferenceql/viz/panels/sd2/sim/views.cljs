@@ -58,17 +58,13 @@
    :children [[h-box
                :style {:margin-bottom "30px"}
                :align :center
-               :children [[:span {:style {:display "inline" :margin-top "0px"
-                                          :font-weight "500"
+               :children [[:span {:style {:font-weight "500"
                                           :line-height "1.1"
-                                          :font-size "24px"
-                                          :margin-bottom "0px"}} "GENE KNOCKOUT ➔"]
+                                          :font-size "24px"}} "GENE KNOCKOUT ➔"]
                           [gap :size "20px"]
-                          [:span {:style {:display "inline"
-                                          :margin-top "0px"
-                                          :font-weight "500"
+                          [:span {:style {:font-weight "500"
                                           :line-height "1.1"
-                                          :margin-bottom "0px" :font-size "40px"}} (name target-gene)]
+                                          :font-size "40px"}} (name target-gene)]
                           [gap :size "20px"]
                           [hyperlink
                            :on-click (fn [e]
