@@ -277,28 +277,32 @@
      :height vega-plot-height
      :data {:values data}
      :mark {:type "circle" :tooltip {:content "data"}}
-     :selection {zoom-control-name {:type "interval"
-                                    :bind "scales"
-                                    :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                                    :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                                    :clear "dblclick[event.shiftKey]"
-                                    :zoom "wheel![event.shiftKey]"}
-                 :pts {:type "interval"
-                       :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                       :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                       :clear "dblclick[!event.shiftKey]"
-                       :zoom "wheel![!event.shiftKey]"
-                       :empty "none"}}
+     :params [{:name zoom-control-name
+               :bind "scales"
+               :select {:type "interval"
+                        :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                        :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                        :clear "dblclick[event.shiftKey]"
+                        :zoom "wheel![event.shiftKey]"}}
+              {:name "pts"
+               :select {:type "interval"
+                        :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                        :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                        :clear "dblclick[!event.shiftKey]"
+                        :zoom "wheel![!event.shiftKey]"}}]
      :encoding {:x {:field (first cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
                 :y {:field (second cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
-                :color {:field "dataset"
-                        :legend nil
-                        #_:condition #_{:selection "pts"
-                                        :value selection-color}}}}))
+                :order {:condition {:param "pts"
+                                    :value 1}
+                        :value 0}
+                :color {:condition {:param "pts"
+                                    :field "dataset"
+                                    :legend nil}
+                        :value "lightgrey"}}}))
 
 (defn- heatmap-plot
   "Generates vega-lite spec for a heatmap plot.
