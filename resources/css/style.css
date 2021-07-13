@@ -87,8 +87,8 @@ div {
 .toolbar-button {
   align-self: center;
   margin-left: 6px;
-  padding: 4px .8em
-  border: 1px;
+  padding: 4px .8em;
+  border-width: 1px;
   border-style: solid;
   border-color: grey;
 }
