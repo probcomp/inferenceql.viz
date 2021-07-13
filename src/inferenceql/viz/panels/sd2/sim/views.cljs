@@ -132,6 +132,8 @@
                          :background "#f0f0f0"}
                  :children [[:button.toolbar-button.pure-button
                              {:on-click (fn [e]
+                                          (rf/dispatch [:sd2/clear-animation])
+                                          (rf/dispatch [:sim/clear-simulations])
                                           (rf/dispatch [:set-page :start])
                                           (.blur (.-target e)))
                               :style {:align-self "start" :margin-left "0px"}}
