@@ -149,27 +149,27 @@
        :style {:padding "15px 50px"
                :min-width "660px"
                :background "#f0f0f0"}
-       :children [[:div
-                   (if gene-clicked
-                     [h-box
-                      :align :center
-                      :children [[:span {:style {:font-weight "500"
-                                                 :line-height "1.1"
-                                                 :font-size "36px"}}
-                                  gene-clicked]
-                                 [gap :size "20px"]
-                                 [hyperlink
-                                  :style {:font-weight "500"
-                                          :font-size "18px"}
-                                  :on-click (fn [e]
-                                              (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
-                                              (rf/dispatch [:set-page :knockout-sim])
-                                              (.blur (.-target e)))
-                                  :label "continue to knockout simulator"]]]
-                     [:span {:style {:font-weight "500"
-                                     :line-height "1.1"
-                                     :font-size "24px"}}
-                      "Select a target gene"])]
+       :children [[h-box
+                   :align :center
+                   :min-height "40px"
+                   :children (if gene-clicked
+                               [[:span {:style {:font-weight "500"
+                                                :line-height "1.1"
+                                                :font-size "36px"}}
+                                 gene-clicked]
+                                [gap :size "20px"]
+                                [hyperlink
+                                 :style {:font-weight "500"
+                                         :font-size "18px"}
+                                 :on-click (fn [e]
+                                             (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
+                                             (rf/dispatch [:set-page :knockout-sim])
+                                             (.blur (.-target e)))
+                                 :label "continue to knockout simulator"]]
+                               [[:span {:style {:font-weight "500"
+                                                :line-height "1.1"
+                                                :font-size "24px"}}
+                                 "Select a target gene"]])]
                   [gap :size "20px"]
                   [gene-selector gene-clicked]]]
       [line :size "1px" :color "whitesmoke"]
