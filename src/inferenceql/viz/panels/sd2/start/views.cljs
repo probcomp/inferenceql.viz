@@ -137,9 +137,10 @@
                              gene-name]]]))]))})))
 
 
-(defn view []
+(defn view [show]
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
     [h-box
+     :style {:display (when-not show "none")}
      :children
      [[v-box
        :size "5"

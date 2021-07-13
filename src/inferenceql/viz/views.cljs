@@ -8,11 +8,10 @@
 
 (defn app
   []
-  (let [page @(rf/subscribe [:page])]
-    (case page
-      :start
-      [sd2-start/view]
-
-      :knockout-sim
-      [sd2-sim/view])))
+  (let [page @(rf/subscribe [:page])
+        show-start-page (= page :start)
+        show-sim-page (= page :knockout-sim)]
+    [:<>
+     [sd2-start/view show-start-page]
+     [sd2-sim/view show-sim-page]]))
 

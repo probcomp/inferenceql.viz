@@ -116,8 +116,7 @@
                                               (.blur (.-target e)))}
                            "Clear simulations"]]]]])
 
-(defn view
-  []
+(defn view [show]
   (let [vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
         models @(rf/subscribe [:store/models])
         columns-used @(rf/subscribe [:sim/columns-used])
@@ -125,23 +124,25 @@
         target-gene @(rf/subscribe [:sim/target-gene])
         essential-genes @(rf/subscribe [:sim/essential-genes])
         all-essential-genes @(rf/subscribe [:sim/all-essential-genes])]
-    [h-box :children [[v-box
-                       :size "6"
-                       :style {:padding "20px"
-                               :background "#f0f0f0"}
-                       :children [[:button.toolbar-button.pure-button
-                                   {:on-click (fn [e]
-                                                (rf/dispatch [:set-page :start])
-                                                (.blur (.-target e)))
-                                    :style {:align-self "start" :margin-left "0px"}}
-                                   "back"]
-                                  [simulator-controls target-gene essential-genes all-essential-genes]
-                                  [gap :size "30px"]
-                                  [sd2-model/view (:model models) columns-used constraints]]]
-                      [line
-                       :size "1px"
-                       :color "whitesmoke"]
-                      [box
-                       :size "8"
-                       :margin "40px 0px"
-                       :child [viz/vega-lite vega-lite-spec {} :knockout-sim-page]]]]))
+    [h-box
+     :style {:display (when-not show "none")}
+     :children [[v-box
+                 :size "6"
+                 :style {:padding "20px"
+                         :background "#f0f0f0"}
+                 :children [[:button.toolbar-button.pure-button
+                             {:on-click (fn [e]
+                                          (rf/dispatch [:set-page :start])
+                                          (.blur (.-target e)))
+                              :style {:align-self "start" :margin-left "0px"}}
+                             "back"]
+                            [simulator-controls target-gene essential-genes all-essential-genes]
+                            [gap :size "30px"]
+                            [sd2-model/view (:model models) columns-used constraints]]]
+                [line
+                 :size "1px"
+                 :color "whitesmoke"]
+                [box
+                 :size "8"
+                 :margin "40px 0px"
+                 :child [viz/vega-lite vega-lite-spec {} :knockout-sim-page]]]]))
