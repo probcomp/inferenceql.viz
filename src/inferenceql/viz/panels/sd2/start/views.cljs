@@ -1,7 +1,7 @@
 (ns inferenceql.viz.panels.sd2.start.views
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
-            [re-com.core :refer [v-box h-box box gap line]]
+            [re-com.core :refer [v-box h-box box gap line hyperlink]]
             [inferenceql.viz.panels.sd2.start.db :refer [plot-data gene-selection-list]]
             [inferenceql.viz.panels.viz.views :as viz]
             [re-frame.core :as rf]))
@@ -151,15 +151,25 @@
                :background "#f0f0f0"}
        :children [[:div
                    (if gene-clicked
-                     [h-box :children [[:h4 (str gene-clicked " selected")]
-                                       [gap :size "10px"]
-                                       [:button.toolbar-button.pure-button
-                                        {:on-click (fn [e]
-                                                     (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
-                                                     (rf/dispatch [:set-page :knockout-sim])
-                                                     (.blur (.-target e)))}
-                                        "continue"]]]
-                     [:h4 "Select a target gene"])]
+                     [h-box
+                      :align :center
+                      :children [[:span {:style {:font-weight "500"
+                                                 :line-height "1.1"
+                                                 :font-size "36px"}}
+                                  gene-clicked]
+                                 [gap :size "20px"]
+                                 [hyperlink
+                                  :style {:font-weight "500"
+                                          :font-size "18px"}
+                                  :on-click (fn [e]
+                                              (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
+                                              (rf/dispatch [:set-page :knockout-sim])
+                                              (.blur (.-target e)))
+                                  :label "continue to knockout simulator"]]]
+                     [:span {:style {:font-weight "500"
+                                     :line-height "1.1"
+                                     :font-size "24px"}}
+                      "Select a target gene"])]
                   [gap :size "20px"]
                   [gene-selector gene-clicked]]]
       [line :size "1px" :color "whitesmoke"]

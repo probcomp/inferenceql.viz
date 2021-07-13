@@ -72,9 +72,8 @@
                                        (rf/dispatch [:sim/clear-simulations])
                                        (rf/dispatch [:set-page :start])
                                        (.blur (.-target e)))
-                           :style {:margin-left "0px"
-                                   :font-weight "500"
-                                   :font-size "16px"}
+                           :style {:font-weight "500"
+                                   :font-size "18px"}
                            :label "edit"]]]
               [:h4 "ESSENTIAL GENES"]
               [gap :size "5px"]
