@@ -20,7 +20,9 @@
             [yarn.scroll-into-view]
             [yarn.react-chips]
             [komponentit.autocomplete :as autocomplete]
-            [komponentit.mixins :as mixins]))
+            [komponentit.mixins :as mixins]
+            [inferenceql.viz.panels.sd2.model.views :as sd2-model]
+            [inferenceql.viz.panels.viz.views :as viz]))
 
 (defn expr-level-slider []
   (let [level (rf/subscribe [:sim/expr-level])
@@ -51,7 +53,7 @@
                                                   "(unconstrained)")]]]]]]))
 
 
-(defn view [target-gene essential-genes all-essential-genes]
+(defn simulator-controls [target-gene essential-genes all-essential-genes]
   [v-box
    :children [[h-box
                :style {:margin-bottom "30px"}
@@ -113,3 +115,33 @@
                                               (rf/dispatch [:sim/clear-simulations])
                                               (.blur (.-target e)))}
                            "Clear simulations"]]]]])
+
+(defn view
+  []
+  (let [vega-lite-spec @(rf/subscribe [:viz/vega-lite-spec])
+        models @(rf/subscribe [:store/models])
+        columns-used @(rf/subscribe [:sim/columns-used])
+        constraints @(rf/subscribe [:sim/constraints])
+        target-gene @(rf/subscribe [:sim/target-gene])
+        essential-genes @(rf/subscribe [:sim/essential-genes])
+        all-essential-genes @(rf/subscribe [:sim/all-essential-genes])]
+    [h-box :children [[v-box
+                       :size "6"
+                       :style {:padding "20px"
+                               :background "#f0f0f0"}
+                       :children [[:button.toolbar-button.pure-button
+                                   {:on-click (fn [e]
+                                                (rf/dispatch [:set-page :start])
+                                                (.blur (.-target e)))
+                                    :style {:align-self "start" :margin-left "0px"}}
+                                   "back"]
+                                  [simulator-controls target-gene essential-genes all-essential-genes]
+                                  [gap :size "30px"]
+                                  [sd2-model/view (:model models) columns-used constraints]]]
+                      [line
+                       :size "1px"
+                       :color "whitesmoke"]
+                      [box
+                       :size "8"
+                       :margin "40px 0px"
+                       :child [viz/vega-lite vega-lite-spec {} :knockout-sim-page]]]]))
