@@ -128,8 +128,9 @@
                     clicked (= gene-name gene-clicked)]
                 ^{:key gene-name}
                 [h-box
-                 :style {:margin-left (when clicked "-19px")}
-                 :children [(when clicked [:div "➡️"])
+                 :style {:margin-left (when clicked "-24px")}
+                 :children [(when clicked
+                              [:div {:style {:margin-right "5px"}} "➡️"])
                             [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
                                            ;;:width "50%"
                                            :cursor "pointer"}
