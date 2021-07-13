@@ -90,7 +90,7 @@ div {
   padding: 4px .8em;
   border-width: 1px;
   border-style: solid;
-  border-color: grey;
+  border-color: #c4c4c4;
 }
 
 /* --------------- styling for more button and menu --------------- */
@@ -99,14 +99,14 @@ div {
   padding: 0px;
   border: 0px;
   border-radius: 24px;
-  height: 30px;
-  width: 30px;
-  background-color: white;
+  height: 20px;
+  width: 20px;
+  background-color: #f0f0f0;
 }
 
 .more-icon {
-  height: 30px;
-  width: 30px;
+  height: 20px;
+  width: 20px;
   pointer-events: none;
   /* Color settings for the icon are inside the icon svg file itself. */
 }

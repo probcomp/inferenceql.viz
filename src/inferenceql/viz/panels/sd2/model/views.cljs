@@ -128,8 +128,9 @@
                               [:object.more-icon {:type "image/svg+xml" :data more-icon-path}
                                "expand content"]]
                              [:div
-                              {:style {:font-size "24px" :font-weight "500"
-                                       :line-height "1.1" :color "inherit"}
+                              {:style {:font-size "18px" :font-weight "500"
+                                       :line-height "1.1" :color "inherit"
+                                       :cursor "pointer"}
                                :on-click (fn [e]
                                            (rf/dispatch [:sd2/toggle-cluster view-id cat-id]))}
                               (sd2-cat-rename cat-id)]
@@ -157,7 +158,8 @@
 (defn cat-weight [view-id cat-id scale weight]
   [:div {:class ["cat-group-container" (when false "cat-group-highlighted")]
          :on-click #(rf/dispatch [:sd2/toggle-cluster view-id cat-id])}
-    [:div.cat-group {:style {:border-color (scale weight)}}
+    [:div.cat-group {:style {:border-color (scale weight)
+                             :cursor "pointer"}}
      [:div.cat-name (str (sd2-cat-rename cat-id) ":")]
      [:div.cat-weight (format "%.3f" weight)]]])
 
@@ -195,8 +197,8 @@
     [:div {:id (name view-id) :style {:margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
-                         :children [[:h2 {:style {:display "inline" :margin "0px"}} (sd2-view-rename view-id)]
-                                    [:h4 {:style {:display "inline" :margin-top "9px" :margin-bottom "0px"}}
+                         :children [[:h4 {:style {:display "inline" :margin "0px"}} (sd2-view-rename view-id)]
+                                    [:h4 {:style {:display "inline" :margin "0px"}}
                                      (if (seq columns)
                                        (str "(" (string/join ", " columns) ")")
                                        "[not used]")]]]
@@ -220,7 +222,7 @@
 
 (defn view [model columns-used constraints]
   [:div
-   [v-box :children [[:h1 "model"]
+   [v-box :children [[:h4 "MODEL"]
                      [gap :size "5px"]
                      (for [[view-id view] (:views model)]
                        ^{:key view-id} [xcat-view view-id view columns-used constraints])

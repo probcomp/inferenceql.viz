@@ -77,7 +77,6 @@
                            :label "edit"]]]
               [:h4 "ESSENTIAL GENES"]
               [gap :size "5px"]
-
               ;; TODO: remove ability to add already included gene.
               ;; TODO: remove drop down when new gene is deleted
               [box
@@ -100,7 +99,7 @@
                         :search-fields [:value]
                         :items (zipmap all-essential-genes (map name all-essential-genes))
                         :max-results 20}]]
-              [gap :size "10px"]
+              [gap :size "30px"]
 
               #_[:> (r/adapt-react-class js/Chips)
                  {:value ["foo"]
@@ -109,7 +108,7 @@
 
               [:h4 "SIMULATION CONTROLS"]
               [expr-level-slider]
-              [gap :size "20px"]
+              [gap :size "10px"]
               [h-box
                :style {:margin "5px 15px 0px 15px"}
                :gap "10px"
