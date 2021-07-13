@@ -164,7 +164,7 @@
                   [gene-selector gene-clicked]]]
       [line :size "1px" :color "whitesmoke"]
       [box :size "8" :margin "60px 0px 0px 0px"
-       :child [viz/vega-lite (time-series plot-data) {:actions false} :start-page]]]]))
+       :child [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]]]]))
 
 
 
