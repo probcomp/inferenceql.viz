@@ -436,11 +436,22 @@
 
 (defn generate-spec [simulations target-gene essential-genes datasets]
   (let [schema (get-in datasets [:data :schema])
+        genes (conj essential-genes target-gene)
         observed-data (->> (get-in datasets [:data :rows])
+                           (map #(select-keys % genes))
                            (map #(assoc % :dataset "observed")))
-        simulations (map #(assoc % :dataset "virtual") simulations)
-        all-data (concat observed-data simulations)
 
+        view-to-operon (fn [view cluster]
+                         (if-let [[_ view-num] (re-matches #":view_(\d+)" (str view))]
+                           (let [[_ cluster-num] (re-matches #":cluster_(\d+)" (str cluster))]
+                             [(str "operon_" view-num) (str "regime_" cluster-num)])
+                           [view cluster]))
+
+        simulations  (->> simulations
+                          (map #(assoc % :dataset "virtual"))
+                          (map #(medley/map-kv view-to-operon %)))
+
+        all-data (concat observed-data simulations)
         selection-layers (for [gene essential-genes]
                            {:cols [target-gene gene]
                             :selections all-data})]
