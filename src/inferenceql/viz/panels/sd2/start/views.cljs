@@ -124,13 +124,14 @@
                           :justify-content "flex-start"}}
             (for [row gene-selection-list]
               (let [[value gene-key rec] row
-                    gene-name (name gene-key)]
+                    gene-name (name gene-key)
+                    clicked (= gene-name gene-clicked)]
                 ^{:key gene-name}
                 [h-box
-                 :style {:margin-right "60px"}
-                 :children [(if (= gene-name gene-clicked)
-                              [:div "➡️"])
+                 :style {:margin-left (when clicked "-19px")}
+                 :children [(when clicked [:div "➡️"])
                             [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
+                                           ;;:width "50%"
                                            :cursor "pointer"}
                                    :on-click (fn [e]
                                                (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
@@ -140,11 +141,13 @@
 (defn view [show]
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
     [h-box
-     :style {:display (when-not show "none")}
+     :style {:display (when-not show "none")
+             :height "100%"}
      :children
      [[v-box
-       :size "5"
-       :style {:padding "20px 60px"
+       :size "4"
+       :style {:padding "15px 50px"
+               :min-width "660px"
                :background "#f0f0f0"}
        :children [[:div
                    (if gene-clicked
@@ -160,7 +163,7 @@
                   [gap :size "20px"]
                   [gene-selector gene-clicked]]]
       [line :size "1px" :color "whitesmoke"]
-      [box :size "8" :margin "60px 0px"
+      [box :size "8" :margin "60px 0px 0px 0px"
        :child [viz/vega-lite (time-series plot-data) {:actions false} :start-page]]]]))
 
 
