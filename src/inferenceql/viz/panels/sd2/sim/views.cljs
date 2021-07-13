@@ -10,7 +10,7 @@
             [goog.string :refer [format]]
             [re-com.core :refer [border title v-box p h-box box line button gap input-text
                                  checkbox horizontal-bar-tabs horizontal-tabs
-                                 radio-button]]
+                                 radio-button hyperlink]]
             [clojure.string :as string]
             [goog.string :refer [format]]
             [cljsjs.highlight]
@@ -57,12 +57,29 @@
   [v-box
    :children [[h-box
                :style {:margin-bottom "30px"}
-               :gap "25px"
-               :children [[:h3 {:style {:display "inline" :margin-top "25px"
-                                        :margin-bottom "0px"}} "GENE KNOCKOUT➔"]
-                          [:h1 {:style {:display "inline" :margin-top "0px"
-                                        :margin-bottom "0px" :font-size "56px"}} (name target-gene)]]]
-
+               :align :center
+               :children [[:span {:style {:display "inline" :margin-top "0px"
+                                          :font-weight "500"
+                                          :line-height "1.1"
+                                          :font-size "24px"
+                                          :margin-bottom "0px"}} "GENE KNOCKOUT ➔"]
+                          [gap :size "20px"]
+                          [:span {:style {:display "inline"
+                                          :margin-top "0px"
+                                          :font-weight "500"
+                                          :line-height "1.1"
+                                          :margin-bottom "0px" :font-size "40px"}} (name target-gene)]
+                          [gap :size "20px"]
+                          [hyperlink
+                           :on-click (fn [e]
+                                       (rf/dispatch [:sd2/clear-animation])
+                                       (rf/dispatch [:sim/clear-simulations])
+                                       (rf/dispatch [:set-page :start])
+                                       (.blur (.-target e)))
+                           :style {:margin-left "0px"
+                                   :font-weight "500"
+                                   :font-size "16px"}
+                           :label "edit"]]]
               [:h4 "ESSENTIAL GENES"]
               [gap :size "5px"]
 
@@ -130,14 +147,7 @@
                  :size "6"
                  :style {:padding "20px"
                          :background "#f0f0f0"}
-                 :children [[:button.toolbar-button.pure-button
-                             {:on-click (fn [e]
-                                          (rf/dispatch [:sd2/clear-animation])
-                                          (rf/dispatch [:sim/clear-simulations])
-                                          (rf/dispatch [:set-page :start])
-                                          (.blur (.-target e)))
-                              :style {:align-self "start" :margin-left "0px"}}
-                             "back"]
+                 :children [
                             [simulator-controls target-gene essential-genes all-essential-genes]
                             [gap :size "30px"]
                             [sd2-model/view (:model models) columns-used constraints]]]
