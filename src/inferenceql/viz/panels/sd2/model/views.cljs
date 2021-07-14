@@ -220,7 +220,8 @@
   (let [output (rf/subscribe [:sd2/model-output])]
     (fn []
       [:div#model-output
-       [:h4 "MODEL OUTPUT"]
+       [:h4 {:style {:font-size "16px"}}
+        "MODEL OUTPUT"]
        (if @output
          [:pre.cat-group-highlighted @output]
          [:div {:style {:margin-left "20px"}}
@@ -228,7 +229,8 @@
 
 (defn view [model columns-used constraints]
   [:div
-   [v-box :children [[:h4 "MODEL"]
+   [v-box :children [[:h4 {:style {:font-size "16px"}}
+                      "MODEL"]
                      [gap :size "5px"]
                      (for [[view-id view] (:views model)]
                        ^{:key view-id} [xcat-view view-id view columns-used constraints])

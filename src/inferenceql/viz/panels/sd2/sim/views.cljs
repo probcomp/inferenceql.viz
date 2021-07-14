@@ -75,7 +75,8 @@
                                    :font-size "18px"
                                    :margin-top "-3px"}
                            :label "edit"]]]
-              [:h4 "ESSENTIAL GENES"]
+              [:h4 {:style {:font-size "16px"}}
+               "ESSENTIAL GENES"]
               [gap :size "5px"]
               ;; TODO: remove ability to add already included gene.
               ;; TODO: remove drop down when new gene is deleted
@@ -100,7 +101,8 @@
                         :items (zipmap all-essential-genes (map name all-essential-genes))
                         :max-results 20}]]
               [gap :size "30px"]
-              [:h4 "SIMULATION CONTROLS"]
+              [:h4 {:style {:font-size "16px"}}
+               "SIMULATION CONTROLS"]
               [expr-level-slider]
               [gap :size "10px"]
               [h-box
@@ -133,12 +135,17 @@
      :style {:display (when-not show "none")}
      :children [[v-box
                  :size "6"
-                 :style {:padding "20px"
-                         :background "#f0f0f0"
+                 :style {:background "#f0f0f0"
                          :min-width "740px"}
-                 :children [[simulator-controls target-gene essential-genes all-essential-genes]
+                 :children [[box
+                             :style {:padding "20px 20px 0px 20px"}
+                             :child [simulator-controls target-gene essential-genes all-essential-genes]]
+                            [gap :size "40px"]
+                            [line :size "1px" :color "#cccccc"]
                             [gap :size "30px"]
-                            [sd2-model/view (:model models) columns-used constraints]]]
+                            [box
+                             :style {:padding "0px 20px 20px 20px"}
+                             :child [sd2-model/view (:model models) columns-used constraints]]]]
                 [line
                  :size "1px"
                  :color "whitesmoke"]
