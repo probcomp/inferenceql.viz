@@ -16,6 +16,7 @@
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
             [clojure.edn :as edn]
+            [vega :as yarn-vega]
             ["highlight.js/lib/core" :as yarn-hljs]
             ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]))
 
@@ -149,9 +150,9 @@
         min-w (apply min weights)
         max-w (apply max weights)
 
-        lin (.scale js/vega "linear")
+        lin (.scale yarn-vega "linear")
         ;; TODO: try with different color scale.
-        scheme (.scheme js/vega "blues")
+        scheme (.scheme yarn-vega "blues")
         scale-fn (doto (lin)
                        (.domain [min-w max-w])
                        (.range [0 1]))]
