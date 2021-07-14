@@ -13,8 +13,6 @@
                                  radio-button hyperlink]]
             [clojure.string :as string]
             [goog.string :refer [format]]
-            [cljsjs.highlight]
-            [cljsjs.highlight.langs.javascript]
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
             [komponentit.autocomplete :as autocomplete]

@@ -13,11 +13,15 @@
                                  radio-button]]
             [clojure.string :as string]
             [goog.string :refer [format]]
-            [cljsjs.highlight]
-            [cljsjs.highlight.langs.javascript]
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            ["highlight.js/lib/core" :as yarn-hljs]
+            ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]))
+
+;; We are using the minimal version of highlight.js where
+;; every language used has to be registered individually.
+(.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
 (defn sd2-cat-rename
   "utility fn"
@@ -77,7 +81,7 @@
 
     :component-did-update
     (fn [this]
-      (.highlightBlock js/hljs (rdom/dom-node this)))
+      (.highlightElement yarn-hljs (rdom/dom-node this)))
 
     :reagent-render
     (fn [js-code]
