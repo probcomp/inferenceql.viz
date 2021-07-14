@@ -100,12 +100,6 @@
                         :items (zipmap all-essential-genes (map name all-essential-genes))
                         :max-results 20}]]
               [gap :size "30px"]
-
-              #_[:> (r/adapt-react-class js/Chips)
-                 {:value ["foo"]
-                  :suggestions ["bar" "biz" "baz"]
-                  :onChange #(.log js/console :-------output %)}]
-
               [:h4 "SIMULATION CONTROLS"]
               [expr-level-slider]
               [gap :size "10px"]
