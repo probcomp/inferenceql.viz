@@ -17,7 +17,6 @@
             [cljsjs.highlight.langs.javascript]
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
-            [yarn.scroll-into-view]
             [clojure.edn :as edn]))
 
 (defn sd2-cat-rename

@@ -139,7 +139,7 @@
 (defn scroll-fx
   [[div-id options]]
   (let [dom-elem (.getElementById js/document div-id)]
-    (.scrollIntoView js/window dom-elem
+    (.scrollIntoView dom-elem
                      (clj->js {:scrollMode "if-needed" :behavior "smooth" :block "center" :inline "start"}))))
 
 (rf/reg-fx :scroll
