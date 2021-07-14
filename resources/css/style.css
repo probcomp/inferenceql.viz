@@ -339,7 +339,7 @@ psuedo-class applied. */
   border-style: solid;
   border-width: 1px;
   padding: 2px 5px;
-  margin: 0px;
+  margin: 0px 2px 0px 0px;
   border-radius: 10px;
 }
 

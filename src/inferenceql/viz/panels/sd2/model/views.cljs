@@ -160,7 +160,7 @@
          :on-click #(rf/dispatch [:sd2/toggle-cluster view-id cat-id])}
     [:div.cat-group {:style {:border-color (scale weight)
                              :cursor "pointer"}}
-     [:div.cat-name (str (sd2-cat-rename cat-id) ":")]
+     [:div.cat-name (sd2-cat-rename cat-id)]
      [:div.cat-weight (format "%.3f" weight)]]])
 
 (defn cat-output [view-id]
