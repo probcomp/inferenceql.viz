@@ -15,7 +15,9 @@
    :width 800
    :height 800
    :encoding {:color {:field "status", :type "nominal"
-                      :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}}
+                      :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}
+                      :legend {:orient "top"
+                               :title nil}}
               :order {:condition {:param "pts"
                                   :value 1}
                       :value 0}
@@ -54,9 +56,11 @@
                    :strokeWidth 2}
             :encoding {:x {:field "time", :type "quantitative"
                            :axis {:grid true
-                                  :values (range 0 60 2)}}
+                                  :values (range 0 60 2)
+                                  :title "minutes"}}
                        :y {:field "expr-level", :type "quantitative"
-                           :axis {:grid true}}
+                           :axis {:grid true
+                                  :title "optical density (OD600)"}}
                        ;:values (range 0 1.70 0.4)}}
                        ;; TODO: make stroke solid on selection.
                        :strokeDash {:field "gene" :type "nominal" :legend nil}}}
