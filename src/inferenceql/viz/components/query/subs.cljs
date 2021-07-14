@@ -80,7 +80,7 @@
   "Returns a schema for the query whose results are currently displayed.
 
   This schema includes new columns that have been generated and columns that have been renamed.
-  Returns: {:column-name-1 :gaussian, :column-name-2 :categorical, ...}"
+  Returns: {:column-name-1 :numerical, :column-name-2 :nominal, ...}"
   [db _]
   (get-in db [:query-component :schema]))
 (rf/reg-sub :query/schema

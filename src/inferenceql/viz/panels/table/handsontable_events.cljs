@@ -7,8 +7,10 @@
             [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
             [inferenceql.viz.panels.control.db :as control-db]
             [inferenceql.viz.components.query.db :as query-db]
+            [inferenceql.viz.components.store.db :as store-db]
             [goog.string :refer [format]]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [clojure.string :as string]))
 
 (rf/reg-event-db
  :hot/after-selection-end
@@ -76,7 +78,14 @@
       ;; Changes should only be the result of user edits, copy paste, drag and autofill,
       ;; and undo. This should be enforced by Hansontable settings.
       (assert (some? (valid-change-sources source))))
-    (let [{:keys [updates errors]}
+    (let [models (store-db/models db)
+          model (get models (query-db/model-name db))
+          categories (->> (for [view (vals (:views model))
+                                [col-name col] (:columns view)]
+                            [col-name (set (:metadata col))])
+                          (into {}))
+
+          {:keys [updates errors change-ids-to-cancel]}
           (reduce (fn [acc [i change]]
                     (let [[row col _prev-val new-val] change
                           row-id (get (table-db/visual-row-ids db) row)
@@ -88,44 +97,74 @@
                       (assert (or (= col :label) editable))
 
                       (cond
-                        (= type :gaussian)
+                        (= type :numerical)
                         ;; Try to cast.
                         (let [new-val (edn/read-string new-val)]
                           (if (or (number? new-val) (nil? new-val))
                             ;; Include the change.
                             (assoc-in acc [:updates row-id col] new-val)
-                            (do
-                              ;; Cancel this change.
-                              (aset changes i nil)
-                              (let [error (format
-                                           (str "The value '%s' is not a number. "
-                                                "New values for column '%s' must be a number.")
-                                           new-val (name col))]
-                                ;; Do not include the change. Add the error.
-                                (update acc :errors conj error)))))
+                            (let [error (format
+                                         (str "Table-edit cancelled: The value '%s' is not a number. "
+                                              "New values for column '%s' must be a number.")
+                                         new-val (name col))]
+                              ;; Do not include the change. Add the error.
+                              (-> acc
+                                  (update :errors conj error)
+                                  (update :change-ids-to-cancel conj i)))))
 
-                        (or (= type :categorical) (= col :label))
+                        (= type :nominal)
+                        ;; Check if valid category-value
+                        (let [categories (get categories col)]
+                          (if (or (contains? categories new-val) (string/blank? new-val))
+                            ;; Include the change.
+                            (assoc-in acc [:updates row-id col] new-val)
+                            (let [error (format
+                                         (str "Table-edit cancelled: The value '%s' is not a valid "
+                                              "category value for the column '%s'. Valid categories "
+                                              "are %s.")
+                                         new-val (name col) (seq categories))]
+                              ;; Do not include the change. Add the error.
+                              (-> acc
+                                  (update :errors conj error)
+                                  (update :change-ids-to-cancel conj i)))))
+
+                        (= col :label)
                         ;; Just include the change.
                         (assoc-in acc [:updates row-id col] new-val)
 
                         :else
-                        (do
-                          ;; Cancel this change.
-                          (aset changes i nil)
-                          ;; Trying to edit a column that is either not in the original
-                          ;; dateset's schema or the column has been renamed in the query.
-                          (let [error (format
-                                       (str "Column '%s' is not part of the original dataset. "
-                                            "You can not edit its values.")
-                                       (name col))]
-                            (update acc :errors conj error))))))
+                        ;; Trying to edit a column that is either not in the original
+                        ;; dateset's schema or the column has been renamed in the query.
+                        (let [error (format
+                                     (str "Table-edit cancelled: Column '%s' is not part of the "
+                                          "original dataset. You can not edit its values.")
+                                     (name col))]
+                          (-> acc
+                              (update :errors conj error)
+                              (update :change-ids-to-cancel conj i))))))
 
-                  {:updates {} :errors []}
+                  {:updates {} :errors [] :change-ids-to-cancel []}
                   (map-indexed vector changes))
-          ;; Re-frame :fx vectors
+
+
+
+          ;; Re-frame :fx vectors for emmiting errors to browser console.
           errors (vec (for [error errors]
-                        [:js/console-error error]))]
+                        [:js/console-error error]))
+          ;; If we have errors, display a js alert message slightly later,
+          ;; so we don't lock up Handsontable from undoing changes.
+          errors (cond-> errors
+                   (seq errors)
+                   (conj [:dispatch-later
+                          [{:ms 100 :dispatch [:app/alert (str "Your edits were undone because they "
+                                                               "contained invalid values or they edited "
+                                                               "special columns. "
+                                                               "Check the browser console for more "
+                                                               "information.")]}]]))]
+      ;; Cancel changes by mutating changes.
+      (doseq [id change-ids-to-cancel]
+        (aset changes id nil))
       ;; Add the changes to db. Handsontable itself already has the updates.
       {:db (update-in db [:table-panel :rows-by-id] merge-row-updates updates)
-       :fx (conj errors
-                 [:dispatch [:control/add-edits-to-query]])})))
+       :fx (conj errors [:dispatch [:control/add-edits-to-query]])})))
+

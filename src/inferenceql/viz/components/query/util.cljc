@@ -1,8 +1,8 @@
 (ns inferenceql.viz.components.query.util
   "Utility functions for manipulating and extracting info from iql.query parse trees."
   (:require [instaparse.core :as insta]
-            [inferenceql.query :as query]
-            [inferenceql.query.parse-tree :as tree]
+            [inferenceql.query.parser :as parser]
+            [inferenceql.query.parser.tree :as tree]
             [clojure.zip :as z]))
 
 ;;; Various utility functions related to queries.
@@ -75,7 +75,7 @@
     (when new-name
       {:detail-type :new-column-schema
        :name (keyword (tree/only-child new-name))
-       :stat-type :gaussian})))
+       :stat-type :numerical})))
 
 (defn- column-details-for-selection
   "Returns a column-detail map for this `selection` portion of the parse tree."
@@ -96,7 +96,7 @@
   Returns a sequences of column-detail maps, each map representing either a column rename or
   schema info for a new column."
   [query]
-  (keep column-details-for-selection (get-selection-list (query/parse query))))
+  (keep column-details-for-selection (get-selection-list (parser/parse query))))
 
 (defn column-renames
   "Returns a map of columns that have been renamed as a result of executing the last query.
@@ -112,7 +112,7 @@
 (defn new-columns-schema
   "Returns a schema for new columns that were created as a result of executing the last query.
 
-  Returns: {:new-column-name :gaussian, ...}"
+  Returns: {:new-column-name :numerical, ...}"
   [column-details]
   (->> column-details
     (filter #(= (:detail-type %) :new-column-schema))
@@ -124,7 +124,7 @@
 (defn virtual-data?
   "Returns whether the resultset of `query` represents virtual data."
   [query]
-  (let [node-or-failure (query/parse query)]
+  (let [node-or-failure (parser/parse query)]
     (when-not (insta/failure? node-or-failure)
       (some? (some-> node-or-failure
                      zipper

@@ -49,7 +49,6 @@
             ;; Library functions for user-defined JS functions.
             [inferenceql.viz.user]))
 
-
 (enable-console-print!)
 (set! *warn-on-infer* true)
 
@@ -69,5 +68,5 @@
   []
   ;; We only initialize the app-db on first load. This is so figwheel's hot code reloading does
   ;; not reset the state of the app.
-  (rf/dispatch-sync [:initialize-db])
+  (rf/dispatch-sync [:app/initialize-db])
   (render-app))

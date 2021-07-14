@@ -3,8 +3,9 @@
   The store component is esentially a part of the app-db where datasets and
   models and geodata are stored."
   (:require [clojure.spec.alpha :as s]
+            [clojure.edn :as edn]
             [inferenceql.viz.config :as config]
-            [inferenceql.viz.csv :as csv-utils]
+            [inferenceql.viz.csv :refer [clean-csv-maps]]
             [inferenceql.inference.gpm :as gpm]))
 
 ;;; Compiled-in elements to store
@@ -12,9 +13,9 @@
 (def compiled-in-schema (get config/config :schema))
 
 (def compiled-in-dataset
-  (csv-utils/csv-data->clean-maps (get config/config :schema)
-                                  (get config/config :data)
-                                  {:keywordize-cols true}))
+  (clean-csv-maps (get config/config :schema)
+                  (get config/config :data)))
+
 
 (def compiled-in-model (get config/config :model))
 
@@ -59,7 +60,7 @@
 (s/def ::rows (s/coll-of ::row))
 (s/def ::row (s/map-of ::column-name any?))
 (s/def ::schema (s/map-of ::column-name ::stat-type))
-(s/def ::stat-type #{:gaussian :categorical})
+(s/def ::stat-type #{:numerical :nominal})
 (s/def ::model-name keyword?)
 ;; This is the model used to generate samples for sim plots when a
 ;; single cell is selected in the table.
@@ -108,3 +109,7 @@
 (defn datasets
   [db]
   (get-in db [:store-component :datasets]))
+
+(defn models
+  [db]
+  (get-in db [:store-component :models]))

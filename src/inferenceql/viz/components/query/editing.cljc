@@ -1,8 +1,9 @@
 (ns inferenceql.viz.components.query.editing
   "Defs related to editing inferenceql.query queries."
   (:require [instaparse.core :as insta]
-            [inferenceql.query :as query]
-            [inferenceql.query.parse-tree :as tree]
+            [inferenceql.query.lang.eval :as eval]
+            [inferenceql.query.parser :as parser]
+            [inferenceql.query.parser.tree :as tree]
             [inferenceql.viz.util :refer [coerce-bool]]
             [inferenceql.viz.components.query.util :refer [long-str make-node children zipper
                                                            seek-tag]]
@@ -21,9 +22,9 @@
   Returns:
     A query string."
   [query]
-  (let [rowid-selection-node (query/parse "rowid" :start :selection)
-        editable-col-selection-node (query/parse "editable" :start :selection)
-        label-col-selection-node (query/parse "label" :start :selection)
+  (let [rowid-selection-node (parser/parse "rowid" :start :selection)
+        editable-col-selection-node (parser/parse "editable" :start :selection)
+        label-col-selection-node (parser/parse "label" :start :selection)
 
         add-rowid (fn [select-list-node]
                     (let [selections (into [rowid-selection-node
@@ -31,16 +32,16 @@
                                             label-col-selection-node]
                                            (tree/child-nodes select-list-node))
                           selections (as-> selections $
-                                           (interleave $ (repeat ",") (repeat (query/parse " " :start :ws)))
+                                           (interleave $ (repeat ",") (repeat (parser/parse " " :start :ws)))
                                            (drop-last 2 $))]
 
                       (tree/node :select-list selections)))]
-    (-> (query/parse query)
+    (-> (parser/parse query)
         (zipper)
         (seek-tag :select-list)
         (z/edit add-rowid)
         (z/root)
-        (query/unparse))))
+        (parser/unparse))))
 
 (defn add-rowid-and-label
   "Adds rowid to the start of the select-list in a `query` string.
@@ -52,7 +53,7 @@
   Returns:
     A query string."
   [query]
-  (let [node-or-failure (query/parse query)]
+  (let [node-or-failure (parser/parse query)]
     (if (insta/failure? node-or-failure)
       query
       (add-rowid-and-label-helper query))))
@@ -60,10 +61,10 @@
 ;;; Functions related to adding ALTER and UPDATE and INSERT expressions
 ;;; for label column and new rows.
 
-(def whitespace (query/parse "\n     " :start :ws))
+(def whitespace (parser/parse "\n     " :start :ws))
 
 (defn with-sub-query-node [qs]
-  (let [qz (-> qs query/parse zipper)
+  (let [qz (-> qs parser/parse zipper)
         qz-with (seek-tag qz :with-expr)]
     (if qz-with
       (-> (z/node qz-with)
@@ -72,7 +73,7 @@
 
 ;----------------
 
-(def label-alter-node (query/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr))
+(def label-alter-node (parser/parse "(ALTER data ADD label) AS data" :start :with-map-entry-expr))
 
 (defn is-label-alter? [node]
   (let [val-expr (tree/get-node node :with-map-value-expr)
@@ -81,13 +82,13 @@
                            (z/node))
         table-name (some-> alter-expr
                            (tree/get-node-in [:table-expr :ref])
-                           (query/unparse))
+                           (parser/unparse))
         column-name (some-> alter-expr
                             (tree/get-node-in [:column-expr])
-                            (query/unparse))
+                            (parser/unparse))
 
         binding-name (-> (tree/get-node node :name)
-                         (query/unparse))]
+                         (parser/unparse))]
     (and (= table-name "data")
          (= column-name "label")
          (= binding-name "data"))))
@@ -113,10 +114,10 @@
                     :condition (reducer (tree/only-child node))
                     :equality-condition (let [selection (some-> node
                                                                 (tree/get-node :selection)
-                                                                (query/eval {}))
+                                                                (eval/eval {}))
                                               value (some-> node
                                                             (tree/get-node :value)
-                                                            (query/eval {}))]
+                                                            (eval/eval {}))]
                                           [[selection value]])
                     nil))]
     (reducer node)))
@@ -128,19 +129,19 @@
                             (z/node))
         table-name (some-> update-expr
                            (tree/get-node-in [:table-expr :ref])
-                           (query/unparse))
+                           (parser/unparse))
 
-        eval #(query/eval % {})
+        q-eval #(eval/eval % {})
         set-map-exprs (some-> update-expr
                               (tree/get-node-in [:set-clause :map-expr])
                               (tree/child-nodes))
-        set-map (apply merge (map eval set-map-exprs))
+        set-map (apply merge (map q-eval set-map-exprs))
 
         where-pairs  (some-> update-expr
                              (tree/get-node-in [:where-clause :or-condition])
                              (reduce-or-node))
         binding-name (-> (tree/get-node node :name)
-                         (query/unparse))
+                         (parser/unparse))
 
         is-label-update (and (= table-name "data")
                              (every? #(and (= "rowid" (first %)) (integer? (second %)))
@@ -160,7 +161,7 @@
                           (map #(format "rowid=%d" %))
                           (str/join " OR "))
             qs (format "(UPDATE data SET label=%s WHERE %s) AS data" label-val cond-str)]
-        (query/parse qs :start :with-map-entry-expr)))))
+        (parser/parse qs :start :with-map-entry-expr)))))
 
 (defn remove-label-update [entry-exprs]
   (remove update-node-map entry-exprs))
@@ -182,7 +183,7 @@
                   (format "%s=%s" k v))
         row-str (str/join ", " kv-strs)
         qs (format "(INSERT INTO data VALUES (%s)) AS data" row-str)]
-    (query/parse qs :start :with-map-entry-expr)))
+    (parser/parse qs :start :with-map-entry-expr)))
 
 (defn remove-new-rows [entry-exprs]
   (remove new-row-node? entry-exprs))
@@ -223,8 +224,8 @@
                             (interleave $ (repeat ",") (repeat whitespace))
                             (drop-last 2 $))
           with-map-expr (tree/node :with-map-expr entry-exprs)]
-      (str "WITH " (query/unparse with-map-expr) ":\n" (query/unparse sub-query-node)))
-    (query/unparse sub-query-node)))
+      (str "WITH " (parser/unparse with-map-expr) ":\n" (parser/unparse sub-query-node)))
+    (parser/unparse sub-query-node)))
 
 (defn handle [qz-with sub-query-node label-vals new-rows]
   (if qz-with
@@ -249,7 +250,7 @@
                             (z/replace sub-query-node)
                             (z/root))
                         sub-query-node)]
-      (query/unparse return-node))
+      (parser/unparse return-node))
     (add-new-with sub-query-node label-vals new-rows)))
 
 (defn add-edit-exprs
@@ -280,11 +281,11 @@
   Returns a query string or nil if the original query string could not be parsed."
   [cur-qs prev-qs label-vals new-rows]
   (let [cur-qs (str/trim cur-qs)]
-    (when-not (insta/failure? (query/parse cur-qs))
+    (when-not (insta/failure? (parser/parse cur-qs))
       ;; Edit the query.
-      (let [prev-qz (some-> prev-qs query/parse zipper)
+      (let [prev-qz (some-> prev-qs parser/parse zipper)
             prev-qz-with (some-> prev-qz (seek-tag :with-expr))
-            cur-qz (some-> cur-qs query/parse zipper)
+            cur-qz (some-> cur-qs parser/parse zipper)
             cur-qz-with (some-> cur-qz (seek-tag :with-expr))
             sub-query-node (with-sub-query-node cur-qs)]
         (if prev-qz-with
@@ -314,7 +315,7 @@
                              (recur rs new-query))
                            query))
                        column-incorp)]
-    (query/parse row-incorps :start :model-expr)))
+    (parser/parse row-incorps :start :model-expr)))
 
 (defn add-incorp-node [node label-vals editable-rows]
   (let [loc (zipper node)
@@ -357,11 +358,11 @@
   Returns a query string or nil if the original query string could not be parsed."
   [query-string label-vals editable-rows]
   (let [query-string (str/trim query-string)]
-    (when-not (insta/failure? (query/parse query-string))
+    (when-not (insta/failure? (parser/parse query-string))
       ;; Edit the query.
-      (loop [qz (-> query-string query/parse zipper)]
+      (loop [qz (-> query-string parser/parse zipper)]
         (if (z/end? qz)
-          (-> qz z/node query/unparse)
+          (-> qz z/node parser/unparse)
           (if-let [qz-under (seek-tag qz :under-clause)]
             (recur (z/next (z/edit qz-under add-incorp-node label-vals editable-rows)))
             (recur (z/next qz))))))))
