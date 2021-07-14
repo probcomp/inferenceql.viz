@@ -191,7 +191,6 @@
                               [checkbox :model false :on-change (fn [] nil) :label "not-recommeneded"]]]
                   [gap :size "20px"]
                   [gene-selector gene-clicked]]]
-      [line :size "1px" :color "whitesmoke"]
       [box :size "8" :margin "60px 0px 0px 0px"
        :child [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]]]]))
 

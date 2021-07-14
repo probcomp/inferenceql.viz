@@ -146,9 +146,6 @@
                             [box
                              :style {:padding "0px 20px 20px 20px"}
                              :child [sd2-model/view (:model models) columns-used constraints]]]]
-                [line
-                 :size "1px"
-                 :color "whitesmoke"]
                 [box
                  :size "8"
                  :margin "40px 0px"
