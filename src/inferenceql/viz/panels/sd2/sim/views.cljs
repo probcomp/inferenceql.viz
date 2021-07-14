@@ -60,11 +60,14 @@
                :align :center
                :children [[:span {:style {:font-weight "500"
                                           :line-height "1.1"
-                                          :font-size "24px"}} "GENE KNOCKOUT ➔"]
+                                          :font-size "24px"}}
+                           "GENE KNOCKOUT ➔"]
                           [gap :size "20px"]
                           [:span {:style {:font-weight "500"
                                           :line-height "1.1"
-                                          :font-size "40px"}} (name target-gene)]
+                                          :font-size "40px"
+                                          :margin-top "-5px"}}
+                           (name target-gene)]
                           [gap :size "20px"]
                           [hyperlink
                            :on-click (fn [e]
@@ -73,7 +76,8 @@
                                        (rf/dispatch [:set-page :start])
                                        (.blur (.-target e)))
                            :style {:font-weight "500"
-                                   :font-size "18px"}
+                                   :font-size "18px"
+                                   :margin-top "-3px"}
                            :label "edit"]]]
               [:h4 "ESSENTIAL GENES"]
               [gap :size "5px"]

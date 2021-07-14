@@ -215,10 +215,12 @@
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
     (fn []
-      (when @output
-        [:div#model-output
-         [:h1 "model output"]
-         [:pre.cat-group-highlighted @output]]))))
+      [:div#model-output
+       [:h4 "MODEL OUTPUT"]
+       (if @output
+         [:pre.cat-group-highlighted @output]
+         [:div {:style {:margin-left "20px"}}
+          "When \"Simulate 1 point\" is clicked, the model's output will appear here."])])))
 
 (defn view [model columns-used constraints]
   [:div

@@ -287,8 +287,8 @@ psuedo-class applied. */
 .program-display {
   padding: 8px;
   background-color: #f0f0f0;
-  border-left: 3px solid #ccc;
-  border-width: 0px 0px 0px 3px;
+  border-left: 2px solid #ccc;
+  border-width: 0px 0px 0px 2px;
   border-radius: 0px;
 }
 
@@ -327,7 +327,7 @@ psuedo-class applied. */
 }
 
 .cat-group-highlighted {
-  border-width: 0px 0px 0px 3px;
+  border-width: 0px 0px 0px 2px;
   background-color: #f0f0f0;
   border-radius: 0px;
   border-color: crimson;
@@ -358,7 +358,7 @@ psuedo-class applied. */
   color: #333;
   word-break: break-all;
   word-wrap: break-word;
-  border-left: 3px solid #ccc;
+  border-left: 2px solid #ccc;
 }
 
 .points-badge {
@@ -367,19 +367,20 @@ psuedo-class applied. */
   border-width: 1px;
   padding: 0px 10px 0px 10px;
   border-radius: 10px;
-  top: -2px;
+  top: -1px;
   position: relative;
 }
 
 .autocomplete {
   position: relative;
+  width: 432px;
 }
 .autocomplete__control {
   padding: 4px 28px 4px 8px;
-  border: 1px solid #444;
+  border: 1px solid #c4c4c4;
   overflow: hidden;
   cursor: text;
-  background: #fff;
+  background: #fbfbfb;
   display: flex;
   flex-direction: row;
 }
