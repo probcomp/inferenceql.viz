@@ -1,7 +1,7 @@
 (ns inferenceql.viz.panels.sd2.start.views
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
-            [re-com.core :refer [v-box h-box box gap line hyperlink]]
+            [re-com.core :refer [v-box h-box box gap line hyperlink checkbox]]
             [inferenceql.viz.panels.sd2.start.db :refer [plot-data gene-selection-list]]
             [inferenceql.viz.panels.viz.views :as viz]
             [re-frame.core :as rf]))
@@ -179,6 +179,12 @@
                                                 :line-height "1.1"
                                                 :font-size "24px"}}
                                  "Select a target gene"]])]
+                  [gap :size "15px"]
+                  [h-box
+                   :align :center
+                   :children [[checkbox :model true :on-change (fn [] nil) :label "recommeneded"]
+                              [gap :size "20px"]
+                              [checkbox :model false :on-change (fn [] nil) :label "not-recommeneded"]]]
                   [gap :size "20px"]
                   [gene-selector gene-clicked]]]
       [line :size "1px" :color "whitesmoke"]
