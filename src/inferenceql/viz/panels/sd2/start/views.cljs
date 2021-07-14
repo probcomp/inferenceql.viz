@@ -27,6 +27,13 @@
                         :select {:type "point",
                                  :fields ["gene"],
                                  :on "mouseover"}}
+                     #_{:name "zoom-pan-control"
+                        :bind "scales"
+                        :select {:type "interval"
+                                 :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                 :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                 :clear "dblclick[event.shiftKey]"
+                                 :zoom "wheel![event.shiftKey]"}}
                      {:name "xypoint"
                       :select {:type "point",
                                :fields ["time", "expr-level"]
