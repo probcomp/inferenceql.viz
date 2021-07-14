@@ -18,7 +18,6 @@
             [cljstache.core :refer [render]]
             [inferenceql.viz.config :refer [config]]
             [yarn.scroll-into-view]
-            [yarn.react-chips]
             [komponentit.autocomplete :as autocomplete]
             [komponentit.mixins :as mixins]
             [inferenceql.viz.panels.sd2.model.views :as sd2-model]

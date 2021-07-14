@@ -17,11 +17,5 @@
                  :provides ["yarn.handsontable"]}
                 {:file "node_modules/scroll-into-view-if-needed/umd/scroll-into-view-if-needed.js"
                  :file-min "node_modules/scroll-into-view-if-needed/umd/scroll-into-view-if-needed.min.js"
-                 :provides ["yarn.scroll-into-view"]}
-                {:file "node_modules/react-chips/site/bundle.js"
-                 :provides ["yarn.react-chips"]}
-                #_{:file "node_modules/react-chips/lib/Chip.js"
-                   :provides ["yarn.react-chips-chip"]}
-                #_{:file "node_modules/react-chips/lib/Chips.js"
-                   :provides ["yarn.react-chips-chips"]}]
+                 :provides ["yarn.scroll-into-view"]}]
  :optimizations :none}
