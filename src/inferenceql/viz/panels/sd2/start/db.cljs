@@ -64,6 +64,7 @@
          ret)))
 
 (def default-db
-  {:sd2-start-panel {}})
+  {:sd2-start-panel {:rec-genes-filter true
+                     :not-rec-genes-filter false}})
 
 (s/def ::sd2-start-panel (s/keys :req-un []))

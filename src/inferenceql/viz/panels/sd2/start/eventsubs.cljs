@@ -22,3 +22,37 @@
 (rf/reg-event-fx :sd2-start/set-gene-clicked
                  event-interceptors
                  set-gene-clicked)
+
+;-----------------------------
+
+(defn rec-genes-filter
+  [db _]
+  (get-in db [:sd2-start-panel :rec-genes-filter]))
+
+(rf/reg-sub :sd2-start/rec-gene-filter
+            rec-genes-filter)
+
+(defn set-rec-genes-filter
+  [db [_ new-val]]
+  (-> db
+      (assoc-in [:sd2-start-panel :rec-genes-filter] new-val)))
+
+(rf/reg-event-db :sd2-start/set-rec-genes-filter
+                 event-interceptors
+                 set-rec-genes-filter)
+
+(defn not-rec-genes-filter
+  [db _]
+  (get-in db [:sd2-start-panel :not-rec-genes-filter]))
+
+(rf/reg-sub :sd2-start/not-rec-gene-filter
+            not-rec-genes-filter)
+
+(defn set-not-rec-genes-filter
+  [db [_ new-val]]
+  (-> db
+      (assoc-in [:sd2-start-panel :not-rec-genes-filter] new-val)))
+
+(rf/reg-event-db :sd2-start/set-not-rec-genes-filter
+                 event-interceptors
+                 set-not-rec-genes-filter)

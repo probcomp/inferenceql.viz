@@ -155,7 +155,9 @@
 
 
 (defn view [show]
-  (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])]
+  (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])
+        rec-gene-filter @(rf/subscribe [:sd2-start/rec-gene-filter])
+        not-rec-gene-filter @(rf/subscribe [:sd2-start/not-rec-gene-filter])]
     [h-box
      :style {:display (when-not show "none")
              :height "100%"
@@ -191,9 +193,15 @@
                   [gap :size "15px"]
                   [h-box
                    :align :center
-                   :children [[checkbox :model true :on-change (fn [] nil) :label "recommeneded"]
+                   :children [[checkbox
+                               :model rec-gene-filter
+                               :on-change (fn [e] (rf/dispatch [:sd2-start/set-rec-genes-filter e]))
+                               :label "recommeneded"]
                               [gap :size "20px"]
-                              [checkbox :model false :on-change (fn [] nil) :label "not-recommeneded"]]]
+                              [checkbox
+                               :model not-rec-gene-filter
+                               :on-change (fn [e] (rf/dispatch [:sd2-start/set-not-rec-genes-filter e]))
+                               :label "not-recommeneded"]]]
                   [gap :size "20px"]
                   [gene-selector gene-clicked]]]
       [box :size "8" :margin "60px 0px 0px 0px"
