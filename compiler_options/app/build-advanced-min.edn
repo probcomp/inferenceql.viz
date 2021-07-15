@@ -8,6 +8,8 @@
  :browser-repl false
  :target :bundle
  ;; Webpack will minify code.
- :bundle-cmd {:default ["yarn" "run" "webpack" "--config-name" "minified"]}
+ :bundle-cmd {:default ["yarn" "run" "webpack"
+                        "--config" "compiler_options/app/webpack.config.js"
+                        "--config-name" "minified"]}
  :closure-defines {cljs.core/*global* "window"}
  :optimizations :advanced}

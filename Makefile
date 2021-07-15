@@ -133,12 +133,19 @@ figwheel-clean-static:
 .PHONY: figwheel-static
 figwheel-static: figwheel-clean-static $(figwheel-public-dir) $(figwheel-resource-dir) $(figwheel-index-file)
 
+figwheel-compile-opts := $(current-dir)/compiler_options/figwheel/build.edn
+reframe-10x-compile-opts := $(current-dir)/compiler_options/reframe-10x/support.edn
+
 ## Starts the spreadsheets app using Figwheel.
 .PHONY: figwheel
 figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	clojure -M:figwheel
+	clojure -A:figwheel -M -m figwheel.main \
+	-co  $(figwheel-compile-opts) \
+	-c inferenceql.viz.core --repl
 
 ## Starts the spreadsheets app using Figwheel and Re-frame-10x.
 .PHONY: figwheel-10x
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	clojure -M:figwheel:10x
+	clojure -A:figwheel:reframe-10x -M -m figwheel.main \
+	-co $(figwheel-compile-opts):$(reframe-10x-compile-opts) \
+	-c inferenceql.viz.core --repl
