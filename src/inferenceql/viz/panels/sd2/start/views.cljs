@@ -15,8 +15,7 @@
    :height 800
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}
-                      :legend {:orient "top"
-                               :title nil}}
+                      :legend nil}
               :order {:condition {:param "pts"
                                   :value 1}
                       :value 0}
@@ -132,7 +131,7 @@
            (reset! prev-gene (some->> prev-gene-index (nth gene-order) second))
            [:div {:style {:display "flex"
                           :align-items "stretch"
-                          :max-height "800px"
+                          :max-height "780px"
                           :flex-flow "column wrap"
                           :flex "0 0 auto"
                           :justify-content "flex-start"}}
@@ -197,16 +196,25 @@
                    :children [[checkbox
                                :model rec-gene-filter
                                :on-change (fn [e] (rf/dispatch [:sd2-start/set-rec-genes-filter e]))
-                               :label "recommeneded"]
+                               :label [:div {:style {:background-color "#d7e4f4"
+                                                     :padding "0px 5px 0px 5px"
+                                                     :font-weight "bold"}}
+                                       "recommended"]]
                               [gap :size "20px"]
                               [checkbox
                                :model not-rec-gene-filter
                                :on-change (fn [e] (rf/dispatch [:sd2-start/set-not-rec-genes-filter e]))
-                               :label "not-recommeneded"]]]
+                               :label [:div {:style {:background-color "#ffdbb8"
+                                                     :padding "0px 5px 0px 5px"
+                                                     :font-weight "bold"}}
+                                       "not-recommended"]]]]
                   [gap :size "20px"]
                   [gene-selector gene-selection-list gene-clicked]]]
-      [box :size "8" :margin "60px 0px 0px 0px"
-       :child [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]]]]))
+      [box :size "8" :margin "71px 0px 0px 5px"
+       :child (if (seq plot-data)
+                [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]
+                ;; Show an empty div when there is no plot data.
+                [:div])]]]))
 
 
 
