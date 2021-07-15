@@ -36,35 +36,46 @@
                                    thing))))]
     (zipmap header timepoints)))
 
-(def gene-selection-list
+(def gene-selection-list-rec
   (let [final-levels (medley/map-vals last all-gene-time-series)
         ret (for [[gene-name value] final-levels]
-              (cond
-                ((:rec gene-filter) gene-name)
+              (if ((:rec gene-filter) gene-name)
                 [value gene-name true]
+                nil))]
+    (filter some? ret)))
 
-                ((:not-rec gene-filter) gene-name)
+(def gene-selection-list-not-rec
+  (let [final-levels (medley/map-vals last all-gene-time-series)
+        ret (for [[gene-name value] final-levels]
+              (if ((:not-rec gene-filter) gene-name)
                 [value gene-name false]
+                nil))]
+    (filter some? ret)))
 
-                :else nil))
-        ret (filter some? ret)]
-    (sort-by first > ret)))
-
-(def plot-data
+(def plot-data-rec
   (let [rec-gene-time-series (medley/filter-keys (:rec gene-filter) all-gene-time-series)
-        not-rec-gene-time-series (medley/filter-keys (:not-rec gene-filter) all-gene-time-series)
-
         rec-flattened (flatten-time-series rec-gene-time-series)
-        not-rec-flattened (flatten-time-series not-rec-gene-time-series)
-
-        ret (concat (map #(conj % :not-rec) not-rec-flattened)
-                    (map #(conj % :rec) rec-flattened))]
+        ret  (map #(conj % :rec) rec-flattened)]
     (map (fn [[gene time expr-level status]]
            {:gene gene :time time :expr-level expr-level :status status})
          ret)))
 
+(def plot-data-not-rec
+  (let [not-rec-gene-time-series (medley/filter-keys (:not-rec gene-filter) all-gene-time-series)
+        not-rec-flattened (flatten-time-series not-rec-gene-time-series)
+        ret (map #(conj % :not-rec) not-rec-flattened)]
+    (map (fn [[gene time expr-level status]]
+           {:gene gene :time time :expr-level expr-level :status status})
+         ret)))
+
+
 (def default-db
   {:sd2-start-panel {:rec-genes-filter true
-                     :not-rec-genes-filter false}})
+                     :not-rec-genes-filter false
+
+                     :genes-rec gene-selection-list-rec
+                     :genes-not-rec gene-selection-list-not-rec
+                     :plot-data-rec plot-data-rec
+                     :plot-data-not-rec plot-data-not-rec}})
 
 (s/def ::sd2-start-panel (s/keys :req-un []))

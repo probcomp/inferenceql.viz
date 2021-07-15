@@ -56,3 +56,18 @@
 (rf/reg-event-db :sd2-start/set-not-rec-genes-filter
                  event-interceptors
                  set-not-rec-genes-filter)
+
+;-----------------------------
+
+;; TODO: finish this, make use of checkbox subscriptions.
+;; Also
+;; TODO: make use of this in the subscription to keep genes sorted.
+;;(sort-by first > ret)
+
+(defn genes
+  [db _]
+  (get-in db [:sd2-start-panel :not-rec-genes-filter]))
+
+(rf/reg-sub :sd2-start/genes
+            not-rec-genes-filter)
+
