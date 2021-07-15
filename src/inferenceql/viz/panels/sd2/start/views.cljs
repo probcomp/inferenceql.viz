@@ -103,12 +103,16 @@
        :component-did-mount
        (fn [this]
          (.addEventListener js/window "keydown" keydown-handler)
-         (.addEventListener js/window "dblclick" dbl-click-handler))
+         ;; NOTE: This is hackey because the "gene-selector-pane" DOM node doesn't belong
+         ;; to this component. This should be moved.
+         (when-let [bg-pane (.getElementById js/document "gene-selector-pane")]
+           (.addEventListener bg-pane "dblclick" dbl-click-handler)))
 
        :component-will-unmount
        (fn [this]
          (.removeEventListener js/window "keydown" keydown-handler)
-         (.addEventListener js/window "dblclick" dbl-click-handler))
+         (when-let [bg-pane (.getElementById js/document "gene-selector-pane")]
+           (.removeEventListener bg-pane "dblclick" dbl-click-handler)))
 
        :reagent-render
        (fn [gene-clicked]
@@ -159,6 +163,7 @@
      :children
      [[v-box
        :size "4"
+       :attr {:id "gene-selector-pane"}
        :style {:padding "15px 50px"
                :min-width "660px"
                :background "#f0f0f0"}
