@@ -17,6 +17,7 @@
             [inferenceql.viz.config :refer [config]]
             [clojure.edn :as edn]
             [vega :as yarn-vega]
+            [oops.core :refer [ocall]]
             ["highlight.js/lib/core" :as yarn-hljs]
             ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]))
 
@@ -153,9 +154,10 @@
         lin (.scale yarn-vega "linear")
         ;; TODO: try with different color scale.
         scheme (.scheme yarn-vega "blues")
-        scale-fn (doto (lin)
-                       (.domain [min-w max-w])
-                       (.range [0 1]))]
+
+        scale-fn (let [s (lin)]
+                   (ocall s "domain" [min-w max-w])
+                   (ocall s "range" [0 1]))]
     (fn [weight]
       (scheme (scale-fn weight)))))
 
