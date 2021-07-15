@@ -1,7 +1,7 @@
 (ns inferenceql.viz.panels.sd2.start.views
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
-            [re-com.core :refer [v-box h-box box gap line hyperlink checkbox]]
+            [re-com.core :refer [v-box h-box box gap line hyperlink checkbox info-button]]
             [inferenceql.viz.panels.viz.views :as viz]
             [re-frame.core :as rf]))
 
@@ -207,7 +207,12 @@
                                :label [:div {:style {:background-color "#ffdbb8"
                                                      :padding "0px 5px 0px 5px"
                                                      :font-weight "bold"}}
-                                       "not-recommended"]]]]
+                                       "not-recommended"]]
+                              [gap :size "20px"]
+                              [info-button
+                               :style {:fill "#878484"}
+                               :info [:span (str "Genes are ordered by their final "
+                                                 "optical density (OD600) values.")]]]]
                   [gap :size "20px"]
                   [gene-selector gene-selection-list gene-clicked]]]
       [box :size "8" :margin "71px 0px 0px 5px"
