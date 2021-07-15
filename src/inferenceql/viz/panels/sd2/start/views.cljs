@@ -2,7 +2,6 @@
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
             [re-com.core :refer [v-box h-box box gap line hyperlink checkbox]]
-            [inferenceql.viz.panels.sd2.start.db :refer [plot-data gene-selection-list]]
             [inferenceql.viz.panels.viz.views :as viz]
             [re-frame.core :as rf]))
 
@@ -81,7 +80,7 @@
                      :encoding {:text {:field "gene" :type "nominal"}}}]}]})
 
 
-(defn gene-selector [gene-clicked]
+(defn gene-selector [gene-selection-list gene-clicked]
   (let [next-gene (r/atom nil)
         prev-gene (r/atom nil)
         keydown-handler (fn [e]
@@ -115,7 +114,7 @@
            (.removeEventListener bg-pane "dblclick" dbl-click-handler)))
 
        :reagent-render
-       (fn [gene-clicked]
+       (fn [gene-selection-list gene-clicked]
          (let [gene-order (map vector
                                (range)
                                (map (comp name second) gene-selection-list))
@@ -157,7 +156,9 @@
 (defn view [show]
   (let [gene-clicked @(rf/subscribe [:sd2-start/gene-clicked])
         rec-gene-filter @(rf/subscribe [:sd2-start/rec-gene-filter])
-        not-rec-gene-filter @(rf/subscribe [:sd2-start/not-rec-gene-filter])]
+        not-rec-gene-filter @(rf/subscribe [:sd2-start/not-rec-gene-filter])
+        gene-selection-list @(rf/subscribe [:sd2-start/gene-selection-list])
+        plot-data @(rf/subscribe [:sd2-start/plot-data])]
     [h-box
      :style {:display (when-not show "none")
              :height "100%"
@@ -203,7 +204,7 @@
                                :on-change (fn [e] (rf/dispatch [:sd2-start/set-not-rec-genes-filter e]))
                                :label "not-recommeneded"]]]
                   [gap :size "20px"]
-                  [gene-selector gene-clicked]]]
+                  [gene-selector gene-selection-list gene-clicked]]]
       [box :size "8" :margin "60px 0px 0px 0px"
        :child [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]]]]))
 

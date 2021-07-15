@@ -73,8 +73,8 @@
   {:sd2-start-panel {:rec-genes-filter true
                      :not-rec-genes-filter false
 
-                     :genes-rec gene-selection-list-rec
-                     :genes-not-rec gene-selection-list-not-rec
+                     :gene-selection-list-rec gene-selection-list-rec
+                     :gene-selection-list-not-rec gene-selection-list-not-rec
                      :plot-data-rec plot-data-rec
                      :plot-data-not-rec plot-data-not-rec}})
 

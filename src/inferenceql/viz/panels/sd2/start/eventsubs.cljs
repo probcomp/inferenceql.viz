@@ -59,15 +59,39 @@
 
 ;-----------------------------
 
-;; TODO: finish this, make use of checkbox subscriptions.
-;; Also
-;; TODO: make use of this in the subscription to keep genes sorted.
-;;(sort-by first > ret)
+(rf/reg-sub :sd2-start/gene-selection-list-rec
+            (fn [db _]
+              (get-in db [:sd2-start-panel :gene-selection-list-rec])))
 
-(defn genes
-  [db _]
-  (get-in db [:sd2-start-panel :not-rec-genes-filter]))
+(rf/reg-sub :sd2-start/gene-selection-list-not-rec
+            (fn [db _]
+              (get-in db [:sd2-start-panel :gene-selection-list-not-rec])))
 
-(rf/reg-sub :sd2-start/genes
-            not-rec-genes-filter)
+(rf/reg-sub :sd2-start/gene-selection-list
+            :<- [:sd2-start/gene-selection-list-rec]
+            :<- [:sd2-start/gene-selection-list-not-rec]
+            :<- [:sd2-start/rec-gene-filter]
+            :<- [:sd2-start/not-rec-gene-filter]
+            (fn [[list-rec list-not-rec rec-filter not-rec-filter]]
+              (cond->> []
+                rec-filter (concat list-rec)
+                not-rec-filter (concat list-not-rec)
+                :always (sort-by first >))))
 
+(rf/reg-sub :sd2-start/plot-data-rec
+            (fn [db _]
+              (get-in db [:sd2-start-panel :plot-data-rec])))
+
+(rf/reg-sub :sd2-start/plot-data-not-rec
+            (fn [db _]
+              (get-in db [:sd2-start-panel :plot-data-not-rec])))
+
+(rf/reg-sub :sd2-start/plot-data
+            :<- [:sd2-start/plot-data-rec]
+            :<- [:sd2-start/plot-data-not-rec]
+            :<- [:sd2-start/rec-gene-filter]
+            :<- [:sd2-start/not-rec-gene-filter]
+            (fn [[plot-data-rec plot-data-not-rec rec-filter not-rec-filter]]
+              (cond->> []
+                rec-filter (concat plot-data-rec)
+                not-rec-filter (concat plot-data-not-rec))))
