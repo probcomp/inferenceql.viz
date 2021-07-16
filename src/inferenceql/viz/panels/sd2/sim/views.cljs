@@ -84,6 +84,7 @@
                :style {:margin-left "20px"}
                :child [autocomplete/multiple-autocomplete
                        {:value essential-genes
+                        :placeholder (when-not (seq essential-genes) "Select one or more genes")
 
                         :on-change
                         #_(fn [item] (swap! value conj (:key item)))
@@ -99,7 +100,7 @@
 
                         :search-fields [:value]
                         :items (zipmap all-essential-genes (map name all-essential-genes))
-                        :max-results 20}]]
+                        :max-results 50}]]
               [gap :size "30px"]
               [:h4 {:style {:font-size "16px"}}
                "SIMULATION CONTROLS"]
