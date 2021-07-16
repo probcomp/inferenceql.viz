@@ -131,7 +131,7 @@
            (reset! prev-gene (some->> prev-gene-index (nth gene-order) second))
            [:div {:style {:display "flex"
                           :align-items "stretch"
-                          :max-height "780px"
+                          :max-height "759px"
                           :flex-flow "column wrap"
                           :flex "0 0 auto"
                           :justify-content "flex-start"}}
@@ -207,13 +207,17 @@
                                :label [:div {:style {:background-color "#ffdbb8"
                                                      :padding "0px 5px 0px 5px"
                                                      :font-weight "bold"}}
-                                       "not-recommended"]]
-                              [gap :size "20px"]
-                              [info-button
+                                       "not-recommended"]]]]
+                  [gap :size "10px"]
+                  [h-box
+                   :align :center
+                   :children [[info-button
                                :style {:fill "#878484"}
                                :info [:span (str "Genes are ordered by their final "
-                                                 "optical density (OD600) values.")]]]]
-                  [gap :size "20px"]
+                                                 "optical density (OD600) values.")]]
+                              [gap :size "5px"]
+                              [:span "sort order"]]]
+                  [gap :size "15px"]
                   [gene-selector gene-selection-list gene-clicked]]]
       [box :size "8" :margin "71px 0px 0px 5px"
        :child (if (seq plot-data)
