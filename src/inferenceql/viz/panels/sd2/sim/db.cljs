@@ -3,7 +3,7 @@
 
 (def default-db
   {:sd2-sim-panel {:target-gene :stoA
-                   :essential-genes [:recR :mdxG]
+                   :essential-genes []
                    ;; Keys related to constraining target gene expr level.
                    :conditioned false
                    :expr-level nil
