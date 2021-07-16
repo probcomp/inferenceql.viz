@@ -180,7 +180,7 @@
     [:div
      [:div.cats
       [:h4 {:style {:margin "0px" :margin-bottom "5px" :font-size "14px"}}
-       "sample a regime to use"]
+       "regime weights"]
       [:div {:style {:margin-left "-10px"}}
        (for [[cat-id weight] weights]
          ^{:key [view-id cat-id]} [cat-weight view-id cat-id scale weight])]]
