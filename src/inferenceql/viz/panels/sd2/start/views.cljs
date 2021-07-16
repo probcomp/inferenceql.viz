@@ -141,15 +141,24 @@
                     clicked (= gene-name gene-clicked)]
                 ^{:key gene-name}
                 [h-box
-                 :style {:margin-left (when clicked "-24px")}
+                 :style {:margin-left (when clicked "-18px")}
                  :children [(when clicked
-                              [:div {:style {:margin-right "5px"}} "➡️"])
+                              [:div {:style {:margin-right "5px"}} "➔️"])
                             [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
                                            ;;:width "50%"
                                            :cursor "pointer"}
                                    :on-click (fn [e]
                                                (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
-                             gene-name]]]))]))})))
+                             gene-name]
+                            [gap :size "10px"]
+                            (when clicked
+                              [hyperlink
+                               :style {:font-weight "500"}
+                               :on-click (fn [e]
+                                           (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
+                                           (rf/dispatch [:set-page :knockout-sim])
+                                           (.blur (.-target e)))
+                               :label "continue"])]]))]))})))
 
 
 (defn view [show]
@@ -176,16 +185,7 @@
                                [[:span {:style {:font-weight "500"
                                                 :line-height "1.1"
                                                 :font-size "36px"}}
-                                 gene-clicked]
-                                [gap :size "20px"]
-                                [hyperlink
-                                 :style {:font-weight "500"
-                                         :font-size "18px"}
-                                 :on-click (fn [e]
-                                             (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
-                                             (rf/dispatch [:set-page :knockout-sim])
-                                             (.blur (.-target e)))
-                                 :label "continue to knockout simulator"]]
+                                 gene-clicked]]
                                [[:span {:style {:font-weight "500"
                                                 :line-height "1.1"
                                                 :font-size "24px"}}
