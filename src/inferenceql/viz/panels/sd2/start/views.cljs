@@ -141,7 +141,8 @@
                     clicked (= gene-name gene-clicked)]
                 ^{:key gene-name}
                 [h-box
-                 :style {:margin-left (when clicked "-18px")}
+                 :style {:width "150px"
+                         :margin-left (when clicked "-18px")}
                  :children [(when clicked
                               [:div {:style {:margin-right "5px"}} "➔️"])
                             [:div {:style {:background-color (if rec "#d7e4f4" "#ffdbb8")
@@ -150,15 +151,16 @@
                                    :on-click (fn [e]
                                                (rf/dispatch [:sd2-start/set-gene-clicked gene-name]))}
                              gene-name]
-                            [gap :size "10px"]
                             (when clicked
-                              [hyperlink
-                               :style {:font-weight "500"}
-                               :on-click (fn [e]
-                                           (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
-                                           (rf/dispatch [:set-page :knockout-sim])
-                                           (.blur (.-target e)))
-                               :label "continue"])]]))]))})))
+                              [:<>
+                               [gap :size "10px"]
+                               [hyperlink
+                                :style {:font-weight "500"}
+                                :on-click (fn [e]
+                                            (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
+                                            (rf/dispatch [:set-page :knockout-sim])
+                                            (.blur (.-target e)))
+                                :label "continue"]])]]))]))})))
 
 
 (defn view [show]
