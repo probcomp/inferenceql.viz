@@ -5,7 +5,6 @@
             [inferenceql.viz.panels.table.handsontable :as hot]
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.config :as config]
-            [inferenceql.viz.vega :as vega.init]
             [goog.string :as gstring]
             [medley.core :as medley]))
 
@@ -260,7 +259,7 @@
                                       :range color-range
                                       :reverse reverse-scale}
                       "nominal" {:type "ordinal"
-                                 :scheme {:name vega.init/nyt-color-scheme}})
+                                 :scheme {:name "nyt"}})
 
               color-spec {:field (str "row." (name color-by-col))
                           :type (vega-type color-by-col)
