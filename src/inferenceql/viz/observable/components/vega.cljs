@@ -19,18 +19,11 @@
                 mapping {:numerical "quantitative"
                          :nominal "nominal"}
 
-                infer-type (fn [col-name]
-                             (let [numbers (->> data
-                                                (take 10)
-                                                (map #(get % col-name))
-                                                (map number?)
-                                                (every? true?))]
-                               (if numbers :numerical :nominal)))
-
                 iql-type (or (->> (keyword col-name)
                                   (get schema)
                                   (keyword))
-                             (infer-type col-name))]
+                             ;; Assume unknown columns are numerical.
+                             :numerical)]
             (get mapping iql-type)))))
 
 (defn- spec-for-selection-layer [schema data cols]
