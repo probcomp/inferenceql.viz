@@ -91,7 +91,7 @@
 
                               col-type (get schema (:column chk))
                               val (str (get row (:column chk)))
-                              val (if (= col-type :gaussian) val (quote-val val))
+                              val (if (= col-type :numerical) val (quote-val val))
 
                               q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" col-name val)
 
@@ -100,7 +100,7 @@
                                       {:col c :val (get row-rest c)})
                               cells (filter #(some? (:val %)) cells)
                               cells (map (fn [{:keys [col val]}]
-                                           (if (= (get schema col) :gaussian)
+                                           (if (= (get schema col) :numerical)
                                              (format "%s=%s" (name col) val)
                                              (format "%s=\"%s\"" (name col) val)))
                                          cells)

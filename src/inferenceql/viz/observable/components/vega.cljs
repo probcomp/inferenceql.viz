@@ -16,8 +16,8 @@
 
           :else
           (let [ ;; Mapping from multi-mix stat-types to vega-lite data-types.
-                mapping {:gaussian "quantitative"
-                         :categorical "nominal"}
+                mapping {:numerical "quantitative"
+                         :nominal "nominal"}
 
                 infer-type (fn [col-name]
                              (let [numbers (->> data
@@ -25,7 +25,7 @@
                                                 (map #(get % col-name))
                                                 (map number?)
                                                 (every? true?))]
-                               (if numbers :gaussian :categorical)))
+                               (if numbers :numerical :nominal)))
 
                 iql-type (or (->> col-name
                                   (get schema)
