@@ -447,8 +447,12 @@
 
         view-to-operon (fn [view cluster]
                          (if-let [[_ view-num] (re-matches #":view_(\d+)" (str view))]
-                           (let [[_ cluster-num] (re-matches #":cluster_(\d+)" (str cluster))]
-                             [(str "operon_" view-num) (str "regime_" cluster-num)])
+                           (if-let [[_ cluster-num] (re-matches #":cluster_(\d+)" (str cluster))]
+                             ;; Normal cluster assignments.
+                             [(str "operon_" view-num) (str "regime_" cluster-num)]
+                             ;; This handles the case of samples from the aux cluster.
+                             [(str "operon_" view-num) "regime_prior"])
+                           ;; Normal columns
                            [view cluster]))
 
         simulations  (->> simulations

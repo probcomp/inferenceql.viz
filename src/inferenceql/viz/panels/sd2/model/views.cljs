@@ -32,7 +32,8 @@
                          (second))]
     (if cat-num
       (str "regime_" cat-num)
-      (name cat-id))))
+      ;; Alternate name for AUX category.
+      "regime_prior")))
 
 (defn sd2-view-rename
   "utility fn"
