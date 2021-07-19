@@ -45,15 +45,13 @@
         node (dom/createElement "div")
         comp (fn [options]
                [v-box
-                :min-height "1100px"
+                :style {:min-height "1100px"
+                        :border-width "3px"
+                        :border-style "solid"
+                        :border-radius "7px"
+                        :border-color "grey"}
                 :children [[v-box
                             :class "cell-by-cell-app"
-                            :style {:border-width "3px"
-                                    :border-style "solid"
-                                    :padding "20px 20px 20px 20px"
-                                    :margin "25px 0px 25px 0px"
-                                    :border-radius "7px"
-                                    :border-color "grey"}
                             :children [[handsontable-wrapper table-data @options]
                                        [gap :size "20px"]
                                        [h-box
