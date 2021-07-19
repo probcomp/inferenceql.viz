@@ -223,7 +223,7 @@
     (fn []
       [:div#model-output
        [:h4 {:style {:font-size "16px"}}
-        "MODEL OUTPUT"]
+        "SIMULATOR OUTPUT"]
        (if @output
          [:pre.cat-group-highlighted @output]
          [:div {:style {:margin-left "20px"}}
