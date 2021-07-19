@@ -5,21 +5,20 @@
             [inferenceql.inference.gpm.column :as column]
             [inferenceql.inference.gpm.primitive-gpms :as pgpms]
             [clojure.pprint :refer [pprint]]
+            [clojure.edn :as edn]
+            [clojure.string :as string]
+            [cljstache.core :refer [render]]
             [re-frame.core :as rf]
-            [medley.core :as medley]
-            [goog.string :refer [format]]
             [re-com.core :refer [border title v-box p h-box line button gap input-text
                                  checkbox horizontal-bar-tabs horizontal-tabs
-                                 radio-button]]
-            [clojure.string :as string]
+                                 radio-button info-button]]
+            [medley.core :as medley]
             [goog.string :refer [format]]
-            [cljstache.core :refer [render]]
-            [inferenceql.viz.config :refer [config]]
-            [clojure.edn :as edn]
-            [vega :as yarn-vega]
             [oops.core :refer [ocall]]
+            [vega :as yarn-vega]
             ["highlight.js/lib/core" :as yarn-hljs]
-            ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]))
+            ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]
+            [inferenceql.viz.config :refer [config]]))
 
 ;; We are using the minimal version of highlight.js where
 ;; every language used has to be registered individually.
@@ -231,8 +230,14 @@
 
 (defn view [model columns-used constraints]
   [:div
-   [v-box :children [[:h4 {:style {:font-size "16px"}}
-                      "MODEL"]
+   [v-box :children [[h-box
+                      :children [[:h4 {:style {:font-size "16px"}}
+                                  "SIMULATOR"]
+                                 [gap :size "5px"]
+                                 [info-button
+                                  :style {:fill "#878484"}
+                                  :info [:span (str "Our model is a probabilistic program. "
+                                                    "It can be executed to produce virtual data.")]]]]
                      [gap :size "5px"]
                      (for [[view-id view] (:views model)]
                        ^{:key view-id} [xcat-view view-id view columns-used constraints])
