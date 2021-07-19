@@ -149,7 +149,10 @@
       {:fx [[:dispatch [:store/datasets datasets]]
             [:dispatch [:store/models models]]
             [:dispatch [:control/set-query-string-to-select-all]]
-            (when (seq geodata) [:dispatch [:store/geodata geodata]])]})
+            (when (seq geodata) [:dispatch [:store/geodata geodata]])
+            [:js/console-warn "Successfully read the following datasets and models."]
+            [:js/console-warn (clj->js datasets)]
+            [:js/console-warn (clj->js models)]]})
     (catch js/Error e
       {:fx [[:dispatch [:upload/read-failed (str "Error processing reads.\n" (.-stack e))]]]})))
 
