@@ -46,6 +46,7 @@
         comp (fn [options]
                [v-box
                 :style {:min-height "1100px"
+                        :padding "20px"
                         :border-width "3px"
                         :border-style "solid"
                         :border-radius "7px"

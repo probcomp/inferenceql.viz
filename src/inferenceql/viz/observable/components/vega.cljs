@@ -27,7 +27,7 @@
                                                 (every? true?))]
                                (if numbers :numerical :nominal)))
 
-                iql-type (or (->> col-name
+                iql-type (or (->> (keyword col-name)
                                   (get schema)
                                   (keyword))
                              (infer-type col-name))]
