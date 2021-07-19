@@ -5,7 +5,7 @@
  :cluster-fn-template #txt "templates/cluster.js.mustache"
 
  ;:gene-recs #csv "gene-extra-info/gene-recs.csv"
- ;:gene-growth-curves #csv "gene-extra-info/growth-curves-mean.csv"}
+ ;:gene-growth-curves #csv "gene-extra-info/growth-curves-mean.csv"
 
  :gene-selection-list-rec #edn "gene-extra-info/gene-selection-list-rec.edn"
  :gene-selection-list-not-rec #edn "gene-extra-info/gene-selection-list-not-rec.edn"

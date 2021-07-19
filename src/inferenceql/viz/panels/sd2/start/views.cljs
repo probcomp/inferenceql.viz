@@ -54,7 +54,10 @@
                    :strokeWidth 2}
             :encoding {:x {:field "time", :type "quantitative"
                            :axis {:grid true
-                                  :values (range 0 60 2)
+                                  :values (range 0 700 25)
+                                  :labelOverlap true
+                                  :labelFontSize 12
+                                  ;;:labelSeparation 5
                                   :title "minutes"}}
                        :y {:field "expr-level", :type "quantitative"
                            :axis {:grid true

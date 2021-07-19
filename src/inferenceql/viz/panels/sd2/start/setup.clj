@@ -59,7 +59,9 @@
         rec-flattened (flatten-time-series rec-gene-time-series)
         ret  (map #(conj % :rec) rec-flattened)]
     (map (fn [[gene time expr-level status]]
-           {:gene gene :time time :expr-level expr-level :status status})
+           ;; Time is actually invervals of 12 min.
+           (let [time (* time 12)]
+             {:gene gene :time time :expr-level expr-level :status status}))
          ret)))
 
 (def plot-data-not-rec
@@ -67,7 +69,9 @@
         not-rec-flattened (flatten-time-series not-rec-gene-time-series)
         ret (map #(conj % :not-rec) not-rec-flattened)]
     (map (fn [[gene time expr-level status]]
-           {:gene gene :time time :expr-level expr-level :status status})
+           ;; Time is actually invervals of 12 min.
+           (let [time (* time 12)]
+             {:gene gene :time time :expr-level expr-level :status status}))
          ret)))
 
 (defn write-files []
