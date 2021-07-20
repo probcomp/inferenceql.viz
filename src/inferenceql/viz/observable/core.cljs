@@ -5,4 +5,5 @@
             [inferenceql.viz.observable.components]
             [inferenceql.viz.observable.smart.core]
             [inferenceql.viz.observable.util]
-            [inferenceql.auto-modeling.xcat :as xcat]))
+            [inferenceql.auto-modeling.xcat :as xcat]
+            [inferenceql.viz.observable.jsprogram]))

@@ -26,6 +26,12 @@
         schema (clj-schema schema)]
     (clj->js (csv/clean-csv-maps schema csv-vecs))))
 
+(defn ^:export read-and-coerce-csv-2
+  [csv-text schema]
+  (let [csv-vecs (-> csv-text js->clj)
+        schema (clj-schema schema)]
+    (clj->js (csv/clean-csv-maps schema csv-vecs))))
+
 (defn ^:export run-remote-query
   [query query-server-url]
   (js/Promise. (fn [resolve reject]
