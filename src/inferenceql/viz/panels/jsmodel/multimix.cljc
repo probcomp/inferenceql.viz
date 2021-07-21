@@ -6,7 +6,7 @@
             #?(:cljs [goog.string :refer [format]])))
 
 (defn truncate-num [n]
-  (format "%.2f" n))
+  (format "%.3f" n))
 
 (def range-1
   "Infinite list of natural numbers."
