@@ -19,7 +19,11 @@
   "Returns a map of categorical cols and their values given a multimix `spec`.
   The map returned maps from col name to a sequence of col values for that category."
   [spec]
-  (let [first-cluster (get-in spec [:views 0 0 :parameters])
+  (let [first-cluster (->> (get-in spec [:views])
+                           (map first)
+                           (map :parameters)
+                           (apply merge))
+
         categorical-cols (keys (medley/filter-vals #(= % :categorical)
                                                    (get-in spec [:vars])))]
     (into {}
