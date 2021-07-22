@@ -147,7 +147,7 @@
                             [box
                              :style {:padding "0px 20px 20px 30px"}
                              :child [sd2-model/view (:model models) columns-used constraints]]]]
-                (if (seq vega-lite-spec)
+                (if (some? vega-lite-spec)
                   [box :size "8" :margin "40px 0px"
                    :child [viz/vega-lite vega-lite-spec {:actions false :renderer "canvas"} :knockout-sim-page]]
                   [box :size "8"
