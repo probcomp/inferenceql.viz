@@ -202,7 +202,7 @@
       [v-box :children [[h-box
                          :gap "15px"
                          :children [[:h4 {:style {:display "inline" :margin "0px"
-                                                  :color (when-not (seq columns) "gray")}}
+                                                  :color (when-not (seq columns) "#a4a4a4")}}
                                      (str
                                       (sd2-view-rename view-id)
                                       (when (seq columns)
@@ -219,15 +219,17 @@
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
     (fn []
-      [v-box :children [[h-box
-                         :children [[:h4 {:style {:font-size "16px"}}
-                                     "SIMULATOR OUTPUT"]
-                                    [gap :size "5px"]
-                                    [info-button
-                                     :style {:fill "#878484"}
-                                     :info [:span "When \"Simulate 1 point\" is clicked, the model's output will appear here."]]]]
-                        (if @output
-                          [:pre.cat-group-highlighted @output])]])))
+      [v-box
+       :attr {:id "model-output"}
+       :children [[h-box
+                   :children [[:h4 {:style {:font-size "16px"}}
+                               "SIMULATOR OUTPUT"]
+                              [gap :size "5px"]
+                              [info-button
+                               :style {:fill "#878484"}
+                               :info [:span "When \"Simulate 1 point\" is clicked, the model's output will appear here."]]]]
+                  (if @output
+                    [:pre.cat-group-highlighted @output])]])))
 
 (defn view [model columns-used constraints]
   [:div
@@ -239,12 +241,12 @@
                                   :style {:fill "#878484"}
                                   :info [:span (str "Our model is a probabilistic program. "
                                                     "It can be executed to produce virtual data.")]]]]
-                     [gap :size "30px"]
+                     [gap :size "40px"]
                      (for [[view-id view] (:views model)]
                        ^{:key view-id}
                        [v-box :children [[xcat-view view-id view columns-used constraints]
                                          [gap :size "30px"]]])
-                     [gap :size "40px"]
+                     [gap :size "50px"]
                      [model-output]]]])
 
 ;; TODO: remember to pass in all the component args into render function in
