@@ -147,7 +147,13 @@
                             [box
                              :style {:padding "0px 20px 20px 20px"}
                              :child [sd2-model/view (:model models) columns-used constraints]]]]
-                [box
-                 :size "8"
-                 :margin "40px 0px"
-                 :child [viz/vega-lite vega-lite-spec {:actions false :renderer "canvas"} :knockout-sim-page]]]]))
+                (if (seq vega-lite-spec)
+                  [box :size "8" :margin "40px 0px"
+                   :child [viz/vega-lite vega-lite-spec {:actions false :renderer "canvas"} :knockout-sim-page]]
+                  [box :size "8"
+                   :style {:justify-content "center"
+                           :margin "131px 0px"
+                           :font-size "18px"
+                           :color "grey"}
+
+                   :child [:div "Pair plots will appear here for each essential gene selected."]])]]))
