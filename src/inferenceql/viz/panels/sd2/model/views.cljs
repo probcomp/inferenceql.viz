@@ -203,11 +203,13 @@
     [:div {:id (name view-id) :style {:margin-left "20px"}}
       [v-box :children [[h-box
                          :gap "15px"
-                         :children [[:h4 {:style {:display "inline" :margin "0px"}} (sd2-view-rename view-id)]
-                                    [:h4 {:style {:display "inline" :margin "0px"}}
-                                     (if (seq columns)
-                                       (str "(" (string/join ", " columns) ")")
-                                       "[not used]")]]]
+                         :children [[:h4 {:style {:display "inline" :margin "0px"
+                                                  :color (when-not (seq columns) "gray")}}
+                                     (str
+                                      (sd2-view-rename view-id)
+                                      (when (seq columns)
+                                        (str "  (" (string/join ", " columns) ")")))]
+                                    [:h4 {:style {:display "inline" :margin "0px"}}]]]
                         (if (seq columns)
                           [:div {:style {:margin-left "20px"}}
                            [v-box :children [[gap :size "15px"]
