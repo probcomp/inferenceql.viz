@@ -210,24 +210,24 @@
                                        "[not used]")]]]
                         (if (seq columns)
                           [:div {:style {:margin-left "20px"}}
-                           [v-box :children [[gap :size "20px"]
+                           [v-box :children [[gap :size "15px"]
                                              [cats view-id weights]
-                                             [gap :size "20px"]
                                              [:div {:style {:margin-left "-15px"}}
                                                (for [[cat-id _] weights]
-                                                 ^{:key [view-id cat-id]} [xcat-category column-gpms view-id cat-id])]
-                                             [gap :size "20px"]]]])]]]))
+                                                 ^{:key [view-id cat-id]} [xcat-category column-gpms view-id cat-id])]]]])]]]))
 
 (defn model-output []
   (let [output (rf/subscribe [:sd2/model-output])]
     (fn []
-      [:div#model-output
-       [:h4 {:style {:font-size "16px"}}
-        "SIMULATOR OUTPUT"]
-       (if @output
-         [:pre.cat-group-highlighted @output]
-         [:div {:style {:margin-left "20px"}}
-          "When \"Simulate 1 point\" is clicked, the model's output will appear here."])])))
+      [v-box :children [[h-box
+                         :children [[:h4 {:style {:font-size "16px"}}
+                                     "SIMULATOR OUTPUT"]
+                                    [gap :size "5px"]
+                                    [info-button
+                                     :style {:fill "#878484"}
+                                     :info [:span "When \"Simulate 1 point\" is clicked, the model's output will appear here."]]]]
+                        (if @output
+                          [:pre.cat-group-highlighted @output])]])))
 
 (defn view [model columns-used constraints]
   [:div
@@ -239,9 +239,11 @@
                                   :style {:fill "#878484"}
                                   :info [:span (str "Our model is a probabilistic program. "
                                                     "It can be executed to produce virtual data.")]]]]
-                     [gap :size "5px"]
+                     [gap :size "30px"]
                      (for [[view-id view] (:views model)]
-                       ^{:key view-id} [xcat-view view-id view columns-used constraints])
+                       ^{:key view-id}
+                       [v-box :children [[xcat-view view-id view columns-used constraints]
+                                         [gap :size "30px"]]])
                      [gap :size "40px"]
                      [model-output]]]])
 
