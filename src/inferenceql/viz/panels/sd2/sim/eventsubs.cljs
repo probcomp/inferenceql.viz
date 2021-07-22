@@ -157,12 +157,9 @@
             columns-used)
 
 (defn all-essential-genes
-  [[target-gene datasets]]
-  (let [all-genes (keys (get-in datasets [:data :schema]))]
-    (remove #{target-gene} all-genes)))
+  [db [_]]
+  (get-in db [:sd2-sim-panel :essential-genes-available]))
 (rf/reg-sub :sim/all-essential-genes
-            :<- [:sim/target-gene]
-            :<- [:store/datasets]
             all-essential-genes)
 
 (defn add-essential-gene
