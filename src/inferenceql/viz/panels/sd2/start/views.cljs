@@ -183,7 +183,7 @@
      [[v-box
        :size "4"
        :attr {:id "gene-selector-pane"}
-       :style {:padding "15px 50px"
+       :style {:padding "25px 50px"
                :min-width "740px"
                :background "#f0f0f0"}
        :children [[h-box

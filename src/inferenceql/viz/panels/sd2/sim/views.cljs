@@ -139,21 +139,20 @@
                  :style {:background "#f0f0f0"
                          :min-width "740px"}
                  :children [[box
-                             :style {:padding "20px 20px 0px 20px"}
+                             :style {:padding "30px 20px 0px 30px"}
                              :child [simulator-controls target-gene essential-genes all-essential-genes]]
                             [gap :size "40px"]
                             [line :size "1px" :color "#cccccc"]
                             [gap :size "30px"]
                             [box
-                             :style {:padding "0px 20px 20px 20px"}
+                             :style {:padding "0px 20px 20px 30px"}
                              :child [sd2-model/view (:model models) columns-used constraints]]]]
                 (if (seq vega-lite-spec)
                   [box :size "8" :margin "40px 0px"
                    :child [viz/vega-lite vega-lite-spec {:actions false :renderer "canvas"} :knockout-sim-page]]
                   [box :size "8"
                    :style {:justify-content "center"
-                           :margin "131px 0px"
+                           :margin "141px 0px"
                            :font-size "18px"
                            :color "grey"}
-
-                   :child [:div "Pair plots will appear here for each essential gene selected."]])]]))
+                   :child [:div "Pair plots will appear here for each essential gene selected"]])]]))
