@@ -301,7 +301,8 @@
                         :value 0}
                 :color {:condition {:param "pts"
                                     :field "dataset"
-                                    :legend nil}
+                                    :legend {:title nil
+                                             :orient "right"}}
                         :value "lightgrey"}}}))
 
 (defn- heatmap-plot
@@ -468,5 +469,5 @@
        :concat spec-layers
        :columns 2
        :resolve {:legend {:size "independent"
-                          :color "independent"}
-                 :scale {:color "independent"}}})))
+                          :color "shared"}
+                 :scale {:color "shared"}}})))
