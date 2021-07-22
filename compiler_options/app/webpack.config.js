@@ -5,7 +5,7 @@ module.exports = [
     {
       name: 'un-minified',
       output: {
-        path: path.resolve(__dirname, 'out'),
+        path: path.resolve('./out'),
         filename: 'main.js',
       },
       entry: './out/index.js',
@@ -27,7 +27,7 @@ module.exports = [
     {
       name: 'minified',
       output: {
-        path: path.resolve(__dirname, 'out'),
+        path: path.resolve('./out'),
         filename: 'main.js',
       },
       entry: './out/index.js',
