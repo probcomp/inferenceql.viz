@@ -7,12 +7,13 @@
 
 (defn time-series [data]
   {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
+   :title "Growth curves"
    :config {:view {:stroke nil}}
    :data {:values data}
    ;;:transform [{:calculate "datum.status == 'rec' ? 1 : 0" :as "zorder"}]
    :resolve {:axis {:x "independent" :y "independent"}}
-   :width 800
-   :height 800
+   :width 780
+   :height 780
    :encoding {:color {:field "status", :type "nominal"
                       :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}
                       :legend nil}
@@ -144,7 +145,7 @@
                     clicked (= gene-name gene-clicked)]
                 ^{:key gene-name}
                 [h-box
-                 :style {:width "150px"
+                 :style {:width (if clicked "153px" "135px")
                          :margin-left (when clicked "-18px")}
                  :children [(when clicked
                               [:div {:style {:margin-right "5px"}} "➔️"])
@@ -158,7 +159,9 @@
                               [:<>
                                [gap :size "10px"]
                                [hyperlink
-                                :style {:font-weight "500"}
+                                :style {:font-weight "500"
+                                        :padding "0px 5px"
+                                        :box-shadow "0px 0px 0px 1px #457ab2 inset"};
                                 :on-click (fn [e]
                                             (rf/dispatch [:sim/set-target-gene (keyword gene-clicked)])
                                             (rf/dispatch [:set-page :knockout-sim])
@@ -181,7 +184,7 @@
        :size "4"
        :attr {:id "gene-selector-pane"}
        :style {:padding "15px 50px"
-               :min-width "660px"
+               :min-width "740px"
                :background "#f0f0f0"}
        :children [[h-box
                    :align :center
@@ -224,7 +227,7 @@
                               [:span "sort order"]]]
                   [gap :size "15px"]
                   [gene-selector gene-selection-list gene-clicked]]]
-      [box :size "8" :margin "71px 0px 0px 5px"
+      [box :size "8" :margin "70px 0px 0px 5px"
        :child (if (seq plot-data)
                 [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]
                 ;; Show an empty div when there is no plot data.
