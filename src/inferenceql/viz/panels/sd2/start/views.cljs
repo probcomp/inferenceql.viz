@@ -174,7 +174,8 @@
         rec-gene-filter @(rf/subscribe [:sd2-start/rec-gene-filter])
         not-rec-gene-filter @(rf/subscribe [:sd2-start/not-rec-gene-filter])
         gene-selection-list @(rf/subscribe [:sd2-start/gene-selection-list])
-        plot-data @(rf/subscribe [:sd2-start/plot-data])]
+        plot-data @(rf/subscribe [:sd2-start/plot-data])
+        show-growth-curves @(rf/subscribe [:sd2-start/show-growth-curves])]
     [h-box
      :style {:display (when-not show "none")
              :height "100%"
@@ -215,7 +216,13 @@
                                :label [:div {:style {:background-color "#ffdbb8"
                                                      :padding "0px 5px 0px 5px"
                                                      :font-weight "bold"}}
-                                       "not-recommended"]]]]
+                                       "not-recommended"]]
+                              [gap :size "20px"]
+                              [checkbox
+                               :model show-growth-curves
+                               :on-change (fn [e] (rf/dispatch [:sd2-start/set-show-growth-curves e]))
+                               :label [:div {:style {:padding "0px 5px 0px 5px"}}
+                                       "show growth curves"]]]]
                   [gap :size "10px"]
                   [h-box
                    :align :center
@@ -229,9 +236,10 @@
                   [gene-selector gene-selection-list gene-clicked]]]
       [box :size "8" :margin "70px 0px 0px 5px"
        :child (if (seq plot-data)
-                [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]
-                ;; Show an empty div when there is no plot data.
+                [:div {:style {:display (when-not show-growth-curves "none")}}
+                 [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]]
                 [:div])]]]))
+
 
 
 

@@ -95,3 +95,21 @@
               (cond->> []
                 rec-filter (concat plot-data-rec)
                 not-rec-filter (concat plot-data-not-rec))))
+
+;--------------------
+
+(defn show-growth-curves
+  [db _]
+  (get-in db [:sd2-start-panel :show-growth-curves]))
+
+(rf/reg-sub :sd2-start/show-growth-curves
+            show-growth-curves)
+
+(defn set-show-growth-curves
+  [db [_ new-val]]
+  (-> db
+      (assoc-in [:sd2-start-panel :show-growth-curves] new-val)))
+
+(rf/reg-event-db :sd2-start/set-show-growth-curves
+                 event-interceptors
+                 set-show-growth-curves)

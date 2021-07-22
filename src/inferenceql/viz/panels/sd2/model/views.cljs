@@ -248,6 +248,3 @@
                                          [gap :size "30px"]]])
                      [gap :size "50px"]
                      [model-output]]]])
-
-;; TODO: remember to pass in all the component args into render function in
-;; type 2 and 3 components.
