@@ -141,10 +141,8 @@
                               (sd2-cat-rename cat-id)]
                              [points-badge @points-count]]]
                  [:div {:style {:display display :margin-left "40px"}}
-                  [v-box :children [[gap :size "15px"]
-                                    [js-code-block (js-fn-text stat-types params)]
-                                    [cluster-output view-id cat-id]
-                                    [gap :size "15px"]]]]]]]))
+                  [v-box :children [[js-code-block (js-fn-text stat-types params)]
+                                    [cluster-output view-id cat-id]]]]]]]))
 
 (defn scale [weights]
   (let [weights (map second weights)
