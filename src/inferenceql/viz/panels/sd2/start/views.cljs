@@ -226,6 +226,7 @@
                   [gap :size "10px"]
                   [h-box
                    :align :center
+                   :style {:margin-left "-1px"}
                    :children [[info-button
                                :style {:fill "#878484"}
                                :info [:span (str "Genes are ordered by their final "
