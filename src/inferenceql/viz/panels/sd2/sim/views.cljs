@@ -20,13 +20,13 @@
             [inferenceql.viz.panels.sd2.model.views :as sd2-model]
             [inferenceql.viz.panels.viz.views :as viz]))
 
-(defn expr-level-slider []
+(defn expr-level-slider [target-gene]
   (let [level (rf/subscribe [:sim/expr-level])
         conditioned (rf/subscribe [:sim/conditioned])
         settings (rf/subscribe [:sim/expr-level-slider-settings])]
     [v-box
      :margin "5px 20px"
-     :children [[box :child [:span "Expression level (gene knockout): "]]
+     :children [[box :child [:span (format "Expression level (%s): " (name target-gene))]]
                 [h-box
                  :style {:margin-left "20px"
                          :margin-top "5px"}
@@ -104,7 +104,7 @@
               [gap :size "30px"]
               [:h4 {:style {:font-size "16px"}}
                "SIMULATION CONTROLS"]
-              [expr-level-slider]
+              [expr-level-slider target-gene]
               [gap :size "10px"]
               [h-box
                :style {:margin "5px 15px 0px 15px"}
