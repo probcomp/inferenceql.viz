@@ -15,7 +15,7 @@
    :width 780
    :height 780
    :encoding {:color {:field "status", :type "nominal"
-                      :scale {:domain ["rec", "not-rec"] :range ["#4e79a7" "#f28e2b"]}
+                      :scale {:domain ["recommended", "not-recommended"] :range ["#4e79a7" "#f28e2b"]}
                       :legend nil}
               :order {:condition {:param "pts"
                                   :value 1}
@@ -37,7 +37,7 @@
                                  :zoom "wheel![event.shiftKey]"}}
                      {:name "xypoint"
                       :select {:type "point",
-                               :fields ["time", "expr-level"]
+                               :fields ["time", "OD600"]
                                :on "mousedown"
                                :nearest true}}
                      {:name "pts"
@@ -47,7 +47,7 @@
                                :nearest true}}]
             :encoding {:x {:field "time", :type "quantitative"
                            :axis nil}
-                       :y {:field "expr-level", :type "quantitative"
+                       :y {:field "OD600", :type "quantitative"
                            :axis nil}
                        :opacity {:value 0}}}
 
@@ -60,7 +60,7 @@
                                   :labelFontSize 12
                                   ;;:labelSeparation 5
                                   :title "minutes"}}
-                       :y {:field "expr-level", :type "quantitative"
+                       :y {:field "OD600", :type "quantitative"
                            :axis {:grid true
                                   :title "optical density (OD600)"}}
                        ;:values (range 0 1.70 0.4)}}
@@ -73,7 +73,7 @@
                            :type "quantitative"
                            :axis nil}
                        :y {:aggregate {:argmax "time"}
-                           :field "expr-level"
+                           :field "OD600"
                            :type "quantitative"
                            :axis nil}}
             :layer [{:mark {:type "circle"}
@@ -238,6 +238,7 @@
       [box :size "8" :margin "70px 0px 0px 5px"
        :child (if (seq plot-data)
                 [:div {:style {:display (when-not show-growth-curves "none")}}
+                 (.log js/console :plot-data plot-data)
                  [viz/vega-lite (time-series plot-data) {:actions false :renderer "canvas"} :start-page]]
                 [:div])]]]))
 

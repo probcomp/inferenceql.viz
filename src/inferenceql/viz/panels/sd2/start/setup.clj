@@ -55,24 +55,20 @@
     (filter some? ret)))
 
 (def plot-data-rec
-  (let [rec-gene-time-series (medley/filter-keys (:rec gene-filter) all-gene-time-series)
-        rec-flattened (flatten-time-series rec-gene-time-series)
-        ret  (map #(conj % :rec) rec-flattened)]
-    (map (fn [[gene time expr-level status]]
+  (let [rec-gene-time-series (medley/filter-keys (:rec gene-filter) all-gene-time-series)]
+    (map (fn [[gene time expr-level]]
            ;; Time is actually invervals of 12 min.
            (let [time (* time 12)]
-             {:gene gene :time time :expr-level expr-level :status status}))
-         ret)))
+             {:gene gene :time time :OD600 expr-level :status "recommended"}))
+         (flatten-time-series rec-gene-time-series))))
 
 (def plot-data-not-rec
-  (let [not-rec-gene-time-series (medley/filter-keys (:not-rec gene-filter) all-gene-time-series)
-        not-rec-flattened (flatten-time-series not-rec-gene-time-series)
-        ret (map #(conj % :not-rec) not-rec-flattened)]
-    (map (fn [[gene time expr-level status]]
+  (let [not-rec-gene-time-series (medley/filter-keys (:not-rec gene-filter) all-gene-time-series)]
+    (map (fn [[gene time expr-level]]
            ;; Time is actually invervals of 12 min.
            (let [time (* time 12)]
-             {:gene gene :time time :expr-level expr-level :status status}))
-         ret)))
+             {:gene gene :time time :OD600 expr-level :status "not-recommended"}))
+         (flatten-time-series not-rec-gene-time-series))))
 
 (defn write-files []
   (spit "resources/gene-extra-info/gene-selection-list-rec.edn"
