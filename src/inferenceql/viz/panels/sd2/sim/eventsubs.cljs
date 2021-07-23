@@ -76,8 +76,12 @@
                    (get-in db [:sd2-sim-panel :target-gene]))
         cols (remove (set (keys constraints)) cols)
 
-        rows (repeatedly 10 #(-> (gpm/simulate model cols constraints)
-                                 (merge constraints)))]
+        simulate-row #(-> (gpm/simulate model cols constraints)
+                          (merge constraints))
+
+        rows (->> (repeatedly simulate-row)
+                  (remove #(some neg? (vals %)))
+                  (take 10))]
     (update-in db [:sd2-sim-panel :simulations] (fnil concat []) rows)))
 (rf/reg-event-db :sim/simulate-many
                  event-interceptors
