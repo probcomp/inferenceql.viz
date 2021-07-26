@@ -1,7 +1,6 @@
 (ns inferenceql.viz.panels.control.events
   (:require [re-frame.core :as rf]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.viz.components.highlight.db :as highlight-db]
             [inferenceql.viz.components.query.editing :refer [add-edit-exprs add-incorp-expr]]
             [inferenceql.viz.panels.table.db :as table-db]
             [inferenceql.viz.components.query.db :as query-db]
@@ -45,19 +44,11 @@
          new-query-string (query-for-conf-options value conf-threshold)
          query-string-event [:control/set-query-string new-query-string]
 
-         ;; Determine if a load event needs to take place.
+         ;; TODO: emit events for computing row-wise probabilities or for imputing missing cells.
          load-event (cond
-                      (and (= value :row)
-                           (nil? (highlight-db/row-likelihoods db)))
-                      [:highlight/compute-row-likelihoods]
-
-                      (and (= value :cells-missing)
-                           (nil? (highlight-db/missing-cells db)))
-                      [:highlight/compute-missing-cells]
-
-                      ;; Default case: no event
-                      :else
-                      nil)
+                      (= value :row) nil
+                      (= value :cells-missing) nil
+                      :else nil)
          event-list [query-string-event load-event]]
      {:db (assoc-in db path value)
       :dispatch-n event-list})))
