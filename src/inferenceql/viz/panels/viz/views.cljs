@@ -12,7 +12,7 @@
 (def ^:private log-level-debug
   (.-Warn yarn-vega))
 
-(def ^:private default-vega-embed-options
+(def default-vega-embed-options
   {:renderer "svg"
    :mode "vega-lite"
    :logLevel log-level-default
