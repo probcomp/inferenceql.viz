@@ -7,3 +7,11 @@
   [rows updates]
   (let [merge-op (fnil (partial merge-with merge) {} {})]
     (merge-op rows updates)))
+
+(defn column-settings [headers]
+  "Returns an array of objects that define settings for each column
+  in the table including which attribute from the underlying map for the row
+  is presented."
+  (let [settings-map (fn [attr]
+                       {:data attr})]
+    (map settings-map headers)))
