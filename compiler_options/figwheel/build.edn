@@ -1,0 +1,22 @@
+;; Metadata used by Figwheel.
+^{:watch-dirs ["src"]
+  :css-dirs ["figwheel-target/public/resources"]}
+{:output-dir "figwheel-target/public/out"
+ :output-to "figwheel-target/public/out/index.js"
+ :externs ["externs/handsontable.ext.js"
+           "externs/vega.ext.js"
+           "externs/vega-embed.ext.js"
+           "externs/vega-lite.ext.js"
+           "externs/highlight.ext.js"]
+ :browser-repl false
+ :target :bundle
+ ;; Webpack will not minify code.
+ :bundle-cmd {:none ["yarn" "run" "webpack" "--mode=development"
+                     "--config" "compiler_options/figwheel/webpack.config.js"
+                     "--config-name" "figwheel-un-minified"]}
+ :closure-defines {cljs.core/*global* "window"}
+ ;; Cljs Chrome dev-tools.
+ :preloads [devtools.preload]
+ ;; Pretty code output.
+ :pseudo-names true
+ :pretty-print true}
