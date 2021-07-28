@@ -22,7 +22,7 @@
         num-cols (count columns)]
     (every? #(< % num-cols) col-nums-refed)))
 
-(defn- update-hot!
+(defn update-hot!
   "A helper function for updating the settings in a handsontable."
   [hot-instance new-settings current-selection]
   (let [;; Stores whether settings that determine the data displayed have changed.
