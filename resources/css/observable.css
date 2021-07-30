@@ -1,0 +1,120 @@
+/* --------------- utility classes --------------- */
+
+.no-select {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+/* --------------- styling for the toolbar --------------- */
+
+#toolbar {
+  display: flex;
+  min-height: 90px;
+  margin-top: 10px;
+  margin-bottom: -5px;
+  margin-left: 0px;
+  margin-right: 14px;
+}
+/* --------------- styling for search input --------------- */
+
+#search-section {
+  width: 100%;
+  min-width: 350px;
+  max-width: 1200px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+#search-buttons {
+  margin-top: 0px;
+}
+
+#search-input {
+  width: 100%;
+  height: 100px;
+  min-height: 60px;
+  max-height: 250px;
+  resize: vertical;
+  font-size: 14px;
+  font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+  color: #333;
+
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #bbbbbb;
+  outline-width: 0;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 6px;
+}
+
+.toolbar-button {
+  align-self: center;
+  margin-right: 6px;
+  padding: 4px .8em;
+  height: 30px;
+  font-family: roboto;
+}
+
+/* --------------- styling for handsontables --------------- */
+
+.ht_master tr td {
+  font-family: roboto;
+  font-size: 14px;
+}
+
+/* All headers */
+.handsontable th {
+  font-size: 12px;
+}
+
+.handsontable .htDimmed {
+  color: #676767;
+}
+
+/* --------------- styling for vega-vizualization --------------- */
+
+#vg-tooltip-element.vg-tooltip.custom-theme table {
+  font-size: .75rem;
+}
+
+/* --------------- styles used by re-com library ---------------
+  Flexbox "display" styles
+  Requires 2 display values which we can't represent in a Clojure map
+----------------------------------------------------------------*/
+
+.display-flex {
+    display: -webkit-flex;
+    display: flex;
+}
+.display-inline-flex {
+    display: -webkit-inline-flex;
+    display: inline-flex;
+}
+
+.zmdi-hc-fw-rc {
+  width: 1em;
+  text-align: center;
+}
+
+.rc-typeahead-suggestions-container {
+    position: absolute;
+    width: 100%;
+    background-color: #eee;
+}
+
+.rc-typeahead-suggestion {
+    background-color: #eee;
+    padding: 0.4em;
+}
+
+.rc-typeahead-suggestion.active {
+    background-color: #ddd;
+}
+
