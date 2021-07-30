@@ -61,6 +61,19 @@ js-advanced: $(hot-css-resource)
 js-advanced-min: $(hot-css-resource)
 	clojure -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
+### Observable components compilation.
+
+observable-compile-opts := $(current-dir)/compiler_options/observable/build-advanced.edn
+
+.PHONY: watch-observable
+watch-observable: $(hot-css-resource)
+	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts) -c inferenceql.viz.js.observable.notebook
+
+.PHONY: observable
+observable: $(hot-css-resource)
+	## Compile js-bundle for notebooks.
+	clojure -M -m cljs.main -co $(observable-compile-opts) -c inferenceql.viz.js.observable.notebook
+
 ### Supporting defs for compilation.
 
 yarn-install-opts = --no-progress --frozen-lockfile
