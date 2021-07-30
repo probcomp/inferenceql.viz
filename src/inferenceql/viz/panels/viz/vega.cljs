@@ -423,8 +423,7 @@
   (let [vega-type (vega-type-fn schema)
         {layer-name :id
          selections :selections
-         cols :selected-columns
-         row :row-at-selection-start} selection-layer]
+         cols :selected-columns} selection-layer]
     ;; Only produce a spec when we can find a vega-type for all selected columns
     ;; except the geo-id-col which we handle specially.
     (when (every? some? (map vega-type (remove #{geo-id-col} cols)))
@@ -432,7 +431,7 @@
                        (gen-choropleth geodata geo-id-col selections cols vega-type)
 
                        (simulatable? selections cols simulatable-cols)
-                       (gen-simulate-plot (first cols) row (name layer-name) vega-type)
+                       (gen-simulate-plot (first cols) (first selections) (name layer-name) vega-type)
 
                        (= 1 (count cols)) ; One column selected.
                        (gen-histogram (first cols) selections vega-type)
