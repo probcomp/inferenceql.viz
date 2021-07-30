@@ -57,7 +57,7 @@
   or PROBABILITY DENSITY OF statement and was not rebinded with an AS label.
   `col-name` is the name of the column."
   (when col-name
-    (some? (re-matches #"^density[\d]*$" (name col-name)))))
+    (some? (re-matches #"^(density|prob)[\d]*$" (name col-name)))))
 
 (defn vega-type-fn
   "Given a `schema`, returns a vega-type function.
@@ -73,10 +73,13 @@
           "quantitative"
 
           :else
-          ;; Mapping from multi-mix stat-types to vega-lite data-types.
-          (let [mapping {:numerical "quantitative"
-                         :nominal "nominal"}]
-            (get mapping (get schema col-name))))))
+          (let [;; Mapping from iql stat-types to vega-lite data-types.
+                mapping {:numerical "quantitative"
+                         :nominal "nominal"}
+
+                ;; Assume unknown columns are numerical.
+                iql-type (get schema col-name :numerical)]
+            (mapping iql-type)))))
 
 (defn should-bin?
   "Returns whether data for a certain column should be binned in a vega-lite spec.
@@ -437,11 +440,12 @@
                        (gen-histogram (first cols) selections vega-type)
 
                        :else ; Two or more columns selected.
-                       (gen-comparison-plot (take 2 cols) selections vega-type))
-             title {:title {:text (str (name layer-name) " " "selection")
-                            :color (title-color layer-name)
-                            :fontWeight 500}}]
-        (merge spec title)))))
+                       (gen-comparison-plot (take 2 cols) selections vega-type))]
+        (cond-> spec
+          ;; Adds a title to the plot.
+          layer-name (assoc :title {:text (str (name layer-name) " " "selection")
+                                    :color (title-color layer-name)
+                                    :fontWeight 500}))))))
 
 (defn generate-spec [schema simulatable-cols geodata geo-id-col selection-layers]
   (when-let [spec-layers (seq (keep #(spec-for-selection-layer schema simulatable-cols geodata geo-id-col %)
