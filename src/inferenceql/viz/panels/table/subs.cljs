@@ -7,7 +7,7 @@
             [inferenceql.viz.panels.table.handsontable :as hot]
             [inferenceql.viz.panels.table.selections :as selections]
             [inferenceql.viz.util :refer [coerce-bool]]
-            [inferenceql.viz.panels.table.util :refer [merge-row-updates]]
+            [inferenceql.viz.panels.table.util :refer [merge-row-updates column-settings]]
             [goog.string :refer [format]]
             [handsontable$default :as yarn-handsontable]))
 
@@ -99,14 +99,6 @@
     (let [make-presentable (fn [header]
                              header)] ;; no-op stub for now.
       (map make-presentable headers))))
-
-(defn- column-settings [headers]
-  "Returns an array of objects that define settings for each column
-  in the table including which attribute from the underlying map for the row
-  is presented."
-  (let [settings-map (fn [attr]
-                       {:data attr})]
-    (map settings-map headers)))
 
 ;;; Subs related to data in handsontable with various user edits incorporated.
 
