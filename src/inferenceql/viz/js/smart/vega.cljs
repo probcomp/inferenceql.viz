@@ -8,6 +8,8 @@
     {:width 250
      :height 250
      :data {:values data}
+     :transform [{:calculate "(datum.anomaly != 'undefined') ? 1 : 0"
+                  :as "layer-number"}]
      :mark {:type "circle" :tooltip {:content "data"}}
      :selection {zoom-control-name {:type "interval"
                                     :bind "scales"
@@ -27,11 +29,8 @@
                 :y {:field (second cols-to-draw)
                     :type "quantitative"
                     :scale {:zero false}}
-                #_:order #_{:field "anomaly"
-                            :type "nominal"
-                            :scale {:domain ["true", "false", "undefined"]
-                                    :range [1 1 0]}
-                            :legend nil}
+                :order {:field "layer-number"
+                        :type "quantitative"}
                 :size {:condition {:selection "pts"
                                    :value 100}
                        :value 50}
@@ -69,6 +68,8 @@
     {:width width
      :height height
      :data {:values data}
+     :transform [{:calculate "(datum.anomaly != 'undefined') ? 1 : 0"
+                  :as "layer-number"}]
      :mark {:type "tick" :tooltip {:content "data"}}
      :selection {zoom-control-name {:type "interval"
                                     :bind "scales"
@@ -91,11 +92,8 @@
                 :y {:field y-field
                     :type y-type
                     :axis {:grid true :gridDash [2 2]}}
-                #_:order #_{:field "anomaly"
-                            :type "nominal"
-                            :scale {:domain ["true", "false", "undefined"]
-                                    :range [1 1 0]}
-                            :legend nil}
+                :order {:field "layer-number"
+                        :type "quantitative"}
                 :color {:field "anomaly"
                         :type "nominal"
                         :scale {:domain ["true", "false", "undefined"]
