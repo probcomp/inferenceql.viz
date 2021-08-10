@@ -10,13 +10,20 @@
             [inferenceql.viz.js.components.table.views :refer [handsontable]]
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
             [inferenceql.viz.js.smart.views :refer [anomaly-plot]]
-            [inferenceql.viz.js.util :refer [clj-schema]]))
+            [inferenceql.viz.js.util :refer [clj-schema]]
+            [medley.core :as medley]))
 
 (defn ^:export app
   "Javascript interface for displaying the SMART app"
   [query-fn table-data schema num-rows thresh step-time options]
-  (let [table-data (vec (take num-rows (->clj table-data)))
-        schema (clj-schema schema)
+  (let [schema (clj-schema schema)
+        table-data (vec (take num-rows (->clj table-data)))
+        table-data-rounded (for [r table-data]
+                             (let [round (fn [col val]
+                                           (if (= (get schema col) :numerical)
+                                             (.toFixed val 2)
+                                             val))]
+                               (medley/map-kv-vals round r)))
 
         options (->clj options)
         cols (map keyword (:cols options))
@@ -43,12 +50,12 @@
                         :border-color "grey"}
                 :children [[v-box
                             :class "cell-by-cell-app"
-                            :children [[handsontable table-data @options]
+                            :children [[handsontable table-data-rounded @options]
                                        [gap :size "20px"]
                                        [h-box
                                         :children [[gap :size "25px"]
                                                    ;; TODO: Move this into the anomaly-plot component.
-                                                   (when (and (some? @plot-data) (some? @cur-row) (some? @cur-cell-status))
+                                                   (when (every? some? [@plot-data @cur-row @cur-cell-status])
                                                      (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
                                                            plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
