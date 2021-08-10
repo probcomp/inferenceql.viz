@@ -143,6 +143,10 @@
                               q1 (uncond-query (:column chk) row schema)
                               q2 (cond-query (:column chk) cols row schema)
 
+                              ;; TODO: refactor this into a function to run anomaly query.
+                              ;; Run it for all the cell in the row.
+                              ;; Return: query-strings, values, and anomaly-status.
+
                               q1-val (-> (query-fn q1) first (.-p))
                               q2-val (-> (query-fn q2) first (.-p))
                               anomaly (and (< q2-val q1-val)
