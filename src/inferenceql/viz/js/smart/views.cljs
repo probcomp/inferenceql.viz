@@ -31,40 +31,35 @@
     {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
      :datasets {:simulations simulations
                 :actual actual}
-     :height 400
+     :height 200
      :width 400
+     :encoding {:x {:field "timepoint", :type "ordinal"
+                    :scale {:padding 0.01}}}
      :layer [{:data {:name "simulations"}
               :mark {:type "errorband",
                      :extent "stdev"
                      :opacity 0.8
                      :color "#FFE8C7"}
               :encoding {:y {:field "value",
-                             :type "quantitative",}
-                         :x {:field "timepoint", :type "ordinal"
-                             :scale {:padding 0.01}}}}
+                             :type "quantitative",}}}
              {:data {:name "simulations"}
               :mark {:type "line"
                      :color "#FF8D00"}
-              :encoding {:y {:aggregate "mean", :field "value"}
-                         :x {:field "timepoint", :type "ordinal"
-                             :scale {:padding 0.01}}}}
+              :encoding {:y {:aggregate "mean", :field "value"}}}
+             ;; Actual data section
              {:data {:name "actual"}
               :mark {:type "line"
                      :color "black"
                      :strokeDash [4, 3]}
-              :encoding {:y {:field "value" :type "quantitative"}
-                         :x {:field "timepoint", :type "ordinal"
-                             :scale {:padding 0.01}}}}
+              :encoding {:y {:field "value" :type "quantitative"}}}
              {:data {:name "actual"}
               :mark {:type "circle"
-                     :size 100}
-                     :opacity 1
+                     :size 100
+                     :opacity 1}
               :encoding {:color {:condition {:test "datum.anomaly == true"
                                              :value "red"}
                                  :value "black"}
-                         :y {:field "value" :type "quantitative"}
-                         :x {:field "timepoint", :type "ordinal"
-                             :scale {:padding 0.01}}}}]}))
+                         :y {:field "value" :type "quantitative"}}}]}))
 
 
 
