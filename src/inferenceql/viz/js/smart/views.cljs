@@ -18,28 +18,55 @@
 
 (defn generate-sim-spec
   [sims row]
-  (let [tuples (fn [[k vs]]
+  (let [cols (keys sims)
+        row (select-keys row cols)
+        actual (for [[k v] row]
+                 (let [a (rand)]
+                   {:timepoint k :value v :anomaly (> a 0.5)}))
+
+        tuples (fn [[k vs]]
                  (for [v vs]
                    {:timepoint k :value v}))
-        sims (mapcat tuples sims)]
+        simulations (mapcat tuples sims)]
     {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
-     :datasets {:simulations sims
-                :actual row}
+     :datasets {:simulations simulations
+                :actual actual}
      :height 400
      :width 400
      :layer [{:data {:name "simulations"}
               :mark {:type "errorband",
                      :extent "stdev"
-                     :opacity 1.0
-                     :color "#FFF4E4"}
+                     :opacity 0.8
+                     :color "#FFE8C7"}
               :encoding {:y {:field "value",
                              :type "quantitative",}
-                         :x {:field "timepoint", :type "ordinal"}}}
+                         :x {:field "timepoint", :type "ordinal"
+                             :scale {:padding 0.01}}}}
              {:data {:name "simulations"}
               :mark {:type "line"
                      :color "#FF8D00"}
               :encoding {:y {:aggregate "mean", :field "value"}
-                         :x {:field "timepoint", :type "ordinal"}}}]}))
+                         :x {:field "timepoint", :type "ordinal"
+                             :scale {:padding 0.01}}}}
+             {:data {:name "actual"}
+              :mark {:type "line"
+                     :color "black"
+                     :strokeDash [4, 3]}
+              :encoding {:y {:field "value" :type "quantitative"}
+                         :x {:field "timepoint", :type "ordinal"
+                             :scale {:padding 0.01}}}}
+             {:data {:name "actual"}
+              :mark {:type "circle"
+                     :size 100}
+                     :opacity 1
+              :encoding {:color {:condition {:test "datum.anomaly == true"
+                                             :value "red"}
+                                 :value "black"}
+                         :y {:field "value" :type "quantitative"}
+                         :x {:field "timepoint", :type "ordinal"
+                             :scale {:padding 0.01}}}}]}))
+
+
 
 (defn sim-plot
   [data]
@@ -49,4 +76,4 @@
       [:div
        #_[:div (str "sims: " sims)]
        #_[:div (str "row: " row)]
-       [vega-lite spec {:actions false} nil nil]])))
+       [vega-lite spec {:actions true} nil nil]])))
