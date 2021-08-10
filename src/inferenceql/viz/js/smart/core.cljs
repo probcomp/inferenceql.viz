@@ -45,6 +45,30 @@
 
 ;------------------------------------------
 
+(defn quote-val
+  [val]
+  (format "\"%s\"" val))
+
+(defn uncond-query [col row schema]
+  (let [col-type (get schema col)
+        val (->> (get row col)
+                 str)
+        val (if (= col-type :numerical) val (quote-val val))]
+    (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name col) val)))
+
+(defn cond-query [col col-order row schema]
+  (let [col-type (get schema col)
+        val (->> (get row col)
+                 str)
+        val (if (= col-type :numerical) val (quote-val val))
+
+        other-cols (remove #{col} col-order)
+        b-str (binding-string row other-cols schema)]
+    (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
+            (name col) val b-str)))
+
+;------------------------------------------
+
 (defn ^:export app
   "Javascript interface for displaying the SMART app"
   [query-fn table-data schema num-rows thresh step-time options]
@@ -116,18 +140,8 @@
 
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
-
-                              quote-val (fn [val] (format "\"%s\"" val))
-
-                              col-type (get schema (:column chk))
-                              val (str (get row (:column chk)))
-                              val (if (= col-type :numerical) val (quote-val val))
-
-                              q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" col-name val)
-
-                              b-str (binding-string row other-cols schema)
-                              q2 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
-                                         col-name val b-str)
+                              q1 (uncond-query (:column chk) row schema)
+                              q2 (cond-query (:column chk) cols row schema)
 
                               q1-val (-> (query-fn q1) first (.-p))
                               q2-val (-> (query-fn q2) first (.-p))
