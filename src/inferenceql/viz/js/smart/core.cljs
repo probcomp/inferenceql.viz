@@ -94,7 +94,7 @@
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
                                                        [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))]]
                                        [gap :size "20px"]
-                                       [sim-plot @sim-plot-data schema]
+                                       [sim-plot @sim-plot-data]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
                                         @query]]]]])
