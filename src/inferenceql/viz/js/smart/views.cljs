@@ -35,10 +35,12 @@
      :width 400
      :encoding {:x {:field "timepoint", :type "ordinal"
                     :scale {:padding 0.01}}}
-     :layer [{:data {:name "simulations"}
+     :layer [;; Layers for simulated data.
+             {:data {:name "simulations"}
               :mark {:type "errorband",
                      :extent "stdev"
                      :opacity 0.8
+                     :borders true
                      :color "#FFE8C7"}
               :encoding {:y {:field "value",
                              :type "quantitative",}}}
@@ -46,7 +48,7 @@
               :mark {:type "line"
                      :color "#FF8D00"}
               :encoding {:y {:aggregate "mean", :field "value"}}}
-             ;; Actual data section
+             ;; Layers for actual data.
              {:data {:name "actual"}
               :mark {:type "line"
                      :color "black"
