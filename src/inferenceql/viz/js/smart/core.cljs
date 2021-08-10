@@ -9,9 +9,41 @@
             [goog.string :refer [format]]
             [inferenceql.viz.js.components.table.views :refer [handsontable]]
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
-            [inferenceql.viz.js.smart.views :refer [anomaly-plot]]
+            [inferenceql.viz.js.smart.views :refer [anomaly-plot sim-plot]]
             [inferenceql.viz.js.util :refer [clj-schema]]
             [medley.core :as medley]))
+
+(defn binding-string
+  [row cols schema]
+  (let [cells (for [c cols]
+                {:col c :val (get row c)})
+        cells (filter #(some? (:val %)) cells)
+        cells (map (fn [{:keys [col val]}]
+                     (if (= (get schema col) :numerical)
+                       (format "%s=%s" (name col) val)
+                       (format "%s=\"%s\"" (name col) val)))
+                   cells)]
+    (string/join " AND " cells)))
+
+(def col-group [:ld1 :ld2 :ld3 :ld4 :ld5])
+
+(defn simulate-cell
+  [query-fn col col-order row schema]
+  (let [sample-count 10
+        rem-cols (remove #{col} col-order)
+        b-str (binding-string row rem-cols schema)
+        generate-query (format "SELECT * FROM (GENERATE %s UNDER model CONDITIONED BY %s) LIMIT %s;"
+                               (name col) b-str sample-count)]
+    (->> (query-fn generate-query)
+      (map #(get (->clj %) col)))))
+
+(defn simulate-row
+  [query-fn col-order row schema]
+  (into {}
+    (for [c col-group]
+      [c (simulate-cell query-fn c col-order row schema)])))
+
+;------------------------------------------
 
 (defn ^:export app
   "Javascript interface for displaying the SMART app"
@@ -38,6 +70,7 @@
         cur-row (r/atom nil)
         cur-cell-status (r/atom false)
         plot-data (r/atom nil)
+        sim-plot-data (r/atom nil)
 
         node (dom/createElement "div")
         comp (fn [options]
@@ -61,6 +94,7 @@
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
                                                        [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))]]
                                        [gap :size "20px"]
+                                       [sim-plot @sim-plot-data schema]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
                                         @query]]]]])
@@ -91,23 +125,15 @@
 
                               q1 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" col-name val)
 
-                              row-rest (dissoc row (:column chk))
-                              cells (for [c other-cols]
-                                      {:col c :val (get row-rest c)})
-                              cells (filter #(some? (:val %)) cells)
-                              cells (map (fn [{:keys [col val]}]
-                                           (if (= (get schema col) :numerical)
-                                             (format "%s=%s" (name col) val)
-                                             (format "%s=\"%s\"" (name col) val)))
-                                         cells)
-                              bind-str (string/join " AND " cells)
+                              b-str (binding-string row other-cols schema)
                               q2 (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
-                                         col-name val bind-str)
+                                         col-name val b-str)
 
                               q1-val (-> (query-fn q1) first (.-p))
                               q2-val (-> (query-fn q2) first (.-p))
                               anomaly (and (< q2-val q1-val)
-                                           (< q2-val thresh))]
+                                           (< q2-val thresh))
+                              sims (simulate-row query-fn cols row schema)]
                           ;; Update query.
                           (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val)]))
 
@@ -115,10 +141,14 @@
                           (reset! cur-row (:row chk))
                           (reset! cur-cell-status anomaly)
 
+                          ;; Update sim plot.
+                          (reset! sim-plot-data {:sims sims :row row} #_(if anomaly "true" "false"))
+
                           ;; Switch to next check.
                           (swap! checks rest)
 
                           ;; Update table highlighting.
+                          ;; TODO: Move this into a specialized table component.
                           (let [new-cells (fn [row col prop]
                                             (let [cell-props #js {}]
                                               (when (and (= row (:row chk))

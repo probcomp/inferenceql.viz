@@ -11,9 +11,21 @@
   (if (some? data)
     (let [selections (postwalk #(if (string? %) (keyword  %) %)
                                selections)
-          schema (clj-schema schema)
           data (->clj data)
           ;; Custom spec generating function for SMART app.
           spec (generate-spec schema data selections)]
       [vega-lite spec {:actions false} nil nil])))
 
+(defn generate-sim-spec
+  [schema sims row]
+  {})
+
+(defn sim-plot
+  [data schema]
+  (when (some? data)
+    (let [{:keys [sims row]} data
+          spec (generate-sim-spec schema sims row)]
+      [:div
+       [:div (str "sims: " sims)]
+       [:div (str "row: " row)]]
+      #_[vega-lite spec {:actions false} nil nil])))
