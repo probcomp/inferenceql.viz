@@ -140,10 +140,30 @@
                               anomaly-status (:anomaly-status aqr)
 
                               update-sim-plot-data
-                              #(let [sims (simulate-row query-fn cols row schema)
-                                     row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
-                                 ;; Update sim plot.
-                                 (reset! sim-plot-data {:sims sims :row row :row-anom row-anom}))]
+                              (fn []
+                                (let [sims (simulate-row query-fn cols row schema)
+                                      row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
+                                  ;; Update sim plot.
+                                  (reset! sim-plot-data {:sims sims :row row :row-anom row-anom})
+                                  (let [new-cells (fn [row col prop]
+                                                    (let [cell-props #js {}
+                                                          color
+                                                          (cond (and (= row (:row chk))
+                                                                     (= prop (name (:column chk))))
+                                                                "red-highlight"
+
+                                                                (and (= row (:row chk))
+                                                                     (get row-anom (keyword prop)))
+                                                                "light-red-highlight"
+
+                                                                (= row (:row chk))
+                                                                "grey-highlight"
+
+                                                                :else nil)]
+                                                      (when color
+                                                        (set! (.-className cell-props) color))
+                                                      cell-props))]
+                                    (swap! options assoc :cells new-cells))))]
 
                           ;; Update query.
                           (reset! query (query-display aqr))
