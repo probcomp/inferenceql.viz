@@ -186,22 +186,23 @@
                             :class "cell-by-cell-app"
                             :children [[handsontable table-data-rounded @options]
                                        [gap :size "20px"]
-                                       [h-box
-                                        :children [[gap :size "25px"]
-                                                   ;; TODO: Move this into the anomaly-plot component.
-                                                   (when (every? some? [@plot-data @cur-row @cur-cell-status])
-                                                     (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
-                                                           plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
-                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
-                                                       [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))]]
-                                       [gap :size "20px"]
-                                       [sim-plot @sim-plot-data]
                                        (when @cur-cell-status
                                          [:button.toolbar-button.pure-button
                                           {:on-click (fn [e]
                                                        (anim-step)
                                                        (.blur (.-target e)))}
                                           "Continue"])
+                                       [gap :size "10px"]
+                                       [h-box
+                                        :children [;; TODO: Move this into the anomaly-plot component.
+                                                   (when (every? some? [@plot-data @cur-row @cur-cell-status])
+                                                     (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
+                                                           plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
+                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
+                                                       [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))
+                                                   [gap :size "5px"]
+                                                   [sim-plot @sim-plot-data]]]
+                                       [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
                                         @query]]]]])]
