@@ -17,12 +17,11 @@
       [vega-lite spec {:actions false} nil nil])))
 
 (defn generate-sim-spec
-  [sims row]
+  [sims row row-anom]
   (let [cols (keys sims)
         row (select-keys row cols)
         actual (for [[k v] row]
-                 (let [a (rand)]
-                   {:timepoint k :value v :anomaly (> a 0.5)}))
+                 {:timepoint k :value v :anomaly (get row-anom k)})
 
         tuples (fn [[k vs]]
                  (for [v vs]
@@ -34,7 +33,8 @@
      :height 200
      :width 400
      :encoding {:x {:field "timepoint", :type "ordinal"
-                    :scale {:padding 0.01}}}
+                    :scale {:padding 0.01}}
+                :y {:axis {:grid false}}}
      :layer [;; Layers for simulated data.
              {:data {:name "simulations"}
               :mark {:type "errorband",
@@ -68,8 +68,8 @@
 (defn sim-plot
   [data]
   (when (some? data)
-    (let [{:keys [sims row]} data
-          spec (generate-sim-spec sims row)]
+    (let [{:keys [sims row row-anom]} data
+          spec (generate-sim-spec sims row row-anom)]
       [:div
        #_[:div (str "sims: " sims)]
        #_[:div (str "row: " row)]

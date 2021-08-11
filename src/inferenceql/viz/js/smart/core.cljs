@@ -49,14 +49,14 @@
   [val]
   (format "\"%s\"" val))
 
-(defn uncond-query [col row schema]
+(defn query-uncond [col row schema]
   (let [col-type (get schema col)
         val (->> (get row col)
                  str)
         val (if (= col-type :numerical) val (quote-val val))]
     (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name col) val)))
 
-(defn cond-query [col col-order row schema]
+(defn query-cond [col col-order row schema]
   (let [col-type (get schema col)
         val (->> (get row col)
                  str)
@@ -66,6 +66,29 @@
         b-str (binding-string row other-cols schema)]
     (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
             (name col) val b-str)))
+
+(defn anomaly-query-results
+  [query-fn thresh col col-order row schema]
+  (let [q1 (query-uncond col row schema)
+        q2 (query-cond col col-order row schema)
+        q1-val (-> (query-fn q1) first (.-p))
+        q2-val (-> (query-fn q2) first (.-p))
+        anomaly (and (< q2-val q1-val)
+                     (< q2-val thresh))]
+    {:q-uncond q1 :q-uncond-v q1-val
+     :q-cond q2 :q-cond-v q2-val
+     :anomaly-status anomaly}))
+
+(defn query-display [aqr]
+  (let [{:keys [q-uncond q-uncond-v q-cond q-cond-v]} aqr]
+    (string/join "\n\n" [q-uncond (str q-uncond-v) q-cond (str q-cond-v)])))
+
+(defn row-anomaly-statuses
+  [query-fn thresh col-order row schema]
+  (let [aqrs (for [c col-order]
+               (anomaly-query-results query-fn thresh c col-order row schema))
+        anomaly-statuses (map :anomaly-status aqrs)]
+    (zipmap col-order anomaly-statuses)))
 
 ;------------------------------------------
 
@@ -140,27 +163,21 @@
 
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
-                              q1 (uncond-query (:column chk) row schema)
-                              q2 (cond-query (:column chk) cols row schema)
+                              aqr (anomaly-query-results query-fn thresh (:column chk) cols row schema)
+                              anomaly-status (:anomaly-status aqr)
 
-                              ;; TODO: refactor this into a function to run anomaly query.
-                              ;; Run it for all the cell in the row.
-                              ;; Return: query-strings, values, and anomaly-status.
+                              sims (simulate-row query-fn cols row schema)
+                              row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
 
-                              q1-val (-> (query-fn q1) first (.-p))
-                              q2-val (-> (query-fn q2) first (.-p))
-                              anomaly (and (< q2-val q1-val)
-                                           (< q2-val thresh))
-                              sims (simulate-row query-fn cols row schema)]
                           ;; Update query.
-                          (reset! query (string/join "\n\n" [q1 (str q1-val) q2 (str q2-val)]))
+                          (reset! query (query-display aqr))
 
                           ;; Update highlighted point in plot.
                           (reset! cur-row (:row chk))
-                          (reset! cur-cell-status anomaly)
+                          (reset! cur-cell-status anomaly-status)
 
                           ;; Update sim plot.
-                          (reset! sim-plot-data {:sims sims :row row} #_(if anomaly "true" "false"))
+                          (reset! sim-plot-data {:sims sims :row row :row-anom row-anom})
 
                           ;; Switch to next check.
                           (swap! checks rest)
@@ -171,7 +188,7 @@
                                             (let [cell-props #js {}]
                                               (when (and (= row (:row chk))
                                                          (= prop (name (:column chk))))
-                                                (let [color (if anomaly
+                                                (let [color (if anomaly-status
                                                               "red-highlight"
                                                               "blue-highlight")]
                                                   (set! (.-className cell-props) color)))
