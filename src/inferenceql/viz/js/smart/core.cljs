@@ -29,7 +29,7 @@
 
 (defn simulate-cell
   [query-fn col col-order row schema]
-  (let [sample-count 10
+  (let [sample-count 30
         rem-cols (remove #{col} col-order)
         b-str (binding-string row rem-cols schema)
         generate-query (format "SELECT * FROM (GENERATE %s UNDER model CONDITIONED BY %s) LIMIT %s;"
@@ -142,6 +142,12 @@
                                                        [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))]]
                                        [gap :size "20px"]
                                        [sim-plot @sim-plot-data]
+                                       (when @cur-cell-status
+                                         [:button.toolbar-button.pure-button
+                                          {:on-click (fn [e]
+                                                       (js/setTimeout anim-step step-time)
+                                                       (.blur (.-target e)))}
+                                          "Continue"])
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
                                         @query]]]]])
@@ -194,8 +200,10 @@
                                                   (set! (.-className cell-props) color)))
                                               cell-props))]
                             (swap! options assoc :cells new-cells))
-                          ;; Setup next iteration.
-                          (js/setTimeout anim-step step-time)))))]
+
+                          (when-not anomaly-status
+                            ;; Setup next iteration.
+                            (js/setTimeout anim-step step-time))))))]
 
     ;; Start animation.
     (js/setTimeout anim-step step-time)
