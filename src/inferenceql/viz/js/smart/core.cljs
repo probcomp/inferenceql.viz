@@ -94,7 +94,7 @@
 
 (defn ^:export app
   "Javascript interface for displaying the SMART app"
-  [query-fn table-data schema num-rows thresh step-time options]
+  [query-fn table-data schema num-rows thresh step-time options invalidation]
   (let [schema (clj-schema schema)
         table-data (vec (take num-rows (->clj table-data)))
         table-data-rounded (for [r table-data]
@@ -137,21 +137,23 @@
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
                               aqr (anomaly-query-results query-fn thresh (:column chk) cols row schema)
-                              anomaly-status (:anomaly-status aqr)]
+                              anomaly-status (:anomaly-status aqr)
+
+                              update-sim-plot-data
+                              #(let [sims (simulate-row query-fn cols row schema)
+                                     row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
+                                 ;; Update sim plot.
+                                 (reset! sim-plot-data {:sims sims :row row :row-anom row-anom}))]
 
                           ;; Update query.
                           (reset! query (query-display aqr))
 
+                          ;; Clear the sim-plot.
+                          (reset! sim-plot-data nil)
+
                           ;; Update highlighted point in plot.
                           (reset! cur-row (:row chk))
                           (reset! cur-cell-status anomaly-status)
-
-                          (if anomaly-status
-                            (let [sims (simulate-row query-fn cols row schema)
-                                  row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
-                              ;; Update sim plot.
-                              (reset! sim-plot-data {:sims sims :row row :row-anom row-anom}))
-                            (reset! sim-plot-data nil))
 
                           ;; Switch to next check.
                           (swap! checks rest)
@@ -169,7 +171,9 @@
                                               cell-props))]
                             (swap! options assoc :cells new-cells))
 
-                          (when-not anomaly-status
+                          (if anomaly-status
+                            ;; Update the simulation plot.
+                            (js/setTimeout update-sim-plot-data 0)
                             ;; Setup next iteration.
                             (js/setTimeout anim-step step-time))))))
 
@@ -186,13 +190,6 @@
                             :class "cell-by-cell-app"
                             :children [[handsontable table-data-rounded @options]
                                        [gap :size "20px"]
-                                       (when @cur-cell-status
-                                         [:button.toolbar-button.pure-button
-                                          {:on-click (fn [e]
-                                                       (anim-step)
-                                                       (.blur (.-target e)))}
-                                          "Continue"])
-                                       [gap :size "10px"]
                                        [h-box
                                         :children [;; TODO: Move this into the anomaly-plot component.
                                                    (when (every? some? [@plot-data @cur-row @cur-cell-status])
@@ -200,8 +197,9 @@
                                                            plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
                                                        [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))
-                                                   [gap :size "5px"]
-                                                   [sim-plot @sim-plot-data]]]
+                                                   [gap :size "20px"]
+                                                   (when @cur-cell-status
+                                                     [sim-plot @sim-plot-data anim-step])]]
                                        [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
