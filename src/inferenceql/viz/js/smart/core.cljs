@@ -29,7 +29,7 @@
 
 (defn simulate-cell
   [query-fn col col-order row schema]
-  (let [sample-count 30
+  (let [sample-count 70
         rem-cols (remove #{col} col-order)
         b-str (binding-string row rem-cols schema)
         generate-query (format "SELECT * FROM (GENERATE %s UNDER model CONDITIONED BY %s) LIMIT %s;"
@@ -137,10 +137,7 @@
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
                               aqr (anomaly-query-results query-fn thresh (:column chk) cols row schema)
-                              anomaly-status (:anomaly-status aqr)
-
-                              sims (simulate-row query-fn cols row schema)
-                              row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
+                              anomaly-status (:anomaly-status aqr)]
 
                           ;; Update query.
                           (reset! query (query-display aqr))
@@ -149,8 +146,12 @@
                           (reset! cur-row (:row chk))
                           (reset! cur-cell-status anomaly-status)
 
-                          ;; Update sim plot.
-                          (reset! sim-plot-data {:sims sims :row row :row-anom row-anom})
+                          (if anomaly-status
+                            (let [sims (simulate-row query-fn cols row schema)
+                                  row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
+                              ;; Update sim plot.
+                              (reset! sim-plot-data {:sims sims :row row :row-anom row-anom}))
+                            (reset! sim-plot-data nil))
 
                           ;; Switch to next check.
                           (swap! checks rest)
