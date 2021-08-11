@@ -23,6 +23,8 @@
         row (select-keys row cols)
         actual (for [[k v] row]
                  {:timepoint k :value v :anomaly (get row-anom k)})
+        anomalous-timepoints (keep (fn [[k v]] (when v k))
+                                   row-anom)
 
         tuples (fn [[k vs]]
                  (for [v vs]
@@ -34,7 +36,13 @@
      :height 200
      :width 400
      :encoding {:x {:field "timepoint", :type "ordinal"
-                    :scale {:padding 0.01}}
+                    :scale {:padding 0.01}
+                    :axis {:tickColor {:condition {:test {:field "value" :oneOf anomalous-timepoints}
+                                                   :value "red"}
+                                       :value "black"}
+                           :labelColor {:condition {:test {:field "value" :oneOf anomalous-timepoints}
+                                                    :value "red"}
+                                        :value "black"}}}
                 :y {:axis {:grid false}}}
      :layer [;; Layers for simulated data.
              {:data {:name "simulations"}
