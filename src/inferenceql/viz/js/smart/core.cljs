@@ -119,39 +119,6 @@
         plot-data (r/atom nil)
         sim-plot-data (r/atom nil)
 
-        node (dom/createElement "div")
-        comp (fn [options]
-               [v-box
-                :style {:min-height "1100px"
-                        :padding "20px"
-                        :border-width "3px"
-                        :border-style "solid"
-                        :border-radius "7px"
-                        :border-color "grey"}
-                :children [[v-box
-                            :class "cell-by-cell-app"
-                            :children [[handsontable table-data-rounded @options]
-                                       [gap :size "20px"]
-                                       [h-box
-                                        :children [[gap :size "25px"]
-                                                   ;; TODO: Move this into the anomaly-plot component.
-                                                   (when (every? some? [@plot-data @cur-row @cur-cell-status])
-                                                     (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
-                                                           plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
-                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
-                                                       [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))]]
-                                       [gap :size "20px"]
-                                       [sim-plot @sim-plot-data]
-                                       (when @cur-cell-status
-                                         [:button.toolbar-button.pure-button
-                                          {:on-click (fn [e]
-                                                       (js/setTimeout anim-step step-time)
-                                                       (.blur (.-target e)))}
-                                          "Continue"])
-                                       [:div {:class "observablehq--inspect"
-                                              :style {:white-space "pre-wrap"}}
-                                        @query]]]]])
-
         anim-step (fn anim-step []
                     ;; When there are checks left to be made.
                     (when-let [chk (first @checks)]
@@ -203,7 +170,40 @@
 
                           (when-not anomaly-status
                             ;; Setup next iteration.
-                            (js/setTimeout anim-step step-time))))))]
+                            (js/setTimeout anim-step step-time))))))
+
+        node (dom/createElement "div")
+        comp (fn [options]
+               [v-box
+                :style {:min-height "1100px"
+                        :padding "20px"
+                        :border-width "3px"
+                        :border-style "solid"
+                        :border-radius "7px"
+                        :border-color "grey"}
+                :children [[v-box
+                            :class "cell-by-cell-app"
+                            :children [[handsontable table-data-rounded @options]
+                                       [gap :size "20px"]
+                                       [h-box
+                                        :children [[gap :size "25px"]
+                                                   ;; TODO: Move this into the anomaly-plot component.
+                                                   (when (every? some? [@plot-data @cur-row @cur-cell-status])
+                                                     (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
+                                                           plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
+                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
+                                                       [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))]]
+                                       [gap :size "20px"]
+                                       [sim-plot @sim-plot-data]
+                                       (when @cur-cell-status
+                                         [:button.toolbar-button.pure-button
+                                          {:on-click (fn [e]
+                                                       (anim-step)
+                                                       (.blur (.-target e)))}
+                                          "Continue"])
+                                       [:div {:class "observablehq--inspect"
+                                              :style {:white-space "pre-wrap"}}
+                                        @query]]]]])]
 
     ;; Start animation.
     (js/setTimeout anim-step step-time)
