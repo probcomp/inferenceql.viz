@@ -117,7 +117,8 @@
         table-data (vec (take num-rows (->clj table-data)))
         table-data-rounded (for [r table-data]
                              (let [round (fn [col val]
-                                           (if (= (get schema col) :numerical)
+                                           (if (and (= (get schema col) :numerical)
+                                                    (number? val))
                                              (.toFixed val 2)
                                              val))]
                                (medley/map-kv-vals round r)))
