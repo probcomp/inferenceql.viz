@@ -68,14 +68,14 @@
               (name col) val b-str))))
 
 (defn anomaly-query-results
-  [query-fn thresh col col-order row schema]
+  [query-fn thresh alpha col col-order row schema]
   (let [q1 (query-uncond col row schema)
         q2 (query-cond col col-order row schema)
         q1-val (some-> q1 query-fn first (.-p))
         q2-val (some-> q2 query-fn first (.-p))
 
         anomaly (and q1-val q2-val
-                     (< q2-val q1-val)
+                     (< q2-val (* alpha q1-val))
                      (< q2-val thresh))]
     {:q-uncond q1 :q-uncond-v q1-val
      :q-cond q2 :q-cond-v q2-val
@@ -87,22 +87,22 @@
     (string/join "\n\n" [q-uncond (str q-uncond-v) q-cond (str q-cond-v)])))
 
 (defn row-anomaly-statuses
-  [query-fn thresh cols ts-cols row schema]
+  [query-fn thresh alpha cols ts-cols row schema]
   (let [aqrs (for [c ts-cols]
-               (anomaly-query-results query-fn thresh c cols row schema))
+               (anomaly-query-results query-fn thresh alpha c cols row schema))
         anomaly-statuses (map :anomaly-status aqrs)]
     (zipmap ts-cols anomaly-statuses)))
 
 ;------------------------------------------
 
-(defn anomaly-helper [cur-col-uncond-p cur-col-cond-p chk row cols schema thresh]
+(defn anomaly-helper [cur-col-uncond-p cur-col-cond-p chk row cols schema thresh alpha]
   (let [q-uncond-v (-> cur-col-uncond-p
                        (nth (:row chk))
                        (:p))
         q-cond-v (-> cur-col-cond-p
                      (nth (:row chk))
                      (:p))
-        anomaly (and (< q-cond-v q-uncond-v)
+        anomaly (and (< q-cond-v (* alpha q-uncond-v))
                      (< q-cond-v thresh))
         user-text (query-display
                    {:q-uncond (query-uncond (:column chk) row schema)
@@ -171,7 +171,7 @@
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
 
-                              ah (anomaly-helper @cur-col-uncond-p @cur-col-cond-p chk row cols schema thresh)
+                              ah (anomaly-helper @cur-col-uncond-p @cur-col-cond-p chk row cols schema thresh alpha)
                               {:keys [user-text anomaly]} ah
 
                               update-sim-plot-data
@@ -184,7 +184,7 @@
                                   (if-not ts-col-set
                                     (reset! sim-plot-data false)
                                     (let [sims (simulate-row query-fn cols ts-col-set row schema)
-                                          row-anom (row-anomaly-statuses query-fn thresh cols ts-col-set row schema)]
+                                          row-anom (row-anomaly-statuses query-fn thresh alpha cols ts-col-set row schema)]
 
                                       ;; Update sim plot.
                                       (reset! sim-plot-data {:sims sims :row row :row-anom row-anom})
