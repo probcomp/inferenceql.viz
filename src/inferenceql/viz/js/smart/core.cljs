@@ -25,8 +25,6 @@
                    cells)]
     (string/join " AND " cells)))
 
-(def col-group [:ld1 :ld2 :ld3 :ld4 :ld5])
-
 (defn simulate-cell
   [query-fn col cols row schema]
   (let [sample-count 70
@@ -84,6 +82,15 @@
   (let [{:keys [q-uncond q-uncond-v q-cond q-cond-v]} aqr]
     (string/join "\n\n" [q-uncond (str q-uncond-v) q-cond (str q-cond-v)])))
 
+(defn row-anomaly-statuses
+  [query-fn thresh cols ts-cols row schema]
+  (let [aqrs (for [c ts-cols]
+               (anomaly-query-results query-fn thresh c cols row schema))
+        anomaly-statuses (map :anomaly-status aqrs)]
+    (zipmap ts-cols anomaly-statuses)))
+
+;------------------------------------------
+
 (defn anomaly-helper [cur-col-uncond-p cur-col-cond-p chk row cols schema thresh]
   (let [q-uncond-v (-> cur-col-uncond-p
                        (nth (:row chk))
@@ -100,13 +107,6 @@
                     :q-cond-v q-cond-v})]
     {:anomaly anomaly
      :user-text user-text}))
-
-(defn row-anomaly-statuses
-  [query-fn thresh cols ts-cols row schema]
-  (let [aqrs (for [c ts-cols]
-               (anomaly-query-results query-fn thresh c cols row schema))
-        anomaly-statuses (map :anomaly-status aqrs)]
-    (zipmap ts-cols anomaly-statuses)))
 
 ;------------------------------------------
 
@@ -170,7 +170,8 @@
                                                        (map set))
                                       ts-col-set (some (fn [s] (when (s (:column chk)) s))
                                                        ts-col-sets)]
-                                  (if ts-col-set
+                                  (if-not ts-col-set
+                                    (reset! sim-plot-data false)
                                     (let [sims (simulate-row query-fn cols ts-col-set row schema)
                                           row-anom (row-anomaly-statuses query-fn thresh cols ts-col-set row schema)]
 

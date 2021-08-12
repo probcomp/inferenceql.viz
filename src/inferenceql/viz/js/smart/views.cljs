@@ -69,26 +69,25 @@
                                  :value "black"}
                          :y {:field "value" :type "quantitative"}}}]}))
 
-
-
 (defn sim-plot
   [data anim-step]
-  (if-not data
+  (if-not (some? data)
     [v-box
      :min-height "200px"
      :min-width "400px"
      :align :center
      :justify :center
      :children [[:span "Running simulations..."]]]
-    (let [{:keys [sims row row-anom]} data
-          spec (generate-sim-spec sims row row-anom)]
-     [v-box
-      :align :start
-      :children [[:button.toolbar-button.pure-button
-                  {:style {:margin-left "48px"}
-                   :on-click (fn [e]
-                               (anim-step)
-                               (.blur (.-target e)))}
-                  "Continue"]
-                 [gap :size "10px"]
-                 [vega-lite spec {:actions false} nil nil]]])))
+    [v-box
+     :align :start
+     :children [[:button.toolbar-button.pure-button
+                 {:style {:margin-left "48px"}
+                  :on-click (fn [e]
+                              (anim-step)
+                              (.blur (.-target e)))}
+                 "Continue"]
+                (when data
+                  (let [{:keys [sims row row-anom]} data
+                        spec (generate-sim-spec sims row row-anom)]
+                    [gap :size "10px"]
+                    [vega-lite spec {:actions false} nil nil]))]]))
