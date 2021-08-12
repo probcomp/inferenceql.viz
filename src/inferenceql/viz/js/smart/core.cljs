@@ -48,30 +48,34 @@
   (format "\"%s\"" val))
 
 (defn query-uncond [col row schema]
-  (let [col-type (get schema col)
-        val (->> (get row col)
-                 str)
-        val (if (= col-type :numerical) val (quote-val val))]
-    (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name col) val)))
+  (when (get row col)
+    (let [col-type (get schema col)
+          val (->> (get row col)
+                   str)
+          val (if (= col-type :numerical) val (quote-val val))]
+      (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model AS p) FROM data LIMIT 1;" (name col) val))))
 
 (defn query-cond [col col-order row schema]
-  (let [col-type (get schema col)
-        val (->> (get row col)
-                 str)
-        val (if (= col-type :numerical) val (quote-val val))
+  (when (get row col)
+    (let [col-type (get schema col)
+          val (->> (get row col)
+                   str)
+          val (if (= col-type :numerical) val (quote-val val))
 
-        other-cols (remove #{col} col-order)
-        b-str (binding-string row other-cols schema)]
-    (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
-            (name col) val b-str)))
+          other-cols (remove #{col} col-order)
+          b-str (binding-string row other-cols schema)]
+      (format "SELECT (PROBABILITY DENSITY OF %s=%s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT 1;"
+              (name col) val b-str))))
 
 (defn anomaly-query-results
   [query-fn thresh col col-order row schema]
   (let [q1 (query-uncond col row schema)
         q2 (query-cond col col-order row schema)
-        q1-val (-> (query-fn q1) first (.-p))
-        q2-val (-> (query-fn q2) first (.-p))
-        anomaly (and (< q2-val q1-val)
+        q1-val (some-> q1 query-fn first (.-p))
+        q2-val (some-> q2 query-fn first (.-p))
+
+        anomaly (and q1-val q2-val
+                     (< q2-val q1-val)
                      (< q2-val thresh))]
     {:q-uncond q1 :q-uncond-v q1-val
      :q-cond q2 :q-cond-v q2-val
