@@ -20,7 +20,9 @@
         cols (keys sims)
         row (select-keys row cols)
         actual (for [[k v] row]
-                 {:timepoint k :value v :anomaly (get row-anom k)})
+                 (when v
+                   {:timepoint k :value v :anomaly (get row-anom k)}))
+        actual (remove nil? actual)
         anomalous-timepoints (keep (fn [[k v]] (when v k))
                                    row-anom)
 
