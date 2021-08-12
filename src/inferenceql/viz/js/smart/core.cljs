@@ -29,7 +29,7 @@
 
 (defn simulate-cell
   [query-fn col cols row schema]
-  (let [sample-count 30
+  (let [sample-count 70
         rem-cols (remove #{col} cols)
         b-str (binding-string row rem-cols schema)
         generate-query (format "SELECT * FROM (GENERATE %s UNDER model CONDITIONED BY %s) LIMIT %s;"
