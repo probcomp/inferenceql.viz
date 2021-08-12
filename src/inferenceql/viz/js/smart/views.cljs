@@ -8,13 +8,10 @@
 
 (defn anomaly-plot
   "Reagent component for displaying an anomoly plot"
-  [data schema selections]
+  [data schema cur-col]
   (if (some? data)
-    (let [selections (postwalk #(if (string? %) (keyword  %) %)
-                               selections)
-          data (->clj data)
-          ;; Custom spec generating function for SMART app.
-          spec (generate-spec schema data selections)]
+    (let [;; Custom spec generating function for SMART app.
+          spec (generate-spec schema data [[cur-col :p]])]
       [vega-lite spec {:actions false} nil nil])))
 
 (defn generate-sim-spec

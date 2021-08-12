@@ -126,11 +126,11 @@
                             col-name (name (:column chk))]
                         ;; Update the plot.
                         (if (not= @cur-col (:column chk))
-                          (let [all-bindings (string/join " AND " (map name other-cols))
+                          (let [all-columns (string/join ", " (map name cols))
+                                all-bindings (string/join " AND " (map name other-cols))
                                 q-conditional-all (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
-                                                          col-name col-name all-bindings num-rows)]
-                            (reset! plot-data {:col-names [col-name "p"]
-                                               :rows (query-fn q-conditional-all)})
+                                                          all-columns col-name all-bindings num-rows)]
+                            (reset! plot-data (-> (query-fn q-conditional-all) ->clj vec))
                             (reset! cur-col (:column chk))))
 
                         ;; Update the table.
@@ -220,11 +220,11 @@
                                        [gap :size "20px"]
                                        [h-box
                                         :children [;; TODO: Move this into the anomaly-plot component.
-                                                   (when (every? some? [@plot-data @cur-row @cur-cell-status])
-                                                     (let [plot-rows (some->> (:rows @plot-data) ->clj vec)
+                                                   (when (every? some? [@plot-data @cur-row @cur-col @cur-cell-status])
+                                                     (let [plot-rows @plot-data
                                                            plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
-                                                       [anomaly-plot plot-rows schema [(:col-names @plot-data)]]))
+                                                       [anomaly-plot plot-rows schema @cur-col]))
                                                    [gap :size "20px"]
                                                    (when @cur-cell-status
                                                      [sim-plot @sim-plot-data anim-step])]]
