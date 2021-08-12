@@ -91,14 +91,14 @@
         q-cond-v (-> cur-col-cond-p
                      (nth (:row chk))
                      (:p))
-        anom-status (and (< q-cond-v q-uncond-v)
-                         (< q-cond-v thresh))
+        anomaly (and (< q-cond-v q-uncond-v)
+                     (< q-cond-v thresh))
         user-text (query-display
                    {:q-uncond (query-uncond (:column chk) row schema)
                     :q-uncond-v q-uncond-v
                     :q-cond (query-cond (:column chk) cols row schema)
                     :q-cond-v q-cond-v})]
-    {:anom-status anom-status
+    {:anomaly anomaly
      :user-text user-text}))
 
 (defn row-anomaly-statuses
@@ -161,7 +161,7 @@
                         (let [row (nth table-data (:row chk))
 
                               ah (anomaly-helper @cur-col-uncond-p @cur-col-cond-p chk row cols schema thresh)
-                              {:keys [user-text anom-status]} ah
+                              {:keys [user-text anomaly]} ah
 
                               update-sim-plot-data
                               (fn []
@@ -206,7 +206,7 @@
 
                           ;; Update highlighted point in plot.
                           (reset! cur-row (:row chk))
-                          (reset! cur-cell-anom anom-status)
+                          (reset! cur-cell-anom anomaly)
 
                           ;; Switch to next check.
                           (swap! checks rest)
@@ -217,16 +217,16 @@
                                             (let [cell-props #js {}]
                                               (when (and (= row (:row chk))
                                                          (= prop (name (:column chk))))
-                                                (let [color (if anomaly-status
+                                                (let [color (if anomaly
                                                               "red-highlight"
                                                               "blue-highlight")]
                                                   (set! (.-className cell-props) color)))
                                               cell-props))]
                             (swap! options assoc :cells new-cells))
 
-                          (if anomaly-status
+                          (if anomaly
                             ;; Update the simulation plot.
-                            (js/setTimeout update-sim-plot-data 0)
+                            (js/setTimeout update-sim-plot-data 50)
                             ;; Setup next iteration.
                             (js/setTimeout anim-step step-time))))))
 
