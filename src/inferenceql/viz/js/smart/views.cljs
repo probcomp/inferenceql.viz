@@ -43,8 +43,10 @@
                                        :value "black"}
                            :labelColor {:condition {:test {:field "value" :oneOf anomalous-timepoints}
                                                     :value "red"}
-                                        :value "black"}}}
-                :y {:axis {:grid false}}}
+                                        :value "black"}
+                           :labelLimit 500}}
+                :y {:axis {:grid false}
+                    :scale {:zero false}}}
      :layer [;; Layers for simulated data.
              {:data {:name "simulations"}
               :mark {:type "errorband",
