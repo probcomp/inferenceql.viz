@@ -116,7 +116,7 @@
 
 (defn ^:export app
   "Javascript interface for displaying the SMART app"
-  [query-fn table-data schema num-rows thresh step-time index-col options]
+  [query-fn table-data schema num-rows thresh alpha step-time index-col invalidation options]
   (let [schema (clj-schema schema)
         table-data (vec (take num-rows (->clj table-data)))
         table-data-rounded (for [r table-data]
@@ -147,6 +147,7 @@
         cur-col-cond-p (r/atom nil)
         cur-col-uncond-p (r/atom nil)
         sim-plot-data (r/atom nil)
+        timer (r/atom nil)
 
         anim-step (fn anim-step []
                     ;; There should always be another check in the list.
@@ -237,9 +238,9 @@
 
                           (if anomaly
                             ;; Update the simulation plot.
-                            (js/setTimeout update-sim-plot-data 50)
+                            (reset! timer (js/setTimeout update-sim-plot-data 50))
                             ;; Setup next iteration.
-                            (js/setTimeout anim-step step-time))))))
+                            (reset! timer (js/setTimeout anim-step step-time)))))))
 
         node (dom/createElement "div")
         comp (fn [options]
@@ -269,7 +270,9 @@
                                               :style {:white-space "pre-wrap"}}
                                         @query-user-text]]]]])]
 
+    ;; Stop the animation when the cell is invalided.
+    (.then invalidation #(when @timer (js/clearTimeout @timer)))
     ;; Start animation.
-    (js/setTimeout anim-step step-time)
+    (reset! timer (js/setTimeout anim-step 1000))
     (rdom/render [comp options] node)
     node))
