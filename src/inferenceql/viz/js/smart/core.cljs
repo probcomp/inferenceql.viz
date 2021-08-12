@@ -79,9 +79,27 @@
      :q-cond q2 :q-cond-v q2-val
      :anomaly-status anomaly}))
 
+
 (defn query-display [aqr]
   (let [{:keys [q-uncond q-uncond-v q-cond q-cond-v]} aqr]
     (string/join "\n\n" [q-uncond (str q-uncond-v) q-cond (str q-cond-v)])))
+
+(defn anomaly-helper [cur-col-uncond-p cur-col-cond-p chk row cols schema thresh]
+  (let [q-uncond-v (-> cur-col-uncond-p
+                       (nth (:row chk))
+                       (:p))
+        q-cond-v (-> cur-col-cond-p
+                     (nth (:row chk))
+                     (:p))
+        anomaly-status (and (< q-cond-v q-uncond-v)
+                            (< q-cond-v thresh))
+        query-user-text (query-display
+                         {:q-uncond (query-uncond (:column chk) row schema)
+                          :q-uncond-v q-uncond-v
+                          :q-cond (query-cond (:column chk) cols row schema)
+                          :q-cond-v q-cond-v})]
+    {:anomaly-status anomaly-status
+     :query-user-text query-user-text}))
 
 (defn row-anomaly-statuses
   [query-fn thresh cols ts-cols row schema]
@@ -116,7 +134,8 @@
         cur-col (r/atom nil)
         cur-row (r/atom nil)
         cur-cell-status (r/atom false)
-        plot-data (r/atom nil)
+        cur-col-cond-p (r/atom nil)
+        cur-col-uncond-p (r/atom nil)
         sim-plot-data (r/atom nil)
 
         anim-step (fn anim-step []
@@ -124,19 +143,38 @@
                     (when-let [chk (first @checks)]
                       (let [other-cols (remove #{(:column chk)} cols)
                             col-name (name (:column chk))]
+
+                        ;; Update the condition and un-conditional probs for the current columns.
                         ;; Update the plot.
                         (if (not= @cur-col (:column chk))
                           (let [all-columns (string/join ", " (map name cols))
                                 all-bindings (string/join " AND " (map name other-cols))
-                                q-conditional-all (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
-                                                          all-columns col-name all-bindings num-rows)]
-                            (reset! plot-data (-> (query-fn q-conditional-all) ->clj vec))
+                                q-cond (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
+                                               all-columns col-name all-bindings num-rows)
+                                q-uncond (format "SELECT %s, (PROBABILITY DENSITY OF %s UNDER model AS p) FROM data LIMIT %s;"
+                                                 col-name col-name num-rows)]
+                            (reset! cur-col-cond-p (-> (query-fn q-cond) ->clj vec))
+                            (reset! cur-col-uncond-p (-> (query-fn q-uncond) ->clj vec))
                             (reset! cur-col (:column chk))))
 
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
-                              aqr (anomaly-query-results query-fn thresh (:column chk) cols row schema)
-                              anomaly-status (:anomaly-status aqr)
+
+                              ;;foo (bar cur-col-uncond-p cur-col-cond-p chk row schema)
+
+                              q-uncond-v (-> @cur-col-uncond-p
+                                             (nth (:row chk))
+                                             (:p))
+                              q-cond-v (-> @cur-col-cond-p
+                                           (nth (:row chk))
+                                           (:p))
+                              anomaly-status (and (< q-cond-v q-uncond-v)
+                                                  (< q-cond-v thresh))
+                              query-user-text (query-display
+                                               {:q-uncond (query-uncond (:column chk) row schema)
+                                                :q-uncond-v q-uncond-v
+                                                :q-cond (query-cond (:column chk) cols row schema)
+                                                :q-cond-v q-cond-v})
 
                               update-sim-plot-data
                               (fn []
@@ -174,7 +212,7 @@
                                         (swap! options assoc :cells new-cells))))))]
 
                           ;; Update query.
-                          (reset! query (query-display aqr))
+                          (reset! query query-user-text)
 
                           ;; Clear the sim-plot.
                           (reset! sim-plot-data nil)
@@ -220,8 +258,8 @@
                                        [gap :size "20px"]
                                        [h-box
                                         :children [;; TODO: Move this into the anomaly-plot component.
-                                                   (when (every? some? [@plot-data @cur-row @cur-col @cur-cell-status])
-                                                     (let [plot-rows @plot-data
+                                                   (when (every? some? [@cur-col-cond-p @cur-row @cur-col @cur-cell-status])
+                                                     (let [plot-rows @cur-col-cond-p
                                                            plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
                                                        [anomaly-plot plot-rows schema @cur-col]))
