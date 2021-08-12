@@ -91,15 +91,15 @@
         q-cond-v (-> cur-col-cond-p
                      (nth (:row chk))
                      (:p))
-        anomaly-status (and (< q-cond-v q-uncond-v)
-                            (< q-cond-v thresh))
-        query-user-text (query-display
-                         {:q-uncond (query-uncond (:column chk) row schema)
-                          :q-uncond-v q-uncond-v
-                          :q-cond (query-cond (:column chk) cols row schema)
-                          :q-cond-v q-cond-v})]
-    {:anomaly-status anomaly-status
-     :query-user-text query-user-text}))
+        anom-status (and (< q-cond-v q-uncond-v)
+                         (< q-cond-v thresh))
+        user-text (query-display
+                   {:q-uncond (query-uncond (:column chk) row schema)
+                    :q-uncond-v q-uncond-v
+                    :q-cond (query-cond (:column chk) cols row schema)
+                    :q-cond-v q-cond-v})]
+    {:anom-status anom-status
+     :user-text user-text}))
 
 (defn row-anomaly-statuses
   [query-fn thresh cols ts-cols row schema]
@@ -125,7 +125,7 @@
         options (->clj options)
         cols (map keyword (:cols options))
 
-        query (r/atom "SELECT * FROM data;")
+        query-user-text (r/atom "SELECT * FROM data;")
         options (r/atom (assoc options :cells (fn [row col prop] #js {})))
 
         checks (for [c cols i (range (count table-data))] {:column c :row i})
@@ -133,7 +133,7 @@
         checks (r/atom checks)
         cur-col (r/atom nil)
         cur-row (r/atom nil)
-        cur-cell-status (r/atom false)
+        cur-cell-anom (r/atom false)
         cur-col-cond-p (r/atom nil)
         cur-col-uncond-p (r/atom nil)
         sim-plot-data (r/atom nil)
@@ -160,21 +160,8 @@
                         ;; Update the table.
                         (let [row (nth table-data (:row chk))
 
-                              ;;foo (bar cur-col-uncond-p cur-col-cond-p chk row schema)
-
-                              q-uncond-v (-> @cur-col-uncond-p
-                                             (nth (:row chk))
-                                             (:p))
-                              q-cond-v (-> @cur-col-cond-p
-                                           (nth (:row chk))
-                                           (:p))
-                              anomaly-status (and (< q-cond-v q-uncond-v)
-                                                  (< q-cond-v thresh))
-                              query-user-text (query-display
-                                               {:q-uncond (query-uncond (:column chk) row schema)
-                                                :q-uncond-v q-uncond-v
-                                                :q-cond (query-cond (:column chk) cols row schema)
-                                                :q-cond-v q-cond-v})
+                              ah (anomaly-helper @cur-col-uncond-p @cur-col-cond-p chk row cols schema thresh)
+                              {:keys [user-text anom-status]} ah
 
                               update-sim-plot-data
                               (fn []
@@ -212,14 +199,14 @@
                                         (swap! options assoc :cells new-cells))))))]
 
                           ;; Update query.
-                          (reset! query query-user-text)
+                          (reset! query-user-text user-text)
 
                           ;; Clear the sim-plot.
                           (reset! sim-plot-data nil)
 
                           ;; Update highlighted point in plot.
                           (reset! cur-row (:row chk))
-                          (reset! cur-cell-status anomaly-status)
+                          (reset! cur-cell-anom anom-status)
 
                           ;; Switch to next check.
                           (swap! checks rest)
@@ -258,18 +245,18 @@
                                        [gap :size "20px"]
                                        [h-box
                                         :children [;; TODO: Move this into the anomaly-plot component.
-                                                   (when (every? some? [@cur-col-cond-p @cur-row @cur-col @cur-cell-status])
+                                                   (when (every? some? [@cur-col-cond-p @cur-row @cur-col @cur-cell-anom])
                                                      (let [plot-rows @cur-col-cond-p
                                                            plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
-                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-status))]
+                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-anom))]
                                                        [anomaly-plot plot-rows schema @cur-col]))
                                                    [gap :size "20px"]
-                                                   (when @cur-cell-status
+                                                   (when @cur-cell-anom
                                                      [sim-plot @sim-plot-data anim-step])]]
                                        [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
-                                        @query]]]]])]
+                                        @query-user-text]]]]])]
 
     ;; Start animation.
     (js/setTimeout anim-step step-time)
