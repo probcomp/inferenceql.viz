@@ -112,7 +112,7 @@
 
 (defn ^:export app
   "Javascript interface for displaying the SMART app"
-  [query-fn table-data schema num-rows thresh step-time options invalidation]
+  [query-fn table-data schema num-rows thresh step-time index-col options]
   (let [schema (clj-schema schema)
         table-data (vec (take num-rows (->clj table-data)))
         table-data-rounded (for [r table-data]
@@ -126,7 +126,12 @@
         cols (map keyword (:cols options))
 
         query-user-text (r/atom "SELECT * FROM data;")
-        options (r/atom (assoc options :cells (fn [row col prop] #js {})))
+
+        cols-with-index (concat [index-col] (:cols options))
+        options (r/atom (-> options
+                            (assoc :cells (fn [row col prop] #js {}))
+                            (assoc :cols cols-with-index)))
+
 
         checks (for [c cols i (range (count table-data))] {:column c :row i})
         checks (cycle (filter #(some? (get-in table-data [(:row %) (:column %)])) checks))
@@ -147,9 +152,9 @@
                         ;; Update the condition and un-conditional probs for the current columns.
                         ;; Update the plot.
                         (if (not= @cur-col (:column chk))
-                          (let [all-columns (string/join ", " (map name cols))
+                          (let [all-columns (string/join ", " cols-with-index)
                                 all-bindings (string/join " AND " (map name other-cols))
-                                q-cond (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
+                                q-cond (format "SELECT %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
                                                all-columns col-name all-bindings num-rows)
                                 q-uncond (format "SELECT %s, (PROBABILITY DENSITY OF %s UNDER model AS p) FROM data LIMIT %s;"
                                                  col-name col-name num-rows)]
@@ -253,7 +258,7 @@
                                                        [anomaly-plot plot-rows schema @cur-col]))
                                                    [gap :size "20px"]
                                                    (when @cur-cell-anom
-                                                     [sim-plot @sim-plot-data anim-step])]]
+                                                     [sim-plot @sim-plot-data anim-step index-col])]]
                                        [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
