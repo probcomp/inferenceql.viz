@@ -28,9 +28,9 @@
 (def col-group [:ld1 :ld2 :ld3 :ld4 :ld5])
 
 (defn simulate-cell
-  [query-fn col col-order row schema]
+  [query-fn col cols row schema]
   (let [sample-count 70
-        rem-cols (remove #{col} col-order)
+        rem-cols (remove #{col} cols)
         b-str (binding-string row rem-cols schema)
         generate-query (format "SELECT * FROM (GENERATE %s UNDER model CONDITIONED BY %s) LIMIT %s;"
                                (name col) b-str sample-count)]
@@ -38,10 +38,10 @@
       (map #(get (->clj %) col)))))
 
 (defn simulate-row
-  [query-fn col-order row schema]
+  [query-fn cols ts-cols row schema]
   (into {}
-    (for [c col-group]
-      [c (simulate-cell query-fn c col-order row schema)])))
+        (for [c ts-cols]
+          [c (simulate-cell query-fn c cols row schema)])))
 
 ;------------------------------------------
 
@@ -84,11 +84,11 @@
     (string/join "\n\n" [q-uncond (str q-uncond-v) q-cond (str q-cond-v)])))
 
 (defn row-anomaly-statuses
-  [query-fn thresh col-order row schema]
-  (let [aqrs (for [c col-order]
-               (anomaly-query-results query-fn thresh c col-order row schema))
+  [query-fn thresh cols ts-cols row schema]
+  (let [aqrs (for [c ts-cols]
+               (anomaly-query-results query-fn thresh c cols row schema))
         anomaly-statuses (map :anomaly-status aqrs)]
-    (zipmap col-order anomaly-statuses)))
+    (zipmap ts-cols anomaly-statuses)))
 
 ;------------------------------------------
 
@@ -120,16 +120,15 @@
         sim-plot-data (r/atom nil)
 
         anim-step (fn anim-step []
-                    ;; When there are checks left to be made.
+                    ;; There should always be another check in the list.
                     (when-let [chk (first @checks)]
                       (let [other-cols (remove #{(:column chk)} cols)
                             col-name (name (:column chk))]
                         ;; Update the plot.
                         (if (not= @cur-col (:column chk))
                           (let [all-bindings (string/join " AND " (map name other-cols))
-                                all-columns (string/join ", " (map name cols))
                                 q-conditional-all (format "SELECT rowid, %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
-                                                          all-columns col-name all-bindings num-rows)]
+                                                          col-name col-name all-bindings num-rows)]
                             (reset! plot-data {:col-names [col-name "p"]
                                                :rows (query-fn q-conditional-all)})
                             (reset! cur-col (:column chk))))
@@ -141,29 +140,38 @@
 
                               update-sim-plot-data
                               (fn []
-                                (let [sims (simulate-row query-fn cols row schema)
-                                      row-anom (row-anomaly-statuses query-fn thresh cols row schema)]
-                                  ;; Update sim plot.
-                                  (reset! sim-plot-data {:sims sims :row row :row-anom row-anom})
-                                  (let [new-cells (fn [row col prop]
-                                                    (let [cell-props #js {}
-                                                          color
-                                                          (cond (and (= row (:row chk))
-                                                                     (= prop (name (:column chk))))
-                                                                "red-highlight"
+                                (let [ts-col-sets (->> (take-last 15 cols)
+                                                       (partition 5)
+                                                       (map set))
+                                      ts-col-set (some (fn [s] (when (s (:column chk)) s))
+                                                       ts-col-sets)]
+                                  (if ts-col-set
+                                    (let [sims (simulate-row query-fn cols ts-col-set row schema)
+                                          row-anom (row-anomaly-statuses query-fn thresh cols ts-col-set row schema)]
 
-                                                                (and (= row (:row chk))
-                                                                     (get row-anom (keyword prop)))
-                                                                "light-red-highlight"
+                                      ;; Update sim plot.
+                                      (reset! sim-plot-data {:sims sims :row row :row-anom row-anom})
 
-                                                                (= row (:row chk))
-                                                                "grey-highlight"
+                                      (let [new-cells (fn [row col prop]
+                                                        (let [cell-props #js {}
+                                                              color
+                                                              (cond (and (= row (:row chk))
+                                                                         (= prop (name (:column chk))))
+                                                                    "red-highlight"
 
-                                                                :else nil)]
-                                                      (when color
-                                                        (set! (.-className cell-props) color))
-                                                      cell-props))]
-                                    (swap! options assoc :cells new-cells))))]
+                                                                    (and (= row (:row chk))
+                                                                         (get row-anom (keyword prop)))
+                                                                    "light-red-highlight"
+
+                                                                    (and (= row (:row chk))
+                                                                         (ts-col-set (keyword prop)))
+                                                                    "grey-highlight"
+
+                                                                    :else nil)]
+                                                          (when color
+                                                            (set! (.-className cell-props) color))
+                                                          cell-props))]
+                                        (swap! options assoc :cells new-cells))))))]
 
                           ;; Update query.
                           (reset! query (query-display aqr))
