@@ -147,6 +147,7 @@
         cur-col-cond-p (r/atom nil)
         cur-col-uncond-p (r/atom nil)
         sim-plot-data (r/atom nil)
+        sim-plot-cache (r/atom {})
         timer (r/atom nil)
 
         anim-step (fn anim-step []
@@ -183,11 +184,19 @@
                                                        ts-col-sets)]
                                   (if-not ts-col-set
                                     (reset! sim-plot-data false)
-                                    (let [sims (simulate-row query-fn cols ts-col-set row schema)
-                                          row-anom (row-anomaly-statuses query-fn thresh alpha cols ts-col-set row schema)]
+                                    (let [cache-index [ts-col-set (:row chk)]
+                                          cache-hit (get @sim-plot-cache cache-index)
+                                          new-data (or cache-hit
+                                                       (let [sims (simulate-row query-fn cols ts-col-set row schema)
+                                                             row-anom (row-anomaly-statuses query-fn thresh alpha cols ts-col-set row schema)]
+                                                         {:sims sims :row row :row-anom row-anom}))]
+
+                                      ;; Update the cache if needed.
+                                      (when-not cache-hit
+                                        (swap! sim-plot-cache assoc cache-index new-data))
 
                                       ;; Update sim plot.
-                                      (reset! sim-plot-data {:sims sims :row row :row-anom row-anom})
+                                      (reset! sim-plot-data new-data)
 
                                       (let [new-cells (fn [row col prop]
                                                         (let [cell-props #js {}
@@ -197,7 +206,7 @@
                                                                     "red-highlight"
 
                                                                     (and (= row (:row chk))
-                                                                         (get row-anom (keyword prop)))
+                                                                         (get (:row-anom new-data) (keyword prop)))
                                                                     "light-red-highlight"
 
                                                                     (and (= row (:row chk))
