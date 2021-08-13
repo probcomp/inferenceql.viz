@@ -6,7 +6,6 @@
             [inferenceql.viz.panels.viz.db :as viz-panel]
             [inferenceql.viz.panels.more.db :as more-panel]
             [inferenceql.viz.panels.modal.db :as modal-panel]
-            [inferenceql.viz.components.highlight.db :as highlight-component]
             [inferenceql.viz.components.query.db :as query-component]
             [inferenceql.viz.components.store.db :as store-component]))
 
@@ -18,7 +17,6 @@
                              ::viz-panel/viz-panel
                              ::more-panel/more-panel
                              ::modal-panel/modal-panel
-                             ::highlight-component/highlight-component
                              ::query-component/query-component
                              ::store-component/store-component]))
 
@@ -39,7 +37,6 @@
              viz-panel/default-db
              more-panel/default-db
              modal-panel/default-db
-             highlight-component/default-db
              query-component/default-db
              store-component/default-db]]
     (apply merge dbs)))

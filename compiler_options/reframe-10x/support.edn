@@ -1,5 +1,4 @@
 ;; Augments the build.edn for spreadsheets app.
 ;; Used to get re-frame-10x working with the app.
-
 {:closure-defines {"re_frame.trace.trace_enabled_QMARK_" true}
  :preloads [day8.re-frame-10x.preload]}

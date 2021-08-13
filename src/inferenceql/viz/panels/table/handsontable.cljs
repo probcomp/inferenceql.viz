@@ -57,6 +57,12 @@
                                        (js->clj (.getSelected hot))])
                          true))
 
+                     :hot/after-deselect
+                     (fn [_]
+                       (fn []
+                         (rf/dispatch [:hot/after-deselect])
+                         true))
+
                      :hot/after-on-cell-mouse-down
                      (fn [_]
                        (fn [mouse-event _coords _TD]

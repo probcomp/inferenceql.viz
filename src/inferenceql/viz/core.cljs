@@ -36,9 +36,6 @@
             ;; Query Component
             [inferenceql.viz.components.query.events]
             [inferenceql.viz.components.query.subs]
-            ;; Highlight Component
-            [inferenceql.viz.components.highlight.events]
-            [inferenceql.viz.components.highlight.subs]
             ;; Store Component
             [inferenceql.viz.components.store.events]
             [inferenceql.viz.components.store.subs]

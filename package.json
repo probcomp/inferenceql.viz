@@ -6,10 +6,10 @@
     "isomorphic-ws": "^4.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "vega": "^5.17.3",
-    "vega-embed": "^6.8.0",
-    "vega-lite": "5",
-    "vega-tooltip": "^0.23.0",
+    "vega": "^5.20.2",
+    "vega-embed": "^6.18.2",
+    "vega-lite": "^5.1.0",
+    "vega-tooltip": "^0.26.0",
     "ws": "7.4.6"
   },
   "devDependencies": {

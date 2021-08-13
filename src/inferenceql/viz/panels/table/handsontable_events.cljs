@@ -12,16 +12,26 @@
             [clojure.edn :as edn]
             [clojure.string :as string]))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :hot/after-selection-end
  event-interceptors
- (fn [db [_ selections]]
+ (fn [{:keys [db]} [_ selections]]
    (let [selection-coords (selections/normalize selections)
+
          color (control-db/selection-color db)
-         num-rows (count (table-db/visual-row-ids db))]
+         num-rows (count (table-db/visual-row-ids db))
+         hot (table-db/hot-instance db)]
      (if (selections/valid-selection? selection-coords num-rows)
-       (assoc-in db [:table-panel :selection-layer-coords color] selection-coords)
-       (update-in db [:table-panel :selection-layer-coords] dissoc color)))))
+       {:db (assoc-in db [:table-panel :selection-layer-coords color] selection-coords)}
+       ;; Deselect everything.
+       {:hot/select [hot nil]}))))
+
+(rf/reg-event-db
+ :hot/after-deselect
+ event-interceptors
+ (fn [db [_]]
+   (let [color (control-db/selection-color db)]
+     (update-in db [:table-panel :selection-layer-coords] dissoc color))))
 
 (rf/reg-event-db
   :hot/after-on-cell-mouse-down

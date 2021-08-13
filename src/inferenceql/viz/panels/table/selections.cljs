@@ -53,12 +53,6 @@
     ;; Merging the row-wise data for each selection layer.
     (apply mapv merge data-by-layer)))
 
-(defn get-row-at-selection-start
-  "Returns the row in `rows` indexed by the start of the last selection rectangle in `coords`."
-  [coords rows]
-  (let [[r1 _c1 _r2 _c2] (last coords)]
-    (nth rows r1)))
-
 (defn valid-coords?
   "Checks whether the bounds of the selection rectangles in `coords` fit the data table size."
   [coords table-width table-height]
@@ -78,8 +72,7 @@
   (when (valid-coords? coords (count headers) (count rows))
     {:coords coords
      :selected-columns (get-selected-columns coords headers)
-     :selections (get-selections coords headers rows)
-     :row-at-selection-start (get-row-at-selection-start coords rows)}))
+     :selections (get-selections coords headers rows)}))
 
 (defn selection-layers
   "Merges in data pertaining to the selection-layer-coords

@@ -90,37 +90,16 @@
   color: #676767;
 }
 
-/*
-Still working on this.
-#table-container {
-  background: #f5f5f5;
-
-  /* This is like setting a border-top of 1px width expect that this border
-  extends into the div instead of outside of it. This way the table will cover
-  this border when it appears, thereby avoiding a double border. */
-  //box-shadow:inset 0px 1px 0px 1px #e7e7e7;
-
-  border-bottom: solid;
-  border-right: solid;
-  border-width: 1px;
-  border-color: #e7e7e7;
-}
-*/
-
 /* --------------- styling for vega-vizualization --------------- */
 
 #vg-tooltip-element.vg-tooltip.custom-theme table {
   font-size: .75rem;
 }
 
-/* re-com */
-
-
-
-/*----------------------------------------------------------------------------------------
+/* --------------- styles used by re-com library ---------------
   Flexbox "display" styles
   Requires 2 display values which we can't represent in a Clojure map
-----------------------------------------------------------------------------------------*/
+----------------------------------------------------------------*/
 
 .display-flex {
     display: -webkit-flex;
