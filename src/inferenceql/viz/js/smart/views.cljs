@@ -4,7 +4,10 @@
             [re-com.core :refer [v-box h-box box gap]]
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
             [inferenceql.viz.js.smart.vega :refer [generate-spec]]
-            [inferenceql.viz.js.util :refer [clj-schema]]))
+            [inferenceql.viz.js.util :refer [clj-schema]]
+            [inferenceql.inference.utils :as utils]
+            [kixi.stats.core :refer [standard-deviation-p
+                                     standard-deviation]]))
 
 (defn anomaly-plot
   "Reagent component for displaying an anomoly plot"
@@ -13,6 +16,24 @@
     (let [;; Custom spec generating function for SMART app.
           spec (generate-spec schema data [[cur-col :p]])]
       [vega-lite spec {:actions false} nil nil])))
+
+(defn mean [coll]
+  (let [sum (apply + coll)
+        count (count coll)]
+    (if (pos? count)
+      (/ sum count)
+      0)))
+
+(defn median [coll]
+  (let [sorted (sort coll)
+        cnt (count sorted)
+        halfway (quot cnt 2)]
+    (if (odd? cnt)
+      (nth sorted halfway) ; (1)
+      (let [bottom (dec halfway)
+            bottom-val (nth sorted bottom)
+            top-val (nth sorted halfway)]
+        (mean [bottom-val top-val]))))) ; (2)
 
 (defn generate-sim-spec
   [sims row row-anom index-col]
@@ -26,13 +47,16 @@
         anomalous-timepoints (keep (fn [[k v]] (when v k))
                                    row-anom)
 
-        tuples (fn [[k vs]]
-                 (for [v vs]
-                   {:timepoint k :value v}))
-        simulations (mapcat tuples sims)]
+        calc-error (fn [[time a]] (let [stddev (utils/std a)
+                                        m (median a)]
+                                    {:ci1 (+ m stddev)
+                                     :ci0 (- m stddev)
+                                     :center m
+                                     :timepoint time}))
+        simulations-error (map calc-error sims)]
     {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
      :title (str index-col ": " index-col-val)
-     :datasets {:simulations simulations
+     :datasets {:simulations-error simulations-error
                 :actual actual}
      :height 200
      :width 400
@@ -45,21 +69,23 @@
                                                     :value "red"}
                                         :value "black"}
                            :labelLimit 500}}
-                :y {:axis {:grid false}
+                :y {:axis {:grid false
+                           :title "value"}
                     :scale {:zero false}}}
      :layer [;; Layers for simulated data.
-             {:data {:name "simulations"}
+             {:data {:name "simulations-error"}
               :mark {:type "errorband",
-                     :extent "stdev"
                      :opacity 0.8
                      :borders true
                      :color "#FFE8C7"}
-              :encoding {:y {:field "value",
-                             :type "quantitative",}}}
-             {:data {:name "simulations"}
+              :encoding {:y {:field "ci1"
+                             :type "quantitative"}
+                         :y2 {:field "ci0"
+                              :type "quantitative"}}}
+             {:data {:name "simulations-error"}
               :mark {:type "line"
                      :color "#FF8D00"}
-              :encoding {:y {:aggregate "mean", :field "value"}}}
+              :encoding {:y {:field "center" :type "quantitative"}}}
              ;; Layers for actual data.
              {:data {:name "actual"}
               :mark {:type "line"

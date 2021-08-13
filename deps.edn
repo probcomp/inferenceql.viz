@@ -18,6 +18,7 @@
         cljs-ajax/cljs-ajax {:mvn/version "0.8.1"}
         cljs-bean/cljs-bean {:mvn/version "1.7.0"}
         cljstache/cljstache {:mvn/version "2.0.6"}
+        kixi/stats {:mvn/version "0.5.4"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "0f4476e9dbd4e4dafa8ecdb09f209908c97b6eaa"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"

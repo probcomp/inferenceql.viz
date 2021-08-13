@@ -37,7 +37,7 @@
                 :color {:field "anomaly"
                         :type "nominal"
                         :scale {:domain ["true", "false", "undefined"]
-                                :range ["Crimson" "steelblue" "lightgrey"]}
+                                :range ["red" "steelblue" "black"]}
                         :legend nil}}}))
 
 (defn- strip-plot-size-helper
