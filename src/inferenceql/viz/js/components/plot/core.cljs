@@ -6,7 +6,9 @@
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
             [inferenceql.viz.js.components.plot.vega :refer [generate-spec]]
             [inferenceql.viz.js.util :refer [clj-schema]]
-            [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]))
+            [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
+            [inferenceql.viz.panels.jsmodel.views :refer [js-code-block]]))
+
 
 (defn plot
   "Javascript interface to plot UI component. Returns a DOM node with a plot."
@@ -34,5 +36,13 @@
           spec (circle-viz-spec node-names edges)
           node (dom/createElement "div")
           component [vega-lite spec {:actions false :mode "vega"} nil nil]]
+      (rdom/render component node)
+      node)))
+
+(defn js-highlight
+  [js-text]
+  (when js-text
+    (let [node (dom/createElement "div")
+          component [js-code-block js-text]]
       (rdom/render component node)
       node)))
