@@ -254,11 +254,11 @@
                                        [gap :size "20px"]
                                        [h-box
                                         :children [;; TODO: Move this into the anomaly-plot component.
-                                                   (when (every? some? [@cur-col-cond-p @cur-row @cur-col @cur-cell-anom])
-                                                     (let [plot-rows @cur-col-cond-p
-                                                           plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
-                                                           plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-anom))]
-                                                       [anomaly-plot plot-rows schema @cur-col]))
+                                                   #_(when (every? some? [@cur-col-cond-p @cur-row @cur-col @cur-cell-anom])
+                                                       (let [plot-rows @cur-col-cond-p
+                                                             plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
+                                                             plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-anom))]
+                                                         [anomaly-plot plot-rows schema @cur-col]))
                                                    [gap :size "20px"]
                                                    (when @selected-cell-anomalous
                                                      [sim-plot @sim-plot-data index-col])]]
