@@ -149,7 +149,8 @@
         sim-plot-data (r/atom nil)
         sim-plot-cache (r/atom {})
         timer (r/atom nil)
-
+        row-to-anomaly (atom {})
+        _ (add-watch row-to-anomaly :debug (fn [key add-watch old new] (js/console.log "row-to-anomaly changed" (clj->js new))))
         anim-step (fn anim-step []
                     ;; There should always be another check in the list.
                     (when-let [chk (first @checks)]
@@ -174,7 +175,6 @@
 
                               ah (anomaly-helper @cur-col-uncond-p @cur-col-cond-p chk row cols schema thresh alpha)
                               {:keys [user-text anomaly]} ah
-
                               update-sim-plot-data
                               (fn []
                                 (let [ts-col-sets (->> (take-last 15 cols)
@@ -234,16 +234,24 @@
 
                           ;; Update table highlighting.
                           ;; TODO: Move this into a specialized table component.
+                          (js/console.log "anomaly" anomaly)
+                          (swap! row-to-anomaly assoc {:row (:row chk) :col (name (:column chk))} anomaly)
+                          (js/console.log "row-to-anomaly after swap" row-to-anomaly)
                           (let [new-cells (fn [row col prop]
                                             (let [cell-props #js {}]
-                                              (when (and (= row (:row chk))
-                                                         (= prop (name (:column chk))))
-                                                (let [color (if anomaly
-                                                              "red-highlight"
-                                                              "blue-highlight")]
-                                                  (set! (.-className cell-props) color)))
+                                              (js/console.log "row" row)
+                                              (let [curr-anom (get @row-to-anomaly {:row row :col prop})]
+                                                (when-not (nil? curr-anom)
+                                                  (let [color (if curr-anom
+                                                                "red-highlight"
+                                                                "blue-highlight")] ;; should be blue
+                                                    (set! (.-className cell-props) color)))
+                                                (js/console.log "@row-to-anomaly" @row-to-anomaly "row" row))
                                               cell-props))]
+                            (js/console.log "calling swap here" new-cells)
+                            (js/console.log "Before swap (:cells @options)" (:cells @options))
                             (swap! options assoc :cells new-cells))
+                            (js/console.log "After (:cells @options)" (:cells @options))
 
                           (if anomaly
                             ;; Update the simulation plot.
