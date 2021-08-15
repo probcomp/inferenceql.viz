@@ -247,11 +247,8 @@
                                               cell-props))]
                             (swap! options assoc :cells new-cells))
 
-                          (if anomaly
-                            ;; Update the simulation plot.
-                            (reset! timer (js/setTimeout update-sim-plot-data 50))
-                            ;; Setup next iteration.
-                            (reset! timer (js/setTimeout anim-step step-time)))))))
+                          ;; Setup next iteration.
+                          (reset! timer (js/setTimeout anim-step step-time))))))
 
         node (dom/createElement "div")
         comp (fn [options]
