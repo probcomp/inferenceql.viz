@@ -129,19 +129,10 @@
 
         options (->clj options)
         cols (map keyword (:cols options))
-
         query-user-text (r/atom "SELECT * FROM data;")
 
-        cols-with-index (concat [index-col] (:cols options))
-        options (r/atom (-> options
-                            (assoc :cells (fn [row col prop] #js {}))
-                            (assoc :cols cols-with-index)
-                            (assoc :on-click
-                                   (fn [row-1 col-1 row-2 col-2 _]
-                                     (.log js/console "on-click: " row-1 col-1)))))
-
         checks (for [c cols i (range (count table-data))] {:column c :row i})
-        checks (cycle (filter #(some? (get-in table-data [(:row %) (:column %)])) checks))
+        checks (filter #(some? (get-in table-data [(:row %) (:column %)])) checks)
         checks (r/atom checks)
         cur-col (r/atom nil)
         cur-row (r/atom nil)
@@ -152,6 +143,50 @@
         sim-plot-cache (r/atom {})
         timer (r/atom nil)
         row-to-anomaly (atom {})
+
+        selected-cell-anomalous (r/atom nil)
+
+        cols-with-index (vec (concat [index-col] (:cols options)))
+        update-sim-plot (fn [row-num col-num]
+                          (let [col (nth (map keyword cols-with-index) col-num)
+                                anomalous (get @row-to-anomaly {:row row-num :col (name col)})]
+                            (reset! selected-cell-anomalous anomalous)
+                            ;; Clear the previous sim-plot.
+                            (reset! sim-plot-data nil
+
+                              (let [work #(when anomalous
+                                            (let [col (nth (map keyword cols-with-index) col-num)
+                                                  row (nth table-data row-num)
+
+                                                  ts-col-sets (->> (take-last 15 cols)
+                                                                   (partition 5)
+                                                                   (map set))
+                                                  ts-col-set (some (fn [s] (when (s col) s))
+                                                                   ts-col-sets)]
+                                              (if-not ts-col-set
+                                                (reset! sim-plot-data false)
+                                                (let [cache-index [ts-col-set row-num]
+                                                      cache-hit (get @sim-plot-cache cache-index)
+                                                      new-data (or cache-hit
+                                                                   (let [sims (simulate-row query-fn cols ts-col-set row schema)
+                                                                         row-anom (row-anomaly-statuses query-fn thresh alpha cols ts-col-set row schema)]
+                                                                     {:sims sims :row row :row-anom row-anom}))]
+
+                                                  ;; Update the cache if needed.
+                                                  (when-not cache-hit
+                                                    (swap! sim-plot-cache assoc cache-index new-data))
+
+                                                  ;; Update sim plot.
+                                                  (reset! sim-plot-data new-data)))))]
+                                (js/setTimeout work 100)))))
+
+        options (r/atom (-> options
+                            (assoc :cells (fn [row col prop] #js {}))
+                            (assoc :cols cols-with-index)
+                            (assoc :on-click
+                                   (fn [row-1 col-1 _ _ _]
+                                     (update-sim-plot row-1 col-1)))))
+
         anim-step (fn anim-step []
                     ;; There should always be another check in the list.
                     (when-let [chk (first @checks)]
@@ -175,56 +210,10 @@
                         (let [row (nth table-data (:row chk))
 
                               ah (anomaly-helper @cur-col-uncond-p @cur-col-cond-p chk row cols schema thresh alpha)
-                              {:keys [user-text anomaly]} ah
-                              update-sim-plot-data
-                              (fn []
-                                (let [ts-col-sets (->> (take-last 15 cols)
-                                                       (partition 5)
-                                                       (map set))
-                                      ts-col-set (some (fn [s] (when (s (:column chk)) s))
-                                                       ts-col-sets)]
-                                  (if-not ts-col-set
-                                    (reset! sim-plot-data false)
-                                    (let [cache-index [ts-col-set (:row chk)]
-                                          cache-hit (get @sim-plot-cache cache-index)
-                                          new-data (or cache-hit
-                                                       (let [sims (simulate-row query-fn cols ts-col-set row schema)
-                                                             row-anom (row-anomaly-statuses query-fn thresh alpha cols ts-col-set row schema)]
-                                                         {:sims sims :row row :row-anom row-anom}))]
-
-                                      ;; Update the cache if needed.
-                                      (when-not cache-hit
-                                        (swap! sim-plot-cache assoc cache-index new-data))
-
-                                      ;; Update sim plot.
-                                      (reset! sim-plot-data new-data)
-
-                                      (let [new-cells (fn [row col prop]
-                                                        (let [cell-props #js {}
-                                                              color
-                                                              (cond (and (= row (:row chk))
-                                                                         (= prop (name (:column chk))))
-                                                                    "red-highlight"
-
-                                                                    (and (= row (:row chk))
-                                                                         (get (:row-anom new-data) (keyword prop)))
-                                                                    "light-red-highlight"
-
-                                                                    (and (= row (:row chk))
-                                                                         (ts-col-set (keyword prop)))
-                                                                    "grey-highlight"
-
-                                                                    :else nil)]
-                                                          (when color
-                                                            (set! (.-className cell-props) color))
-                                                          cell-props))]
-                                        (swap! options assoc :cells new-cells))))))]
+                              {:keys [user-text anomaly]} ah]
 
                           ;; Update query.
                           (reset! query-user-text user-text)
-
-                          ;; Clear the sim-plot.
-                          (reset! sim-plot-data nil)
 
                           ;; Update highlighted point in plot.
                           (reset! cur-row (:row chk))
@@ -271,8 +260,8 @@
                                                            plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-anom))]
                                                        [anomaly-plot plot-rows schema @cur-col]))
                                                    [gap :size "20px"]
-                                                   (when @cur-cell-anom
-                                                     [sim-plot @sim-plot-data anim-step index-col])]]
+                                                   (when @selected-cell-anomalous
+                                                     [sim-plot @sim-plot-data index-col])]]
                                        [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}
