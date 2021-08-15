@@ -251,7 +251,7 @@
                             (js/console.log "calling swap here" new-cells)
                             (js/console.log "Before swap (:cells @options)" (:cells @options))
                             (swap! options assoc :cells new-cells))
-                            (js/console.log "After (:cells @options)" (:cells @options))
+                          (js/console.log "After (:cells @options)" (:cells @options))
 
                           (if anomaly
                             ;; Update the simulation plot.
