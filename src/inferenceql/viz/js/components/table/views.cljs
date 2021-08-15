@@ -25,7 +25,7 @@
 
        :component-did-mount
        (fn [this]
-         (let [{:keys [settings hooks]} props
+         (let [{:keys [settings on-click]} props
                hot (yarn-handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
            ;; Fix scrolling for HOT in Observable.
@@ -34,6 +34,12 @@
                  (fn []
                    (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
                  hot)
+
+           (when on-click
+             (.add (.-hooks yarn-handsontable)
+                   "afterSelectionEnd"
+                   on-click
+                   hot))
 
            ;; Make new HOT instances appear immediately in Observable.
            (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30)
@@ -71,7 +77,7 @@
   It properly transforms data and options and delivers them as props to handsontable."
   [data options]
   (when data
-    (let [{:keys [cols height v-scroll cells col-widths]} options
+    (let [{:keys [cols height v-scroll cells col-widths on-click]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
           cols (or cols (->> data first keys (map name)))
           col-headers (for [col cols]
@@ -91,7 +97,8 @@
                        (assoc-in [:settings :width] "100%"))
           settings (cond-> settings
                            cells (assoc-in [:settings :cells] cells)
-                           col-widths (assoc-in [:settings :colWidths] col-widths))]
+                           col-widths (assoc-in [:settings :colWidths] col-widths)
+                           on-click (assoc-in [:on-click] on-click))]
       [handsontable-base {:style {:padding-bottom "5px"}} settings])))
 
 ;;; Handsontable as React component.

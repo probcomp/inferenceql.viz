@@ -135,8 +135,10 @@
         cols-with-index (concat [index-col] (:cols options))
         options (r/atom (-> options
                             (assoc :cells (fn [row col prop] #js {}))
-                            (assoc :cols cols-with-index)))
-
+                            (assoc :cols cols-with-index)
+                            (assoc :on-click
+                                   (fn [row-1 col-1 row-2 col-2 _]
+                                     (.log js/console "on-click: " row-1 col-1)))))
 
         checks (for [c cols i (range (count table-data))] {:column c :row i})
         checks (cycle (filter #(some? (get-in table-data [(:row %) (:column %)])) checks))
