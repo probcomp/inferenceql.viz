@@ -259,7 +259,7 @@
                                                              plot-rows (mapv #(assoc % :anomaly "undefined") plot-rows)
                                                              plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-anom))]
                                                          [anomaly-plot plot-rows schema @cur-col]))
-                                                   [gap :size "20px"]
+                                                   [gap :size "200px"]
                                                    (when @selected-cell-anomalous
                                                      [sim-plot @sim-plot-data index-col])]]
                                        [gap :size "20px"]
