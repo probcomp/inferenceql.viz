@@ -150,7 +150,6 @@
         sim-plot-cache (r/atom {})
         timer (r/atom nil)
         row-to-anomaly (atom {})
-        _ (add-watch row-to-anomaly :debug (fn [key add-watch old new] (js/console.log "row-to-anomaly changed" (clj->js new))))
         anim-step (fn anim-step []
                     ;; There should always be another check in the list.
                     (when-let [chk (first @checks)]
@@ -234,24 +233,17 @@
 
                           ;; Update table highlighting.
                           ;; TODO: Move this into a specialized table component.
-                          (js/console.log "anomaly" anomaly)
                           (swap! row-to-anomaly assoc {:row (:row chk) :col (name (:column chk))} anomaly)
-                          (js/console.log "row-to-anomaly after swap" row-to-anomaly)
                           (let [new-cells (fn [row col prop]
                                             (let [cell-props #js {}]
-                                              (js/console.log "row" row)
                                               (let [curr-anom (get @row-to-anomaly {:row row :col prop})]
                                                 (when-not (nil? curr-anom)
                                                   (let [color (if curr-anom
                                                                 "red-highlight"
                                                                 "blue-highlight")] ;; should be blue
-                                                    (set! (.-className cell-props) color)))
-                                                (js/console.log "@row-to-anomaly" @row-to-anomaly "row" row))
+                                                    (set! (.-className cell-props) color))))
                                               cell-props))]
-                            (js/console.log "calling swap here" new-cells)
-                            (js/console.log "Before swap (:cells @options)" (:cells @options))
                             (swap! options assoc :cells new-cells))
-                          (js/console.log "After (:cells @options)" (:cells @options))
 
                           (if anomaly
                             ;; Update the simulation plot.
