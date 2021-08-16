@@ -4,13 +4,17 @@
   models and geodata are stored."
   (:require [clojure.spec.alpha :as s]
             [clojure.edn :as edn]
+            [medley.core :as medley]
             [inferenceql.viz.config :as config]
             [inferenceql.viz.csv :refer [clean-csv-maps]]
+            [inferenceql.viz.util :refer [keywordize-kv]]
             [inferenceql.inference.gpm :as gpm]))
 
 ;;; Compiled-in elements to store
 
-(def compiled-in-schema (get config/config :schema))
+(def compiled-in-schema
+  ;; Coerce schema to contain columns names and datatyptes as keywords.
+  (keywordize-kv (get config/config :schema)))
 
 (def compiled-in-dataset
   (clean-csv-maps (get config/config :schema)

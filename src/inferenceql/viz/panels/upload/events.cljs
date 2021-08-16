@@ -6,6 +6,7 @@
             [medley.core :refer [index-by map-vals find-first]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
             [inferenceql.viz.csv :refer [clean-csv-maps]]
+            [inferenceql.viz.util :refer [keywordize-kv]]
             [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
             [inferenceql.inference.gpm :as gpm]))
 
@@ -110,8 +111,11 @@
                                (let [schema-read (find-first #(= (:kind %) :schema) read-pair)
                                      dataset-read (find-first #(= (:kind %) :dataset) read-pair)
 
-                                     schema (edn/read-string (:raw-data schema-read))
-                                     csv-data (csv/parse (:raw-data dataset-read))
+                                     schema  (-> (:raw-data schema-read)
+                                                 edn/read-string
+                                                 keywordize-kv)
+                                     csv-data (-> (:raw-data dataset-read)
+                                                  csv/parse)
                                      rows (clean-csv-maps schema csv-data)]
 
                                  (merge (:details dataset-read)
