@@ -102,7 +102,7 @@
                          :y {:field "value" :type "quantitative"}}}]}))
 
 (defn sim-plot
-  [data anim-step index-col]
+  [data index-col]
   (if-not (some? data)
     [v-box
      :min-height "200px"
@@ -112,13 +112,7 @@
      :children [[:span "Running simulations..."]]]
     [v-box
      :align :start
-     :children [[:button.toolbar-button.pure-button
-                 {:style {:margin-left "48px"}
-                  :on-click (fn [e]
-                              (anim-step)
-                              (.blur (.-target e)))}
-                 "Continue"]
-                (when data
+     :children [(when data
                   (let [{:keys [sims row row-anom]} data
                         spec (generate-sim-spec sims row row-anom index-col)]
                     [gap :size "10px"]
