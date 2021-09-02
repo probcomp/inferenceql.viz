@@ -68,7 +68,17 @@
 
 (defn handsontable
   "A reagent component that dispalys `data` in handsontable.
-  It properly transforms data and options and delivers them as props to handsontable."
+  It properly transforms data and options and delivers them as props to handsontable.
+
+  `options` - A map which contains various options about how the table is displayed. All keys
+    are optional. Some keys simply map to the same setting in Handsontable library. See the official
+    Handsontable documentation for more details on those options.
+      cols - Which columns from `data` to display.
+        Default will show all columns (keys) from the first row of data.
+      height - Handsontable height setting.
+      v-scroll - Set to false so the full table is drawn with no scrollbars.
+      cells - Handsontable cells setting. Can be used a variety of ways including cell highlighting.
+      col-widths - Handsontable colWidths setting."
   [data options]
   (when data
     (let [{:keys [cols height v-scroll cells col-widths]} options

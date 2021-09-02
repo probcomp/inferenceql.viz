@@ -5,7 +5,7 @@
             [cljs.core.async.interop :refer-macros [<p!]]))
 
 (defn control-panel
-  "A reagant component. Acts as control and input panel for the mini-app."
+  "A reagent component. Acts as control and input panel for the mini-app."
   [query query-fn success failure]
   (let [input-text (r/atom query)
         running (r/atom false)
@@ -46,11 +46,13 @@
           :children [[:button.toolbar-button.pure-button
                       {:on-click (fn [e]
                                    (run-query)
+                                   ;; Clears focus from button after click.
                                    (.blur (.-target e)))}
                       "Run query"]
                      [:button.toolbar-button.pure-button
                       {:on-click (fn [e]
                                    (success nil)
+                                   ;; Clears focus from button after click.
                                    (.blur (.-target e)))}
                       "Clear results"]
                      (when @running

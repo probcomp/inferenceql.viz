@@ -5,7 +5,10 @@
             [inferenceql.viz.js.components.table.views :refer [handsontable]]))
 
 (defn table
-  "Javascript interface to table UI component. Returns a DOM node with the table."
+  "Javascript interface to table UI component. Returns a DOM node with the table.
+  `data` - an array of js objects representing rows.
+  `options` - a js object with options for the table. See the handsontable component
+    for details on options."
   ([data]
    (table data {}))
   ([data options]

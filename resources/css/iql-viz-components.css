@@ -1,3 +1,8 @@
+/* This CSS file is meant to be used independently from the main app.
+
+It is required when using IQL Viz components independently
+from Javascript environments such as an Observable notebook. */
+
 /* --------------- utility classes --------------- */
 
 .no-select {
