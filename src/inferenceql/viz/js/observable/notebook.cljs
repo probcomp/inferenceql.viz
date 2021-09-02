@@ -3,5 +3,4 @@
   (:require [inferenceql.query.js]
             [inferenceql.inference.js]
             [inferenceql.viz.js.comp]
-            [inferenceql.viz.js.util]
-            [inferenceql.viz.js.smart.core]))
+            [inferenceql.viz.js.util]))
