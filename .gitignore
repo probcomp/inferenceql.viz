@@ -2,6 +2,7 @@
 
 /node_modules/
 /out/
+/out-worker/
 
 /.publish/
 /figwheel-target/
