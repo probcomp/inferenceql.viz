@@ -1,1 +1,12 @@
-{:gender :nominal, :age :numerical, :height :numerical},
+{:age :nominal
+ :gender :nominal
+ :race :nominal
+ :household_size :nominal
+ :state :nominal
+ :BMI :numerical
+ :health_status :nominal
+ :smoker :nominal
+ :exercise :nominal
+ :care_covid_sought :nominal
+ :respiratory_symptoms :nominal
+ :fever_symptoms :nominal}
