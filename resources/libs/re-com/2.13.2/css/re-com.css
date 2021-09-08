@@ -71,26 +71,7 @@ fieldset[disabled] .btn {
   The section immediately below is required for the drop-down components and comes from
   the bootstrap-chosen library:
 
-    https://github.com/alxlit/bootstrap-chosen
-    License: MIT.
-
-  That library provides it's css as a .less file.
-  To compile the less file into the css below, use the following steps from
-  a command prompt (you'll need git and the lessc compiler (http://lesscss.org):
-
-	git clone https://github.com/alxlit/bootstrap-chosen
-
-	cd bootstrap-chosen
-
-	git clone --depth=1 https://github.com/twbs/bootstrap
-
-  Now edit bootstrap-chosen.less and add the following two lines before the first @import:
-    @import "bootstrap/less/variables.less";
-    @import "bootstrap/less/mixins.less";
-
-    lessc bootstrap-chosen.less > bootstrap-chosen.css
-
-  Finally, replace the section below with the contents of bootstrap-chosen.css.
+  ---detailed comments removed---
 
   START OF BOOTSTRAP-CHOSEN SECTION...
 ----------------------------------------------------------------------------------------*/
