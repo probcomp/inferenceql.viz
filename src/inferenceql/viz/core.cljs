@@ -40,7 +40,10 @@
             [inferenceql.viz.components.store.events]
             [inferenceql.viz.components.store.subs]
             ;; Library functions for user-defined JS functions.
-            [inferenceql.viz.user]))
+            [inferenceql.viz.user]
+            ;; Learning
+            [inferenceql.viz.panels.learning.db]
+            [inferenceql.viz.panels.learning.eventsubs]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
