@@ -21,12 +21,16 @@
     (r/create-class
      {:display-name "js-model-code"
 
-      :component-did-mount
-      (fn [this]
-        (.highlightElement yarn-hljs (:program-display @dom-nodes)))
+      ;;:component-did-mount
+      #_(fn [this]
+          (.highlightElement yarn-hljs (:program-display @dom-nodes)))
+
+      ;;:component-did-update
+      #_(fn [this]
+          (.highlightElement yarn-hljs (:program-display @dom-nodes)))
 
       :reagent-render
-      (fn []
+      (fn [js-code]
         [:pre#program-display {:ref #(swap! dom-nodes assoc :program-display %)}
          [:code {:class "js"}
           js-code]])})))
