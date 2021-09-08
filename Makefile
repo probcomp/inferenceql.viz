@@ -152,13 +152,13 @@ reframe-10x-compile-opts := $(current-dir)/compiler_options/reframe-10x/support.
 ## Starts the spreadsheets app using Figwheel.
 .PHONY: figwheel
 figwheel: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	clojure -A:figwheel -M -m figwheel.main \
+	clojure -J-Xmx4G -A:figwheel -M -m figwheel.main \
 	-co  $(figwheel-compile-opts) \
 	-c inferenceql.viz.core --repl
 
 ## Starts the spreadsheets app using Figwheel and Re-frame-10x.
 .PHONY: figwheel-10x
 figwheel-10x: figwheel-clean $(figwheel-resource-dir) $(figwheel-index-file)
-	clojure -A:figwheel:reframe-10x -M -m figwheel.main \
+	clojure -J-Xmx4G -A:figwheel:reframe-10x -M -m figwheel.main \
 	-co $(figwheel-compile-opts):$(reframe-10x-compile-opts) \
 	-c inferenceql.viz.core --repl
