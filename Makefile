@@ -51,15 +51,15 @@ watch-advanced-min: $(hot-css-resource)
 
 .PHONY: js
 js: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(compile-opts) -c inferenceql.viz.core
+	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts) -c inferenceql.viz.core
 
 .PHONY: js-advanced
 js-advanced: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(compile-opts-advn) -c inferenceql.viz.core
+	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts-advn) -c inferenceql.viz.core
 
 .PHONY: js-advanced-min
 js-advanced-min: $(hot-css-resource)
-	clojure -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
+	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 ### Observable components compilation.
 
