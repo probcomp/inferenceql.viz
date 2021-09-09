@@ -46,8 +46,8 @@
     [v-box
      :margin "20px"
      :children [[learning/panel]
-                [gap :size "10px"]
+                [gap :size "30px"]
                 [h-box
-                 :children [[vega-lite circle-spec {:actions false :mode "vega"} nil nil]
+                 :children [[js-code-block js-model-text]
                             [gap :size "20px"]
-                            [js-code-block js-model-text]]]]]))
+                            [vega-lite circle-spec {:actions false :mode "vega"} nil nil]]]]]))

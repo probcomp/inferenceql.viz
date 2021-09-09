@@ -53,5 +53,6 @@
       :reagent-render
       (fn [spec opt generators pts-store]
         (when spec
-          [:div#viz-container {:style {:overflow-x "auto"}}
+          [:div#viz-container {:style {:overflow-x "auto"
+                                       :min-width "720px"}}
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
