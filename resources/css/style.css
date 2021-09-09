@@ -283,7 +283,7 @@ psuedo-class applied. */
 
 #program-display {
   min-width: 700px;
-  padding: 5px;
+  padding: 8px;
   font-size: .875rem;
   background-color: #f8f8f8;
 }

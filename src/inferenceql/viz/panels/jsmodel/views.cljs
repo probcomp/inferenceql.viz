@@ -17,22 +17,22 @@
 
   Returns: A reagent component."
   [js-code]
-  (let [dom-nodes (r/atom {})]
+  (let [dom-nodes (r/atom {})
+        highlight-code #(.highlightElement yarn-hljs (:code-elem @dom-nodes))]
     (r/create-class
      {:display-name "js-model-code"
 
-      ;;:component-did-mount
-      #_(fn [this]
-          (.highlightElement yarn-hljs (:program-display @dom-nodes)))
+      :component-did-mount
+      (fn [this] (highlight-code))
 
-      ;;:component-did-update
-      #_(fn [this]
-          (.highlightElement yarn-hljs (:program-display @dom-nodes)))
+      :component-did-update
+      (fn [this _] (highlight-code))
 
       :reagent-render
       (fn [js-code]
-        [:pre#program-display {:ref #(swap! dom-nodes assoc :program-display %)}
-         [:code {:class "js"}
+        [:pre#program-display
+         [:code {:class "js"
+                 :ref #(swap! dom-nodes assoc :code-elem %)}
           js-code]])})))
 
 (defn display
