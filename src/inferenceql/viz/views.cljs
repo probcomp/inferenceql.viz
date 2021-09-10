@@ -11,26 +11,51 @@
             [inferenceql.viz.panels.jsmodel.views :refer [js-code-block]]
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
             [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
-            [clojure.math.combinatorics :refer [combinations]]))
+            [clojure.math.combinatorics :refer [combinations]]
+            [inferenceql.inference.gpm :as gpm]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
+
+(def datasets @(rf/subscribe [:store/datasets]))
+(def rows (->> (get-in datasets [:data :rows])
+            (map #(medley/remove-vals nil? %))))
+
+;; TODO: Off load all this stuff into DVC stages.
+(def cgpm-models (:transitions config))
+(def xcat-models (map (fn [cgpm]
+                        (let [num-rows (count (get cgpm "X"))]
+                          ;; TODO: better to use the schema in the db.
+                          (import-cgpm cgpm (take num-rows rows) (:mapping-table config) (:schema config))))
+                      cgpm-models))
+(def mmix-models (map crosscat/xcat->mmix xcat-models))
+
+
+(def num-points-at-iter (map #(count (get % "X")) cgpm-models))
+(def num-points-required (map - num-points-at-iter (conj num-points-at-iter 0)))
+
+(defn sample-xcat
+  "Samples all targets from an XCat gpm."
+  [model sample-count]
+  (let [targets (gpm/variables model)]
+    (repeatedly sample-count #(gpm/simulate model targets {}))))
+
+(def observed-samples (map #(assoc % :collection "observed") rows))
+(def virtual-samples (->> (mapcat sample-xcat xcat-models num-points-required)
+                          (map #(assoc % :collection "virtual"))))
+
+(defn samples-for-iteration [i]
+  (let [n (nth num-points-at-iter i)]
+    (concat (take n observed-samples)
+            (take n virtual-samples))))
 
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
-        cgpm-models (:transitions config)
 
-        datasets @(rf/subscribe [:store/datasets])
-        rows (->> (get-in datasets [:data :rows])
-                  (map #(medley/remove-vals nil? %)))
 
         cgpm-model (nth cgpm-models iteration)
-        num-rows (count (get cgpm-model "X"))
-        xcat-model (import-cgpm cgpm-model
-                                (take num-rows rows)
-                                (:mapping-table config)
-                                (:schema config)) ; TODO: better to use the schema in the db.
-        mmix-model (crosscat/xcat->mmix xcat-model)
+        mmix-model (nth mmix-models iteration)
+
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
