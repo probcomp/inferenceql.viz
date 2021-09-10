@@ -20,7 +20,8 @@
                (map #(medley/remove-vals nil? %))))
                ;;(map #(dissoc % :household_size))))
 
-(def schema (dissoc (:schema config) :household_size))
+;;(def schema (dissoc (:schema config) :household_size))
+(def schema (:schema config))
 
 ;; TODO: Off load all this stuff into DVC stages.
 (def cgpm-models (:transitions config))
@@ -44,6 +45,7 @@
 (def observed-samples (map #(assoc % :collection "observed") rows))
 (def virtual-samples (->> (mapcat sample-xcat xcat-models num-points-required)
                           (map #(assoc % :collection "virtual"))))
+(def all-samples (concat observed-samples virtual-samples))
 
 (defn samples-for-iteration [i]
   (let [n (nth num-points-at-iter i)]
@@ -70,14 +72,14 @@
         circle-spec (circle-viz-spec node-names edges)
 
         samples (samples-for-iteration iteration)
-        qc-spec (dashboard/spec samples schema nil nil 10)]
+        qc-spec (dashboard/spec all-samples schema nil nil 10)]
     [v-box
      :margin "20px"
      :children [[learning/panel]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
-                [vega-lite qc-spec {:actions false} nil nil]
+                [vega-lite qc-spec {:actions false} nil nil samples]
                 [h-box
                  :children [[js-code-block js-model-text]
                             [gap :size "20px"]
-                            [vega-lite circle-spec {:actions false :mode "vega"} nil nil]]]]]))
+                            [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil]]]]]))
