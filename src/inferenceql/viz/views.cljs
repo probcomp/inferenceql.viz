@@ -12,20 +12,22 @@
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
             [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
             [clojure.math.combinatorics :refer [combinations]]
-            [inferenceql.inference.gpm :as gpm]))
+            [inferenceql.inference.gpm :as gpm]
+            [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]
+            [inferenceql.viz.components.store.db :as store-db]))
 
-;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
+(def rows (->> store-db/compiled-in-dataset
+               (map #(medley/remove-vals nil? %))))
+               ;;(map #(dissoc % :household_size))))
 
-(def datasets @(rf/subscribe [:store/datasets]))
-(def rows (->> (get-in datasets [:data :rows])
-            (map #(medley/remove-vals nil? %))))
+(def schema (dissoc (:schema config) :household_size))
 
 ;; TODO: Off load all this stuff into DVC stages.
 (def cgpm-models (:transitions config))
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
                           ;; TODO: better to use the schema in the db.
-                          (import-cgpm cgpm (take num-rows rows) (:mapping-table config) (:schema config))))
+                          (import-cgpm cgpm (take num-rows rows) (:mapping-table config) schema)))
                       cgpm-models))
 (def mmix-models (map crosscat/xcat->mmix xcat-models))
 
@@ -52,13 +54,11 @@
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
 
-
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
-
 
         node-names (map keyword (get cgpm-model "names"))
         view-assignment (fn [col]
@@ -67,11 +67,16 @@
                             (-> col col-to-num col-num-to-view-num)))
         views (vals (group-by view-assignment node-names))
         edges (mapcat #(combinations % 2) views)
-        circle-spec (circle-viz-spec node-names edges)]
+        circle-spec (circle-viz-spec node-names edges)
+
+        samples (samples-for-iteration iteration)
+        qc-spec (dashboard/spec samples schema nil nil 10)]
     [v-box
      :margin "20px"
      :children [[learning/panel]
                 [gap :size "30px"]
+                [:div {:id "controls" :style {:display "none"}}]
+                [vega-lite qc-spec {:actions false} nil nil]
                 [h-box
                  :children [[js-code-block js-model-text]
                             [gap :size "20px"]
