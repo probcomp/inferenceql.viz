@@ -55,9 +55,11 @@
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
+        cols @(rf/subscribe [:learning/col-selection])
 
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
+        all-columns (keys schema)
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
@@ -72,10 +74,10 @@
         circle-spec (circle-viz-spec node-names edges)
 
         samples (samples-for-iteration iteration)
-        qc-spec (dashboard/spec all-samples schema nil nil 10)]
+        qc-spec (dashboard/spec all-samples schema nil cols 10)]
     [v-box
      :margin "20px"
-     :children [[learning/panel]
+     :children [[learning/panel all-columns]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [vega-lite qc-spec {:actions false} nil nil samples]
