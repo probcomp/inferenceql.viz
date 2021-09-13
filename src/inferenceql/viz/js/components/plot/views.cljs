@@ -33,8 +33,7 @@
                                (when (seq data)
                                  (let [view (.-view res)]
                                    (.insert view "rows" (clj->js data))
-                                   (.run view)
-                                   (.resize view)))))
+                                   (.run view)))))
                       (.catch (fn [err]
                                 (js/console.error err)))))))]
     (r/create-class
@@ -59,10 +58,9 @@
               (let [cs (.changeset vega)
                     view (.-view v)]
                 (.insert cs (clj->js new-data))
-                ;;(.remove cs (fn [] true))
+                (.remove cs (fn [] true))
                 (.change view "rows" cs)
-                (.run view)
-                (.resize view))))))
+                (.run view))))))
 
       :component-will-unmount
       (fn [this]
@@ -71,6 +69,5 @@
       :reagent-render
       (fn [spec opt generators pts-store data]
         (when spec
-          [:div#viz-container {:style {:overflow-x "auto"
-                                       :min-width "720px"}}
+          [:div#viz-container {:style {:min-width "720px"}}
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
