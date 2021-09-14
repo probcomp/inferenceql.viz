@@ -8,7 +8,7 @@
  :learning/iteration
  (fn [db _]
    ;; TODO: move default value to db.
-   (get-in db [:learning-panel :iteration] 2)))
+   (get-in db [:learning-panel :iteration] 20)))
 
 (rf/reg-event-db
   :learning/set-iteration
