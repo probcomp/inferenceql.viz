@@ -34,6 +34,12 @@
                                  (let [view (.-view res)]
                                    (.insert view "rows" (clj->js data))
                                    (.run view)))))
+                      (.then (fn [res]
+                               (when (seq params)
+                                 (let [view (.-view res)]
+                                   (doseq [[k v] params]
+                                     (.signal view (name k) v))
+                                   (.run view)))))
                       (.catch (fn [err]
                                 (js/console.error err)))))))]
     (r/create-class
@@ -65,8 +71,8 @@
           (when (not= old-params new-params)
             (when-let [v @vega-embed-result]
               (let [view (.-view v)]
-                ;; TODO: make this so it can handle any params.
-                (.signal view "iter" (:iter new-params))
+                (doseq [[k v] new-params]
+                  (.signal view (name k) v))
                 (.run view))))))
 
       :component-will-unmount
