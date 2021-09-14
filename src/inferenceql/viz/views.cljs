@@ -45,12 +45,21 @@
 (def observed-samples (map #(assoc % :collection "observed") rows))
 (def virtual-samples (->> (mapcat sample-xcat xcat-models num-points-required)
                           (map #(assoc % :collection "virtual"))))
-(def all-samples (concat observed-samples virtual-samples))
 
-(defn samples-for-iteration [i]
-  (let [n (nth num-points-at-iter i)]
-    (concat (take n observed-samples)
-            (take n virtual-samples))))
+(def all-samples (loop [ret [] os observed-samples
+                        vs virtual-samples nps num-points-required
+                        iters (range)]
+                   (if-not (seq nps)
+                     ret
+                     (let [i (first iters)
+                           np (first nps)
+                           samples (concat (take np os) (take np vs))
+                           samples (map #(assoc % :iter i) samples)]
+                       (recur (concat ret samples)
+                              (drop np os)
+                              (drop np vs)
+                              (rest nps)
+                              (rest iters))))))
 
 (defn app
   []
@@ -73,15 +82,14 @@
         edges (mapcat #(combinations % 2) views)
         circle-spec (circle-viz-spec node-names edges)
 
-        samples (samples-for-iteration iteration)
         qc-spec (dashboard/spec all-samples schema nil cols 10)]
     [v-box
      :margin "20px"
      :children [[learning/panel all-columns]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
-                [vega-lite qc-spec {:actions false} nil nil samples]
+                [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration}]
                 [h-box
                  :children [[js-code-block js-model-text]
                             [gap :size "20px"]
-                            [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil]]]]]))
+                            [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil]]]]]))

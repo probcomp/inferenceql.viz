@@ -7,7 +7,7 @@
 
 (defn vega-lite
   "Simplified Reagent component for displaying vega-lite specs in Observable"
-  [spec opt generators pts-store data]
+  [spec opt generators pts-store data params]
   (let [run (atom 0)
         dom-nodes (r/atom {})
         vega-embed-result (r/atom nil)
@@ -17,7 +17,7 @@
                                 ;; Free resources used by vega-embed.
                                 ;; See https://github.com/vega/vega-embed#api-reference
                                 (.finalize @vega-embed-result)))
-        embed (fn [this spec opt generators pts-store data]
+        embed (fn [this spec opt generators pts-store data params]
                 (free-resources)
                 (when (:vega-node @dom-nodes)
                   (let [spec (clj->js spec)
@@ -41,17 +41,17 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt generators pts-store data))
+        (embed this spec opt generators pts-store data params))
 
       :component-did-update
       (fn [this old-argv]
-        (let [[_ old-spec old-opt old-generators _old-pts-store old-data] old-argv
-              [_ new-spec new-opt new-generators current-pts-store new-data] (r/argv this)]
+        (let [[_ old-spec old-opt old-generators _old-pts-store old-data old-params] old-argv
+              [_ new-spec new-opt new-generators current-pts-store new-data new-params] (r/argv this)]
           ;; Only perform the update when it was due to one of these args changing.
           ;; We do not want to update when it is just `pts-store` that changed.
           (when (not= [old-spec old-opt old-generators]
                       [new-spec new-opt new-generators])
-            (embed this new-spec new-opt new-generators current-pts-store new-data))
+            (embed this new-spec new-opt new-generators current-pts-store new-data new-params))
 
           (when (not= old-data new-data)
             (when-let [v @vega-embed-result]
@@ -60,6 +60,13 @@
                 (.insert cs (clj->js new-data))
                 (.remove cs (fn [] true))
                 (.change view "rows" cs)
+                (.run view))))
+
+          (when (not= old-params new-params)
+            (when-let [v @vega-embed-result]
+              (let [view (.-view v)]
+                ;; TODO: make this so it can handle any params.
+                (.signal view "iter" (:iter new-params))
                 (.run view))))))
 
       :component-will-unmount
@@ -67,7 +74,7 @@
         (free-resources))
 
       :reagent-render
-      (fn [spec opt generators pts-store data]
+      (fn [spec opt generators pts-store data params]
         (when spec
           [:div#viz-container {:style {:min-width "720px"}}
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
