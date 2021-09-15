@@ -6,4 +6,5 @@
 /.publish/
 /figwheel-target/
 /resources/css/handsontable.full.css
+/resources/transitions.js
 
