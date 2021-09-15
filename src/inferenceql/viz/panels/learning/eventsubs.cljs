@@ -20,7 +20,7 @@
  :learning/col-selection
  (fn [db _]
    ;; TODO: move default value to db.
-   (let [default (set (map keyword (get (first (:transitions config))
+   (let [default (set (map keyword (get (first js/transitions)
                                         "col_names")))]
      (get-in db [:learning-panel :col-selection] default))))
 

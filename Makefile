@@ -9,6 +9,8 @@ output-to	 := $(output-dir)/main.js
 
 hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/css/handsontable.full.css
+transitions-js := $(resource-dir)/transitions.js
+transitions-json := $(resource-dir)/transitions.json
 
 ### Definitions for publishing.
 
@@ -50,15 +52,15 @@ watch-advanced-min: $(hot-css-resource)
 	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 .PHONY: js
-js: $(hot-css-resource)
+js: $(hot-css-resource) $(transitions-js)
 	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts) -c inferenceql.viz.core
 
 .PHONY: js-advanced
-js-advanced: $(hot-css-resource)
+js-advanced: $(hot-css-resource) $(transitions-js)
 	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts-advn) -c inferenceql.viz.core
 
 .PHONY: js-advanced-min
-js-advanced-min: $(hot-css-resource)
+js-advanced-min: $(hot-css-resource) $(transitions-js)
 	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 ### Observable components compilation.
@@ -87,6 +89,9 @@ $(hot-css-resource): $(hot-css-file)
 	## This copies the Handsontable CSS file from the Handsontable NPM dependency to the
 	## app's css folder.
 	cp $(hot-css-file) $(resource-dir)/css
+
+$(transitions-js): $(transitions-json)
+	echo "var transitions =" "$(cat resources/transitions.json)" ";"
 
 ### Publishing
 

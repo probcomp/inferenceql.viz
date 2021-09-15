@@ -24,7 +24,8 @@
 (def schema (:schema config))
 
 ;; TODO: Off load all this stuff into DVC stages.
-(def cgpm-models (:transitions config))
+(def cgpm-models js/transitions)
+
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
                           ;; TODO: better to use the schema in the db.

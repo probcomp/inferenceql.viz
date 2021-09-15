@@ -1,5 +1,4 @@
 {:data #csv "ignored.csv"
  :schema  #edn "schema.edn"
- :transitions #json "transitions.json"
  :mapping-table #edn "mapping-table.edn"
  :js-model-template #txt "templates/model.js.mustache"}

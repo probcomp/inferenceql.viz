@@ -3,7 +3,7 @@
             [re-com.core :refer [v-box h-box box slider label gap selection-list]]
             [inferenceql.viz.config :refer [config]]))
 
-(def models (:transitions config))
+(def models js/transitions)
 
 (defn panel
   [column-list]
