@@ -7,3 +7,5 @@
      :clj (:require [inferenceql.viz.config-reader :as config-reader])))
 
 (def config (config-reader/read))
+
+#?(:cljs (def transitions (take 50 (js->clj js/transitions))))

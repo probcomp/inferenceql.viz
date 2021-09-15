@@ -1,9 +1,7 @@
 (ns inferenceql.viz.panels.learning.views
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box box slider label gap selection-list]]
-            [inferenceql.viz.config :refer [config]]))
-
-(def models js/transitions)
+            [inferenceql.viz.config :refer [config transitions]]))
 
 (defn panel
   [column-list]
@@ -17,7 +15,7 @@
                              :style {:padding-top "3px"}
                              :child [slider
                                      :min 0
-                                     :max (dec (count models))
+                                     :max (dec (count transitions))
                                      :model iteration
                                      :on-change #(rf/dispatch [:learning/set-iteration %])]]
                             [gap :size "10px"]

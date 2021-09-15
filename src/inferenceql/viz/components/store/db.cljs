@@ -12,8 +12,6 @@
 
 ;;; Compiled-in elements to store
 
-(.log js/console :here-------)
-
 (def compiled-in-schema
   ;; Coerce schema to contain columns names and datatyptes as keywords.
   (keywordize-kv (get config/config :schema)))
@@ -21,9 +19,6 @@
 (def compiled-in-dataset
   (clean-csv-maps (get config/config :schema)
                   (get config/config :data)))
-
-(.log js/console :a-- compiled-in-schema)
-(.log js/console :b-- compiled-in-dataset)
 
 (def compiled-in-model (get config/config :model))
 

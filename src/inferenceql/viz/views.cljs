@@ -1,7 +1,7 @@
 (ns inferenceql.viz.views
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box gap]]
-            [inferenceql.viz.config :refer [config]]
+            [inferenceql.viz.config :refer [config transitions]]
             [inferenceql.viz.panels.learning.views :as learning]
             [medley.core :as medley]
             [inferenceql.inference.gpm.crosscat :as crosscat]
@@ -18,13 +18,11 @@
 
 (def rows (->> store-db/compiled-in-dataset
                (map #(medley/remove-vals nil? %))))
-               ;;(map #(dissoc % :household_size))))
 
-;;(def schema (dissoc (:schema config) :household_size))
-(def schema (:schema config))
+(def schema store-db/compiled-in-schema)
 
 ;; TODO: Off load all this stuff into DVC stages.
-(def cgpm-models js/transitions)
+(def cgpm-models transitions)
 
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
@@ -67,9 +65,6 @@
   (let [iteration @(rf/subscribe [:learning/iteration])
         cols @(rf/subscribe [:learning/col-selection])
 
-        _ (.log js/console :a--- (count cgpm-models))
-        _ (.log js/console :b--- (count mmix-models))
-
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
         all-columns (keys schema)
@@ -77,7 +72,7 @@
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
-        node-names (map keyword (get cgpm-model "names"))
+        node-names (map keyword (get cgpm-model "col_names"))
         view-assignment (fn [col]
                           (let [col-to-num (zipmap node-names (get cgpm-model "outputs"))
                                 col-num-to-view-num (into {} (get cgpm-model "Zv"))]

@@ -2,7 +2,7 @@
   (:require [re-frame.core :as rf]
             [goog.string :refer [format]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.viz.config :refer [config]]))
+            [inferenceql.viz.config :refer [config transitions]]))
 
 (rf/reg-sub
  :learning/iteration
@@ -20,7 +20,7 @@
  :learning/col-selection
  (fn [db _]
    ;; TODO: move default value to db.
-   (let [default (set (map keyword (get (first js/transitions)
+   (let [default (set (map keyword (get (first transitions)
                                         "col_names")))]
      (get-in db [:learning-panel :col-selection] default))))
 
