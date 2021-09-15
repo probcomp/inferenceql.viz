@@ -21,7 +21,7 @@
  (fn [db _]
    ;; TODO: move default value to db.
    (let [default (set (map keyword (get (first (:transitions config))
-                                        "names")))]
+                                        "col_names")))]
      (get-in db [:learning-panel :col-selection] default))))
 
 (rf/reg-event-db
