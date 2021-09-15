@@ -66,6 +66,9 @@
   (let [iteration @(rf/subscribe [:learning/iteration])
         cols @(rf/subscribe [:learning/col-selection])
 
+        _ (.log js/console :a--- (count cgpm-models))
+        _ (.log js/console :b--- (count mmix-models))
+
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
         all-columns (keys schema)
