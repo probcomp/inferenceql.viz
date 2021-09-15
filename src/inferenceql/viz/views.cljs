@@ -29,7 +29,7 @@
                           ;; TODO: better to use the schema in the db.
                           (import-cgpm cgpm (take num-rows rows) (:mapping-table config) schema)))
                       cgpm-models))
-(def mmix-models (map crosscat/xcat->mmix xcat-models))
+(def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
 
 
 (def num-points-at-iter (map #(count (get % "X")) cgpm-models))
