@@ -8,4 +8,4 @@
 
 (def config (config-reader/read))
 
-#?(:cljs (def transitions (take 50 (js->clj js/transitions))))
+#?(:cljs (def transitions (js->clj js/transitions)))
