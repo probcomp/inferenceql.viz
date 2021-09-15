@@ -32,6 +32,7 @@ clean:
 	rm -Rf $(figwheel-build-dir)
 	rm -Rf $(publish-dir)
 	rm -Rf $(node-modules-dir)
+	rm -Rf $(transitions-js)
 
 ### Spreadsheets app compilation.
 
@@ -91,7 +92,7 @@ $(hot-css-resource): $(hot-css-file)
 	cp $(hot-css-file) $(resource-dir)/css
 
 $(transitions-js): $(transitions-json)
-	echo "var transitions =" "$(cat resources/transitions.json)" ";"
+	bin/js-ify-transitions $(transitions-json) $(transitions-js)
 
 ### Publishing
 
