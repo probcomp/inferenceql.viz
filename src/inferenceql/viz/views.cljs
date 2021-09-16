@@ -26,7 +26,6 @@
 
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
-                          ;; TODO: better to use the schema in the db.
                           (import-cgpm cgpm (take num-rows rows) (:mapping-table config) schema)))
                       cgpm-models))
 (def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
