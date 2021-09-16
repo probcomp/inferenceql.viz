@@ -17,7 +17,7 @@
   (keywordize-kv (get config/config :schema)))
 
 (def compiled-in-dataset
-  (clean-csv-maps (get config/config :schema)
+  (clean-csv-maps compiled-in-schema
                   (get config/config :data)))
 
 (def compiled-in-model (get config/config :model))
