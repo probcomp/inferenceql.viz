@@ -41,3 +41,15 @@
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :plot-type] new-val)))
+
+(rf/reg-sub
+ :learning/marginal-types
+ (fn [db _]
+   ;; TODO: move default value to db.
+   (get-in db [:learning-panel :marginal-types] #{:1D})))
+
+(rf/reg-event-db
+  :learning/set-marginal-types
+  event-interceptors
+  (fn [db [_ new-val]]
+    (assoc-in db [:learning-panel :marginal-types] new-val)))

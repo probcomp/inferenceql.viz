@@ -7,7 +7,8 @@
   [column-list]
   (let [iteration @(rf/subscribe [:learning/iteration])
         col-selection @(rf/subscribe [:learning/col-selection])
-        plot-type @(rf/subscribe [:learning/plot-type])]
+        plot-type @(rf/subscribe [:learning/plot-type])
+        marginal-types @(rf/subscribe [:learning/marginal-types])]
     [v-box
      :children [[h-box
                  :children [[label :label "Iteration:"]
@@ -35,7 +36,18 @@
                                        :model plot-type
                                        :label-style (if (= p plot-type) {:font-weight "bold"})
                                        :on-change #(rf/dispatch [:learning/set-plot-type %])]))]]]
-
+                [gap :size "30px"]
+                [h-box
+                 :children [[label :label "Marginals:"]
+                            [gap :size "10px"]
+                            [box
+                             :style {:padding-top "3px"}
+                             :child [selection-list
+                                     :choices (vec (for [c [:1D :2D]]
+                                                     {:id c :label (name c)}))
+                                     :disabled? (= plot-type :mutual-information)
+                                     :model marginal-types
+                                     :on-change #(rf/dispatch [:learning/set-marginal-types %])]]]]
                 [h-box
                  :children [[label :label "Columns:"]
                             [gap :size "10px"]
@@ -44,9 +56,9 @@
                              :child [selection-list
                                      :choices (vec (for [c column-list]
                                                      {:id c :label (name c)}))
-                                     :required? true
                                      :disabled? (= plot-type :mutual-information)
                                      :model col-selection
                                      :on-change #(rf/dispatch [:learning/select-cols %])]]]]]]))
+
 
 
