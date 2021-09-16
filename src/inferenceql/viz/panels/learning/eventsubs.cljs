@@ -29,3 +29,15 @@
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :col-selection] new-val)))
+
+(rf/reg-sub
+ :learning/plot-type
+ (fn [db _]
+   ;; TODO: move default value to db.
+   (get-in db [:learning-panel :plot-type] :select-vs-simulate)))
+
+(rf/reg-event-db
+  :learning/set-plot-type
+  event-interceptors
+  (fn [db [_ new-val]]
+    (assoc-in db [:learning-panel :plot-type] new-val)))

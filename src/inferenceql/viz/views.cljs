@@ -1,6 +1,6 @@
 (ns inferenceql.viz.views
   (:require [re-frame.core :as rf]
-            [re-com.core :refer [v-box h-box gap]]
+            [re-com.core :refer [v-box h-box gap box]]
             [inferenceql.viz.config :refer [config transitions]]
             [inferenceql.viz.panels.learning.views :as learning]
             [medley.core :as medley]
@@ -63,6 +63,7 @@
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
         cols @(rf/subscribe [:learning/col-selection])
+        plot-type @(rf/subscribe [:learning/plot-type])
 
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
@@ -86,8 +87,15 @@
      :children [[learning/panel all-columns]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
-                [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration}]
                 [h-box
                  :children [[js-code-block js-model-text]
                             [gap :size "20px"]
-                            [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil]]]]]))
+                            [box :style {:display (if (= plot-type :mutual-information)
+                                                    "block"
+                                                    "none")}
+                             :child [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil]]
+                            [box :style {:display (if (= plot-type :select-vs-simulate)
+                                                    "block"
+                                                    "none")}
+                             :child [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration}]]]]]]))
+

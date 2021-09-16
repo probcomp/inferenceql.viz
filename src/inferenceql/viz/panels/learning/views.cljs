@@ -1,12 +1,13 @@
 (ns inferenceql.viz.panels.learning.views
   (:require [re-frame.core :as rf]
-            [re-com.core :refer [v-box h-box box slider label gap selection-list]]
+            [re-com.core :refer [v-box h-box box slider label gap selection-list radio-button]]
             [inferenceql.viz.config :refer [config transitions]]))
 
 (defn panel
   [column-list]
   (let [iteration @(rf/subscribe [:learning/iteration])
-        col-selection @(rf/subscribe [:learning/col-selection])]
+        col-selection @(rf/subscribe [:learning/col-selection])
+        plot-type @(rf/subscribe [:learning/plot-type])]
     [v-box
      :children [[h-box
                  :children [[label :label "Iteration:"]
@@ -22,6 +23,20 @@
                             [label :label iteration]]]
                 [gap :size "10px"]
                 [h-box
+                 :children [[label :label "Plot type:"]
+                            [gap :size "10px"]
+                            [v-box
+                             :children
+                             (doall (for [p ["mutual-information" "select-vs-simulate"]]
+                                      ^{:key p}
+                                      [radio-button
+                                       :label p
+                                       :value (keyword p)
+                                       :model plot-type
+                                       :label-style (if (= p plot-type) {:font-weight "bold"})
+                                       :on-change #(rf/dispatch [:learning/set-plot-type %])]))]]]
+
+                [h-box
                  :children [[label :label "Columns:"]
                             [gap :size "10px"]
                             [box
@@ -30,6 +45,7 @@
                                      :choices (vec (for [c column-list]
                                                      {:id c :label (name c)}))
                                      :required? true
+                                     :disabled? (= plot-type :mutual-information)
                                      :model col-selection
                                      :on-change #(rf/dispatch [:learning/select-cols %])]]]]]]))
 
