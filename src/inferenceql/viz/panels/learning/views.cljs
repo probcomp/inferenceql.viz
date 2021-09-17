@@ -36,7 +36,7 @@
                                        :model plot-type
                                        :label-style (if (= p plot-type) {:font-weight "bold"})
                                        :on-change #(rf/dispatch [:learning/set-plot-type %])]))]]]
-                [gap :size "30px"]
+                [gap :size "50px"]
                 [h-box
                  :children [[label :label "Marginals:"]
                             [gap :size "10px"]
@@ -48,9 +48,10 @@
                                      :disabled? (= plot-type :mutual-information)
                                      :model marginal-types
                                      :on-change #(rf/dispatch [:learning/set-marginal-types %])]]]]
+                [gap :size "10px"]
                 [h-box
                  :children [[label :label "Columns:"]
-                            [gap :size "10px"]
+                            [gap :size "16px"]
                             [box
                              :style {:padding-top "3px"}
                              :child [selection-list
