@@ -9,6 +9,10 @@
 ;; every language used has to be registered individually.
 (.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
+
+(defn add-cluster-spans [highlighted-js-text]
+  highlighted-js-text)
+
 (defn js-code-block
   "Display of Javascript code with syntax highlighting.
 
@@ -18,22 +22,25 @@
   Returns: A reagent component."
   [js-code]
   (let [dom-nodes (r/atom {})
-        highlight-code #(.highlightElement yarn-hljs (:code-elem @dom-nodes))]
+        highlight (fn [js-text]
+                    (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))]
     (r/create-class
      {:display-name "js-model-code"
 
       :component-did-mount
-      (fn [this] (highlight-code))
-
-      :component-did-update
-      (fn [this _] (highlight-code))
+      (fn [this]
+        (.addEventListener
+         (:code-elem @dom-nodes)
+         "click"
+         (fn [e] (.log js/console :here (.-target e)))))
 
       :reagent-render
       (fn [js-code]
-        [:pre#program-display
-         [:code {:class "js"
-                 :ref #(swap! dom-nodes assoc :code-elem %)}
-          js-code]])})))
+        (let [tagged-code (-> js-code highlight add-cluster-spans)]
+          [:pre#program-display
+           [:code {:class "js"
+                   :ref #(swap! dom-nodes assoc :code-elem %)
+                   :dangerouslySetInnerHTML {:__html tagged-code}}]]))})))
 
 (defn display
   "Display of js-model source code with syntax highlighting.
