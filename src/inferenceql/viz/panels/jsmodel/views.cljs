@@ -2,6 +2,8 @@
   (:require [re-com.core :refer [border v-box title button gap]]
             [reagent.core :as r]
             [re-frame.core :as rf]
+            [clojure.string :refer [replace]]
+            [goog.string :refer [format]]
             ["highlight.js/lib/core" :as yarn-hljs]
             ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]))
 
@@ -11,7 +13,17 @@
 
 
 (defn add-cluster-spans [highlighted-js-text]
-  highlighted-js-text)
+  (let [form-1 "<span class=\"hljs-keyword\">if</span> (cluster_id == <span class=\"hljs-number\">%s</span>) {"
+        form-2 "} <span class=\"hljs-keyword\">else</span> <span class=\"hljs-keyword\">if</span> (cluster_id == <span class=\"hljs-number\">%s</span>) {"
+        form-1-rep (fn [id] (str (format "<span class=\"cluster\" data=\"%s\">" id)
+                                 (format form-1 id)
+                                 "</span>"))
+        form-2-rep (fn [id] (str (format "<span class=\"cluster\" data=\"%s\">" id)
+                                 (format form-2 id)
+                                 "</span>"))]
+    (-> highlighted-js-text
+        (replace form))
+    highlighted-js-text))
 
 (defn js-code-block
   "Display of Javascript code with syntax highlighting.
