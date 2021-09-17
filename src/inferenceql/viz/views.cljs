@@ -84,7 +84,10 @@
         circle-spec (circle-viz-spec node-names edges)
 
         qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
-        num-points (nth num-points-at-iter iteration)]
+        num-points (nth num-points-at-iter iteration)
+
+        table-col-width 100
+        table-width (+ 200 (* table-col-width (count cols)))]
     [v-box
      :margin "20px"
      :children [[h-box
@@ -92,9 +95,9 @@
                             [gap :size "60px"]
                             [handsontable (take num-points rows)
                              {:height "500px"
-                              :width (str (+ 200 (* 100 (count cols))) "px")
+                              :width (str table-width "px")
                               :cols (map name cols)
-                              :col-widths "100px"}]]]
+                              :col-widths (str table-col-width "px")}]]]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [h-box
