@@ -102,5 +102,5 @@
           settings (cond-> settings
                            cells (assoc-in [:settings :cells] cells)
                            col-widths (assoc-in [:settings :colWidths] col-widths))]
-      [handsontable-base {:style {:padding-bottom "5px"}} settings])))
+      [handsontable-base {} settings])))
 
