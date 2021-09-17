@@ -14,7 +14,8 @@
             [clojure.math.combinatorics :refer [combinations]]
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]
-            [inferenceql.viz.components.store.db :as store-db]))
+            [inferenceql.viz.components.store.db :as store-db]
+            [inferenceql.viz.js.components.table.views :refer [handsontable]]))
 
 (def rows (->> store-db/compiled-in-dataset
                (map #(medley/remove-vals nil? %))))
@@ -64,6 +65,7 @@
   (let [iteration @(rf/subscribe [:learning/iteration])
         cols @(rf/subscribe [:learning/col-selection])
         plot-type @(rf/subscribe [:learning/plot-type])
+        marginal-types @(rf/subscribe [:learning/marginal-types])
 
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
@@ -81,10 +83,16 @@
         edges (mapcat #(combinations % 2) views)
         circle-spec (circle-viz-spec node-names edges)
 
-        qc-spec (dashboard/spec all-samples schema nil cols 10)]
+        qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
+        num-points (nth num-points-at-iter iteration)]
     [v-box
      :margin "20px"
-     :children [[learning/panel all-columns]
+     :children [[h-box
+                 :children [[learning/panel all-columns]
+                            [gap :size "60px"]
+                            [handsontable (take num-points rows)
+                             {:height "500px" :width "2400px"
+                              :cols (map name cols)}]]]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [h-box

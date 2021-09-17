@@ -81,7 +81,7 @@
       col-widths - Handsontable colWidths setting."
   [data options]
   (when data
-    (let [{:keys [cols height v-scroll cells col-widths]} options
+    (let [{:keys [cols height width v-scroll cells col-widths]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
           cols (or cols (->> data first keys (map name)))
           col-headers (for [col cols]
@@ -98,7 +98,7 @@
                        (assoc-in [:settings :colHeaders] col-headers)
                        (assoc-in [:settings :columns] (column-settings cols))
                        (assoc-in [:settings :height] height)
-                       (assoc-in [:settings :width] "100%"))
+                       (assoc-in [:settings :width] width))
           settings (cond-> settings
                            cells (assoc-in [:settings :cells] cells)
                            col-widths (assoc-in [:settings :colWidths] col-widths))]
