@@ -5,25 +5,28 @@
             [clojure.string :refer [replace]]
             [goog.string :refer [format]]
             ["highlight.js/lib/core" :as yarn-hljs]
-            ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]))
+            ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]
+            [hickory.core]
+            [hickory.select]
+            [hickory.zip]
+            [hickory.render]
+            [clojure.zip :as zip]))
 
 ;; We are using the minimal version of highlight.js where
 ;; every language used has to be registered individually.
 (.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
-
 (defn add-cluster-spans [highlighted-js-text]
-  (let [form-1 "<span class=\"hljs-keyword\">if</span> (cluster_id == <span class=\"hljs-number\">%s</span>) {"
-        form-2 "} <span class=\"hljs-keyword\">else</span> <span class=\"hljs-keyword\">if</span> (cluster_id == <span class=\"hljs-number\">%s</span>) {"
-        form-1-rep (fn [id] (str (format "<span class=\"cluster\" data=\"%s\">" id)
-                                 (format form-1 id)
-                                 "</span>"))
-        form-2-rep (fn [id] (str (format "<span class=\"cluster\" data=\"%s\">" id)
-                                 (format form-2 id)
-                                 "</span>"))]
-    (-> highlighted-js-text
-        (replace form))
-    highlighted-js-text))
+  (let [p (map hickory.core/as-hiccup (hickory.core/parse-fragment highlighted-js-text))
+        pp (map hickory.core/as-hickory (hickory.core/parse-fragment highlighted-js-text))
+        ppp (map hickory.render/hickory-to-html pp)]
+    #_(.log js/console :orig highlighted-js-text)
+    #_(.log js/console :pp pp)
+    #_(.log js/console :ppp ppp)
+    #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&lArr;")))
+    #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&nbsp;")))
+    #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&quot;")))
+    (apply str ppp)))
 
 (defn js-code-block
   "Display of Javascript code with syntax highlighting.
