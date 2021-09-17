@@ -64,7 +64,8 @@
        :reagent-render
        (fn [attributes props]
          [:div#table-container attributes
-          [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
+          [:div {:style {:margin-left "-1px" :margin-top "-1px"}}
+           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]]])}))))
 
 (defn handsontable
   "A reagent component that dispalys `data` in handsontable.
