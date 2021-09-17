@@ -91,8 +91,10 @@
                  :children [[learning/panel all-columns]
                             [gap :size "60px"]
                             [handsontable (take num-points rows)
-                             {:height "500px" :width "2400px"
-                              :cols (map name cols)}]]]
+                             {:height "500px"
+                              :width (str (+ 200 (* 100 (count cols))) "px")
+                              :cols (map name cols)
+                              :col-widths "100px"}]]]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [h-box

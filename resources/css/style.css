@@ -196,6 +196,7 @@ div {
 /* --------------- styling for handsontables --------------- */
 
 #table-container {
+  display: table;
   background: #f5f5f5;
 
   /* This is like setting a border-top of 1px width expect that this border
