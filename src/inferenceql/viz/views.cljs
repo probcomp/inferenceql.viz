@@ -85,16 +85,16 @@
 
         qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
         num-points (nth num-points-at-iter iteration)
-        table-width 800]
+        table-width 700]
     [v-box
      :margin "20px"
      :children [[h-box
-                 :children [[learning/panel all-columns]
-                            [gap :size "60px"]
-                            [handsontable (take num-points rows)
+                 :children [[handsontable (take num-points rows)
                              {:height "500px"
                               :width (str table-width "px")
-                              :cols (map name cols)}]]]
+                              :cols (map name cols)}]
+                            [gap :size "60px"]
+                            [learning/panel all-columns]]]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [h-box

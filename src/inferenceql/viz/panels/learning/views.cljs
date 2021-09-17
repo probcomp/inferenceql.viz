@@ -22,7 +22,7 @@
                                      :on-change #(rf/dispatch [:learning/set-iteration %])]]
                             [gap :size "10px"]
                             [label :label iteration]]]
-                [gap :size "10px"]
+                [gap :size "60px"]
                 [h-box
                  :children [[label :label "Plot type:"]
                             [gap :size "10px"]
@@ -36,7 +36,7 @@
                                        :model plot-type
                                        :label-style (if (= p plot-type) {:font-weight "bold"})
                                        :on-change #(rf/dispatch [:learning/set-plot-type %])]))]]]
-                [gap :size "50px"]
+                [gap :size "10px"]
                 [h-box
                  :children [[label :label "Marginals:"]
                             [gap :size "10px"]
