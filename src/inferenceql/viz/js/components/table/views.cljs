@@ -10,9 +10,9 @@
 
 (def observable-hot-settings
   (-> default-hot-settings
-      (dissoc :colHeaders :columns :dropdownMenu)
-      (assoc :height "auto")
-      (assoc :width "auto")))
+      (update :settings dissoc :colHeaders :columns :dropdownMenu :filters)
+      (assoc-in [:settings :height] "auto")
+      (assoc-in [:settings :width] "auto")))
 
 (defn handsontable-base
   "A simplified version of a reagent component for Handsontable."

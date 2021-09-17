@@ -43,7 +43,11 @@
                       (map (fn [[k v]]
                              (case (get schema k)
                                :numerical [(name k) (str v)]
-                               :nominal [(name k) (str "\"" v "\"")])))
+                               :nominal [(name k) (str "\"" v "\"")]
+                               ;; Do not include the constraint if it is not in the schema.
+                               ;; This is so un-modeled columns are ignored.
+                               nil)))
+                      (remove nil?)
                       (map (fn [[k v]] (format "%s=%s" k v)))
                       (string/join " AND "))
         targets-str (string/join ", " (map name targets))]
@@ -82,7 +86,7 @@
   "Returns a collection of query strings for imputing missing values in `rows`"
   [rows schema impute-cols num-samples]
   (let [queries (for [r rows]
-                  (let [missing (set/difference (set impute-cols) (set (keys rows)))]
+                  (let [missing (set/difference (set impute-cols) (set (keys r)))]
                     (when (seq missing)
                       (impute-query impute-cols r num-samples schema))))
         queries (map-indexed vector queries)]
