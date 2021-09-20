@@ -23,7 +23,6 @@
         p-zero (->> (hickory.core/parse-fragment highlighted-js-text)
                     (map hickory.core/as-hiccup)
                     (first))
-
         p-zero-tree (hickory.zip/hiccup-zip p-zero)
 
 
@@ -41,11 +40,20 @@
                   (do (.log js/console (zip/node n))
                       (recur (zip/next n)))))
 
+        remove-right (fn [loc] (zip/remove (zip/next loc)))
+
+        ;; TODO: change tree names to loc.
         fix-node (fn [tree]
                    (let [node (zip/node tree)]
                      (cond
                        (= node [:span {:class "hljs-keyword"} "if"])
-                       (zip/replace tree [:span {:class "hljs-keyword"} "iffff"])
+                       (do
+                         (let [x (.log js/console :here--- (take 3 (zip/rights tree)))])
+                         (-> tree
+                             (zip/replace [:span {:class "hljs-keyword"} "iffff"])
+                             (remove-right)
+                             (remove-right)))
+
 
                        (string? node)
                        ;; TODO: change this to zip/update
