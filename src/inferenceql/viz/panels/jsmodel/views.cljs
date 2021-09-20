@@ -40,11 +40,13 @@
                       (do (.log js/console (zip/node n))
                           (recur (zip/next n)))))
 
-        remove (fn [loc]
-                 ;; TODO: I should be able to do right no?
-                 (.log js/console :rem------ (zip/node loc))
-                 (zip/remove loc))
-
+        ;; Removes n nodes. Returns position before all removals (depth-first).
+        remove-n (fn [loc num-to-remove]
+                   (loop [l loc n num-to-remove]
+                     (cond
+                       (> n 1) (recur (zip/next (zip/remove l)) (dec n))
+                       (= n 1) (recur (zip/remove l) (dec n))
+                       (= n 0) l)))
 
         fix-node (fn [loc]
                    (let [node (zip/node loc)
@@ -55,13 +57,7 @@
                             (= (first r2) :span)
                             (= r3 ") {\n    ret_val = {\n     "))
                        (-> loc
-                           (remove)
-                           (zip/next)
-                           (remove)
-                           (zip/next)
-                           (remove)
-                           (zip/next)
-                           (remove)
+                           (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
                            (zip/insert-right [:span {:class "cluster-button"
                                                      :style {:background-color "lightsteelblue"}}
                                               [:span {:class "hljs-keyword"} "if"]
