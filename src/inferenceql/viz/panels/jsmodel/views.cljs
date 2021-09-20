@@ -35,23 +35,45 @@
                                    (s/find-in-text #"if"))
                             pp)
 
-        nodes (loop [n p-zero-tree]
-                (if (not (zip/end? n))
-                  (do (.log js/console (zip/node n))
-                      (recur (zip/next n)))))
+        #_nodes #_(loop [n p-zero-tree]
+                    (if (not (zip/end? n))
+                      (do (.log js/console (zip/node n))
+                          (recur (zip/next n)))))
 
-        remove-right (fn [loc] (zip/remove (zip/next loc)))
+        remove-right (fn [loc]
+                       ;; TODO: I should be able to do right no?
+                       (let [rem-loc (zip/right loc)]
+                         (.log js/console :to-rem------ (zip/node rem-loc))
+                         (zip/remove rem-loc)))
+
+        remove-right-2 (fn [loc]
+                         ;; TODO: I should be able to do right no?
+                         (.log js/console :to-rem-pre----- (zip/node loc))
+                         (let [rem-loc (zip/right loc)]
+                           (.log js/console :to-rem------ (zip/node rem-loc))
+                           loc))
 
         fix-node (fn [loc]
-                   (let [node (zip/node loc)]
+                   (let [node (zip/node loc)
+                         [r1 r2 r3] (take 3 (zip/rights loc))]
                      (cond
-                       (= node [:span {:class "hljs-keyword"} "if"])
+                       (and (= node [:span {:class "hljs-keyword"} "if"])
+                            (= r1 " (cluster_id == ")
+                            (= (first r2) :span)
+                            (= r3 ") {\n    ret_val = {\n     "))
                        (do
-                         (let [x (.log js/console :here--- (take 3 (zip/rights loc)))])
+                         #_(.log js/console :here----- [r1 r2 r3])
                          (-> loc
-                             (zip/replace [:span {:class "hljs-keyword"} "iffff"])
                              (remove-right)
-                             (remove-right)))
+                             (remove-right-2)
+                             #_(remove-right)
+                             (zip/replace [:span {:class "cluster-button"
+                                                  :style {:background-color "lightsteelblue"}}
+                                           [:span {:class "hljs-keyword"} "iffff"]
+                                           r1
+                                           r2
+                                           ")"])
+                             #_(zip/insert-right (subs r3 1))))
 
 
                        (string? node)
