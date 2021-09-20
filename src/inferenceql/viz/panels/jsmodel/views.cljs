@@ -7,7 +7,7 @@
             ["highlight.js/lib/core" :as yarn-hljs]
             ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]
             [hickory.core]
-            [hickory.select]
+            [hickory.select :as s]
             [hickory.zip]
             [hickory.render]
             [clojure.zip :as zip]))
@@ -17,16 +17,32 @@
 (.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
 (defn add-cluster-spans [highlighted-js-text]
-  (let [p (map hickory.core/as-hiccup (hickory.core/parse-fragment highlighted-js-text))
-        pp (map hickory.core/as-hickory (hickory.core/parse-fragment highlighted-js-text))
-        ppp (map hickory.render/hickory-to-html pp)]
+  (let [highlighted-js-text (str "<code>" highlighted-js-text "</code>")
+
+        p-zero (map hickory.core/as-hiccup (hickory.core/parse-fragment highlighted-js-text))
+
+        pp (->> (hickory.core/parse-fragment highlighted-js-text)
+                (map hickory.core/as-hickory)
+                first)
+        ppp (hickory.render/hickory-to-html pp)
+        nodes (s/select (s/and (s/class "hljs-keyword")
+                               (s/tag :span)
+                               (s/find-in-text #"if"))
+                        pp)]
+
+    (.log js/console :pp pp)
+    (.log js/console :nodes nodes)
+
+
+
+
     #_(.log js/console :orig highlighted-js-text)
     #_(.log js/console :pp pp)
     #_(.log js/console :ppp ppp)
     #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&lArr;")))
     #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&nbsp;")))
     #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&quot;")))
-    (apply str ppp)))
+    ppp))
 
 (defn js-code-block
   "Display of Javascript code with syntax highlighting.
@@ -52,10 +68,10 @@
       :reagent-render
       (fn [js-code]
         (let [tagged-code (-> js-code highlight add-cluster-spans)]
-          [:pre#program-display
-           [:code {:class "js"
-                   :ref #(swap! dom-nodes assoc :code-elem %)
-                   :dangerouslySetInnerHTML {:__html tagged-code}}]]))})))
+          [:pre#program-display {:ref #(swap! dom-nodes assoc :code-elem %)
+                                 :dangerouslySetInnerHTML {:__html tagged-code}}]))})))
+                                 ;; :class "js"
+
 
 (defn display
   "Display of js-model source code with syntax highlighting.
