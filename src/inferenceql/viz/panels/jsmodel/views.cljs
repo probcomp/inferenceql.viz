@@ -42,14 +42,13 @@
 
         remove-right (fn [loc] (zip/remove (zip/next loc)))
 
-        ;; TODO: change tree names to loc.
-        fix-node (fn [tree]
-                   (let [node (zip/node tree)]
+        fix-node (fn [loc]
+                   (let [node (zip/node loc)]
                      (cond
                        (= node [:span {:class "hljs-keyword"} "if"])
                        (do
-                         (let [x (.log js/console :here--- (take 3 (zip/rights tree)))])
-                         (-> tree
+                         (let [x (.log js/console :here--- (take 3 (zip/rights loc)))])
+                         (-> loc
                              (zip/replace [:span {:class "hljs-keyword"} "iffff"])
                              (remove-right)
                              (remove-right)))
@@ -57,15 +56,15 @@
 
                        (string? node)
                        ;; TODO: change this to zip/update
-                       (zip/replace tree (string/replace node #"&quot;" "\""))
+                       (zip/replace loc (string/replace node #"&quot;" "\""))
 
                        :else
-                       tree)))
+                       loc)))
 
-        fixed (loop [tree p-zero-tree]
-                (if (not (zip/end? tree))
-                  (recur (zip/next (fix-node tree)))
-                  (zip/root tree)))]
+        fixed (loop [loc p-zero-tree]
+                (if (not (zip/end? loc))
+                  (recur (zip/next (fix-node loc)))
+                  (zip/root loc)))]
 
     (.log js/console :p-zero p-zero)
     (.log js/console :fixed fixed)
