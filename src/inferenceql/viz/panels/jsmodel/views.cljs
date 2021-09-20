@@ -56,17 +56,19 @@
                             (= r1 " (cluster_id == ")
                             (= (first r2) :span)
                             (= r3 ") {\n    ret_val = {\n     "))
-                       (-> loc
-                           (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
-                           (zip/insert-right [:span {:class "cluster-button"
-                                                     :style {:background-color "lightsteelblue"}}
-                                              [:span {:class "hljs-keyword"} "if"]
-                                              r1
-                                              r2
-                                              ")"])
-                           (zip/right)
-                           (zip/insert-right (subs r3 1)))
-
+                       (let [cluster-id 3
+                             view-id 3]
+                         (-> loc
+                             (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
+                             (zip/insert-right [:span {:class "cluster-button"
+                                                       :style {:background-color "lightsteelblue"}
+                                                       :onClick (fn [] (.log js/console "hi"))}
+                                                [:span {:class "hljs-keyword"} "if"]
+                                                r1
+                                                r2
+                                                ")"])
+                             (zip/right)
+                             (zip/insert-right (subs r3 1))))
 
                        (string? node)
                        ;; TODO: change this to zip/update
@@ -99,23 +101,14 @@
 
   Returns: A reagent component."
   [js-code]
-  (let [dom-nodes (r/atom {})
-        highlight (fn [js-text]
-                    (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))]
+  (let [ highlight (fn [js-text] (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))]
     (r/create-class
      {:display-name "js-model-code"
-
-      :component-did-mount
-      (fn [this]
-        (.addEventListener
-         (:code-elem @dom-nodes)
-         "click"
-         (fn [e] (.log js/console :here (.-target e)))))
 
       :reagent-render
       (fn [js-code]
         (let [tagged-code (-> js-code highlight add-cluster-spans)]
-          [:pre#program-display {:ref #(swap! dom-nodes assoc :code-elem %)}
+          [:pre#program-display
            tagged-code]))})))
 
 
