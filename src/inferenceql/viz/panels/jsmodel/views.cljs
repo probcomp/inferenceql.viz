@@ -33,6 +33,26 @@
                        (> n 1) (recur (zip/next (zip/remove l)) (dec n))
                        (= n 1) (recur (zip/remove l) (dec n))
                        (= n 0) l)))
+
+        view-id (fn [loc]
+                  (let [view-fn-loc (loop [l loc]
+                                      (cond
+                                        (nil? l)
+                                        nil
+
+                                        (= (take 2 (zip/node l)) [:span {:class "hljs-function"}])
+                                        ;; TODO: grab the view number from the function name.
+                                        (.log js/console :here---------)
+
+                                        :else
+                                        (recur (zip/left l))))]
+                    9999))
+
+        ;; TODO
+        if-statement-for-cluster? (fn [])
+        ;; TODO
+        cluster-id (fn [])
+
         fix-node (fn [loc]
                    (let [node (zip/node loc)
                          [r1 r2 r3] (take 3 (zip/rights loc))
@@ -44,7 +64,7 @@
                             (number? (edn/read-string r2-content))
                             (= r3 ") {\n    ret_val = {\n     "))
                        (let [cluster-id (edn/read-string r2-content)
-                             view-id 9999]
+                             view-id (view-id loc)]
                          (-> loc
                              (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
                              (zip/insert-right [:span {:class "cluster-button"
@@ -59,6 +79,7 @@
 
                        (string? node)
                        ;; TODO: change this to zip/update
+                       ;; TODO: change this to the escape function -- see notion notes.
                        (zip/replace loc (string/replace node #"&quot;" "\""))
 
                        :else
