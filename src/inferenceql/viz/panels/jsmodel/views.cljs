@@ -11,7 +11,8 @@
             [hickory.zip]
             [hickory.render]
             [clojure.zip :as zip]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [clojure.edn :as edn]))
 
 ;; We are using the minimal version of highlight.js where
 ;; every language used has to be registered individually.
@@ -32,22 +33,23 @@
                        (> n 1) (recur (zip/next (zip/remove l)) (dec n))
                        (= n 1) (recur (zip/remove l) (dec n))
                        (= n 0) l)))
-
         fix-node (fn [loc]
                    (let [node (zip/node loc)
-                         [r1 r2 r3] (take 3 (zip/rights loc))]
+                         [r1 r2 r3] (take 3 (zip/rights loc))
+                         [r2-tag r2-attr r2-content] r2]
                      (cond
                        (and (= node [:span {:class "hljs-keyword"} "if"])
                             (= r1 " (cluster_id == ")
-                            (= (first r2) :span)
+                            (= [:span {:class "hljs-number"}] [r2-tag r2-attr])
+                            (number? (edn/read-string r2-content))
                             (= r3 ") {\n    ret_val = {\n     "))
-                       (let [cluster-id 3
-                             view-id 3]
+                       (let [cluster-id (edn/read-string r2-content)
+                             view-id 9999]
                          (-> loc
                              (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
                              (zip/insert-right [:span {:class "cluster-button"
                                                        :style {:background-color "lightsteelblue"}
-                                                       :onClick (fn [] (.log js/console "hi"))}
+                                                       :onClick (fn [] (.log js/console "hi" view-id " " cluster-id))}
                                                 [:span {:class "hljs-keyword"} "if"]
                                                 r1
                                                 r2
