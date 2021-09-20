@@ -10,7 +10,8 @@
             [hickory.select :as s]
             [hickory.zip]
             [hickory.render]
-            [clojure.zip :as zip]))
+            [clojure.zip :as zip]
+            [clojure.string :as string]))
 
 ;; We are using the minimal version of highlight.js where
 ;; every language used has to be registered individually.
@@ -19,22 +20,47 @@
 (defn add-cluster-spans [highlighted-js-text]
   (let [highlighted-js-text (str "<code>" highlighted-js-text "</code>")
 
-        p-zero (map hickory.core/as-hiccup (hickory.core/parse-fragment highlighted-js-text))
+        p-zero (->> (hickory.core/parse-fragment highlighted-js-text)
+                    (map hickory.core/as-hiccup)
+                    (first))
 
-        pp (->> (hickory.core/parse-fragment highlighted-js-text)
-                (map hickory.core/as-hickory)
-                first)
-        ppp (hickory.render/hickory-to-html pp)
-        nodes (s/select (s/and (s/class "hljs-keyword")
-                               (s/tag :span)
-                               (s/find-in-text #"if"))
-                        pp)]
-
-    (.log js/console :pp pp)
-    (.log js/console :nodes nodes)
+        p-zero-tree (hickory.zip/hiccup-zip p-zero)
 
 
+        #_pp #_(->> (hickory.core/parse-fragment highlighted-js-text)
+                    (map hickory.core/as-hickory)
+                    first)
+        #_ppp #_(hickory.render/hickory-to-html pp)
+        #_nodes #_(s/select (s/and (s/class "hljs-keyword")
+                                   (s/tag :span)
+                                   (s/find-in-text #"if"))
+                            pp)
 
+        nodes (loop [n p-zero-tree]
+                (if (not (zip/end? n))
+                  (do (.log js/console (zip/node n))
+                      (recur (zip/next n)))))
+
+        fix-node (fn [tree]
+                   (let [node (zip/node tree)]
+                     (cond
+                       (= node [:span {:class "hljs-keyword"} "if"])
+                       (zip/replace tree [:span {:class "hljs-keyword"} "iffff"])
+
+                       (string? node)
+                       ;; TODO: change this to zip/update
+                       (zip/replace tree (string/replace node #"&quot;" "\""))
+
+                       :else
+                       tree)))
+
+        fixed (loop [tree p-zero-tree]
+                (if (not (zip/end? tree))
+                  (recur (zip/next (fix-node tree)))
+                  (zip/root tree)))]
+
+    (.log js/console :p-zero p-zero)
+    (.log js/console :fixed fixed)
 
     #_(.log js/console :orig highlighted-js-text)
     #_(.log js/console :pp pp)
@@ -42,7 +68,7 @@
     #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&lArr;")))
     #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&nbsp;")))
     #_(.log js/console (map hickory.core/as-hiccup (hickory.core/parse-fragment "&quot;")))
-    ppp))
+    fixed))
 
 (defn js-code-block
   "Display of Javascript code with syntax highlighting.
@@ -68,9 +94,8 @@
       :reagent-render
       (fn [js-code]
         (let [tagged-code (-> js-code highlight add-cluster-spans)]
-          [:pre#program-display {:ref #(swap! dom-nodes assoc :code-elem %)
-                                 :dangerouslySetInnerHTML {:__html tagged-code}}]))})))
-                                 ;; :class "js"
+          [:pre#program-display {:ref #(swap! dom-nodes assoc :code-elem %)}
+           tagged-code]))})))
 
 
 (defn display
