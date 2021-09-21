@@ -52,23 +52,28 @@
                       :else
                       (recur (zip/left l)))))
 
-        ;; TODO
-        if-statement-for-cluster? (fn [])
-        ;; TODO
-        cluster-id (fn [])
+        cluster-if-statement? (fn [loc]
+                                (let [node (zip/node loc)
+                                      [r1 r2 r3] (take 3 (zip/rights loc))
+                                      [r2-tag r2-attr r2-content] r2]
+                                  (and (= node [:span {:class "hljs-keyword"} "if"])
+                                       (= r1 " (cluster_id == ")
+                                       (= [:span {:class "hljs-number"}] [r2-tag r2-attr])
+                                       (number? (edn/read-string r2-content))
+                                       (= r3 ") {\n    ret_val = {\n     "))))
+
+        cluster-id (fn [loc]
+                     (let [[_ r2 _] (take 3 (zip/rights loc))
+                           [_ _ r2-content] r2]
+                       (edn/read-string r2-content)))
 
         fix-node (fn [loc]
-                   (let [node (zip/node loc)
-                         [r1 r2 r3] (take 3 (zip/rights loc))
-                         [r2-tag r2-attr r2-content] r2]
+                   (let [node (zip/node loc)]
                      (cond
-                       (and (= node [:span {:class "hljs-keyword"} "if"])
-                            (= r1 " (cluster_id == ")
-                            (= [:span {:class "hljs-number"}] [r2-tag r2-attr])
-                            (number? (edn/read-string r2-content))
-                            (= r3 ") {\n    ret_val = {\n     "))
-                       (let [cluster-id (edn/read-string r2-content)
-                             view-id (view-id loc)]
+                       (cluster-if-statement? loc)
+                       (let [cluster-id (cluster-id loc)
+                             view-id (view-id loc)
+                             [r1 r2 r3] (take 3 (zip/rights loc))]
                          (-> loc
                              (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
                              (zip/insert-right [:span {:class "cluster-button"
@@ -109,6 +114,7 @@
       (fn [js-code]
         (let [tagged-code (-> js-code highlight add-cluster-spans)]
           [:pre#program-display
+           ;; TODO: try to make tagged code its own reagent component for performance.
            tagged-code]))})))
 
 
