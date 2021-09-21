@@ -3,7 +3,7 @@
             [reagent.core :as r]
             [re-frame.core :as rf]
             [clojure.string :refer [replace]]
-            [goog.string :refer [format]]
+            [goog.string :refer [format] :as gstring]
             ["highlight.js/lib/core" :as yarn-hljs]
             ["highlight.js/lib/languages/javascript" :as yarn-hljs-js]
             [hickory.core]
@@ -87,9 +87,8 @@
                              (zip/insert-right (subs r3 1))))
 
                        (string? node)
-                       ;; TODO: change this to zip/update
-                       ;; TODO: change this to the escape function -- see notion notes.
-                       (zip/replace loc (string/replace node #"&quot;" "\""))
+                       (zip/edit loc gstring/unescapeEntities)
+
 
                        :else
                        loc)))]
