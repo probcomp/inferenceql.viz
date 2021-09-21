@@ -306,3 +306,13 @@ psuedo-class applied. */
   width: 100%;
   height: 400px;
 }
+
+/* --------------- js-model program cluster selection --------------- */
+
+.cluster-clickable {
+  background-color: lightsteelblue;
+}
+
+.cluster-selected {
+  background-color: green;
+}

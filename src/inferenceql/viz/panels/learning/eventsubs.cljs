@@ -53,3 +53,14 @@
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :marginal-types] new-val)))
+
+(rf/reg-sub
+ :learning/cluster-selected
+ (fn [db _]
+   (get-in db [:learning-panel :cluster-selected])))
+
+(rf/reg-event-db
+  :learning/select-cluster
+  event-interceptors
+  (fn [db [_ view-id cluster-id]]
+    (assoc-in db [:learning-panel :cluster-selected] {:view-id view-id :cluster-id cluster-id})))

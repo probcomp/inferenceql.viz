@@ -66,6 +66,7 @@
         cols @(rf/subscribe [:learning/col-selection])
         plot-type @(rf/subscribe [:learning/plot-type])
         marginal-types @(rf/subscribe [:learning/marginal-types])
+        cluster-selected @(rf/subscribe [:learning/cluster-selected])
 
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
@@ -98,7 +99,7 @@
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [h-box
-                 :children [[js-code-block js-model-text]
+                 :children [[js-code-block js-model-text cluster-selected]
                             [gap :size "20px"]
                             [box :style {:display (if (= plot-type :mutual-information)
                                                     "block"

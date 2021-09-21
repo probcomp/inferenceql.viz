@@ -18,7 +18,7 @@
 ;; every language used has to be registered individually.
 (.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
-(defn add-cluster-spans [highlighted-js-text]
+(defn add-cluster-spans [highlighted-js-text cluster-selected]
   (let [highlighted-js-text (str "<code>" highlighted-js-text "</code>")
 
         hiccup (->> (hickory.core/parse-fragment highlighted-js-text)
@@ -73,12 +73,17 @@
                        (cluster-if-statement? loc)
                        (let [cluster-id (cluster-id loc)
                              view-id (view-id loc)
+                             current {:cluster-id cluster-id :view-id view-id}
+                             current-selected (= current cluster-selected)
+                             _ (.log js/console :current current)
+                             _ (.log js/console :cluster-selected cluster-selected)
                              [r1 r2 r3] (take 3 (zip/rights loc))]
                          (-> loc
                              (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
-                             (zip/insert-right [:span {:class "cluster-button"
-                                                       :style {:background-color "lightsteelblue"}
-                                                       :onClick (fn [] (.log js/console "hi" view-id " " cluster-id))}
+                             (zip/insert-right [:span {:class ["cluster-clickable"
+                                                               (when current-selected
+                                                                 "cluster-selected")]
+                                                       :onClick #(rf/dispatch [:learning/select-cluster view-id cluster-id])}
                                                 [:span {:class "hljs-keyword"} "if"]
                                                 r1
                                                 r2
@@ -104,18 +109,17 @@
     `code` -- (string) The Javascript source code to display.
 
   Returns: A reagent component."
-  [js-code]
+  [js-code cluster-selected]
   (let [ highlight (fn [js-text] (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))]
     (r/create-class
      {:display-name "js-model-code"
 
       :reagent-render
-      (fn [js-code]
-        (let [tagged-code (-> js-code highlight add-cluster-spans)]
+      (fn [js-code cluster-selected]
+        (let [tagged-code (-> js-code highlight (add-cluster-spans cluster-selected))]
+          ;; TODO: try to make tagged code its own reagent component for performance.
           [:pre#program-display
-           ;; TODO: try to make tagged code its own reagent component for performance.
            tagged-code]))})))
-
 
 (defn display
   "Display of js-model source code with syntax highlighting.
