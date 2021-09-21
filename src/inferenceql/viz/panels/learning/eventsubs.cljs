@@ -64,3 +64,15 @@
   event-interceptors
   (fn [db [_ new-selection]]
     (assoc-in db [:learning-panel :cluster-selected] new-selection)))
+
+(rf/reg-sub
+ :learning/show-plot-options
+ ;; TODO: move default value to db.
+ (fn [db _]
+   (get-in db [:learning-panel :show-plot-options] false)))
+
+(rf/reg-event-db
+  :learning/toggle-plot-options
+  event-interceptors
+  (fn [db [_]]
+    (update-in db [:learning-panel :show-plot-options] not)))
