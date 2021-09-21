@@ -35,18 +35,22 @@
                        (= n 0) l)))
 
         view-id (fn [loc]
-                  (let [view-fn-loc (loop [l loc]
-                                      (cond
-                                        (nil? l)
-                                        nil
+                  (loop [l loc]
+                    (cond
+                      (nil? l)
+                      nil
 
-                                        (= (take 2 (zip/node l)) [:span {:class "hljs-function"}])
-                                        ;; TODO: grab the view number from the function name.
-                                        (.log js/console :here---------)
+                      (= (take 2 (zip/node l)) [:span {:class "hljs-function"}])
+                      (let [func-name (-> l
+                                          zip/down zip/right
+                                          zip/right zip/down
+                                          zip/node)]
+                        (-> (re-matches #"view_(\d+)_model" func-name)
+                            second
+                            edn/read-string))
 
-                                        :else
-                                        (recur (zip/left l))))]
-                    9999))
+                      :else
+                      (recur (zip/left l)))))
 
         ;; TODO
         if-statement-for-cluster? (fn [])
