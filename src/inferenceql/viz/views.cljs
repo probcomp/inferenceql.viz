@@ -92,14 +92,6 @@
         mmix-model (nth mmix-models iteration)
         all-columns (keys schema)
 
-        ;_ (.log js/console :cgpm cgpm-model)
-        ;_ (.log js/console (-> cgpm-model walk/keywordize-keys xcat/fix-cgpm-maps))
-        ;_ (.log js/console (columns-in-view cgpm-model 1))
-        ;_ (.log js/console (columns-in-view cgpm-model 2))
-        ;_ (.log js/console (rows-in-view-cluster cgpm-model 1 1))
-        ;_ (.log js/console (rows-in-view-cluster cgpm-model 1 2))
-        ;_ (.log js/console (rows-in-view-cluster cgpm-model 1 3))
-
         columns-in-view (when cluster-selected
                           (set (columns-in-view cgpm-model (:view-id cluster-selected))))
         rows-in-view-cluster (when cluster-selected
@@ -130,17 +122,12 @@
                               :width (str table-width "px")
                               :cols (map name cols)
                               :cells (fn [row _col prop]
-                                       (.log js/console row)
-                                       (.log js/console prop)
                                        (if-not cluster-selected
                                          #js {}
                                          (if (and (rows-in-view-cluster row)
                                                   (columns-in-view (keyword prop)))
                                            #js {:className "blue-highlight"}
                                            #js {})))}]
-
-
-
                             [gap :size "60px"]
                             [learning/panel all-columns]]]
                 [gap :size "30px"]
