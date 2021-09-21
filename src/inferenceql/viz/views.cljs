@@ -65,8 +65,18 @@
 (defn columns-in-view [cgpm view-id]
   (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
         view-id (dec view-id)
-        view-assignments (zipmap (map keyword (:col_names cgpm))
-                                 (vals (:Zv cgpm)))]
+
+        cols (mapv keyword (:col_names cgpm))
+        view-assignments (zipmap (map #(nth cols %) (keys (:Zv cgpm)))
+                                 (vals (:Zv cgpm)))
+        _ (.log js/console :original-view-assignments view-assignments)
+        view-assignments-new (zipmap (sort (distinct (vals view-assignments)))
+                                     (range))
+        view-assignments (medley/map-vals view-assignments-new view-assignments)
+        _ (.log js/console :new-view-assignments view-assignments)]
+
+    ;(.log js/console :view-assignments view-assignments)
+    ;(.log js/console :view-assignments-new view-assignments-new)
     (keep (fn [[col vid]]
             (when (= vid view-id) col))
           view-assignments)))
@@ -74,10 +84,19 @@
 (defn rows-in-view-cluster [cgpm view-id cluster-id]
   (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
         view-id (dec view-id)
+        view-assignments (zipmap (map keyword (:col_names cgpm))
+                                 (vals (:Zv cgpm)))
+        view-reassignments (zipmap (range) (sort (distinct (vals view-assignments))))
+
         cluster-id (dec cluster-id)
-        cluster-assignments (map vector (range) (get-in cgpm [:Zrv view-id]))]
+        cluster-assignments (map vector (range) (get-in cgpm [:Zrv (view-reassignments view-id)]))
+
+        cluster-reassignments (zipmap (range)
+                                      (sort (distinct (map second cluster-assignments))))]
+
+    (.log js/console :clusters (sort (distinct (map second cluster-assignments))))
     (keep (fn [[row-num cid]]
-            (when (= cid cluster-id) row-num))
+            (when (= (cluster-reassignments cid) cluster-id) row-num))
           cluster-assignments)))
 
 (defn app
@@ -98,6 +117,14 @@
                                (set (rows-in-view-cluster cgpm-model
                                                           (:view-id cluster-selected)
                                                           (:cluster-id cluster-selected))))
+
+        _ (.log js/console :col columns-in-view)
+        _ (.log js/console :rows rows-in-view-cluster)
+
+
+        _ (.log js/console :cgpm cgpm-model)
+        _ (.log js/console :xcat (nth xcat-models iteration))
+
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
