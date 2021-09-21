@@ -21,10 +21,10 @@
 (defn add-cluster-spans [highlighted-js-text]
   (let [highlighted-js-text (str "<code>" highlighted-js-text "</code>")
 
-        p-zero (->> (hickory.core/parse-fragment highlighted-js-text)
+        hiccup (->> (hickory.core/parse-fragment highlighted-js-text)
                     (map hickory.core/as-hiccup)
                     (first))
-        p-zero-tree (hickory.zip/hiccup-zip p-zero)
+        hiccup-zipper (hickory.zip/hiccup-zip hiccup)
 
         ;; Removes n nodes. Returns position before all removals (depth-first).
         remove-n (fn [loc num-to-remove]
@@ -93,7 +93,7 @@
 
                        :else
                        loc)))]
-    (loop [loc p-zero-tree]
+    (loop [loc hiccup-zipper]
       (if (not (zip/end? loc))
         (recur (zip/next (fix-node loc)))
         (zip/root loc)))))
