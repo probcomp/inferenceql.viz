@@ -102,7 +102,8 @@
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
-        node-names (map keyword (get cgpm-model "col_names"))
+        cols-incorporated (map keyword (get cgpm-model "col_names"))
+        node-names cols-incorporated
         view-assignment (fn [col]
                           (let [col-to-num (zipmap node-names (get cgpm-model "outputs"))
                                 col-num-to-view-num (into {} (get cgpm-model "Zv"))]
@@ -120,7 +121,7 @@
                  :children [[handsontable (take num-points rows)
                              {:height "500px"
                               :width (str table-width "px")
-                              :cols (map name cols)
+                              :cols (map name cols-incorporated)
                               :cells (fn [row _col prop]
                                        (if-not cluster-selected
                                          #js {}
