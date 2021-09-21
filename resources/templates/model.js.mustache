@@ -1,22 +1,3 @@
-/* Distributions */
-
-function gaussian(mu, sigma) {
-  return metaprob.distributions.gaussian.afn(mu, sigma);
-}
-
-function categorical(weights) {
-  return metaprob.distributions.categorical.afn(weights);
-}
-
-/* Categorical variables */
-
-{{#categories}}
-function {{name}}_categories(index) {
-  var categories = [{{{values}}}]
-  return categories[index];
-}
-
-{{/categories}}
 /* Views */
 
 {{#views}}
