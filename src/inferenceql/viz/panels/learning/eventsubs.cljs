@@ -62,5 +62,5 @@
 (rf/reg-event-db
   :learning/select-cluster
   event-interceptors
-  (fn [db [_ view-id cluster-id]]
-    (assoc-in db [:learning-panel :cluster-selected] {:view-id view-id :cluster-id cluster-id})))
+  (fn [db [_ new-selection]]
+    (assoc-in db [:learning-panel :cluster-selected] new-selection)))

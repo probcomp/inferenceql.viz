@@ -75,15 +75,12 @@
                              view-id (view-id loc)
                              current {:cluster-id cluster-id :view-id view-id}
                              current-selected (= current cluster-selected)
-                             _ (.log js/console :current current)
-                             _ (.log js/console :cluster-selected cluster-selected)
                              [r1 r2 r3] (take 3 (zip/rights loc))]
                          (-> loc
                              (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
                              (zip/insert-right [:span {:class ["cluster-clickable"
-                                                               (when current-selected
-                                                                 "cluster-selected")]
-                                                       :onClick #(rf/dispatch [:learning/select-cluster view-id cluster-id])}
+                                                               (when current-selected "cluster-selected")]
+                                                       :onClick #(rf/dispatch [:learning/select-cluster current])}
                                                 [:span {:class "hljs-keyword"} "if"]
                                                 r1
                                                 r2
@@ -110,15 +107,22 @@
 
   Returns: A reagent component."
   [js-code cluster-selected]
-  (let [ highlight (fn [js-text] (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))]
+  (let [dom-nodes (r/atom {})
+        highlight (fn [js-text] (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))]
     (r/create-class
      {:display-name "js-model-code"
+
+      :component-did-mount
+      (fn [this]
+        #_(.onclick (:prog-elem @dom-nodes)
+                    (fn [e]
+                      (.log js/console :here-------))))
 
       :reagent-render
       (fn [js-code cluster-selected]
         (let [tagged-code (-> js-code highlight (add-cluster-spans cluster-selected))]
           ;; TODO: try to make tagged code its own reagent component for performance.
-          [:pre#program-display
+          [:pre#program-display {:ref #(swap! dom-nodes assoc :prog-elem %)}
            tagged-code]))})))
 
 (defn display
