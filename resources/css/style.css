@@ -318,3 +318,7 @@ psuedo-class applied. */
 .cluster-selected {
   background-color: lightsteelblue;
 }
+
+.handsontable .blue-highlight {
+  background-color: lightsteelblue;
+}

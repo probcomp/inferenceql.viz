@@ -8,6 +8,7 @@
             [inferenceql.viz.panels.jsmodel.multimix :as multimix]
             [cljstache.core :refer [render]]
             [inferenceql.auto-modeling.js :refer [import-cgpm]]
+            [inferenceql.auto-modeling.xcat :as xcat]
             [inferenceql.viz.panels.jsmodel.views :refer [js-code-block]]
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
             [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
@@ -15,7 +16,8 @@
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]
             [inferenceql.viz.components.store.db :as store-db]
-            [inferenceql.viz.js.components.table.views :refer [handsontable]]))
+            [inferenceql.viz.js.components.table.views :refer [handsontable]]
+            [clojure.walk :as walk]))
 
 (def rows (->> store-db/compiled-in-dataset
                (map #(medley/remove-vals nil? %))))
@@ -60,6 +62,24 @@
                               (rest nps)
                               (rest iters))))))
 
+(defn columns-in-view [cgpm view-id]
+  (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
+        view-id (dec view-id)
+        view-assignments (zipmap (map keyword (:col_names cgpm))
+                                 (vals (:Zv cgpm)))]
+    (keep (fn [[col vid]]
+            (when (= vid view-id) col))
+          view-assignments)))
+
+(defn rows-in-view-cluster [cgpm view-id cluster-id]
+  (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
+        view-id (dec view-id)
+        cluster-id (dec cluster-id)
+        cluster-assignments (map vector (range) (get-in cgpm [:Zrv view-id]))]
+    (keep (fn [[row-num cid]]
+            (when (= cid cluster-id) row-num))
+          cluster-assignments)))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
@@ -71,6 +91,21 @@
         cgpm-model (nth cgpm-models iteration)
         mmix-model (nth mmix-models iteration)
         all-columns (keys schema)
+
+        ;_ (.log js/console :cgpm cgpm-model)
+        ;_ (.log js/console (-> cgpm-model walk/keywordize-keys xcat/fix-cgpm-maps))
+        ;_ (.log js/console (columns-in-view cgpm-model 1))
+        ;_ (.log js/console (columns-in-view cgpm-model 2))
+        ;_ (.log js/console (rows-in-view-cluster cgpm-model 1 1))
+        ;_ (.log js/console (rows-in-view-cluster cgpm-model 1 2))
+        ;_ (.log js/console (rows-in-view-cluster cgpm-model 1 3))
+
+        columns-in-view (when cluster-selected
+                          (set (columns-in-view cgpm-model (:view-id cluster-selected))))
+        rows-in-view-cluster (when cluster-selected
+                               (set (rows-in-view-cluster cgpm-model
+                                                          (:view-id cluster-selected)
+                                                          (:cluster-id cluster-selected))))
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
@@ -93,7 +128,19 @@
                  :children [[handsontable (take num-points rows)
                              {:height "500px"
                               :width (str table-width "px")
-                              :cols (map name cols)}]
+                              :cols (map name cols)
+                              :cells (fn [row _col prop]
+                                       (.log js/console row)
+                                       (.log js/console prop)
+                                       (if-not cluster-selected
+                                         #js {}
+                                         (if (and (rows-in-view-cluster row)
+                                                  (columns-in-view (keyword prop)))
+                                           #js {:className "blue-highlight"}
+                                           #js {})))}]
+
+
+
                             [gap :size "60px"]
                             [learning/panel all-columns]]]
                 [gap :size "30px"]
