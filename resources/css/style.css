@@ -310,9 +310,11 @@ psuedo-class applied. */
 /* --------------- js-model program cluster selection --------------- */
 
 .cluster-clickable {
-  background-color: lightsteelblue;
+  cursor: pointer;
+  text-decoration: underline;
+  background-color: lightyellow;
 }
 
 .cluster-selected {
-  background-color: green;
+  background-color: lightsteelblue;
 }
