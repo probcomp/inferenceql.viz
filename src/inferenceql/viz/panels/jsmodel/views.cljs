@@ -1,6 +1,7 @@
 (ns inferenceql.viz.panels.jsmodel.views
   (:require [re-com.core :refer [border v-box title button gap]]
             [reagent.core :as r]
+            [reagent.dom :as rdom]
             [re-frame.core :as rf]
             [clojure.string :refer [replace]]
             [goog.string :refer [format] :as gstring]
@@ -19,7 +20,7 @@
 (.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
 (defn add-cluster-spans [highlighted-js-text cluster-selected]
-  (let [highlighted-js-text (str "<code>" highlighted-js-text "</code>")
+  (let [highlighted-js-text (str "<span>" highlighted-js-text "</span>")
 
         hiccup (->> (hickory.core/parse-fragment highlighted-js-text)
                     (map hickory.core/as-hiccup)
@@ -114,16 +115,19 @@
 
       :component-did-mount
       (fn [this]
-        #_(.onclick (:prog-elem @dom-nodes)
-                    (fn [e]
-                      (.log js/console :here-------))))
+        (.addEventListener (:code-elem @dom-nodes)
+                           "click"
+                           (fn [event]
+                             (if (= (.-target event) (:code-elem @dom-nodes))
+                               (rf/dispatch [:learning/select-cluster nil])))))
 
       :reagent-render
       (fn [js-code cluster-selected]
         (let [tagged-code (-> js-code highlight (add-cluster-spans cluster-selected))]
           ;; TODO: try to make tagged code its own reagent component for performance.
-          [:pre#program-display {:ref #(swap! dom-nodes assoc :prog-elem %)}
-           tagged-code]))})))
+          [:pre#program-display
+           [:code {:ref #(swap! dom-nodes assoc :code-elem %)}
+            tagged-code]]))})))
 
 (defn display
   "Display of js-model source code with syntax highlighting.
