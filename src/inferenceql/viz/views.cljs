@@ -173,5 +173,9 @@
                             [box :style {:display (if (= plot-type :select-vs-simulate)
                                                     "block"
                                                     "none")}
-                             :child [vega-lite qc-spec {:actions true} nil nil tagged-samples {:iter iteration}]]]]]]))
+                             :child [vega-lite qc-spec {:actions false} nil nil tagged-samples {:iter iteration
+                                                                                                :cluster (:cluster-id cluster-selected)
+                                                                                                :view_columns (clj->js (map name columns-in-view))
+                                                                                                :view (str "view_" (:view-id cluster-selected))}]]]]]]))
+
 
