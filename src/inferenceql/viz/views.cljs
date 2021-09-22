@@ -140,7 +140,9 @@
         edges (mapcat #(combinations % 2) views)
         circle-spec (circle-viz-spec node-names edges)
 
-        qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
+        tagged-samples (map #(assoc % :view_0 (rand-int 4))
+                            all-samples)
+        qc-spec (dashboard/spec tagged-samples schema nil cols 10 marginal-types)
         num-points (nth num-points-at-iter iteration)
         table-width 700]
     [v-box
@@ -171,5 +173,5 @@
                             [box :style {:display (if (= plot-type :select-vs-simulate)
                                                     "block"
                                                     "none")}
-                             :child [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration}]]]]]]))
+                             :child [vega-lite qc-spec {:actions true} nil nil tagged-samples {:iter iteration}]]]]]]))
 
