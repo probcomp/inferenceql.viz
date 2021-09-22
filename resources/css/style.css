@@ -204,11 +204,11 @@ div {
 }
 
 .ht_master tr td {
-  font-size: .875rem;
+  font-size: 13px;
 }
 
 .handsontable th {
-  font-size: .875rem;
+  font-size: 13px;
 }
 
 .virtual .ht_master tr td {
@@ -311,7 +311,6 @@ psuedo-class applied. */
 
 .cluster-clickable {
   cursor: pointer;
-  text-decoration: underline;
   background-color: lightyellow;
 }
 

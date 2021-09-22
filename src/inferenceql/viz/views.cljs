@@ -91,10 +91,11 @@
         cluster-id (dec cluster-id)
         cluster-assignments (map vector (range) (get-in cgpm [:Zrv (view-reassignments view-id)]))
 
-        cluster-reassignments (zipmap (range)
-                                      (sort (distinct (map second cluster-assignments))))]
+        cluster-reassignments (zipmap (sort (distinct (map second cluster-assignments)))
+                                      (range))]
 
-    (.log js/console :clusters (sort (distinct (map second cluster-assignments))))
+    (.log js/console :clusters (map second cluster-assignments))
+    (.log js/console :clusters-distinct (sort (distinct (map second cluster-assignments))))
     (keep (fn [[row-num cid]]
             (when (= (cluster-reassignments cid) cluster-id) row-num))
           cluster-assignments)))
@@ -124,7 +125,7 @@
 
         _ (.log js/console :cgpm cgpm-model)
         _ (.log js/console :xcat (nth xcat-models iteration))
-
+        _ (.log js/console :mmix mmix-model)
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
