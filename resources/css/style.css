@@ -314,6 +314,10 @@ psuedo-class applied. */
   background-color: lightyellow;
 }
 
+.cluster-clickable:not(.cluster-selected):hover {
+  background-color: #dbe4f0;
+}
+
 .cluster-selected {
   background-color: lightsteelblue;
 }
