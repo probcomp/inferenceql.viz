@@ -55,23 +55,24 @@
 (def all-samples (concat observed-samples virtual-samples))
 
 (defn columns-in-view [cgpm view-id]
-  (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
-        view-id (dec view-id)
+  (when view-id
+    (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
+          view-id (dec view-id)
 
-        cols (mapv keyword (:col_names cgpm))
-        view-assignments (zipmap (map #(nth cols %) (keys (:Zv cgpm)))
-                                 (vals (:Zv cgpm)))
-        ;_ (.log js/console :original-view-assignments view-assignments)
-        view-assignments-new (zipmap (sort (distinct (vals view-assignments)))
-                                     (range))
-        view-assignments (medley/map-vals view-assignments-new view-assignments)]
-        ;_ (.log js/console :new-view-assignments view-assignments)]
+          cols (mapv keyword (:col_names cgpm))
+          view-assignments (zipmap (map #(nth cols %) (keys (:Zv cgpm)))
+                                   (vals (:Zv cgpm)))
+          ;_ (.log js/console :original-view-assignments view-assignments)
+          view-assignments-new (zipmap (sort (distinct (vals view-assignments)))
+                                       (range))
+          view-assignments (medley/map-vals view-assignments-new view-assignments)]
+          ;_ (.log js/console :new-view-assignments view-assignments)]
 
-    ;(.log js/console :view-assignments view-assignments)
-    ;(.log js/console :view-assignments-new view-assignments-new)
-    (keep (fn [[col vid]]
-            (when (= vid view-id) col))
-          view-assignments)))
+      ;(.log js/console :view-assignments view-assignments)
+      ;(.log js/console :view-assignments-new view-assignments-new)
+      (keep (fn [[col vid]]
+              (when (= vid view-id) col))
+            view-assignments))))
 
 (defn rows-in-view-cluster [cgpm view-id cluster-id]
   (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
@@ -113,6 +114,20 @@
         view-names (map #(keyword (str "view_" %)) (keys cluster-assignments))]
     (apply map (fn [& a] (zipmap view-names a)) (vals cluster-assignments))))
 
+
+(defn cells-fn [cgpm-model cluster-selected]
+  (if-not cluster-selected
+    (fn [_ _ _] #js {})
+    (let [cols-set (set (columns-in-view cgpm-model (:view-id cluster-selected)))
+          rows-set (set (rows-in-view-cluster cgpm-model
+                                              (:view-id cluster-selected)
+                                              (:cluster-id cluster-selected)))]
+      (fn [row _col prop]
+        (if (and (rows-set row)
+                 (cols-set (keyword prop)))
+          #js {:className "blue-highlight"}
+          #js {})))))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
@@ -125,12 +140,7 @@
         mmix-model (nth mmix-models iteration)
         all-columns (keys schema)
 
-        columns-in-view (when cluster-selected
-                          (set (columns-in-view cgpm-model (:view-id cluster-selected))))
-        rows-in-view-cluster (when cluster-selected
-                               (set (rows-in-view-cluster cgpm-model
-                                                          (:view-id cluster-selected)
-                                                          (:cluster-id cluster-selected))))
+        columns-in-view (set (columns-in-view cgpm-model (:view-id cluster-selected)))
 
         ;_ (.log js/console :col columns-in-view)
         ;_ (.log js/console :rows rows-in-view-cluster)
@@ -169,13 +179,7 @@
                              {:height "500px"
                               :width (str table-width "px")
                               :cols (map name cols-incorporated)
-                              :cells (fn [row _col prop]
-                                       (if-not cluster-selected
-                                         #js {}
-                                         (if (and (rows-in-view-cluster row)
-                                                  (columns-in-view (keyword prop)))
-                                           #js {:className "blue-highlight"}
-                                           #js {})))}]
+                              :cells (cells-fn cgpm-model cluster-selected)}]
                             [gap :size "60px"]
                             [learning/panel all-columns]]]
                 [gap :size "30px"]

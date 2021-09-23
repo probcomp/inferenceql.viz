@@ -21,7 +21,9 @@
                                      :min 0
                                      :max (dec (count transitions))
                                      :model iteration
-                                     :on-change #(rf/dispatch [:learning/set-iteration %])]]
+                                     :on-change (fn [iter]
+                                                  (rf/dispatch [:learning/select-cluster nil])
+                                                  (rf/dispatch [:learning/set-iteration iter]))]]
                             [gap :size "10px"]
                             [label :label iteration]]]
                 [gap :size "20px"]
