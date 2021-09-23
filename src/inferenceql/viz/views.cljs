@@ -47,6 +47,8 @@
 (def virtual-samples (->> (mapcat sample-xcat xcat-models num-points-required)
                           (map #(assoc % :collection "virtual"))))
 
+;; TODO: save observed and virtual samples separetely.
+;; Concat later, after view-cluster assignments have been added.
 (def all-samples (loop [ret [] os observed-samples
                         vs virtual-samples nps num-points-required
                         iters (range)]
