@@ -114,10 +114,12 @@
         view-names (map #(keyword (str "view_" %)) (keys cluster-assignments))]
     (apply map (fn [& a] (zipmap view-names a)) (vals cluster-assignments))))
 
+(def default-cells-fn
+  (fn [_ _ _] #js {}))
 
 (defn cells-fn [cgpm-model cluster-selected]
   (if-not cluster-selected
-    (fn [_ _ _] #js {})
+    default-cells-fn
     (let [cols-set (set (columns-in-view cgpm-model (:view-id cluster-selected)))
           rows-set (set (rows-in-view-cluster cgpm-model
                                               (:view-id cluster-selected)
