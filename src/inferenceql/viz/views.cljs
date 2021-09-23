@@ -166,7 +166,8 @@
 
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
-                      (let [view-cluster-assignments (all-row-assignments cgpm-model)]
+                      (let [view-cluster-assignments (concat (all-row-assignments cgpm-model)
+                                                             (repeat {}))]
                         (concat (map merge observed-samples view-cluster-assignments)
                                 virtual-samples))
                       all-samples)
