@@ -43,26 +43,16 @@
   (let [targets (gpm/variables model)]
     (repeatedly sample-count #(gpm/simulate model targets {}))))
 
-(def observed-samples (map #(assoc % :collection "observed") rows))
+(def iteration-tags (mapcat (fn [iter count]
+                              (repeat count {:iter iter}))
+                            (range)
+                            num-points-required))
+(def observed-samples (->> (map #(assoc % :collection "observed") rows)
+                           (map merge iteration-tags)))
 (def virtual-samples (->> (mapcat sample-xcat xcat-models num-points-required)
-                          (map #(assoc % :collection "virtual"))))
-
-;; TODO: save observed and virtual samples separetely.
-;; Concat later, after view-cluster assignments have been added.
-(def all-samples (loop [ret [] os observed-samples
-                        vs virtual-samples nps num-points-required
-                        iters (range)]
-                   (if-not (seq nps)
-                     ret
-                     (let [i (first iters)
-                           np (first nps)
-                           samples (concat (take np os) (take np vs))
-                           samples (map #(assoc % :iter i) samples)]
-                       (recur (concat ret samples)
-                              (drop np os)
-                              (drop np vs)
-                              (rest nps)
-                              (rest iters))))))
+                          (map #(assoc % :collection "virtual"))
+                          (map merge iteration-tags)))
+(def all-samples (concat observed-samples virtual-samples))
 
 (defn columns-in-view [cgpm view-id]
   (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
@@ -71,11 +61,11 @@
         cols (mapv keyword (:col_names cgpm))
         view-assignments (zipmap (map #(nth cols %) (keys (:Zv cgpm)))
                                  (vals (:Zv cgpm)))
-        _ (.log js/console :original-view-assignments view-assignments)
+        ;_ (.log js/console :original-view-assignments view-assignments)
         view-assignments-new (zipmap (sort (distinct (vals view-assignments)))
                                      (range))
-        view-assignments (medley/map-vals view-assignments-new view-assignments)
-        _ (.log js/console :new-view-assignments view-assignments)]
+        view-assignments (medley/map-vals view-assignments-new view-assignments)]
+        ;_ (.log js/console :new-view-assignments view-assignments)]
 
     ;(.log js/console :view-assignments view-assignments)
     ;(.log js/console :view-assignments-new view-assignments-new)
@@ -96,8 +86,8 @@
         cluster-reassignments (zipmap (sort (distinct (map second cluster-assignments)))
                                       (range))]
 
-    (.log js/console :clusters (map second cluster-assignments))
-    (.log js/console :clusters-distinct (sort (distinct (map second cluster-assignments))))
+    ;(.log js/console :clusters (map second cluster-assignments))
+    ;(.log js/console :clusters-distinct (sort (distinct (map second cluster-assignments))))
     (keep (fn [[row-num cid]]
             (when (= (cluster-reassignments cid) cluster-id) row-num))
           cluster-assignments)))
@@ -120,7 +110,7 @@
                                  (medley/map-keys view-reassignments)
                                  (medley/map-vals cluster-reassign))
 
-        view-names (map #(str "view_" %) (keys cluster-assignments))]
+        view-names (map #(keyword (str "view_" %)) (keys cluster-assignments))]
     (apply map (fn [& a] (zipmap view-names a)) (vals cluster-assignments))))
 
 (defn app
@@ -142,16 +132,12 @@
                                                           (:view-id cluster-selected)
                                                           (:cluster-id cluster-selected))))
 
-        _ (.log js/console :col columns-in-view)
-        _ (.log js/console :rows rows-in-view-cluster)
+        ;_ (.log js/console :col columns-in-view)
+        ;_ (.log js/console :rows rows-in-view-cluster)
 
-
-        _ (.log js/console :cgpm cgpm-model)
-        _ (.log js/console :xcat (nth xcat-models iteration))
-        _ (.log js/console :mmix mmix-model)
-
-        ;; TODO: merge this into observed rows.
-        _ (all-row-assignments cgpm-model)
+        ;_ (.log js/console :cgpm cgpm-model)
+        ;_ (.log js/console :xcat (nth xcat-models iteration))
+        ;_ (.log js/console :mmix mmix-model)
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
@@ -166,9 +152,14 @@
         edges (mapcat #(combinations % 2) views)
         circle-spec (circle-viz-spec node-names edges)
 
-        tagged-samples (map #(assoc % :view_0 (rand-int 4))
-                            all-samples)
-        qc-spec (dashboard/spec tagged-samples schema nil cols 10 marginal-types)
+        ;; Merge in the view-cluster information only when we have to.
+        all-samples (if cluster-selected
+                      (let [view-cluster-assignments (all-row-assignments cgpm-model)]
+                        (concat (map merge observed-samples view-cluster-assignments)
+                                virtual-samples))
+                      all-samples)
+
+        qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
         num-points (nth num-points-at-iter iteration)
         table-width 700]
     [v-box
@@ -199,9 +190,9 @@
                             [box :style {:display (if (= plot-type :select-vs-simulate)
                                                     "block"
                                                     "none")}
-                             :child [vega-lite qc-spec {:actions false} nil nil tagged-samples {:iter iteration
-                                                                                                :cluster (:cluster-id cluster-selected)
-                                                                                                :view_columns (clj->js (map name columns-in-view))
-                                                                                                :view (str "view_" (:view-id cluster-selected))}]]]]]]))
+                             :child [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration
+                                                                                             :cluster (:cluster-id cluster-selected)
+                                                                                             :view_columns (clj->js (map name columns-in-view))
+                                                                                             :view (some->> (:view-id cluster-selected) (str "view_"))}]]]]]]))
 
 
