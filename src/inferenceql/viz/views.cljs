@@ -100,6 +100,27 @@
             (when (= (cluster-reassignments cid) cluster-id) row-num))
           cluster-assignments)))
 
+(defn all-row-assignments [cgpm]
+  (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
+        range-1 (drop 1 (range))
+
+        view-assignments (zipmap (map keyword (:col_names cgpm))
+                                 (vals (:Zv cgpm)))
+        view-reassignments (zipmap (sort (distinct (vals view-assignments)))
+                                   range-1)
+
+        cluster-reassign (fn [cluster-vals]
+                            (let [reassignments (zipmap (sort (distinct cluster-vals))
+                                                        range-1)]
+                              (map reassignments cluster-vals)))
+
+        cluster-assignments (->> (:Zrv cgpm)
+                                 (medley/map-keys view-reassignments)
+                                 (medley/map-vals cluster-reassign))
+
+        view-names (map #(str "view_" %) (keys cluster-assignments))]
+    (apply map (fn [& a] (zipmap view-names a)) (vals cluster-assignments))))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
@@ -126,6 +147,9 @@
         _ (.log js/console :cgpm cgpm-model)
         _ (.log js/console :xcat (nth xcat-models iteration))
         _ (.log js/console :mmix mmix-model)
+
+        ;; TODO: merge this into observed rows.
+        _ (all-row-assignments cgpm-model)
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
