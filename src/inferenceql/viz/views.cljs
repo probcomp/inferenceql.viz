@@ -70,41 +70,48 @@
 
 (def range-1 (drop 1 (range)))
 
-(defn xcat-view-id-mapping
+(defn xcat-view-id-map
+  "Returns map from js-program view-id (int) to xcat view-id (keyword)."
   [xcat]
-  (let [view-names (->> (get-in xcat [:latents :counts])
-                        keys)
+  (let [view-names (keys (get-in xcat [:latents :counts]))
         view-number (fn [view-name]
                       (-> (re-matches #"view_(\d+)" (name view-name))
                           second
                           edn/read-string))]
     (zipmap range-1 (sort-by view-number view-names))))
 
+(defn xcat-cluster-id-map
+  "Returns map from js-program cluster-id (int) to xcat cluster-id (keyword).
+  Cluster id is specific to view specified by js-program view-id (int)."
+  [xcat view-id]
+  (let [view-map (xcat-view-id-map xcat)
+        view-id (view-map view-id)
+        view (get-in xcat [:views view-id])
+        cluster-names (keys (get-in view [:latents :counts]))
+        cluster-number (fn [cluster-name]
+                         (-> (re-matches #"cluster_(\d+)" (name cluster-name))
+                             second
+                             edn/read-string))]
+    (zipmap range-1 (sort-by cluster-number cluster-names))))
+
 (defn columns-in-view [xcat view-id]
   (when view-id
-    (let [view-id (get (xcat-view-id-mapping xcat)
+    (let [view-id (get (xcat-view-id-map xcat)
                        view-id)
           view (get-in xcat [:views view-id])]
       (keys (:columns view)))))
 
-(defn rows-in-view-cluster [cgpm view-id cluster-id]
-  (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
-        view-id (dec view-id)
-        view-assignments (zipmap (map keyword (:col_names cgpm))
-                                 (vals (:Zv cgpm)))
-        view-reassignments (zipmap (range) (sort (distinct (vals view-assignments))))
+(defn rows-in-view-cluster [xcat view-id cluster-id]
+  (let [view-map (xcat-view-id-map xcat)
+        cluster-map (xcat-cluster-id-map xcat view-id)
 
-        cluster-id (dec cluster-id)
-        cluster-assignments (map vector (range) (get-in cgpm [:Zrv (view-reassignments view-id)]))
+        view-id (view-map view-id)
+        cluster-id (cluster-map cluster-id)
 
-        cluster-reassignments (zipmap (sort (distinct (map second cluster-assignments)))
-                                      (range))]
-
-    ;(.log js/console :clusters (map second cluster-assignments))
-    ;(.log js/console :clusters-distinct (sort (distinct (map second cluster-assignments))))
-    (keep (fn [[row-num cid]]
-            (when (= (cluster-reassignments cid) cluster-id) row-num))
-          cluster-assignments)))
+        view (get-in xcat [:views view-id])
+        cluster-assignments (get-in view [:latents :y])]
+   (->> (filter #(= cluster-id (val %)) cluster-assignments)
+        (map first))))
 
 (defn all-row-assignments [cgpm]
   (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
@@ -130,11 +137,11 @@
 (def default-cells-fn
   (fn [_ _ _] #js {}))
 
-(defn cells-fn [cgpm-model cluster-selected]
+(defn cells-fn [xcat-model cluster-selected]
   (if-not cluster-selected
     default-cells-fn
-    (let [cols-set (set (columns-in-view cgpm-model (:view-id cluster-selected)))
-          rows-set (set (rows-in-view-cluster cgpm-model
+    (let [cols-set (set (columns-in-view xcat-model (:view-id cluster-selected)))
+          rows-set (set (rows-in-view-cluster xcat-model
                                               (:view-id cluster-selected)
                                               (:cluster-id cluster-selected)))]
       (fn [row _col prop]
@@ -197,7 +204,7 @@
                              {:height "500px"
                               :width (str table-width "px")
                               :cols (map name cols-incorporated)
-                              :cells (cells-fn cgpm-model cluster-selected)}]
+                              :cells (cells-fn xcat-model cluster-selected)}]
                             [gap :size "60px"]
                             [learning/panel all-columns]]]
                 [gap :size "30px"]
