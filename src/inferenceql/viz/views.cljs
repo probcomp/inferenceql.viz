@@ -24,9 +24,8 @@
 
 (def schema store-db/compiled-in-schema)
 
-;; TODO: Off load all this stuff into DVC stages.
 (def cgpm-models transitions)
-
+;; TODO: Off load the conversion into xcat into DVC stage.
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
                           (import-cgpm cgpm (take num-rows rows) (:mapping-table config) schema)))
@@ -34,7 +33,11 @@
 (def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
 
 
-(def num-points-at-iter (map #(count (get % "X")) cgpm-models))
+(def num-points-at-iter (map (fn [xcat]
+                               (let [[view-1-name view-1] (first (get xcat :views))]
+                                 ;; Count the number of row to cluster assignments.
+                                 (count (get-in view-1 [:latents :y]))))
+                             xcat-models))
 (def num-points-required (map - num-points-at-iter (conj num-points-at-iter 0)))
 
 (defn sample-xcat
@@ -148,7 +151,9 @@
         cluster-selected @(rf/subscribe [:learning/cluster-selected])
 
         cgpm-model (nth cgpm-models iteration)
+        xcat-model (nth xcat-models iteration)
         mmix-model (nth mmix-models iteration)
+
         all-columns (keys schema)
 
         columns-in-view (set (columns-in-view cgpm-model (:view-id cluster-selected)))
@@ -157,7 +162,7 @@
         ;_ (.log js/console :rows rows-in-view-cluster)
 
         ;_ (.log js/console :cgpm cgpm-model)
-        ;_ (.log js/console :xcat (nth xcat-models iteration))
+        ;_ (.log js/console :xcat xcat-model))
         ;_ (.log js/console :mmix mmix-model)
 
         js-model-text (render (:js-model-template config)
