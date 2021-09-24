@@ -17,7 +17,9 @@
             [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]
             [inferenceql.viz.components.store.db :as store-db]
             [inferenceql.viz.js.components.table.views :refer [handsontable]]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.edn :as edn]))
+
 
 (def rows (->> store-db/compiled-in-dataset
                (map #(medley/remove-vals nil? %))))
@@ -66,25 +68,24 @@
                           (map merge iteration-tags)))
 (def all-samples (concat observed-samples virtual-samples))
 
-(defn columns-in-view [cgpm view-id]
+(def range-1 (drop 1 (range)))
+
+(defn xcat-view-id-mapping
+  [xcat]
+  (let [view-names (->> (get-in xcat [:latents :counts])
+                        keys)
+        view-number (fn [view-name]
+                      (-> (re-matches #"view_(\d+)" (name view-name))
+                          second
+                          edn/read-string))]
+    (zipmap range-1 (sort-by view-number view-names))))
+
+(defn columns-in-view [xcat view-id]
   (when view-id
-    (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
-          view-id (dec view-id)
-
-          cols (mapv keyword (:col_names cgpm))
-          view-assignments (zipmap (map #(nth cols %) (keys (:Zv cgpm)))
-                                   (vals (:Zv cgpm)))
-          ;_ (.log js/console :original-view-assignments view-assignments)
-          view-assignments-new (zipmap (sort (distinct (vals view-assignments)))
-                                       (range))
-          view-assignments (medley/map-vals view-assignments-new view-assignments)]
-          ;_ (.log js/console :new-view-assignments view-assignments)]
-
-      ;(.log js/console :view-assignments view-assignments)
-      ;(.log js/console :view-assignments-new view-assignments-new)
-      (keep (fn [[col vid]]
-              (when (= vid view-id) col))
-            view-assignments))))
+    (let [view-id (get (xcat-view-id-mapping xcat)
+                       view-id)
+          view (get-in xcat [:views view-id])]
+      (keys (:columns view)))))
 
 (defn rows-in-view-cluster [cgpm view-id cluster-id]
   (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
@@ -156,13 +157,13 @@
 
         all-columns (keys schema)
 
-        columns-in-view (set (columns-in-view cgpm-model (:view-id cluster-selected)))
+        columns-in-view (set (columns-in-view xcat-model (:view-id cluster-selected)))
 
         ;_ (.log js/console :col columns-in-view)
         ;_ (.log js/console :rows rows-in-view-cluster)
 
         ;_ (.log js/console :cgpm cgpm-model)
-        ;_ (.log js/console :xcat xcat-model))
+        _ (.log js/console :xcat xcat-model)
         ;_ (.log js/console :mmix mmix-model)
 
         js-model-text (render (:js-model-template config)
