@@ -43,14 +43,23 @@
   (let [targets (gpm/variables model)]
     (repeatedly sample-count #(gpm/simulate model targets {}))))
 
+(defn add-null-columns [row]
+  (let [columns (keys schema)
+        null-kvs (zipmap columns (repeat nil))]
+    (merge null-kvs row)))
+
 (def iteration-tags (mapcat (fn [iter count]
                               (repeat count {:iter iter}))
                             (range)
                             num-points-required))
+
 (def observed-samples (->> (map #(assoc % :collection "observed") rows)
+                           (map add-null-columns)
                            (map merge iteration-tags)))
+
 (def virtual-samples (->> (mapcat sample-xcat xcat-models num-points-required)
                           (map #(assoc % :collection "virtual"))
+                          (map add-null-columns)
                           (map merge iteration-tags)))
 (def all-samples (concat observed-samples virtual-samples))
 
