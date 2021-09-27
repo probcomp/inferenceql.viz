@@ -28,7 +28,7 @@
                             [gap :size "10px"]
                             [label :label iteration]]]
                 [gap :size "20px"]
-                [hyperlink :label (if show-plot-options "plot options" "hide")
+                [hyperlink :label (if show-plot-options "hide" "plot options")
                            :on-click #(rf/dispatch [:learning/toggle-plot-options])]
                 [v-box
                  :style {:display (if show-plot-options "block" "none")}
