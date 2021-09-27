@@ -113,28 +113,7 @@
    (->> (filter #(= cluster-id (val %)) cluster-assignments)
         (map first))))
 
-(defn all-row-assignments [cgpm]
-  (let [cgpm (-> cgpm walk/keywordize-keys xcat/fix-cgpm-maps)
-        range-1 (drop 1 (range))
-
-        view-assignments (zipmap (map keyword (:col_names cgpm))
-                                 (vals (:Zv cgpm)))
-        view-reassignments (zipmap (sort (distinct (vals view-assignments)))
-                                   range-1)
-
-        cluster-reassign (fn [cluster-vals]
-                            (let [reassignments (zipmap (sort (distinct cluster-vals))
-                                                        range-1)]
-                              (map reassignments cluster-vals)))
-
-        cluster-assignments (->> (:Zrv cgpm)
-                                 (medley/map-keys view-reassignments)
-                                 (medley/map-vals cluster-reassign))
-
-        view-names (map #(keyword (str "view_" %)) (keys cluster-assignments))]
-    (apply map (fn [& a] (zipmap view-names a)) (vals cluster-assignments))))
-
-(defn all-row-assignments-2 [xcat]
+(defn all-row-assignments [xcat]
   (let [view-map (xcat-view-id-map xcat)
         inv-view-map (zipmap (vals view-map)
                              (map #(keyword (str "view_" %)) (keys view-map)))
@@ -197,12 +176,6 @@
         _ (.log js/console :xcat xcat-model)
         ;_ (.log js/console :mmix mmix-model)
 
-        _ (.log js/console :xxxx (all-row-assignments cgpm-model))
-        _ (.log js/console :xxxx (all-row-assignments-2 xcat-model))
-        _ (.log js/console :xxxx (= (all-row-assignments cgpm-model)
-                                    (all-row-assignments-2 xcat-model)))
-
-
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
@@ -218,7 +191,7 @@
 
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
-                      (let [view-cluster-assignments (concat (all-row-assignments cgpm-model)
+                      (let [view-cluster-assignments (concat (all-row-assignments xcat-model)
                                                              (repeat {}))]
                         (concat (map merge observed-samples view-cluster-assignments)
                                 virtual-samples))
