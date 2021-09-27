@@ -165,11 +165,18 @@
         plot-type @(rf/subscribe [:learning/plot-type])
         marginal-types @(rf/subscribe [:learning/marginal-types])
         cluster-selected @(rf/subscribe [:learning/cluster-selected])
+        mi-threshold @(rf/subscribe [:learning/mi-threshold])
 
         cgpm-model (nth cgpm-models iteration)
         xcat-model (nth xcat-models iteration)
         mmix-model (nth mmix-models iteration)
         mi-vals (:mi (nth mutual-info iteration))
+        mi-flat-vals (flatten
+                      (for [[_ inner-vals] mi-vals]
+                        (for [[_ v1] inner-vals]
+                          v1)))
+        mi-min (apply min mi-flat-vals)
+        mi-max (apply max mi-flat-vals)
 
         all-columns (keys schema)
 
@@ -186,11 +193,10 @@
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
-        edge-threshold 0
         cols-incorporated (columns-in-model xcat-model)
         edges (filter (fn [[col-1 col-2]]
                         (<= (get-in mi-vals [col-1 col-2])
-                            edge-threshold))
+                            mi-threshold))
                       ;; All potential edges
                       (combinations cols-incorporated 2))
         circle-spec (circle-viz-spec cols-incorporated edges)
@@ -215,7 +221,7 @@
                               :cols (map name cols-incorporated)
                               :cells (cells-fn xcat-model cluster-selected)}]
                             [gap :size "60px"]
-                            [learning/panel all-columns]]]
+                            [learning/panel all-columns mi-min mi-max]]]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [h-box

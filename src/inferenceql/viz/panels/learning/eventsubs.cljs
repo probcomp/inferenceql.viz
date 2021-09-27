@@ -76,3 +76,15 @@
   event-interceptors
   (fn [db [_]]
     (update-in db [:learning-panel :show-plot-options] not)))
+
+(rf/reg-sub
+ :learning/mi-threshold
+ ;; TODO: move default value to db.
+ (fn [db _]
+   (get-in db [:learning-panel :mi-threshold] 0)))
+
+(rf/reg-event-db
+  :learning/set-mi-threshold
+  event-interceptors
+  (fn [db [_ new-val]]
+    (assoc-in db [:learning-panel :mi-threshold] new-val)))
