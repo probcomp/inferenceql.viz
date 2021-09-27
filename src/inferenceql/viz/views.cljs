@@ -173,7 +173,7 @@
         ;_ (.log js/console :rows rows-in-view-cluster)
 
         ;_ (.log js/console :cgpm cgpm-model)
-        _ (.log js/console :xcat xcat-model)
+        ;_ (.log js/console :xcat xcat-model)
         ;_ (.log js/console :mmix mmix-model)
 
         js-model-text (render (:js-model-template config)
