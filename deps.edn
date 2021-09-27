@@ -19,13 +19,12 @@
         cljs-bean/cljs-bean {:mvn/version "1.7.0"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         hickory/hickory {:mvn/version "0.7.1"}
-        probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "0f4476e9dbd4e4dafa8ecdb09f209908c97b6eaa"}
+        ;; This is branch: htella/20210922-fix-mmix-export
+        probcomp/inferenceql.inference {:local/root "../inferenceql.inference/"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "0241ee57e059f618ae55b2ae8822986d778b0d68"}
         ;; This is branch: htella/20210720-js-xcat-import
-        probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
-                                            :sha "8f8ee9a7559c1158a2c00f401fa3ca4a5789cbab"}
+        probcomp/inferenceql.auto-modeling {:local/root "../inferenceql.auto-modeling/"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"
