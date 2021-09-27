@@ -1,7 +1,7 @@
 (ns inferenceql.viz.views
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box gap box]]
-            [inferenceql.viz.config :refer [config transitions]]
+            [inferenceql.viz.config :refer [config transitions mutual-info]]
             [inferenceql.viz.panels.learning.views :as learning]
             [medley.core :as medley]
             [inferenceql.inference.gpm.crosscat :as crosscat]
@@ -100,6 +100,11 @@
           view (get-in xcat [:views view-id])]
       (keys (:columns view)))))
 
+(defn columns-in-model [xcat]
+  (let [views (-> xcat :views vals)
+        columns-in-view (fn [view] (-> view :columns keys))]
+    (mapcat columns-in-view views)))
+
 (defn rows-in-view-cluster [xcat view-id cluster-id]
   (let [view-map (xcat-view-id-map xcat)
         ;; View-name-kw used in xcat model.
@@ -164,6 +169,7 @@
         cgpm-model (nth cgpm-models iteration)
         xcat-model (nth xcat-models iteration)
         mmix-model (nth mmix-models iteration)
+        mi-vals (:mi (nth mutual-info iteration))
 
         all-columns (keys schema)
 
@@ -175,19 +181,19 @@
         ;_ (.log js/console :cgpm cgpm-model)
         ;_ (.log js/console :xcat xcat-model)
         ;_ (.log js/console :mmix mmix-model)
+        ;_ (.log js/console :mutual-info mutual-info)
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
-        cols-incorporated (map keyword (get cgpm-model "col_names"))
-        node-names cols-incorporated
-        view-assignment (fn [col]
-                          (let [col-to-num (zipmap node-names (get cgpm-model "outputs"))
-                                col-num-to-view-num (into {} (get cgpm-model "Zv"))]
-                            (-> col col-to-num col-num-to-view-num)))
-        views (vals (group-by view-assignment node-names))
-        edges (mapcat #(combinations % 2) views)
-        circle-spec (circle-viz-spec node-names edges)
+        edge-threshold 0
+        cols-incorporated (columns-in-model xcat-model)
+        edges (filter (fn [[col-1 col-2]]
+                        (<= (get-in mi-vals [col-1 col-2])
+                            edge-threshold))
+                      ;; All potential edges
+                      (combinations cols-incorporated 2))
+        circle-spec (circle-viz-spec cols-incorporated edges)
 
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
