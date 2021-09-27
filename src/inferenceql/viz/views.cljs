@@ -159,15 +159,20 @@
           #js {})))))
 
 (def mi-raw-vals
-  (flatten
-   (for [mi-iter (map :mi mutual-info)]
-     (for [[_ inner-vals] mi-iter]
-       (for [[_ v1] inner-vals]
-         v1)))))
+  (when (seq mutual-info)
+    (flatten
+     (for [mi-iter (map :mi mutual-info)]
+       (for [[_ inner-vals] mi-iter]
+         (for [[_ v1] inner-vals]
+           v1))))))
 
-(def mi-min (apply min mi-raw-vals))
+(def mi-min (if (seq mi-raw-vals)
+              (apply min mi-raw-vals)
+              0))
 
-(def mi-max (apply max mi-raw-vals))
+(def mi-max (if (seq mi-raw-vals)
+              (apply max mi-raw-vals)
+              1))
 
 (defn app
   []
@@ -181,7 +186,7 @@
         cgpm-model (nth cgpm-models iteration)
         xcat-model (nth xcat-models iteration)
         mmix-model (nth mmix-models iteration)
-        mi-vals (:mi (nth mutual-info iteration))
+        mi-vals (:mi (nth mutual-info iteration {}))
 
         all-columns (keys schema)
 
@@ -200,7 +205,7 @@
 
         cols-incorporated (sort (columns-in-model xcat-model))
         edges (filter (fn [[col-1 col-2]]
-                        (>= (get-in mi-vals [col-1 col-2])
+                        (>= (get-in mi-vals [col-1 col-2] 0)
                             mi-threshold))
                       ;; All potential edges
                       (combinations cols-incorporated 2))
