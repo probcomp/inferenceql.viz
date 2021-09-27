@@ -1,6 +1,9 @@
 #!/bin/sh
 
-echo "var transitions = " > $2
+# Echo the variable declaration and equals sign into the output file.
+echo "var $3 = " > $2
+# Echo the JSON data into the output file..
 cat $1 >> $2
+# Echo end-of-statment semicolon into the output file.
 echo ";" >> $2
 

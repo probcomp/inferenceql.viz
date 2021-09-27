@@ -9,3 +9,4 @@
 (def config (config-reader/read))
 
 #?(:cljs (def transitions (js->clj js/transitions)))
+#?(:cljs (def mutual-info (js->clj js/mutual_info :keywordize-keys true)))

@@ -12,6 +12,8 @@ hot-css-file     := $(node-modules-dir)/handsontable/dist/handsontable.full.css
 hot-css-resource := $(resource-dir)/css/handsontable.full.css
 transitions-js := $(resource-dir)/transitions.js
 transitions-json := $(resource-dir)/transitions.json
+mutual-info-js := $(resource-dir)/mutual-info.js
+mutual-info-json := $(resource-dir)/mutual-info.json
 
 ### Definitions for publishing.
 
@@ -35,6 +37,7 @@ clean:
 	rm -Rf $(publish-dir)
 	rm -Rf $(node-modules-dir)
 	rm -Rf $(transitions-js)
+	rm -Rf $(mutual-info-js)
 
 ### Spreadsheets app compilation.
 
@@ -55,15 +58,15 @@ watch-advanced-min: $(hot-css-resource)
 	clojure -M -m cljs.main -w $(src-dir) -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 .PHONY: js
-js: $(hot-css-resource) $(transitions-js)
+js: $(hot-css-resource) $(transitions-js) $(mutual-info-js)
 	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts) -c inferenceql.viz.core
 
 .PHONY: js-advanced
-js-advanced: $(hot-css-resource) $(transitions-js)
+js-advanced: $(hot-css-resource) $(transitions-js) $(mutual-info-js)
 	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts-advn) -c inferenceql.viz.core
 
 .PHONY: js-advanced-min
-js-advanced-min: $(hot-css-resource) $(transitions-js)
+js-advanced-min: $(hot-css-resource) $(transitions-js) $(mutual-info-js)
 	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
 ### Observable components compilation.
@@ -103,7 +106,10 @@ $(hot-css-resource): $(hot-css-file)
 	cp $(hot-css-file) $(resource-dir)/css
 
 $(transitions-js): $(transitions-json)
-	bin/js-ify-transitions $(transitions-json) $(transitions-js)
+	bin/js-ify-transitions $(transitions-json) $(transitions-js) transitions
+
+$(mutual-info-js): $(mutual-info-json)
+	bin/js-ify-transitions $(mutual-info-json) $(mutual-info-js) mutual_info
 
 ### Publishing
 
