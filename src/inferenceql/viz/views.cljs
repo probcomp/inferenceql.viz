@@ -158,6 +158,17 @@
           #js {:className "blue-highlight"}
           #js {})))))
 
+(def mi-raw-vals
+  (flatten
+   (for [mi-iter (map :mi mutual-info)]
+     (for [[_ inner-vals] mi-iter]
+       (for [[_ v1] inner-vals]
+         v1)))))
+
+(def mi-min (apply min mi-raw-vals))
+
+(def mi-max (apply max mi-raw-vals))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
@@ -171,12 +182,6 @@
         xcat-model (nth xcat-models iteration)
         mmix-model (nth mmix-models iteration)
         mi-vals (:mi (nth mutual-info iteration))
-        mi-flat-vals (flatten
-                      (for [[_ inner-vals] mi-vals]
-                        (for [[_ v1] inner-vals]
-                          v1)))
-        mi-min (apply min mi-flat-vals)
-        mi-max (apply max mi-flat-vals)
 
         all-columns (keys schema)
 
