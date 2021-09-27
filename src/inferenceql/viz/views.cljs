@@ -195,7 +195,7 @@
 
         cols-incorporated (columns-in-model xcat-model)
         edges (filter (fn [[col-1 col-2]]
-                        (<= (get-in mi-vals [col-1 col-2])
+                        (>= (get-in mi-vals [col-1 col-2])
                             mi-threshold))
                       ;; All potential edges
                       (combinations cols-incorporated 2))
