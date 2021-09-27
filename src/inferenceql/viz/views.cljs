@@ -20,6 +20,8 @@
             [clojure.walk :as walk]
             [clojure.edn :as edn]))
 
+;; Util
+(def range-1 (drop 1 (range)))
 
 (def rows (->> store-db/compiled-in-dataset
                (map #(medley/remove-vals nil? %))))
@@ -68,7 +70,6 @@
                           (map merge iteration-tags)))
 (def all-samples (concat observed-samples virtual-samples))
 
-(def range-1 (drop 1 (range)))
 
 (defn xcat-view-id-map
   "Returns map from js-program view-id (int) to xcat view-id (keyword)."
@@ -82,11 +83,9 @@
 
 (defn xcat-cluster-id-map
   "Returns map from js-program cluster-id (int) to xcat cluster-id (keyword).
-  Cluster id is specific to view specified by js-program view-id (int)."
-  [xcat view-id]
-  (let [view-map (xcat-view-id-map xcat)
-        view-id (view-map view-id)
-        view (get-in xcat [:views view-id])
+  Cluster id is specific to xact view view-id (keyword)."
+  [xcat view-name]
+  (let [view (get-in xcat [:views view-name])
         cluster-names (keys (get-in view [:latents :counts]))
         cluster-number (fn [cluster-name]
                          (-> (re-matches #"cluster_(\d+)" (name cluster-name))
@@ -103,9 +102,10 @@
 
 (defn rows-in-view-cluster [xcat view-id cluster-id]
   (let [view-map (xcat-view-id-map xcat)
-        cluster-map (xcat-cluster-id-map xcat view-id)
-
+        ;; View-name-kw used in xcat model.
         view-id (view-map view-id)
+        cluster-map (xcat-cluster-id-map xcat view-id)
+        ;; Cluster-id used in xcat model.
         cluster-id (cluster-map cluster-id)
 
         view (get-in xcat [:views view-id])
@@ -133,6 +133,30 @@
 
         view-names (map #(keyword (str "view_" %)) (keys cluster-assignments))]
     (apply map (fn [& a] (zipmap view-names a)) (vals cluster-assignments))))
+
+(defn all-row-assignments-2 [xcat]
+  (let [view-map (xcat-view-id-map xcat)
+        inv-view-map (zipmap (vals view-map)
+                             (map #(keyword (str "view_" %)) (keys view-map)))
+
+        view-cluster-assignemnts (->> (:views xcat)
+                                      ;; Get the cluster assignments.
+                                      (medley/map-vals #(get-in % [:latents :y]))
+                                      ;; Sort the map of cluster assignments.
+                                      (medley/map-vals #(sort-by first %))
+                                      ;; Get just the cluster names. Drop row numbers.
+                                      (medley/map-vals #(map second %))
+                                      ;; Remap view-id and cluster-ids.
+                                      (medley/map-kv (fn [view-name cluster-assignments]
+                                                       (let [cluster-map (xcat-cluster-id-map xcat view-name)
+                                                             inv-cluster-map (zipmap (vals cluster-map)
+                                                                                     (keys cluster-map))]
+                                                         [(inv-view-map view-name)
+                                                          (map inv-cluster-map cluster-assignments)]))))]
+    view-cluster-assignemnts
+    ;; Expand the lists of cluster assigments into assignments for each row.
+    (apply map (fn [& a] (zipmap (keys view-cluster-assignemnts) a))
+           (vals view-cluster-assignemnts))))
 
 (def default-cells-fn
   (fn [_ _ _] #js {}))
@@ -172,6 +196,12 @@
         ;_ (.log js/console :cgpm cgpm-model)
         _ (.log js/console :xcat xcat-model)
         ;_ (.log js/console :mmix mmix-model)
+
+        _ (.log js/console :xxxx (all-row-assignments cgpm-model))
+        _ (.log js/console :xxxx (all-row-assignments-2 xcat-model))
+        _ (.log js/console :xxxx (= (all-row-assignments cgpm-model)
+                                    (all-row-assignments-2 xcat-model)))
+
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
