@@ -198,7 +198,7 @@
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
-        cols-incorporated (columns-in-model xcat-model)
+        cols-incorporated (sort (columns-in-model xcat-model))
         edges (filter (fn [[col-1 col-2]]
                         (>= (get-in mi-vals [col-1 col-2])
                             mi-threshold))
