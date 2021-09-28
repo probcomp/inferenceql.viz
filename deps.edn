@@ -26,7 +26,7 @@
                                     :sha "0241ee57e059f618ae55b2ae8822986d778b0d68"}
         ;; This is branch: htella/20210720-js-xcat-import
         probcomp/inferenceql.auto-modeling {:git/url "git@github.com:probcomp/inferenceql.auto-modeling.git"
-                                            :sha "9d93acfa208a9d8578d206281d93b74330a395eb"}
+                                            :sha "07ff7f4e6dd75561a888bdce4d7d2d551876e125"}
         probcomp/metaprob {:git/url "https://github.com/probcomp/metaprob.git"
                            :sha "8dc9d09f747c1e29886bb9628a0110c6f6bc6f5a"}}
  :paths ["src"
