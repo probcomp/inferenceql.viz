@@ -174,6 +174,8 @@
               (apply max mi-raw-vals)
               1))
 
+(def cols-incorporated (atom []))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
@@ -203,7 +205,13 @@
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
 
-        cols-incorporated (sort (columns-in-model xcat-model))
+        ;; Deals with getting consistent column ordering.
+        ;; TODO: improve this very confusing block.
+        modeled-cols (set (columns-in-model xcat-model))
+        new-columns (clojure.set/difference modeled-cols (set @cols-incorporated))
+        _ (swap! cols-incorporated concat (seq new-columns))
+        cols-incorporated (keep modeled-cols @cols-incorporated)
+
         edges (filter (fn [[col-1 col-2]]
                         (>= (get-in mi-vals [col-1 col-2] 0)
                             mi-threshold))
