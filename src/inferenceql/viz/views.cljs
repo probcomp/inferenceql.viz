@@ -220,18 +220,15 @@
                       all-samples)
 
         qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
-        num-points (nth num-points-at-iter iteration)
-        table-width 700]
+        num-points (nth num-points-at-iter iteration)]
     [v-box
      :margin "20px"
-     :children [[h-box
-                 :children [[handsontable (take num-points rows)
-                             {:height "500px"
-                              :width (str table-width "px")
+     :children [[learning/panel all-columns mi-min mi-max]
+                [handsontable (take num-points rows)
+                             {:height "400px"
+                              :width (str 1390 "px")
                               :cols (map name cols-incorporated)
                               :cells (cells-fn xcat-model cluster-selected)}]
-                            [gap :size "60px"]
-                            [learning/panel all-columns mi-min mi-max]]]
                 [gap :size "30px"]
                 [:div {:id "controls" :style {:display "none"}}]
                 [h-box
