@@ -222,28 +222,29 @@
         qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
         num-points (nth num-points-at-iter iteration)]
     [v-box
-     :margin "20px"
      :children [[learning/panel all-columns mi-min mi-max]
-                [handsontable (take num-points rows)
-                             {:height "400px"
-                              :width (str 1390 "px")
-                              :cols (map name cols-incorporated)
-                              :cells (cells-fn xcat-model cluster-selected)}]
-                [gap :size "30px"]
-                [:div {:id "controls" :style {:display "none"}}]
-                [h-box
-                 :children [[js-code-block js-model-text cluster-selected]
-                            [gap :size "20px"]
-                            [box :style {:display (if (= plot-type :mutual-information)
-                                                    "block"
-                                                    "none")}
-                             :child [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil]]
-                            [box :style {:display (if (= plot-type :select-vs-simulate)
-                                                    "block"
-                                                    "none")}
-                             :child [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration
-                                                                                             :cluster (:cluster-id cluster-selected)
-                                                                                             :view_columns (clj->js (map name columns-in-view))
-                                                                                             :view (some->> (:view-id cluster-selected) (str "view_"))}]]]]]]))
+                [v-box
+                 :margin "20px"
+                 :children [[handsontable (take num-points rows)
+                                         {:height "400px"
+                                          :width (str 1390 "px")
+                                          :cols (map name cols-incorporated)
+                                          :cells (cells-fn xcat-model cluster-selected)}]
+                            [gap :size "30px"]
+                            [:div {:id "controls" :style {:display "none"}}]
+                            [h-box
+                             :children [[js-code-block js-model-text cluster-selected]
+                                        [gap :size "20px"]
+                                        [box :style {:display (if (= plot-type :mutual-information)
+                                                                "block"
+                                                                "none")}
+                                         :child [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil]]
+                                        [box :style {:display (if (= plot-type :select-vs-simulate)
+                                                                "block"
+                                                                "none")}
+                                         :child [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration
+                                                                                                         :cluster (:cluster-id cluster-selected)
+                                                                                                         :view_columns (clj->js (map name columns-in-view))
+                                                                                                         :view (some->> (:view-id cluster-selected) (str "view_"))}]]]]]]]]))
 
 

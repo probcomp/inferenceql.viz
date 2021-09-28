@@ -13,6 +13,10 @@
         show-plot-options @(rf/subscribe [:learning/show-plot-options])
         mi-threshold @(rf/subscribe [:learning/mi-threshold])]
     [v-box
+     :padding "20px 20px 20px 20px"
+     :margin "0px 0px 20px 0px"
+     :style {:background-color "#f5f5f5"
+             :border-bottom "1px solid #ececec"}
      :children [[h-box
                  :children [[label :label "Iteration:"]
                             [gap :size "10px"]
@@ -27,7 +31,7 @@
                                                   (rf/dispatch [:learning/set-iteration iter]))]]
                             [gap :size "10px"]
                             [label :label iteration]]]
-                [gap :size "20px"]
+                [gap :size "5px"]
                 [hyperlink :label (if show-plot-options "hide" "plot options")
                            :on-click #(rf/dispatch [:learning/toggle-plot-options])]
                 [v-box
