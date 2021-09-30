@@ -176,6 +176,8 @@
 
 (def cols-incorporated (atom []))
 
+(def mutual-info (first mutual-info))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
