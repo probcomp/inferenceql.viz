@@ -179,7 +179,7 @@
     {:min 0
      :max 1}))
 
-(defn mi-plot [mi-data iteration threshold]
+(defn mi-plot [mi-data threshold iteration]
   (when mi-data
     (let [mi-data (-> mi-data (nth iteration) :mi)
           nodes (-> (set (keys mi-data))
