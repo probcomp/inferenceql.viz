@@ -158,25 +158,33 @@
           #js {:className "blue-highlight"}
           #js {})))))
 
-(def mi-raw-vals
-  (when (seq mutual-info)
-    (flatten
-     (for [mi-iter (map :mi mutual-info)]
-       (for [[_ inner-vals] mi-iter]
-         (for [[_ v1] inner-vals]
-           v1))))))
-
-(def mi-min (if (seq mi-raw-vals)
-              (apply min mi-raw-vals)
-              0))
-
-(def mi-max (if (seq mi-raw-vals)
-              (apply max mi-raw-vals)
-              1))
-
 (def cols-incorporated (atom []))
 
-(def mutual-info (first mutual-info))
+(def mutual-info-bounds
+  (if (seq mutual-info)
+    (let [mi-vals (flatten
+                   (for [mi-crosscat-sample mutual-info]
+                     (for [mi-model-iter mi-crosscat-sample]
+                       (for [[_col-1 inner-map] (:mi mi-model-iter)]
+                         (for [[_col-2 mi-val] inner-map]
+                           mi-val)))))]
+      {:min (apply min mi-vals)
+       :max (apply max mi-vals)})
+    {:min 0
+     :max 1}))
+
+(defn mi-plot [mi-data iteration threshold]
+  (when mi-data
+    (let [mi-data (-> mi-data (nth iteration) :mi)
+          nodes (keys mi-data)
+          ;; TODO: sort the edges so they are as consistent as can be with the displayed model.
+          edges (filter (fn [[col-1 col-2]]
+                          (>= (get-in mi-data [col-1 col-2])
+                              threshold))
+                        ;; All potential edges
+                        (combinations nodes 2))
+          circle-spec (circle-viz-spec nodes edges)]
+      [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil])))
 
 (defn app
   []
@@ -214,13 +222,6 @@
         _ (swap! cols-incorporated concat (seq new-columns))
         cols-incorporated (keep modeled-cols @cols-incorporated)
 
-        edges (filter (fn [[col-1 col-2]]
-                        (>= (get-in mi-vals [col-1 col-2] 0)
-                            mi-threshold))
-                      ;; All potential edges
-                      (combinations cols-incorporated 2))
-        circle-spec (circle-viz-spec cols-incorporated edges)
-
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
                       (let [view-cluster-assignments (concat (all-row-assignments xcat-model)
@@ -232,7 +233,7 @@
         qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
         num-points (nth num-points-at-iter iteration)]
     [v-box
-     :children [[learning/panel all-columns mi-min mi-max]
+     :children [[learning/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]
                 [v-box
                  :margin "20px"
                  :children [[handsontable (take num-points rows)
@@ -245,10 +246,12 @@
                             [h-box
                              :children [[js-code-block js-model-text cluster-selected]
                                         [gap :size "20px"]
-                                        [box :style {:display (if (= plot-type :mutual-information)
-                                                                "block"
-                                                                "none")}
-                                         :child [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil]]
+                                        [v-box :style {:display (if (= plot-type :mutual-information)
+                                                                  "block"
+                                                                  "none")}
+                                         ;; Create a mi-plot for mi-info from each CrossCat sample.
+                                         :children (for [mi mutual-info]
+                                                     [mi-plot mi mi-threshold iteration])]
                                         [box :style {:display (if (= plot-type :select-vs-simulate)
                                                                 "block"
                                                                 "none")}
