@@ -195,22 +195,11 @@
         cluster-selected @(rf/subscribe [:learning/cluster-selected])
         mi-threshold @(rf/subscribe [:learning/mi-threshold])
 
-        cgpm-model (nth cgpm-models iteration)
         xcat-model (nth xcat-models iteration)
         mmix-model (nth mmix-models iteration)
-        mi-vals (:mi (nth mutual-info iteration {}))
 
         all-columns (keys schema)
-
         columns-in-view (set (columns-in-view xcat-model (:view-id cluster-selected)))
-
-        ;_ (.log js/console :col columns-in-view)
-        ;_ (.log js/console :rows rows-in-view-cluster)
-
-        ;_ (.log js/console :cgpm cgpm-model)
-        ;_ (.log js/console :xcat xcat-model)
-        ;_ (.log js/console :mmix mmix-model)
-        ;_ (.log js/console :mutual-info mutual-info)
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
