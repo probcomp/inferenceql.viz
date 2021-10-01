@@ -158,7 +158,13 @@
           #js {:className "blue-highlight"}
           #js {})))))
 
-(def cols-incorporated (atom []))
+(def col-ordering
+  (reduce (fn [ordering xcat]
+            (let [new-columns (clojure.set/difference (set (columns-in-model xcat))
+                                                      (set ordering))]
+              (concat ordering new-columns)))
+          []
+          xcat-models))
 
 (def mutual-info-bounds
   (if (seq mutual-info)
@@ -176,8 +182,9 @@
 (defn mi-plot [mi-data iteration threshold]
   (when mi-data
     (let [mi-data (-> mi-data (nth iteration) :mi)
-          nodes (keys mi-data)
-          ;; TODO: sort the edges so they are as consistent as can be with the displayed model.
+          nodes (-> (set (keys mi-data))
+                    ;; Get nodes in consistent order by picking from col-ordering.
+                    (keep col-ordering))
           edges (filter (fn [[col-1 col-2]]
                           (>= (get-in mi-data [col-1 col-2])
                               threshold))
@@ -189,7 +196,7 @@
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
-        cols @(rf/subscribe [:learning/col-selection])
+        viz-cols @(rf/subscribe [:learning/col-selection])
         plot-type @(rf/subscribe [:learning/plot-type])
         marginal-types @(rf/subscribe [:learning/marginal-types])
         cluster-selected @(rf/subscribe [:learning/cluster-selected])
@@ -199,17 +206,14 @@
         mmix-model (nth mmix-models iteration)
 
         all-columns (keys schema)
+        modeled-cols (-> (set (columns-in-model xcat-model))
+                         ;; Get modeled columns in the correct order by picking items in order
+                         ;; from col-ordering.
+                         (keep col-ordering))
         columns-in-view (set (columns-in-view xcat-model (:view-id cluster-selected)))
 
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))
-
-        ;; Deals with getting consistent column ordering.
-        ;; TODO: improve this very confusing block.
-        modeled-cols (set (columns-in-model xcat-model))
-        new-columns (clojure.set/difference modeled-cols (set @cols-incorporated))
-        _ (swap! cols-incorporated concat (seq new-columns))
-        cols-incorporated (keep modeled-cols @cols-incorporated)
 
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
@@ -219,7 +223,7 @@
                                 virtual-samples))
                       all-samples)
 
-        qc-spec (dashboard/spec all-samples schema nil cols 10 marginal-types)
+        qc-spec (dashboard/spec all-samples schema nil viz-cols 10 marginal-types)
         num-points (nth num-points-at-iter iteration)]
     [v-box
      :children [[learning/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]
@@ -228,7 +232,7 @@
                  :children [[handsontable (take num-points rows)
                                          {:height "400px"
                                           :width (str 1390 "px")
-                                          :cols (map name cols-incorporated)
+                                          :cols (map name modeled-cols)
                                           :cells (cells-fn xcat-model cluster-selected)}]
                             [gap :size "30px"]
                             [:div {:id "controls" :style {:display "none"}}]
