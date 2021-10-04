@@ -191,6 +191,7 @@
                         ;; All potential edges
                         (combinations nodes 2))
           circle-spec (circle-viz-spec nodes edges)]
+      ;; TODO: make this faster by passing in nodes and edges as datasets.
       [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil])))
 
 (defn app
@@ -239,18 +240,18 @@
                             [h-box
                              :children [[js-code-block js-model-text cluster-selected]
                                         [gap :size "20px"]
-                                        [v-box :style {:display (if (= plot-type :mutual-information)
-                                                                  "block"
-                                                                  "none")}
-                                         ;; Create a mi-plot for mi-info from each CrossCat sample.
-                                         :children (for [mi mutual-info]
-                                                     [mi-plot mi mi-threshold iteration])]
-                                        [box :style {:display (if (= plot-type :select-vs-simulate)
-                                                                "block"
-                                                                "none")}
-                                         :child [vega-lite qc-spec {:actions false} nil nil all-samples {:iter iteration
-                                                                                                         :cluster (:cluster-id cluster-selected)
-                                                                                                         :view_columns (clj->js (map name columns-in-view))
-                                                                                                         :view (some->> (:view-id cluster-selected) (str "view_"))}]]]]]]]]))
+                                        (case plot-type
+                                          :mutual-information
+                                          ;; Create a mi-plot for mi-info from each CrossCat sample.
+                                          [v-box
+                                           :children (for [mi mutual-info]
+                                                        [mi-plot mi mi-threshold iteration])]
+
+                                          :select-vs-simulate
+                                          [vega-lite qc-spec {:actions false} nil nil all-samples
+                                           {:iter iteration
+                                            :cluster (:cluster-id cluster-selected)
+                                            :view_columns (clj->js (map name columns-in-view))
+                                            :view (some->> (:view-id cluster-selected) (str "view_"))}])]]]]]]))
 
 
