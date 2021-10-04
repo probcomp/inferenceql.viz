@@ -181,15 +181,16 @@
 
 (defn mi-plot
   "Reagent component for circle viz for mutual info."
-  [mi-data threshold iteration]
+  [mi-data iteration]
   (when mi-data
-    (let [mi-data (-> mi-data (nth iteration) :mi)
+    (let [mi-threshold @(rf/subscribe [:learning/mi-threshold])
+          mi-data (-> mi-data (nth iteration) :mi)
           nodes (-> (set (keys mi-data))
                     ;; Get nodes in consistent order by picking from col-ordering.
                     (keep col-ordering))
           edges (filter (fn [[col-1 col-2]]
                           (>= (get-in mi-data [col-1 col-2])
-                              threshold))
+                              mi-threshold))
                         ;; All potential edges
                         (combinations nodes 2))
           circle-spec (circle-viz-spec nodes edges)]
@@ -204,23 +205,11 @@
                               (multimix/template-data mmix-model))]
     [js-code-block js-model-text cluster-selected]))
 
-(defn app
-  []
-  (let [iteration @(rf/subscribe [:learning/iteration])
-        viz-cols @(rf/subscribe [:learning/col-selection])
-        plot-type @(rf/subscribe [:learning/plot-type])
+(defn select-vs-simulate-plot
+  "Reagent component for select-vs-simulate plot."
+  [xcat-model cluster-selected iteration]
+  (let [viz-cols @(rf/subscribe [:learning/col-selection])
         marginal-types @(rf/subscribe [:learning/marginal-types])
-        cluster-selected @(rf/subscribe [:learning/cluster-selected])
-        mi-threshold @(rf/subscribe [:learning/mi-threshold])
-
-        xcat-model (nth xcat-models iteration)
-
-        all-columns (keys schema)
-        modeled-cols (-> (set (columns-in-model xcat-model))
-                         ;; Get modeled columns in the correct order by picking items in order
-                         ;; from col-ordering.
-                         (keep col-ordering))
-        columns-in-view (set (columns-in-view xcat-model (:view-id cluster-selected)))
 
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
@@ -229,35 +218,53 @@
                         (concat (map merge observed-samples view-cluster-assignments)
                                 virtual-samples))
                       all-samples)
-
         qc-spec (dashboard/spec all-samples schema nil viz-cols 10 marginal-types)
+        cols-in-view (set (columns-in-view xcat-model (:view-id cluster-selected)))]
+    [vega-lite qc-spec {:actions false} nil nil all-samples
+     {:iter iteration
+      :cluster (:cluster-id cluster-selected)
+      :view_columns (clj->js (map name cols-in-view))
+      :view (some->> (:view-id cluster-selected) (str "view_"))}]))
+
+(defn app
+  []
+  (let [iteration @(rf/subscribe [:learning/iteration])
+        plot-type @(rf/subscribe [:learning/plot-type])
+        cluster-selected @(rf/subscribe [:learning/cluster-selected])
+
+        xcat-model (nth xcat-models iteration)
+
+        all-columns (keep (set (keys schema)) col-ordering)
+        modeled-cols (-> (set (columns-in-model xcat-model))
+                         ;; Get modeled columns in the correct order by picking items in order
+                         ;; from col-ordering.
+                         (keep col-ordering))
+
         num-points (nth num-points-at-iter iteration)]
     [v-box
      :children [[learning/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]
                 [v-box
                  :margin "20px"
                  :children [[handsontable (take num-points rows)
-                                         {:height "400px"
-                                          :width (str 1390 "px")
-                                          :cols (map name modeled-cols)
-                                          :cells (cells-fn xcat-model cluster-selected)}]
+                             {:height "400px"
+                              :width (str 1390 "px")
+                              :cols (map name modeled-cols)
+                              :cells (cells-fn xcat-model cluster-selected)}]
                             [gap :size "30px"]
+                            ;; TODO: get rid of params that bind to controls in spec.
                             [:div {:id "controls" :style {:display "none"}}]
                             [h-box
                              :children [[js-model iteration cluster-selected]
                                         [gap :size "20px"]
                                         (case plot-type
                                           :mutual-information
-                                          ;; Create a mi-plot for mi-info from each CrossCat sample.
                                           [v-box
+                                           ;; Create a mi-plot for mi-info from each CrossCat sample.
                                            :children (for [mi mutual-info]
-                                                        [mi-plot mi mi-threshold iteration])]
+                                                        [mi-plot mi iteration])]
 
                                           :select-vs-simulate
-                                          [vega-lite qc-spec {:actions false} nil nil all-samples
-                                           {:iter iteration
-                                            :cluster (:cluster-id cluster-selected)
-                                            :view_columns (clj->js (map name columns-in-view))
-                                            :view (some->> (:view-id cluster-selected) (str "view_"))}])]]]]]]))
+                                          [select-vs-simulate-plot xcat-model
+                                           cluster-selected iteration])]]]]]]))
 
 
