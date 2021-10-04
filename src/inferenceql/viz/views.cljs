@@ -207,10 +207,11 @@
 
 (defn select-vs-simulate-plot
   "Reagent component for select-vs-simulate plot."
-  [xcat-model cluster-selected iteration]
+  [cluster-selected iteration]
   (let [viz-cols @(rf/subscribe [:learning/col-selection])
         marginal-types @(rf/subscribe [:learning/marginal-types])
 
+        xcat-model (nth xcat-models iteration)
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
                       (let [view-cluster-assignments (concat (all-row-assignments xcat-model)
@@ -226,30 +227,33 @@
       :view_columns (clj->js (map name cols-in-view))
       :view (some->> (:view-id cluster-selected) (str "view_"))}]))
 
+(defn data-table
+  "Reagent component for data table."
+  [rows iteration cluster-selected]
+  (let [xcat-model (nth xcat-models iteration)
+        num-points (nth num-points-at-iter iteration)
+        modeled-cols (-> (set (columns-in-model xcat-model))
+                         ;; Get modeled columns in the correct order by picking items in order
+                         ;; from col-ordering.
+                         (keep col-ordering))]
+
+    [handsontable (take num-points rows)
+     {:height "400px"
+      :width (str 1390 "px")
+      :cols (map name modeled-cols)
+      :cells (cells-fn xcat-model cluster-selected)}]))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
         plot-type @(rf/subscribe [:learning/plot-type])
         cluster-selected @(rf/subscribe [:learning/cluster-selected])
-
-        xcat-model (nth xcat-models iteration)
-
-        all-columns (keep (set (keys schema)) col-ordering)
-        modeled-cols (-> (set (columns-in-model xcat-model))
-                         ;; Get modeled columns in the correct order by picking items in order
-                         ;; from col-ordering.
-                         (keep col-ordering))
-
-        num-points (nth num-points-at-iter iteration)]
+        all-columns (keep (set (keys schema)) col-ordering)]
     [v-box
      :children [[learning/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]
                 [v-box
                  :margin "20px"
-                 :children [[handsontable (take num-points rows)
-                             {:height "400px"
-                              :width (str 1390 "px")
-                              :cols (map name modeled-cols)
-                              :cells (cells-fn xcat-model cluster-selected)}]
+                 :children [[data-table rows iteration cluster-selected]
                             [gap :size "30px"]
                             ;; TODO: get rid of params that bind to controls in spec.
                             [:div {:id "controls" :style {:display "none"}}]
@@ -264,7 +268,7 @@
                                                         [mi-plot mi iteration])]
 
                                           :select-vs-simulate
-                                          [select-vs-simulate-plot xcat-model
+                                          [select-vs-simulate-plot
                                            cluster-selected iteration])]]]]]]))
 
 
