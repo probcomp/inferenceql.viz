@@ -179,7 +179,9 @@
     {:min 0
      :max 1}))
 
-(defn mi-plot [mi-data threshold iteration]
+(defn mi-plot
+  "Reagent component for circle viz for mutual info."
+  [mi-data threshold iteration]
   (when mi-data
     (let [mi-data (-> mi-data (nth iteration) :mi)
           nodes (-> (set (keys mi-data))
@@ -194,6 +196,14 @@
       ;; TODO: make this faster by passing in nodes and edges as datasets.
       [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil])))
 
+(defn js-model
+  "Reagent component for js-model."
+  [iteration cluster-selected]
+  (let [mmix-model (nth mmix-models iteration)
+        js-model-text (render (:js-model-template config)
+                              (multimix/template-data mmix-model))]
+    [js-code-block js-model-text cluster-selected]))
+
 (defn app
   []
   (let [iteration @(rf/subscribe [:learning/iteration])
@@ -204,7 +214,6 @@
         mi-threshold @(rf/subscribe [:learning/mi-threshold])
 
         xcat-model (nth xcat-models iteration)
-        mmix-model (nth mmix-models iteration)
 
         all-columns (keys schema)
         modeled-cols (-> (set (columns-in-model xcat-model))
@@ -212,9 +221,6 @@
                          ;; from col-ordering.
                          (keep col-ordering))
         columns-in-view (set (columns-in-view xcat-model (:view-id cluster-selected)))
-
-        js-model-text (render (:js-model-template config)
-                              (multimix/template-data mmix-model))
 
         ;; Merge in the view-cluster information only when we have to.
         all-samples (if cluster-selected
@@ -238,7 +244,7 @@
                             [gap :size "30px"]
                             [:div {:id "controls" :style {:display "none"}}]
                             [h-box
-                             :children [[js-code-block js-model-text cluster-selected]
+                             :children [[js-model iteration cluster-selected]
                                         [gap :size "20px"]
                                         (case plot-type
                                           :mutual-information
