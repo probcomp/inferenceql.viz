@@ -1,23 +1,22 @@
 (ns inferenceql.viz.views
-  (:require [re-frame.core :as rf]
+  (:require [clojure.edn :as edn]
+            [clojure.math.combinatorics :refer [combinations]]
+            [cljstache.core :refer [render]]
+            [medley.core :as medley]
             [re-com.core :refer [v-box h-box gap box]]
+            [re-frame.core :as rf]
+            [inferenceql.inference.gpm :as gpm]
+            [inferenceql.inference.gpm.crosscat :as crosscat]
             [inferenceql.viz.config :refer [config transitions mutual-info]]
             [inferenceql.viz.panels.learning.views :as learning]
-            [medley.core :as medley]
-            [inferenceql.inference.gpm.crosscat :as crosscat]
             [inferenceql.viz.panels.jsmodel.multimix :as multimix]
-            [cljstache.core :refer [render]]
             [inferenceql.viz.panels.jsmodel.views :refer [js-code-block]]
-            [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
-            [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
-            [clojure.math.combinatorics :refer [combinations]]
-            [inferenceql.inference.gpm :as gpm]
-            [inferenceql.auto-modeling.js :refer [import-cgpm]]
-            [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]
             [inferenceql.viz.components.store.db :as store-db]
             [inferenceql.viz.js.components.table.views :refer [handsontable]]
-            [clojure.walk :as walk]
-            [clojure.edn :as edn]))
+            [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
+            [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
+            [inferenceql.auto-modeling.js :refer [import-cgpm]]
+            [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]))
 
 ;; Util
 (def range-1 (drop 1 (range)))
