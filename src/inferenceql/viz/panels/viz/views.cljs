@@ -1,4 +1,4 @@
-(ns inferenceql.viz.js.components.plot.views
+(ns inferenceql.viz.panels.viz.views
   (:require [vega-embed$default :as yarn-vega-embed]
             [vega-embed$vega :as vega]
             [reagent.core :as r]

@@ -12,9 +12,9 @@
             [inferenceql.viz.panels.jsmodel.multimix :as multimix]
             [inferenceql.viz.panels.jsmodel.views :refer [js-code-block]]
             [inferenceql.viz.panels.table.views :refer [handsontable]]
-            [inferenceql.viz.components.store.db :as store-db]
-            [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
+            [inferenceql.viz.panels.viz.views :refer [vega-lite]]
             [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
+            [inferenceql.viz.components.store.db :as store-db]
             [inferenceql.auto-modeling.js :refer [import-cgpm]]
             [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]))
 

@@ -1,4 +1,4 @@
-(ns inferenceql.viz.js.components.table.views
+(ns inferenceql.viz.panels.table.views
   (:require [handsontable$default :as yarn-handsontable]
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]
