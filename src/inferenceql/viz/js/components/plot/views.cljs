@@ -2,8 +2,22 @@
   (:require [vega-embed$default :as yarn-vega-embed]
             [vega-embed$vega :as vega]
             [reagent.core :as r]
-            [inferenceql.viz.panels.viz.views :refer [default-vega-embed-options]]
             [clojure.data :refer [diff]]))
+
+(def ^:private log-level-default
+  (.-Error vega))
+
+(def default-vega-embed-options
+  {:renderer "svg"
+   :mode "vega-lite"
+   :logLevel log-level-default
+   :tooltip {:theme "custom"}
+   :config {:axis {:labelFontSize 14 :titleFontSize 14 :titlePadding 5}
+            :legend {:labelFontSize 12 :titleFontSize 12}
+            :header {:labelFontSize 14}
+            ;; Remove title from faceted plots.
+            :headerFacet {:title nil}
+            :concat {:spacing 50}}})
 
 (defn vega-lite
   "Simplified Reagent component for displaying vega-lite specs in Observable"
