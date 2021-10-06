@@ -3,10 +3,88 @@
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]
             [reagent.core :as r]
-            [cljs-bean.core :refer [->clj]]
-            [inferenceql.viz.panels.table.util :refer [column-settings]]
-            [inferenceql.viz.panels.table.views :refer [update-hot!]]
-            [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]))
+            [cljs-bean.core :refer [->clj]]))
+
+(defn column-settings [headers]
+  "Returns an array of objects that define settings for each column
+  in the table including which attribute from the underlying map for the row
+  is presented."
+  (let [settings-map (fn [attr]
+                       {:data attr})]
+    (map settings-map headers)))
+
+(defn- sort-state-applicable
+  "Determines whether `sort-config` can be applied to the columns.
+
+  This simply checks column numbers referenced `sort-config` are applicable to the number for
+  `columns` present.
+
+  Args:
+    columns: A vector of column names.
+    sort-config: (js-object) A sort config returned by Handsontable.
+  Returns:
+    A boolean if `sort-config` is applicable."
+  [columns sort-config]
+  (let [col-nums-refed (map :column (js->clj sort-config :keywordize-keys true))
+        num-cols (count columns)]
+    (every? #(< % num-cols) col-nums-refed)))
+
+(defn update-hot!
+  "A helper function for updating the settings in a handsontable."
+  [hot-instance new-settings current-selection]
+  (let [;; Stores whether settings that determine the data displayed have changed.
+        table-changed (some new-settings [:data :colHeaders])
+        sorting-plugin (.getPlugin hot-instance "multiColumnSorting")
+        sort-config (.getSortConfig sorting-plugin)]
+
+    (when table-changed
+      (.deselectCell hot-instance))
+
+    ;; When data is the only updated setting, use a different, potentially faster update function.
+    (if (= (keys new-settings) [:data])
+      (.loadData hot-instance (clj->js (:data new-settings)))
+      (.updateSettings hot-instance (clj->js new-settings)))
+
+    (when table-changed
+      ;; Maintain the same sort order as before the update.
+      ;; If colHeaders hasn't changed, we can apply the previous sort state.
+      ;; Or if the sort-state is applicable to the current columns, we can as well.
+      (when (or (nil? (:colHeaders new-settings))
+                (sort-state-applicable (:colHeaders new-settings) sort-config))
+        (.sort sorting-plugin sort-config))
+
+      ;; Reapply selections present before the update.
+      (when-let [coords (clj->js current-selection)]
+        (.selectCells hot-instance coords false)))))
+
+(def default-hot-settings
+  {:settings {:data                []
+              :colHeaders          []
+              :columns             []
+              :rowHeaders          true
+              :multiColumnSorting  true
+              :manualColumnMove    true
+              :manualColumnResize  true
+              :autoWrapCol         false
+              :autoWrapRow         false
+              :filters             true
+              ;; TODO: investigate more closely what each of
+              ;; these options adds. And if they can be put
+              ;; in the context-menu instead.
+              :dropdownMenu        ["filter_by_condition"
+                                    "filter_operators"
+                                    "filter_by_condition2"
+                                    "filter_by_value"
+                                    "filter_action_bar"]
+              :bindRowsWithHeaders true
+              :selectionMode       :multiple
+              :outsideClickDeselects false
+              :readOnly            true
+              :height              "50vh"
+              :width               "100vw"
+              :stretchH            "none"
+              :licenseKey          "non-commercial-and-evaluation"}
+   :hooks []})
 
 (def observable-hot-settings
   (-> default-hot-settings

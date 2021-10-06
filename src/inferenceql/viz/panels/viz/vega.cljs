@@ -1,12 +1,6 @@
 (ns inferenceql.viz.panels.viz.vega
   "Code related to generating vega-lite specs"
-  (:require [clojure.walk :as walk]
-            [clojure.string :as string]
-            [inferenceql.viz.panels.table.handsontable :as hot]
-            [inferenceql.viz.panels.table.db :as table-db]
-            [inferenceql.viz.config :as config]
-            [goog.string :as gstring]
-            [medley.core :as medley]))
+  (:require [medley.core :as medley]))
 
 (def vega-map-width
   "Width setting for the choropleth specs produced by the :vega-lite-spec sub"
