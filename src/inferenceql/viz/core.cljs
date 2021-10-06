@@ -8,41 +8,9 @@
             [inferenceql.viz.effects]
             [inferenceql.viz.views :as views]
             [inferenceql.viz.vega :as vega.init]
-            ;; Control Panel
-            [inferenceql.viz.panels.control.events]
-            [inferenceql.viz.panels.control.subs]
-            ;; Viz Panel
-            [inferenceql.viz.panels.viz.events]
-            [inferenceql.viz.panels.viz.subs]
-            ;; Table Panel
-            [inferenceql.viz.panels.table.events]
-            [inferenceql.viz.panels.table.subs]
-            [inferenceql.viz.panels.table.handsontable-events]
-            [inferenceql.viz.panels.table.handsontable-effects]
-            ;; More Panel
-            [inferenceql.viz.panels.more.events]
-            [inferenceql.viz.panels.more.subs]
-            ;; Override Panel
-            [inferenceql.viz.panels.override.events]
-            [inferenceql.viz.panels.override.subs]
-            ;; Modal Panel
-            [inferenceql.viz.panels.modal.events]
-            [inferenceql.viz.panels.modal.subs]
-            ;; Upload Panel
-            [inferenceql.viz.panels.upload.events]
-            [inferenceql.viz.panels.upload.effects]
-            ;; JSmodel Panel
-            [inferenceql.viz.panels.jsmodel.subs]
-            ;; Query Component
-            [inferenceql.viz.components.query.events]
-            [inferenceql.viz.components.query.subs]
             ;; Store Component
-            [inferenceql.viz.components.store.events]
             [inferenceql.viz.components.store.subs]
-            ;; Library functions for user-defined JS functions.
-            [inferenceql.viz.user]
             ;; Learning
-            [inferenceql.viz.panels.learning.db]
             [inferenceql.viz.panels.learning.eventsubs]))
 
 (enable-console-print!)
@@ -66,13 +34,6 @@
   ;; not reset the state of the app.
   (rf/dispatch-sync [:app/initialize-db])
 
-  (let [params (query-string-params)]
-    (rf/dispatch-sync [:upload/read-query-string-params params])
-
-    (if (:query params)
-      ;; Use the query string passed in params.
-      (rf/dispatch-sync [:control/set-query-string (:query params)])
-      ;; Set the query string to select all columns.
-      (rf/dispatch-sync [:control/set-query-string-to-select-all])))
+  (let [params (query-string-params)])
 
   (render-app))
