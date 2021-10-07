@@ -5,7 +5,7 @@
             [inferenceql.viz.panels.jsmodel.views :refer [js-model]]
             [inferenceql.viz.panels.table.views :refer [data-table]]
             [inferenceql.viz.panels.viz.views :refer [mi-plot select-vs-simulate-plot]]
-            [inferenceql.viz.components.store.db :refer [mutual-info]]))
+            [inferenceql.viz.store :refer [mutual-info]]))
 
 (defn app
   []

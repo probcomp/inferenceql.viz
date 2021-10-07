@@ -2,8 +2,8 @@
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box box slider label gap
                                  selection-list radio-button hyperlink]]
-            [inferenceql.viz.components.store.db :refer [schema col-ordering
-                                                         xcat-models mutual-info]]))
+            [inferenceql.viz.store :refer [schema col-ordering
+                                           xcat-models mutual-info]]))
 
 (def mi-bounds
   (if (seq mutual-info)

@@ -1,4 +1,4 @@
-(ns inferenceql.viz.components.store.db
+(ns inferenceql.viz.store
   (:require [inferenceql.viz.config :refer [config]]
             [inferenceql.viz.csv :refer [clean-csv-maps]]
             [inferenceql.viz.util :refer [keywordize-kv]]

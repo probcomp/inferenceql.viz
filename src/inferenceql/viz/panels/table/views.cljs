@@ -4,8 +4,8 @@
             [medley.core :refer [filter-kv]]
             [reagent.core :as r]
             [cljs-bean.core :refer [->clj]]
-            [inferenceql.viz.components.store.db :refer [rows col-ordering num-points-at-iter
-                                                         xcat-models]]
+            [inferenceql.viz.store :refer [rows col-ordering num-points-at-iter
+                                           xcat-models]]
             [inferenceql.viz.model.xcat-util :as xcat-util]
             [medley.core :as medley]))
 

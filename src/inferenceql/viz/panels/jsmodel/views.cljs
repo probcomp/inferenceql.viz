@@ -17,7 +17,7 @@
             [cljstache.core :refer [render]]
             [inferenceql.viz.panels.jsmodel.multimix :as multimix]
             [inferenceql.viz.config :refer [config]]
-            [inferenceql.viz.components.store.db :refer [mmix-models]]))
+            [inferenceql.viz.store :refer [mmix-models]]))
 
 ;; We are using the minimal version of highlight.js where
 ;; every language used has to be registered individually.

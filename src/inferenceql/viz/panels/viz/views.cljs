@@ -8,8 +8,8 @@
             [inferenceql.viz.panels.viz.dashboard :as dashboard]
             [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
             [inferenceql.viz.model.xcat-util :refer [columns-in-view all-row-assignments]]
-            [inferenceql.viz.components.store.db :refer [schema xcat-models col-ordering
-                                                         all-samples observed-samples virtual-samples]]))
+            [inferenceql.viz.store :refer [schema xcat-models col-ordering
+                                           all-samples observed-samples virtual-samples]]))
 
 (def ^:private log-level-default
   (.-Error vega))
