@@ -1,7 +1,0 @@
-{:output-to "out-worker/worker.js"
- :output-dir "out-worker"
- :browser-repl false
- :optimizations :advanced
- ;; Pretty code output.
- :pseudo-names true
- :pretty-print true}
