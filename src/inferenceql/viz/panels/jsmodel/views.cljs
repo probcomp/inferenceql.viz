@@ -13,7 +13,11 @@
             [hickory.render]
             [clojure.zip :as zip]
             [clojure.string :as string]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [cljstache.core :refer [render]]
+            [inferenceql.viz.panels.jsmodel.multimix :as multimix]
+            [inferenceql.viz.config :refer [config]]
+            [inferenceql.viz.components.store.db :as store-db]))
 
 ;; We are using the minimal version of highlight.js where
 ;; every language used has to be registered individually.
@@ -129,20 +133,10 @@
            [:code {:ref #(swap! dom-nodes assoc :code-elem %)}
             tagged-code]]))})))
 
-(defn display
-  "Display of js-model source code with syntax highlighting.
-
-  Intended to be set as the contents of a modal dialog.
-  Returns: A reagent component. "
-  []
-  (let [source-code @(rf/subscribe [:jsmodel/source-code])]
-    [border
-     :border "1px solid #eee"
-     :child  [v-box
-              :min-height "777px"
-              :min-width "800px"
-              :padding "10px 30px 30px 30px"
-              :style    {:background-color "cornsilk"}
-              :children [[title :label "Javascript model export" :level :level1]
-                         [gap :size "10px"]
-                         [js-code-block source-code]]]]))
+(defn js-model
+  "Reagent component for js-model."
+  [iteration cluster-selected]
+  (let [mmix-model (nth store-db/mmix-models iteration)
+        js-model-text (render (:js-model-template config)
+                              (multimix/template-data mmix-model))]
+    [js-code-block js-model-text cluster-selected]))

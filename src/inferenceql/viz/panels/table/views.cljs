@@ -3,7 +3,10 @@
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]
             [reagent.core :as r]
-            [cljs-bean.core :refer [->clj]]))
+            [cljs-bean.core :refer [->clj]]
+            [inferenceql.viz.components.store.db :as store-db]
+            [inferenceql.viz.model.xcat-util :as xcat-util]
+            [medley.core :as medley]))
 
 (defn column-settings [headers]
   "Returns an array of objects that define settings for each column
@@ -182,4 +185,40 @@
                            cells (assoc-in [:settings :cells] cells)
                            col-widths (assoc-in [:settings :colWidths] col-widths))]
       [handsontable-base {:style {:width width}} settings])))
+
+;;-------------------------
+
+(def default-cells-fn
+  (fn [_ _ _] #js {}))
+
+(defn cells-fn [xcat-model cluster-selected]
+  (if-not cluster-selected
+    default-cells-fn
+    (let [cols-set (set (xcat-util/columns-in-view xcat-model (:view-id cluster-selected)))
+          rows-set (set (xcat-util/rows-in-view-cluster xcat-model
+                                                        (:view-id cluster-selected)
+                                                        (:cluster-id cluster-selected)))]
+      (fn [row _col prop]
+        (if (and (rows-set row)
+                 (cols-set (keyword prop)))
+          #js {:className "blue-highlight"}
+          #js {})))))
+
+(def rows (map #(medley/remove-vals nil? %) store-db/rows))
+
+(defn data-table
+  "Reagent component for data table."
+  [iteration cluster-selected]
+  (let [xcat-model (nth store-db/xcat-models iteration)
+        num-points (nth store-db/num-points-at-iter iteration)
+        modeled-cols (-> (set (xcat-util/columns-in-model xcat-model))
+                         ;; Get modeled columns in the correct order by picking items in order
+                         ;; from col-ordering.
+                         (keep store-db/col-ordering))]
+
+    [handsontable (take num-points rows)
+     {:height "400px"
+      :width (str 1390 "px")
+      :cols (map name modeled-cols)
+      :cells (cells-fn xcat-model cluster-selected)}]))
 

@@ -2,7 +2,14 @@
   (:require [vega-embed$default :as yarn-vega-embed]
             [vega-embed$vega :as vega]
             [reagent.core :as r]
-            [clojure.data :refer [diff]]))
+            [re-frame.core :as rf]
+            [clojure.data :refer [diff]]
+            [clojure.math.combinatorics :refer [combinations]]
+            [inferenceql.viz.panels.viz.dashboard :as dashboard]
+            [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
+            [inferenceql.viz.model.xcat-util :refer [columns-in-view all-row-assignments]]
+            [inferenceql.viz.components.store.db :refer [schema xcat-models col-ordering
+                                                         all-samples observed-samples virtual-samples]]))
 
 (def ^:private log-level-default
   (.-Error vega))
@@ -98,3 +105,43 @@
         (when spec
           [:div#viz-container {:style {:min-width "720px"}}
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
+
+(defn mi-plot
+  "Reagent component for circle viz for mutual info."
+  [mi-data iteration]
+  (when mi-data
+    (let [mi-threshold @(rf/subscribe [:control/mi-threshold])
+          mi-data (-> mi-data (nth iteration) :mi)
+          nodes (-> (set (keys mi-data))
+                    ;; Get nodes in consistent order by picking from col-ordering.
+                    (keep col-ordering))
+          edges (filter (fn [[col-1 col-2]]
+                          (>= (get-in mi-data [col-1 col-2])
+                              mi-threshold))
+                        ;; All potential edges
+                        (combinations nodes 2))
+          circle-spec (circle-viz-spec nodes edges)]
+      ;; TODO: make this faster by passing in nodes and edges as datasets.
+      [vega-lite circle-spec {:actions false :mode "vega"} nil nil nil nil])))
+
+(defn select-vs-simulate-plot
+  "Reagent component for select-vs-simulate plot."
+  [cluster-selected iteration]
+  (let [viz-cols @(rf/subscribe [:control/col-selection])
+        marginal-types @(rf/subscribe [:control/marginal-types])
+
+        xcat-model (nth xcat-models iteration)
+        ;; Merge in the view-cluster information only when we have to.
+        all-samples (if cluster-selected
+                      (let [view-cluster-assignments (concat (all-row-assignments xcat-model)
+                                                             (repeat {}))]
+                        (concat (map merge observed-samples view-cluster-assignments)
+                                virtual-samples))
+                      all-samples)
+        qc-spec (dashboard/spec all-samples schema nil viz-cols 10 marginal-types)
+        cols-in-view (set (columns-in-view xcat-model (:view-id cluster-selected)))]
+    [vega-lite qc-spec {:actions false} nil nil all-samples
+     {:iter iteration
+      :cluster (:cluster-id cluster-selected)
+      :view_columns (clj->js (map name cols-in-view))
+      :view (some->> (:view-id cluster-selected) (str "view_"))}]))

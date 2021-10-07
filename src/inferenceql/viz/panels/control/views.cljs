@@ -2,7 +2,8 @@
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box box slider label gap
                                  selection-list radio-button hyperlink]]
-            [inferenceql.viz.config :refer [config transitions mutual-info]]))
+            [inferenceql.viz.config :refer [config transitions mutual-info]]
+            [inferenceql.viz.components.store.db :refer [schema col-ordering]]))
 
 (def mi-bounds
   (if (seq mutual-info)
@@ -17,8 +18,9 @@
     {:min 0
      :max 1}))
 
-(defn panel
-  [column-list]
+(def column-list (keep (set (keys schema)) col-ordering))
+
+(defn panel []
   (let [iteration @(rf/subscribe [:control/iteration])
         col-selection @(rf/subscribe [:control/col-selection])
         plot-type @(rf/subscribe [:control/plot-type])
