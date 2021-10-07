@@ -8,7 +8,7 @@
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.inference.gpm.crosscat :as crosscat]
             [inferenceql.viz.config :refer [config transitions mutual-info]]
-            [inferenceql.viz.panels.learning.views :as learning]
+            [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.jsmodel.multimix :as multimix]
             [inferenceql.viz.panels.jsmodel.views :refer [js-code-block]]
             [inferenceql.viz.panels.table.views :refer [handsontable]]
@@ -248,7 +248,7 @@
         cluster-selected @(rf/subscribe [:learning/cluster-selected])
         all-columns (keep (set (keys schema)) col-ordering)]
     [v-box
-     :children [[learning/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]
+     :children [[control/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]
                 [v-box
                  :margin "20px"
                  :children [[data-table rows iteration cluster-selected]

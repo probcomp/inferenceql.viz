@@ -1,4 +1,4 @@
-(ns inferenceql.viz.panels.learning.eventsubs
+(ns inferenceql.viz.panels.control.eventsubs
   (:require [re-frame.core :as rf]
             [goog.string :refer [format]]
             [inferenceql.viz.events.interceptors :refer [event-interceptors]]

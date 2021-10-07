@@ -1,4 +1,4 @@
-(ns inferenceql.viz.panels.learning.db
+(ns inferenceql.viz.panels.control.db
   (:require [clojure.spec.alpha :as s]))
 
 (def default-db

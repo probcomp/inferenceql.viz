@@ -1,4 +1,4 @@
-(ns inferenceql.viz.panels.learning.views
+(ns inferenceql.viz.panels.control.views
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box box slider label gap
                                  selection-list radio-button hyperlink]]

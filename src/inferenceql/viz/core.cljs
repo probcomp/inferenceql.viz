@@ -10,8 +10,8 @@
             [inferenceql.viz.vega :as vega.init]
             ;; Store Component
             [inferenceql.viz.components.store.subs]
-            ;; Learning
-            [inferenceql.viz.panels.learning.eventsubs]))
+            ;; Control
+            [inferenceql.viz.panels.control.eventsubs]))
 
 (enable-console-print!)
 (set! *warn-on-infer* true)
