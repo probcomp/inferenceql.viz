@@ -1,4 +1,6 @@
 {:data #csv "ignored.csv"
  :schema  #edn "schema.edn"
  :mapping-table #edn "mapping-table.edn"
- :js-model-template #txt "templates/model.js.mustache"}
+ :js-model-template #txt "templates/model.js.mustache"
+
+ :enable-debug-interceptors false}
