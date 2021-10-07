@@ -15,12 +15,6 @@ transitions-json := $(resource-dir)/transitions.json
 mutual-info-js := $(resource-dir)/mutual-info.js
 mutual-info-json := $(resource-dir)/mutual-info.json
 
-### Definitions for publishing.
-
-publish-dir := $(current-dir)/.publish
-auth-file := $(current-dir)/AUTH
-cname-file := $(current-dir)/CNAME
-
 ### Definitions for Figwheel.
 
 figwheel-build-dir := $(current-dir)/figwheel-target
@@ -34,7 +28,6 @@ clean:
 	rm -Rf $(output-dir)
 	rm -Rf $(output-dir-worker)
 	rm -Rf $(figwheel-build-dir)
-	rm -Rf $(publish-dir)
 	rm -Rf $(node-modules-dir)
 	rm -Rf $(transitions-js)
 	rm -Rf $(mutual-info-js)
@@ -69,27 +62,6 @@ js-advanced: $(hot-css-resource) $(transitions-js) $(mutual-info-js)
 js-advanced-min: $(hot-css-resource) $(transitions-js) $(mutual-info-js)
 	clojure -J-Xmx4G -M -m cljs.main -co $(compile-opts-advn-min) -c inferenceql.viz.core
 
-### Observable components compilation.
-
-observable-compile-opts := $(current-dir)/compiler_options/observable/build-advanced.edn
-observable-worker-compile-opts := $(current-dir)/compiler_options/observable/build-advanced-worker.edn
-
-.PHONY: watch-observable
-watch-observable: $(hot-css-resource)
-	clojure -M -m cljs.main -w $(src-dir) -co $(observable-compile-opts) -c inferenceql.viz.js.observable.notebook
-
-.PHONY: observable
-observable: $(hot-css-resource)
-	## Compile js-bundle for notebooks.
-	clojure -M -m cljs.main -co $(observable-compile-opts) -c inferenceql.viz.js.observable.notebook
-
-.PHONY: observable-worker
-observable-worker:
-	## Compile js-bundle for web-workers.
-	clojure -M -m cljs.main -co $(observable-worker-compile-opts) -c inferenceql.viz.js.observable.worker
-
-.PHONY: observable-all
-observable-all: observable observable-worker
 
 ### Supporting defs for compilation.
 
@@ -110,31 +82,6 @@ $(transitions-js): $(transitions-json)
 
 $(mutual-info-js): $(mutual-info-json)
 	bin/js-ify-transitions $(mutual-info-json) $(mutual-info-js) mutual_info
-
-### Publishing
-
-.PHONY: publish-dir
-publish-dir: js $(publish-dir)
-
-$(publish-dir):
-	mkdir -p $(publish-dir)
-	## Copy static index.html file.
-	cp $(current-dir)/index.html $(publish-dir)
-	## Copy static resource files.
-	cp -r $(resource-dir) $(publish-dir)
-	## Copy compiled js files.
-	cp -r $(output-dir) $(publish-dir)
-	## Copy AUTH file if it exists.
-	-[ -f $(auth-file) ] && cp $(auth-file) $(publish-dir)
-	## Copy CNAME file if it exists.
-	-[ -f $(cname-file) ] && cp $(cname-file) $(publish-dir)
-	## Prevent ignore of node-modules dir in surge publish.
-	echo "!node_modules" > $(publish-dir)/.surgeignore
-
-## This target can be called like `make publish DOMAIN=probcomp.surge.sh`
-.PHONY: publish
-publish: publish-dir
-	bin/publish $(DOMAIN)
 
 ### Compilation with Figwheel
 
