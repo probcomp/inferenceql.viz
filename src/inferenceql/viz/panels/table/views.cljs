@@ -6,8 +6,7 @@
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.store :refer [rows col-ordering num-points-at-iter
                                            xcat-models]]
-            [inferenceql.viz.model.xcat-util :as xcat-util]
-            [medley.core :as medley]))
+            [inferenceql.viz.model.xcat-util :as xcat-util]))
 
 (defn column-settings [headers]
   "Returns an array of objects that define settings for each column
@@ -61,40 +60,23 @@
       (when-let [coords (clj->js current-selection)]
         (.selectCells hot-instance coords false)))))
 
-(def default-hot-settings
+(def hot-settings
   {:settings {:data                []
-              :colHeaders          []
-              :columns             []
               :rowHeaders          true
               :multiColumnSorting  true
               :manualColumnMove    true
               :manualColumnResize  true
               :autoWrapCol         false
               :autoWrapRow         false
-              :filters             true
-              ;; TODO: investigate more closely what each of
-              ;; these options adds. And if they can be put
-              ;; in the context-menu instead.
-              :dropdownMenu        ["filter_by_condition"
-                                    "filter_operators"
-                                    "filter_by_condition2"
-                                    "filter_by_value"
-                                    "filter_action_bar"]
               :bindRowsWithHeaders true
               :selectionMode       :multiple
               :outsideClickDeselects false
               :readOnly            true
-              :height              "50vh"
-              :width               "100vw"
+              :height              "auto"
+              :width               "auto"
               :stretchH            "none"
               :licenseKey          "non-commercial-and-evaluation"}
    :hooks []})
-
-(def observable-hot-settings
-  (-> default-hot-settings
-      (update :settings dissoc :colHeaders :columns :dropdownMenu :filters)
-      (assoc-in [:settings :height] "auto")
-      (assoc-in [:settings :width] "auto")))
 
 (defn handsontable-base
   "A simplified version of a reagent component for Handsontable."
@@ -176,7 +158,7 @@
                    ;; TODO: may need to adjust these sizes.
                    (let [data-height (+ (* (count data) 22) 38)]
                      (min data-height 500)))
-          settings (-> observable-hot-settings
+          settings (-> hot-settings
                        (assoc-in [:settings :data] data)
                        (assoc-in [:settings :colHeaders] col-headers)
                        (assoc-in [:settings :columns] (column-settings cols))
