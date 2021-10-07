@@ -1,4 +1,5 @@
 (ns inferenceql.viz.model.xcat-util
+  "Defs for extracting information from XCat records."
   (:require [medley.core :as medley]
             [clojure.edn :as edn]
             [inferenceql.inference.gpm :as gpm]))

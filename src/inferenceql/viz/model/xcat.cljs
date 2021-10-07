@@ -1,9 +1,7 @@
 (ns inferenceql.viz.model.xcat
+  "Defs for importing an XCat record from a CGPM json."
   (:refer-clojure :exclude [import])
-  (:require #?(:clj [cheshire.core :as json])
-            #?(:clj [clojure.data.csv :as csv])
-            #?(:clj [inferenceql.auto-modeling.csv :as am.csv])
-            [clojure.edn :as edn]
+  (:require [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]
             [medley.core :as medley]
             [inferenceql.inference.gpm.crosscat :as crosscat]
@@ -33,18 +31,6 @@
         (update :view_alphas ->map)
         (update :Zv ->map)
         (update :Zrv ->map))))
-
-#?(:clj (defn ^:private data
-          [data-cells schema]
-          (let [headers (map keyword (first data-cells))
-                column->f (comp {:numerical am.csv/parse-number
-                                 :nominal am.csv/parse-str}
-                                schema
-                                name)]
-            (zipmap (range)
-                    (map #(-> (zipmap headers %)
-                              (am.csv/update-by-key column->f))
-                         (rest data-cells))))))
 
 (defn ^:private views
   [columns {:keys [hypers Zv]}]
@@ -98,22 +84,22 @@
        (medley/map-keys keyword)
        (medley/map-vals #(->> % (sort-by val) (map key) (into [])))))
 
-#?(:cljs (defn import
-           [cgpm-json data mapping-table schema]
-           (let [schema (js->clj schema) ; KVs do not have to be keywords.
-                 mapping-table (js->clj mapping-table) ; Ks do not have to be keywords.
-                 ;; Ks do not have to be keywords.
-                 cgpm-model (-> cgpm-json js->clj keywordize-keys fix-cgpm-maps)
+(defn import
+  [cgpm-json data mapping-table schema]
+  (let [schema (js->clj schema) ; KVs do not have to be keywords.
+        mapping-table (js->clj mapping-table) ; Ks do not have to be keywords.
+        ;; Ks do not have to be keywords.
+        cgpm-model (-> cgpm-json js->clj keywordize-keys fix-cgpm-maps)
 
-                 ;; Expects a collection of maps with values appropriately cast.
-                 data (->> (js->clj data)
-                        (map #(medley/map-keys keyword %))
-                        (zipmap (range)))
+        ;; Expects a collection of maps with values appropriately cast.
+        data (->> (js->clj data)
+               (map #(medley/map-keys keyword %))
+               (zipmap (range)))
 
-                 ;; Dummy version of numericalized. This should not ever get used because
-                 ;; model-model contains our column names.
-                 numericalized [[]]
-                 spec (spec numericalized schema cgpm-model)
-                 latents (latents cgpm-model)
-                 options (options mapping-table)]
-             (crosscat/construct-xcat-from-latents spec latents data {:options options}))))
+        ;; Dummy version of numericalized. This should not ever get used because
+        ;; model-model contains our column names.
+        numericalized [[]]
+        spec (spec numericalized schema cgpm-model)
+        latents (latents cgpm-model)
+        options (options mapping-table)]
+    (crosscat/construct-xcat-from-latents spec latents data {:options options})))

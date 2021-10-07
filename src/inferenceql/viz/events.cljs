@@ -8,9 +8,3 @@
  event-interceptors
  (fn [_ _]
    (db/default-db)))
-
-(rf/reg-event-fx
-  :app/alert
-  event-interceptors
-  (fn [_ [_ msg]]
-    {:fx [[:js/alert msg]]}))
