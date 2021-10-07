@@ -1,9 +1,8 @@
 (ns inferenceql.viz.panels.viz.dashboard
   "Code related to producing a vega-lite spec for a dashboard."
-  (:require [inferenceql.viz.panels.viz.util :refer [filtering-summary should-bin? bind-to-element
+  (:require [inferenceql.viz.panels.viz.util :refer [filtering-summary should-bin?
                                                      obs-data-color virtual-data-color
                                                      unselected-color vega-type-fn
-                                                     regression-color
                                                      vl5-schema]]
             [cljs-bean.core :refer [->clj]]
             #?(:cljs [goog.string :refer [format]])

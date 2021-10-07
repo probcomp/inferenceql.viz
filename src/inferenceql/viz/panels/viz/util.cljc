@@ -91,12 +91,3 @@
      :rem-cats rem-cats
      :num-valid num-valid
      :num-invalid (- (count samples) num-valid)}))
-
-(defn bind-to-element
-  "Returns vega-lite parameter maps bound to a specified css selector.
-  This attaches sliders and other controls to the DOM element specified by the css selector.
-  If a parameter map does not have a binding, it is not altered."
-  [params css-selector]
-  (for [param params]
-    (medley/update-existing param :bind assoc :element css-selector)))
-

@@ -7,21 +7,11 @@
         num-other-nodes (count node-names)
 
         other-nodes-ids (map inc (range num-other-nodes))
-        other-nodes-locs
-        #_(if (> num-other-nodes 10)
-              (map #(* (/ 1 num-other-nodes)
-                       (- % 0.5))
-                   other-nodes-ids)
-              (map #(* (/ 1 (dec num-other-nodes))
-                       (- % 1))
-                   other-nodes-ids))
-        (map #(* (/ 1 num-other-nodes)
-                 (- % 0.5))
-             other-nodes-ids)
-
+        other-nodes-locs (map #(* (/ 1 num-other-nodes)
+                                  (- % 0.5))
+                              other-nodes-ids)
         other-nodes (for [[name id loc] (map vector node-names other-nodes-ids other-nodes-locs)]
                       {:name name :id id :parent root-id :alpha loc :beta 1 :status nil})]
-
     (concat [root-node] other-nodes)))
 
 (defn dependencies [dependencies]
@@ -176,17 +166,12 @@
        "datum['source-id'] === activeSource || datum['target-id'] === activeTarget"}]}]})
 
 (defn circle-viz-spec [node-names edges]
-  (let [
-        ;; TODO: node-names -- distict keywords
-        tree (tree node-names)
-
-        ;; TODO: edges -- sequence of pairs
+  (let [tree (tree node-names)
         edges-clean (let [edges (for [edge edges]
                                   (set (map keyword edge)))]
                       (->> edges
                            (remove #(= (count %) 1))
                            (distinct)))
-
         dependencies (let [tree (remove (comp #(= % -1) :id) tree) ;; Remove the root node.
                            col-ids (zipmap (map :name tree) (map :id tree))
                            proto-dependencies (for [[node-1 node-2] (map seq edges-clean)]
