@@ -17,7 +17,7 @@
             [cljstache.core :refer [render]]
             [inferenceql.viz.panels.jsmodel.multimix :as multimix]
             [inferenceql.viz.config :refer [config]]
-            [inferenceql.viz.components.store.db :as store-db]))
+            [inferenceql.viz.components.store.db :refer [mmix-models]]))
 
 ;; We are using the minimal version of highlight.js where
 ;; every language used has to be registered individually.
@@ -136,7 +136,7 @@
 (defn js-model
   "Reagent component for js-model."
   [iteration cluster-selected]
-  (let [mmix-model (nth store-db/mmix-models iteration)
+  (let [mmix-model (nth mmix-models iteration)
         js-model-text (render (:js-model-template config)
                               (multimix/template-data mmix-model))]
     [js-code-block js-model-text cluster-selected]))

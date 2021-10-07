@@ -4,7 +4,8 @@
             [medley.core :refer [filter-kv]]
             [reagent.core :as r]
             [cljs-bean.core :refer [->clj]]
-            [inferenceql.viz.components.store.db :as store-db]
+            [inferenceql.viz.components.store.db :refer [rows col-ordering num-points-at-iter
+                                                         xcat-models]]
             [inferenceql.viz.model.xcat-util :as xcat-util]
             [medley.core :as medley]))
 
@@ -204,17 +205,17 @@
           #js {:className "blue-highlight"}
           #js {})))))
 
-(def rows (map #(medley/remove-vals nil? %) store-db/rows))
+(def rows (map #(medley/remove-vals nil? %) rows))
 
 (defn data-table
   "Reagent component for data table."
   [iteration cluster-selected]
-  (let [xcat-model (nth store-db/xcat-models iteration)
-        num-points (nth store-db/num-points-at-iter iteration)
+  (let [xcat-model (nth xcat-models iteration)
+        num-points (nth num-points-at-iter iteration)
         modeled-cols (-> (set (xcat-util/columns-in-model xcat-model))
                          ;; Get modeled columns in the correct order by picking items in order
                          ;; from col-ordering.
-                         (keep store-db/col-ordering))]
+                         (keep col-ordering))]
 
     [handsontable (take num-points rows)
      {:height "400px"

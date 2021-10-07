@@ -1,7 +1,7 @@
 (ns inferenceql.viz.views
   (:require [re-com.core :refer [v-box h-box gap box]]
             [re-frame.core :as rf]
-            [inferenceql.viz.config :refer [config transitions mutual-info]]
+            [inferenceql.viz.config :refer [mutual-info]]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.jsmodel.views :refer [js-model]]
             [inferenceql.viz.panels.table.views :refer [data-table]]

@@ -7,5 +7,6 @@
 
 (def config (config-reader/read))
 
+;; Data placed into the global js namespace in index.html
 (def mutual-info (js->clj js/mutual_info :keywordize-keys true))
 (def transitions (js->clj js/transitions))
