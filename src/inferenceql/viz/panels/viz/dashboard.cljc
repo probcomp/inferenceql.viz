@@ -6,8 +6,8 @@
                                                      unselected-color vega-type-fn
                                                      regression-color
                                                      vl5-schema]]
-            [goog.string :refer [format]]
             [cljs-bean.core :refer [->clj]]
+            #?(:cljs [goog.string :refer [format]])
             #?(:cljs [vega-embed$vega :as vega])
             #?(:cljs [goog.object])))
 
