@@ -2,10 +2,23 @@
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box box slider label gap
                                  selection-list radio-button hyperlink]]
-            [inferenceql.viz.config :refer [config transitions]]))
+            [inferenceql.viz.config :refer [config transitions mutual-info]]))
+
+(def mi-bounds
+  (if (seq mutual-info)
+    (let [mi-vals (flatten
+                   (for [mi-crosscat-sample mutual-info]
+                     (for [mi-model-iter mi-crosscat-sample]
+                       (for [[_col-1 inner-map] (:mi mi-model-iter)]
+                         (for [[_col-2 mi-val] inner-map]
+                           mi-val)))))]
+      {:min (apply min mi-vals)
+       :max (apply max mi-vals)})
+    {:min 0
+     :max 1}))
 
 (defn panel
-  [column-list mi-min mi-max]
+  [column-list]
   (let [iteration @(rf/subscribe [:control/iteration])
         col-selection @(rf/subscribe [:control/col-selection])
         plot-type @(rf/subscribe [:control/plot-type])
@@ -58,9 +71,9 @@
                                           [box
                                            :style {:padding-top "3px"}
                                            :child [slider
-                                                   :min mi-min
-                                                   :max mi-max
-                                                   :step (/ (- mi-max mi-min)
+                                                   :min (:min mi-bounds)
+                                                   :max (:max mi-bounds)
+                                                   :step (/ (- (:max mi-bounds) (:min mi-bounds))
                                                             100)
                                                    :disabled? (not= plot-type :mutual-information)
                                                    :model mi-threshold

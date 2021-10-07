@@ -68,7 +68,6 @@
                           (map merge iteration-tags)))
 (def all-samples (concat observed-samples virtual-samples))
 
-
 (defn xcat-view-id-map
   "Returns map from js-program view-id (int) to xcat view-id (keyword)."
   [xcat]
@@ -164,19 +163,6 @@
           []
           xcat-models))
 
-(def mutual-info-bounds
-  (if (seq mutual-info)
-    (let [mi-vals (flatten
-                   (for [mi-crosscat-sample mutual-info]
-                     (for [mi-model-iter mi-crosscat-sample]
-                       (for [[_col-1 inner-map] (:mi mi-model-iter)]
-                         (for [[_col-2 mi-val] inner-map]
-                           mi-val)))))]
-      {:min (apply min mi-vals)
-       :max (apply max mi-vals)})
-    {:min 0
-     :max 1}))
-
 (defn mi-plot
   "Reagent component for circle viz for mutual info."
   [mi-data iteration]
@@ -248,7 +234,7 @@
         cluster-selected @(rf/subscribe [:control/cluster-selected])
         all-columns (keep (set (keys schema)) col-ordering)]
     [v-box
-     :children [[control/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]
+     :children [[control/panel all-columns]
                 [v-box
                  :margin "20px"
                  :children [[data-table rows iteration cluster-selected]

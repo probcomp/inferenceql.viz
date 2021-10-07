@@ -1,11 +1,14 @@
 (ns inferenceql.viz.panels.control.db
   (:require [clojure.spec.alpha :as s]
             [clojure.set]
-            [inferenceql.viz.config :refer [config transitions]]))
+            [inferenceql.viz.config :refer [transitions]]))
+
+(def default-col-selection
+  (set (map keyword (get (first transitions) "col_names"))))
 
 (def default-db
   {:control-panel {:iteration 0
-                   :col-selection (set (map keyword (get (first transitions) "col_names")))
+                   :col-selection default-col-selection
                    :plot-type :select-vs-simulate
                    :marginal-types #{:1D}
                    :show-plot-options false
