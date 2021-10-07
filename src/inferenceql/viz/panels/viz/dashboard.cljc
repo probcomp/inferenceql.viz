@@ -545,29 +545,17 @@
                        {:name "cluster"
                         :value 1}
                        {:name "splomAlphaObserved"
-                        :value 0.7
-                        :bind {:input "range" :min 0 :max 1 :step 0.05
-                               :name "scatter plots - alpha (observed data)"}}
+                        :value 0.7}
                        {:name "splomAlphaVirtual"
-                        :value 0.7
-                        :bind {:input "range" :min 0 :max 1 :step 0.05
-                               :name "scatter plots - alpha (virtual data)"}}
+                        :value 0.7}
                        {:name "splomPointSize"
-                        :value 30
-                        :bind {:input "range" :min 1 :max 100 :step 1
-                               :name "scatter plots - point size"}}
+                        :value 30}
                        {:name "numObservedPoints"
-                        :value num-observed
-                        :bind {:input "range" :min 1 :max num-observed :step 1
-                               :name "number of points (observed data)"}}
+                        :value num-observed}
                        {:name "numVirtualPoints"
-                        :value num-virtual
-                        :bind {:input "range" :min 1 :max num-virtual :step 1
-                               :name "number of points (virtual data)"}}
+                        :value num-virtual}
                        {:name "showRegression"
-                        :value false
-                        :bind {:input "checkbox"
-                               :name "regression lines"}}]
+                        :value false}]
               :transform [{:window [{:op "row_number", :as "row_number"}]
                            :groupby ["collection"]}
                           {:filter {:field "iter" :lte {:expr "iter"}}}]

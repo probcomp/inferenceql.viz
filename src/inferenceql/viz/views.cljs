@@ -253,8 +253,6 @@
                  :margin "20px"
                  :children [[data-table rows iteration cluster-selected]
                             [gap :size "30px"]
-                            ;; TODO: get rid of params that bind to controls in spec.
-                            [:div {:id "controls" :style {:display "none"}}]
                             [h-box
                              :children [[js-model iteration cluster-selected]
                                         [gap :size "20px"]
