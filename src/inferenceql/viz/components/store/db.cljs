@@ -10,9 +10,10 @@
 
 (def schema
   ;; Coerce schema to contain columns names and datatyptes as keywords.
-  (keywordize-kv (get config :schema)))
+  (keywordize-kv (:schema config)))
 
-(def rows (clean-csv-maps schema (get config :data)))
+(def rows (clean-csv-maps schema (:data config)))
+(def mapping-table (:mapping-table config))
 
 ;; Data placed into the global js namespace from index.html
 
@@ -24,7 +25,7 @@
 ;; TODO: Off load the conversion into xcat into DVC stage.
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
-                          (xcat/import cgpm (take num-rows rows) (:mapping-table config) schema)))
+                          (xcat/import cgpm (take num-rows rows) mapping-table schema)))
                       cgpm-models))
 (def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
 
