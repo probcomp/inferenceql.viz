@@ -187,8 +187,6 @@
                            col-widths (assoc-in [:settings :colWidths] col-widths))]
       [handsontable-base {:style {:width width}} settings])))
 
-;;-------------------------
-
 (def default-cells-fn
   (fn [_ _ _] #js {}))
 
@@ -204,8 +202,6 @@
                  (cols-set (keyword prop)))
           #js {:className "blue-highlight"}
           #js {})))))
-
-(def rows (map #(medley/remove-vals nil? %) rows))
 
 (defn data-table
   "Reagent component for data table."
