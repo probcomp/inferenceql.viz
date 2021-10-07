@@ -14,9 +14,9 @@
             [inferenceql.viz.panels.table.views :refer [handsontable]]
             [inferenceql.viz.panels.viz.views :refer [vega-lite]]
             [inferenceql.viz.panels.viz.circle :refer [circle-viz-spec]]
+            [inferenceql.viz.panels.viz.dashboard :as dashboard]
             [inferenceql.viz.components.store.db :as store-db]
-            [inferenceql.auto-modeling.js :refer [import-cgpm]]
-            [inferenceql.auto-modeling.qc.vega.dashboard :as dashboard]))
+            [inferenceql.viz.model.cgpm :as cgpm]))
 
 ;; Util
 (def range-1 (drop 1 (range)))
@@ -30,7 +30,7 @@
 ;; TODO: Off load the conversion into xcat into DVC stage.
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
-                          (import-cgpm cgpm (take num-rows rows) (:mapping-table config) schema)))
+                          (cgpm/import cgpm (take num-rows rows) (:mapping-table config) schema)))
                       cgpm-models))
 (def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
 
