@@ -5,9 +5,9 @@
                                                      unselected-color vega-type-fn
                                                      vl5-schema]]
             [cljs-bean.core :refer [->clj]]
-            #?(:cljs [goog.string :refer [format]])
-            #?(:cljs [vega-embed$vega :as vega])
-            #?(:cljs [goog.object])))
+            [goog.string :refer [format]]
+            [vega-embed$vega :as vega]
+            [goog.object]))
 
 (def cluster-selected-color "#4e79a7")
 
@@ -33,9 +33,7 @@
 
 (defn bin-outcome [bin-config]
   (let [[min max] (:extent bin-config)]
-    #?(:cljs (->clj (vega/bin (clj->js bin-config)))
-       ;; Very bad appproximaiton of good binning.
-       :clj {:start min :stop max :step (/ (- max min) 10)})))
+    (->clj (vega/bin (clj->js bin-config)))))
 
 (defn histogram-quant
   "Generates a vega-lite spec for a histogram.
@@ -527,40 +525,39 @@
        :spacing {:column 100 :row 50}})))
 
 (defn top-level-spec [data num-observed num-virtual sections]
-  (let [spec {:$schema vl5-schema
-              :autosize {:resize true}
-              :vconcat sections
-              :spacing 100
-              :data {:name "rows"}
-              :params [{:name "iter"
-                        :value 0}
-                       {:name "view"
-                        :value "view_1"}
-                       {:name "view_columns"
-                        :value ["BMI" "age" "blah"]}
-                       {:name "cluster"
-                        :value 1}
-                       {:name "splomAlphaObserved"
-                        :value 0.7}
-                       {:name "splomAlphaVirtual"
-                        :value 0.7}
-                       {:name "splomPointSize"
-                        :value 30}
-                       {:name "numObservedPoints"
-                        :value num-observed}
-                       {:name "numVirtualPoints"
-                        :value num-virtual}
-                       {:name "showRegression"
-                        :value false}]
-              :transform [{:window [{:op "row_number", :as "row_number"}]
-                           :groupby ["collection"]}
-                          {:filter {:field "iter" :lte {:expr "iter"}}}]
-              :config {:countTitle "Count"
-                       :axisY {:minExtent 10}}
-              :resolve {:legend {:size "independent"
-                                 :color "independent"}
-                        :scale {:color "independent"}}}]
-    (update spec :params bind-to-element "#controls")))
+  {:$schema vl5-schema
+   :autosize {:resize true}
+   :vconcat sections
+   :spacing 100
+   :data {:name "rows"}
+   :params [{:name "iter"
+             :value 0}
+            {:name "view"
+             :value "view_1"}
+            {:name "view_columns"
+             :value ["BMI" "age" "blah"]}
+            {:name "cluster"
+             :value 1}
+            {:name "splomAlphaObserved"
+             :value 0.7}
+            {:name "splomAlphaVirtual"
+             :value 0.7}
+            {:name "splomPointSize"
+             :value 30}
+            {:name "numObservedPoints"
+             :value num-observed}
+            {:name "numVirtualPoints"
+             :value num-virtual}
+            {:name "showRegression"
+             :value false}]
+   :transform [{:window [{:op "row_number", :as "row_number"}]
+                :groupby ["collection"]}
+               {:filter {:field "iter" :lte {:expr "iter"}}}]
+   :config {:countTitle "Count"
+            :axisY {:minExtent 10}}
+   :resolve {:legend {:size "independent"
+                      :color "independent"}
+             :scale {:color "independent"}}})
 
 (defn spec
   "Produces a vega-lite spec for the QC Dashboard app.
