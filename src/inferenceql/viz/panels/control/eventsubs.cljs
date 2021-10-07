@@ -1,14 +1,12 @@
 (ns inferenceql.viz.panels.control.eventsubs
   (:require [re-frame.core :as rf]
             [goog.string :refer [format]]
-            [inferenceql.viz.events.interceptors :refer [event-interceptors]]
-            [inferenceql.viz.config :refer [config transitions]]))
+            [inferenceql.viz.events.interceptors :refer [event-interceptors]]))
 
 (rf/reg-sub
   :control/iteration
   (fn [db _]
-    ;; TODO: move default value to db.
-    (get-in db [:control-panel :iteration] 0)))
+    (get-in db [:control-panel :iteration])))
 
 (rf/reg-event-db
   :control/set-iteration
@@ -19,10 +17,7 @@
 (rf/reg-sub
   :control/col-selection
   (fn [db _]
-    ;; TODO: move default value to db.
-    (let [default (set (map keyword (get (first transitions)
-                                         "col_names")))]
-      (get-in db [:control-panel :col-selection] default))))
+    (get-in db [:control-panel :col-selection])))
 
 (rf/reg-event-db
   :control/select-cols
@@ -33,8 +28,7 @@
 (rf/reg-sub
   :control/plot-type
   (fn [db _]
-    ;; TODO: move default value to db.
-    (get-in db [:control-panel :plot-type] :select-vs-simulate)))
+    (get-in db [:control-panel :plot-type])))
 
 (rf/reg-event-db
   :control/set-plot-type
@@ -45,8 +39,7 @@
 (rf/reg-sub
   :control/marginal-types
   (fn [db _]
-    ;; TODO: move default value to db.
-    (get-in db [:control-panel :marginal-types] #{:1D})))
+    (get-in db [:control-panel :marginal-types])))
 
 (rf/reg-event-db
   :control/set-marginal-types
@@ -67,9 +60,8 @@
 
 (rf/reg-sub
   :control/show-plot-options
-  ;; TODO: move default value to db.
   (fn [db _]
-    (get-in db [:control-panel :show-plot-options] false)))
+    (get-in db [:control-panel :show-plot-options])))
 
 (rf/reg-event-db
   :control/toggle-plot-options
@@ -79,9 +71,8 @@
 
 (rf/reg-sub
   :control/mi-threshold
-  ;; TODO: move default value to db.
   (fn [db _]
-    (get-in db [:control-panel :mi-threshold] 0)))
+    (get-in db [:control-panel :mi-threshold])))
 
 (rf/reg-event-db
   :control/set-mi-threshold

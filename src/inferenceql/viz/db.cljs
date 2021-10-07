@@ -1,10 +1,13 @@
 (ns inferenceql.viz.db
   (:require [clojure.spec.alpha :as s]
-            [inferenceql.viz.components.store.db :as store-component]))
+            [inferenceql.viz.components.store.db :as store-component]
+            [inferenceql.viz.panels.control.db :as control-panel]))
+
 
 ;;; Primary DB spec.
 
-(s/def ::db (s/keys :req-un [::store-component/store-component]))
+(s/def ::db (s/keys :req-un [::store-component/store-component
+                             ::control-panel/control-panel]))
 
 (def default-general-db
   "This db map is meant to contain keys and values not specific to
@@ -17,5 +20,6 @@
   and panel specific dbs all merged together."
   []
   (let [dbs [default-general-db
-             store-component/default-db]]
+             store-component/default-db
+             control-panel/default-db]]
     (apply merge dbs)))
