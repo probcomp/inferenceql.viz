@@ -1,27 +1,30 @@
 (ns inferenceql.viz.components.store.db
-  (:require [inferenceql.viz.config :as c]
+  (:require [inferenceql.viz.config :refer [config]]
             [inferenceql.viz.csv :refer [clean-csv-maps]]
             [inferenceql.viz.util :refer [keywordize-kv]]
             [inferenceql.inference.gpm.crosscat :as crosscat]
             [inferenceql.viz.model.xcat :as xcat]
             [inferenceql.viz.model.xcat-util :refer [columns-in-model sample-xcat]]))
 
-;;; Compiled-in elements to store
+;;; Compiled-in elements from config.
 
 (def schema
   ;; Coerce schema to contain columns names and datatyptes as keywords.
-  (keywordize-kv (get c/config :schema)))
+  (keywordize-kv (get config :schema)))
 
-(def rows (clean-csv-maps schema (get c/config :data)))
-(def cgpm-models c/transitions)
-(def mutual-info c/mutual-info)
+(def rows (clean-csv-maps schema (get config :data)))
+
+;; Data placed into the global js namespace from index.html
+
+(def mutual-info (js->clj js/mutual_info :keywordize-keys true))
+(def cgpm-models (js->clj js/transitions))
 
 ;; Model iterations
 
 ;; TODO: Off load the conversion into xcat into DVC stage.
 (def xcat-models (map (fn [cgpm]
                         (let [num-rows (count (get cgpm "X"))]
-                          (xcat/import cgpm (take num-rows rows) (:mapping-table c/config) schema)))
+                          (xcat/import cgpm (take num-rows rows) (:mapping-table config) schema)))
                       cgpm-models))
 (def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
 
