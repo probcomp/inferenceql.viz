@@ -2,8 +2,8 @@
   (:require [re-frame.core :as rf]
             [re-com.core :refer [v-box h-box box slider label gap
                                  selection-list radio-button hyperlink]]
-            [inferenceql.viz.config :refer [config transitions mutual-info]]
-            [inferenceql.viz.components.store.db :refer [schema col-ordering]]))
+            [inferenceql.viz.components.store.db :refer [schema col-ordering
+                                                         xcat-models mutual-info]]))
 
 (def mi-bounds
   (if (seq mutual-info)
@@ -39,7 +39,7 @@
                              :style {:padding-top "3px"}
                              :child [slider
                                      :min 0
-                                     :max (dec (count transitions))
+                                     :max (dec (count xcat-models))
                                      :model iteration
                                      :on-change (fn [iter]
                                                   (rf/dispatch [:control/clear-cluster-selection])

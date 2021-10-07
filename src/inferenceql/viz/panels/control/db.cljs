@@ -1,10 +1,10 @@
 (ns inferenceql.viz.panels.control.db
   (:require [clojure.spec.alpha :as s]
             [clojure.set]
-            [inferenceql.viz.config :refer [transitions]]))
+            [inferenceql.viz.components.store.db :as store-db]))
 
 (def default-col-selection
-  (set (map keyword (get (first transitions) "col_names"))))
+  (-> store-db/xcat-models first :latents :z keys set))
 
 (def default-db
   {:control-panel {:iteration 0

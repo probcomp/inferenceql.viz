@@ -1,11 +1,11 @@
 (ns inferenceql.viz.views
   (:require [re-com.core :refer [v-box h-box gap box]]
             [re-frame.core :as rf]
-            [inferenceql.viz.config :refer [mutual-info]]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.jsmodel.views :refer [js-model]]
             [inferenceql.viz.panels.table.views :refer [data-table]]
-            [inferenceql.viz.panels.viz.views :refer [mi-plot select-vs-simulate-plot]]))
+            [inferenceql.viz.panels.viz.views :refer [mi-plot select-vs-simulate-plot]]
+            [inferenceql.viz.components.store.db :refer [mutual-info]]))
 
 (defn app
   []
