@@ -15,7 +15,7 @@
 (def rows (clean-csv-maps schema (:data config)))
 (def mapping-table (:mapping-table config))
 
-;; Data placed into the global js namespace from index.html
+;; Data obtained from the global js namespace, placed there by scripts tags in index.html.
 
 (def mutual-info (js->clj js/mutual_info :keywordize-keys true))
 (def cgpm-models (js->clj js/transitions))
@@ -28,6 +28,8 @@
                           (xcat/import cgpm (take num-rows rows) mapping-table schema)))
                       cgpm-models))
 (def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
+
+;; Secondary defs built off of xcat model iterations.
 
 (def col-ordering
   (reduce (fn [ordering xcat]
@@ -42,24 +44,32 @@
                                  ;; Count the number of row to cluster assignments.
                                  (count (get-in view-1 [:latents :y]))))
                              xcat-models))
+
 (def num-points-required (map - num-points-at-iter (conj num-points-at-iter 0)))
+
+;; Settings up samples.
 
 (defn add-null-columns [row]
   (let [columns (keys schema)
         null-kvs (zipmap columns (repeat nil))]
     (merge null-kvs row)))
 
-(def iteration-tags (mapcat (fn [iter count]
-                              (repeat count {:iter iter}))
-                            (range)
-                            num-points-required))
+(def iteration-tags
+  (mapcat (fn [iter count]
+            (repeat count {:iter iter}))
+          (range)
+          num-points-required))
 
-(def observed-samples (->> (map #(assoc % :collection "observed") rows)
-                        (map add-null-columns)
-                        (map merge iteration-tags)))
+(def observed-samples
+  (->> rows
+       (map #(assoc % :collection "observed"))
+       (map add-null-columns)
+       (map merge iteration-tags)))
 
-(def virtual-samples (->> (mapcat sample-xcat xcat-models num-points-required)
-                       (map #(assoc % :collection "virtual"))
-                       (map add-null-columns)
-                       (map merge iteration-tags)))
+(def virtual-samples
+  (->> (mapcat sample-xcat xcat-models num-points-required)
+       (map #(assoc % :collection "virtual"))
+       (map add-null-columns)
+       (map merge iteration-tags)))
+
 (def all-samples (concat observed-samples virtual-samples))
