@@ -181,7 +181,7 @@
   "Reagent component for circle viz for mutual info."
   [mi-data iteration]
   (when mi-data
-    (let [mi-threshold @(rf/subscribe [:learning/mi-threshold])
+    (let [mi-threshold @(rf/subscribe [:control/mi-threshold])
           mi-data (-> mi-data (nth iteration) :mi)
           nodes (-> (set (keys mi-data))
                     ;; Get nodes in consistent order by picking from col-ordering.
@@ -206,8 +206,8 @@
 (defn select-vs-simulate-plot
   "Reagent component for select-vs-simulate plot."
   [cluster-selected iteration]
-  (let [viz-cols @(rf/subscribe [:learning/col-selection])
-        marginal-types @(rf/subscribe [:learning/marginal-types])
+  (let [viz-cols @(rf/subscribe [:control/col-selection])
+        marginal-types @(rf/subscribe [:control/marginal-types])
 
         xcat-model (nth xcat-models iteration)
         ;; Merge in the view-cluster information only when we have to.
@@ -243,9 +243,9 @@
 
 (defn app
   []
-  (let [iteration @(rf/subscribe [:learning/iteration])
-        plot-type @(rf/subscribe [:learning/plot-type])
-        cluster-selected @(rf/subscribe [:learning/cluster-selected])
+  (let [iteration @(rf/subscribe [:control/iteration])
+        plot-type @(rf/subscribe [:control/plot-type])
+        cluster-selected @(rf/subscribe [:control/cluster-selected])
         all-columns (keep (set (keys schema)) col-ordering)]
     [v-box
      :children [[control/panel all-columns (:min mutual-info-bounds) (:max mutual-info-bounds)]

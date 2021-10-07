@@ -5,86 +5,86 @@
             [inferenceql.viz.config :refer [config transitions]]))
 
 (rf/reg-sub
- :learning/iteration
- (fn [db _]
-   ;; TODO: move default value to db.
-   (get-in db [:learning-panel :iteration] 0)))
+  :control/iteration
+  (fn [db _]
+    ;; TODO: move default value to db.
+    (get-in db [:learning-panel :iteration] 0)))
 
 (rf/reg-event-db
-  :learning/set-iteration
+  :control/set-iteration
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :iteration] new-val)))
 
 (rf/reg-sub
- :learning/col-selection
- (fn [db _]
-   ;; TODO: move default value to db.
-   (let [default (set (map keyword (get (first transitions)
-                                        "col_names")))]
-     (get-in db [:learning-panel :col-selection] default))))
+  :control/col-selection
+  (fn [db _]
+    ;; TODO: move default value to db.
+    (let [default (set (map keyword (get (first transitions)
+                                         "col_names")))]
+      (get-in db [:learning-panel :col-selection] default))))
 
 (rf/reg-event-db
-  :learning/select-cols
+  :control/select-cols
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :col-selection] new-val)))
 
 (rf/reg-sub
- :learning/plot-type
- (fn [db _]
-   ;; TODO: move default value to db.
-   (get-in db [:learning-panel :plot-type] :select-vs-simulate)))
+  :control/plot-type
+  (fn [db _]
+    ;; TODO: move default value to db.
+    (get-in db [:learning-panel :plot-type] :select-vs-simulate)))
 
 (rf/reg-event-db
-  :learning/set-plot-type
+  :control/set-plot-type
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :plot-type] new-val)))
 
 (rf/reg-sub
- :learning/marginal-types
- (fn [db _]
-   ;; TODO: move default value to db.
-   (get-in db [:learning-panel :marginal-types] #{:1D})))
+  :control/marginal-types
+  (fn [db _]
+    ;; TODO: move default value to db.
+    (get-in db [:learning-panel :marginal-types] #{:1D})))
 
 (rf/reg-event-db
-  :learning/set-marginal-types
+  :control/set-marginal-types
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :marginal-types] new-val)))
 
 (rf/reg-sub
- :learning/cluster-selected
- (fn [db _]
-   (get-in db [:learning-panel :cluster-selected])))
+  :control/cluster-selected
+  (fn [db _]
+    (get-in db [:learning-panel :cluster-selected])))
 
 (rf/reg-event-db
-  :learning/select-cluster
+  :control/select-cluster
   event-interceptors
   (fn [db [_ new-selection]]
     (assoc-in db [:learning-panel :cluster-selected] new-selection)))
 
 (rf/reg-sub
- :learning/show-plot-options
- ;; TODO: move default value to db.
- (fn [db _]
-   (get-in db [:learning-panel :show-plot-options] false)))
+  :control/show-plot-options
+  ;; TODO: move default value to db.
+  (fn [db _]
+    (get-in db [:learning-panel :show-plot-options] false)))
 
 (rf/reg-event-db
-  :learning/toggle-plot-options
+  :control/toggle-plot-options
   event-interceptors
   (fn [db [_]]
     (update-in db [:learning-panel :show-plot-options] not)))
 
 (rf/reg-sub
- :learning/mi-threshold
- ;; TODO: move default value to db.
- (fn [db _]
-   (get-in db [:learning-panel :mi-threshold] 0)))
+  :control/mi-threshold
+  ;; TODO: move default value to db.
+  (fn [db _]
+    (get-in db [:learning-panel :mi-threshold] 0)))
 
 (rf/reg-event-db
-  :learning/set-mi-threshold
+  :control/set-mi-threshold
   event-interceptors
   (fn [db [_ new-val]]
     (assoc-in db [:learning-panel :mi-threshold] new-val)))

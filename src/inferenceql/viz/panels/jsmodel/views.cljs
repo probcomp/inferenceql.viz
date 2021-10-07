@@ -81,7 +81,7 @@
                              (remove-n 4) ; Remove all the nodes we are going to re-insert with edits.
                              (zip/insert-right [:span {:class ["cluster-clickable"
                                                                (when current-selected "cluster-selected")]
-                                                       :onClick #(rf/dispatch [:learning/select-cluster current])}
+                                                       :onClick #(rf/dispatch [:control/select-cluster current])}
                                                 [:span {:class "hljs-keyword"} "if"]
                                                 r1
                                                 r2
@@ -119,7 +119,7 @@
                            "click"
                            (fn [event]
                              (if (= (.-target event) (:code-elem @dom-nodes))
-                               (rf/dispatch [:learning/select-cluster nil])))))
+                               (rf/dispatch [:control/select-cluster nil])))))
 
       :reagent-render
       (fn [js-code cluster-selected]
