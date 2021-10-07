@@ -1,7 +1,6 @@
 (ns inferenceql.viz.panels.viz.dashboard
   "Code related to producing a vega-lite spec for a dashboard."
-  (:require [inferenceql.viz.panels.viz.regression :as regression]
-            [inferenceql.viz.panels.viz.util :refer [filtering-summary should-bin? bind-to-element
+  (:require [inferenceql.viz.panels.viz.util :refer [filtering-summary should-bin? bind-to-element
                                                      obs-data-color virtual-data-color
                                                      unselected-color vega-type-fn
                                                      regression-color
@@ -208,83 +207,81 @@
   Useful for comparing quatitative-quantitative data."
   [col-1 col-2 vega-type correlation samples counter]
   (let [zoom-control-name (str "zoom-control-" counter) ; Random id so pan/zoom is independent.
-        f-sum (filtering-summary [col-1 col-2] vega-type nil samples)
-
-        base-spec {:width 400
-                   :height 400
-                   :layer [{:transform [{:window [{:op "row_number", :as "row_number_subplot"}]
-                                         :groupby ["collection"]}
-                                        {:filter {:or [{:and [{:field "collection" :equal "observed"}
-                                                              {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                                       {:and [{:field "collection" :equal "virtual"}
-                                                              {:field "row_number_subplot" :lte (:num-valid f-sum)}
-                                                              {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
-                            :mark {:type "point"
-                                   :tooltip {:content "data"}
-                                   :filled true
-                                   :size {:expr "splomPointSize"}}
-                            :params [{:name zoom-control-name
-                                      :bind "scales"
-                                      :select {:type "interval"
-                                               :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                                               :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
-                                               :clear "dblclick[event.shiftKey]"
-                                               :zoom "wheel![event.shiftKey]"}}
-                                     {:name :brush-all
-                                      :select {:type "interval"
-                                               :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                               :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                               :clear "dblclick[!event.shiftKey]"
-                                               :zoom "wheel![!event.shiftKey]"}}]
-                            :encoding {:x {:field col-1
-                                           :type "quantitative"
-                                           :scale {:zero false}
-                                           :axis {:title col-1}}
-                                       :y {:field col-2
-                                           :type "quantitative"
-                                           :scale {:zero false}
-                                           :axis {:minExtent 40
-                                                  :title col-2}}
-                                       :order {:condition [{:test {:and ["datum[view] == cluster"
-                                                                         (format "indexof(view_columns, '%s') != -1" (name col-1))
-                                                                         (format "indexof(view_columns, '%s') != -1" (name col-2))]}
-                                                            :value 10}
-                                                           {:test {:and [{:field "collection" :equal "observed"}
-                                                                         {:param "brush-all"}
-                                                                         "cluster == null"]}
-                                                            :value 1}
-                                                           ;; Show the virtual data colored even
-                                                           ;; when a particular cluster is selected.
-                                                           {:test {:and [{:field "collection" :equal "virtual"}
-                                                                         {:param "brush-all"}]}
-                                                            :value 2}
-                                                           {:test "true"
-                                                            :value 0}]
-                                               :value 0}
-                                       :opacity {:field "collection"
-                                                 :scale {:domain ["observed", "virtual"]
-                                                         :range [{:expr "splomAlphaObserved"} {:expr "splomAlphaVirtual"}]}
-                                                 :legend nil}
-                                       :color {:condition [{:test {:and ["datum[view] == cluster"
-                                                                         (format "indexof(view_columns, '%s') != -1" (name col-1))
-                                                                         (format "indexof(view_columns, '%s') != -1" (name col-2))]}
-                                                            :value cluster-selected-color}
-                                                           {:test {:and [{:field "collection" :equal "observed"}
-                                                                         {:param "brush-all"}
-                                                                         "cluster == null"]}
-                                                            :value obs-data-color}
-                                                           {:test {:and [{:field "collection" :equal "virtual"}
-                                                                         {:param "brush-all"}
-                                                                         "cluster == null"]}
-                                                            :value virtual-data-color}
-                                                           {:test "true"
-                                                            :value unselected-color}]
-                                               :field "collection" ; Dummy field. Never gets used.
-                                               :scale {:domain ["observed", "virtual"]
-                                                       :range [obs-data-color virtual-data-color]}
-                                               :legend {:orient "top"
-                                                        :title nil}}}}]}]
-    (regression/line col-1 col-2 correlation samples base-spec)))
+        f-sum (filtering-summary [col-1 col-2] vega-type nil samples)]
+    {:width 400
+     :height 400
+     :layer [{:transform [{:window [{:op "row_number", :as "row_number_subplot"}]
+                           :groupby ["collection"]}
+                          {:filter {:or [{:and [{:field "collection" :equal "observed"}
+                                                {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
+                                         {:and [{:field "collection" :equal "virtual"}
+                                                {:field "row_number_subplot" :lte (:num-valid f-sum)}
+                                                {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
+              :mark {:type "point"
+                     :tooltip {:content "data"}
+                     :filled true
+                     :size {:expr "splomPointSize"}}
+              :params [{:name zoom-control-name
+                        :bind "scales"
+                        :select {:type "interval"
+                                 :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                 :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove"
+                                 :clear "dblclick[event.shiftKey]"
+                                 :zoom "wheel![event.shiftKey]"}}
+                       {:name :brush-all
+                        :select {:type "interval"
+                                 :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                                 :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                                 :clear "dblclick[!event.shiftKey]"
+                                 :zoom "wheel![!event.shiftKey]"}}]
+              :encoding {:x {:field col-1
+                             :type "quantitative"
+                             :scale {:zero false}
+                             :axis {:title col-1}}
+                         :y {:field col-2
+                             :type "quantitative"
+                             :scale {:zero false}
+                             :axis {:minExtent 40
+                                    :title col-2}}
+                         :order {:condition [{:test {:and ["datum[view] == cluster"
+                                                           (format "indexof(view_columns, '%s') != -1" (name col-1))
+                                                           (format "indexof(view_columns, '%s') != -1" (name col-2))]}
+                                              :value 10}
+                                             {:test {:and [{:field "collection" :equal "observed"}
+                                                           {:param "brush-all"}
+                                                           "cluster == null"]}
+                                              :value 1}
+                                             ;; Show the virtual data colored even
+                                             ;; when a particular cluster is selected.
+                                             {:test {:and [{:field "collection" :equal "virtual"}
+                                                           {:param "brush-all"}]}
+                                              :value 2}
+                                             {:test "true"
+                                              :value 0}]
+                                 :value 0}
+                         :opacity {:field "collection"
+                                   :scale {:domain ["observed", "virtual"]
+                                           :range [{:expr "splomAlphaObserved"} {:expr "splomAlphaVirtual"}]}
+                                   :legend nil}
+                         :color {:condition [{:test {:and ["datum[view] == cluster"
+                                                           (format "indexof(view_columns, '%s') != -1" (name col-1))
+                                                           (format "indexof(view_columns, '%s') != -1" (name col-2))]}
+                                              :value cluster-selected-color}
+                                             {:test {:and [{:field "collection" :equal "observed"}
+                                                           {:param "brush-all"}
+                                                           "cluster == null"]}
+                                              :value obs-data-color}
+                                             {:test {:and [{:field "collection" :equal "virtual"}
+                                                           {:param "brush-all"}
+                                                           "cluster == null"]}
+                                              :value virtual-data-color}
+                                             {:test "true"
+                                              :value unselected-color}]
+                                 :field "collection" ; Dummy field. Never gets used.
+                                 :scale {:domain ["observed", "virtual"]
+                                         :range [obs-data-color virtual-data-color]}
+                                 :legend {:orient "top"
+                                          :title nil}}}}]}))
 
 (defn- strip-plot-size-helper
   "Returns a vega-lite height/width size.
