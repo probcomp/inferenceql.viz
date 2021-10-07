@@ -1,4 +1,6 @@
 (ns inferenceql.viz.store
+  "Main static data-store for the app.
+  Contains defs for model iterations and samples to be used in visualizations."
   (:require [inferenceql.viz.config :refer [config]]
             [inferenceql.viz.csv :refer [clean-csv-maps]]
             [inferenceql.viz.util :refer [keywordize-kv]]

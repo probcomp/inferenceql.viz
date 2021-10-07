@@ -23,7 +23,9 @@
 ;; every language used has to be registered individually.
 (.registerLanguage yarn-hljs "javascript" yarn-hljs-js)
 
-(defn add-cluster-spans [highlighted-js-text cluster-selected]
+(defn add-cluster-spans
+  "Takes html of highlighted js-program and returns hiccup with cluster if-statements clickable."
+  [highlighted-js-text cluster-selected]
   (let [highlighted-js-text (str "<span>" highlighted-js-text "</span>")
 
         hiccup (->> (hickory.core/parse-fragment highlighted-js-text)
@@ -104,16 +106,22 @@
         (recur (zip/next (fix-node loc)))
         (zip/root loc)))))
 
-(defn js-code-block
-  "Display of Javascript code with syntax highlighting.
+(defn highlight
+  "Returns html of js-text highlighted with highlight.js"
+  [js-text]
+  (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))
 
-  Args:
-    `code` -- (string) The Javascript source code to display.
-
-  Returns: A reagent component."
+(defn js-clickable-clusters
+  "A reagent component that highlights js-code and makes clusters clickable."
   [js-code cluster-selected]
-  (let [dom-nodes (r/atom {})
-        highlight (fn [js-text] (.-value (.highlight yarn-hljs js-text #js {"language" "js"})))]
+  ;; Returns hiccup.
+  (-> js-code highlight (add-cluster-spans cluster-selected)))
+
+(defn js-code-block
+  "Reagent component that display of Javascript code with syntax highlighting.
+  Args: `js-code` -- (string) The Javascript source code to display."
+  [js-code cluster-selected]
+  (let [dom-nodes (r/atom {})]
     (r/create-class
      {:display-name "js-model-code"
 
@@ -127,11 +135,9 @@
 
       :reagent-render
       (fn [js-code cluster-selected]
-        (let [tagged-code (-> js-code highlight (add-cluster-spans cluster-selected))]
-          ;; TODO: try to make tagged code its own reagent component for performance.
-          [:pre#program-display
-           [:code {:ref #(swap! dom-nodes assoc :code-elem %)}
-            tagged-code]]))})))
+        [:pre#program-display
+         [:code {:ref #(swap! dom-nodes assoc :code-elem %)}
+          [js-clickable-clusters js-code cluster-selected]]])})))
 
 (defn js-model
   "Reagent component for js-model."

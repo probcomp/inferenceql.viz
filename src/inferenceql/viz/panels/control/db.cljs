@@ -1,4 +1,5 @@
 (ns inferenceql.viz.panels.control.db
+  "Main db for state of user interactions and settings."
   (:require [clojure.spec.alpha :as s]
             [clojure.set]
             [inferenceql.viz.store :as store]))
