@@ -1,5 +1,6 @@
 (ns inferenceql.viz.panels.control.db
   (:require [clojure.spec.alpha :as s]
+            [clojure.set]
             [inferenceql.viz.config :refer [config transitions]]))
 
 (def default-db
@@ -22,8 +23,11 @@
 (s/def ::iteration integer?)
 (s/def ::col-selection set?)
 (s/def ::plot-type #{:select-vs-simulate :mutual-information})
-(s/def ::marginal-types some?) ;; TODO
+(s/def ::marginal-types #(and (set? %)
+                              (clojure.set/subset? % #{:1D :2D})))
 (s/def ::show-plot-options boolean?)
 (s/def ::mi-threshold number?)
 
-(s/def ::cluster-selected some?) ;; TODO
+(s/def ::cluster-selected (s/keys :req-un [::cluster-id ::view-id]))
+(s/def ::cluster-id integer?)
+(s/def ::view-id integer?)
