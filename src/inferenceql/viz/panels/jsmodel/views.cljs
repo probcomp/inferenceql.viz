@@ -119,7 +119,7 @@
                            "click"
                            (fn [event]
                              (if (= (.-target event) (:code-elem @dom-nodes))
-                               (rf/dispatch [:control/select-cluster nil])))))
+                               (rf/dispatch [:control/clear-cluster-selection])))))
 
       :reagent-render
       (fn [js-code cluster-selected]

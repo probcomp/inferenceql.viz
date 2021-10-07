@@ -8,7 +8,6 @@
                    :col-selection (set (map keyword (get (first transitions) "col_names")))
                    :plot-type :select-vs-simulate
                    :marginal-types #{:1D}
-                   ; :cluster-selected
                    :show-plot-options false
                    :mi-threshold 0}})
 
