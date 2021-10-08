@@ -4,7 +4,7 @@
             [medley.core :refer [filter-kv]]
             [reagent.core :as r]
             [cljs-bean.core :refer [->clj]]
-            [inferenceql.viz.store :refer [rows col-ordering num-points-at-iter
+            [inferenceql.viz.store :refer [rows col-ordering num-rows-at-iter
                                            xcat-models]]
             [inferenceql.viz.model.xcat-util :as xcat-util]))
 
@@ -189,7 +189,7 @@
   "Reagent component for data table."
   [iteration cluster-selected]
   (let [xcat-model (nth xcat-models iteration)
-        num-points (nth num-points-at-iter iteration)
+        num-points (nth num-rows-at-iter iteration)
         modeled-cols (-> (set (xcat-util/columns-in-model xcat-model))
                          ;; Get modeled columns in the correct order by picking items in order
                          ;; from col-ordering.

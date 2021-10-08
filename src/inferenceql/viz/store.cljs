@@ -22,18 +22,25 @@
 (def mutual-info (js->clj js/mutual_info :keywordize-keys true))
 (def cgpm-models (js->clj js/transitions))
 
-;; Model iterations
+;;; Model iterations
 
-;; TODO: Off load the conversion into xcat into DVC stage.
-(def xcat-models (map (fn [cgpm]
-                        (let [num-rows (count (get cgpm "X"))]
-                          (xcat/import cgpm (take num-rows rows) mapping-table schema)))
-                      cgpm-models))
-(def mmix-models (doall (map crosscat/xcat->mmix xcat-models)))
+;; TODO: Off-load the conversion into xcat into a DVC stage.
+(def xcat-models
+  "Sequence of xcat models for each iteration."
+  (map (fn [cgpm]
+         (let [num-rows (count (get cgpm "X"))]
+           (xcat/import cgpm (take num-rows rows) mapping-table schema)))
+       cgpm-models))
 
-;; Secondary defs built off of xcat model iterations.
+(def mmix-models
+  "Sequence of mmix models for each iteration."
+  ;; Using doall so models are fully evaled. Scrubbing through iterations will be smooth.
+  (doall (map crosscat/xcat->mmix xcat-models)))
+
+;;; Secondary defs built off of xcat model iterations.
 
 (def col-ordering
+  "Ordering of columns as they appear in the sequence of model iterations."
   (reduce (fn [ordering xcat]
             (let [new-columns (clojure.set/difference (set (columns-in-model xcat))
                                                       (set ordering))]
@@ -41,15 +48,19 @@
           []
           xcat-models))
 
-(def num-points-at-iter (map (fn [xcat]
-                               (let [[view-1-name view-1] (first (get xcat :views))]
-                                 ;; Count the number of row to cluster assignments.
-                                 (count (get-in view-1 [:latents :y]))))
-                             xcat-models))
+(def num-rows-at-iter
+  "Number of rows used at each model iteration."
+  (map (fn [xcat]
+         (let [[view-1-name view-1] (first (get xcat :views))]
+           ;; Count the number of row to cluster assignments.
+           (count (get-in view-1 [:latents :y]))))
+       xcat-models))
 
-(def num-points-required (map - num-points-at-iter (conj num-points-at-iter 0)))
+(def num-rows-required
+  "Number of new rows incorporated at this model iteration."
+  (map - num-rows-at-iter (conj num-rows-at-iter 0)))
 
-;; Settings up samples.
+;;; Settings up samples.
 
 (defn add-null-columns [row]
   (let [columns (keys schema)
@@ -60,7 +71,7 @@
   (mapcat (fn [iter count]
             (repeat count {:iter iter}))
           (range)
-          num-points-required))
+          num-rows-required))
 
 (def observed-samples
   (->> rows
@@ -69,7 +80,7 @@
        (map merge iteration-tags)))
 
 (def virtual-samples
-  (->> (mapcat sample-xcat xcat-models num-points-required)
+  (->> (mapcat sample-xcat xcat-models num-rows-required)
        (map #(assoc % :collection "virtual"))
        (map add-null-columns)
        (map merge iteration-tags)))
