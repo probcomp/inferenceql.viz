@@ -51,8 +51,11 @@
         (.selectCells hot-instance coords false)))))
 
 (defn handsontable
-  ([attributes props]
-   (let [hot-instance (rf/subscribe [:table/hot-instance])
+  "Mode can be :reagent, :reagent-observable, :re-frame."
+  ([attributes props mode]
+   (let [hot-instance (if (= mode :re-frame)
+                        (rf/subscribe [:table/hot-instance])
+                        (reagent/atom nil))
          dom-nodes (reagent/atom {})]
      (reagent/create-class
       {:display-name "handsontable-reagent"
@@ -70,8 +73,20 @@
                      (callback-gen hot)
                      hot)))
 
-           ;; Save the hot object in the app db.
-           (rf/dispatch [:table/set-hot-instance hot])))
+           (when (= mode :reagent-observable)
+             ;; Fix scrolling for HOT in Observable.
+             (.add (.-hooks yarn-handsontable)
+                   "afterRender"
+                   (fn []
+                     (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
+                   hot)
+             ;; Make new HOT instances appear immediately in Observable.
+             (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30))
+
+           ;; Save HOT instance.
+           (if (= mode :re-frame)
+             (rf/dispatch [:table/set-hot-instance hot])
+             (reset! hot-instance hot))))
 
        :component-did-update
        (fn [this old-argv]
@@ -91,7 +106,8 @@
        :component-will-unmount
        (fn [this]
          (when @hot-instance
-           (rf/dispatch [:table/unset-hot-instance])
+           (when (= mode :re-frame)
+             (rf/dispatch [:table/unset-hot-instance]))
            (.destroy @hot-instance)))
 
        :reagent-render

@@ -5,66 +5,14 @@
             [reagent.core :as r]
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.panels.table.util :refer [column-settings]]
-            [inferenceql.viz.panels.table.views :refer [update-hot!]]
-            [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]))
+            [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
+            [inferenceql.viz.panels.table.views :refer [handsontable]]))
 
 (def simple-hot-settings
   (-> default-hot-settings
       (update :settings dissoc :colHeaders :columns :dropdownMenu :filters)
       (assoc-in [:settings :height] "auto")
       (assoc-in [:settings :width] "auto")))
-
-(defn handsontable-base
-  "A simplified version of a reagent component for Handsontable."
-  ([attributes props obs-fixes]
-   (let [hot-instance (reagent/atom nil)
-         dom-nodes (reagent/atom {})]
-
-     (reagent/create-class
-      {:display-name "handsontable-reagent"
-
-       :component-did-mount
-       (fn [this]
-         (let [{:keys [settings hooks]} props
-               hot (yarn-handsontable. (:table-div @dom-nodes) (clj->js settings))]
-
-           (when obs-fixes
-             ;; Fix scrolling for HOT in Observable.
-             (.add (.-hooks yarn-handsontable)
-                   "afterRender"
-                   (fn []
-                     (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
-                   hot)
-             ;; Make new HOT instances appear immediately in Observable.
-             (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30))
-
-           ;; Save HOT instance.
-           (reset! hot-instance hot)))
-
-       :component-did-update
-       (fn [this old-argv]
-         (let [[_ _old-attributes old-props] old-argv
-               [_ _new-attributes new-props] (reagent/argv this)
-
-               old-settings (:settings old-props)
-               new-settings (:settings new-props)
-               changed-settings (filter-kv (fn [setting-key new-val]
-                                             (not= (get old-settings setting-key) new-val))
-                                           new-settings)]
-
-           ;; Update settings.
-           (when (seq changed-settings)
-             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))))
-
-       :component-will-unmount
-       (fn [this]
-         (when @hot-instance
-           (.destroy @hot-instance)))
-
-       :reagent-render
-       (fn [attributes props]
-         [:div#table-container attributes
-          [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
 
 (defn handsontable
   "A reagent component that dispalys `data` in handsontable.
@@ -76,12 +24,16 @@
       cols - Which columns from `data` to display.
         Default will show all columns (keys) from the first row of data.
       height - Handsontable height setting.
+      width - Handsontable width setting.
       v-scroll - Set to false so the full table is drawn with no scrollbars.
       cells - Handsontable cells setting. Can be used a variety of ways including cell highlighting.
-      col-widths - Handsontable colWidths setting."
-  [attributues data options]
+      col-widths - Handsontable colWidths setting.
+
+   `mode` - can be :reagent or :reagent-observable. Using :reagent-observable will enable certain
+      fixes for Observable notebooks."
+  [attributues data options mode]
   (when data
-    (let [{:keys [cols height width v-scroll cells col-widths obs-fixes]} options
+    (let [{:keys [cols height width v-scroll cells col-widths]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
           cols (or cols (->> data first keys (map name)))
           col-headers (for [col cols]
@@ -103,5 +55,5 @@
           props (cond-> props
                         cells (assoc-in [:settings :cells] cells)
                         col-widths (assoc-in [:settings :colWidths] col-widths))]
-      [handsontable-base attributues props obs-fixes])))
+      [handsontable attributues props mode])))
 

@@ -40,8 +40,8 @@
                      [control-panel query query-fn success-cb failure-cb]
                      (if (some? @failure)
                        [failure-msg @failure]
-                       [handsontable {:style {:padding-bottom "5px"}}
-                        @results options])])]
+                       [handsontable {:style {:padding-bottom "5px"}} @results options
+                        :reagent-observable])])]
     (rdom/render [component] node)
     ;; Starting value of the component is nil.
     ;; Relevant when used with Observable's [view of] operator.
