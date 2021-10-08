@@ -52,7 +52,7 @@
 
 (defn handsontable
   "Mode can be :reagent, :reagent-observable, :re-frame."
-  ([attributes props mode]
+  ([mode attributes props]
    (let [hot-instance (if (= mode :re-frame)
                         (rf/subscribe [:table/hot-instance])
                         (reagent/atom nil))
@@ -111,7 +111,7 @@
            (.destroy @hot-instance)))
 
        :reagent-render
-       (fn [attributes props]
+       (fn [mode attributes props]
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
 

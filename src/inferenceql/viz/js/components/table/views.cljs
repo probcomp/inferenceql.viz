@@ -14,7 +14,7 @@
       (assoc-in [:settings :height] "auto")
       (assoc-in [:settings :width] "auto")))
 
-(defn handsontable
+(defn handsontable-simple
   "A reagent component that dispalys `data` in handsontable.
   It properly transforms data and options and delivers them as props to handsontable.
 
@@ -31,7 +31,7 @@
 
    `mode` - can be :reagent or :reagent-observable. Using :reagent-observable will enable certain
       fixes for Observable notebooks."
-  [attributues data options mode]
+  [mode attributues data options]
   (when data
     (let [{:keys [cols height width v-scroll cells col-widths]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
@@ -55,5 +55,5 @@
           props (cond-> props
                         cells (assoc-in [:settings :cells] cells)
                         col-widths (assoc-in [:settings :colWidths] col-widths))]
-      [handsontable attributues props mode])))
+      [handsontable mode attributues props])))
 
