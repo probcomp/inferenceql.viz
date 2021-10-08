@@ -90,8 +90,8 @@
 
        :component-did-update
        (fn [this old-argv]
-         (let [[_ _old-attributes old-props] old-argv
-               [_ _new-attributes new-props] (reagent/argv this)
+         (let [[_ _old-mode _old-attributes old-props] old-argv
+               [_ _new-mode _new-attributes new-props] (reagent/argv this)
 
                old-settings (:settings old-props)
                new-settings (:settings new-props)

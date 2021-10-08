@@ -1,4 +1,4 @@
-(ns inferenceql.viz.js.components.table.views
+(ns inferenceql.viz.panels.table.views-simple
   (:require [handsontable$default :as yarn-handsontable]
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]
@@ -6,7 +6,7 @@
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.panels.table.util :refer [column-settings]]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
-            [inferenceql.viz.panels.table.views :refer [handsontable]]))
+            [inferenceql.viz.panels.table.views :as tv]))
 
 (def simple-hot-settings
   (-> default-hot-settings
@@ -14,9 +14,13 @@
       (assoc-in [:settings :height] "auto")
       (assoc-in [:settings :width] "auto")))
 
-(defn handsontable-simple
+(defn handsontable
   "A reagent component that dispalys `data` in handsontable.
-  It properly transforms data and options and delivers them as props to handsontable.
+  It is a simple version of the full handsonatable component, that properly transforms `data` and
+  `options` and delivers them as `props` to the full handsontable component.
+
+   `mode` - can be :reagent or :reagent-observable. Using :reagent-observable will enable certain
+      fixes for Observable notebooks.
 
   `options` - A map which contains various options about how the table is displayed. All keys
     are optional. Some keys simply map to the same setting in Handsontable library. See the official
@@ -27,10 +31,7 @@
       width - Handsontable width setting.
       v-scroll - Set to false so the full table is drawn with no scrollbars.
       cells - Handsontable cells setting. Can be used a variety of ways including cell highlighting.
-      col-widths - Handsontable colWidths setting.
-
-   `mode` - can be :reagent or :reagent-observable. Using :reagent-observable will enable certain
-      fixes for Observable notebooks."
+      col-widths - Handsontable colWidths setting. "
   [mode attributues data options]
   (when data
     (let [{:keys [cols height width v-scroll cells col-widths]} options
@@ -55,5 +56,4 @@
           props (cond-> props
                         cells (assoc-in [:settings :cells] cells)
                         col-widths (assoc-in [:settings :colWidths] col-widths))]
-      [handsontable mode attributues props])))
-
+      [tv/handsontable mode attributues props])))

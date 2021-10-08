@@ -3,7 +3,7 @@
             [reagent.dom :as rdom]
             [reagent.core :as r]
             [cljs-bean.core :refer [->clj]]
-            [inferenceql.viz.js.components.table.views :refer [handsontable-simple]]
+            [inferenceql.viz.panels.table.views-simple :refer [handsontable]]
             [inferenceql.viz.js.components.mini-app.views :refer [failure-msg control-panel]]))
 
 (defn mini-app
@@ -40,7 +40,7 @@
                      [control-panel query query-fn success-cb failure-cb]
                      (if (some? @failure)
                        [failure-msg @failure]
-                       [handsontable-simple :reagent-observable
+                       [handsontable :reagent-observable
                         {:style {:padding-bottom "5px"}} @results options])])]
     (rdom/render [component] node)
     ;; Starting value of the component is nil.
