@@ -8,7 +8,7 @@
             [inferenceql.viz.panels.table.views :refer [update-hot!]]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]))
 
-(def observable-hot-settings
+(def simple-hot-settings
   (-> default-hot-settings
       (update :settings dissoc :colHeaders :columns :dropdownMenu :filters)
       (assoc-in [:settings :height] "auto")
@@ -16,7 +16,7 @@
 
 (defn handsontable-base
   "A simplified version of a reagent component for Handsontable."
-  ([attributes props]
+  ([attributes props obs-fixes]
    (let [hot-instance (reagent/atom nil)
          dom-nodes (reagent/atom {})]
 
@@ -28,15 +28,15 @@
          (let [{:keys [settings hooks]} props
                hot (yarn-handsontable. (:table-div @dom-nodes) (clj->js settings))]
 
-           ;; Fix scrolling for HOT in Observable.
-           (.add (.-hooks yarn-handsontable)
-                 "afterRender"
-                 (fn []
-                   (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
-                 hot)
-
-           ;; Make new HOT instances appear immediately in Observable.
-           (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30)
+           (when obs-fixes
+             ;; Fix scrolling for HOT in Observable.
+             (.add (.-hooks yarn-handsontable)
+                   "afterRender"
+                   (fn []
+                     (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
+                   hot)
+             ;; Make new HOT instances appear immediately in Observable.
+             (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30))
 
            ;; Save HOT instance.
            (reset! hot-instance hot)))
@@ -79,9 +79,9 @@
       v-scroll - Set to false so the full table is drawn with no scrollbars.
       cells - Handsontable cells setting. Can be used a variety of ways including cell highlighting.
       col-widths - Handsontable colWidths setting."
-  [data options]
+  [attributues data options]
   (when data
-    (let [{:keys [cols height v-scroll cells col-widths]} options
+    (let [{:keys [cols height width v-scroll cells col-widths obs-fixes]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
           cols (or cols (->> data first keys (map name)))
           col-headers (for [col cols]
@@ -93,14 +93,15 @@
                    ;; TODO: may need to adjust these sizes.
                    (let [data-height (+ (* (count data) 22) 38)]
                      (min data-height 500)))
-          settings (-> observable-hot-settings
-                       (assoc-in [:settings :data] data)
-                       (assoc-in [:settings :colHeaders] col-headers)
-                       (assoc-in [:settings :columns] (column-settings cols))
-                       (assoc-in [:settings :height] height)
-                       (assoc-in [:settings :width] "100%"))
-          settings (cond-> settings
-                           cells (assoc-in [:settings :cells] cells)
-                           col-widths (assoc-in [:settings :colWidths] col-widths))]
-      [handsontable-base {:style {:padding-bottom "5px"}} settings])))
+          width (or width "100%")
+          props (-> simple-hot-settings
+                    (assoc-in [:settings :data] data)
+                    (assoc-in [:settings :colHeaders] col-headers)
+                    (assoc-in [:settings :columns] (column-settings cols))
+                    (assoc-in [:settings :height] height)
+                    (assoc-in [:settings :width] width))
+          props (cond-> props
+                        cells (assoc-in [:settings :cells] cells)
+                        col-widths (assoc-in [:settings :colWidths] col-widths))]
+      [handsontable-base attributues props obs-fixes])))
 
