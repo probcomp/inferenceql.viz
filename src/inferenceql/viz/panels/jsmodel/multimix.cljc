@@ -2,7 +2,13 @@
   "Functions for transforming a multimix model spec into template data for passing to
   a mustache template that displays a javascript representation of the model spec."
   (:require [clojure.string :as str]
-            [medley.core :as medley]))
+            [medley.core :as medley]
+            #?(:cljs [goog.string :refer [format]])))
+
+(defn trunc
+  "Truncate number to 3 decimals places."
+  [n]
+  (format "%.3f" n))
 
 (def range-1
   "Infinite list of natural numbers."
@@ -19,12 +25,16 @@
   "Returns a map of categorical cols and their values given a multimix `spec`.
   The map returned maps from col name to a sequence of col values for that category."
   [spec]
-  (let [first-cluster (get-in spec [:views 0 0 :parameters])
+  (let [;; First cluster from all views merged.
+        first-clusters (->> (get-in spec [:views])
+                            (map first)
+                            (map :parameters)
+                            (apply merge))
         categorical-cols (keys (medley/filter-vals #(= % :categorical)
                                                    (get-in spec [:vars])))]
     (into {}
       (for [col categorical-cols]
-        (let [cat-values (keys (get first-cluster col))]
+        (let [cat-values (keys (get first-clusters col))]
           [col cat-values])))))
 
 (defn categories-section
@@ -62,14 +72,17 @@
          :last (= index num-params)
          :categorical true
          ;; We need to produce a string of the category weights in a consistent order.
-         :weights (str/join ", " (map param-vals (get categorical-col-vals param-key)))}
+         :weights (->> (get categorical-col-vals param-key)
+                       (map param-vals)
+                       (map trunc)
+                       (str/join ","))}
 
         false ;; Guassian variable.
         {:name (name param-key)
          :last (= index num-params)
          :gaussian true
-         :mu (:mu param-vals)
-         :sigma (:sigma param-vals)}))))
+         :mu (trunc (:mu param-vals))
+         :sigma (trunc (:sigma param-vals))}))))
 
 (defn views-section
   "Returns data for the views section of the js-model-template."
@@ -78,7 +91,7 @@
         views (get-in spec [:views])]
     (for [[view-num view] (map vector range-1 views)]
       {:num view-num
-       :cluster-probs (str/join ", " (map :probability view))
+       :cluster-probs (str/join ", " (map (comp trunc :probability) view))
        :clusters (for [[cluster-num cluster] (map vector range-1 view)]
                    {:first (= cluster-num 1)
                     :num cluster-num
