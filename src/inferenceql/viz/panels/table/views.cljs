@@ -51,11 +51,17 @@
         (.selectCells hot-instance coords false)))))
 
 (defn handsontable
-  "Mode can be :reagent, :reagent-observable, :re-frame.
+  "mode -- can be one of the following keywords.
     :reagent - standard reagent component.
-    :reagent-observable - enables a hook and timeout to get handsontable displaying correctly in
+    :reagent-observable - enables options to get handsontable to display correctly in
        observable notebooks.
-    :re-frame - stores the Handsontable object in the app-db instead of a local atom."
+    :re-frame - stores the Handsontable object in the re-frame app-db instead of a local atom.
+
+   attributes -- dom node attributes for the table container.
+   props -- map with keys :settings and :hooks.
+     :settings -- settings for Handsontable, see Handsontable docs.
+     :hooks -- (optional) hooks for Handsontable, see Handsontable docs.
+     :selections-coords -- (optional) current selection in table to reapply after update."
   ([mode attributes props]
    (let [hot-instance (if (= mode :re-frame)
                         (rf/subscribe [:table/hot-instance])
