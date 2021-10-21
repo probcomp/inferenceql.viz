@@ -8,7 +8,9 @@
 (defn trunc
   "Truncate number to 3 decimals places."
   [n]
-  (format "%.3f" n))
+  (if (integer? n)
+    (str n)
+    (format "%.3f" n)))
 
 (def range-1
   "Infinite list of natural numbers."
@@ -75,7 +77,7 @@
          :weights (->> (get categorical-col-vals param-key)
                        (map param-vals)
                        (map trunc)
-                       (str/join ","))}
+                       (str/join ", "))}
 
         false ;; Guassian variable.
         {:name (name param-key)
