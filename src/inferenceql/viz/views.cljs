@@ -25,7 +25,8 @@
                 [h-box
                  :justify :center
                  :children [[gap :size "20px"]
-                            [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
+                            [viz/vega-lite vega-lite-spec {:actions false}
+                             generators pts-store {}]
                             ;; TODO: this gap is not working when viz in very wide
                             [gap :size "20px"]]]
                 [modal/modal modal-content]]]))
