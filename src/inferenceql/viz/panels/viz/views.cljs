@@ -28,17 +28,17 @@
   "vega-lite reagent component"
   [spec opt options]
   (let [dom-nodes (r/atom {})
-        vega-embed-result (r/atom nil)
+        vega-inst (r/atom nil) ; vega-embed instance.
 
-        free-embed-instance (fn []
-                              (when @vega-embed-result
-                                ;; Free resources used by vega-embed.
-                                ;; See https://github.com/vega/vega-embed#api-reference
-                                (.finalize @vega-embed-result)))
+        free-vega (fn []
+                    (when @vega-inst
+                      ;; Free resources used by vega-embed.
+                      ;; See https://github.com/vega/vega-embed#api-reference
+                      (.finalize @vega-inst)))
 
         embed (fn [this spec opt options]
                 (if-not (:vega-node @dom-nodes)
-                  (free-embed-instance)
+                  (free-vega)
                   (let [spec (clj->js spec)
                         opt (clj->js (merge default-vega-embed-options
                                             opt))]
@@ -50,7 +50,7 @@
                                  (init-fn res))))
                       ;; Store the result of vega-embed.
                       (.then (fn [res]
-                               (reset! vega-embed-result res)))
+                               (reset! vega-inst res)))
                       (.catch (fn [err]
                                 (js/console.error err)))))))]
     (r/create-class
@@ -70,7 +70,7 @@
 
       :component-will-unmount
       (fn [this]
-        (free-embed-instance))
+        (free-vega))
 
       :reagent-render
       (fn [spec opt options]
