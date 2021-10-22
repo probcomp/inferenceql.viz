@@ -27,12 +27,10 @@
 (defn vega-lite
   "vega-lite reagent component"
   [spec opt options]
-  (let [run (atom 0)
-        dom-nodes (r/atom {})
+  (let [dom-nodes (r/atom {})
         vega-embed-result (r/atom nil)
 
         free-resources (fn [teardown-fn]
-                         (swap! run inc) ; Turn off any running generators.
                          (when @vega-embed-result
                            ;; Run the user-provided teardown first.
                            (when teardown-fn
@@ -89,7 +87,8 @@
 (defn vega-lite-2
   "vega-lite reagent component"
   [spec opt generators pts-store]
-  (let [
+  (let [run (atom 0)
+
         ;; Used to set the pts-store whenever the mouse click is lifted.
         mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
 
@@ -108,8 +107,8 @@
                                         (run))))))
 
         ;; Start generators for inserting data in simulation plots.
-        start-gen (fn [res]
-                    (when generators
+        start-gen (fn [generators res]
+                    (when (seq generators)
                       (let [current-run (swap! run inc)]
                         (js/requestAnimationFrame
                          (fn send []
@@ -118,40 +117,46 @@
                              (js/requestAnimationFrame send)))))))
 
         ;; Update value of pts_store and attach a listener to it.
-        init-fn (fn [res]
-                 (let [view-obj (.-view res)
-                       spec-has-pts-store (try (some? (.data view-obj "pts_store"))
-                                               (catch :default e false))]
-                   (when spec-has-pts-store
-                     ;; Update value of pts_store in view object to the last value
-                     ;; we had saved.
-                     (when pts-store
-                       (.data view-obj "pts_store" (clj->js pts-store))
-                       (.run view-obj))
+        pts-store-setup (fn [pts-store res]
+                         (let [view-obj (.-view res)
+                               spec-has-pts-store (try (some? (.data view-obj "pts_store"))
+                                                       (catch :default e false))]
+                           (when spec-has-pts-store
+                             ;; Update value of pts_store in view object to the last value
+                             ;; we had saved.
+                             (when pts-store
+                               (.data view-obj "pts_store" (clj->js pts-store))
+                               (.run view-obj))
 
-                     ;; Listen to future updates to pts_store that come from interactions
-                     ;; in the visualization itself. Stage changes.
-                     (.addDataListener view-obj "pts_store"
-                                       (fn [_ds-name data]
-                                         (rf/dispatch [:viz/stage-pts-store data])))
+                             ;; Listen to future updates to pts_store that come from interactions
+                             ;; in the visualization itself. Stage changes.
+                             (.addDataListener view-obj "pts_store"
+                                               (fn [_ds-name data]
+                                                 (rf/dispatch [:viz/stage-pts-store data])))
 
-                     ;; Used to set the pts-store shortly after the mouse wheel is
-                     ;; done scrolling on a selection rectangle (pts_brush) within
-                     ;; a vega-lite visualization.
-                     (.addEventListener view-obj "wheel"
-                                        (gfn/debounce
-                                         (fn [_event item]
-                                           (when (= "pts_brush" (.. item -mark -name))
-                                             (rf/dispatch [:viz/set-pts-store])))
-                                         500)))))]
+                             ;; Used to set the pts-store shortly after the mouse wheel is
+                             ;; done scrolling on a selection rectangle (pts_brush) within
+                             ;; a vega-lite visualization.
+                             (.addEventListener view-obj "wheel"
+                                                (gfn/debounce
+                                                 (fn [_event item]
+                                                   (when (= "pts_brush" (.. item -mark -name))
+                                                     (rf/dispatch [:viz/set-pts-store])))
+                                                 500)))))]
     (r/create-class
      {:display-name "vega-lite-wrapper"
       :component-did-mount (fn [this]
                              ;; Add global listener for mouseup.
                              (.addEventListener js/window "mouseup" mouseup-handler))
       :component-will-unmount (fn [this]
+                                ;; Turn off any running generators.
+                                (swap! run inc)
+
                                 ;; Remove global listener for mouseup.
                                 (.removeEventListener js/window "mouseup" mouseup-handler))
       :reagent-render (fn [spec opt generators pts-store]
-                        [vega-lite spec opt {:init-fn init-fn}])})))
+                        (let [init (fn [res]
+                                     (pts-store-setup pts-store res)
+                                     (start-gen generators res))]
+                          [vega-lite spec opt {:init-fn init}]))})))
 
