@@ -43,19 +43,6 @@
                            (.finalize @vega-embed-result)))
 
 
-        ;; Uses generator functions in map `generators` to generate new rows and
-        ;; insert them into `vega-instance`.
-        gen-and-insert (fn [generators vega-instance]
-                         (doall (for [[dataset-name gen-fn] (seq generators)]
-                                  (let [datum (gen-fn)
-                                        changeset (.. yarn-vega
-                                                      (changeset)
-                                                      (insert (clj->js datum)))]
-                                    (.. vega-instance
-                                        -view
-                                        (change (name dataset-name) changeset)
-                                        (resize)
-                                        (run))))))
         embed (fn [this spec opt generators options]
                 (if-not (:vega-node @dom-nodes)
                   (free-resources (:teardown-fn options))
@@ -108,6 +95,30 @@
         ;; Used to set the pts-store whenever the mouse click is lifted.
         mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
 
+        ;; Uses generator functions in map `generators` to generate new rows and
+        ;; insert them into `vega-instance`.
+        gen-and-insert (fn [generators vega-instance]
+                         (doall (for [[dataset-name gen-fn] (seq generators)]
+                                  (let [datum (gen-fn)
+                                        changeset (.. yarn-vega
+                                                      (changeset)
+                                                      (insert (clj->js datum)))]
+                                    (.. vega-instance
+                                        -view
+                                        (change (name dataset-name) changeset)
+                                        (resize)
+                                        (run))))))
+
+        ;; Start generators for inserting data in simulation plots.
+        start-gen (fn [res]
+                    (when generators
+                      (let [current-run (swap! run inc)]
+                        (js/requestAnimationFrame
+                         (fn send []
+                           (when (= current-run @run)
+                             (gen-and-insert generators res)
+                             (js/requestAnimationFrame send)))))))
+
         ;; Update value of pts_store and attach a listener to it.
         init-fn (fn [res]
                  (let [view-obj (.-view res)
@@ -145,19 +156,4 @@
                                 (.removeEventListener js/window "mouseup" mouseup-handler))
       :reagent-render (fn [spec opt generators pts-store]
                         [vega-lite spec opt generators {:init-fn init-fn}])})))
-
-
-
-
-
-;; Start generators for inserting data in simulation plots.
-#_(.then (fn [res]
-           (when generators
-             (let [current-run (swap! run inc)]
-               (js/requestAnimationFrame
-                (fn send []
-                  (when (= current-run @run)
-                    (gen-and-insert generators res)
-                    (js/requestAnimationFrame send))))))))
-
 
