@@ -82,10 +82,8 @@
 (defn vega-lite-2
   "vega-lite reagent component"
   [spec opt generators pts-store]
-  (let [run (atom 0)
-
-        ;; Used to set the pts-store whenever the mouse click is lifted.
-        mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
+  (let [;; Used to stop generators functions.
+        run (atom 0)
 
         ;; Uses generator functions in map `generators` to generate new rows and
         ;; insert them into `vega-instance`.
@@ -110,6 +108,9 @@
                            (when (= current-run @run)
                              (gen-and-insert generators res)
                              (js/requestAnimationFrame send)))))))
+
+        ;; Used to set the pts-store whenever the mouse click is lifted.
+        mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
 
         ;; Update value of pts_store and attach a listener to it.
         pts-store-setup (fn [pts-store res]
