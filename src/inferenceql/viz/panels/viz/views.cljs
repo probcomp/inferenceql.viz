@@ -80,12 +80,22 @@
 
       :component-did-update
       (fn [this old-argv]
-        (let [[_ spec-o opt-o init-fn-o] old-argv
+        (let [[_ spec-o opt-o init-fn-o data-o params-o] old-argv
               [_ spec opt init-fn data params] (r/argv this)]
-          ;; Only perform the update when it was due to one of these args changing.
-          (when (not= [spec-o opt-o init-fn-o]
-                      [spec opt init-fn])
-            (embed this spec opt init-fn data params))))
+          (if (not= [spec-o opt-o init-fn-o]
+                    [spec opt init-fn])
+            ;; When the spec, options, or init-fn changed, we want to completely reset the
+            ;; component by calling embed again which creates a new instance of vega-embed.
+            (embed this spec opt init-fn data params)
+            ;; Otherwise, we update the data or params in the current instance of vega-embed
+            ;; if needed.
+            (do
+              (when (not= data-o data)
+                (update-data @vega-inst data))
+
+              (when (not= params-o params)
+                (update-params @vega-inst params))))))
+
 
       :component-will-unmount
       (fn [this]
