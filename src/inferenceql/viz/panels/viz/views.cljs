@@ -72,6 +72,7 @@
                                         (gen-and-insert generators res)
                                         (js/requestAnimationFrame send))))))))
                       ;; Update value of pts_store and attach a listener to it.
+                      ;; TODO: move this to a vega-embed init function in a new reagent component.
                       (.then (fn [res]
                                (let [view-obj (.-view res)
                                      spec-has-pts-store (try (some? (.data view-obj "pts_store"))
@@ -132,6 +133,7 @@
       :reagent-render
       (fn [spec opt generators pts-store]
         (when spec
+          ;; TODO: move the flex boxes out of this component.
           [:div#viz-container
            [:div.flex-box-space-filler-20]
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
