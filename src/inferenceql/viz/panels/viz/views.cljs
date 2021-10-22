@@ -29,7 +29,6 @@
   [spec opt options]
   (let [dom-nodes (r/atom {})
         vega-inst (r/atom nil) ; vega-embed instance.
-
         free-vega (fn []
                     (when @vega-inst
                       ;; Free resources used by vega-embed.
@@ -87,34 +86,34 @@
 
         ;; Uses generator functions in map `generators` to generate new rows and
         ;; insert them into `vega-instance`.
-        gen-and-insert (fn [generators vega-instance]
+        gen-and-insert (fn [generators vega-inst]
                          (doall (for [[dataset-name gen-fn] (seq generators)]
                                   (let [datum (gen-fn)
                                         changeset (.. yarn-vega
                                                       (changeset)
                                                       (insert (clj->js datum)))]
-                                    (.. vega-instance
+                                    (.. vega-inst
                                         -view
                                         (change (name dataset-name) changeset)
                                         (resize)
                                         (run))))))
 
         ;; Start generators for inserting data in simulation plots.
-        start-gen (fn [generators res]
+        start-gen (fn [generators vega-inst]
                     (when (seq generators)
                       (let [current-run (swap! run inc)]
                         (js/requestAnimationFrame
                          (fn send []
                            (when (= current-run @run)
-                             (gen-and-insert generators res)
+                             (gen-and-insert generators vega-inst)
                              (js/requestAnimationFrame send)))))))
 
         ;; Used to set the pts-store whenever the mouse click is lifted.
         mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
 
         ;; Update value of pts_store and attach a listener to it.
-        pts-store-setup (fn [pts-store res]
-                         (let [view-obj (.-view res)
+        pts-store-setup (fn [pts-store vega-inst]
+                         (let [view-obj (.-view vega-inst)
                                spec-has-pts-store (try (some? (.data view-obj "pts_store"))
                                                        (catch :default e false))]
                            (when spec-has-pts-store
