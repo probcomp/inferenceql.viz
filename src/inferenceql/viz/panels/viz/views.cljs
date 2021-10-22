@@ -26,7 +26,7 @@
 
 (defn vega-lite
   "vega-lite reagent component"
-  [spec opt options]
+  [spec opt init-fn data params]
   (let [dom-nodes (r/atom {})
         vega-inst (r/atom nil) ; vega-embed instance.
         free-vega (fn []
@@ -35,7 +35,24 @@
                       ;; See https://github.com/vega/vega-embed#api-reference
                       (.finalize @vega-inst)))
 
-        embed (fn [this spec opt options]
+        update-data (fn [vega data]
+                      (when (and vega (seq data))
+                        (let [view (.-view vega)]
+                          (doseq [[k v] data]
+                            (let [cs (.changeset vega)]
+                              (.insert cs (clj->js v))
+                              (.remove cs (fn [] true))
+                              (.change view (name k) cs)))
+                          (.run view))))
+
+        update-params (fn [vega params]
+                        (when (and vega (seq params))
+                          (let [view (.-view vega)]
+                            (doseq [[k v] params]
+                              (.signal view (name k) (clj->js v)))
+                            (.run view))))
+
+        embed (fn [this spec opt init-fn data params]
                 (if-not (:vega-node @dom-nodes)
                   (free-vega)
                   (let [spec (clj->js spec)
@@ -45,7 +62,9 @@
                                            spec
                                            opt)
                       (.then (fn [res]
-                               (when-let [init-fn (:init-fn options)]
+                               (update-data res data)
+                               (update-params res params)
+                               (when init-fn
                                  (init-fn res))))
                       ;; Store the result of vega-embed.
                       (.then (fn [res]
@@ -57,22 +76,23 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt options))
+        (embed this spec opt init-fn data params))
 
       :component-did-update
       (fn [this old-argv]
-        (let [[_ old-spec old-opt _old-options] old-argv
-              [_ new-spec new-opt new-options] (r/argv this)]
+        (let [[_ spec-o opt-o init-fn-o] old-argv
+              [_ spec opt init-fn data params] (r/argv this)]
           ;; Only perform the update when it was due to one of these args changing.
-          (when (not= [old-spec old-opt] [new-spec new-opt])
-            (embed this new-spec new-opt new-options))))
+          (when (not= [spec-o opt-o init-fn-o]
+                      [spec opt init-fn])
+            (embed this spec opt init-fn data params))))
 
       :component-will-unmount
       (fn [this]
         (free-vega))
 
       :reagent-render
-      (fn [spec opt options]
+      (fn [spec opt init-fn data params]
         (when spec
           [:div#viz-container
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
@@ -86,7 +106,7 @@
 
         ;; Uses generator functions in map `generators` to generate new rows and
         ;; insert them into a vega-instance.
-        gen-and-insert (fn [generators vega]
+        gen-and-insert (fn [vega generators]
                          (doall (for [[dataset-name gen-fn] (seq generators)]
                                   (let [datum (gen-fn)
                                         changeset (.. yarn-vega
@@ -99,20 +119,20 @@
                                         (run))))))
 
         ;; Start generators for inserting data in simulation plots.
-        start-gen (fn [generators vega]
+        start-gen (fn [vega generators]
                     (when (seq generators)
                       (let [current-run (swap! run inc)]
                         (js/requestAnimationFrame
                          (fn send []
                            (when (= current-run @run)
-                             (gen-and-insert generators vega)
+                             (gen-and-insert vega generators)
                              (js/requestAnimationFrame send)))))))
 
         ;; Used to set the pts-store whenever the mouse click is lifted.
         mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
 
         ;; Update value of pts_store and attach a listener to it.
-        pts-store-setup (fn [pts-store vega]
+        pts-store-setup (fn [vega pts-store]
                          (let [view-obj (.-view vega)
                                spec-has-pts-store (try (some? (.data view-obj "pts_store"))
                                                        (catch :default e false))]
@@ -150,8 +170,8 @@
                                 ;; Remove global listener for mouseup.
                                 (.removeEventListener js/window "mouseup" mouseup-handler))
       :reagent-render (fn [spec opt generators pts-store]
-                        (let [init (fn [res]
-                                     (pts-store-setup pts-store res)
-                                     (start-gen generators res))]
-                          [vega-lite spec opt {:init-fn init}]))})))
+                        (let [init (fn [vega]
+                                     (pts-store-setup vega pts-store)
+                                     (start-gen vega generators))]
+                          [vega-lite spec opt init nil nil]))})))
 
