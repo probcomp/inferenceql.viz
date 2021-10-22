@@ -30,19 +30,15 @@
   (let [dom-nodes (r/atom {})
         vega-embed-result (r/atom nil)
 
-        free-resources (fn [teardown-fn]
-                         (when @vega-embed-result
-                           ;; Run the user-provided teardown first.
-                           (when teardown-fn
-                             (teardown-fn @vega-embed-result))
-
-                           ;; Free resources used by vega-embed.
-                           ;; See https://github.com/vega/vega-embed#api-reference
-                           (.finalize @vega-embed-result)))
+        free-embed-instance (fn []
+                              (when @vega-embed-result
+                                ;; Free resources used by vega-embed.
+                                ;; See https://github.com/vega/vega-embed#api-reference
+                                (.finalize @vega-embed-result)))
 
         embed (fn [this spec opt options]
                 (if-not (:vega-node @dom-nodes)
-                  (free-resources (:teardown-fn options))
+                  (free-embed-instance)
                   (let [spec (clj->js spec)
                         opt (clj->js (merge default-vega-embed-options
                                             opt))]
@@ -74,8 +70,7 @@
 
       :component-will-unmount
       (fn [this]
-        (let [[_ spec opt options] (r/argv this)]
-          (free-resources (:teardown-fn options))))
+        (free-embed-instance))
 
       :reagent-render
       (fn [spec opt options]
