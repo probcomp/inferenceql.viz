@@ -136,14 +136,16 @@
                                            (when (= "pts_brush" (.. item -mark -name))
                                              (rf/dispatch [:viz/set-pts-store])))
                                          500)))))]
-    {:component-did-mount (fn [this]
-                            ;; Add global listener for mouseup.
-                            (.addEventListener js/window "mouseup" mouseup-handler))
-     :component-will-unmount (fn [this]
-                               ;; Remove global listener for mouseup.
-                               (.removeEventListener js/window "mouseup" mouseup-handler))
-     :reagent-render (fn [spec opt generators pts-store]
-                       [vega-lite spec opt generators pts-store {:init-fn init-fn}])}))
+    (r/create-class
+     {:display-name "vega-lite-wrapper"
+      :component-did-mount (fn [this]
+                             ;; Add global listener for mouseup.
+                             (.addEventListener js/window "mouseup" mouseup-handler))
+      :component-will-unmount (fn [this]
+                                ;; Remove global listener for mouseup.
+                                (.removeEventListener js/window "mouseup" mouseup-handler))
+      :reagent-render (fn [spec opt generators pts-store]
+                        [vega-lite spec opt generators pts-store {:init-fn init-fn}])})))
 
 
 
