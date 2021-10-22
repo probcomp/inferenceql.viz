@@ -96,7 +96,6 @@
               (when (not= params-o params)
                 (update-params @vega-inst params))))))
 
-
       :component-will-unmount
       (fn [this]
         (free-vega))
@@ -106,7 +105,6 @@
         (when spec
           [:div#viz-container
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
-
 
 (defn vega-lite-2
   "vega-lite reagent component"
