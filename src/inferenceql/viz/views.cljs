@@ -1,6 +1,6 @@
 (ns inferenceql.viz.views
   (:require [re-frame.core :as rf]
-            [re-com.core :refer [v-box h-box]]
+            [re-com.core :refer [v-box h-box box gap]]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.viz.views :as viz]
             [inferenceql.viz.panels.table.views :as table]
@@ -22,8 +22,10 @@
      :children [[control/panel]
                 [table/controls show-table-controls]
                 [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
-                [h-box :children
-                 [[:div.flex-box-space-filler-20]
-                  [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
-                  [:div.flex-box-space-filler-20]]]
+                [h-box
+                 :justify :center
+                 :children [[gap :size "20px"]
+                            [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
+                            ;; TODO: this gap is not working when viz in very wide
+                            [gap :size "20px"]]]
                 [modal/modal modal-content]]]))

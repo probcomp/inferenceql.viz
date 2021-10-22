@@ -172,7 +172,7 @@ div {
 /* --------------- styling for vega-vizualization --------------- */
 
 #viz-container {
-  display: flex;
+  display: table;
 }
 
 #vg-tooltip-element.vg-tooltip.custom-theme table {
