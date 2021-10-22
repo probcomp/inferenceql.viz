@@ -26,7 +26,7 @@
 
 (defn vega-lite
   "vega-lite reagent component"
-  [spec opt generators pts-store options]
+  [spec opt generators options]
   (let [run (atom 0)
         dom-nodes (r/atom {})
         vega-embed-result (r/atom nil)
@@ -56,7 +56,7 @@
                                         (change (name dataset-name) changeset)
                                         (resize)
                                         (run))))))
-        embed (fn [this spec opt generators pts-store options]
+        embed (fn [this spec opt generators options]
                 (if-not (:vega-node @dom-nodes)
                   (free-resources (:teardown-fn options))
                   (let [spec (clj->js spec)
@@ -78,25 +78,24 @@
 
       :component-did-mount
       (fn [this]
-        (embed this spec opt generators pts-store options))
+        (embed this spec opt generators options))
 
       :component-did-update
       (fn [this old-argv]
-        (let [[_ old-spec old-opt old-generators _old-pts-store _old-options] old-argv
-              [_ new-spec new-opt new-generators current-pts-store new-options] (r/argv this)]
+        (let [[_ old-spec old-opt old-generators _old-options] old-argv
+              [_ new-spec new-opt new-generators new-options] (r/argv this)]
           ;; Only perform the update when it was due to one of these args changing.
-          ;; We do not want to update when it is just `pts-store` that changed.
           (when (not= [old-spec old-opt old-generators]
                       [new-spec new-opt new-generators])
-            (embed this new-spec new-opt new-generators current-pts-store new-options))))
+            (embed this new-spec new-opt new-generators new-options))))
 
       :component-will-unmount
       (fn [this]
-        (let [[_ spec opt generators pts-store options] (r/argv this)]
+        (let [[_ spec opt generators options] (r/argv this)]
           (free-resources (:teardown-fn options))))
 
       :reagent-render
-      (fn [spec opt generators pts-store options]
+      (fn [spec opt generators options]
         (when spec
           [:div#viz-container
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
@@ -145,7 +144,7 @@
                                 ;; Remove global listener for mouseup.
                                 (.removeEventListener js/window "mouseup" mouseup-handler))
       :reagent-render (fn [spec opt generators pts-store]
-                        [vega-lite spec opt generators pts-store {:init-fn init-fn}])})))
+                        [vega-lite spec opt generators {:init-fn init-fn}])})))
 
 
 
