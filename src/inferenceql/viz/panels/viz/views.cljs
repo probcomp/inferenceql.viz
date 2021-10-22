@@ -133,8 +133,5 @@
       :reagent-render
       (fn [spec opt generators pts-store]
         (when spec
-          ;; TODO: move the flex boxes out of this component.
           [:div#viz-container
-           [:div.flex-box-space-filler-20]
-           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]
-           [:div.flex-box-space-filler-20]]))})))
+           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
