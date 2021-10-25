@@ -3,7 +3,7 @@
             [reagent.dom :as rdom]
             [cljs-bean.core :refer [->clj]]
             [clojure.walk :refer [postwalk]]
-            [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
+            [inferenceql.viz.panels.viz.views-simple :refer [vega-lite]]
             [inferenceql.viz.js.components.plot.vega :refer [generate-spec]]
             [inferenceql.viz.js.util :refer [clj-schema]]))
 
