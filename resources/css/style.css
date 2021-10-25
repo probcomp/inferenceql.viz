@@ -23,12 +23,6 @@ div {
   z-index: -1;
 }
 
-.flex-box-space-filler-20 {
-  flex: auto;
-  min-width: 20px;
-  z-index: -1;
-}
-
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

@@ -23,9 +23,7 @@
                 [table/controls show-table-controls]
                 [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
                 [h-box
-                 :justify :center
-                 :children [[gap :size "20px"]
+                 :children [[gap :size "1 0 20px"]
                             [viz/vega-lite-2 vega-lite-spec {:actions false} generators pts-store]
-                            ;; TODO: this gap is not working when viz in very wide
-                            [gap :size "20px"]]]
+                            [gap :size "1 0 20px"]]]
                 [modal/modal modal-content]]]))
