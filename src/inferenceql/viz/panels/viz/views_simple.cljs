@@ -100,8 +100,5 @@
       :reagent-render
       (fn [spec _ _ _ _]
         (when spec
-         ;; Do I need this for observable?
-         ;; {:style {:overflow-x "auto"}}
-         ;; TODO: test later.
           [:div#viz-container
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))

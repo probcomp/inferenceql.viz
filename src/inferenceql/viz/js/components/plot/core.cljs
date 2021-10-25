@@ -18,6 +18,8 @@
           spec (generate-spec schema data selections)
 
           node (dom/createElement "div")
-          component [vega-lite spec {:actions false} nil nil]]
-      (rdom/render component node)
+          component (fn []
+                      [:div {:style {:overflow-x "auto"}} ;; This div may not be necessary.
+                       [vega-lite spec {:actions false} nil nil]])]
+      (rdom/render [component] node)
       node)))
