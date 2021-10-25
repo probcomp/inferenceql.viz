@@ -4,6 +4,7 @@
             [vega-embed$default :as yarn-vega-embed]
             [reagent.core :as r]
             [re-frame.core :as rf]
+            [re-com.core :refer [h-box gap]]
             [goog.functions :as gfn]))
 
 (def ^:private log-level-default
@@ -181,5 +182,6 @@
                         (let [init (fn [vega]
                                      (pts-store-setup vega pts-store)
                                      (start-gen vega generators))]
-                          [vega-lite spec opt init nil nil]))})))
-
+                          [h-box :children [[gap :size "1 0 20px"]
+                                            [vega-lite spec opt init nil nil]
+                                            [gap :size "1 0 20px"]]]))})))

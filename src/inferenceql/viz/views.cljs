@@ -1,6 +1,6 @@
 (ns inferenceql.viz.views
   (:require [re-frame.core :as rf]
-            [re-com.core :refer [v-box h-box box gap]]
+            [re-com.core :refer [v-box]]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.viz.views :as viz]
             [inferenceql.viz.panels.table.views :as table]
@@ -22,8 +22,5 @@
      :children [[control/panel]
                 [table/controls show-table-controls]
                 [table/handsontable {:class [highlight-class (when virtual "virtual")]} real-hot-props]
-                [h-box
-                 :children [[gap :size "1 0 20px"]
-                            [viz/vega-lite-2 vega-lite-spec {:actions false} generators pts-store]
-                            [gap :size "1 0 20px"]]]
+                [viz/vega-lite-2 vega-lite-spec {:actions false} generators pts-store]
                 [modal/modal modal-content]]]))
