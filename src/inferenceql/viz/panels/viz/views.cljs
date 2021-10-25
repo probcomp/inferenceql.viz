@@ -106,7 +106,8 @@
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
 
 (defn vega-lite-2
-  "vega-lite reagent component"
+  "Vega-lite reagent component for the full spreadsheets app.
+  Dispatches re-frame events for saving information about selections."
   [spec opt generators pts-store]
   (let [;; Used to stop generators functions.
         run (atom 0)
