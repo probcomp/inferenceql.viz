@@ -1,6 +1,6 @@
 (ns inferenceql.viz.panels.viz.views-simple
   "Views for displaying vega-lite specs"
-  (:require [vega :as yarn-vega]
+  (:require [vega-embed$vega :as yarn-vega]
             [vega-embed$default :as yarn-vega-embed]
             [reagent.core :as r]))
 
@@ -37,7 +37,7 @@
                       (when (and vega (seq data))
                         (let [view (.-view vega)]
                           (doseq [[k v] data]
-                            (let [cs (.changeset vega)]
+                            (let [cs (.changeset yarn-vega)]
                               (.insert cs (clj->js v))
                               (.remove cs (fn [] true))
                               (.change view (name k) cs)))
