@@ -51,8 +51,21 @@
         (.selectCells hot-instance coords false)))))
 
 (defn handsontable
-  ([attributes props]
-   (let [hot-instance (rf/subscribe [:table/hot-instance])
+  "mode -- can be one of the following keywords.
+    :reagent - standard reagent component.
+    :reagent-observable - enables options to get handsontable to display correctly in
+       observable notebooks.
+    :re-frame - stores the Handsontable object in the re-frame app-db instead of a local atom.
+
+   attributes -- dom node attributes for the table container.
+   props -- map with keys :settings and :hooks.
+     :settings -- settings for Handsontable, see Handsontable docs.
+     :hooks -- (optional) hooks for Handsontable, see Handsontable docs.
+     :selections-coords -- (optional) current selection in table to reapply after update."
+  ([mode attributes props]
+   (let [hot-instance (if (= mode :re-frame)
+                        (rf/subscribe [:table/hot-instance])
+                        (reagent/atom nil))
          dom-nodes (reagent/atom {})]
      (reagent/create-class
       {:display-name "handsontable-reagent"
@@ -70,13 +83,25 @@
                      (callback-gen hot)
                      hot)))
 
-           ;; Save the hot object in the app db.
-           (rf/dispatch [:table/set-hot-instance hot])))
+           (when (= mode :reagent-observable)
+             ;; Fix scrolling for HOT in Observable.
+             (.add (.-hooks yarn-handsontable)
+                   "afterRender"
+                   (fn []
+                     (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
+                   hot)
+             ;; Make new HOT instances appear immediately in Observable.
+             (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30))
+
+           ;; Save HOT instance.
+           (if (= mode :re-frame)
+             (rf/dispatch [:table/set-hot-instance hot])
+             (reset! hot-instance hot))))
 
        :component-did-update
        (fn [this old-argv]
-         (let [[_ _old-attributes old-props] old-argv
-               [_ _new-attributes new-props] (reagent/argv this)
+         (let [[_ _old-mode _old-attributes old-props] old-argv
+               [_ _new-mode _new-attributes new-props] (reagent/argv this)
 
                old-settings (:settings old-props)
                new-settings (:settings new-props)
@@ -91,11 +116,12 @@
        :component-will-unmount
        (fn [this]
          (when @hot-instance
-           (rf/dispatch [:table/unset-hot-instance])
+           (when (= mode :re-frame)
+             (rf/dispatch [:table/unset-hot-instance]))
            (.destroy @hot-instance)))
 
        :reagent-render
-       (fn [attributes props]
+       (fn [mode attributes props]
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
 
