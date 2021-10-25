@@ -62,11 +62,8 @@
      :settings -- settings for Handsontable, see Handsontable docs.
      :hooks -- (optional) hooks for Handsontable, see Handsontable docs.
      :selections-coords -- (optional) current selection in table to reapply after update."
-  ([mode attributes props]
-   (let [hot-instance (if (= mode :re-frame)
-                        (rf/subscribe [:table/hot-instance])
-                        (reagent/atom nil))
-         dom-nodes (reagent/atom {})]
+  ([hot-instance hot-reset! attributes props]
+   (let [dom-nodes (reagent/atom {})]
      (reagent/create-class
       {:display-name "handsontable-reagent"
 
@@ -83,20 +80,9 @@
                      (callback-gen hot)
                      hot)))
 
-           (when (= mode :reagent-observable)
-             ;; Fix scrolling for HOT in Observable.
-             (.add (.-hooks yarn-handsontable)
-                   "afterRender"
-                   (fn []
-                     (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
-                   hot)
-             ;; Make new HOT instances appear immediately in Observable.
-             (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30))
 
            ;; Save HOT instance.
-           (if (= mode :re-frame)
-             (rf/dispatch [:table/set-hot-instance hot])
-             (reset! hot-instance hot))))
+           (hot-reset! hot)))
 
        :component-did-update
        (fn [this old-argv]
@@ -116,14 +102,50 @@
        :component-will-unmount
        (fn [this]
          (when @hot-instance
-           (when (= mode :re-frame)
-             (rf/dispatch [:table/unset-hot-instance]))
            (.destroy @hot-instance)))
 
        :reagent-render
        (fn [mode attributes props]
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
+
+(defn handsontable-rf
+  [attributes props]
+  (let [hot-instance (rf/subscribe [:table/hot-instance])
+        hot-reset #(rf/dispatch [:table/set-hot-instance %])]
+    (reagent/create-class
+     {:component-will-unmount
+      (fn [this]
+        (rf/dispatch [:table/unset-hot-instance]))
+
+      :reagent-render
+      (fn [attributes props]
+        [handsontable hot-instance hot-reset attributes props])})))
+
+(defn handsontable-re
+  [attributes props]
+  (let [hot-instance (reagent/atom nil)
+        hot-reset #(reset! hot-instance %)]
+    [handsontable hot-instance hot-reset attributes props]))
+
+(defn handsontable-re-obs
+  [attributes props]
+  (let [hot-instance (reagent/atom nil)
+        hot-reset #(reset! hot-instance %)]
+    (reagent/create-class
+     {:component-did-mount
+      (fn [this]
+        ;; Make new HOT instances appear immediately in Observable.
+        (.setTimeout js/window (fn [] (.refreshDimensions @hot-instance)) 30))
+
+      :reagent-render
+      (fn [attributes props]
+        (let [props (assoc-in props [:hooks :afterRender]
+                      (fn [hot]
+                        ;; Fix scrolling for Handsontable in Observable.
+                        (fn [] (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))))])
+
+        [handsontable hot-instance hot-reset attributes props])})))
 
 (defn controls
   "Controls for a handsontable instance."
