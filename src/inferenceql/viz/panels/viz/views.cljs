@@ -52,7 +52,7 @@
                               (.signal view (name k) (clj->js v)))
                             (.run view))))
 
-        embed (fn [this spec opt init-fn data params]
+        embed (fn [spec opt init-fn data params]
                 (if-not (:vega-node @dom-nodes)
                   (free-vega)
                   (let [spec (clj->js spec)
@@ -75,8 +75,8 @@
      {:display-name "vega-lite"
 
       :component-did-mount
-      (fn [this]
-        (embed this spec opt init-fn data params))
+      (fn [_]
+        (embed spec opt init-fn data params))
 
       :component-did-update
       (fn [this old-argv]
@@ -86,7 +86,7 @@
                     [spec opt init-fn])
             ;; When the spec, options, or init-fn changed, we want to completely reset the
             ;; component by calling embed again which creates a new instance of vega-embed.
-            (embed this spec opt init-fn data params)
+            (embed spec opt init-fn data params)
             ;; Otherwise, we update the data or params in the current instance of vega-embed
             ;; if needed.
             (do
@@ -97,11 +97,11 @@
                 (update-params @vega-inst params))))))
 
       :component-will-unmount
-      (fn [this]
+      (fn [_]
         (free-vega))
 
       :reagent-render
-      (fn [spec opt init-fn data params]
+      (fn [spec _ _ _ _]
         (when spec
           [:div#viz-container
            [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
@@ -168,10 +168,10 @@
                                                  500)))))]
     (r/create-class
      {:display-name "vega-lite-wrapper"
-      :component-did-mount (fn [this]
+      :component-did-mount (fn [_]
                              ;; Add global listener for mouseup.
                              (.addEventListener js/window "mouseup" mouseup-handler))
-      :component-will-unmount (fn [this]
+      :component-will-unmount (fn [_]
                                 ;; Turn off any running generators.
                                 (swap! run inc)
 
