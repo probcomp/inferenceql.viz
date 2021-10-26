@@ -37,8 +37,8 @@
     params -- (map) Param name to value. Will be used to update values of the params in the
       vega-embed instance.
 
-  Updating `data` or `params` will not create a new vega-embed instance.
-  Changing any other parameters will create a new vega-embed instance, however."
+  Only changing the `spec` will create a new vega-embed instance. Changes to `opt` and `init-fn` are
+  ignored. Change to `data` and `params` are applied to the existing vega-embed instance."
   [spec opt init-fn data params]
   (let [dom-nodes (r/atom {})
         vega-inst (r/atom nil) ; vega-embed instance.
@@ -77,22 +77,23 @@
 
         ;; Creates a new instance of vega-embed.
         embed (fn [spec opt init-fn data params]
-                (let [spec (clj->js spec)
-                      opt (clj->js (merge default-vega-embed-options
-                                          opt))]
-                  (doto (yarn-vega-embed (:vega-node @dom-nodes)
-                                         spec
-                                         opt)
-                    (.then (fn [res]
-                             (update-data res data nil)
-                             (update-params res params nil)
-                             (when init-fn
-                               (init-fn res))))
-                    (.then (fn [res]
-                             ;; Store the result of vega-embed.
-                             (reset! vega-inst res)))
-                    (.catch (fn [err]
-                              (js/console.error err))))))]
+                (when spec
+                  (let [spec (clj->js spec)
+                        opt (clj->js (merge default-vega-embed-options
+                                            opt))]
+                    (doto (yarn-vega-embed (:vega-node @dom-nodes)
+                                           spec
+                                           opt)
+                      (.then (fn [res]
+                               (update-data res data nil)
+                               (update-params res params nil)
+                               (when init-fn
+                                 (init-fn res))))
+                      (.then (fn [res]
+                               ;; Store the result of vega-embed.
+                               (reset! vega-inst res)))
+                      (.catch (fn [err]
+                                (js/console.error err)))))))]
     (r/create-class
      {:display-name "vega-lite-simple"
 
@@ -103,11 +104,11 @@
       :component-did-update
       (fn [this argv-old]
         (let [[_ spec opt init-fn data params] (r/argv this)
-              [_ spec-old opt-old init-fn-old data-old params-old] argv-old]
-          (if (not= [spec opt init-fn] [spec-old opt-old init-fn-old])
+              [_ spec-old _ _ data-old params-old] argv-old]
+          (if (not= spec spec-old)
             (do
-              ;; When the spec, options, or init-fn changed, we want to completely reset the
-              ;; component by calling embed again which creates a new instance of vega-embed.
+              ;; When the spec changed, we want to completely reset the component by calling embed
+              ;; again which creates a new instance of vega-embed.
               (free-vega)
               (embed spec opt init-fn data params))
             (do
@@ -123,7 +124,6 @@
         (free-vega))
 
       :reagent-render
-      (fn [spec _ _ _ _]
-        (when spec
-          [:div#viz-container
-           [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]]))})))
+      (fn [_ _ _ _ _]
+        [:div#viz-container
+         [:div {:ref #(swap! dom-nodes assoc :vega-node %)}]])})))
