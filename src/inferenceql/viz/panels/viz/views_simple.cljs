@@ -1,8 +1,9 @@
 (ns inferenceql.viz.panels.viz.views-simple
-  "Views for displaying vega-lite specs"
+  "Reagent component for displaying vega-lite specs. Can be used independently from iql.viz app."
   (:require [vega-embed$vega :as yarn-vega]
             [vega-embed$default :as yarn-vega-embed]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [medley.core :as medley]))
 
 (def ^:private log-level-default
   (.-Error yarn-vega))
@@ -23,7 +24,21 @@
             :concat {:spacing 50}}})
 
 (defn vega-lite
-  "vega-lite reagent component"
+  "Reagent component for displaying vega-lite specs. Can be used independently of the iql.viz app.
+
+  Args:
+    spec -- a vega-lite spec.
+    opt -- (map) options to pass to vega-embed runtime.
+    init-fn -- (function) Ran after the vega-embed instance in initialized and data and
+      params have been updated. Recieves an instance of vega-embed. Used to perform additional
+      setup on the vega-embed instance. Can be nil.
+    data -- (map) Dataset name to data. Will be used to update the datasets in the vega-embed
+      instance.
+    params -- (map) Param name to value. Will be used to update values of the params in the
+      vega-embed instance.
+
+  Updating `data` or `params` will not create a new vega-embed instance.
+  Changing any other parameters will create a new vega-embed instance, however."
   [spec opt init-fn data params]
   (let [dom-nodes (r/atom {})
         vega-inst (r/atom nil) ; vega-embed instance.
@@ -33,9 +48,14 @@
                       ;; See https://github.com/vega/vega-embed#api-reference
                       (.finalize @vega-inst)))
 
-        update-data (fn [vega data]
+        update-data (fn [vega data data-old]
                       (when (and vega (seq data))
-                        (let [view (.-view vega)]
+                        (let [view (.-view vega)
+                              ;; Only update the datasets that have changed.
+                              data (medley/filter-kv (fn [k v]
+                                                       (and (contains? data-old k)
+                                                            (not= v (get data-old k))))
+                                                     data)]
                           (doseq [[k v] data]
                             (let [cs (.changeset yarn-vega)]
                               (.insert cs (clj->js v))
@@ -43,9 +63,14 @@
                               (.change view (name k) cs)))
                           (.run view))))
 
-        update-params (fn [vega params]
+        update-params (fn [vega params params-old]
                         (when (and vega (seq params))
-                          (let [view (.-view vega)]
+                          (let [view (.-view vega)
+                                ;; Only update the params that have changed.
+                                params (medley/filter-kv (fn [k v]
+                                                           (and (contains? params-old k)
+                                                                (not= v (get params-old k))))
+                                                         params)]
                             (doseq [[k v] params]
                               (.signal view (name k) (clj->js v)))
                             (.run view))))
@@ -60,8 +85,8 @@
                                            spec
                                            opt)
                       (.then (fn [res]
-                               (update-data res data)
-                               (update-params res params)
+                               (update-data res data nil)
+                               (update-params res params nil)
                                (when init-fn
                                  (init-fn res))))
                       ;; Store the result of vega-embed.
@@ -70,7 +95,7 @@
                       (.catch (fn [err]
                                 (js/console.error err)))))))]
     (r/create-class
-     {:display-name "vega-lite"
+     {:display-name "vega-lite-simple"
 
       :component-did-mount
       (fn [_]
@@ -88,10 +113,10 @@
             ;; if needed.
             (do
               (when (not= data data-old)
-                (update-data @vega-inst data))
+                (update-data @vega-inst data data-old))
 
               (when (not= params params-old)
-                (update-params @vega-inst params))))))
+                (update-params @vega-inst params params-old))))))
 
       :component-will-unmount
       (fn [_]

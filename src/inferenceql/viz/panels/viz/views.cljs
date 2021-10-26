@@ -1,5 +1,5 @@
 (ns inferenceql.viz.panels.viz.views
-  "Views for displaying vega-lite specs"
+  "Reagent component for displaying vega-lite specs in the full iql.viz app."
   (:require [vega :as yarn-vega]
             [vega-embed$default :as yarn-vega-embed]
             [reagent.core :as r]
@@ -11,8 +11,16 @@
              :rename {vega-lite vega-lite-simple}]))
 
 (defn vega-lite
-  "Vega-lite reagent component for the full spreadsheets app.
-  Dispatches re-frame events for saving information about selections."
+  "Reagent component for displaying vega-lite specs in the full iql.viz app.
+  Dispatches re-frame events for saving information about selections.
+
+  Args:
+    spec -- a vega-lite spec.
+    opt -- (map) options to pass to vega-embed runtime.
+    generators -- (map) of dataset-name to generator function. Generator functions will be run
+      to insert new rows of data into thier corresponding datasets every animation frame.
+    pts-store -- (map) initial value to set for the dataset backing the `pts` vega-lite selection.
+      It will only be set if the vega-lite spec has a selection called `pts`."
   [spec opt generators pts-store]
   (let [;; Used to stop generators functions.
         run (atom 0)
@@ -31,7 +39,7 @@
                                         (resize)
                                         (run))))))
 
-        ;; Start generators for inserting data in simulation plots.
+        ;; Starts generators for inserting data in simulation plots.
         start-gen (fn [vega generators]
                     (when (seq generators)
                       (let [current-run (swap! run inc)]
@@ -44,7 +52,7 @@
         ;; Used to set the pts-store whenever the mouse click is lifted.
         mouseup-handler (fn [] (rf/dispatch [:viz/set-pts-store]))
 
-        ;; Update value of pts_store and attach a listener to it.
+        ;; Updates value of pts_store and attach a listener to it.
         pts-store-setup (fn [vega pts-store]
                          (let [view-obj (.-view vega)
                                spec-has-pts-store (try (some? (.data view-obj "pts_store"))
@@ -57,7 +65,10 @@
                                (.run view-obj))
 
                              ;; Listen to future updates to pts_store that come from interactions
-                             ;; in the visualization itself. Stage changes.
+                             ;; in the visualization itself. Stage changes. We are staging instead
+                             ;; of setting right away to avoid laggyness in the interface. Other
+                             ;; operations that happen after setting changes, like row-highlighting
+                             ;; are slow.
                              (.addDataListener view-obj "pts_store"
                                                (fn [_ds-name data]
                                                  (rf/dispatch [:viz/stage-pts-store data])))
@@ -72,9 +83,9 @@
                                                      (rf/dispatch [:viz/set-pts-store])))
                                                  500)))))]
     (r/create-class
-     {:display-name "vega-lite-wrapper"
+     {:display-name "vega-lite"
       :component-did-mount (fn [_]
-                             ;; Add global listener for mouseup.
+                             ;; Add a global listener for mouseup.
                              (.addEventListener js/window "mouseup" mouseup-handler))
       :component-will-unmount (fn [_]
                                 ;; Turn off any running generators.
