@@ -5,7 +5,7 @@
             [inferenceql.viz.panels.table.views :refer [handsontable-base]]))
 
 (defn handsontable
-  "A reagent component for Handsontable.
+  "A Reagent component for Handsontable.
   Uses re-frame app-db as the data-store for the Handsontable instance used by the component.
   Only one instance of the component is supported at a time in the full iql.viz application."
   [attributes props]

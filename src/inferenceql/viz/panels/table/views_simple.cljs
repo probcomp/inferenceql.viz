@@ -1,5 +1,5 @@
 (ns inferenceql.viz.panels.table.views-simple
-  "Reagent components for Handsontable that can be used independently from iql.viz app."
+  "Reagent component for Handsontable that can be used independently from iql.viz app."
   (:require [handsontable$default :as yarn-handsontable]
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]
