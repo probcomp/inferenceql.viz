@@ -3,7 +3,7 @@
             [re-com.core :refer [v-box]]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.viz.views :as viz]
-            [inferenceql.viz.panels.table.views :as table]
+            [inferenceql.viz.panels.table.views_app :as table]
             [inferenceql.viz.panels.modal.views :as modal]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.
@@ -21,7 +21,7 @@
     [v-box
      :children [[control/panel]
                 [table/controls show-table-controls]
-                [table/handsontable-reframe
+                [table/handsontable
                  {:class [highlight-class (when virtual "virtual")]}
                  real-hot-props]
                 [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]

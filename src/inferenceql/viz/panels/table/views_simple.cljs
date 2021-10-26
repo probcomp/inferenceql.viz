@@ -1,4 +1,5 @@
 (ns inferenceql.viz.panels.table.views-simple
+  ""
   (:require [handsontable$default :as yarn-handsontable]
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]
@@ -6,7 +7,33 @@
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.panels.table.util :refer [column-settings]]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
-            [inferenceql.viz.panels.table.views :as tv]))
+            [inferenceql.viz.panels.table.views :refer [handsontable-base]]))
+
+(defn handsontable-reagent
+  [attributes props]
+  (let [hot-instance (reagent/atom nil)
+        hot-reset #(reset! hot-instance %)]
+    (fn [attributes props]
+      [handsontable-base hot-instance hot-reset attributes props])))
+
+(defn handsontable-reagent-observable
+  [attributes props]
+  (let [hot-instance (reagent/atom nil)
+        hot-reset #(reset! hot-instance %)]
+    (reagent/create-class
+     {:component-did-mount
+      (fn [this]
+        ;; Make new HOT instances appear immediately in Observable.
+        (.setTimeout js/window (fn [] (.refreshDimensions @hot-instance)) 30))
+
+      :reagent-render
+      (fn [attributes props]
+        (let [props (assoc-in props [:hooks :afterRender]
+                              (fn [hot]
+                                ;; Fix scrolling for Handsontable in Observable.
+                                (fn [] (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))))])
+
+        [handsontable-base hot-instance hot-reset attributes props])})))
 
 (def simple-hot-settings
   (-> default-hot-settings
@@ -57,5 +84,5 @@
                         cells (assoc-in [:settings :cells] cells)
                         col-widths (assoc-in [:settings :colWidths] col-widths))]
       (case mode
-        :reagent [tv/handsontable-reagent attributues props]
-        :reagent-observable [tv/handsontable-reagent-observable attributues props]))))
+        :reagent [handsontable-reagent attributues props]
+        :reagent-observable [handsontable-reagent-observable attributues props]))))
