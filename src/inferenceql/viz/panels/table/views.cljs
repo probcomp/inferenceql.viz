@@ -85,19 +85,21 @@
            (hot-reset! hot)))
 
        :component-did-update
-       (fn [this old-argv]
-         (let [[_ _old-mode _old-attributes old-props] old-argv
-               [_ _new-mode _new-attributes new-props] (reagent/argv this)
+       (fn [this argv-old]
+         ;; This update function assumes that only the
+         ;; `props` argument to the component changes.
+         (let [[_ _ _ _ props-old] argv-old
+               [_ _ _ _ props] (reagent/argv this)
 
-               old-settings (:settings old-props)
-               new-settings (:settings new-props)
+               old-settings (:settings props-old)
+               settings (:settings props)
                changed-settings (filter-kv (fn [setting-key new-val]
                                              (not= (get old-settings setting-key) new-val))
-                                           new-settings)]
+                                           settings)]
 
            ;; Update settings.
            (when (seq changed-settings)
-             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))))
+             (update-hot! @hot-instance changed-settings (:selections-coords props)))))
 
        :component-will-unmount
        (fn [this]
@@ -106,6 +108,6 @@
            (hot-reset! nil)))
 
        :reagent-render
-       (fn [mode attributes props]
+       (fn [_ _ attributes _]
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
