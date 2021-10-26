@@ -3,7 +3,7 @@
             [re-com.core :refer [v-box]]
             [inferenceql.viz.panels.control.views :as control]
             [inferenceql.viz.panels.viz.views :as viz]
-            [inferenceql.viz.panels.table.views-app :as table]
+            [inferenceql.viz.panels.table.views :as table]
             [inferenceql.viz.panels.modal.views :as modal]))
 
 ;;;; Views are expressed in Hiccup-like syntax. See the Reagent docs for more info.

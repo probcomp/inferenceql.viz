@@ -6,7 +6,7 @@
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.panels.table.util :refer [column-settings]]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
-            [inferenceql.viz.panels.table.views :refer [handsontable-base]]))
+            [inferenceql.viz.panels.table.views-base :refer [handsontable-base]]))
 
 (defn handsontable-reagent
   "A Reagent component for Handsontable that uses an atom as a datastore for the Handsontable
