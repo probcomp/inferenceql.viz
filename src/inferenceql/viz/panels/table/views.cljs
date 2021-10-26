@@ -80,7 +80,6 @@
                      (callback-gen hot)
                      hot)))
 
-
            ;; Save HOT instance.
            (hot-reset! hot)))
 
@@ -102,7 +101,8 @@
        :component-will-unmount
        (fn [this]
          (when @hot-instance
-           (.destroy @hot-instance)))
+           (.destroy @hot-instance)
+           (hot-reset! nil)))
 
        :reagent-render
        (fn [mode attributes props]
@@ -112,21 +112,19 @@
 (defn handsontable-rf
   [attributes props]
   (let [hot-instance (rf/subscribe [:table/hot-instance])
-        hot-reset #(rf/dispatch [:table/set-hot-instance %])]
-    (reagent/create-class
-     {:component-will-unmount
-      (fn [this]
-        (rf/dispatch [:table/unset-hot-instance]))
-
-      :reagent-render
-      (fn [attributes props]
-        [handsontable hot-instance hot-reset attributes props])})))
+        hot-reset (fn [new-val]
+                    (if new-val
+                      (rf/dispatch [:table/set-hot-instance new-val])
+                      (rf/dispatch [:table/unset-hot-instance])))]
+    (fn [attributes props]
+      [handsontable hot-instance hot-reset attributes props])))
 
 (defn handsontable-re
   [attributes props]
   (let [hot-instance (reagent/atom nil)
         hot-reset #(reset! hot-instance %)]
-    [handsontable hot-instance hot-reset attributes props]))
+    (fn [attributes props]
+      [handsontable hot-instance hot-reset attributes props])))
 
 (defn handsontable-re-obs
   [attributes props]
