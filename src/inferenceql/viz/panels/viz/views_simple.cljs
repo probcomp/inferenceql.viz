@@ -75,25 +75,24 @@
                               (.signal view (name k) (clj->js v)))
                             (.run view))))
 
+        ;; Creates a new instance of vega-embed.
         embed (fn [spec opt init-fn data params]
-                (if-not (:vega-node @dom-nodes)
-                  (free-vega)
-                  (let [spec (clj->js spec)
-                        opt (clj->js (merge default-vega-embed-options
-                                            opt))]
-                    (doto (yarn-vega-embed (:vega-node @dom-nodes)
-                                           spec
-                                           opt)
-                      (.then (fn [res]
-                               (update-data res data nil)
-                               (update-params res params nil)
-                               (when init-fn
-                                 (init-fn res))))
-                      ;; Store the result of vega-embed.
-                      (.then (fn [res]
-                               (reset! vega-inst res)))
-                      (.catch (fn [err]
-                                (js/console.error err)))))))]
+                (let [spec (clj->js spec)
+                      opt (clj->js (merge default-vega-embed-options
+                                          opt))]
+                  (doto (yarn-vega-embed (:vega-node @dom-nodes)
+                                         spec
+                                         opt)
+                    (.then (fn [res]
+                             (update-data res data nil)
+                             (update-params res params nil)
+                             (when init-fn
+                               (init-fn res))))
+                    (.then (fn [res]
+                             ;; Store the result of vega-embed.
+                             (reset! vega-inst res)))
+                    (.catch (fn [err]
+                              (js/console.error err))))))]
     (r/create-class
      {:display-name "vega-lite-simple"
 
@@ -106,15 +105,16 @@
         (let [[_ spec opt init-fn data params] (r/argv this)
               [_ spec-old opt-old init-fn-old data-old params-old] argv-old]
           (if (not= [spec opt init-fn] [spec-old opt-old init-fn-old])
-            ;; When the spec, options, or init-fn changed, we want to completely reset the
-            ;; component by calling embed again which creates a new instance of vega-embed.
-            (embed spec opt init-fn data params)
-            ;; Otherwise, we update the data or params in the current instance of vega-embed
-            ;; if needed.
             (do
+              ;; When the spec, options, or init-fn changed, we want to completely reset the
+              ;; component by calling embed again which creates a new instance of vega-embed.
+              (free-vega)
+              (embed spec opt init-fn data params))
+            (do
+              ;; Otherwise, we update the data or params in the current instance of vega-embed
+              ;; if needed.
               (when (not= data data-old)
                 (update-data @vega-inst data data-old))
-
               (when (not= params params-old)
                 (update-params @vega-inst params params-old))))))
 
