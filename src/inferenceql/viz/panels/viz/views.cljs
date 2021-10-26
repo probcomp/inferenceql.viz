@@ -6,6 +6,7 @@
             [re-frame.core :as rf]
             [re-com.core :refer [h-box gap]]
             [goog.functions :as gfn]
+            [goog.object :as g]
             [inferenceql.viz.panels.viz.views-simple
              :refer [vega-lite]
              :rename {vega-lite vega-lite-simple}]))
@@ -79,7 +80,8 @@
                              (.addEventListener view-obj "wheel"
                                                 (gfn/debounce
                                                  (fn [_event item]
-                                                   (when (= "pts_brush" (.. item -mark -name))
+                                                   (when (= "pts_brush"
+                                                            (g/getValueByKeys item "mark" "name"))
                                                      (rf/dispatch [:viz/set-pts-store])))
                                                  500)))))]
     (r/create-class
