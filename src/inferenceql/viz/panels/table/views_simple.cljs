@@ -1,15 +1,16 @@
 (ns inferenceql.viz.panels.table.views-simple
-  ""
+  "Reagent components for Handsontable that can be used independently from iql.viz app."
   (:require [handsontable$default :as yarn-handsontable]
             [reagent.core :as reagent]
             [medley.core :refer [filter-kv]]
-            [reagent.core :as r]
             [cljs-bean.core :refer [->clj]]
             [inferenceql.viz.panels.table.util :refer [column-settings]]
             [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
             [inferenceql.viz.panels.table.views :refer [handsontable-base]]))
 
 (defn handsontable-reagent
+  "A Reagent component for Handsontable that uses an atom as a datastore for the Handsontable
+  instance."
   [attributes props]
   (let [hot-instance (reagent/atom nil)
         hot-reset #(reset! hot-instance %)]
@@ -17,6 +18,9 @@
       [handsontable-base hot-instance hot-reset attributes props])))
 
 (defn handsontable-reagent-observable
+  "A Reagent component for Handsontable that includes fixes for glitches with scrolling
+  and refreshing when used in Observable notebooks. This uses an atom as a datastore for the
+  Handsontable instance."
   [attributes props]
   (let [hot-instance (reagent/atom nil)
         hot-reset #(reset! hot-instance %)]
@@ -42,12 +46,9 @@
       (assoc-in [:settings :width] "auto")))
 
 (defn handsontable
-  "A reagent component that dispalys `data` in handsontable.
-  It is a simple version of the full handsonatable component, that properly transforms `data` and
-  `options` and delivers them as `props` to the full handsontable component.
-
-   `mode` - can be :reagent or :reagent-observable. Using :reagent-observable will enable certain
-      fixes for Observable notebooks.
+  "A reagent component that displays `data` in handsontable.
+  It properly transforms `data` and `options` and delivers them as `props` to the base
+  handsontable component.
 
   `options` - A map which contains various options about how the table is displayed. All keys
     are optional. Some keys simply map to the same setting in Handsontable library. See the official
@@ -58,8 +59,10 @@
       width - Handsontable width setting.
       v-scroll - Set to false so the full table is drawn with no scrollbars.
       cells - Handsontable cells setting. Can be used a variety of ways including cell highlighting.
-      col-widths - Handsontable colWidths setting. "
-  [mode attributues data options]
+      col-widths - Handsontable colWidths setting.
+
+    `observable-fixes` - (boolean) Enable certain settings and fixes for Observable notebooks."
+  [attributues data options observable-fixes]
   (when data
     (let [{:keys [cols height width v-scroll cells col-widths]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
@@ -83,6 +86,6 @@
           props (cond-> props
                         cells (assoc-in [:settings :cells] cells)
                         col-widths (assoc-in [:settings :colWidths] col-widths))]
-      (case mode
-        :reagent [handsontable-reagent attributues props]
-        :reagent-observable [handsontable-reagent-observable attributues props]))))
+      (if observable-fixes
+        [handsontable-reagent-observable attributues props]
+        [handsontable-reagent attributues props]))))

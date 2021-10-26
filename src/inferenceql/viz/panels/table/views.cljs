@@ -1,5 +1,5 @@
 (ns inferenceql.viz.panels.table.views
-  ""
+  "Base Reagent component for Handsontable."
   (:require [handsontable$default :as yarn-handsontable]
             [camel-snake-kebab.core :as csk]
             [reagent.core :as reagent]
@@ -50,17 +50,19 @@
         (.selectCells hot-instance coords false)))))
 
 (defn handsontable-base
-  "mode -- can be one of the following keywords.
-    :reagent - standard reagent component.
-    :reagent-observable - enables options to get handsontable to display correctly in
-       observable notebooks.
-    :re-frame - stores the Handsontable object in the re-frame app-db instead of a local atom.
+  "Low-level reagent component that wraps Handsontable.
+  Not meant to be used directly as it requires an atom-like store for the instance of
+  Handontable used by each instance of the component.
 
-   attributes -- dom node attributes for the table container.
-   props -- map with keys :settings and :hooks.
-     :settings -- settings for Handsontable, see Handsontable docs.
-     :hooks -- (optional) hooks for Handsontable, see Handsontable docs.
-     :selections-coords -- (optional) current selection in table to reapply after update."
+  Args:
+    hot-instance -- an atom-like object that when de-referenced gets the current instance of
+      Handsontable for this component.
+    hot-reset! -- a function that resets the value of `hot-instance` to the new value provided.
+    attributes -- dom node attributes for the table container.
+    props -- map with keys :settings and :hooks.
+      :settings -- settings for Handsontable, see Handsontable docs.
+      :hooks -- (optional) hooks for Handsontable, see Handsontable docs.
+      :selections-coords -- (optional) current selection in table to reapply after update."
   ([hot-instance hot-reset! attributes props]
    (let [dom-nodes (reagent/atom {})]
      (reagent/create-class
