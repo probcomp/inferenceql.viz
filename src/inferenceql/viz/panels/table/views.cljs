@@ -1,9 +1,8 @@
 (ns inferenceql.viz.panels.table.views
+  "Base Reagent component for Handsontable."
   (:require [handsontable$default :as yarn-handsontable]
             [camel-snake-kebab.core :as csk]
-            [re-frame.core :as rf]
             [reagent.core :as reagent]
-            [reagent.dom :as dom]
             [medley.core :refer [filter-kv]]))
 
 (defn- sort-state-applicable
@@ -50,25 +49,24 @@
       (when-let [coords (clj->js current-selection)]
         (.selectCells hot-instance coords false)))))
 
-(defn handsontable
-  "mode -- can be one of the following keywords.
-    :reagent - standard reagent component.
-    :reagent-observable - enables options to get handsontable to display correctly in
-       observable notebooks.
-    :re-frame - stores the Handsontable object in the re-frame app-db instead of a local atom.
+(defn handsontable-base
+  "Low-level reagent component that wraps Handsontable.
+  Not meant to be used directly as it requires an atom-like store for the instance of
+  Handontable used by each instance of the component.
 
-   attributes -- dom node attributes for the table container.
-   props -- map with keys :settings and :hooks.
-     :settings -- settings for Handsontable, see Handsontable docs.
-     :hooks -- (optional) hooks for Handsontable, see Handsontable docs.
-     :selections-coords -- (optional) current selection in table to reapply after update."
-  ([mode attributes props]
-   (let [hot-instance (if (= mode :re-frame)
-                        (rf/subscribe [:table/hot-instance])
-                        (reagent/atom nil))
-         dom-nodes (reagent/atom {})]
+  Args:
+    hot-instance -- an atom-like object that when de-referenced gets the current instance of
+      Handsontable for this component.
+    hot-reset! -- a function that resets the value of `hot-instance` to the new value provided.
+    attributes -- dom node attributes for the table container.
+    props -- map with keys :settings and :hooks.
+      :settings -- settings for Handsontable, see Handsontable docs.
+      :hooks -- (optional) hooks for Handsontable, see Handsontable docs.
+      :selections-coords -- (optional) current selection in table to reapply after update."
+  ([hot-instance hot-reset! attributes props]
+   (let [dom-nodes (reagent/atom {})]
      (reagent/create-class
-      {:display-name "handsontable-reagent"
+      {:display-name "handsontable-base"
 
        :component-did-mount
        (fn [this]
@@ -83,65 +81,33 @@
                      (callback-gen hot)
                      hot)))
 
-           (when (= mode :reagent-observable)
-             ;; Fix scrolling for HOT in Observable.
-             (.add (.-hooks yarn-handsontable)
-                   "afterRender"
-                   (fn []
-                     (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))
-                   hot)
-             ;; Make new HOT instances appear immediately in Observable.
-             (.setTimeout js/window (fn [] (.refreshDimensions hot)) 30))
-
            ;; Save HOT instance.
-           (if (= mode :re-frame)
-             (rf/dispatch [:table/set-hot-instance hot])
-             (reset! hot-instance hot))))
+           (hot-reset! hot)))
 
        :component-did-update
-       (fn [this old-argv]
-         (let [[_ _old-mode _old-attributes old-props] old-argv
-               [_ _new-mode _new-attributes new-props] (reagent/argv this)
+       (fn [this argv-old]
+         ;; This update function assumes that only the
+         ;; `props` argument to the component changes.
+         (let [[_ _ _ _ props-old] argv-old
+               [_ _ _ _ props] (reagent/argv this)
 
-               old-settings (:settings old-props)
-               new-settings (:settings new-props)
+               old-settings (:settings props-old)
+               settings (:settings props)
                changed-settings (filter-kv (fn [setting-key new-val]
                                              (not= (get old-settings setting-key) new-val))
-                                           new-settings)]
+                                           settings)]
 
            ;; Update settings.
            (when (seq changed-settings)
-             (update-hot! @hot-instance changed-settings (:selections-coords new-props)))))
+             (update-hot! @hot-instance changed-settings (:selections-coords props)))))
 
        :component-will-unmount
        (fn [this]
          (when @hot-instance
-           (when (= mode :re-frame)
-             (rf/dispatch [:table/unset-hot-instance]))
-           (.destroy @hot-instance)))
+           (.destroy @hot-instance)
+           (hot-reset! nil)))
 
        :reagent-render
-       (fn [mode attributes props]
+       (fn [_ _ attributes _]
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
-
-(defn controls
-  "Controls for a handsontable instance."
-  [show-table-controls]
-  [:div#table-controls {:style {:visibility show-table-controls}}
-   [:button.table-button.pure-button
-    {:on-click (fn [e]
-                 (rf/dispatch [:table/toggle-label-column])
-                 (.blur (.-target e)))}
-    "labels"]
-   [:button.table-button.pure-button
-    {:on-click (fn [e]
-                 (rf/dispatch [:table/add-row])
-                 (.blur (.-target e)))}
-    "+row"]
-   [:button.table-button.pure-button
-    {:on-click (fn [e]
-                 (rf/dispatch [:table/delete-row])
-                 (.blur (.-target e)))
-     :disabled true}
-    "-row"]])
