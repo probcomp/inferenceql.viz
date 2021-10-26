@@ -38,7 +38,7 @@
       vega-embed instance.
 
   Only changing the `spec` will create a new vega-embed instance. Changes to `opt` and `init-fn` are
-  ignored. Change to `data` and `params` are applied to the existing vega-embed instance."
+  ignored. Changes to `data` and `params` are applied to the existing vega-embed instance."
   [spec opt init-fn data params]
   (let [dom-nodes (r/atom {})
         vega-inst (r/atom nil) ; vega-embed instance.
@@ -48,14 +48,9 @@
                       ;; See https://github.com/vega/vega-embed#api-reference
                       (.finalize @vega-inst)))
 
-        update-data (fn [vega data data-old]
+        update-data (fn [vega data]
                       (when (and vega (seq data))
-                        (let [view (.-view vega)
-                              ;; Only update the datasets that have changed.
-                              data (medley/filter-kv (fn [k v]
-                                                       (and (contains? data-old k)
-                                                            (not= v (get data-old k))))
-                                                     data)]
+                        (let [view (.-view vega)]
                           (doseq [[k v] data]
                             (let [cs (.changeset yarn-vega)]
                               (.insert cs (clj->js v))
@@ -63,14 +58,9 @@
                               (.change view (name k) cs)))
                           (.run view))))
 
-        update-params (fn [vega params params-old]
+        update-params (fn [vega params]
                         (when (and vega (seq params))
-                          (let [view (.-view vega)
-                                ;; Only update the params that have changed.
-                                params (medley/filter-kv (fn [k v]
-                                                           (and (contains? params-old k)
-                                                                (not= v (get params-old k))))
-                                                         params)]
+                          (let [view (.-view vega)]
                             (doseq [[k v] params]
                               (.signal view (name k) (clj->js v)))
                             (.run view))))
@@ -85,8 +75,8 @@
                                            spec
                                            opt)
                       (.then (fn [res]
-                               (update-data res data nil)
-                               (update-params res params nil)
+                               (update-data res data)
+                               (update-params res params)
                                (when init-fn
                                  (init-fn res))))
                       (.then (fn [res]
@@ -115,9 +105,19 @@
               ;; Otherwise, we update the data or params in the current instance of vega-embed
               ;; if needed.
               (when (not= data data-old)
-                (update-data @vega-inst data data-old))
+                ;; Only update the datasets that have changed.
+                (let [data-changed (medley/filter-kv (fn [k v]
+                                                       (and (contains? data-old k)
+                                                            (not= v (get data-old k))))
+                                                     data)]
+                  (update-data @vega-inst data-changed)))
               (when (not= params params-old)
-                (update-params @vega-inst params params-old))))))
+                ;; Only update the params that have changed.
+                (let [params-changed (medley/filter-kv (fn [k v]
+                                                         (and (contains? params-old k)
+                                                              (not= v (get params-old k))))
+                                                       params)]
+                  (update-params @vega-inst params-changed)))))))
 
       :component-will-unmount
       (fn [_]
