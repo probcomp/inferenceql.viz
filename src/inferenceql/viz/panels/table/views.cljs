@@ -50,7 +50,7 @@
       (when-let [coords (clj->js current-selection)]
         (.selectCells hot-instance coords false)))))
 
-(defn handsontable
+(defn handsontable-base
   "mode -- can be one of the following keywords.
     :reagent - standard reagent component.
     :reagent-observable - enables options to get handsontable to display correctly in
@@ -65,7 +65,7 @@
   ([hot-instance hot-reset! attributes props]
    (let [dom-nodes (reagent/atom {})]
      (reagent/create-class
-      {:display-name "handsontable-reagent"
+      {:display-name "handsontable-base"
 
        :component-did-mount
        (fn [this]
@@ -117,14 +117,14 @@
                       (rf/dispatch [:table/set-hot-instance new-val])
                       (rf/dispatch [:table/unset-hot-instance])))]
     (fn [attributes props]
-      [handsontable hot-instance hot-reset attributes props])))
+      [handsontable-base hot-instance hot-reset attributes props])))
 
 (defn handsontable-re
   [attributes props]
   (let [hot-instance (reagent/atom nil)
         hot-reset #(reset! hot-instance %)]
     (fn [attributes props]
-      [handsontable hot-instance hot-reset attributes props])))
+      [handsontable-base hot-instance hot-reset attributes props])))
 
 (defn handsontable-re-obs
   [attributes props]
@@ -143,7 +143,7 @@
                         ;; Fix scrolling for Handsontable in Observable.
                         (fn [] (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))))])
 
-        [handsontable hot-instance hot-reset attributes props])})))
+        [handsontable-base hot-instance hot-reset attributes props])})))
 
 (defn controls
   "Controls for a handsontable instance."

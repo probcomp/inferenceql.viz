@@ -21,7 +21,7 @@
     [v-box
      :children [[control/panel]
                 [table/controls show-table-controls]
-                [table/handsontable :re-frame
+                [table/handsontable-base :re-frame
                  {:class [highlight-class (when virtual "virtual")]}
                  real-hot-props]
                 [viz/vega-lite vega-lite-spec {:actions false} generators pts-store]
