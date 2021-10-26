@@ -56,4 +56,6 @@
           props (cond-> props
                         cells (assoc-in [:settings :cells] cells)
                         col-widths (assoc-in [:settings :colWidths] col-widths))]
-      [tv/handsontable-base mode attributues props])))
+      (case mode
+        :reagent [tv/handsontable-reagent attributues props]
+        :reagent-observable [tv/handsontable-reagent-observable attributues props]))))

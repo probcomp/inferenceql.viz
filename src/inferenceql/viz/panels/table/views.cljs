@@ -109,7 +109,7 @@
          [:div#table-container attributes
           [:div {:ref #(swap! dom-nodes assoc :table-div %)}]])}))))
 
-(defn handsontable-rf
+(defn handsontable-reframe
   [attributes props]
   (let [hot-instance (rf/subscribe [:table/hot-instance])
         hot-reset (fn [new-val]
@@ -119,14 +119,14 @@
     (fn [attributes props]
       [handsontable-base hot-instance hot-reset attributes props])))
 
-(defn handsontable-re
+(defn handsontable-reagent
   [attributes props]
   (let [hot-instance (reagent/atom nil)
         hot-reset #(reset! hot-instance %)]
     (fn [attributes props]
       [handsontable-base hot-instance hot-reset attributes props])))
 
-(defn handsontable-re-obs
+(defn handsontable-reagent-observable
   [attributes props]
   (let [hot-instance (reagent/atom nil)
         hot-reset #(reset! hot-instance %)]
