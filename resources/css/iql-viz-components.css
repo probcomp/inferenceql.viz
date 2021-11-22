@@ -32,6 +32,7 @@ from Javascript environments such as an Observable notebook. */
   min-width: 350px;
   max-width: 1200px;
   font-size: 14px;
+  margin-top: 5px;
   margin-bottom: 12px;
 }
 

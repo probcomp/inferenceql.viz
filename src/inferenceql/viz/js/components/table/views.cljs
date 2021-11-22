@@ -89,9 +89,7 @@
           height (cond
                    (false? v-scroll) "auto"
                    (some? height) height
-                   :else
-                   (let [data-height (+ (* (count data) 22) 27)]
-                     (min data-height 500)))
+                   :else (if (<= (count data) 15) "auto" 500))
           settings (-> observable-hot-settings
                        (assoc-in [:settings :data] data)
                        (assoc-in [:settings :colHeaders] col-headers)
