@@ -90,8 +90,7 @@
                    (false? v-scroll) "auto"
                    (some? height) height
                    :else
-                   ;; TODO: may need to adjust these sizes.
-                   (let [data-height (+ (* (count data) 22) 38)]
+                   (let [data-height (+ (* (count data) 22) 27)]
                      (min data-height 500)))
           settings (-> observable-hot-settings
                        (assoc-in [:settings :data] data)
@@ -102,5 +101,5 @@
           settings (cond-> settings
                            cells (assoc-in [:settings :cells] cells)
                            col-widths (assoc-in [:settings :colWidths] col-widths))]
-      [handsontable-base {:style {:padding-bottom "5px"}} settings])))
+      [handsontable-base {} settings])))
 
