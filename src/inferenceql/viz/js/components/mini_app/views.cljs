@@ -15,7 +15,8 @@
                       (let [r (<p! (query-fn @input-text))]
                         (success r))
                       (catch js/Error err
-                        (failure (with-out-str (print (.-message (ex-cause err))))))
+                        (.log js/console err)
+                        (failure (with-out-str (print (str (ex-cause err))))))
                       (finally (reset! running false))))]
     (fn []
       [:div#toolbar
