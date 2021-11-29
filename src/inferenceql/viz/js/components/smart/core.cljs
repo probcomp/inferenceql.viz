@@ -242,7 +242,7 @@
         node (dom/createElement "div")
         comp (fn [options]
                [v-box
-                :style {:min-height "1100px"
+                :style {:min-height "600px"
                         :padding "20px"
                         :border-width "3px"
                         :border-style "solid"
