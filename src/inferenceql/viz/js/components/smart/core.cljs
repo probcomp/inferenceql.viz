@@ -116,7 +116,7 @@
 
 (defn app
   "Javascript interface for displaying the SMART app"
-  [query-fn table-data schema num-rows thresh alpha step-time index-col invalidation options]
+  [query-fn table-data schema num-rows thresh alpha step-time invalidation options]
   (let [schema (clj-schema schema)
         table-data (vec (take num-rows (->clj table-data)))
         table-data-rounded (for [r table-data]
@@ -146,7 +146,7 @@
 
         selected-cell-anomalous (r/atom nil)
 
-        cols-with-index (vec (concat [index-col] (:cols options)))
+        cols-with-index (vec (:cols options))
         update-sim-plot (fn [row-num col-num]
                           (let [col (nth (map keyword cols-with-index) col-num)
                                 anomalous (get @row-to-anomaly {:row row-num :col (name col)})]
