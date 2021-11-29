@@ -4,10 +4,14 @@
             [inferenceql.viz.js.components.table.core
              :refer [table] :rename {table table-comp}]
             [inferenceql.viz.js.components.mini-app.core
-             :refer [mini-app] :rename {mini-app mini-app-comp}]))
+             :refer [mini-app] :rename {mini-app mini-app-comp}]
+            [inferenceql.viz.js.components.smart.core
+             :refer [app] :rename {app smart-app-comp}]))
 
 (def ^:export plot plot-comp)
 
 (def ^:export table table-comp)
 
 (def ^:export mini-app mini-app-comp)
+
+(def ^:export smart-app smart-app-comp)
