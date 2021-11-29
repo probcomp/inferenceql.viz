@@ -87,11 +87,10 @@
     (string/join "\n\n" [q-uncond (str q-uncond-v) q-cond (str q-cond-v)])))
 
 (defn row-anomaly-statuses
-  [query-fn thresh alpha cols ts-cols row schema]
-  (let [aqrs (for [c ts-cols]
-               (anomaly-query-results query-fn thresh alpha c cols row schema))
-        anomaly-statuses (map :anomaly-status aqrs)]
-    (zipmap ts-cols anomaly-statuses)))
+  [query-fn thresh alpha cols row schema]
+  (let [aqrs (for [c cols]
+               (anomaly-query-results query-fn thresh alpha c cols row schema))]
+    (zipmap cols aqrs)))
 
 ;------------------------------------------
 
@@ -154,30 +153,25 @@
                             ;; Clear the previous sim-plot.
                             (reset! sim-plot-data nil)
 
+                            (.log js/console "here!")
+
                             (let [work #(when anomalous
+                                          (.log js/console "here2!")
                                           (let [col (nth (map keyword cols-with-index) col-num)
-                                                row (nth table-data row-num)
+                                                row (nth table-data row-num)]
 
-                                                ts-col-sets (->> (take-last 15 cols)
-                                                                 (partition 5)
-                                                                 (map set))
-                                                ts-col-set (some (fn [s] (when (s col) s))
-                                                                 ts-col-sets)]
-                                            (if-not ts-col-set
-                                              (reset! sim-plot-data false)
-                                              (let [cache-index [ts-col-set row-num]
-                                                    cache-hit (get @sim-plot-cache cache-index)
-                                                    new-data (or cache-hit
-                                                                 (let [sims (simulate-row query-fn cols ts-col-set row schema)
-                                                                       row-anom (row-anomaly-statuses query-fn thresh alpha cols ts-col-set row schema)]
-                                                                   {:sims sims :row row :row-anom row-anom}))]
+                                            (let [cache-index [row-num]
+                                                  cache-hit (get @sim-plot-cache cache-index)
+                                                  new-data (or cache-hit
+                                                               (row-anomaly-statuses query-fn thresh alpha cols row schema))]
 
-                                                ;; Update the cache if needed.
-                                                (when-not cache-hit
-                                                  (swap! sim-plot-cache assoc cache-index new-data))
+                                              ;; Update the cache if needed.
+                                              (when-not cache-hit
+                                                (swap! sim-plot-cache assoc cache-index new-data))
 
-                                                ;; Update sim plot.
-                                                (reset! sim-plot-data new-data)))))]
+                                              (.log js/console :new-data new-data)
+                                              ;; Update sim plot.
+                                              (reset! sim-plot-data new-data))))]
                               (js/setTimeout work 100))))
 
         options (r/atom (-> options
@@ -198,6 +192,7 @@
                         (if (not= @cur-col (:column chk))
                           (let [all-columns (string/join ", " cols-with-index)
                                 all-bindings (string/join " AND " (map name other-cols))
+                                ;; TODO: Can I change this to only get values for the current column?
                                 q-cond (format "SELECT %s, (PROBABILITY DENSITY OF %s UNDER model CONDITIONED BY %s AS p) FROM data LIMIT %s;"
                                                all-columns col-name all-bindings num-rows)
                                 q-uncond (format "SELECT %s, (PROBABILITY DENSITY OF %s UNDER model AS p) FROM data LIMIT %s;"
@@ -260,8 +255,7 @@
                                                              plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-anom))]
                                                          [anomaly-plot plot-rows schema @cur-col]))
                                                    [gap :size "200px"]
-                                                   (when @selected-cell-anomalous
-                                                     [sim-plot @sim-plot-data index-col])]]
+                                                   [sim-plot @selected-cell-anomalous @sim-plot-data]]]
                                        [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}

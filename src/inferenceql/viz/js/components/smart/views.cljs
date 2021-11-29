@@ -36,9 +36,8 @@
         (mean [bottom-val top-val]))))) ; (2)
 
 (defn generate-sim-spec
-  [sims row row-anom index-col]
-  (let [index-col-val (get row (keyword index-col))
-        cols (keys sims)
+  [sims row row-anom]
+  (let [cols (keys sims)
         row (select-keys row cols)
         actual (for [[k v] row]
                  (when v
@@ -55,7 +54,6 @@
                                      :timepoint time}))
         simulations-error (map calc-error sims)]
     {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
-     :title (str index-col ": " index-col-val)
      :datasets {:simulations-error simulations-error
                 :actual actual}
      :height 200
@@ -102,18 +100,19 @@
                          :y {:field "value" :type "quantitative"}}}]}))
 
 (defn sim-plot
-  [data index-col]
-  (if-not (some? data)
-    [v-box
-     :min-height "200px"
-     :min-width "400px"
-     :align :center
-     :justify :center
-     :children [[:span "Running simulations..."]]]
-    [v-box
-     :align :start
-     :children [(when data
-                  (let [{:keys [sims row row-anom]} data
-                        spec (generate-sim-spec sims row row-anom index-col)]
-                    [gap :size "10px"]
-                    [vega-lite spec {:actions false} nil nil]))]]))
+  [anomalous data]
+  (when anomalous
+    (if-not (some? data)
+      [v-box
+       :min-height "200px"
+       :min-width "400px"
+       :align :center
+       :justify :center
+       :children [[:span "Running simulations..."]]]
+      [v-box
+       :align :start
+       :children [(when data
+                    (let [{:keys [sims row row-anom]} data
+                          spec (generate-sim-spec sims row row-anom)]
+                      [gap :size "10px"]
+                      [vega-lite spec {:actions false} nil nil]))]])))
