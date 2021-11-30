@@ -81,7 +81,7 @@
       col-widths - Handsontable colWidths setting."
   [data options]
   (when data
-    (let [{:keys [cols height v-scroll cells col-widths on-click]} options
+    (let [{:keys [cols height v-scroll cells col-widths on-click current-row-class]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
           cols (or cols (->> data first keys (map name)))
           col-headers (for [col cols]
@@ -99,6 +99,8 @@
           settings (cond-> settings
                            cells (assoc-in [:settings :cells] cells)
                            col-widths (assoc-in [:settings :colWidths] col-widths)
-                           on-click (assoc-in [:settings :afterSelection] on-click))]
+                           on-click (assoc-in [:settings :afterSelection] on-click)
+                           current-row-class (assoc-in [:settings :currentRowClassName] current-row-class))]
+
       [handsontable-base {} settings])))
 

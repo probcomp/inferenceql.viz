@@ -144,19 +144,18 @@
         row-to-anomaly (atom {})
 
         selected-cell-anomalous (r/atom nil)
+        selected-cell (r/atom nil)
 
         cols-with-index (vec (:cols options))
         update-sim-plot (fn [row-num col-num]
                           (let [col (nth (map keyword cols-with-index) col-num)
                                 anomalous (get @row-to-anomaly {:row row-num :col (name col)})]
                             (reset! selected-cell-anomalous anomalous)
+                            (reset! selected-cell {:row row-num :col (name col)})
                             ;; Clear the previous sim-plot.
                             (reset! sim-plot-data nil)
 
-                            (.log js/console "here!")
-
                             (let [work #(when anomalous
-                                          (.log js/console "here2!")
                                           (let [col (nth (map keyword cols-with-index) col-num)
                                                 row (nth table-data row-num)]
 
@@ -169,7 +168,6 @@
                                               (when-not cache-hit
                                                 (swap! sim-plot-cache assoc cache-index new-data))
 
-                                              (.log js/console :new-data new-data)
                                               ;; Update sim plot.
                                               (reset! sim-plot-data new-data))))]
                               (js/setTimeout work 100))))
@@ -177,6 +175,7 @@
         options (r/atom (-> options
                             (assoc :cells (fn [row col prop] #js {}))
                             (assoc :cols cols-with-index)
+                            (assoc :current-row-class "currentRow")
                             (assoc :on-click
                                    (fn [row-1 col-1 _ _ _]
                                      (update-sim-plot row-1 col-1)))))
@@ -255,7 +254,9 @@
                                                              plot-rows (some-> plot-rows (assoc-in [@cur-row :anomaly] @cur-cell-anom))]
                                                          [anomaly-plot plot-rows schema @cur-col]))
                                                    [gap :size "200px"]
-                                                   [sim-plot @selected-cell-anomalous @sim-plot-data]]]
+                                                   [sim-plot @selected-cell-anomalous @sim-plot-data
+                                                    (:row @selected-cell)
+                                                    cols-with-index]]]
                                        [gap :size "20px"]
                                        [:div {:class "observablehq--inspect"
                                               :style {:white-space "pre-wrap"}}

@@ -2,6 +2,7 @@
   (:require [clojure.walk :refer [postwalk]]
             [cljs-bean.core :refer [->clj]]
             [re-com.core :refer [v-box h-box box gap]]
+            [medley.core :as medley]
             [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
             [inferenceql.viz.js.components.smart.vega :refer [generate-spec]]
             [inferenceql.viz.js.util :refer [clj-schema]]
@@ -99,8 +100,36 @@
                                  :value "black"}
                          :y {:field "value" :type "quantitative"}}}]}))
 
+(defn generate-prob-bar-plot-spec
+  [data row-number col-order]
+  (let [anomalous-columns (->> data
+                               (medley/map-vals :anomaly-status)
+                               (keep (fn [[col-name anomaly-status]] (when anomaly-status col-name))))
+        rows (mapcat (fn [[col-name row]]
+                       [{:column col-name :type "marginal" :probability (:q-uncond-v row)}
+                        {:column col-name :type "conditional" :probability  (:q-cond-v row)}])
+                     data)]
+    {:$schema "https://vega.github.io/schema/vega-lite/v5.json",
+     :title (str "Row: " (inc row-number))
+     :data {:values rows}
+     :height 200
+     :width 400
+     :mark "bar"
+     :encoding {:x {:field "column" :type "nominal"
+                    :scale {:domain col-order}
+                    :axis {:tickColor {:condition {:test {:field "value" :oneOf anomalous-columns}
+                                                   :value "red"}
+                                       :value "black"}
+                           :labelColor {:condition {:test {:field "value" :oneOf anomalous-columns}
+                                                    :value "red"}
+                                        :value "black"}
+                           :labelLimit 500}}
+                :y {:field "probability" :type "quantitative"}
+                :xOffset {:field "type"}
+                :color {:field "type"}}}))
+
 (defn sim-plot
-  [anomalous data]
+  [anomalous data row-number col-order]
   (when anomalous
     (if-not (some? data)
       [v-box
@@ -108,11 +137,10 @@
        :min-width "400px"
        :align :center
        :justify :center
-       :children [[:span "Running simulations..."]]]
+       :children [[:span "Running probability queries..."]]]
       [v-box
        :align :start
        :children [(when data
-                    (let [{:keys [sims row row-anom]} data
-                          spec (generate-sim-spec sims row row-anom)]
+                    (let [spec (generate-prob-bar-plot-spec data row-number col-order)]
                       [gap :size "10px"]
                       [vega-lite spec {:actions false} nil nil]))]])))
