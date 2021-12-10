@@ -8,16 +8,16 @@
             [inferenceql.viz.config :as config]))
 
 (defn check-and-throw
-  "Throws an exception if `db` doesn't match the Spec `a-spec`."
-  [db a-spec]
+  "Throws an exception with `excep-str` if `db` doesn't match the Spec `a-spec`."
+  [db a-spec excep-str]
   (when-not (s/valid? a-spec db)
     (js/console.error (with-out-str (expound/expound a-spec db)))
-    (throw (ex-info (str "db does not satisfy spec: " (s/explain-str a-spec db))
+    (throw (ex-info (str excep-str (s/explain-str a-spec db))
                     (s/explain-data a-spec db)))))
 
-(defn check-spec [db-spec]
+(defn check-spec [spec]
   "An interceptor which validates the entire db against the spec passed in as a namespaced keyword."
-  (rf/after #(check-and-throw % db-spec)))
+  (rf/after #(check-and-throw % spec "re-frame db does not satisfy spec: ")))
 
 (def log-name
   "An interceptor which logs an event handler's name to the console.
