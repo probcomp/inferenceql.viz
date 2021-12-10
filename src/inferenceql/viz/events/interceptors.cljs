@@ -15,9 +15,9 @@
     (throw (ex-info (str "db does not satisfy spec: " (s/explain-str a-spec db))
                     (s/explain-data a-spec db)))))
 
-(def check-spec
-  "An interceptor which validates the entire db against its spec."
-  (rf/after #(check-and-throw % ::db/db)))
+(defn check-spec [db-spec]
+  "An interceptor which validates the entire db against the spec passed in as a namespaced keyword."
+  (rf/after #(check-and-throw % db-spec)))
 
 (def log-name
   "An interceptor which logs an event handler's name to the console.
@@ -34,6 +34,6 @@
 
 (def event-interceptors
   "A default set of event interceptors to use within events across the app."
-  (if (get config/config :enable-debug-interceptors false)  ;; Pulling out the relevant application setting.
-    [rf/debug check-spec]
+  (if (get config/config :enable-debug-interceptors false)  ;; App setting for debug level.
+    [rf/debug (check-spec ::db/db)]
     [log-name]))
