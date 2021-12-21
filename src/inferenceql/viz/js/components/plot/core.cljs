@@ -20,6 +20,6 @@
           node (dom/createElement "div")
           component (fn []
                       [:div {:style {:overflow-x "auto"}} ;; This div may not be necessary.
-                       [vega-lite spec {:actions false} nil nil]])]
+                       [vega-lite spec {:actions false} nil nil nil]])]
       (rdom/render [component] node)
       node)))
