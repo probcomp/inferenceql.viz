@@ -32,6 +32,7 @@ from Javascript environments such as an Observable notebook. */
   min-width: 350px;
   max-width: 1200px;
   font-size: 14px;
+  margin-top: 5px;
   margin-bottom: 12px;
 }
 
@@ -65,13 +66,24 @@ from Javascript environments such as an Observable notebook. */
   padding: 4px .8em;
   height: 30px;
   font-family: roboto;
+  border-radius: 20px;
 }
 
 /* --------------- styling for handsontables --------------- */
 
+#table-container {
+  padding-top: 10px;
+  padding-bottom: 5px
+}
+
+.handsontable {
+  border-radius: 3px;
+}
+
+
 .ht_master tr td {
   font-family: roboto;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* All headers */
