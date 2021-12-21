@@ -16,6 +16,6 @@
          options (->clj options)
 
          node (dom/createElement "div")
-         component [handsontable {:style {:padding-bottom "5px"}} data options true]]
+         component [handsontable {} data options true]]
      (rdom/render component node)
      node)))

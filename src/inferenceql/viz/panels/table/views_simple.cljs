@@ -50,21 +50,25 @@
   It properly transforms `data` and `options` and delivers them as `props` to the base
   handsontable component.
 
+  `attributes` - DOM node attributes to apply
+  `data` - Data to display in the table.
   `options` - A map which contains various options about how the table is displayed. All keys
     are optional. Some keys simply map to the same setting in Handsontable library. See the official
     Handsontable documentation for more details on those options.
       cols - Which columns from `data` to display.
         Default will show all columns (keys) from the first row of data.
-      height - Handsontable height setting.
+      height - Handsontable height setting. If not supplied, table while take on a minimum required
+        height to show all rows up to 15, after which it will take up a fixed height of 500px.
       width - Handsontable width setting.
       v-scroll - Set to false so the full table is drawn with no scrollbars.
       cells - Handsontable cells setting. Can be used a variety of ways including cell highlighting.
       col-widths - Handsontable colWidths setting.
-
-    `observable-fixes` - (boolean) Enable certain settings and fixes for Observable notebooks."
+      on-click - Handsontable click handler.
+      current-row-class - CSS class to apply to currently selected row in Handsontable.
+  `observable-fixes` - (boolean) Enable certain settings and fixes for Observable notebooks."
   [attributues data options observable-fixes]
   (when data
-    (let [{:keys [cols height width v-scroll cells col-widths]} options
+    (let [{:keys [cols height width v-scroll cells col-widths on-click current-row-class]} options
           ;; If no "cols" setting, use the keys in the first row as "cols".
           cols (or cols (->> data first keys (map name)))
           col-headers (for [col cols]
@@ -72,10 +76,7 @@
           height (cond
                    (false? v-scroll) "auto"
                    (some? height) height
-                   :else
-                   ;; TODO: may need to adjust these sizes.
-                   (let [data-height (+ (* (count data) 22) 38)]
-                     (min data-height 500)))
+                   :else (if (<= (count data) 15) "auto" 500))
           width (or width "100%")
           props (-> simple-hot-settings
                     (assoc-in [:settings :data] data)
@@ -85,7 +86,9 @@
                     (assoc-in [:settings :width] width))
           props (cond-> props
                         cells (assoc-in [:settings :cells] cells)
-                        col-widths (assoc-in [:settings :colWidths] col-widths))]
+                        col-widths (assoc-in [:settings :colWidths] col-widths)
+                        on-click (assoc-in [:settings :afterSelection] on-click)
+                        current-row-class (assoc-in [:settings :currentRowClassName] current-row-class))]
       (if observable-fixes
         [handsontable-reagent-observable attributues props]
         [handsontable-reagent attributues props]))))
