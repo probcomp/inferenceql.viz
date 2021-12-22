@@ -1,0 +1,94 @@
+(ns inferenceql.viz.panels.table.views-simple
+  "Reagent component for Handsontable that can be used independently from iql.viz app."
+  (:require [handsontable$default :as yarn-handsontable]
+            [reagent.core :as reagent]
+            [medley.core :refer [filter-kv]]
+            [cljs-bean.core :refer [->clj]]
+            [inferenceql.viz.panels.table.util :refer [column-settings]]
+            [inferenceql.viz.panels.table.handsontable :refer [default-hot-settings]]
+            [inferenceql.viz.panels.table.views-base :refer [handsontable-base]]))
+
+(defn handsontable-reagent
+  "A Reagent component for Handsontable that uses an atom as a datastore for the Handsontable
+  instance."
+  [attributes props]
+  (let [hot-instance (reagent/atom nil)
+        hot-reset #(reset! hot-instance %)]
+    (fn [attributes props]
+      [handsontable-base hot-instance hot-reset attributes props])))
+
+(defn handsontable-reagent-observable
+  "A Reagent component for Handsontable that includes fixes for glitches with scrolling
+  and refreshing when used in Observable notebooks. This uses an atom as a datastore for the
+  Handsontable instance."
+  [attributes props]
+  (let [hot-instance (reagent/atom nil)
+        hot-reset #(reset! hot-instance %)]
+    (reagent/create-class
+     {:component-did-mount
+      (fn [this]
+        ;; Make new HOT instances appear immediately in Observable.
+        (.setTimeout js/window (fn [] (.refreshDimensions @hot-instance)) 30))
+
+      :reagent-render
+      (fn [attributes props]
+        (let [props (assoc-in props [:hooks :afterRender]
+                              (fn [hot]
+                                ;; Fix scrolling for Handsontable in Observable.
+                                (fn [] (.. hot -view -wt -wtOverlays (updateMainScrollableElements)))))])
+
+        [handsontable-base hot-instance hot-reset attributes props])})))
+
+(def simple-hot-settings
+  (-> default-hot-settings
+      (update :settings dissoc :colHeaders :columns :dropdownMenu :filters)
+      (assoc-in [:settings :height] "auto")
+      (assoc-in [:settings :width] "auto")))
+
+(defn handsontable
+  "A reagent component that displays `data` in handsontable.
+  It properly transforms `data` and `options` and delivers them as `props` to the base
+  handsontable component.
+
+  `attributes` - DOM node attributes to apply
+  `data` - Data to display in the table.
+  `options` - A map which contains various options about how the table is displayed. All keys
+    are optional. Some keys simply map to the same setting in Handsontable library. See the official
+    Handsontable documentation for more details on those options.
+      cols - Which columns from `data` to display.
+        Default will show all columns (keys) from the first row of data.
+      height - Handsontable height setting. If not supplied, table while take on a minimum required
+        height to show all rows up to 15, after which it will take up a fixed height of 500px.
+      width - Handsontable width setting.
+      v-scroll - Set to false so the full table is drawn with no scrollbars.
+      cells - Handsontable cells setting. Can be used a variety of ways including cell highlighting.
+      col-widths - Handsontable colWidths setting.
+      on-click - Handsontable click handler.
+      current-row-class - CSS class to apply to currently selected row in Handsontable.
+  `observable-fixes` - (boolean) Enable certain settings and fixes for Observable notebooks."
+  [attributues data options observable-fixes]
+  (when data
+    (let [{:keys [cols height width v-scroll cells col-widths on-click current-row-class]} options
+          ;; If no "cols" setting, use the keys in the first row as "cols".
+          cols (or cols (->> data first keys (map name)))
+          col-headers (for [col cols]
+                        (clojure.string/replace col #"_" "_<wbr>"))
+          height (cond
+                   (false? v-scroll) "auto"
+                   (some? height) height
+                   :else (if (<= (count data) 15) "auto" 500))
+          width (or width "100%")
+          props (-> simple-hot-settings
+                    (assoc-in [:settings :data] data)
+                    (assoc-in [:settings :colHeaders] col-headers)
+                    (assoc-in [:settings :columns] (column-settings cols))
+                    (assoc-in [:settings :height] height)
+                    (assoc-in [:settings :width] width))
+          props (cond-> props
+                        cells (assoc-in [:settings :cells] cells)
+                        col-widths (assoc-in [:settings :colWidths] col-widths)
+                        on-click (assoc-in [:settings :afterSelection] on-click)
+                        current-row-class (assoc-in [:settings :currentRowClassName] current-row-class))]
+      (if observable-fixes
+        [handsontable-reagent-observable attributues props]
+        [handsontable-reagent attributues props]))))

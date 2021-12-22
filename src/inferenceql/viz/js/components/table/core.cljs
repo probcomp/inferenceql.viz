@@ -2,7 +2,7 @@
   (:require [goog.dom :as dom]
             [reagent.dom :as rdom]
             [cljs-bean.core :refer [->clj]]
-            [inferenceql.viz.js.components.table.views :refer [handsontable]]))
+            [inferenceql.viz.panels.table.views-simple :refer [handsontable]]))
 
 (defn table
   "Javascript interface to table UI component. Returns a DOM node with the table.
@@ -16,6 +16,6 @@
          options (->clj options)
 
          node (dom/createElement "div")
-         component [handsontable data options]]
+         component [handsontable {} data options true]]
      (rdom/render component node)
      node)))
