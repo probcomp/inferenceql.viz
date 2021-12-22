@@ -3,7 +3,7 @@
             [reagent.dom :as rdom]
             [cljs-bean.core :refer [->clj]]
             [clojure.walk :refer [postwalk]]
-            [inferenceql.viz.js.components.plot.views :refer [vega-lite]]
+            [inferenceql.viz.panels.viz.views-simple :refer [vega-lite]]
             [inferenceql.viz.js.components.plot.vega :refer [generate-spec]]
             [inferenceql.viz.js.util :refer [clj-schema]]))
 
@@ -18,6 +18,8 @@
           spec (generate-spec schema data selections)
 
           node (dom/createElement "div")
-          component [vega-lite spec {:actions false} nil nil]]
-      (rdom/render component node)
+          component (fn []
+                      [:div {:style {:overflow-x "auto"}} ;; This div may not be necessary.
+                       [vega-lite spec {:actions false} nil nil nil]])]
+      (rdom/render [component] node)
       node)))
